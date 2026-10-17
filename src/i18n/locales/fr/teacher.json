@@ -274,6 +274,7 @@
     "historyNeedStudent": "Saisissez l'identifiant d'un élève ci-dessus pour voir ce qui lui a été attribué.",
     "historyLoading": "Chargement de l'historique…",
     "historyFailed": "Impossible de charger l'historique",
+    "historyNotFound": "Aucun élève avec cet identifiant, ou vous n'y avez pas accès.",
     "historyEmpty": "Aucune attribution pour cet élève pour l'instant.",
     "subjectPending": "Pas encore de matière",
     "topicPending": "pas encore de thème",

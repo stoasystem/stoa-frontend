@@ -16,6 +16,7 @@ import {
   useStudentAssignmentsQuery,
 } from '@/hooks/learning/useLearningOperationsQueries'
 import { DashboardLayout } from '@/layouts/DashboardLayout'
+import { ApiError } from '@/services/api/httpClient'
 import type { AutomationCandidate, AutomationPolicy } from '@/types/learningOperations'
 
 const defaultPolicy: AutomationPolicy = {
@@ -103,6 +104,10 @@ export function LearningAutomationConsolePage() {
   // non-empty id, so a placeholder made every visit open on a red "Assignment
   // history failed" from a student that does not exist (card 124).
   const [studentId, setStudentId] = useState('')
+  // The history is read for the id the operator settled on (leaving the
+  // field, or previewing), not on every key: half an id is an unknown student,
+  // and the panel flashed "could not be loaded" while it was being typed.
+  const [shownStudentId, setShownStudentId] = useState('')
   const [subject, setSubject] = useState('')
   const [topicIds, setTopicIds] = useState('')
   const [sourceTypes, setSourceTypes] = useState('ai_draft,curriculum_exercise')
@@ -111,7 +116,10 @@ export function LearningAutomationConsolePage() {
   const [policyStatus, setPolicyStatus] = useState<AutomationPolicy['status']>('active')
   const [pausedReason, setPausedReason] = useState('')
 
-  const assignmentsQuery = useStudentAssignmentsQuery(studentId)
+  const assignmentsQuery = useStudentAssignmentsQuery(shownStudentId)
+  // An id that names no student, or one this account may not see, is an
+  // answer, not a failure.
+  const historyNotFound = assignmentsQuery.error instanceof ApiError && assignmentsQuery.error.status === 404
   const previewMutation = useAutomationPreviewMutation(studentId)
   const executeMutation = useAutomationExecuteMutation(studentId)
   const preview = previewMutation.data
@@ -139,6 +147,7 @@ export function LearningAutomationConsolePage() {
       toast.error(t('automationConsole.needStudentId'))
       return
     }
+    setShownStudentId(studentId.trim())
     previewMutation.mutate({ policy, subject: subject || undefined })
   }
 
@@ -182,6 +191,7 @@ export function LearningAutomationConsolePage() {
                     value={studentId}
                     placeholder={t('automationConsole.studentIdPlaceholder')}
                     onChange={(event) => setStudentId(event.target.value)}
+                    onBlur={() => setShownStudentId(studentId.trim())}
                   />
                 </div>
                 <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-1">
@@ -360,13 +370,20 @@ export function LearningAutomationConsolePage() {
                 <CardTitle className="text-xl">{t('automationConsole.historyTitle')}</CardTitle>
               </CardHeader>
               <CardContent>
-                {!studentId.trim() && (
+                {!shownStudentId && (
                   <p className="rounded-md border border-dashed p-4 text-sm text-muted-foreground">
                     {t('automationConsole.historyNeedStudent')}
                   </p>
                 )}
                 {assignmentsQuery.isLoading && <LoadingState message={t('automationConsole.historyLoading')} />}
-                {assignmentsQuery.error && <ErrorState title={t('automationConsole.historyFailed')} message={assignmentsQuery.error.message} />}
+                {historyNotFound && (
+                  <p className="rounded-md border border-dashed p-4 text-sm text-muted-foreground">
+                    {t('automationConsole.historyNotFound')}
+                  </p>
+                )}
+                {assignmentsQuery.error && !historyNotFound && (
+                  <ErrorState title={t('automationConsole.historyFailed')} message={assignmentsQuery.error.message} />
+                )}
                 {assignmentsQuery.data?.items.length === 0 && (
                   <p className="rounded-md border border-dashed p-4 text-sm text-muted-foreground">
                     {t('automationConsole.historyEmpty')}

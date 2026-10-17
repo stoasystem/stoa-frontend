@@ -274,6 +274,7 @@
     "historyNeedStudent": "Geben Sie oben eine Schüler-ID ein, um die bisherigen Zuweisungen zu sehen.",
     "historyLoading": "Zuweisungen werden geladen…",
     "historyFailed": "Zuweisungen konnten nicht geladen werden",
+    "historyNotFound": "Keine Schülerin und kein Schüler mit dieser ID, oder Sie haben keinen Zugriff darauf.",
     "historyEmpty": "Für diese Person gibt es noch keine Zuweisungen.",
     "subjectPending": "Noch kein Fach",
     "topicPending": "noch kein Thema",

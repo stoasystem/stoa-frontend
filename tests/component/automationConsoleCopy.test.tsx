@@ -11,6 +11,7 @@ import { I18nextProvider } from 'react-i18next'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import i18n from '@/i18n'
 import { LearningAutomationConsolePage } from '@/pages/learning/LearningAutomationConsolePage'
+import { ApiError } from '@/services/api/httpClient'
 import { getStudentAssignments, previewAssignmentAutomationBatch } from '@/services/learning/learningOperationsApi'
 import type { AutomationPreviewResponse, LearningAssignment } from '@/types/learningOperations'
 
@@ -131,5 +132,59 @@ describe('the automation console speaks the teacher’s language', () => {
     for (const status of [...reviewStatuses, ...assignmentStatuses]) {
       expect(container.textContent, status).not.toContain(status)
     }
+  })
+})
+
+// The history was read on every key, so half an id fetched an unknown student
+// and the panel flashed "could not be loaded" while the operator typed; and an
+// id that names no student read as a failure (branch audit, 17 Oct 2026, from
+// ef2fd3a3 on redesign/planet).
+describe('the automation console reads the history of a settled id', () => {
+  it('reads nothing on open or while typing, then the trimmed id once the field is left', async () => {
+    renderConsole()
+    const field = screen.getByLabelText('Schüler-ID')
+
+    expect(getStudentAssignments).not.toHaveBeenCalled()
+    for (const partial of ['s', 'st', 'stu', ' student-123 ']) {
+      fireEvent.change(field, { target: { value: partial } })
+    }
+    expect(getStudentAssignments).not.toHaveBeenCalled()
+    expect(screen.getByText('Geben Sie oben eine Schüler-ID ein, um die bisherigen Zuweisungen zu sehen.')).toBeInTheDocument()
+
+    fireEvent.blur(field)
+
+    expect(await screen.findByText('Für diese Person gibt es noch keine Zuweisungen.')).toBeInTheDocument()
+    expect(getStudentAssignments).toHaveBeenCalledTimes(1)
+    expect(vi.mocked(getStudentAssignments).mock.calls[0][0]).toBe('student-123')
+  })
+
+  it.each([
+    { language: 'de', studentLabel: 'Schüler-ID', notFound: 'Keine Schülerin und kein Schüler mit dieser ID, oder Sie haben keinen Zugriff darauf.', failed: 'Zuweisungen konnten nicht geladen werden' },
+    { language: 'en', studentLabel: 'Student id', notFound: 'No student with this id, or not one you can see.', failed: 'Assignment history could not be loaded' },
+    { language: 'fr', studentLabel: "Identifiant de l'élève", notFound: "Aucun élève avec cet identifiant, ou vous n'y avez pas accès.", failed: "Impossible de charger l'historique" },
+    { language: 'it', studentLabel: 'ID studente', notFound: 'Nessuno studente con questo ID, oppure non puoi vederlo.', failed: 'Impossibile caricare le assegnazioni' },
+  ])('says an unknown id names no student, not that loading failed ($language)', async ({ language, studentLabel, notFound, failed }) => {
+    await i18n.changeLanguage(language)
+    vi.mocked(getStudentAssignments).mockRejectedValue(new ApiError('Not found', { status: 404 }))
+    renderConsole()
+    const field = screen.getByLabelText(studentLabel)
+
+    fireEvent.change(field, { target: { value: 'nobody' } })
+    fireEvent.blur(field)
+
+    expect(await screen.findByText(notFound)).toBeInTheDocument()
+    expect(screen.queryByText(failed)).not.toBeInTheDocument()
+  })
+
+  it('still reports a failure that is not a missing student', async () => {
+    vi.mocked(getStudentAssignments).mockRejectedValue(new ApiError('Server error', { status: 503 }))
+    renderConsole()
+    const field = screen.getByLabelText('Schüler-ID')
+
+    fireEvent.change(field, { target: { value: 'student-123' } })
+    fireEvent.blur(field)
+
+    expect(await screen.findByText('Zuweisungen konnten nicht geladen werden')).toBeInTheDocument()
+    expect(screen.queryByText('Keine Schülerin und kein Schüler mit dieser ID, oder Sie haben keinen Zugriff darauf.')).not.toBeInTheDocument()
   })
 })
