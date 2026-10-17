@@ -7,6 +7,7 @@ import { skyErrorClass, skyInputClass, skyInvalidInputClass, skyLabelClass } fro
 import { Button } from '@/components/base/Button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import type { AddressContext } from '@/lib/addressForm'
 import { cn } from '@/lib/utils'
 import { useLoginMutation } from '@/hooks/auth/useLoginMutation'
 import { markLoginSubmitted } from '@/lib/loginTiming'
@@ -19,8 +20,13 @@ import { isEmailVerificationRequiredError } from '@/services/auth/authApi'
  * `data-surface="sky"` surface, and the classes here read the sky tokens,
  * which exist only inside one. What it does -- validation, the request, the
  * verification hand-off, the errors -- is unchanged from before the redesign.
+ * `context` is how the page addresses the reader (#241); only its own lines
+ * that speak to them follow it.
  */
-export function LoginForm({ initialEmail = '' }: { initialEmail?: string } = {}) {
+export function LoginForm({
+  initialEmail = '',
+  context,
+}: { initialEmail?: string; context?: AddressContext } = {}) {
   const { t } = useTranslation(['auth', 'common', 'errors'])
   const [email, setEmail] = useState(initialEmail)
   const [password, setPassword] = useState('')
@@ -86,7 +92,7 @@ export function LoginForm({ initialEmail = '' }: { initialEmail?: string } = {})
             reset by an administrator. Signed in, a password is changed under
             /settings/password. */}
         <p className="pt-1 text-[12px] leading-[1.35] text-[color:var(--on-sky-text-caption)]">
-          {t('auth:login.forgotPassword')}
+          {t('auth:login.forgotPassword', { context })}
         </p>
       </div>
       {verificationBlocked && (
@@ -108,7 +114,7 @@ export function LoginForm({ initialEmail = '' }: { initialEmail?: string } = {})
       {/* The wait to a usable page is seconds long; say so rather than
           leaving a disabled button as the only sign of progress. */}
       <p className="-mt-2 min-h-5 text-center text-[12px] leading-[1.35] text-[color:var(--on-sky-text-caption)]" role="status" aria-live="polite">
-        {loginMutation.isPending ? t('auth:login.signingInStatus') : ''}
+        {loginMutation.isPending ? t('auth:login.signingInStatus', { context }) : ''}
       </p>
       <p className="text-[15px] leading-[1.35] text-[color:var(--on-sky-text-body)]">
         {t('auth:login.needAccount')}{' '}
@@ -118,7 +124,7 @@ export function LoginForm({ initialEmail = '' }: { initialEmail?: string } = {})
           className="font-semibold text-on-sky underline decoration-[color:var(--on-sky-field-rule)] decoration-1 underline-offset-4 hover:decoration-on-sky"
           to="/register"
         >
-          {t('auth:login.howToGetAccount')}
+          {t('auth:login.howToGetAccount', { context })}
         </Link>
       </p>
     </form>

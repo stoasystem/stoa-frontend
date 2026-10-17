@@ -44,8 +44,11 @@ export const SIGN_IN_ENDED_KEY = 'stoa_sign_in_ended'
 const LEGACY_ACCESS_KEY = 'stoa_access_token'
 const LEGACY_REFRESH_KEY = 'stoa_refresh_token'
 
-/** Who a tab is, as far as it needs to say so once its sign-in has ended. */
-export type TabAccount = { id?: string; email: string; name?: string }
+/**
+ * Who a tab is, as far as it needs to say so once its sign-in has ended. The
+ * role only picks how the sign-in page addresses them (#241).
+ */
+export type TabAccount = { id?: string; email: string; name?: string; role?: string }
 
 /**
  * Why this tab is signed out. Signing out shows the plain sign-in; the others
@@ -77,6 +80,7 @@ function asAccount(value: unknown): TabAccount | undefined {
     email: entry.email,
     ...(typeof entry.id === 'string' && entry.id ? { id: entry.id } : {}),
     ...(typeof entry.name === 'string' && entry.name ? { name: entry.name } : {}),
+    ...(typeof entry.role === 'string' && entry.role ? { role: entry.role } : {}),
   }
 }
 
