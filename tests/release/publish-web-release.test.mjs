@@ -166,3 +166,48 @@ test('tree hash is path-stable and ignores templates', () => {
   })
   assert.equal(JSON.parse(canonicalize(served)).runtimeConfig.key, 'runtime-config.json')
 })
+
+// ---- Production deploy workflow --------------------------------------------
+// These pins used to sit in the preview section (#28), beside the checks that
+// the preview never called production. The preview workflow is gone with
+// app-planet; what it guarded about production stays. Line-based, so no YAML
+// dependency, and strict about indentation because GitHub reads it that way.
+
+const PRODUCTION_WORKFLOW = '.github/workflows/deploy-production.yml'
+
+async function readWorkflow(relativePath) {
+  return (await readFile(path.join(repoRoot, relativePath), 'utf8')).split(/\r?\n/)
+}
+
+const isComment = (line) => /^\s*#/.test(line)
+const indentOf = (line) => line.match(/^ */)[0].length
+
+// Lines of a top-level key's block, up to the next top-level key. Comments
+// and blank lines never end it.
+function topLevel(lines, key) {
+  const start = lines.findIndex((line) => line === `${key}:` || line.startsWith(`${key}: `))
+  assert.ok(start >= 0, `the workflow has a top-level \`${key}\``)
+  let end = start + 1
+  while (end < lines.length) {
+    const line = lines[end]
+    if (line.trim() && !isComment(line) && indentOf(line) === 0) break
+    end += 1
+  }
+  return lines.slice(start, end)
+}
+
+test('the production workflow deploys only from main, to the publisher defaults, as the frontend role', async () => {
+  const production = await readWorkflow(PRODUCTION_WORKFLOW)
+  assert.deepEqual(
+    topLevel(production, 'on').filter((line) => line.trim() && !isComment(line)),
+    ['on:', '  push:', '    branches: [main]'],
+    'a push to main is the only trigger',
+  )
+  const text = production.join('\n')
+  assert.doesNotMatch(text, /preview|planet|vars\.|environment:/, 'no preview target, no variable-driven target, no Environment')
+  assert.match(text, /^ {10}role-to-assume: arn:aws:iam::562923011260:role\/stoa-github-frontend-deploy$/m)
+  assert.match(text, /^ {12}git -C stoa-backend rev-parse HEAD \| sha256sum \| awk '\{print \$1\}'$/m,
+    'the backend artifact hash comes from the checked-out backend')
+  assert.match(text, /^ {10}node scripts\/publish-web-release\.mjs \\\n {12}--dist dist \\\n {12}--backend-artifact-sha256 "\$backend_artifact_sha256"$/m,
+    'production publishes to the publisher defaults, with no bucket or distribution override')
+})
