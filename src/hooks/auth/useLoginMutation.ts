@@ -5,6 +5,7 @@ import i18n from '@/i18n'
 import { resolveUserLanguage } from '@/i18n/languages'
 import { rememberSession } from '@/lib/devSessions'
 import { getPostLoginPath } from '@/lib/authRoutes'
+import { isSameAccount, readTabAccount } from '@/lib/tabAccount'
 import { markLoginAuthenticated } from '@/lib/loginTiming'
 import { getConversations } from '@/services/chat/chatApi'
 import { chatQueryKeys } from '@/services/chat/chatQueryKeys'
@@ -34,7 +35,7 @@ export function useLoginMutation() {
       // from nothing: like 「添加账号」 it lands with a full load, so nothing
       // of the account left behind - cached answers, a read still in flight
       // - reaches the new one (tab-account audit F2).
-      const replacing = currentSessionToken() !== null
+      const replacing = currentSessionToken() !== null && !isSameAccount(data.user, readTabAccount())
       // Signing in is all this does. The login screen (EntryPage) sees the
       // session and picks the destination: the password change for a reset
       // account, else a permitted `?next=` or `from`, else the role's home.
@@ -64,8 +65,14 @@ export function useLoginMutation() {
       // moving while `?add=1` is up. A full load, not a route change, so the
       // account being left behind takes its cached answers with it — the same
       // reason switching to a held account reloads.
-      if (replacing || new URLSearchParams(window.location.search).get('add') === '1') {
-        window.location.assign(getPostLoginPath(data.user, { search: '' }))
+      const params = new URLSearchParams(window.location.search)
+      if (replacing || params.get('add') === '1') {
+        // A `?next=` or the page sign-in was asked from still counts, checked
+        // for the new account as always; `add` itself is not a destination.
+        params.delete('add')
+        const query = params.toString()
+        const from = (window.history.state as { usr?: unknown } | null)?.usr
+        window.location.assign(getPostLoginPath(data.user, { search: query ? `?${query}` : '', state: from }))
         return
       }
 
