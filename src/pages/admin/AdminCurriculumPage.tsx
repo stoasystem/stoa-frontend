@@ -12,6 +12,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { PageContainer } from '@/components/common/PageContainer'
 import { PageHeader } from '@/components/common/PageHeader'
 import { DashboardLayout } from '@/layouts/DashboardLayout'
+import { curriculumErrorMessage } from '@/pages/admin/curriculumErrorMessage'
 import {
   useApplyCurriculumMigrationMutation,
   useApproveCurriculumVersionMutation,
@@ -588,7 +589,7 @@ function RestrictedPanel({ message }: { message: string }) {
 function ApiErrorPanel({ error }: { error: unknown }) {
   const { t } = useTranslation('admin')
   if (!error) return null
-  const message = error instanceof ApiError ? error.message : t('curriculum.requestFailed')
+  const message = curriculumErrorMessage(error, t)
   return <div role="alert" className="mt-3 rounded-md border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive">{message}</div>
 }
 

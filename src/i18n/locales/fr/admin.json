@@ -600,7 +600,37 @@
     },
     "selectItem": "Sélectionnez un élément du programme dans la liste de travail.",
     "requestFailed": "La requête à l’API du programme a échoué.",
-    "invalidJson": "Le JSON n’est pas valide"
+    "invalidJson": "Le JSON n’est pas valide",
+    "errors": {
+      "code": {
+        "curriculum_capability_required": "Votre compte n’a pas l’autorisation de programme requise pour cette action.",
+        "stale_pointer": "Une autre version a été publiée entre-temps. Rechargez la liste de travail et vérifiez la version actuelle.",
+        "active_assignments_block_archive": "Cette leçon est encore attribuée à des élèves et ne peut pas encore être archivée.",
+        "curriculum_version_not_found": "Cette version n’existe plus. Rechargez la liste de travail.",
+        "curriculum_unit_not_found": "Cette unité du programme n’existe plus. Rechargez la liste de travail.",
+        "validation_failed": "Le contenu n’a pas passé la validation. Lancez la validation pour voir les champs concernés.",
+        "draft_not_editable": "Cette version ne peut plus être modifiée. Créez un nouveau brouillon pour apporter des changements.",
+        "not_reviewable": "Cette version ne peut pas être soumise à la relecture dans son état actuel.",
+        "not_in_review": "Cette version n’est pas en relecture : elle ne peut être ni approuvée ni renvoyée.",
+        "not_approved": "Seule une version approuvée peut être publiée.",
+        "rollback_target_not_publishable": "Cette version ne peut pas être restaurée.",
+        "migration_confirmation_mismatch": "Le jeton de confirmation ne correspond pas à cet essai. Relancez l’essai et utilisez son jeton.",
+        "migration_not_ready": "L’essai a trouvé des conflits ou des erreurs. Corrigez-les avant d’appliquer la migration.",
+        "migration_not_found": "Cette migration est introuvable. Vérifiez l’identifiant de migration.",
+        "invalid_manifest": "Le manifeste est incomplet ou non valide. Vérifiez les leçons et leurs identifiants.",
+        "session_unreachable": "Votre session n’a pas pu être prolongée pour le moment. Vérifiez votre connexion et réessayez."
+      },
+      "status": {
+        "network": "Le serveur est injoignable. Vérifiez votre connexion et réessayez.",
+        "unauthorized": "Votre session a changé. Rechargez la page et réessayez.",
+        "forbidden": "Vous n’avez pas l’autorisation pour cette action sur le programme.",
+        "notFound": "Cet élément est introuvable. Rechargez la liste de travail.",
+        "conflict": "Cet élément a été modifié entre-temps. Rechargez la liste de travail et réessayez.",
+        "invalid": "La requête contient des données non valides. Vérifiez votre saisie et réessayez.",
+        "tooMany": "Trop de requêtes. Patientez un instant et réessayez.",
+        "server": "Le serveur n’a pas pu traiter la requête. Réessayez plus tard."
+      }
+    }
   },
   "operationalNotifications": {
     "title": "Notifications d’exploitation",

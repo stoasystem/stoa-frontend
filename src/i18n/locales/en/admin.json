@@ -600,7 +600,37 @@
     },
     "selectItem": "Select a curriculum item from the worklist.",
     "requestFailed": "Curriculum API request failed.",
-    "invalidJson": "JSON is invalid"
+    "invalidJson": "JSON is invalid",
+    "errors": {
+      "code": {
+        "curriculum_capability_required": "Your account does not have the curriculum permission this action needs.",
+        "stale_pointer": "Someone else published a different version in the meantime. Reload the worklist and check the current version.",
+        "active_assignments_block_archive": "This lesson is still assigned to students and cannot be archived yet.",
+        "curriculum_version_not_found": "This version no longer exists. Reload the worklist.",
+        "curriculum_unit_not_found": "This curriculum unit no longer exists. Reload the worklist.",
+        "validation_failed": "The content did not pass validation. Run the validation to see which fields are affected.",
+        "draft_not_editable": "This version can no longer be edited. Create a new draft to make changes.",
+        "not_reviewable": "This version cannot be submitted for review in its current state.",
+        "not_in_review": "This version is not in review, so it cannot be approved or sent back.",
+        "not_approved": "Only an approved version can be published.",
+        "rollback_target_not_publishable": "This version cannot be restored.",
+        "migration_confirmation_mismatch": "The confirmation token does not match this dry run. Run the dry run again and use its token.",
+        "migration_not_ready": "The dry run found conflicts or errors. Resolve them before applying the migration.",
+        "migration_not_found": "This migration was not found. Check the migration ID.",
+        "invalid_manifest": "The manifest is incomplete or invalid. Check the lessons and their IDs.",
+        "session_unreachable": "Your session could not be renewed right now. Check your connection and try again."
+      },
+      "status": {
+        "network": "The server could not be reached. Check your connection and try again.",
+        "unauthorized": "Your session has changed. Reload the page and try again.",
+        "forbidden": "You do not have permission for this curriculum action.",
+        "notFound": "This item was not found. Reload the worklist.",
+        "conflict": "This item was changed in the meantime. Reload the worklist and try again.",
+        "invalid": "The request contains invalid data. Check your input and try again.",
+        "tooMany": "Too many requests. Wait a moment and try again.",
+        "server": "The server could not complete this request. Try again later."
+      }
+    }
   },
   "operationalNotifications": {
     "title": "Operational notifications",
