@@ -12,8 +12,10 @@ import { ParentValueCard } from '@/components/parent/ParentValueCard'
 // Card 007 (frozen): import { UpgradePromptCard } from '@/components/parent/UpgradePromptCard'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { useChildLearningSummaryQuery } from '@/hooks/parent/useChildLearningSummaryQuery'
 import { useChildReportQuery } from '@/hooks/parent/useChildReportQuery'
 import { DashboardLayout } from '@/layouts/DashboardLayout'
+import { formatDate, formatDateTime } from '@/lib/formatDateTime'
 import { trackEvent } from '@/services/analytics/analyticsClient'
 
 export function ChildReportPage() {
@@ -22,6 +24,8 @@ export function ChildReportPage() {
   const reportQuery = useChildReportQuery(childId)
   const reportState = reportQuery.data
   const report = reportState?.report
+  // The same query the child page reads, so the name is usually cached already.
+  const childName = useChildLearningSummaryQuery(childId).data?.student.name
 
   useEffect(() => {
     if (!report) return
@@ -41,7 +45,7 @@ export function ChildReportPage() {
             <Breadcrumbs
               items={[
                 { label: t('dashboardTitle'), to: '/parent' },
-                { label: childId ?? t('child'), to: childId ? `/parent/children/${childId}` : undefined },
+                { label: childName || t('child'), to: childId ? `/parent/children/${childId}` : undefined },
                 { label: t('weeklyReport') },
               ]}
             />
@@ -68,7 +72,8 @@ export function ChildReportPage() {
               <CardTitle className="text-lg">{t('report.noReportTitle')}</CardTitle>
             </CardHeader>
             <CardContent className="text-sm leading-6 text-muted-foreground">
-              {reportState.message ?? t('report.noReportBody')}
+              {/* The backend's `message` is English whatever the reader's language (#254). */}
+              {t('report.noReportBody')}
             </CardContent>
           </Card>
         )}
@@ -80,7 +85,7 @@ export function ChildReportPage() {
                   <div>
                     <CardTitle className="editorial-heading text-2xl">{t('weeklyReport')}</CardTitle>
                     <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
-                      {report.summary || reportState.message || t('report.summaryFallback')}
+                      {report.summary || t(reportState.status === 'failed' ? 'report.summaryUnavailable' : 'report.summaryFallback')}
                     </p>
                   </div>
                   <div className="flex flex-wrap gap-2">
@@ -162,10 +167,10 @@ export function ChildReportPage() {
                     <p>{t('report.emailFailedNote')}</p>
                   )}
                   {reportState.status === 'pending' && (
-                    <p>{reportState.message || t('report.pendingNote')}</p>
+                    <p>{t('report.pendingNote')}</p>
                   )}
                   {reportState.status === 'failed' && (
-                    <p>{reportState.message || t('report.failedNote')}</p>
+                    <p>{t('report.failedNote')}</p>
                   )}
                 </CardContent>
               </Card>
@@ -196,14 +201,6 @@ function ReportMetric({
       </CardContent>
     </Card>
   )
-}
-
-function formatDate(value: string) {
-  return new Date(value).toLocaleDateString()
-}
-
-function formatDateTime(value: string) {
-  return new Date(value).toLocaleString()
 }
 
 function formatWeekRange(start: string, end?: string | null) {
