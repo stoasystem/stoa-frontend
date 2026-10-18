@@ -19,7 +19,6 @@ import { ApiError, SESSION_UNREACHABLE } from '@/services/api/httpClient'
 const CODE_KEYS = {
   curriculum_capability_required: 'curriculum.errors.code.curriculum_capability_required',
   stale_pointer: 'curriculum.errors.code.stale_pointer',
-  published_pointer_mismatch: 'curriculum.errors.code.stale_pointer',
   active_assignments_block_archive: 'curriculum.errors.code.active_assignments_block_archive',
   curriculum_version_not_found: 'curriculum.errors.code.curriculum_version_not_found',
   curriculum_unit_not_found: 'curriculum.errors.code.curriculum_unit_not_found',

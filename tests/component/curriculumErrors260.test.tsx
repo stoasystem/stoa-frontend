@@ -112,6 +112,34 @@ describe('a 401 on a curriculum request', () => {
     expect(worklistAuth).toEqual(['Bearer expired-access', 'Bearer fresh-access'])
     expectStillSignedIn(assign, 'fresh-access')
   })
+  it('ends the session when the retry after a renewal is refused too', async () => {
+    const assign = stubLocation()
+    mswServer.use(
+      http.get(`${API}/admin/curriculum/worklist`, ({ request }) => {
+        worklistAuth.push(request.headers.get('authorization') ?? '')
+        return HttpResponse.json({ detail: 'expired' }, { status: 401 })
+      }),
+    )
+
+    const error = await rejection(getCurriculumWorklist())
+
+    // One renewal, one retry, then signed out: no loop, and not read as "permission denied".
+    expect((error as Error).message).toBe('session_ended')
+    expect(refreshCalls).toBe(1)
+    expect(worklistAuth).toEqual(['Bearer expired-access', 'Bearer fresh-access'])
+    expect(useAuthStore.getState().accessToken).toBeNull()
+    expect(assign).toHaveBeenCalledWith('/login')
+  })
+
+  it('fails a guarded read when the renewal cannot reach the server, keeping the session', async () => {
+    const assign = stubLocation()
+    mswServer.use(http.post(`${API}/auth/refresh`, () => HttpResponse.json({}, { status: 503 })))
+
+    const error = await rejection(getCurriculumWorklist())
+
+    expect(error).toMatchObject({ code: 'session_unreachable' })
+    expectStillSignedIn(assign, 'expired-access')
+  })
 })
 
 describe('a 403 on a curriculum request', () => {
