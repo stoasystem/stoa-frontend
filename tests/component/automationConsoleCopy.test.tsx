@@ -6,13 +6,17 @@
  */
 import type { ReactNode } from 'react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { fireEvent, render, screen } from '@testing-library/react'
+import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { I18nextProvider } from 'react-i18next'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import i18n from '@/i18n'
 import { LearningAutomationConsolePage } from '@/pages/learning/LearningAutomationConsolePage'
 import { ApiError } from '@/services/api/httpClient'
-import { getStudentAssignments, previewAssignmentAutomationBatch } from '@/services/learning/learningOperationsApi'
+import {
+  executeAssignmentAutomationBatch,
+  getStudentAssignments,
+  previewAssignmentAutomationBatch,
+} from '@/services/learning/learningOperationsApi'
 import type { AutomationPreviewResponse, LearningAssignment } from '@/types/learningOperations'
 
 vi.mock('@/layouts/DashboardLayout', () => ({
@@ -21,6 +25,7 @@ vi.mock('@/layouts/DashboardLayout', () => ({
 
 vi.mock('@/services/learning/learningOperationsApi', async (importOriginal) => ({
   ...await importOriginal<typeof import('@/services/learning/learningOperationsApi')>(),
+  executeAssignmentAutomationBatch: vi.fn(),
   getStudentAssignments: vi.fn(),
   previewAssignmentAutomationBatch: vi.fn(),
 }))
@@ -74,8 +79,8 @@ const preview: AutomationPreviewResponse = {
   autonomousDecision: false,
 }
 
-function renderConsole() {
-  const client = new QueryClient({ defaultOptions: { queries: { retry: false } } })
+function renderConsole({ retry = false }: { retry?: boolean | number } = {}) {
+  const client = new QueryClient({ defaultOptions: { queries: { retry } } })
   return render(
     <I18nextProvider i18n={i18n}>
       <QueryClientProvider client={client}>
@@ -184,7 +189,83 @@ describe('the automation console reads the history of a settled id', () => {
     fireEvent.change(field, { target: { value: 'student-123' } })
     fireEvent.blur(field)
 
-    expect(await screen.findByText('Zuweisungen konnten nicht geladen werden')).toBeInTheDocument()
+    // Retried once, as any failure is, before it is reported.
+    expect(await screen.findByText('Zuweisungen konnten nicht geladen werden', {}, { timeout: 4000 })).toBeInTheDocument()
     expect(screen.queryByText('Keine Schülerin und kein Schüler mit dieser ID, oder Sie haben keinen Zugriff darauf.')).not.toBeInTheDocument()
+  })
+})
+
+// The console addressed one typed id three ways: the preview and the policy
+// took it as typed, the history trimmed; execute went to whatever the field
+// said by then; and the refresh after execute looked under the untrimmed id,
+// so the history never updated (review of #244, 18 Oct 2026).
+describe('the automation console keeps one student per batch', () => {
+  const field = () => screen.getByLabelText('Schüler-ID')
+  const previewFor = (id: string) => {
+    fireEvent.change(field(), { target: { value: id } })
+    fireEvent.click(screen.getByRole('button', { name: 'Vorschläge ansehen' }))
+  }
+  const execute = async () => fireEvent.click(await screen.findByRole('button', { name: 'Freigegebenen Stapel ausführen' }))
+
+  beforeEach(() => {
+    vi.mocked(previewAssignmentAutomationBatch).mockResolvedValue(preview)
+    vi.mocked(executeAssignmentAutomationBatch).mockResolvedValue({
+      batchId: preview.batchId, policyId: preview.policyId, studentId: 'student-123', status: 'executed', results: [], summary: {}, reviewRequired: true, autonomousDecision: false,
+    })
+  })
+
+  it('previews the trimmed id, and stores it in the policy', async () => {
+    renderConsole()
+    previewFor('  student-123 ')
+
+    await waitFor(() => expect(previewAssignmentAutomationBatch).toHaveBeenCalledTimes(1))
+    const [studentId, request] = vi.mocked(previewAssignmentAutomationBatch).mock.calls[0]
+    expect(studentId).toBe('student-123')
+    expect(request.policy.studentIds).toEqual(['student-123'])
+    expect(request.policy.policyId).toBe('policy-student-123')
+  })
+
+  it('executes the batch for the student it was previewed for, not the one typed since', async () => {
+    renderConsole()
+    previewFor('student-123')
+    await screen.findByText('Candidate 0')
+
+    fireEvent.change(field(), { target: { value: 'student-999' } })
+    fireEvent.blur(field())
+    await execute()
+
+    await waitFor(() => expect(executeAssignmentAutomationBatch).toHaveBeenCalledTimes(1))
+    expect(vi.mocked(executeAssignmentAutomationBatch).mock.calls[0][0]).toBe('student-123')
+  })
+
+  it('reads the history again after execute, for a padded id too', async () => {
+    renderConsole()
+    previewFor(' student-123 ')
+    await screen.findByText('Candidate 0')
+    await waitFor(() => expect(getStudentAssignments).toHaveBeenCalledTimes(1))
+
+    await execute()
+
+    await waitFor(() => expect(getStudentAssignments).toHaveBeenCalledTimes(2))
+    expect(vi.mocked(getStudentAssignments).mock.calls.map(([id]) => id)).toEqual(['student-123', 'student-123'])
+  })
+
+  it('does not ask again for a student that is not there, but still retries a failure', async () => {
+    vi.mocked(getStudentAssignments).mockRejectedValue(new ApiError('Not found', { status: 404 }))
+    const { unmount } = renderConsole({ retry: 1 })
+    fireEvent.change(field(), { target: { value: 'nobody' } })
+    fireEvent.blur(field())
+
+    expect(await screen.findByText('Keine Schülerin und kein Schüler mit dieser ID, oder Sie haben keinen Zugriff darauf.')).toBeInTheDocument()
+    expect(getStudentAssignments).toHaveBeenCalledTimes(1)
+    unmount()
+
+    vi.mocked(getStudentAssignments).mockReset().mockRejectedValue(new ApiError('Server error', { status: 503 }))
+    renderConsole({ retry: 1 })
+    fireEvent.change(field(), { target: { value: 'student-123' } })
+    fireEvent.blur(field())
+
+    expect(await screen.findByText('Zuweisungen konnten nicht geladen werden', {}, { timeout: 4000 })).toBeInTheDocument()
+    expect(getStudentAssignments).toHaveBeenCalledTimes(2)
   })
 })

@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { ApiError } from '@/services/api/httpClient'
 import {
   executeAssignmentAutomationBatch,
   getCurriculumAnalyticsDashboard,
@@ -33,6 +34,9 @@ export function useStudentAssignmentsQuery(studentId: string) {
     queryKey: learningOperationsQueryKeys.studentAssignments(studentId),
     queryFn: () => getStudentAssignments(studentId),
     enabled: Boolean(studentId),
+    // A 404 is an answer (no such student, or not one this account may see),
+    // and asking again only delays saying so.
+    retry: (failures, error) => !(error instanceof ApiError && error.status === 404) && failures < 1,
   })
 }
 
@@ -72,20 +76,25 @@ export function useWarehouseExportSummaryQuery(contentType?: string) {
   })
 }
 
-export function useAutomationPreviewMutation(studentId: string) {
+// The student travels with each call rather than with the hook, so a batch is
+// executed for the student it was previewed for, and the history refreshed is
+// that student's, whatever the id field says by then.
+export type StudentAutomationCall<Request> = { studentId: string; request: Request }
+
+export function useAutomationPreviewMutation() {
   return useMutation({
-    mutationFn: (request: AutomationPreviewRequest) =>
+    mutationFn: ({ studentId, request }: StudentAutomationCall<AutomationPreviewRequest>) =>
       previewAssignmentAutomationBatch(studentId, request),
   })
 }
 
-export function useAutomationExecuteMutation(studentId: string) {
+export function useAutomationExecuteMutation() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: (request: AutomationExecuteRequest) =>
+    mutationFn: ({ studentId, request }: StudentAutomationCall<AutomationExecuteRequest>) =>
       executeAssignmentAutomationBatch(studentId, request),
-    onSuccess: () => {
+    onSuccess: (_data, { studentId }) => {
       void queryClient.invalidateQueries({
         queryKey: learningOperationsQueryKeys.studentAssignments(studentId),
       })
