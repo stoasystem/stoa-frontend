@@ -103,6 +103,9 @@ describe('a 401 from a public auth path on a signed-out tab', () => {
   })
 })
 
+// Already true before #249: the request goes out without the tab's token, so
+// its 401 was never this session's. A guard, so a fix that sends the token on
+// public paths, or reads their 401 as the tab's, does not sign the tab out.
 describe('a wrong password while adding an account', () => {
   it('fails with its code and keeps the session the tab is on', async () => {
     const assign = stubLocation('/login')
@@ -117,6 +120,32 @@ describe('a wrong password while adding an account', () => {
     expect(sessionStorage.getItem(TOKEN_KEY)).toBe('s-access')
     expect(useAuthStore.getState().accessToken).toBe('s-access')
     expect(assign).not.toHaveBeenCalled()
+  })
+})
+
+describe('which 401s count as a public auth path', () => {
+  it('a public path with a query string or a full URL is still public', async () => {
+    stubLocation('/login')
+    for (const url of ['/auth/login?next=%2Fpractice', 'https://api.test/auth/login']) {
+      const error = await rejection(httpClient.post(url, { email: 'r@test.stoaedu.ch', password: 'wrong' }))
+      expect(error).toMatchObject({ status: 401, code: 'invalid_credentials' })
+    }
+    expectTabUntouched()
+  })
+
+  it('the teacher application list is not public: its 401 still renews', async () => {
+    // POST /teacher-applications is public (applying); GET is the reviewers' list.
+    mswServer.use(http.get('https://api.test/teacher-applications', () => HttpResponse.json({ detail: 'expired' }, { status: 401 })))
+    const assign = stubLocation('/admin/teacher-applications')
+    sessionStorage.setItem(TOKEN_KEY, 's-access')
+    rememberRefreshToken('s-refresh')
+    useAuthStore.setState({ accessToken: 's-access', isAuthenticated: true })
+
+    const error = await rejection(httpClient.get('/teacher-applications'))
+
+    expect((error as Error).message).toBe('session_ended')
+    expect(refreshCalls).toBe(1)
+    expect(assign).toHaveBeenCalledWith('/login')
   })
 })
 
