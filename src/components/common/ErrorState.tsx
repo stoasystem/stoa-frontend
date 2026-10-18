@@ -21,7 +21,9 @@ export function ErrorState({ title, message, action, reassure = true }: ErrorSta
   const context = useAddressContext()
 
   return (
+    // role="alert" so a screen reader says what went wrong as it appears (#276).
     <div
+      role="alert"
       className="mx-auto flex flex-col items-center text-center"
       style={{ gap: 'var(--state-gap)', maxWidth: 'var(--state-measure)' }}
     >
