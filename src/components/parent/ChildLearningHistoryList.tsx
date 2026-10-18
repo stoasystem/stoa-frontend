@@ -1,6 +1,8 @@
 import { useTranslation } from 'react-i18next'
 import { Card, CardContent } from '@/components/ui/card'
+import { getSubjectLabel } from '@/lib/displayLabels'
 import { formatDateTime } from '@/lib/formatDateTime'
+import { getActivityTypeLabel } from '@/components/parent/activityLabels'
 import type { ParentChildActivity } from '@/types/parent'
 
 type HistoryListItem = Omit<ParentChildActivity, 'type' | 'subject'> & {
@@ -34,7 +36,7 @@ export function ChildLearningHistoryList({
                 <h2 className="font-medium">{item.title}</h2>
                 {(item.sourceLabel || item.type) && (
                   <p className="mt-1 text-xs font-semibold uppercase tracking-[0.08em] text-primary">
-                    {item.sourceLabel ?? formatActivityType(item.type ?? '')}
+                    {item.sourceLabel ?? getActivityTypeLabel(item.type, t)}
                   </p>
                 )}
               </div>
@@ -42,15 +44,11 @@ export function ChildLearningHistoryList({
                 {formatDateTime(item.createdAt)}
               </span>
             </div>
-            {item.subject && <p className="mt-1 text-sm text-muted-foreground">{item.subject}</p>}
+            {item.subject && <p className="mt-1 text-sm text-muted-foreground">{getSubjectLabel(item.subject, t)}</p>}
             <p className="mt-3 text-sm leading-6">{item.summary}</p>
           </CardContent>
         </Card>
       ))}
     </div>
   )
-}
-
-function formatActivityType(type: string) {
-  return type.replace(/_/g, ' ')
 }

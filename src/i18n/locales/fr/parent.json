@@ -80,7 +80,9 @@
     "recentActivity": "Activité récente",
     "noRecentActivity": "Aucune activité récente n’est encore disponible.",
     "teacherHelp": "Aide enseignant",
-    "teacherHelpDescription": "Demandes ou transmissions enregistrées cette semaine."
+    "teacherHelpDescription": "Demandes ou transmissions enregistrées cette semaine.",
+    "weeklyReportLink": "Rapport hebdomadaire",
+    "learningHistoryLink": "Historique d’apprentissage"
   },
   "accountOps": {
     "eyebrow": "Gestion du compte",
@@ -165,7 +167,36 @@
       "child_email_unverified": "L’adresse e-mail d’un compte enfant n’est pas vérifiée.",
       "usage_unreconciled": "L’utilisation est encore en cours de rapprochement.",
       "child_binding": "Le lien avec l’enfant doit être vérifié : {{status}}."
-    }
+    },
+    "usageActions": {
+      "question_submission": "Questions à l’IA",
+      "chat_message": "Messages de chat",
+      "hint_request": "Indices",
+      "question_teacher_help_request": "Aide d’un enseignant sur une question",
+      "conversation_teacher_help_request": "Aide d’un enseignant dans un chat",
+      "practice_teacher_help_request": "Aide d’un enseignant pendant l’exercice",
+      "practice_answer": "Réponses aux exercices",
+      "practice_lesson_completion": "Leçons d’exercice terminées",
+      "practice_quiz_answer": "Réponses au quiz",
+      "assignment_started": "Devoirs commencés",
+      "assignment_completed": "Devoirs terminés",
+      "assignment_skipped": "Devoirs ignorés",
+      "assignment_archived": "Devoirs archivés",
+      "reviewed_assignment_generation": "Devoirs préparés",
+      "unknown": "Autre utilisation"
+    },
+    "usageSupportActions": {
+      "none": "Rien à faire",
+      "review_if_disputed": "Contactez le support STOA si ce nombre vous semble incorrect",
+      "review_counter_and_entitlement": "Contactez le support STOA si la limite vous semble incorrecte",
+      "review_stale_counter": "Contactez le support STOA si ce nombre vous semble incorrect",
+      "review_counter_without_ledger": "Contactez le support STOA si ce nombre vous semble incorrect",
+      "review_ledger_without_counter": "Contactez le support STOA si ce nombre vous semble incorrect",
+      "review_count_mismatch": "Contactez le support STOA si ce nombre vous semble incorrect",
+      "unknown": "Contactez le support STOA si quelque chose vous semble incorrect"
+    },
+    "quotaPeriodDay": "Limite quotidienne du {{date}}",
+    "quotaPeriodUnknown": "Période en cours"
   },
   "progress": {
     "eyebrow": "Progrès parents",
@@ -238,5 +269,14 @@
       "child_binding": "Un lien avec un enfant est à vérifier",
       "billing_inactive": "Le compte doit être vérifié par l’administration STOA"
     }
+  },
+  "activityTypes": {
+    "question": "Question",
+    "conversation": "Conversation avec l’IA",
+    "teacher_help": "Aide d’un enseignant",
+    "practice": "Exercice",
+    "practice_mistake": "Erreur d’exercice",
+    "report": "Rapport",
+    "unknown": "Activité"
   }
 }

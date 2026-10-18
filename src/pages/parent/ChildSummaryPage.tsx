@@ -4,6 +4,7 @@ import { BackButton } from '@/components/common/BackButton'
 import { Breadcrumbs } from '@/components/common/Breadcrumbs'
 import { PageActions } from '@/components/common/PageActions'
 import { ChildSummaryHeader } from '@/components/parent/ChildSummaryHeader'
+import { getActivityTypeLabel } from '@/components/parent/activityLabels'
 import { LearningProfileSignals } from '@/components/learning/LearningProfileSignals'
 import { CurriculumRolloutPanel } from '@/components/practice/CurriculumRolloutPanel'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -11,6 +12,7 @@ import { useCurriculumCatalogQuery } from '@/hooks/practice/useCurriculumCatalog
 import { useChildLearningProfileQuery } from '@/hooks/parent/useChildLearningProfileQuery'
 import { useChildLearningSummaryQuery } from '@/hooks/parent/useChildLearningSummaryQuery'
 import { DashboardLayout } from '@/layouts/DashboardLayout'
+import { getSubjectLabel } from '@/lib/displayLabels'
 
 export function ChildSummaryPage() {
   const { t } = useTranslation('practice')
@@ -110,10 +112,10 @@ export function ChildSummaryPage() {
                     <div key={activity.id} className="rounded-md border p-3">
                       <p className="text-sm font-medium">{activity.title}</p>
                       <p className="mt-1 text-xs uppercase tracking-[0.08em] text-primary">
-                        {activity.type.replace(/_/g, ' ')}
+                        {getActivityTypeLabel(activity.type, tParent)}
                       </p>
                       {activity.subject && (
-                        <p className="mt-1 text-sm text-muted-foreground">{activity.subject}</p>
+                        <p className="mt-1 text-sm text-muted-foreground">{getSubjectLabel(activity.subject, tParent)}</p>
                       )}
                       <p className="mt-2 text-sm leading-6">{activity.summary}</p>
                     </div>
