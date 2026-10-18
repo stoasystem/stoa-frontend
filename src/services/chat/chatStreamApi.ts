@@ -1,3 +1,4 @@
+import { apiPath } from '@/services/api/apiPath'
 import { answerUnauthorized, ApiError, httpClient } from '@/services/api/httpClient'
 import { storedRefreshToken } from '@/services/auth/sessionRefresh'
 import { currentSessionToken } from '@/store/authStore'
@@ -67,7 +68,7 @@ export async function streamConversationMessage({
     // from another one signed in (#218, #219).
     const refresh = token ? storedRefreshToken() : null
     const response = await fetch(
-      `${apiBaseUrl}/conversations/${conversationId}/messages/stream`,
+      `${apiBaseUrl}${apiPath`/conversations/${conversationId}/messages/stream`}`,
       {
         method: 'POST',
         headers: {
@@ -239,7 +240,7 @@ export async function getGenerationProgress(
   idempotencyKey?: string,
 ) {
   const response = await httpClient.get<GenerationState>(
-    `/conversations/${conversationId}/generation`,
+    apiPath`/conversations/${conversationId}/generation`,
     { signal, params: idempotencyKey ? { idempotencyKey } : undefined },
   )
   return response.data

@@ -1,3 +1,4 @@
+import { apiPath } from '@/services/api/apiPath'
 import { httpClient } from '@/services/api/httpClient'
 
 import type {
@@ -18,12 +19,12 @@ export async function getAdminNotifications() {
 }
 
 export async function markNotificationRead(eventId: string) {
-  const response = await httpClient.post<NotificationEvent>(`/notifications/${encodeURIComponent(eventId)}/read`)
+  const response = await httpClient.post<NotificationEvent>(apiPath`/notifications/${eventId}/read`)
   return response.data
 }
 
 export async function archiveNotification(eventId: string) {
-  const response = await httpClient.post<NotificationEvent>(`/notifications/${encodeURIComponent(eventId)}/archive`)
+  const response = await httpClient.post<NotificationEvent>(apiPath`/notifications/${eventId}/archive`)
   return response.data
 }
 

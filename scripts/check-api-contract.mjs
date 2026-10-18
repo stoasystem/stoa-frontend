@@ -55,8 +55,11 @@ function loadBackendRoutes(inventoryPath) {
   return routes
 }
 
+// Service paths are written as apiPath`/x/${id}` (#251); the tag is optional
+// here so a plain string path is still read.
 function collectCalls() {
-  const pattern = /httpClient\.(get|post|patch|put|delete)\s*(?:<[^>]*>)?\s*\(\s*[`'"]([^`'"]+)[`'"]/g
+  const pattern =
+    /httpClient\.(get|post|patch|put|delete)\s*(?:<[^>]*>)?\s*\(\s*(?:apiPath)?[`'"]([^`'"]+)[`'"]/g
   const calls = []
   for (const file of walk(SERVICE_ROOT)) {
     const source = readFileSync(file, 'utf8')

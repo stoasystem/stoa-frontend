@@ -1,3 +1,4 @@
+import { apiPath } from '@/services/api/apiPath'
 import { ApiError, httpClient } from '@/services/api/httpClient'
 import type {
   CurriculumAuditResponse,
@@ -45,7 +46,7 @@ export async function getCurriculumWorklist(status?: string) {
 
 export async function getCurriculumPreview(publicLessonId: string, versionId: string) {
   const response = await httpClient.get<CurriculumVersion>(
-    `/admin/curriculum/lessons/${publicLessonId}/preview`,
+    apiPath`/admin/curriculum/lessons/${publicLessonId}/preview`,
     { params: { versionId } },
   )
   return response.data
@@ -53,7 +54,7 @@ export async function getCurriculumPreview(publicLessonId: string, versionId: st
 
 export async function patchCurriculumDraft(input: CurriculumPatchInput) {
   const response = await httpClient.patch<CurriculumVersion>(
-    `/admin/curriculum/lessons/${input.publicLessonId}/drafts/${input.versionId}`,
+    apiPath`/admin/curriculum/lessons/${input.publicLessonId}/drafts/${input.versionId}`,
     input.payload,
     { validateStatus: noRedirectFor403 },
   )
@@ -63,7 +64,7 @@ export async function patchCurriculumDraft(input: CurriculumPatchInput) {
 
 export async function getCurriculumValidationPreview(publicLessonId: string, versionId: string) {
   const response = await httpClient.post<CurriculumValidationPreview>(
-    `/admin/curriculum/lessons/${publicLessonId}/drafts/${versionId}/validation-preview`,
+    apiPath`/admin/curriculum/lessons/${publicLessonId}/drafts/${versionId}/validation-preview`,
     undefined,
     { validateStatus: noRedirectFor403 },
   )
@@ -73,7 +74,7 @@ export async function getCurriculumValidationPreview(publicLessonId: string, ver
 
 export async function getCurriculumDiff(publicLessonId: string, fromVersionId: string, toVersionId: string) {
   const response = await httpClient.get<CurriculumDiffResponse>(
-    `/admin/curriculum/lessons/${publicLessonId}/diff`,
+    apiPath`/admin/curriculum/lessons/${publicLessonId}/diff`,
     {
       params: { fromVersionId, toVersionId },
       validateStatus: noRedirectFor403,
@@ -85,7 +86,7 @@ export async function getCurriculumDiff(publicLessonId: string, fromVersionId: s
 
 export async function getCurriculumAudit(publicLessonId: string) {
   const response = await httpClient.get<CurriculumAuditResponse>(
-    `/admin/curriculum/lessons/${publicLessonId}/audit`,
+    apiPath`/admin/curriculum/lessons/${publicLessonId}/audit`,
     { validateStatus: noRedirectFor403 },
   )
   if (isForbidden(response.status)) {
@@ -97,7 +98,7 @@ export async function getCurriculumAudit(publicLessonId: string) {
 
 export async function submitCurriculumReview(publicLessonId: string, versionId: string) {
   const response = await httpClient.post<CurriculumVersion>(
-    `/admin/curriculum/lessons/${publicLessonId}/drafts/${versionId}/submit-review`,
+    apiPath`/admin/curriculum/lessons/${publicLessonId}/drafts/${versionId}/submit-review`,
     undefined,
     { validateStatus: noRedirectFor403 },
   )
@@ -107,7 +108,7 @@ export async function submitCurriculumReview(publicLessonId: string, versionId: 
 
 export async function approveCurriculumVersion(publicLessonId: string, versionId: string) {
   const response = await httpClient.post<CurriculumVersion>(
-    `/admin/curriculum/lessons/${publicLessonId}/drafts/${versionId}/approve`,
+    apiPath`/admin/curriculum/lessons/${publicLessonId}/drafts/${versionId}/approve`,
     undefined,
     { validateStatus: noRedirectFor403 },
   )
@@ -117,7 +118,7 @@ export async function approveCurriculumVersion(publicLessonId: string, versionId
 
 export async function requestCurriculumChanges(input: CurriculumReviewNoteInput) {
   const response = await httpClient.post<CurriculumVersion>(
-    `/admin/curriculum/lessons/${input.publicLessonId}/drafts/${input.versionId}/request-changes`,
+    apiPath`/admin/curriculum/lessons/${input.publicLessonId}/drafts/${input.versionId}/request-changes`,
     { reason: input.reason },
     { validateStatus: noRedirectFor403 },
   )
@@ -127,7 +128,7 @@ export async function requestCurriculumChanges(input: CurriculumReviewNoteInput)
 
 export async function publishCurriculumVersion(input: CurriculumPublishInput) {
   const response = await httpClient.post(
-    `/admin/curriculum/lessons/${input.publicLessonId}/publish`,
+    apiPath`/admin/curriculum/lessons/${input.publicLessonId}/publish`,
     {
       versionId: input.versionId,
       expectedPublishedVersionId: input.expectedPublishedVersionId ?? null,
@@ -151,7 +152,7 @@ export async function dryRunCurriculumMigration(manifest: Record<string, unknown
 
 export async function applyCurriculumMigration(input: CurriculumMigrationApplyInput) {
   const response = await httpClient.post<CurriculumMigrationEvidenceResponse>(
-    `/admin/curriculum/migrations/${input.migrationId}/apply`,
+    apiPath`/admin/curriculum/migrations/${input.migrationId}/apply`,
     { manifest: input.manifest, confirmationToken: input.confirmationToken },
     { validateStatus: noRedirectFor403 },
   )
@@ -161,7 +162,7 @@ export async function applyCurriculumMigration(input: CurriculumMigrationApplyIn
 
 export async function getCurriculumMigrationEvidence(migrationId: string) {
   const response = await httpClient.get<CurriculumMigrationEvidenceResponse>(
-    `/admin/curriculum/migrations/${migrationId}`,
+    apiPath`/admin/curriculum/migrations/${migrationId}`,
     { validateStatus: noRedirectFor403 },
   )
   if (isForbidden(response.status)) {

@@ -1,3 +1,4 @@
+import { apiPath } from '@/services/api/apiPath'
 import { httpClient } from '@/services/api/httpClient'
 
 import type { UserRole } from '@/types/user'
@@ -136,7 +137,7 @@ export async function getAdminPlatformStats() {
 
 export async function createModerationReport(input: ModerationReportInput) {
   const response = await httpClient.post<ModerationCase>(
-    `/questions/${input.questionId}/reports`,
+    apiPath`/questions/${input.questionId}/reports`,
     {
       surface: input.surface,
       reason: input.reason,
@@ -155,20 +156,21 @@ export async function getModerationCases(filters: ModerationCaseListFilters = {}
   if (filters.reason) params.set('reason', filters.reason)
   if (filters.reporterRole) params.set('reporter_role', filters.reporterRole)
   if (filters.assignee) params.set('assignee', filters.assignee)
+  const query = params.toString()
   const response = await httpClient.get<ModerationCaseListResponse>(
-    `/admin/moderation/cases${params.toString() ? `?${params.toString()}` : ''}`,
+    '/admin/moderation/cases' + (query ? `?${query}` : ''),
   )
   return response.data
 }
 
 export async function getModerationCase(caseId: string) {
-  const response = await httpClient.get<ModerationCase>(`/admin/moderation/cases/${caseId}`)
+  const response = await httpClient.get<ModerationCase>(apiPath`/admin/moderation/cases/${caseId}`)
   return response.data
 }
 
 export async function updateModerationCase(input: ModerationCaseUpdateInput) {
   const response = await httpClient.patch<ModerationCase>(
-    `/admin/moderation/cases/${input.caseId}`,
+    apiPath`/admin/moderation/cases/${input.caseId}`,
     {
       status: input.status,
       assigned_admin_id: input.assigned_admin_id,
@@ -180,7 +182,7 @@ export async function updateModerationCase(input: ModerationCaseUpdateInput) {
 
 export async function addModerationCaseNote(input: ModerationCaseNoteInput) {
   const response = await httpClient.post<ModerationCase>(
-    `/admin/moderation/cases/${input.caseId}/notes`,
+    apiPath`/admin/moderation/cases/${input.caseId}/notes`,
     { note: input.note },
   )
   return response.data
@@ -708,21 +710,21 @@ export async function getReportOperations(filters: ReportOperationsListFilters =
 
 export async function getReportOperationDetail(target: ReportOperationTarget) {
   const response = await httpClient.get<ReportOperationRow>(
-    `/admin/reports/${target.parent_id}/${target.student_id}/${target.week_start}/ops`,
+    apiPath`/admin/reports/${target.parent_id}/${target.student_id}/${target.week_start}/ops`,
   )
   return response.data
 }
 
 export async function retryReportGeneration(target: ReportOperationTarget) {
   const response = await httpClient.post<ReportOperationMutationResponse>(
-    `/admin/reports/${target.parent_id}/${target.student_id}/${target.week_start}/retry-generation`,
+    apiPath`/admin/reports/${target.parent_id}/${target.student_id}/${target.week_start}/retry-generation`,
   )
   return response.data
 }
 
 export async function resendReportEmail(target: ReportOperationTarget) {
   const response = await httpClient.post<ReportOperationMutationResponse>(
-    `/admin/reports/${target.parent_id}/${target.student_id}/${target.week_start}/resend`,
+    apiPath`/admin/reports/${target.parent_id}/${target.student_id}/${target.week_start}/resend`,
   )
   return response.data
 }
@@ -736,7 +738,7 @@ export async function bulkResendReportEmails(reports: ReportOperationTarget[]) {
 
 export async function getReportAuditEvents(target: ReportOperationTarget) {
   const response = await httpClient.get<ReportAuditListResponse>(
-    `/admin/reports/${target.parent_id}/${target.student_id}/${target.week_start}/audit`,
+    apiPath`/admin/reports/${target.parent_id}/${target.student_id}/${target.week_start}/audit`,
   )
   return response.data
 }
@@ -798,7 +800,7 @@ export async function previewResumeRecoveryJob(input: {
   max_targets?: number
 }) {
   const response = await httpClient.post<RecoveryJobResumePreviewResponse>(
-    `/admin/reports/recovery-jobs/${input.jobId}/resume/preview`,
+    apiPath`/admin/reports/recovery-jobs/${input.jobId}/resume/preview`,
     {
       reason: input.reason,
       results: input.results,
@@ -816,7 +818,7 @@ export async function createResumeRecoveryJob(input: {
   max_targets?: number
 }) {
   const response = await httpClient.post<RecoveryJob>(
-    `/admin/reports/recovery-jobs/${input.jobId}/resume`,
+    apiPath`/admin/reports/recovery-jobs/${input.jobId}/resume`,
     {
       reason: input.reason,
       results: input.results,
@@ -833,20 +835,20 @@ export async function getRecoveryJobs() {
 }
 
 export async function getRecoveryJob(jobId: string) {
-  const response = await httpClient.get<RecoveryJob>(`/admin/reports/recovery-jobs/${jobId}`)
+  const response = await httpClient.get<RecoveryJob>(apiPath`/admin/reports/recovery-jobs/${jobId}`)
   return response.data
 }
 
 export async function getRecoveryJobResults(jobId: string) {
   const response = await httpClient.get<RecoveryJobTargetsResponse>(
-    `/admin/reports/recovery-jobs/${jobId}/results`,
+    apiPath`/admin/reports/recovery-jobs/${jobId}/results`,
   )
   return response.data
 }
 
 export async function getRecoveryJobAuditEvents(jobId: string) {
   const response = await httpClient.get<ReportAuditListResponse>(
-    `/admin/reports/recovery-jobs/${jobId}/audit`,
+    apiPath`/admin/reports/recovery-jobs/${jobId}/audit`,
   )
   return response.data
 }
@@ -876,7 +878,7 @@ export async function getReleaseFixtureStatus(input: {
 }
 
 export async function cancelRecoveryJob(jobId: string) {
-  const response = await httpClient.post<RecoveryJob>(`/admin/reports/recovery-jobs/${jobId}/cancel`)
+  const response = await httpClient.post<RecoveryJob>(apiPath`/admin/reports/recovery-jobs/${jobId}/cancel`)
   return response.data
 }
 
@@ -899,7 +901,7 @@ export async function getSubscriptionRequests(filters: SubscriptionRequestFilter
 
 export async function getSubscriptionRequest(requestId: string) {
   const response = await httpClient.get<SubscriptionRequest>(
-    `/admin/subscriptions/requests/${requestId}`,
+    apiPath`/admin/subscriptions/requests/${requestId}`,
   )
   return response.data
 }
@@ -926,14 +928,14 @@ export async function getSubscriptionBilling(filters: {
 
 export async function getSubscriptionBillingDetail(parentId: string) {
   const response = await httpClient.get<SubscriptionBilling>(
-    `/admin/subscriptions/billing/${parentId}`,
+    apiPath`/admin/subscriptions/billing/${parentId}`,
   )
   return response.data
 }
 
 export async function getAdminParentAccountOperations(parentId: string, day?: string) {
   const response = await httpClient.get<AdminAccountOperations>(
-    `/admin/account-operations/parents/${parentId}`,
+    apiPath`/admin/account-operations/parents/${parentId}`,
     { params: { day: day || undefined } },
   )
   return response.data
@@ -946,7 +948,7 @@ export async function updateSubscriptionRequest(input: {
   effectiveAt?: string
 }) {
   const response = await httpClient.patch<SubscriptionRequest>(
-    `/admin/subscriptions/requests/${input.requestId}`,
+    apiPath`/admin/subscriptions/requests/${input.requestId}`,
     {
       status: input.status,
       admin_note: input.adminNote,
@@ -958,7 +960,7 @@ export async function updateSubscriptionRequest(input: {
 
 export async function applySubscriptionRequest(input: { requestId: string; adminNote?: string; effectiveAt?: string }) {
   const response = await httpClient.post<SubscriptionRequest>(
-    `/admin/subscriptions/requests/${input.requestId}/apply`,
+    apiPath`/admin/subscriptions/requests/${input.requestId}/apply`,
     { admin_note: input.adminNote, effective_at: input.effectiveAt },
   )
   return response.data
@@ -1051,7 +1053,7 @@ export type AdminBillingRecheckResult = {
 
 export async function getAdminBillingOperation(checkoutRef: string, parentId: string) {
   const response = await httpClient.get<AdminBillingOperationDetail>(
-    `/admin/billing/checkouts/${encodeURIComponent(checkoutRef)}`,
+    apiPath`/admin/billing/checkouts/${checkoutRef}`,
     { params: { parentId, detail: true } },
   )
   return response.data
@@ -1059,7 +1061,7 @@ export async function getAdminBillingOperation(checkoutRef: string, parentId: st
 
 export async function recheckAdminBillingOperation(checkoutRef: string, parentId: string) {
   const response = await httpClient.post<AdminBillingRecheckResult>(
-    `/admin/billing/checkouts/${encodeURIComponent(checkoutRef)}/recheck`,
+    apiPath`/admin/billing/checkouts/${checkoutRef}/recheck`,
     {},
     { params: { parentId } },
   )

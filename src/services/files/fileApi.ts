@@ -1,3 +1,4 @@
+import { apiPath } from '@/services/api/apiPath'
 import { httpClient } from '@/services/api/httpClient'
 import type {
   CompleteUploadResponse,
@@ -27,14 +28,14 @@ async function createUploadIntent(file: File, purpose: UploadPurpose) {
 }
 
 async function putChunk(uploadId: string, partNumber: number, chunk: Blob) {
-  await httpClient.put(`/files/${uploadId}/chunks/${partNumber}`, chunk, {
+  await httpClient.put(apiPath`/files/${uploadId}/chunks/${partNumber}`, chunk, {
     headers: { 'Content-Type': 'application/octet-stream' },
   })
 }
 
 async function completeUpload(uploadId: string, partCount: number) {
   const response = await httpClient.post<CompleteUploadResponse>(
-    `/files/${uploadId}/complete`,
+    apiPath`/files/${uploadId}/complete`,
     { partCount },
   )
   return response.data
@@ -81,10 +82,10 @@ export async function uploadFile({
 }
 
 export async function getUploadedFile(attachmentId: string) {
-  const response = await httpClient.get<UploadedFile>(`/files/attachments/${attachmentId}`)
+  const response = await httpClient.get<UploadedFile>(apiPath`/files/attachments/${attachmentId}`)
   return response.data
 }
 
 export async function deleteUploadedFile(attachmentId: string) {
-  await httpClient.delete(`/files/attachments/${attachmentId}`)
+  await httpClient.delete(apiPath`/files/attachments/${attachmentId}`)
 }

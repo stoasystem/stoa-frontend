@@ -1,3 +1,4 @@
+import { apiPath } from '@/services/api/apiPath'
 import { httpClient } from '@/services/api/httpClient'
 import type { LearningProfile } from '@/types/learningProfile'
 import type {
@@ -22,21 +23,21 @@ export async function getParentChildren() {
 
 export async function getChildLearningSummary(childId: string) {
   const response = await httpClient.get<ChildLearningSummary>(
-    `/parents/me/children/${childId}/summary`,
+    apiPath`/parents/me/children/${childId}/summary`,
   )
   return response.data
 }
 
 export async function getChildLearningHistory(childId: string) {
   const response = await httpClient.get<ChildLearningHistoryResponse>(
-    `/parents/me/children/${childId}/history`,
+    apiPath`/parents/me/children/${childId}/history`,
   )
   return response.data
 }
 
 export async function getChildLearningProfile(childId: string) {
   const response = await httpClient.get<LearningProfile>(
-    `/parents/me/children/${childId}/learning-profile`,
+    apiPath`/parents/me/children/${childId}/learning-profile`,
   )
   return response.data
 }

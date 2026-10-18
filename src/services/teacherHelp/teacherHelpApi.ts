@@ -1,3 +1,4 @@
+import { apiPath } from '@/services/api/apiPath'
 import { httpClient } from '@/services/api/httpClient'
 
 import type { TeacherAvailability, TeacherHelpRequest } from '@/types/teacherHelp'
@@ -22,7 +23,7 @@ export async function createTeacherHelpRequest(payload: {
 
 export async function getTeacherHelpRequest(conversationId: string) {
   const response = await httpClient.get<TeacherHelpRequest>(
-    `/teacher-help/conversations/${conversationId}/request`,
+    apiPath`/teacher-help/conversations/${conversationId}/request`,
   )
   return response.data
 }
