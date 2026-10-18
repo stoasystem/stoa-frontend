@@ -710,6 +710,7 @@ describe('what the student reads when it goes wrong', () => {
       'locked',
       'unavailable',
       'notFound',
+      'notStarted',
       'expired',
       'finished',
       'credentialInvalid',
@@ -733,6 +734,84 @@ describe('what the student reads when it goes wrong', () => {
     for (const language of ['de', 'fr', 'it']) {
       for (const key of KEYS) expect(copy[language][key]).not.toBe(copy.en[key])
     }
+  })
+})
+
+// One request lost on the way is not the backend refusing the quiz (#266):
+// before, any failure took the whole stage with "back to the chapter" only,
+// and the quiz, its hearts and a skip quiz's lesson queue were gone.
+describe('a request that fails on the way, not a refusal', () => {
+  const PATH = `${API}/practice/lessons/:lessonId`
+
+  it('an answer lost to the network keeps the quiz, says so, and goes on when sent again', async () => {
+    open('/chapter/u-5/l-2?mode=quiz')
+    await screen.findByText(/Quiz · Question 1 of 5$/)
+    await answerRight()
+    expect(await screen.findByText(/Quiz · Question 2 of 5$/)).toBeInTheDocument()
+
+    mswServer.use(http.post(`${PATH}/quiz/:quizId/answer`, () => HttpResponse.error(), { once: true }))
+    const id = await onScreen()
+    await typeAnswer(right(id))
+
+    expect(await screen.findByText('Your answer could not be checked. Try again.')).toBeInTheDocument()
+    expect(trouble()).toBeNull()
+    expect(screen.getByText(/Quiz · Question 2 of 5$/)).toBeInTheDocument()
+    expect(hearts()).toHaveAccessibleName('2 of 2 hearts left')
+    expect(await onScreen()).toBe(id)
+
+    await user.click(screen.getByRole('button', { name: 'Check answer' }))
+    expect(await screen.findByText('Correct')).toBeInTheDocument()
+    expect(screen.queryByText('Your answer could not be checked. Try again.')).not.toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: 'Next question' }))
+    expect(await screen.findByText(/Quiz · Question 3 of 5$/)).toBeInTheDocument()
+  })
+
+  it('a skip quiz keeps the lesson: a server error on an answer ends nothing', async () => {
+    await skipIntoQuiz(4)
+    mswServer.use(
+      http.post(`${PATH}/quiz/:quizId/answer`, () => HttpResponse.json({ message: 'busy' }, { status: 503 }), {
+        once: true,
+      }),
+    )
+    await typeAnswer(right(await onScreen()))
+
+    expect(await screen.findByText('Your answer could not be checked. Try again.')).toBeInTheDocument()
+    expect(trouble()).toBeNull()
+    expect(seen.starts).toHaveLength(1)
+    await user.click(screen.getByRole('button', { name: 'Check answer' }))
+    await screen.findByText('Correct')
+    await user.click(screen.getByRole('button', { name: /^(Next question|Finish the quiz)$/ }))
+    await passQuiz()
+    expect(await screen.findByRole('heading', { name: 'Lesson complete' })).toBeInTheDocument()
+  })
+
+  it('a paper that could not be drawn: its own sentence, and a way to try again', async () => {
+    mswServer.use(http.post(`${PATH}/quiz`, () => HttpResponse.error(), { once: true }))
+    open('/chapter/u-5/l-2?mode=quiz')
+
+    expect(
+      await screen.findByText('The quiz could not be started. Check your connection and try again.'),
+    ).toBeInTheDocument()
+    expect(trouble()).toHaveAttribute('data-quiz-trouble', 'quiz_not_started')
+
+    await user.click(screen.getByRole('button', { name: 'Start the quiz again' }))
+    expect(await screen.findByText(/Quiz · Question 1 of 5$/)).toBeInTheDocument()
+    expect(seen.starts).toEqual([{ lessonId: 'l-2', kind: 'testOut' }])
+  })
+
+  it('a passed quiz whose completion is lost stays passed, and finishing again sends the same credential', async () => {
+    rules.paper = (all) => all.slice(0, 1)
+    open('/chapter/u-5/l-2?mode=quiz')
+    await screen.findByText(/Quiz · Question 1 of 1$/)
+    mswServer.use(http.post(`${PATH}/complete`, () => HttpResponse.error(), { once: true }))
+    await answerRight()
+
+    expect(await screen.findByText('The lesson could not be finished. Try again.')).toBeInTheDocument()
+    expect(trouble()).toBeNull()
+
+    await user.click(screen.getByRole('button', { name: 'Finish the quiz' }))
+    expect(await screen.findByRole('heading', { name: 'Lesson complete' })).toBeInTheDocument()
+    expect(seen.completes).toEqual([{ lessonId: 'l-2', credential: 'cred-q-1' }])
   })
 })
 

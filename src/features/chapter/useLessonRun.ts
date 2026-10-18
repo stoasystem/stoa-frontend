@@ -14,13 +14,18 @@
  * Finishing posts `POST /practice/lessons/:id/complete`: after a passed quiz
  * with the credential it issued, otherwise with no body at all. Success
  * invalidates every practice query, so the chapter reads its progress again.
+ *
+ * Only a refusal the backend names ends a quiz (`quiz.ts`). An answer, a start
+ * or a completion that fails on the way keeps what the student has and lets
+ * them try again (#266). A failed check or hint belongs to the exercise it was
+ * for and is cleared when the exercise changes.
  */
 import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from 'react'
 import {
   initialPracticeLessonState,
   practiceLessonReducer,
 } from '@/components/practice/practiceLessonReducer'
-import { quizTrouble, type QuizTrouble } from '@/features/chapter/quiz'
+import { quizRefused, quizTrouble, type QuizTrouble } from '@/features/chapter/quiz'
 import { useCompleteLessonMutation } from '@/hooks/practice/useCompleteLessonMutation'
 import { usePracticeHintMutation } from '@/hooks/practice/usePracticeHintMutation'
 import { useSubmitChallengeAnswerMutation } from '@/hooks/practice/useSubmitChallengeAnswerMutation'
@@ -56,6 +61,8 @@ export function useLessonRun(lesson: PracticeLesson | undefined, { testOut = fal
   const submitAnswer = useSubmitChallengeAnswerMutation()
   const completeLesson = useCompleteLessonMutation()
   const hintMutation = usePracticeHintMutation()
+  const { reset: resetCheck } = submitAnswer
+  const { reset: resetHint } = hintMutation
   const challenges = useMemo(() => lesson?.challenges ?? [], [lesson?.challenges])
   const ids = useMemo(() => challenges.map((item) => item.challengeId), [challenges])
 
@@ -77,6 +84,8 @@ export function useLessonRun(lesson: PracticeLesson | undefined, { testOut = fal
   const [finished, setFinished] = useState(false)
   const finishing = useRef(false)
   const [answering, setAnswering] = useState(false)
+  // A quiz answer that never reached a verdict: the quiz goes on, the student tries again.
+  const [quizCheckFailed, setQuizCheckFailed] = useState(false)
 
   const quizExercise = quiz?.view.exercise ?? undefined
   const lessonChallenge = challenges.find((item) => item.challengeId === queue[0])
@@ -105,6 +114,13 @@ export function useLessonRun(lesson: PracticeLesson | undefined, { testOut = fal
     }
   }, [])
 
+  /** A new exercise starts clean: no "check failed" or "hint failed" from the last one. */
+  const clearFailures = useCallback(() => {
+    resetCheck()
+    resetHint()
+    setQuizCheckFailed(false)
+  }, [resetCheck, resetHint])
+
   const finish = useCallback(
     async (quizCredential?: string) => {
       if (!lesson || finishing.current) return
@@ -118,7 +134,9 @@ export function useLessonRun(lesson: PracticeLesson | undefined, { testOut = fal
         setQuiz(null)
         setQuizResult(null)
       } catch (error) {
-        refuse(error, quizCredential !== undefined)
+        // A passed quiz stays passed unless the backend refused its credential
+        // by name: Continue sends the same credential again.
+        refuse(error, quizCredential !== undefined && quizRefused(error))
       } finally {
         finishing.current = false
       }
@@ -135,17 +153,19 @@ export function useLessonRun(lesson: PracticeLesson | undefined, { testOut = fal
       setFailed(null)
       setQuizResult(null)
       setQuizPending(true)
+      clearFailures()
       dispatch({ type: 'reset' })
       try {
         const view = await startLessonQuiz(lesson.id, next)
         setQuiz({ view, size: view.remaining })
       } catch (error) {
-        refuse(error, true)
+        if (quizRefused(error)) refuse(error, true)
+        else setTrouble({ code: 'quiz_not_started', inQuiz: true })
       } finally {
         setQuizPending(false)
       }
     },
-    [lesson, refuse],
+    [clearFailures, lesson, refuse],
   )
 
   // Testing out from the chapter: the quiz is the way in, so it is drawn as
@@ -161,10 +181,12 @@ export function useLessonRun(lesson: PracticeLesson | undefined, { testOut = fal
     if (!challenge || !answered || answering) return
     if (quiz) {
       setAnswering(true)
+      setQuizCheckFailed(false)
       try {
         setQuizResult(await answerLessonQuiz(quiz.view.lessonId, quiz.view.quizId, { answer: state.answer }))
       } catch (error) {
-        refuse(error, true)
+        if (quizRefused(error)) refuse(error, true)
+        else setQuizCheckFailed(true)
       } finally {
         setAnswering(false)
       }
@@ -210,11 +232,13 @@ export function useLessonRun(lesson: PracticeLesson | undefined, { testOut = fal
         setFailed(quiz.view.kind)
         setQuiz(null)
         setQuizResult(null)
+        clearFailures()
         dispatch({ type: 'reset' })
         return
       }
       setQuiz({ view: quizResult, size: quiz.size })
       setQuizResult(null)
+      clearFailures()
       dispatch({ type: 'reset' })
       return
     }
@@ -226,16 +250,18 @@ export function useLessonRun(lesson: PracticeLesson | undefined, { testOut = fal
     }
     setQueue(rest)
     setSkipped((list) => list.filter((id) => id !== challenge.challengeId))
+    clearFailures()
     dispatch({ type: 'reset' })
-  }, [challenge, finish, queue, quiz, quizResult, state.feedback])
+  }, [challenge, clearFailures, finish, queue, quiz, quizResult, state.feedback])
 
   /** No credit: the exercise goes to the back of the queue. Not in a quiz, nor once the quiz is offered. */
   const skip = useCallback(() => {
     if (!challenge || quiz || quizOffered || state.feedback?.correct) return
     setQueue((list) => [...list.filter((id) => id !== challenge.challengeId), challenge.challengeId])
     setSkipped((list) => (list.includes(challenge.challengeId) ? list : [...list, challenge.challengeId]))
+    clearFailures()
     dispatch({ type: 'reset' })
-  }, [challenge, quiz, quizOffered, state.feedback?.correct])
+  }, [challenge, clearFailures, quiz, quizOffered, state.feedback?.correct])
 
   /** The quiz that finishes a lesson with skips. */
   const startQuiz = useCallback(() => {
@@ -250,8 +276,9 @@ export function useLessonRun(lesson: PracticeLesson | undefined, { testOut = fal
   const backToLesson = useCallback(() => {
     setFailed(null)
     setTrouble(null)
+    clearFailures()
     dispatch({ type: 'reset' })
-  }, [])
+  }, [clearFailures])
 
   const retry = useCallback(() => dispatch({ type: 'retry' }), [])
   const answer = useCallback((value: string | string[]) => dispatch({ type: 'answer', answer: value }), [])
@@ -279,7 +306,7 @@ export function useLessonRun(lesson: PracticeLesson | undefined, { testOut = fal
     /** What the backend refused, if it did. */
     trouble,
     checking: quiz ? answering : submitAnswer.isPending,
-    checkFailed: !quiz && submitAnswer.isError,
+    checkFailed: quiz ? quizCheckFailed : submitAnswer.isError,
     hinting: hintMutation.isPending,
     hintFailed: hintMutation.isError,
     finishing: completeLesson.isPending,

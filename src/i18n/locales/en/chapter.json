@@ -105,6 +105,7 @@
       "finished": "This quiz is already over. Start a new one.",
       "locked": "Finish the lessons before this one first: this lesson is still locked.",
       "notFound": "This quiz is no longer open. Start a new one.",
+      "notStarted": "The quiz could not be started. Check your connection and try again.",
       "restart": "Start the quiz again",
       "title": "That did not work",
       "unanswered": "Answer every exercise of this lesson right, or pass the short quiz, before finishing it.",

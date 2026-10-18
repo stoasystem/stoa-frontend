@@ -105,6 +105,7 @@
       "finished": "Dieses Quiz ist bereits vorbei. Starte ein neues.",
       "locked": "Schliess zuerst die Lektionen davor ab: diese Lektion ist noch gesperrt.",
       "notFound": "Dieses Quiz ist nicht mehr offen. Starte ein neues.",
+      "notStarted": "Das Quiz konnte nicht gestartet werden. Prüf deine Verbindung und versuch es nochmals.",
       "restart": "Quiz neu starten",
       "title": "Das hat nicht geklappt",
       "unanswered": "Beantworte alle Aufgaben dieser Lektion richtig oder bestehe das kurze Quiz, bevor du sie abschliesst.",
