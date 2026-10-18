@@ -154,7 +154,9 @@ describe('the automation console reads the history of a settled id', () => {
       fireEvent.change(field, { target: { value: partial } })
     }
     expect(getStudentAssignments).not.toHaveBeenCalled()
-    expect(screen.getByText('Geben Sie oben eine Schüler-ID ein, um die bisherigen Zuweisungen zu sehen.')).toBeInTheDocument()
+    // Typed but not read yet: the card says how to read it, not to type an id.
+    expect(screen.queryByText('Geben Sie oben eine Schüler-ID ein, um die bisherigen Zuweisungen zu sehen.')).not.toBeInTheDocument()
+    expect(screen.getByText('Verlassen Sie das Feld oder wählen Sie „Vorschläge ansehen“, um die Zuweisungen für diese ID zu laden.')).toBeInTheDocument()
 
     fireEvent.blur(field)
 
@@ -267,5 +269,26 @@ describe('the automation console keeps one student per batch', () => {
 
     expect(await screen.findByText('Zuweisungen konnten nicht geladen werden', {}, { timeout: 4000 })).toBeInTheDocument()
     expect(getStudentAssignments).toHaveBeenCalledTimes(2)
+  })
+})
+
+describe('the history card while an id is typed but not read', () => {
+  it.each([
+    { language: 'de', studentLabel: 'Schüler-ID', notLoaded: 'Verlassen Sie das Feld oder wählen Sie „Vorschläge ansehen“, um die Zuweisungen für diese ID zu laden.' },
+    { language: 'en', studentLabel: 'Student id', notLoaded: 'Leave the field or choose “Preview candidates” to load the assignments for this id.' },
+    { language: 'fr', studentLabel: "Identifiant de l'élève", notLoaded: 'Quittez le champ ou choisissez « Prévisualiser les propositions » pour charger les attributions de cet identifiant.' },
+    { language: 'it', studentLabel: 'ID studente', notLoaded: 'Esci dal campo o scegli «Vedi le proposte» per caricare le assegnazioni di questo ID.' },
+  ])('says how to load it, and goes once it is read ($language)', async ({ language, studentLabel, notLoaded }) => {
+    await i18n.changeLanguage(language)
+    renderConsole()
+    const field = screen.getByLabelText(studentLabel)
+
+    expect(screen.queryByText(notLoaded)).not.toBeInTheDocument()
+    fireEvent.change(field, { target: { value: 'student-123' } })
+    expect(screen.getByText(notLoaded)).toBeInTheDocument()
+
+    fireEvent.blur(field)
+    await waitFor(() => expect(getStudentAssignments).toHaveBeenCalledTimes(1))
+    expect(screen.queryByText(notLoaded)).not.toBeInTheDocument()
   })
 })

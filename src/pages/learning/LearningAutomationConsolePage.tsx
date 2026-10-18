@@ -379,9 +379,15 @@ export function LearningAutomationConsolePage() {
                 <CardTitle className="text-xl">{t('automationConsole.historyTitle')}</CardTitle>
               </CardHeader>
               <CardContent>
-                {!shownStudentId && (
+                {!shownStudentId && !trimmedStudentId && (
                   <p className="rounded-md border border-dashed p-4 text-sm text-muted-foreground">
                     {t('automationConsole.historyNeedStudent')}
+                  </p>
+                )}
+                {/* An id is typed but not read yet: say how to read it, not to type one. */}
+                {trimmedStudentId && trimmedStudentId !== shownStudentId && (
+                  <p className="rounded-md border border-dashed p-4 text-sm text-muted-foreground">
+                    {t('automationConsole.historyNotLoaded', { action: t('automationConsole.preview') })}
                   </p>
                 )}
                 {assignmentsQuery.isLoading && <LoadingState message={t('automationConsole.historyLoading')} />}
