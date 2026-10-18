@@ -115,50 +115,59 @@ export function LearningAutomationConsolePage() {
   const [confidence, setConfidence] = useState<AutomationPolicy['confidenceThreshold']>('medium')
   const [policyStatus, setPolicyStatus] = useState<AutomationPolicy['status']>('active')
   const [pausedReason, setPausedReason] = useState('')
+  // One id for everything the console sends: a pasted space must not make the
+  // preview, the policy and the history address different students.
+  const trimmedStudentId = studentId.trim()
 
   const assignmentsQuery = useStudentAssignmentsQuery(shownStudentId)
   // An id that names no student, or one this account may not see, is an
   // answer, not a failure.
   const historyNotFound = assignmentsQuery.error instanceof ApiError && assignmentsQuery.error.status === 404
-  const previewMutation = useAutomationPreviewMutation(studentId)
-  const executeMutation = useAutomationExecuteMutation(studentId)
+  const previewMutation = useAutomationPreviewMutation()
+  const executeMutation = useAutomationExecuteMutation()
   const preview = previewMutation.data
+  // The student the shown preview was made for. Execute uses this one, not the
+  // field, which may have moved on to someone else since.
+  const previewedStudentId = previewMutation.variables?.studentId
   const results = executeMutation.data?.results ?? []
 
   const policy = useMemo<AutomationPolicy>(() => ({
     ...defaultPolicy,
-    policyId: `policy-${studentId || 'student'}`,
+    policyId: `policy-${trimmedStudentId || 'student'}`,
     // The policy's name and pause reason are stored with it, so they stay in
     // one language whatever the console is shown in.
     name: 'Teacher approved assignment automation',
     status: policyStatus,
-    studentIds: studentId ? [studentId] : [],
+    studentIds: trimmedStudentId ? [trimmedStudentId] : [],
     subjectIds: subject ? [subject] : [],
     topicIds: splitList(topicIds),
     sourceTypes: splitList(sourceTypes) as AutomationPolicy['sourceTypes'],
     maxAssignmentsPerStudent: maxAssignments,
     confidenceThreshold: confidence,
     pausedReason: policyStatus === 'paused' ? pausedReason || 'Paused from console.' : undefined,
-  }), [confidence, maxAssignments, pausedReason, policyStatus, sourceTypes, studentId, subject, topicIds])
+  }), [confidence, maxAssignments, pausedReason, policyStatus, sourceTypes, trimmedStudentId, subject, topicIds])
 
   const handlePreview = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-    if (!studentId.trim()) {
+    if (!trimmedStudentId) {
       toast.error(t('automationConsole.needStudentId'))
       return
     }
-    setShownStudentId(studentId.trim())
-    previewMutation.mutate({ policy, subject: subject || undefined })
+    setShownStudentId(trimmedStudentId)
+    previewMutation.mutate({ studentId: trimmedStudentId, request: { policy, subject: subject || undefined } })
   }
 
   const handleExecute = () => {
-    if (!preview) return
+    if (!preview || !previewedStudentId) return
     executeMutation.mutate({
-      batchId: preview.batchId,
-      approved: true,
-      policy: preview.policy,
-      candidates: preview.selected.map((candidate) => ({ ...candidate, approved: true })),
-      subject: subject || undefined,
+      studentId: previewedStudentId,
+      request: {
+        batchId: preview.batchId,
+        approved: true,
+        policy: preview.policy,
+        candidates: preview.selected.map((candidate) => ({ ...candidate, approved: true })),
+        subject: subject || undefined,
+      },
     }, {
       onSuccess: (data) => toast.success(t('automationConsole.executed', { count: data.results.length })),
       onError: (error) => toast.error(error.message),
@@ -191,7 +200,7 @@ export function LearningAutomationConsolePage() {
                     value={studentId}
                     placeholder={t('automationConsole.studentIdPlaceholder')}
                     onChange={(event) => setStudentId(event.target.value)}
-                    onBlur={() => setShownStudentId(studentId.trim())}
+                    onBlur={() => setShownStudentId(trimmedStudentId)}
                   />
                 </div>
                 <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-1">
