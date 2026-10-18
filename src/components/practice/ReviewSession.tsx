@@ -21,7 +21,7 @@
  * read (`bg-primary/10`, `bg-muted/40`), it is the whole token now, so what
  * `check:contrast` rates is what the screen shows.
  */
-import { useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import { RotateCcw } from 'lucide-react'
@@ -49,17 +49,51 @@ const isFilled = (answer: AnswerValue) =>
 
 export function ReviewSession({ unitId }: { unitId?: string } = {}) {
   const { t } = useTranslation('practice')
+  const queryClient = useQueryClient()
   // With a knowledge point named, the server selects before it cuts a page,
   // so what opens here is what its star said was due (stoa-backend#70).
   const dueQuery = useDueReviewQuery({ unitId })
   const cards = dueQuery.data?.items ?? []
+
+  // Every answer reschedules its question, so the list this session opened
+  // with is out of date once one is sent. It stays on screen while the student
+  // is here - each card keeps its feedback - but it must not outlive the
+  // session: kept in the cache, a star opened again within the minute served
+  // the same card from it and the student answered it a second time (#264).
+  // Dropped rather than marked stale, because a stale list is still drawn
+  // while it refetches, and a card drawn can be answered.
+  const answered = useRef(false)
+  const onAnswer = useCallback(() => {
+    answered.current = true
+  }, [])
+  useEffect(
+    () => () => {
+      if (answered.current) {
+        queryClient.removeQueries({ queryKey: [...practiceQueryKeys.all, 'review-due'] })
+      }
+    },
+    [queryClient],
+  )
 
   if (dueQuery.isLoading) {
     return <p className="text-sm text-muted-foreground">{t('review.loading')}</p>
   }
 
   if (dueQuery.isError) {
-    return <p className="text-sm text-destructive">{t('review.loadFailed')}</p>
+    return (
+      <div className="flex flex-col items-start gap-3">
+        <p className="m-0 text-sm text-destructive">{t('review.loadFailed')}</p>
+        <Button
+          lift
+          variant="onSky"
+          disabled={dueQuery.isFetching}
+          onClick={() => void dueQuery.refetch()}
+        >
+          <RotateCcw size={16} aria-hidden="true" />
+          {t('tryAgain')}
+        </Button>
+      </div>
+    )
   }
 
   if (cards.length === 0) {
@@ -77,13 +111,13 @@ export function ReviewSession({ unitId }: { unitId?: string } = {}) {
         {t('review.due', { count: cards.length })}
       </p>
       {cards.map((card) => (
-        <ReviewQuestion key={card.challengeId} card={card} />
+        <ReviewQuestion key={card.challengeId} card={card} onAnswer={onAnswer} />
       ))}
     </div>
   )
 }
 
-function ReviewQuestion({ card }: { card: ReviewCard }) {
+function ReviewQuestion({ card, onAnswer }: { card: ReviewCard; onAnswer: () => void }) {
   const { t } = useTranslation('practice')
   const { t: tStage } = useTranslation('chapter')
   const queryClient = useQueryClient()
@@ -92,10 +126,15 @@ function ReviewQuestion({ card }: { card: ReviewCard }) {
 
   const answer = useMutation({
     mutationFn: (value: AnswerValue) => submitChallengeAnswer(card.challengeId, { answer: value }),
+    // Counted when it is sent, not when it lands: a student who leaves before
+    // the reply still moved the schedule.
+    onMutate: onAnswer,
     onSuccess: (data) => {
       setResult(data)
-      // The schedule moved, so what is due moved with it.
+      // The schedule moved, so what is due moved with it: the totals, and the
+      // "Review N" on the star, which reads from the sky.
       void queryClient.invalidateQueries({ queryKey: practiceQueryKeys.reviewSummary() })
+      void queryClient.invalidateQueries({ queryKey: [...practiceQueryKeys.all, 'knowledge-map'] })
     },
   })
 
