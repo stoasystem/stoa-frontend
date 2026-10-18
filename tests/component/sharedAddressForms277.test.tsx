@@ -18,6 +18,7 @@ import { I18nextProvider } from 'react-i18next'
 import { MemoryRouter } from 'react-router-dom'
 import { toast } from 'sonner'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { AppErrorBoundary } from '@/components/common/AppErrorBoundary'
 import { ErrorState } from '@/components/common/ErrorState'
 import i18n from '@/i18n'
 import { addressContext } from '@/lib/addressForm'
@@ -35,6 +36,7 @@ vi.mock('@/layouts/AppLayout', () => ({ AppLayout: ({ children }: { children: Re
 vi.mock('@/layouts/MarketingLayout', () => ({ MarketingLayout: ({ children }: { children: ReactNode }) => children }))
 vi.mock('@/features/account/GradeGroup', () => ({ GradeGroup: () => null }))
 vi.mock('@/features/account/NotificationPreferencesGroup', () => ({ NotificationPreferencesGroup: () => null }))
+vi.mock('@/services/monitoring', () => ({ reportFrontendError: vi.fn() }))
 vi.mock('sonner', () => ({ toast: { success: vi.fn(), error: vi.fn(), info: vi.fn() } }))
 vi.mock('@/services/auth/authApi', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@/services/auth/authApi')>()),
@@ -124,6 +126,10 @@ const LINES = {
       informal: 'Ton nom et ton adresse e-mail sont liés à ton compte. Pour les modifier, adresse-toi à un administrateur.',
       formal: 'Votre nom et votre adresse e-mail sont liés à votre compte. Pour les modifier, adressez-vous à un administrateur.',
     },
+  },
+  crashBody: {
+    de: { informal: 'Bitte versuche es erneut oder lade die Seite neu.', formal: 'Bitte versuchen Sie es erneut oder laden Sie die Seite neu.' },
+    fr: { informal: 'Réessaie ou recharge la page.', formal: 'Réessayez ou rechargez la page.' },
   },
   notYourFault: {
     de: { informal: 'Das liegt nicht an dir.', formal: 'Das liegt nicht an Ihnen.' },
@@ -228,6 +234,26 @@ describe('the error panel', () => {
 
     expect(screen.getByText(LINES.notYourFault[lang][form])).toBeInTheDocument()
     expectOnlyForm(lang, form)
+  })
+})
+
+describe('the crash screen', () => {
+  function Broken(): never {
+    throw new Error('boom')
+  }
+
+  it.each(CASES)('%s: asks a %s %s to try again', async (lang, role, form) => {
+    await i18n.changeLanguage(lang)
+    signIn(role)
+    vi.spyOn(console, 'error').mockImplementation(() => {})
+    renderPage(
+      <AppErrorBoundary>
+        <Broken />
+      </AppErrorBoundary>,
+    )
+
+    expect(await screen.findByText(LINES.crashBody[lang][form])).toBeInTheDocument()
+    vi.mocked(console.error).mockRestore()
   })
 })
 
@@ -339,6 +365,8 @@ describe('the bundles behind these pages', () => {
     { ns: 'common', prefix: 'me.profile.', plain: { de: 'informal', fr: 'informal' } },
     { ns: 'common', prefix: 'studentRoutes.me.title', plain: { de: 'informal', fr: 'informal' } },
     { ns: 'common', prefix: 'state.notYourFault', plain: { de: 'informal', fr: 'informal' } },
+    { ns: 'common', prefix: 'errorBoundary.', plain: { de: 'informal', fr: 'informal' } },
+    { ns: 'common', prefix: 'status.loadFailedAccount', plain: { de: 'informal', fr: 'informal' } },
     { ns: 'support', prefix: 'description', plain: { de: 'formal', fr: 'formal' } },
     { ns: 'support', prefix: 'sections.', plain: { de: 'formal', fr: 'formal' } },
     { ns: 'support', prefix: 'contactCard.', plain: { de: 'formal', fr: 'formal' } },
