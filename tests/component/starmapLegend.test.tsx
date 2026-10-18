@@ -38,6 +38,21 @@ function showAt(width: number, height: number, target: LayerTarget = { layer: 'm
   return { ...view, navigate }
 }
 
+/** Every string in a locale bundle, with its key. */
+function strings(bundle: unknown, prefix = ''): [string, string][] {
+  if (typeof bundle === 'string') return [[prefix, bundle]]
+  if (!bundle || typeof bundle !== 'object') return []
+  return Object.entries(bundle).flatMap(([key, value]) => strings(value, prefix ? `${prefix}.${key}` : key))
+}
+
+describe('the star map in French says tu to the student (#267)', () => {
+  // The map is the student's: "vous" and its imperatives (Choisissez, faites...) are the parents' and staff's.
+  it.each(strings(fr))('%s', (_key, text) => {
+    expect(text).not.toMatch(/\b(vous|votre|vos)\b/i)
+    expect(text).not.toMatch(/\b\p{L}+ez\b/iu)
+  })
+})
+
 describe('the legend (#141 B7)', () => {
   const locales = { en, de, fr, it: it_ }
 

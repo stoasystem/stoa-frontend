@@ -8,8 +8,15 @@
  * -- so a reload forgets the cards but never replays a celebration. Keeping
  * the card in the conversation itself needs the backend to store it; that is
  * open (#3).
+ *
+ * A card belongs to the conversations it is about, not to every one (#267):
+ * only a conversation about the point's subject, and of those only the one
+ * open in Ask when the point lit (the bridge's "progress flows back into the
+ * conversation" -- the one the student was working in) or one started after
+ * it lit. Last week's conversations, and other subjects', show no card.
  */
 import { create } from 'zustand'
+import { learningSubjectOptions } from '@/types/learningProfile'
 
 export type LitMoment = {
   unitId: string
@@ -18,6 +25,8 @@ export type LitMoment = {
   nebulaId: string
   /** When the point was lit, ISO 8601: where the card sits among the messages. */
   litAt: string
+  /** The conversation open in Ask (on the planet) when it was shown, if any. */
+  conversationId: string | null
 }
 
 type LitMomentsState = {
@@ -39,4 +48,31 @@ const NONE: LitMoment[] = []
 
 export function useLitMoments(ownerId: string | undefined): LitMoment[] {
   return useLitMomentsStore((state) => (ownerId ? state.byOwner[ownerId] : undefined) ?? NONE)
+}
+
+/** The conversation a thread shows: what decides which lit moments are its. */
+export type LitMomentThread = {
+  id: string
+  subject: string | undefined
+  /** When its first message was sent, ISO 8601; `undefined` while it has none. */
+  startedAt: string | undefined
+}
+
+/** The subject an id names (`math`, `subj-math`, `Math`...), as the subject options know it. */
+function subjectOf(id: string | undefined) {
+  if (!id) return undefined
+  const lower = id.toLowerCase()
+  return learningSubjectOptions.find((option) => lower.includes(option.id))?.id ?? lower
+}
+
+/** The moments whose card this conversation shows (#267). */
+export function litMomentsFor(moments: readonly LitMoment[], thread: LitMomentThread): LitMoment[] {
+  const subject = subjectOf(thread.subject)
+  if (!subject) return NONE
+  const started = thread.startedAt === undefined ? Number.NaN : Date.parse(thread.startedAt)
+  return moments.filter(
+    (moment) =>
+      subjectOf(moment.subjectId) === subject &&
+      (moment.conversationId === thread.id || started > Date.parse(moment.litAt)),
+  )
 }

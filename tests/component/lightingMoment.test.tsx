@@ -27,6 +27,7 @@ import { orderedStars, subjectOfNebula, type StarMap } from '@/features/starmap/
 import { emptyStarMapSource } from '@/features/starmap/starMapSource'
 import i18n from '@/i18n'
 import { useAuthStore } from '@/store/authStore'
+import { resetAsk, useAskStore } from '@/store/askStore'
 import { useLitMomentsStore, type LitMoment } from '@/store/litMomentsStore'
 import type { ChatMessage } from '@/types/chat'
 import { fakeClock } from './starmapHarness'
@@ -255,7 +256,7 @@ describe('the lighting moment', () => {
 })
 
 describe('the lit card in Ask', () => {
-  const moment: LitMoment = { unitId: KP, name: 'Sine and cosine', subjectId: 'math', nebulaId: 'trigonometry', litAt: '2026-10-02T09:00:00.000Z' }
+  const moment: LitMoment = { unitId: KP, name: 'Sine and cosine', subjectId: 'math', nebulaId: 'trigonometry', litAt: '2026-10-02T09:00:00.000Z', conversationId: null }
   const message = (id: string, createdAt: string): ChatMessage => ({ id, conversationId: 'c1', role: 'assistant', content: id, createdAt, status: 'completed' })
 
   it('is handed over when the moment is shown', async () => {
@@ -263,8 +264,17 @@ describe('the lit card in Ask', () => {
     const shown = await showMap(mapOf('math', ALL_LESSONS), source)
     act(() => shown.clock.advance(SETTLE_MS + FLARE_MS + 1000))
     expect(useLitMomentsStore.getState().byOwner['student-a']).toEqual([
-      expect.objectContaining({ unitId: KP, name: 'Sine and cosine', subjectId: 'math', litAt: observed.litAt }),
+      expect.objectContaining({ unitId: KP, name: 'Sine and cosine', subjectId: 'math', litAt: observed.litAt, conversationId: null }),
     ])
+  })
+
+  it('is handed over for the conversation open in Ask when it is shown (#267)', async () => {
+    useAskStore.getState().select('student-a', 'c-open')
+    const { source } = serverSource([observed])
+    const shown = await showMap(mapOf('math', ALL_LESSONS), source)
+    act(() => shown.clock.advance(SETTLE_MS + FLARE_MS + 1000))
+    expect(useLitMomentsStore.getState().byOwner['student-a']).toEqual([expect.objectContaining({ unitId: KP, conversationId: 'c-open' })])
+    resetAsk()
   })
 
   it('sits among the messages by time, as its own kind of entry', () => {
