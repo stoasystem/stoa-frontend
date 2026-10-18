@@ -73,8 +73,10 @@ const KEY_BY_CODE: Record<string, string> = {
   verification_code_expired: 'verification.expired',
 }
 
-function getErrorCopy(error: unknown, fallback: string) {
-  const message = toUserFacingError(error, fallback)
+function getErrorCopy(error: unknown) {
+  // The raw message: only the words are looked for, and the user-facing one is
+  // already the translated fallback outside English (#265).
+  const message = error instanceof Error ? error.message : ''
   if (isUnauthorizedError(error)) return 'verification.unauthorized'
   if (isVerificationRateLimitedError(error)) return 'verification.rateLimited'
   // By the code: the backend's own messages ("Check the verification code and
@@ -116,7 +118,7 @@ export function EmailVerificationPanel({
 
   const confirmed = response?.status === 'confirmed' || response?.status === 'already_verified'
   const statusKey = verificationMessageKey(response)
-  const errorKey = getErrorCopy(lastError, t('auth:verification.failed'))
+  const errorKey = getErrorCopy(lastError)
   const Icon = confirmed ? CheckCircle2 : initialStatus === 'expired_verification' ? ShieldAlert : MailCheck
   const sourceBody = source === 'register'
     ? t('auth:verification.registerBody', { email })

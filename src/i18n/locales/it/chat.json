@@ -186,21 +186,27 @@
         "assigned": "Assegnata",
         "in_progress": "In corso",
         "resolved": "Risolta",
-        "cancelled": "Annullata"
+        "cancelled": "Annullata",
+        "withdrawn": "Ritirata",
+        "expired": "Scaduta"
       },
       "title": {
         "pending": "Aiuto di un insegnante richiesto",
         "assigned": "{{name}} si unirà a questa conversazione",
         "in_progress": "{{name}} ti sta aiutando",
         "resolved": "L’aiuto dell’insegnante è terminato",
-        "cancelled": "La richiesta è stata annullata"
+        "cancelled": "La richiesta è stata annullata",
+        "withdrawn": "Hai ritirato la richiesta",
+        "expired": "Nessun insegnante era libero in tempo"
       },
       "body": {
         "pending": "Un insegnante risponderà in questa conversazione. Nel frattempo continua pure.",
         "assigned": "La risposta apparirà in questa conversazione.",
         "in_progress": "Le risposte appaiono in questa conversazione.",
         "resolved": "Ti serve altro aiuto? Chiedi di nuovo a un insegnante sotto una risposta.",
-        "cancelled": "Ti serve altro aiuto? Chiedi di nuovo a un insegnante sotto una risposta."
+        "cancelled": "Ti serve altro aiuto? Chiedi di nuovo a un insegnante sotto una risposta.",
+        "withdrawn": "Ti serve aiuto comunque? Chiedi di nuovo a un insegnante sotto una risposta.",
+        "expired": "La tua richiesta è scaduta. Chiedi di nuovo a un insegnante sotto una risposta."
       }
     },
     "practice": {

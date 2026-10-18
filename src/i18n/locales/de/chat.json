@@ -186,21 +186,27 @@
         "assigned": "Zugewiesen",
         "in_progress": "In Bearbeitung",
         "resolved": "Erledigt",
-        "cancelled": "Abgebrochen"
+        "cancelled": "Abgebrochen",
+        "withdrawn": "Zurückgezogen",
+        "expired": "Abgelaufen"
       },
       "title": {
         "pending": "Lehrperson angefragt",
         "assigned": "{{name}} kommt in diese Unterhaltung",
         "in_progress": "{{name}} hilft dir",
         "resolved": "Die Unterstützung ist abgeschlossen",
-        "cancelled": "Die Anfrage wurde abgebrochen"
+        "cancelled": "Die Anfrage wurde abgebrochen",
+        "withdrawn": "Du hast die Anfrage zurückgezogen",
+        "expired": "Keine Lehrperson war rechtzeitig frei"
       },
       "body": {
         "pending": "Eine Lehrperson antwortet in dieser Unterhaltung. Mach in der Zwischenzeit weiter.",
         "assigned": "Die Antwort erscheint in dieser Unterhaltung.",
         "in_progress": "Die Antworten erscheinen in dieser Unterhaltung.",
         "resolved": "Brauchst du mehr Hilfe? Frag unter einer Antwort erneut eine Lehrperson.",
-        "cancelled": "Brauchst du mehr Hilfe? Frag unter einer Antwort erneut eine Lehrperson."
+        "cancelled": "Brauchst du mehr Hilfe? Frag unter einer Antwort erneut eine Lehrperson.",
+        "withdrawn": "Brauchst du doch Hilfe? Frag unter einer Antwort erneut eine Lehrperson.",
+        "expired": "Deine Anfrage ist abgelaufen. Frag unter einer Antwort erneut eine Lehrperson."
       }
     },
     "practice": {
