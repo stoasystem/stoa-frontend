@@ -118,6 +118,7 @@ export function LearningAutomationConsolePage() {
   // One id for everything the console sends: a pasted space must not make the
   // preview, the policy and the history address different students.
   const trimmedStudentId = studentId.trim()
+  const trimmedSubject = subject.trim()
 
   const assignmentsQuery = useStudentAssignmentsQuery(shownStudentId)
   // An id that names no student, or one this account may not see, is an
@@ -131,8 +132,11 @@ export function LearningAutomationConsolePage() {
   const previewedStudentId = previewMutation.variables?.studentId
   const previewedSubject = previewMutation.variables?.request.subject
   // An execution belongs to the batch it ran: once that batch ran, it is not
-  // offered again, and its results are not shown under another preview.
-  const executedPreview = Boolean(preview && executeMutation.data?.batchId === preview.batchId)
+  // offered again, and its results are not shown under another preview. The
+  // batch is the one sent, not the one the response names.
+  const executedPreview = Boolean(
+    preview && executeMutation.isSuccess && executeMutation.variables?.request.batchId === preview.batchId,
+  )
   const results = executedPreview ? executeMutation.data?.results ?? [] : []
   // The history card shows the student whose id is in the field, or nothing.
   const historyStale = trimmedStudentId !== shownStudentId
@@ -145,13 +149,13 @@ export function LearningAutomationConsolePage() {
     name: 'Teacher approved assignment automation',
     status: policyStatus,
     studentIds: trimmedStudentId ? [trimmedStudentId] : [],
-    subjectIds: subject ? [subject] : [],
+    subjectIds: trimmedSubject ? [trimmedSubject] : [],
     topicIds: splitList(topicIds),
     sourceTypes: splitList(sourceTypes) as AutomationPolicy['sourceTypes'],
     maxAssignmentsPerStudent: maxAssignments,
     confidenceThreshold: confidence,
     pausedReason: policyStatus === 'paused' ? pausedReason || 'Paused from console.' : undefined,
-  }), [confidence, maxAssignments, pausedReason, policyStatus, sourceTypes, trimmedStudentId, subject, topicIds])
+  }), [confidence, maxAssignments, pausedReason, policyStatus, sourceTypes, trimmedStudentId, trimmedSubject, topicIds])
 
   const handlePreview = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -159,9 +163,12 @@ export function LearningAutomationConsolePage() {
       toast.error(t('automationConsole.needStudentId'))
       return
     }
+    // A batch still running keeps its preview, or its result would land unseen
+    // and the operator might run it again.
+    if (executeMutation.isPending) return
     setShownStudentId(trimmedStudentId)
     executeMutation.reset()
-    previewMutation.mutate({ studentId: trimmedStudentId, request: { policy, subject: subject || undefined } })
+    previewMutation.mutate({ studentId: trimmedStudentId, request: { policy, subject: trimmedSubject || undefined } })
   }
 
   const handleExecute = () => {
@@ -262,7 +269,7 @@ export function LearningAutomationConsolePage() {
                     <Input id="paused-reason" value={pausedReason} onChange={(event) => setPausedReason(event.target.value)} />
                   </div>
                 )}
-                <Button className="w-full" type="submit" disabled={previewMutation.isPending}>
+                <Button className="w-full" type="submit" disabled={previewMutation.isPending || executeMutation.isPending}>
                   {previewMutation.isPending ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
                   {t('automationConsole.preview')}
                 </Button>
@@ -327,9 +334,14 @@ export function LearningAutomationConsolePage() {
                   )}
                   {preview && preview.selected.length > 0 && (
                     <Button className="mt-4" onClick={handleExecute} disabled={executeMutation.isPending || executedPreview}>
-                      {executeMutation.isPending ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Play className="h-4 w-4" />}
-                      {t('automationConsole.execute')}
+                      {executeMutation.isPending ? <RefreshCw className="h-4 w-4 animate-spin" /> : executedPreview ? <CheckCircle2 className="h-4 w-4" /> : <Play className="h-4 w-4" />}
+                      {executedPreview ? t('automationConsole.executeDone') : t('automationConsole.execute')}
                     </Button>
+                  )}
+                  {executedPreview && (
+                    <p className="mt-2 text-sm text-muted-foreground">
+                      {t('automationConsole.executeDoneHint', { action: t('automationConsole.preview') })}
+                    </p>
                   )}
                 </CardContent>
               </Card>
@@ -386,7 +398,7 @@ export function LearningAutomationConsolePage() {
                 <CardTitle className="text-xl">{t('automationConsole.historyTitle')}</CardTitle>
               </CardHeader>
               <CardContent>
-                {!trimmedStudentId && (historyStale || !shownStudentId) && (
+                {!trimmedStudentId && (
                   <p className="rounded-md border border-dashed p-4 text-sm text-muted-foreground">
                     {t('automationConsole.historyNeedStudent')}
                   </p>

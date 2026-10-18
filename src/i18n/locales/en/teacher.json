@@ -272,6 +272,8 @@
     "selectedBefore": "Run a preview to see the selected candidates.",
     "selectedEmpty": "No candidate passed the policy. Check the refusal reasons before changing thresholds.",
     "execute": "Run approved batch",
+    "executeDone": "Batch run",
+    "executeDoneHint": "This batch has run. For a new batch, choose “{{action}}” again.",
     "executeFailed": "Run failed",
     "executed_one": "The batch returned {{count}} result.",
     "executed_other": "The batch returned {{count}} results.",

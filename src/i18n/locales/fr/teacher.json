@@ -272,6 +272,8 @@
     "selectedBefore": "Lancez la prévisualisation pour voir les propositions retenues.",
     "selectedEmpty": "Aucune proposition ne respecte les règles. Vérifiez les motifs de refus avant de modifier les seuils.",
     "execute": "Exécuter le lot approuvé",
+    "executeDone": "Lot exécuté",
+    "executeDoneHint": "Ce lot a été exécuté. Pour un nouveau lot, choisissez à nouveau « {{action}} ».",
     "executeFailed": "L'exécution a échoué",
     "executed_one": "Le lot a renvoyé {{count}} résultat.",
     "executed_other": "Le lot a renvoyé {{count}} résultats.",

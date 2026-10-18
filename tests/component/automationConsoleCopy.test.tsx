@@ -333,8 +333,9 @@ describe('the automation console keeps a batch to its own preview', () => {
     fireEvent.click(await executeButton())
     await screen.findByText('Created for the review.')
 
-    expect(await executeButton()).toBeDisabled()
-    fireEvent.click(await executeButton())
+    const ran = screen.getByRole('button', { name: 'Stapel ausgeführt' })
+    expect(ran).toBeDisabled()
+    fireEvent.click(ran)
     expect(executeAssignmentAutomationBatch).toHaveBeenCalledTimes(1)
   })
 
@@ -372,5 +373,106 @@ describe('the automation console keeps a batch to its own preview', () => {
 
     fireEvent.change(field(), { target: { value: 'student-123' } })
     expect(screen.getByText('Practice 0')).toBeInTheDocument()
+  })
+})
+
+// Left from the review of #248 (#253): a preview sent during an execute hid
+// that execute's result; the run was matched by the batch id the response
+// echoed; the subject went out as typed; the spent button gave no reason; and
+// nothing showed a failed execute could be tried again.
+describe('the automation console after an execute', () => {
+  const field = () => screen.getByLabelText('Schüler-ID')
+  const previewButton = () => screen.getByRole('button', { name: 'Vorschläge ansehen' })
+  const executeButton = () => screen.findByRole('button', { name: 'Freigegebenen Stapel ausführen' })
+  const executed = {
+    batchId: preview.batchId, policyId: preview.policyId, studentId: 'student-123', status: 'executed',
+    results: [{ candidateId: 'candidate-0', automationKey: 'key-0', status: 'created', reason: 'Created for the review.' }],
+    summary: {}, reviewRequired: true, autonomousDecision: false,
+  }
+  const previewStudent = async () => {
+    fireEvent.change(field(), { target: { value: 'student-123' } })
+    fireEvent.click(previewButton())
+    await screen.findByText('Candidate 0')
+  }
+
+  beforeEach(() => {
+    vi.mocked(previewAssignmentAutomationBatch).mockResolvedValue(preview)
+    vi.mocked(executeAssignmentAutomationBatch).mockResolvedValue(executed)
+  })
+
+  it('does not preview again while a batch is running, so its result still shows', async () => {
+    let finish: (value: typeof executed) => void = () => {}
+    vi.mocked(executeAssignmentAutomationBatch).mockReturnValue(new Promise((resolve) => { finish = resolve }))
+    renderConsole()
+    await previewStudent()
+
+    fireEvent.click(await executeButton())
+    await waitFor(() => expect(previewButton()).toBeDisabled())
+    // The form can still be sent with Enter, past the button.
+    fireEvent.submit(previewButton().closest('form') as HTMLFormElement)
+    expect(previewAssignmentAutomationBatch).toHaveBeenCalledTimes(1)
+
+    finish(executed)
+    expect(await screen.findByText('Created for the review.')).toBeInTheDocument()
+    expect(previewButton()).toBeEnabled()
+  })
+
+  it('counts the batch it sent as run, whatever batch id the response names', async () => {
+    vi.mocked(executeAssignmentAutomationBatch).mockResolvedValue({ ...executed, batchId: '' })
+    renderConsole()
+    await previewStudent()
+
+    fireEvent.click(await executeButton())
+
+    expect(await screen.findByText('Created for the review.')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Stapel ausgeführt' })).toBeDisabled()
+  })
+
+  it('sends the subject trimmed, to the preview, the policy and the execute', async () => {
+    renderConsole()
+    fireEvent.change(field(), { target: { value: 'student-123' } })
+    fireEvent.change(screen.getByLabelText('Fach'), { target: { value: '  math ' } })
+    fireEvent.click(previewButton())
+    await screen.findByText('Candidate 0')
+    fireEvent.click(await executeButton())
+
+    await waitFor(() => expect(executeAssignmentAutomationBatch).toHaveBeenCalledTimes(1))
+    const [, previewRequest] = vi.mocked(previewAssignmentAutomationBatch).mock.calls[0]
+    expect(previewRequest.subject).toBe('math')
+    expect(previewRequest.policy.subjectIds).toEqual(['math'])
+    expect(vi.mocked(executeAssignmentAutomationBatch).mock.calls[0][1].subject).toBe('math')
+  })
+
+  it.each([
+    { language: 'de', studentLabel: 'Schüler-ID', previewLabel: 'Vorschläge ansehen', executeLabel: 'Freigegebenen Stapel ausführen', doneLabel: 'Stapel ausgeführt', hint: 'Dieser Stapel ist gelaufen. Für einen neuen Stapel wählen Sie erneut „Vorschläge ansehen“.' },
+    { language: 'en', studentLabel: 'Student id', previewLabel: 'Preview candidates', executeLabel: 'Run approved batch', doneLabel: 'Batch run', hint: 'This batch has run. For a new batch, choose “Preview candidates” again.' },
+    { language: 'fr', studentLabel: "Identifiant de l'élève", previewLabel: 'Prévisualiser les propositions', executeLabel: 'Exécuter le lot approuvé', doneLabel: 'Lot exécuté', hint: 'Ce lot a été exécuté. Pour un nouveau lot, choisissez à nouveau « Prévisualiser les propositions ».' },
+    { language: 'it', studentLabel: 'ID studente', previewLabel: 'Vedi le proposte', executeLabel: 'Esegui il lotto approvato', doneLabel: 'Lotto eseguito', hint: 'Questo lotto è stato eseguito. Per un nuovo lotto, scegli di nuovo «Vedi le proposte».' },
+  ])('says the batch ran, and how to get a new one ($language)', async ({ language, studentLabel, previewLabel, executeLabel, doneLabel, hint }) => {
+    await i18n.changeLanguage(language)
+    renderConsole()
+    fireEvent.change(screen.getByLabelText(studentLabel), { target: { value: 'student-123' } })
+    fireEvent.click(screen.getByRole('button', { name: previewLabel }))
+    expect(screen.queryByText(hint)).not.toBeInTheDocument()
+    fireEvent.click(await screen.findByRole('button', { name: executeLabel }))
+
+    expect(await screen.findByRole('button', { name: doneLabel })).toBeDisabled()
+    expect(screen.getByText(hint)).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: executeLabel })).not.toBeInTheDocument()
+  })
+
+  it('offers a failed execute again, and runs it again', async () => {
+    vi.mocked(executeAssignmentAutomationBatch).mockRejectedValueOnce(new ApiError('Server error', { status: 503 }))
+    renderConsole()
+    await previewStudent()
+
+    fireEvent.click(await executeButton())
+    expect(await screen.findByText('Ausführen fehlgeschlagen')).toBeInTheDocument()
+    const retry = await executeButton()
+    expect(retry).toBeEnabled()
+
+    fireEvent.click(retry)
+    await waitFor(() => expect(executeAssignmentAutomationBatch).toHaveBeenCalledTimes(2))
+    expect(await screen.findByText('Created for the review.')).toBeInTheDocument()
   })
 })
