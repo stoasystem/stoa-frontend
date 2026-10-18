@@ -127,9 +127,7 @@ function unsafeReplyReason(blocks: TeacherReplyBlock[]): 'html' | 'privateMarker
     .join('\n')
     .toLowerCase()
   if (!serialized) return null
-  if (/<\s*\/?\s*(script|iframe|embed|object|img|svg|a)\b/.test(serialized) || /\bon[a-z]+\s*=/.test(serialized)) {
-    return 'html'
-  }
+  if (looksLikeUnsafeHtml(serialized)) return 'html'
   const privateMarkers = [
     'private/',
     'weekly-reports/',
@@ -144,4 +142,56 @@ function unsafeReplyReason(blocks: TeacherReplyBlock[]): 'html' | 'privateMarker
   return privateMarkers.some((marker) => serialized.includes(marker))
     ? 'privateMarkers'
     : null
+}
+
+/*
+ * Only what a browser would read as a tag counts: "<" straight before the tag
+ * name (#268). "0 < a < 1", "0<a<1" and "set one = 1" are maths and plain
+ * text, not HTML. Replies are rendered as text nodes, so this guards against
+ * pasted markup; it is not the escaping itself.
+ */
+const UNSAFE_TAG =
+  /<\/?(script|iframe|frame|frameset|embed|object|applet|style|link|meta|base|html|body|img|svg|math|video|audio|form|input|button|a)(?=[\s/>]|$)/
+
+function looksLikeUnsafeHtml(lowercased: string) {
+  return UNSAFE_TAG.test(lowercased) || hasTagWithEventHandler(lowercased)
+}
+
+const isSpace = (char: string) => /\s/.test(char)
+
+/*
+ * An "on…=" handler on any tag. Walks each tag's attributes the way the HTML
+ * tokenizer does, so a quoted ">" cannot hide a handler behind it. A scanner,
+ * not a regex: walking attributes with a regex backtracks exponentially.
+ */
+function hasTagWithEventHandler(text: string) {
+  let at = 0
+  while ((at = text.indexOf('<', at)) !== -1) {
+    at += 1
+    if (!/[a-z]/.test(text[at] ?? '')) continue
+    while (at < text.length && !isSpace(text[at]) && text[at] !== '/' && text[at] !== '>') at += 1
+    while (at < text.length && text[at] !== '>') {
+      if (isSpace(text[at]) || text[at] === '/') {
+        at += 1
+        continue
+      }
+      const nameStart = at
+      at += 1 // a leading "=" belongs to the name
+      while (at < text.length && !isSpace(text[at]) && !'/>='.includes(text[at])) at += 1
+      const name = text.slice(nameStart, at)
+      while (at < text.length && isSpace(text[at])) at += 1
+      if (text[at] !== '=') continue
+      if (/^on[a-z]+$/.test(name)) return true
+      at += 1
+      while (at < text.length && isSpace(text[at])) at += 1
+      const quote = text[at]
+      if (quote === '"' || quote === "'") {
+        const close = text.indexOf(quote, at + 1)
+        at = close === -1 ? text.length : close + 1
+      } else {
+        while (at < text.length && !isSpace(text[at]) && text[at] !== '>') at += 1
+      }
+    }
+  }
+  return false
 }
