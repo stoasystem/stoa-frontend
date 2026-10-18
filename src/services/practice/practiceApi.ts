@@ -39,10 +39,9 @@ export async function getPracticeSubjects() {
 }
 
 export async function getSubjectPath(subjectId: string, topicId?: string) {
-  const path = topicId
-    ? apiPath`/practice/${subjectId}/${topicId}/path`
-    : apiPath`/practice/${subjectId}/${topicId ?? 'default'}/path`
-  const response = await httpClient.get<PracticePath>(path)
+  const response = await httpClient.get<PracticePath>(
+    apiPath`/practice/${subjectId}/${topicId ?? 'default'}/path`,
+  )
   return response.data
 }
 

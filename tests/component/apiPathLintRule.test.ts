@@ -33,6 +33,9 @@ describe('stoa/api-path-template', () => {
     'fetch(`${apiBaseUrl}/conversations/${id}/messages/stream`)',
     'const path = `/practice/${subject}/${topic}/path`',
     'httpClient.get(other`/conversations/${id}`)',
+    "httpClient.get('/conversations/' + id)",
+    'httpClient.get(`/lessons/` + id)',
+    'httpClient.get(apiPath`/conversations/${encodeURIComponent(id)}`)',
   ])('refuses %s', (code) => {
     expect(problems(code)).toContain('stoa/api-path-template')
   })

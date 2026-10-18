@@ -56,10 +56,11 @@ function loadBackendRoutes(inventoryPath) {
 }
 
 // Service paths are written as apiPath`/x/${id}` (#251); the tag is optional
-// here so a plain string path is still read.
+// here so a plain string path is still read. One level of nested generics
+// (`post<Record<string, unknown>>`) is allowed.
 function collectCalls() {
   const pattern =
-    /httpClient\.(get|post|patch|put|delete)\s*(?:<[^>]*>)?\s*\(\s*(?:apiPath)?[`'"]([^`'"]+)[`'"]/g
+    /httpClient\.(get|post|patch|put|delete)\s*(?:<(?:[^<>]|<[^<>]*>)*>)?\s*\(\s*(?:apiPath)?[`'"]([^`'"]+)[`'"]/g
   const calls = []
   for (const file of walk(SERVICE_ROOT)) {
     const source = readFileSync(file, 'utf8')
