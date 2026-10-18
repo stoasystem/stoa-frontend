@@ -49,6 +49,7 @@ vi.mock('@/hooks/admin/useAdminModerationCases', () => ({
     data: { items: [moderationCase], count: 1 },
     isLoading: false,
     isError: false,
+    isSuccess: true,
   }),
   useAdminModerationCaseQuery: () => ({ data: moderationCase }),
   useUpdateModerationCaseMutation: () => idleMutation,
