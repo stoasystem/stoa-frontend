@@ -19,6 +19,18 @@ export type LazyPage = PageComponent & {
  */
 const failedLoads = new Set<() => void>()
 
+/** How long a page waits for the reload `chunkReload.ts` started before it counts as failed. */
+export const RELOAD_GRACE_MS = 10_000
+
+function reloadThatNeverCame(pageName: string): Promise<never> {
+  return new Promise((_, reject) => {
+    window.setTimeout(
+      () => reject(new Error(`${pageName}: the page did not reload after its module failed to load`)),
+      RELOAD_GRACE_MS,
+    )
+  })
+}
+
 /**
  * Lets every page whose module failed to load try again on its next render.
  *
@@ -42,23 +54,27 @@ export function lazyPage<Name extends string>(
   pageName: Name,
   load: () => Promise<Record<Name, PageComponent>>,
 ): LazyPage {
+  const failed = (error: unknown): never => {
+    const reset = () => {
+      failedLoads.delete(reset)
+      current = attempt()
+    }
+    failedLoads.add(reset)
+    throw error
+  }
   const attempt = () =>
     lazy(() =>
-      load().then(
-        (module) =>
+      load()
+        .then((module) =>
           // Vite hands back nothing when the tab is about to reload for a
-          // failed import (chunkReload.ts): stay loading until it does,
-          // rather than fail on a missing module and report that.
-          module ? { default: module[pageName] } : new Promise<never>(() => {}),
-        (error: unknown) => {
-          const reset = () => {
-            failedLoads.delete(reset)
-            current = attempt()
-          }
-          failedLoads.add(reset)
-          throw error
-        },
-      ),
+          // failed import (chunkReload.ts): stay loading until it does, rather
+          // than fail on a missing module and report that. A reload that never
+          // comes -- the reader chose to stay on a "Leave site?" prompt -- is a
+          // failure after all, so the page offers "Try again" instead of
+          // loading for good.
+          module ? { default: module[pageName] } : reloadThatNeverCame(pageName),
+        )
+        .catch(failed),
     )
   let current = attempt()
   const Page: PageComponent = (props) => createElement(current, props)

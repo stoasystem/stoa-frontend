@@ -3,6 +3,7 @@ import type { SubscriptionPlan, SubscriptionStatus } from '@/types/billing'
 import type { UploadedFileStatus } from '@/types/file'
 import type { SupportTicketPriority, SupportTicketStatus } from '@/types/supportTicket'
 import type { TeacherHelpStatus } from '@/types/teacherHelp'
+import { normalSubjectId, subjectSlug } from '@/lib/subjects'
 import { readsEnglish } from '@/lib/userFacingText'
 
 type LabelMap = Record<string, string>
@@ -61,29 +62,6 @@ const subjectLabels: LabelMap = {
   english: 'English',
 }
 
-// Backend subjects and free-text profile entries reach the UI in several
-// spellings; every one of them resolves to a single subject id.
-const subjectAliases: Record<string, string> = {
-  math: 'math',
-  maths: 'math',
-  mathematics: 'math',
-  mathematik: 'math',
-  mathematiques: 'math',
-  matematica: 'math',
-  physics: 'physics',
-  physik: 'physics',
-  physique: 'physics',
-  fisica: 'physics',
-  german: 'german',
-  deutsch: 'german',
-  allemand: 'german',
-  tedesco: 'german',
-  english: 'english',
-  englisch: 'english',
-  anglais: 'english',
-  inglese: 'english',
-}
-
 // Seeded ZAP curriculum topics, keyed by the same slug the content ids use.
 const curriculumTopicLabels: LabelMap = {
   brueche: 'Brüche',
@@ -109,28 +87,16 @@ const rationaleKeys: Record<string, string> = {
     'practice:progress.rationale.signals',
 }
 
-function toSlug(value: string) {
-  return value
-    .trim()
-    .toLowerCase()
-    .replace(/ä/g, 'ae')
-    .replace(/ö/g, 'oe')
-    .replace(/ü/g, 'ue')
-    .replace(/ß/g, 'ss')
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .replace(/[^a-z0-9]+/g, '')
-}
-
 export function getSubjectLabel(subject: string, t: TFunction) {
-  const id = subjectAliases[toSlug(subject)]
-  if (!id) return subject
+  // Every spelling resolves to one id through the app's one alias table.
+  const id = normalSubjectId(subject)
+  if (!id || !(id in subjectLabels)) return subject
   return t(`chat:subjects.${id}`, { defaultValue: subjectLabels[id] })
 }
 
 /** Turn a curriculum topic slug into a readable title, keeping unknown labels as sent. */
 export function getCurriculumTopicLabel(label: string, t: TFunction) {
-  const slug = toSlug(label)
+  const slug = subjectSlug(label)
   const fallback = curriculumTopicLabels[slug]
   if (!fallback) return label
   return t(`practice:progress.topicNames.${slug}`, { defaultValue: fallback })

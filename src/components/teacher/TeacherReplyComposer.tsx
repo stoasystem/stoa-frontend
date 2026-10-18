@@ -145,13 +145,14 @@ function unsafeReplyReason(blocks: TeacherReplyBlock[]): 'html' | 'privateMarker
 }
 
 /*
- * Only what a browser would read as a tag counts: "<" straight before the tag
- * name (#268). "0 < a < 1", "0<a<1" and "set one = 1" are maths and plain
- * text, not HTML. Replies are rendered as text nodes, so this guards against
- * pasted markup; it is not the escaping itself.
+ * Only what a browser would read as a whole tag counts: "<" straight before
+ * the tag name, and the tag closed by ">" (#268). "0 < a < 1", "0<a<1",
+ * "wenn 0<a und a<1" and "set one = 1" are maths and plain text, not HTML;
+ * "<a href=...>" and "<script>" are markup. Replies are rendered as text nodes,
+ * so this guards against pasted markup; it is not the escaping itself.
  */
 const UNSAFE_TAG =
-  /<\/?(script|iframe|frame|frameset|embed|object|applet|style|link|meta|base|html|body|img|svg|math|video|audio|form|input|button|a)(?=[\s/>]|$)/
+  /<\/?(script|iframe|frame|frameset|embed|object|applet|style|link|meta|base|html|body|img|svg|math|video|audio|form|input|button|a)(?:[\s/][^<>]*)?>/
 
 function looksLikeUnsafeHtml(lowercased: string) {
   return UNSAFE_TAG.test(lowercased) || hasTagWithEventHandler(lowercased)

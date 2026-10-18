@@ -33,6 +33,9 @@ describe('the reply composer lets maths and plain text through', () => {
   it.each([
     ['an inequality', '0 < a < 1', 'paragraph'],
     ['an inequality without spaces', '0<a<1', 'paragraph'],
+    ['"<a" before a word (#283–#311 review)', 'Für 0<a und a<1 gilt das', 'paragraph'],
+    ['"<a" at the end', 'Dann ist b<a', 'paragraph'],
+    ['"<a" at the end of a line', 'Es gilt x<a\nund 0<y', 'paragraph'],
     ['a chain of comparisons', 'a<b>c und x <= y', 'paragraph'],
     ['"one =" in a sentence', 'Set one = 1 first, once = 2 after', 'paragraph'],
     ['an inequality in a formula block', '0 < a < 1', 'formula'],

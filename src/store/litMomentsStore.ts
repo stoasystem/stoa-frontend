@@ -16,7 +16,7 @@
  * it lit. Last week's conversations, and other subjects', show no card.
  */
 import { create } from 'zustand'
-import { learningSubjectOptions } from '@/types/learningProfile'
+import { normalSubjectId } from '@/lib/subjects'
 
 export type LitMoment = {
   unitId: string
@@ -58,11 +58,13 @@ export type LitMomentThread = {
   startedAt: string | undefined
 }
 
-/** The subject an id names (`math`, `subj-math`, `Math`...), as the subject options know it. */
+/**
+ * The subject an id names (`math`, `subj-math`, `Mathematik`, `Physik`...),
+ * through the app's one alias table; one it does not know is kept as sent.
+ */
 function subjectOf(id: string | undefined) {
   if (!id) return undefined
-  const lower = id.toLowerCase()
-  return learningSubjectOptions.find((option) => lower.includes(option.id))?.id ?? lower
+  return normalSubjectId(id) ?? id.trim().toLowerCase()
 }
 
 /** The moments whose card this conversation shows (#267). */

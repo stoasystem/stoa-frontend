@@ -1,30 +1,63 @@
 import type { TFunction } from 'i18next'
 
 /**
- * Subject spellings that reached DynamoDB before ids were normalised: free text
- * from the application forms and the English labels the teacher editor used to
- * save. The backend compares subjects through `practice_repo.normal_subject_id`
- * (lowercase, then its own shorter alias table), so writing the id is safe.
+ * Every spelling of a subject the app has met, by its slug (`subjectSlug`):
+ * the ids themselves, free text from application and profile forms, and the
+ * English labels the teacher editor used to save. One table for the whole app,
+ * so a subject reads the same on every page (#267, #270). The backend compares
+ * subjects through `practice_repo.normal_subject_id` (lowercase, then its own
+ * shorter alias table), so writing the id is safe.
  */
 export const SUBJECT_ALIASES: Record<string, string> = {
+  math: 'math',
+  maths: 'math',
   mathematics: 'math',
   mathematik: 'math',
   mathematiques: 'math',
   matematica: 'math',
+  physics: 'physics',
   physik: 'physics',
   physique: 'physics',
   fisica: 'physics',
+  chemistry: 'chemistry',
   chemie: 'chemistry',
   chimie: 'chemistry',
   chimica: 'chemistry',
+  biology: 'biology',
   biologie: 'biology',
   biologia: 'biology',
+  german: 'german',
   deutsch: 'german',
   allemand: 'german',
   tedesco: 'german',
+  english: 'english',
   englisch: 'english',
   anglais: 'english',
   inglese: 'english',
+}
+
+/** A spelling reduced to what `SUBJECT_ALIASES` is keyed by: lowercase ASCII letters and digits. */
+export function subjectSlug(value: string): string {
+  return value
+    .trim()
+    .toLowerCase()
+    .replace(/ä/g, 'ae')
+    .replace(/ö/g, 'oe')
+    .replace(/ü/g, 'ue')
+    .replace(/ß/g, 'ss')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, '')
+}
+
+/**
+ * The subject id a stored or sent subject names (`Mathematik`, `subj-math`
+ * and `math` are one subject), or `undefined` when the app does not know it.
+ */
+export function normalSubjectId(value: string | null | undefined): string | undefined {
+  if (!value) return undefined
+  const slug = subjectSlug(value)
+  return SUBJECT_ALIASES[slug] ?? (slug.startsWith('subj') ? SUBJECT_ALIASES[slug.slice(4)] : undefined)
 }
 
 /** The subjects a teacher can tick, as the ids saved for them. */
@@ -40,8 +73,7 @@ const NAMED_TEACHER_SUBJECTS = new Set<string>([...TEACHER_SUBJECT_IDS, 'german'
  */
 export function normalTeacherSubject(subject: string): string {
   const raw = (subject ?? '').trim()
-  const lower = raw.toLowerCase()
-  const id = SUBJECT_ALIASES[lower] ?? lower
+  const id = normalSubjectId(raw) ?? raw.toLowerCase()
   return NAMED_TEACHER_SUBJECTS.has(id) ? id : raw
 }
 

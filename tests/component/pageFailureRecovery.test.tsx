@@ -17,7 +17,7 @@ import { MemoryRouter, Route, Routes, useNavigate } from 'react-router-dom'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { CHUNK_RELOAD_KEY, CHUNK_RELOAD_WINDOW_MS, installChunkReload } from '@/app/chunkReload'
 import { buildRoutes } from '@/app/router/AppRoutes'
-import { lazyPage, type PageComponent } from '@/app/router/lazyPage'
+import { lazyPage, RELOAD_GRACE_MS, type PageComponent } from '@/app/router/lazyPage'
 import type { PageRoute } from '@/app/router/routeManifest'
 import { AppErrorBoundary, PageErrorBoundary } from '@/components/common/AppErrorBoundary'
 import { reportFrontendError } from '@/services/monitoring'
@@ -146,6 +146,42 @@ describe('a page whose import Vite gave up on for a reload', () => {
     expect(screen.getByText('loading')).toBeInTheDocument()
     expect(screen.queryByRole('alert')).toBeNull()
     expect(reportFrontendError).not.toHaveBeenCalled()
+  })
+})
+
+describe('a reload for a failed import that never comes (#283–#311 review)', () => {
+  it('stops loading after the grace period and offers "Try again"', async () => {
+    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] })
+    let calls = 0
+    const load = vi.fn(() => {
+      calls += 1
+      // Vite handed back nothing for the reload the reader then cancelled.
+      return calls === 1
+        ? Promise.resolve(undefined as unknown as Record<'Page', PageComponent>)
+        : Promise.resolve({ Page: () => <p>page loaded</p> })
+    })
+    const Page = lazyPage('Page', load)
+    try {
+      render(
+        <AppErrorBoundary>
+          <Suspense fallback={<p>loading</p>}>
+            <Page />
+          </Suspense>
+        </AppErrorBoundary>,
+      )
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(RELOAD_GRACE_MS - 1)
+      })
+      expect(screen.getByText('loading')).toBeInTheDocument()
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(1)
+      })
+    } finally {
+      vi.useRealTimers()
+    }
+    fireEvent.click(await screen.findByRole('button', { name: 'Try again' }))
+    expect(await screen.findByText('page loaded')).toBeInTheDocument()
+    expect(load).toHaveBeenCalledTimes(2)
   })
 })
 
