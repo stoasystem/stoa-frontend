@@ -15,7 +15,9 @@ import {
   useUpdateModerationCaseMutation,
 } from '@/hooks/admin/useAdminModerationCases'
 import { formatDayAndTime } from '@/lib/formatDateTime'
+import { toUserFacingError } from '@/lib/userFacingText'
 import { DashboardLayout } from '@/layouts/DashboardLayout'
+import { ApiError } from '@/services/api/httpClient'
 import type {
   ModerationCase,
   ModerationCaseStatus,
@@ -27,6 +29,7 @@ const statusOptions: (ModerationCaseStatus | '')[] = ['', 'open', 'in_review', '
 const severityOptions: (ModerationSeverity | '')[] = ['', 'low', 'medium', 'high']
 const reasonOptions: (ModerationReason | '')[] = ['', 'incorrect_answer', 'unsafe_content', 'abuse', 'privacy', 'other']
 const actionStatuses: ModerationCaseStatus[] = ['in_review', 'actioned', 'dismissed', 'closed']
+const QUEUE_LIMIT = 50
 
 export function AdminModerationPage() {
   const { t } = useTranslation('admin')
@@ -34,13 +37,13 @@ export function AdminModerationPage() {
   const [severity, setSeverity] = useState<ModerationSeverity | ''>('')
   const [reason, setReason] = useState<ModerationReason | ''>('')
   const [selectedCaseId, setSelectedCaseId] = useState<string | null>(null)
-  const [assignee, setAssignee] = useState('admin-1')
-  const [resolutionNote, setResolutionNote] = useState('')
-  const [caseNote, setCaseNote] = useState('')
 
-  const filters = useMemo(() => ({ status, severity, reason, limit: 50 }), [reason, severity, status])
+  const filters = useMemo(() => ({ status, severity, reason, limit: QUEUE_LIMIT }), [reason, severity, status])
   const casesQuery = useAdminModerationCasesQuery(filters)
   const cases = casesQuery.data?.items ?? []
+  // The backend has no cursor or offset, and its `count` is the length of
+  // this page. A full page means there may be more cases nobody can reach yet.
+  const mayHaveMore = cases.length >= QUEUE_LIMIT
 
   useEffect(() => {
     if (selectedCaseId || cases.length === 0) return
@@ -49,8 +52,6 @@ export function AdminModerationPage() {
 
   const detailQuery = useAdminModerationCaseQuery(selectedCaseId)
   const selectedCase = detailQuery.data ?? cases.find((item) => item.case_id === selectedCaseId) ?? null
-  const updateCase = useUpdateModerationCaseMutation()
-  const addNote = useAddModerationCaseNoteMutation()
 
   return (
     <DashboardLayout>
@@ -59,7 +60,15 @@ export function AdminModerationPage() {
           eyebrow={t('moderation.eyebrow')}
           title={t('moderation.title')}
           description={t('moderation.description')}
-          actions={<Badge variant="secondary">{t('moderation.caseCount', { count: casesQuery.data?.count ?? 0 })}</Badge>}
+          actions={
+            casesQuery.isSuccess && (
+              <Badge variant="secondary">
+                {mayHaveMore
+                  ? t('moderation.caseCountMore', { count: cases.length })
+                  : t('moderation.caseCount', { count: cases.length })}
+              </Badge>
+            )
+          }
         />
         <div className="grid gap-4 lg:grid-cols-[22rem_1fr]">
           <section className="space-y-4">
@@ -77,8 +86,14 @@ export function AdminModerationPage() {
               </CardHeader>
               <CardContent className="space-y-2">
                 {casesQuery.isLoading && <p className="text-sm text-muted-foreground">{t('moderation.loading')}</p>}
-                {casesQuery.isError && <p className="text-sm text-destructive">{t('moderation.loadFailed')}</p>}
-                {!casesQuery.isLoading && cases.length === 0 && (
+                {casesQuery.isError && (
+                  <p role="alert" className="text-sm text-destructive">
+                    {casesQuery.error instanceof ApiError && casesQuery.error.status === 403
+                      ? t('moderation.forbidden')
+                      : t('moderation.loadFailed')}
+                  </p>
+                )}
+                {casesQuery.isSuccess && cases.length === 0 && (
                   <p className="text-sm text-muted-foreground">{t('moderation.empty')}</p>
                 )}
                 {cases.map((item) => (
@@ -89,118 +104,18 @@ export function AdminModerationPage() {
                     onSelect={() => setSelectedCaseId(item.case_id)}
                   />
                 ))}
+                {casesQuery.isSuccess && mayHaveMore && (
+                  <p className="text-sm text-muted-foreground">{t('moderation.moreCases', { count: cases.length })}</p>
+                )}
               </CardContent>
             </Card>
           </section>
           <section>
             {selectedCase ? (
-              <Card>
-                <CardHeader>
-                  <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
-                    <div>
-                      <CardTitle className="text-lg">{t('moderation.caseTitle', { id: selectedCase.case_id })}</CardTitle>
-                      <p className="mt-1 text-sm text-muted-foreground">
-                        {surfaceLabel(selectedCase.surface, t)} - {reasonLabel(selectedCase.reason, t)}
-                      </p>
-                    </div>
-                    <div className="flex flex-wrap gap-2">
-                      <StatusBadge status={selectedCase.status} />
-                      <SeverityBadge severity={selectedCase.severity} />
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent className="space-y-5">
-                  <ModerationContext item={selectedCase} />
-                  <div className="grid gap-4 md:grid-cols-[1fr_1fr]">
-                    <div className="rounded-md border p-4">
-                      <div className="flex items-center gap-2">
-                        <UserCheck className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
-                        <h2 className="text-sm font-semibold">{t('moderation.assignment')}</h2>
-                      </div>
-                      <label className="mt-3 grid gap-2 text-sm">
-                        {t('moderation.assignee')}
-                        <input
-                          value={assignee}
-                          onChange={(event) => setAssignee(event.target.value)}
-                          className="h-10 rounded-md border bg-background px-3"
-                        />
-                      </label>
-                      <Button
-                        type="button"
-                        variant="outline"
-                        className="mt-3 w-full"
-                        disabled={updateCase.isPending}
-                        onClick={() =>
-                          selectedCaseId &&
-                          updateCase.mutate({ caseId: selectedCaseId, assigned_admin_id: assignee })
-                        }
-                      >
-                        {t('moderation.assign')}
-                      </Button>
-                    </div>
-                    <div className="rounded-md border p-4">
-                      <div className="flex items-center gap-2">
-                        <CheckCircle2 className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
-                        <h2 className="text-sm font-semibold">{t('moderation.statusAction')}</h2>
-                      </div>
-                      <Textarea
-                        value={resolutionNote}
-                        onChange={(event) => setResolutionNote(event.target.value)}
-                        placeholder={t('moderation.resolutionNote')}
-                        className="mt-3 min-h-20"
-                      />
-                      <div className="mt-3 flex flex-wrap gap-2">
-                        {actionStatuses.map((nextStatus) => (
-                          <Button
-                            key={nextStatus}
-                            type="button"
-                            variant={nextStatus === 'actioned' ? 'default' : 'outline'}
-                            size="sm"
-                            disabled={updateCase.isPending}
-                            onClick={() =>
-                              selectedCaseId &&
-                              updateCase.mutate({
-                                caseId: selectedCaseId,
-                                status: nextStatus,
-                                resolution_note: resolutionNote.trim() || undefined,
-                              })
-                            }
-                          >
-                            {statusLabel(nextStatus, t)}
-                          </Button>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                  <div className="rounded-md border p-4">
-                    <div className="flex items-center gap-2">
-                      <MessageSquare className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
-                      <h2 className="text-sm font-semibold">{t('moderation.internalNote')}</h2>
-                    </div>
-                    <Textarea
-                      value={caseNote}
-                      onChange={(event) => setCaseNote(event.target.value)}
-                      placeholder={t('moderation.notePlaceholder')}
-                      className="mt-3 min-h-20"
-                    />
-                    <Button
-                      type="button"
-                      className="mt-3"
-                      disabled={addNote.isPending || !caseNote.trim()}
-                      onClick={() =>
-                        selectedCaseId &&
-                        addNote.mutate(
-                          { caseId: selectedCaseId, note: caseNote.trim() },
-                          { onSuccess: () => setCaseNote('') },
-                        )
-                      }
-                    >
-                      {t('moderation.addNote')}
-                    </Button>
-                  </div>
-                  <ModerationHistory item={selectedCase} />
-                </CardContent>
-              </Card>
+              // Keyed by case: the note, the assignee and the outcome of the
+              // last action belong to one case and must not follow the admin
+              // to the next one (#261).
+              <ModerationCaseDetail key={selectedCase.case_id} item={selectedCase} />
             ) : (
               <Card>
                 <CardContent className="p-6 text-sm text-muted-foreground">
@@ -212,6 +127,165 @@ export function AdminModerationPage() {
         </div>
       </PageContainer>
     </DashboardLayout>
+  )
+}
+
+type CaseFeedback =
+  | { kind: 'success'; message: string }
+  | { kind: 'error'; message: string }
+
+function ModerationCaseDetail({ item }: { item: ModerationCase }) {
+  const { t } = useTranslation('admin')
+  // An empty assignee, not a placeholder account: the backend stores whatever
+  // string it is sent, so a default here assigned cases to "admin-1" (#261).
+  const [assignee, setAssignee] = useState(item.assigned_admin_id ?? '')
+  const [resolutionNote, setResolutionNote] = useState('')
+  const [caseNote, setCaseNote] = useState('')
+  const [feedback, setFeedback] = useState<CaseFeedback | null>(null)
+  const updateCase = useUpdateModerationCaseMutation()
+  const addNote = useAddModerationCaseNoteMutation()
+  const busy = updateCase.isPending || addNote.isPending
+  const trimmedAssignee = assignee.trim()
+
+  const fail = (error: unknown, fallbackKey: string) =>
+    setFeedback({ kind: 'error', message: toUserFacingError(error, t(fallbackKey)) })
+
+  const assign = () => {
+    setFeedback(null)
+    updateCase.mutate(
+      { caseId: item.case_id, assigned_admin_id: trimmedAssignee },
+      {
+        onSuccess: () => setFeedback({ kind: 'success', message: t('moderation.assigned', { admin: trimmedAssignee }) }),
+        onError: (error) => fail(error, 'moderation.updateFailed'),
+      },
+    )
+  }
+
+  const transition = (nextStatus: ModerationCaseStatus) => {
+    setFeedback(null)
+    updateCase.mutate(
+      { caseId: item.case_id, status: nextStatus, resolution_note: resolutionNote.trim() || undefined },
+      {
+        onSuccess: () => {
+          setResolutionNote('')
+          setFeedback({ kind: 'success', message: t('moderation.statusChanged', { status: statusLabel(nextStatus, t) }) })
+        },
+        onError: (error) => fail(error, 'moderation.updateFailed'),
+      },
+    )
+  }
+
+  const saveNote = () => {
+    setFeedback(null)
+    addNote.mutate(
+      { caseId: item.case_id, note: caseNote.trim() },
+      {
+        onSuccess: () => {
+          setCaseNote('')
+          setFeedback({ kind: 'success', message: t('moderation.noteAdded') })
+        },
+        onError: (error) => fail(error, 'moderation.noteFailed'),
+      },
+    )
+  }
+
+  return (
+    <Card>
+      <CardHeader>
+        <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+          <div>
+            <CardTitle className="text-lg">{t('moderation.caseTitle', { id: item.case_id })}</CardTitle>
+            <p className="mt-1 text-sm text-muted-foreground">
+              {surfaceLabel(item.surface, t)} - {reasonLabel(item.reason, t)}
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <StatusBadge status={item.status} />
+            <SeverityBadge severity={item.severity} />
+          </div>
+        </div>
+      </CardHeader>
+      <CardContent className="space-y-5">
+        {feedback && (
+          <p
+            role={feedback.kind === 'error' ? 'alert' : 'status'}
+            className={`rounded-md border p-3 text-sm ${
+              feedback.kind === 'error' ? 'border-destructive/40 bg-destructive/5 text-destructive' : 'bg-secondary/40'
+            }`}
+          >
+            {feedback.message}
+          </p>
+        )}
+        <ModerationContext item={item} />
+        <div className="grid gap-4 md:grid-cols-[1fr_1fr]">
+          <div className="rounded-md border p-4">
+            <div className="flex items-center gap-2">
+              <UserCheck className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
+              <h2 className="text-sm font-semibold">{t('moderation.assignment')}</h2>
+            </div>
+            <label className="mt-3 grid gap-2 text-sm">
+              {t('moderation.assignee')}
+              <input
+                value={assignee}
+                onChange={(event) => setAssignee(event.target.value)}
+                className="h-10 rounded-md border bg-background px-3"
+              />
+            </label>
+            <Button
+              type="button"
+              variant="outline"
+              className="mt-3 w-full"
+              disabled={busy || !trimmedAssignee}
+              onClick={assign}
+            >
+              {t('moderation.assign')}
+            </Button>
+          </div>
+          <div className="rounded-md border p-4">
+            <div className="flex items-center gap-2">
+              <CheckCircle2 className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
+              <h2 className="text-sm font-semibold">{t('moderation.statusAction')}</h2>
+            </div>
+            <Textarea
+              value={resolutionNote}
+              onChange={(event) => setResolutionNote(event.target.value)}
+              placeholder={t('moderation.resolutionNote')}
+              className="mt-3 min-h-20"
+            />
+            <div className="mt-3 flex flex-wrap gap-2">
+              {actionStatuses.map((nextStatus) => (
+                <Button
+                  key={nextStatus}
+                  type="button"
+                  variant={nextStatus === 'actioned' ? 'default' : 'outline'}
+                  size="sm"
+                  disabled={busy}
+                  onClick={() => transition(nextStatus)}
+                >
+                  {statusLabel(nextStatus, t)}
+                </Button>
+              ))}
+            </div>
+          </div>
+        </div>
+        <div className="rounded-md border p-4">
+          <div className="flex items-center gap-2">
+            <MessageSquare className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
+            <h2 className="text-sm font-semibold">{t('moderation.internalNote')}</h2>
+          </div>
+          <Textarea
+            value={caseNote}
+            onChange={(event) => setCaseNote(event.target.value)}
+            placeholder={t('moderation.notePlaceholder')}
+            className="mt-3 min-h-20"
+          />
+          <Button type="button" className="mt-3" disabled={busy || !caseNote.trim()} onClick={saveNote}>
+            {t('moderation.addNote')}
+          </Button>
+        </div>
+        <ModerationHistory item={item} />
+      </CardContent>
+    </Card>
   )
 }
 
