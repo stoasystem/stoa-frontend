@@ -19,6 +19,7 @@ import { MemoryRouter, useLocation } from 'react-router-dom'
 import { afterAll, beforeEach, describe, expect, it, vi } from 'vitest'
 import '@/i18n'
 import { AppRoutes } from '@/app/router/AppRoutes'
+import { rememberSession } from '@/lib/devSessions'
 import { readTabSignOut, tabNeedsAccountChoice } from '@/lib/tabAccount'
 import { EntryPage } from '@/pages/entry/EntryPage'
 import { type CurrentUser, useAuthStore } from '@/store/authStore'
@@ -76,9 +77,11 @@ function reloadHome() {
   )
 }
 
-function accountArrives(role: CurrentUser['role']) {
+function accountArrives(role: CurrentUser['role'], options: { mustChangePassword?: boolean } = {}) {
   act(() =>
-    useAuthStore.getState().setUser({ id: `u-${role}`, name: 'Ada', email: 'ada@test.stoaedu.ch', role } as CurrentUser),
+    useAuthStore
+      .getState()
+      .setUser({ id: `u-${role}`, name: 'Ada', email: 'ada@test.stoaedu.ch', role, ...options } as CurrentUser),
   )
 }
 
@@ -131,6 +134,14 @@ describe('"/" while the account is being read', () => {
     expect(screen.queryByRole('form', { name: 'sign in' })).toBeNull()
   })
 
+  it('sends a reset student to the password change once the account is in', () => {
+    reloadHome()
+    accountArrives('student', { mustChangePassword: true })
+
+    expect(pathname).toBe('/settings/password')
+    expect(screen.getByTestId('page')).toHaveTextContent('ChangePasswordPage')
+  })
+
   it('asks the same account to sign in again when the session turns out to have ended (ADR 0002)', () => {
     reloadHome()
     act(() =>
@@ -151,5 +162,24 @@ describe('"/" while the account is being read', () => {
     act(() => useAuthStore.getState().clearAuth())
 
     expect(screen.getByRole('form', { name: 'sign in' })).toHaveAttribute('data-email', '')
+  })
+})
+
+describe('"/" in a tab without a session is unchanged', () => {
+  it('asks a new tab which saved account it is (ADR 0002)', () => {
+    for (const email of ['ada@test.stoaedu.ch', 'bob@test.stoaedu.ch']) {
+      rememberSession({ email, name: email, role: 'student', accessToken: `held-${email}` })
+    }
+    useAuthStore.setState({ user: null, accessToken: null, isAuthenticated: false })
+    render(
+      <QueryClientProvider client={new QueryClient()}>
+        <MemoryRouter initialEntries={['/']}>
+          <AppRoutes />
+        </MemoryRouter>
+      </QueryClientProvider>,
+    )
+
+    expect(screen.getByText('Who is using this tab?')).toBeInTheDocument()
+    expect(screen.queryByRole('status')).toBeNull()
   })
 })
