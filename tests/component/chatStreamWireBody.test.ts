@@ -12,6 +12,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { streamConversationMessage } from '@/services/chat/chatStreamApi'
 import { toUserFacingError } from '@/lib/userFacingText'
+import { ApiError } from '@/services/api/httpClient'
 
 const originalFetch = globalThis.fetch
 
@@ -76,5 +77,42 @@ describe('the attachments on a message, on the wire', () => {
     expect(refused).toBeInstanceOf(Error)
     expect((refused as Error).message).toBe('Request failed with status code 503')
     expect(toUserFacingError(refused, 'fallback')).toBe('fallback')
+  })
+})
+
+describe('a refused stream request, read the way httpClient reads one (#252)', () => {
+  async function refusedWith(body: unknown, status = 403) {
+    globalThis.fetch = vi.fn(async () => new Response(JSON.stringify(body), { status })) as typeof fetch
+    return streamConversationMessage({
+      conversationId: 'c-1',
+      payload: { content: 'Why?', idempotencyKey: 'k-1' },
+      onEvent: () => {},
+    }).catch((error: unknown) => error)
+  }
+
+  it('reads the code and message under detail', async () => {
+    const refused = await refusedWith({ detail: { code: 'quota_exceeded', message: 'Daily limit reached.' } }, 429)
+
+    expect(refused).toBeInstanceOf(ApiError)
+    expect(refused).toMatchObject({ status: 429, code: 'quota_exceeded', message: 'Daily limit reached.' })
+  })
+
+  it('reads the flat code and message too (safe_error_body), which were lost', async () => {
+    const refused = await refusedWith({ code: 'content_refused', message: 'This question was refused.', correlationId: 'x' })
+
+    expect(refused).toBeInstanceOf(ApiError)
+    expect(refused).toMatchObject({ status: 403, code: 'content_refused', message: 'This question was refused.' })
+  })
+
+  it('prefers the code under detail when both are sent', async () => {
+    const refused = await refusedWith({ detail: { code: 'inner', message: 'Inner.' }, code: 'outer' })
+
+    expect(refused).toMatchObject({ code: 'inner', message: 'Inner.' })
+  })
+
+  it('keeps a string detail as the message, with no code', async () => {
+    const refused = await refusedWith({ detail: 'Conversation not found.' }, 404)
+
+    expect(refused).toMatchObject({ status: 404, code: undefined, message: 'Conversation not found.' })
   })
 })

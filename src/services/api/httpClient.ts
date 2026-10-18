@@ -28,6 +28,37 @@ export class ApiError extends Error {
   }
 }
 
+/**
+ * The `ApiError` for a refused request's body, read the one way for every
+ * request: through axios here, and by the Ask stream, which calls `fetch`
+ * itself (#252).
+ *
+ * The backend sends its code two ways: under `detail` ({detail: {code,
+ * message}}), and flat ({code, message, correlationId}) for an identity
+ * provider's refusal (`safe_error_body`): an unconfirmed account, a wrong
+ * or expired verification code. Read only under `detail`, the flat one was
+ * lost (#185 review, and in the stream until #252).
+ */
+export function apiErrorFromBody(
+  body: unknown,
+  { status, transportCode, fallback }: { status?: number; transportCode?: string; fallback: string },
+): ApiError {
+  const data = typeof body === 'object' && body !== null ? (body as Record<string, unknown>) : undefined
+  const detail = data?.detail ?? data?.message
+  const message = typeof detail === 'object' && detail !== null && 'message' in detail
+    ? String(detail.message)
+    : typeof detail === 'string'
+      ? detail
+      : fallback
+  const flatCode = data?.code
+  const code = typeof detail === 'object' && detail !== null && 'code' in detail
+    ? String(detail.code)
+    : typeof flatCode === 'string'
+      ? flatCode
+      : undefined
+  return new ApiError(message, { status, detail, code, transportCode })
+}
+
 export const httpClient = axios.create({
   baseURL: apiBaseUrl,
   headers: {
@@ -320,26 +351,14 @@ httpClient.interceptors.response.use(
       if (answered) return answered
     }
 
-    const detail = error.response?.data?.detail ?? error.response?.data?.message
-    const message = typeof detail === 'object' && detail !== null && 'message' in detail
-      ? String(detail.message)
-      : typeof detail === 'string'
-        ? detail
-        : error.message ?? 'Unknown API error'
-    // The backend sends its code two ways: under `detail` ({detail: {code,
-    // message}}), and flat ({code, message, correlationId}) for an identity
-    // provider's refusal (`safe_error_body`): an unconfirmed account, a wrong
-    // or expired verification code. Read only under `detail`, the flat one was
-    // lost (#185 review).
-    const flatCode = error.response?.data?.code
-    const code = typeof detail === 'object' && detail !== null && 'code' in detail
-      ? String(detail.code)
-      : typeof flatCode === 'string'
-        ? flatCode
-        : undefined
-
     const transportCode = typeof error.code === 'string' ? error.code : undefined
 
-    return Promise.reject(new ApiError(message, { status, detail, code, transportCode }))
+    return Promise.reject(
+      apiErrorFromBody(error.response?.data, {
+        status,
+        transportCode,
+        fallback: error.message ?? 'Unknown API error',
+      }),
+    )
   },
 )

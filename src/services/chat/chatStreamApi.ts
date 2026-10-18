@@ -1,5 +1,5 @@
 import { apiPath } from '@/services/api/apiPath'
-import { answerUnauthorized, ApiError, httpClient } from '@/services/api/httpClient'
+import { answerUnauthorized, apiErrorFromBody, httpClient } from '@/services/api/httpClient'
 import { storedRefreshToken } from '@/services/auth/sessionRefresh'
 import { currentSessionToken } from '@/store/authStore'
 import { allowDemoFallback, apiBaseUrl } from '@/lib/env'
@@ -156,26 +156,19 @@ export async function streamConversationMessage({
 
 /** The refusal as `httpClient` would report it: the server's message and code. */
 async function streamRequestError(response: Response) {
-  // Said as axios says it, so `toUserFacingError` knows it for a bare status
-  // and shows its own words (#183: "Streaming request failed with status 503"
-  // reached the student).
-  const fallback = `Request failed with status code ${response.status}`
-  let detail: unknown
+  let body: unknown
   try {
-    const body = (await response.json()) as { detail?: unknown }
-    detail = body?.detail
+    body = await response.json()
   } catch {
-    detail = undefined
+    body = undefined
   }
-  const record = typeof detail === 'object' && detail !== null ? (detail as Record<string, unknown>) : null
-  return new ApiError(
-    typeof record?.message === 'string' ? record.message : typeof detail === 'string' ? detail : fallback,
-    {
-      status: response.status,
-      detail,
-      code: typeof record?.code === 'string' ? record.code : undefined,
-    },
-  )
+  return apiErrorFromBody(body, {
+    status: response.status,
+    // Said as axios says it, so `toUserFacingError` knows it for a bare status
+    // and shows its own words (#183: "Streaming request failed with status 503"
+    // reached the student).
+    fallback: `Request failed with status code ${response.status}`,
+  })
 }
 
 async function emitDemoStream({
