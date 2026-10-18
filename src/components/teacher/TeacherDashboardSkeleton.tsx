@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { Skeleton } from '@/components/common/Skeleton'
 import { Card, CardContent } from '@/components/ui/card'
 
@@ -6,8 +7,9 @@ type TeacherDashboardSkeletonProps = {
 }
 
 export function TeacherDashboardSkeleton({ showHeader = true }: TeacherDashboardSkeletonProps) {
+  const { t } = useTranslation('common')
   return (
-    <div className="space-y-6" role="status" aria-label="Loading teacher dashboard">
+    <div className="space-y-6" role="status" aria-label={t('a11y.loadingDashboard')}>
       {showHeader && (
         <div className="space-y-3">
           <Skeleton className="h-7 w-52" />
@@ -27,7 +29,7 @@ export function TeacherDashboardSkeleton({ showHeader = true }: TeacherDashboard
           </Card>
         ))}
       </div>
-      <span className="sr-only">Loading...</span>
+      <span className="sr-only">{t('a11y.loadingDashboard')}</span>
     </div>
   )
 }

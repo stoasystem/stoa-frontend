@@ -228,6 +228,7 @@
     "note": "Note",
     "notePlaceholder": "What should the admin review?",
     "submitFailed": "Could not submit moderation report.",
+    "submitted": "Report sent. The administration will review it (case {{caseId}}).",
     "cancel": "Cancel",
     "submitting": "Submitting...",
     "submit": "Submit report",

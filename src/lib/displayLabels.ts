@@ -7,99 +7,51 @@ import { readsEnglish } from '@/lib/userFacingText'
 
 type LabelMap = Record<string, string>
 
-const teacherHelpStatusLabels: LabelMap = {
-  pending: 'Pending',
-  assigned: 'Assigned',
-  in_progress: 'In progress',
-  resolved: 'Resolved',
-  cancelled: 'Cancelled',
-  withdrawn: 'Withdrawn',
-  expired: 'Expired',
-}
+// A status value is a single key segment; anything else (dots, colons, empty)
+// would address a different key or a whole group, so it reads as unknown.
+const statusValuePattern = /^[a-z0-9_]+$/i
 
-const supportTicketStatusLabels: LabelMap = {
-  open: 'Open',
-  waiting_on_user: 'Waiting on reply',
-  in_review: 'In review',
-  resolved: 'Resolved',
-}
-
-const supportTicketPriorityLabels: LabelMap = {
-  low: 'Low',
-  normal: 'Normal',
-  high: 'High',
-  urgent: 'Urgent',
-}
-
-const subscriptionStatusLabels: LabelMap = {
-  trial: 'Trial',
-  active: 'Active',
-  inactive: 'Inactive',
-  expired: 'Expired',
-}
-
-const subscriptionPlanLabels: LabelMap = {
-  free_trial: 'Free trial',
-  student: 'Student plan',
-  teacher_supported: 'Teacher-supported plan',
-  family: 'Family plan',
-}
-
-const fileStatusLabels: LabelMap = {
-  uploaded: 'Uploaded',
-  processing: 'Processing',
-  parsed: 'Ready',
-  failed: 'Failed',
-}
-
-const learningTopicStatusLabels: LabelMap = {
-  strong: 'Strong',
-  stable: 'Stable',
-  developing: 'Developing',
-  weak: 'Needs practice',
-}
-
-const adminFeedbackStatusLabels: LabelMap = {
-  new: 'New',
-  reviewed: 'Reviewed',
-  resolved: 'Resolved',
-}
-
-function labelFromMap(t: TFunction, key: string, fallbackMap: LabelMap, value: string) {
-  const fallback = fallbackMap[value] ?? 'Status unavailable'
-  return t(key, { defaultValue: fallback })
+/**
+ * A status value in the reader's language. A value the locales do not know
+ * says "status unavailable" in that language too, rather than in English
+ * (#279).
+ */
+function statusLabel(t: TFunction, group: string, value: string) {
+  const unavailable = t('common:status.unavailable')
+  if (!statusValuePattern.test(value)) return unavailable
+  return t(`common:status.${group}.${value}`, { defaultValue: unavailable })
 }
 
 export function getTeacherHelpStatusLabel(status: TeacherHelpStatus | string, t: TFunction) {
-  return labelFromMap(t, `common:status.teacherHelp.${status}`, teacherHelpStatusLabels, status)
+  return statusLabel(t, 'teacherHelp', status)
 }
 
 export function getSupportTicketStatusLabel(status: SupportTicketStatus | string, t: TFunction) {
-  return labelFromMap(t, `common:status.supportTicket.${status}`, supportTicketStatusLabels, status)
+  return statusLabel(t, 'supportTicket', status)
 }
 
 export function getSupportTicketPriorityLabel(priority: SupportTicketPriority | string, t: TFunction) {
-  return labelFromMap(t, `common:status.priority.${priority}`, supportTicketPriorityLabels, priority)
+  return statusLabel(t, 'priority', priority)
 }
 
 export function getSubscriptionStatusLabel(status: SubscriptionStatus | string, t: TFunction) {
-  return labelFromMap(t, `common:status.subscription.${status}`, subscriptionStatusLabels, status)
+  return statusLabel(t, 'subscription', status)
 }
 
 export function getSubscriptionPlanLabel(plan: SubscriptionPlan | string, t: TFunction) {
-  return labelFromMap(t, `common:status.plan.${plan}`, subscriptionPlanLabels, plan)
+  return statusLabel(t, 'plan', plan)
 }
 
 export function getFileStatusLabel(status: UploadedFileStatus | string, t: TFunction) {
-  return labelFromMap(t, `common:status.file.${status}`, fileStatusLabels, status)
+  return statusLabel(t, 'file', status)
 }
 
 export function getLearningTopicStatusLabel(status: string, t: TFunction) {
-  return labelFromMap(t, `common:status.learningTopic.${status}`, learningTopicStatusLabels, status)
+  return statusLabel(t, 'learningTopic', status)
 }
 
 export function getAdminFeedbackStatusLabel(status: string, t: TFunction) {
-  return labelFromMap(t, `common:status.adminFeedback.${status}`, adminFeedbackStatusLabels, status)
+  return statusLabel(t, 'adminFeedback', status)
 }
 
 const subjectLabels: LabelMap = {

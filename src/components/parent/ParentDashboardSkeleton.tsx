@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { Skeleton } from '@/components/common/Skeleton'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 
@@ -6,8 +7,9 @@ type ParentDashboardSkeletonProps = {
 }
 
 export function ParentDashboardSkeleton({ showHeader = true }: ParentDashboardSkeletonProps) {
+  const { t } = useTranslation('common')
   return (
-    <div className="space-y-6" role="status" aria-label="Loading parent dashboard">
+    <div className="space-y-6" role="status" aria-label={t('a11y.loadingDashboard')}>
       {showHeader && (
         <div className="space-y-3">
           <Skeleton className="h-7 w-56" />
@@ -27,7 +29,7 @@ export function ParentDashboardSkeleton({ showHeader = true }: ParentDashboardSk
           </Card>
         ))}
       </div>
-      <span className="sr-only">Loading...</span>
+      <span className="sr-only">{t('a11y.loadingDashboard')}</span>
     </div>
   )
 }
