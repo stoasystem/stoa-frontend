@@ -112,6 +112,19 @@ describe('which moments a conversation shows', () => {
     expect(litMomentsFor([moment('c-1', 'physics')], thread)).toEqual([])
   })
 
+  it('knows a subject by its German, French or Italian name too (#283–#311 review)', () => {
+    for (const [subject, subjectId] of [
+      ['Physik', 'physics'],
+      ['Deutsch', 'german'],
+      ['Englisch', 'english'],
+      ['fisica', 'physics'],
+      ['Mathématiques', 'math'],
+    ]) {
+      expect(litMomentsFor([moment('c-1', subjectId)], { ...thread, subject })).toHaveLength(1)
+    }
+    expect(litMomentsFor([moment('c-1', 'german')], { ...thread, subject: 'Physik' })).toEqual([])
+  })
+
   it('shows none while the conversation is still loading', () => {
     expect(litMomentsFor([moment('c-1')], { id: 'c-1', subject: undefined, startedAt: undefined })).toEqual([])
   })

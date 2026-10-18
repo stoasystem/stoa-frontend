@@ -210,6 +210,37 @@ describe('actions say how they went', () => {
   })
 })
 
+describe('a write on its way while the admin opens another case (#283–#311 review)', () => {
+  it('still says how it ended when the admin comes back, and allows no second write meanwhile', async () => {
+    listOf([moderationCase('case-a'), moderationCase('case-b')])
+    let fail!: (error: unknown) => void
+    api.updateModerationCase.mockImplementationOnce(
+      () => new Promise((_, reject) => {
+        fail = reject
+      }),
+    )
+    renderPage()
+    await caseHeading('case-a')
+
+    fireEvent.click(screen.getByRole('button', { name: 'Actioned' }))
+    await waitFor(() => expect(api.updateModerationCase).toHaveBeenCalledTimes(1))
+
+    fireEvent.click(caseButton('case-b'))
+    await caseHeading('case-b')
+    // Case A's write is still out: case B cannot start another.
+    expect(screen.getByRole('button', { name: 'Dismissed' })).toBeDisabled()
+    expect(screen.getByRole('button', { name: 'Add note' })).toBeDisabled()
+
+    await act(async () => fail(new ApiError('Request failed with status code 500', { status: 500 })))
+    // Said on the case it belongs to, not on the one now open.
+    expect(screen.queryByRole('alert')).toBeNull()
+
+    fireEvent.click(caseButton('case-a'))
+    await caseHeading('case-a')
+    expect(await screen.findByRole('alert')).toHaveTextContent('Could not update the case. Please try again.')
+  })
+})
+
 describe('the queue', () => {
   it('does not also say "no cases" when the load failed', async () => {
     api.getModerationCases.mockRejectedValue(new ApiError('Request failed with status code 500', { status: 500 }))

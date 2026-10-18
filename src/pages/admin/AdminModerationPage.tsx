@@ -53,6 +53,19 @@ export function AdminModerationPage() {
   const detailQuery = useAdminModerationCaseQuery(selectedCaseId)
   const selectedCase = detailQuery.data ?? cases.find((item) => item.case_id === selectedCaseId) ?? null
 
+  // The writes and what became of them live here, not in the case's detail:
+  // an admin who opens another case while one is on its way still learns how
+  // it ended when they come back, and cannot start a second write meanwhile.
+  const updateCase = useUpdateModerationCaseMutation()
+  const addNote = useAddModerationCaseNoteMutation()
+  const [feedback, setFeedback] = useState<CaseFeedback | null>(null)
+  const writes: CaseWrites = {
+    updateCase,
+    addNote,
+    busy: updateCase.isPending || addNote.isPending,
+    setFeedback,
+  }
+
   return (
     <DashboardLayout>
       <PageContainer size="wide" className="p-0">
@@ -115,7 +128,12 @@ export function AdminModerationPage() {
               // Keyed by case: the note, the assignee and the outcome of the
               // last action belong to one case and must not follow the admin
               // to the next one (#261).
-              <ModerationCaseDetail key={selectedCase.case_id} item={selectedCase} />
+              <ModerationCaseDetail
+                key={selectedCase.case_id}
+                item={selectedCase}
+                writes={writes}
+                feedback={feedback?.caseId === selectedCase.case_id ? feedback : null}
+              />
             ) : (
               <Card>
                 <CardContent className="p-6 text-sm text-muted-foreground">
@@ -130,45 +148,57 @@ export function AdminModerationPage() {
   )
 }
 
-type CaseFeedback =
-  | { kind: 'success'; message: string }
-  | { kind: 'error'; message: string }
+type CaseFeedback = { caseId: string; kind: 'success' | 'error'; message: string }
 
-function ModerationCaseDetail({ item }: { item: ModerationCase }) {
+type CaseWrites = {
+  updateCase: ReturnType<typeof useUpdateModerationCaseMutation>
+  addNote: ReturnType<typeof useAddModerationCaseNoteMutation>
+  /** A write is on its way, for this case or another. */
+  busy: boolean
+  setFeedback: (feedback: CaseFeedback | null) => void
+}
+
+function ModerationCaseDetail({
+  item,
+  writes,
+  feedback,
+}: {
+  item: ModerationCase
+  writes: CaseWrites
+  feedback: CaseFeedback | null
+}) {
   const { t } = useTranslation('admin')
   // An empty assignee, not a placeholder account: the backend stores whatever
   // string it is sent, so a default here assigned cases to "admin-1" (#261).
   const [assignee, setAssignee] = useState(item.assigned_admin_id ?? '')
   const [resolutionNote, setResolutionNote] = useState('')
   const [caseNote, setCaseNote] = useState('')
-  const [feedback, setFeedback] = useState<CaseFeedback | null>(null)
-  const updateCase = useUpdateModerationCaseMutation()
-  const addNote = useAddModerationCaseNoteMutation()
-  const busy = updateCase.isPending || addNote.isPending
+  const { updateCase, addNote, busy } = writes
+  const caseId = item.case_id
+  const setFeedback = (kind: CaseFeedback['kind'], message: string) => writes.setFeedback({ caseId, kind, message })
   const trimmedAssignee = assignee.trim()
 
-  const fail = (error: unknown, fallbackKey: string) =>
-    setFeedback({ kind: 'error', message: toUserFacingError(error, t(fallbackKey)) })
+  const fail = (error: unknown, fallbackKey: string) => setFeedback('error', toUserFacingError(error, t(fallbackKey)))
 
   const assign = () => {
-    setFeedback(null)
+    writes.setFeedback(null)
     updateCase.mutate(
-      { caseId: item.case_id, assigned_admin_id: trimmedAssignee },
+      { caseId, assigned_admin_id: trimmedAssignee },
       {
-        onSuccess: () => setFeedback({ kind: 'success', message: t('moderation.assigned', { admin: trimmedAssignee }) }),
+        onSuccess: () => setFeedback('success', t('moderation.assigned', { admin: trimmedAssignee })),
         onError: (error) => fail(error, 'moderation.updateFailed'),
       },
     )
   }
 
   const transition = (nextStatus: ModerationCaseStatus) => {
-    setFeedback(null)
+    writes.setFeedback(null)
     updateCase.mutate(
-      { caseId: item.case_id, status: nextStatus, resolution_note: resolutionNote.trim() || undefined },
+      { caseId, status: nextStatus, resolution_note: resolutionNote.trim() || undefined },
       {
         onSuccess: () => {
           setResolutionNote('')
-          setFeedback({ kind: 'success', message: t('moderation.statusChanged', { status: statusLabel(nextStatus, t) }) })
+          setFeedback('success', t('moderation.statusChanged', { status: statusLabel(nextStatus, t) }))
         },
         onError: (error) => fail(error, 'moderation.updateFailed'),
       },
@@ -176,13 +206,13 @@ function ModerationCaseDetail({ item }: { item: ModerationCase }) {
   }
 
   const saveNote = () => {
-    setFeedback(null)
+    writes.setFeedback(null)
     addNote.mutate(
-      { caseId: item.case_id, note: caseNote.trim() },
+      { caseId, note: caseNote.trim() },
       {
         onSuccess: () => {
           setCaseNote('')
-          setFeedback({ kind: 'success', message: t('moderation.noteAdded') })
+          setFeedback('success', t('moderation.noteAdded'))
         },
         onError: (error) => fail(error, 'moderation.noteFailed'),
       },

@@ -280,6 +280,21 @@ describe('reviewing a teacher application', () => {
     expect(screen.getByRole('button', { name: enAdmin.teacherApplications.resend })).toBeInTheDocument()
   })
 
+  it('names the subjects in the reader’s language, in the list and the detail (#283–#311 review)', async () => {
+    await i18n.changeLanguage('de')
+    const application = { ...pending, subjects: ['math', 'Physics', 'Chemie'] }
+    state.applications = [application]
+    state.detail = { data: { ...application, statement: 'Ich unterrichte.' }, isPending: false, isError: false, error: null }
+    const user = userEvent.setup()
+    wrap('/admin/teacher-applications', <AdminTeacherApplicationsPage />)
+
+    const row = screen.getByRole('button', { name: /Lea Muster/ })
+    expect(row).toHaveTextContent('Mathematik, Physik, Chemie')
+    expect(row).not.toHaveTextContent('math')
+    await user.click(row)
+    expect(screen.getAllByText(/Mathematik, Physik, Chemie/)).toHaveLength(2)
+  })
+
   it('says so when the statement fails to load or is empty, instead of loading forever', async () => {
     await i18n.changeLanguage('de')
     state.applications = [pending]

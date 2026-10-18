@@ -13,6 +13,7 @@ import {
   useTeacherApplicationsQuery,
 } from '@/hooks/teacher/useTeacherApplication'
 import { DashboardLayout } from '@/layouts/DashboardLayout'
+import { teacherSubjectLabel } from '@/lib/subjects'
 import { toUserFacingError } from '@/lib/userFacingText'
 import type { TeacherApplicationListItem, TeacherReviewState } from '@/services/teacher/teacherApplicationApi'
 
@@ -20,6 +21,10 @@ const states: TeacherReviewState[] = ['pending_review', 'approved', 'rejected']
 
 export function AdminTeacherApplicationsPage() {
   const { t } = useTranslation('admin')
+  // Subject names live with the teacher copy; stored spellings read as the subject they name.
+  const { t: tTeacher } = useTranslation('teacher')
+  const subjectList = (subjects: readonly string[]) =>
+    subjects.map((subject) => teacherSubjectLabel(subject, tTeacher)).join(', ')
   const [reviewState, setReviewState] = useState<TeacherReviewState>('pending_review')
   const [selected, setSelected] = useState<TeacherApplicationListItem | null>(null)
   // The review reason is stored with the decision, so its starting text is
@@ -153,7 +158,7 @@ export function AdminTeacherApplicationsPage() {
                     <span className="font-medium text-foreground">{row.fullName || row.applicationId}</span>
                     <span className="text-sm text-muted-foreground">{row.verifiedEmail}</span>
                     <span className="mt-1 text-xs text-muted-foreground">
-                      {(row.subjects ?? []).join(', ') || t('teacherApplications.noSubjects')} · v{row.version}
+                      {subjectList(row.subjects ?? []) || t('teacherApplications.noSubjects')} · v{row.version}
                     </span>
                   </button>
                 )
@@ -170,7 +175,7 @@ export function AdminTeacherApplicationsPage() {
                 <>
                   <p><span className="font-medium">{t('teacherApplications.name')}</span> {detail?.fullName || selected.fullName}</p>
                   <p><span className="font-medium">{t('teacherApplications.email')}</span> {selected.verifiedEmail}</p>
-                  <p><span className="font-medium">{t('teacherApplications.subjects')}</span> {(detail?.subjects || selected.subjects || []).join(', ')}</p>
+                  <p><span className="font-medium">{t('teacherApplications.subjects')}</span> {subjectList(detail?.subjects || selected.subjects || [])}</p>
                   <p className={`whitespace-pre-wrap ${detailQuery.isError ? 'text-destructive' : 'text-muted-foreground'}`}>{statement}</p>
                   {decidable && (
                     <Textarea
