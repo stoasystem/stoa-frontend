@@ -52,6 +52,9 @@
   },
   "errorBoundary": {
     "body": "Bitte versuche es erneut oder lade die Seite neu.",
+    "pageBody": "Bitte erneut versuchen oder die Seite neu laden. Über die Leiste oben geht es weiterhin zu anderen Seiten.",
+    "pageTitle": "Diese Seite konnte nicht angezeigt werden",
+    "reload": "Seite neu laden",
     "title": "Etwas ist schiefgelaufen"
   },
   "footer": {

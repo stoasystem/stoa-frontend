@@ -52,6 +52,9 @@
   },
   "errorBoundary": {
     "body": "Please try again or reload the page.",
+    "pageBody": "Try again, or reload the page. You can still go elsewhere from the bar above.",
+    "pageTitle": "This page could not be shown",
+    "reload": "Reload page",
     "title": "Something went wrong"
   },
   "footer": {
