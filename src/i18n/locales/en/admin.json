@@ -218,7 +218,9 @@
     "minutes": "{{count}}m",
     "within": "Within",
     "atRisk": "At risk",
-    "breached": "Breached"
+    "breached": "Breached",
+    "loading": "Loading response times…",
+    "unavailable": "Response times are unavailable right now. The figures are not shown so that no false values appear."
   },
   "placeholder": {
     "eyebrow": "Admin operations",
@@ -326,12 +328,15 @@
     "reject": "Reject",
     "resend": "Resend invitation",
     "approvedSent": "Approved. Invitation email was sent.",
-    "approvedNotDelivered": "Approved, but the invitation email was not delivered. Use resend.",
+    "approvedNotDelivered": "Approved, but the invitation email was not delivered. Resend it from the “approved” tab.",
     "rejected": "Application rejected.",
     "reviewFailed": "Review failed.",
     "resent": "Invitation resent.",
     "resentNotDelivered": "Invitation created, but email was not delivered.",
-    "resendFailed": "Could not resend the invitation."
+    "resendFailed": "Could not resend the invitation.",
+    "statementFailed": "The statement could not be loaded.",
+    "noStatement": "No statement was submitted.",
+    "reasonLabel": "Reason for the decision"
   },
   "learningOps": {
     "eyebrow": "Learning operations",
@@ -556,6 +561,96 @@
       "unknown": "Unknown",
       "pending": "Pending",
       "available": "Available"
+    },
+    "codes": {
+      "billingStatus": {
+        "none": "No billing",
+        "checkout_pending": "Checkout pending",
+        "active": "Active",
+        "past_due": "Past due",
+        "canceled": "Cancelled",
+        "payment_failed": "Payment failed",
+        "manual_override": "Set manually",
+        "provider_unknown": "Unknown at provider",
+        "billing_frozen": "Billing paused"
+      },
+      "plan": {
+        "free_trial": "Free trial",
+        "student": "Student",
+        "teacher_supported": "With teacher support",
+        "family": "Family"
+      },
+      "billingMode": {
+        "manual": "Manual",
+        "test": "Test mode",
+        "live": "Live"
+      },
+      "binding": {
+        "active": "Linked",
+        "pending": "Link pending",
+        "rejected": "Link rejected",
+        "missing": "No link",
+        "profile_parent_link": "Linked from the profile"
+      },
+      "usageAction": {
+        "question_submission": "Questions asked"
+      },
+      "usageSupport": {
+        "none": "Nothing to do",
+        "contact_support": "Contact STOA support",
+        "review_count_mismatch": "Check the count mismatch",
+        "review_counter_and_entitlement": "Check the counter and entitlement",
+        "review_counter_without_ledger": "Check the counter without ledger entries",
+        "review_if_disputed": "Check if disputed",
+        "review_ledger_without_counter": "Check ledger entries without a counter",
+        "review_stale_counter": "Check the outdated counter"
+      },
+      "eventType": {
+        "checkout_session_completed": "Checkout completed",
+        "checkout_session_expired": "Checkout expired",
+        "customer_subscription_created": "Subscription created",
+        "customer_subscription_updated": "Subscription updated",
+        "customer_subscription_deleted": "Subscription ended",
+        "invoice_paid": "Invoice paid",
+        "invoice_payment_failed": "Invoice payment failed",
+        "charge_refunded": "Charge refunded",
+        "refund_created": "Refund created",
+        "refund_updated": "Refund updated",
+        "refund_failed": "Refund failed",
+        "customer_updated": "Customer updated"
+      },
+      "factKind": {
+        "checkout_session_completed": "Checkout completed",
+        "checkout_session_expired": "Checkout expired",
+        "invoice_paid": "Invoice paid",
+        "invoice_payment_failed": "Invoice payment failed",
+        "subscription_active": "Subscription active",
+        "subscription_inactive": "Subscription inactive"
+      },
+      "lifecycle": {
+        "no_paid_fact": "No payment recorded",
+        "initial_invoice_paid": "First invoice paid",
+        "subscription_active": "Subscription active",
+        "grace_period": "Grace period",
+        "ended": "Ended",
+        "provider_unknown": "Unknown at provider"
+      },
+      "safeAction": {
+        "recheck_payment": "Check the payment again",
+        "contact_support": "Contact STOA support",
+        "view_billing": "Open billing",
+        "view_parent_home": "Open the parent home",
+        "start_checkout": "Start checkout"
+      },
+      "commandState": {
+        "intent_recorded": "Request recorded",
+        "provider_create_pending": "Waiting for the provider",
+        "provider_session_open": "Checkout open at provider",
+        "reconciling": "Reconciling",
+        "activation_recorded": "Activation recorded",
+        "terminal_without_payment": "Ended without payment",
+        "operator_attention_required": "Needs an operator"
+      }
     }
   },
   "curriculum": {

@@ -63,7 +63,11 @@ export function AdminDashboardPage() {
             </CardContent>
           </Card>
         </div>
-        <AdminTeacherSlaCard stats={platformStatsQuery.data?.teacher_sla} />
+        <AdminTeacherSlaCard
+          stats={platformStatsQuery.data?.teacher_sla}
+          isLoading={platformStatsQuery.isLoading}
+          isError={platformStatsQuery.isError}
+        />
         <AdminOperationalNotificationsCard />
         {/* Card 007 (frozen): billing interest comes back as the source list's
             Subscriptions and billing item, not as a link here. */}

@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next'
 import { useSearchParams } from 'react-router-dom'
 import { PageContainer } from '@/components/common/PageContainer'
 import { PageHeader } from '@/components/common/PageHeader'
-import { describeIssueCode, formatStatus, supportStateTone } from '@/components/parent/accountOperationsView'
+import { describeIssueCode, getAccountStateLabel, supportStateTone } from '@/components/parent/accountOperationsView'
 import { VerificationRecoveryEvidence } from '@/components/parent/VerificationRecoveryEvidence'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -185,7 +185,7 @@ function ParentLinkAssignment({ parentId }: { parentId: string }) {
           // The child list on this page is a different query; without this it
           // keeps showing the parent as having no children right under a line
           // saying the link was made.
-          void queryClient.invalidateQueries({ queryKey: adminQueryKeys.accountOperations(selectedParent) })
+          void queryClient.invalidateQueries({ queryKey: adminQueryKeys.accountOperationsForParent(selectedParent) })
         },
         onError: (error) => setFailure(linkRefusal(error, t)),
       },
@@ -381,7 +381,7 @@ function BillingRecoveryDetail({
   const supportNeeded = reconciliation.lifecycleState === 'support_needed'
   const active = reconciliation.lifecycleState === 'active'
   const effectivePlan = active && Object.keys(data.grantVersion).length > 0
-    ? formatStatus(data.targetPlan)
+    ? codeLabel(data.targetPlan, t, 'plan')
     : t('accountOperations.recovery.pendingConvergence')
 
   return (
@@ -424,12 +424,12 @@ function BillingRecoveryDetail({
               {active
                 ? t('accountOperations.recovery.active')
                 : supportNeeded
-                  ? t('accountOperations.recovery.supportNeeded', { code: formatStatus(reconciliation.failureCode) })
-                  : t('accountOperations.recovery.state', { state: formatStatus(reconciliation.lifecycleState) })}
+                  ? t('accountOperations.recovery.supportNeeded', { code: codeLabel(reconciliation.failureCode, t) })
+                  : t('accountOperations.recovery.state', { state: codeLabel(reconciliation.lifecycleState, t, 'lifecycle') })}
             </p>
             <p className="mt-1 text-sm">
               {t('accountOperations.recovery.safeAction', {
-                action: formatStatus(reconciliation.safeAction),
+                action: codeLabel(reconciliation.safeAction, t, 'safeAction'),
                 generation: reconciliation.reconciliationLeaseGeneration,
               })}
             </p>
@@ -439,18 +439,18 @@ function BillingRecoveryDetail({
 
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             <DetailItem label={t('accountOperations.recovery.parent')} value={data.parentId} />
-            <DetailItem label={t('accountOperations.recovery.targetPlan')} value={formatStatus(data.targetPlan)} />
+            <DetailItem label={t('accountOperations.recovery.targetPlan')} value={codeLabel(data.targetPlan, t, 'plan')} />
             <DetailItem label={t('accountOperations.recovery.effectivePlan')} value={effectivePlan} />
             <DetailItem
               label={t('accountOperations.recovery.sessionSuffix')}
               value={reconciliation.providerSessionSuffix ? `…${reconciliation.providerSessionSuffix}` : t('accountOperations.recovery.noSession')}
             />
-            <DetailItem label={t('accountOperations.recovery.commandState')} value={formatStatus(data.commandLifecycle.state)} />
-            <DetailItem label={t('accountOperations.recovery.providerEffect')} value={formatStatus(data.commandLifecycle.providerEffectStatus)} />
+            <DetailItem label={t('accountOperations.recovery.commandState')} value={codeLabel(data.commandLifecycle.state, t, 'commandState')} />
+            <DetailItem label={t('accountOperations.recovery.providerEffect')} value={codeLabel(data.commandLifecycle.providerEffectStatus, t)} />
             <DetailItem label={t('accountOperations.recovery.created')} value={formatDate(data.commandLifecycle.createdAt)} />
             <DetailItem label={t('accountOperations.recovery.updated')} value={formatDate(data.commandLifecycle.updatedAt)} />
             <DetailItem label={t('accountOperations.recovery.lastRechecked')} value={formatDate(reconciliation.lastRecheckedAt)} />
-            <DetailItem label={t('accountOperations.recovery.failureCode')} value={formatStatus(reconciliation.failureCode)} />
+            <DetailItem label={t('accountOperations.recovery.failureCode')} value={codeLabel(reconciliation.failureCode, t)} />
           </div>
 
           <div>
@@ -495,7 +495,7 @@ function BillingFactEvidence({ data }: { data: AdminBillingOperationDetail }) {
           {data.factLifecycle.map((fact) => (
             <div key={`${fact.kind}-${fact.factVersion}`} className="rounded-md border border-border/70 p-3 text-sm">
               <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
-                <p className="font-medium text-foreground">{formatStatus(fact.kind)}</p>
+                <p className="font-medium text-foreground">{codeLabel(fact.kind, t, 'factKind')}</p>
                 <p className="text-muted-foreground">{formatDate(fact.observedAt)}</p>
               </div>
               <div className="mt-2 grid gap-1 text-muted-foreground lg:grid-cols-2">
@@ -564,7 +564,7 @@ function PaymentReminderEvidence({ data }: { data: AdminBillingOperationDetail }
       {reminder ? (
         <div className="mt-3 grid gap-3 rounded-md border border-border/70 p-3 text-sm sm:grid-cols-2 lg:grid-cols-4">
           <p className="font-medium text-foreground">
-            {t('accountOperations.recovery.reminder.card', { brand: formatStatus(reminder.brand), last4: reminder.last4 })}
+            {t('accountOperations.recovery.reminder.card', { brand: codeLabel(reminder.brand, t), last4: reminder.last4 })}
           </p>
           <p className="text-muted-foreground">
             {t('accountOperations.recovery.reminder.expires', {
@@ -573,7 +573,7 @@ function PaymentReminderEvidence({ data }: { data: AdminBillingOperationDetail }
             })}
           </p>
           <p className="text-muted-foreground">
-            {t('accountOperations.recovery.reminder.status', { status: formatStatus(reminder.status) })}
+            {t('accountOperations.recovery.reminder.status', { status: codeLabel(reminder.status, t) })}
           </p>
           <p className="text-muted-foreground">{formatDate(reminder.reminderAt)}</p>
         </div>
@@ -641,7 +641,7 @@ function AdminAccountOperationsDetail({ data }: { data: AdminAccountOperations }
             <Icon className="mt-1 h-6 w-6 shrink-0" aria-hidden="true" />
             <div>
               <p className="brand-section-kicker">{t('accountOperations.support.kicker')}</p>
-              <h2 className="mt-2 text-2xl font-semibold text-foreground">{formatStatus(state)}</h2>
+              <h2 className="mt-2 text-2xl font-semibold text-foreground">{codeLabel(state, t)}</h2>
               <p className="mt-2 max-w-3xl text-sm leading-6 text-muted-foreground">
                 {state === 'ready'
                   ? t('accountOperations.support.ready')
@@ -663,8 +663,8 @@ function AdminAccountOperationsDetail({ data }: { data: AdminAccountOperations }
       </section>
 
       <div className="grid gap-4 lg:grid-cols-4">
-        <FactCard title={t('accountOperations.facts.parentVerification')} value={formatStatus(data.parent.verification?.emailVerificationStatus)} detail={`${data.parent.name} / ${data.parent.email}`} />
-        <FactCard title={t('accountOperations.facts.billing')} value={formatStatus(data.billing.status)} detail={t('accountOperations.facts.plan', { plan: formatStatus(data.billing.subscriptionTier) })} />
+        <FactCard title={t('accountOperations.facts.parentVerification')} value={codeLabel(data.parent.verification?.emailVerificationStatus, t)} detail={`${data.parent.name} / ${data.parent.email}`} />
+        <FactCard title={t('accountOperations.facts.billing')} value={codeLabel(data.billing.status, t, 'billingStatus')} detail={t('accountOperations.facts.plan', { plan: codeLabel(data.billing.subscriptionTier, t, 'plan') })} />
         <FactCard title={t('accountOperations.facts.children')} value={String(data.children.length)} detail={t('accountOperations.facts.linkedChildren', { count: data.children.length })} />
         <FactCard title={t('accountOperations.facts.usageRows')} value={String(data.usage.length)} detail={data.usage.some((item) => item.unreconciled) ? t('accountOperations.facts.reconciliationPending') : t('accountOperations.facts.usageMatched')} />
       </div>
@@ -708,15 +708,15 @@ function BillingEvidence({ data }: { data: AdminAccountOperations }) {
               {t('accountOperations.billing.description')}
             </p>
           </div>
-          <Badge variant={billing.status === 'active' ? 'secondary' : 'outline'}>{formatStatus(billing.mode)}</Badge>
+          <Badge variant={billing.status === 'active' ? 'secondary' : 'outline'}>{codeLabel(billing.mode, t, 'billingMode')}</Badge>
         </div>
       </CardHeader>
       <CardContent className="grid gap-5 xl:grid-cols-[minmax(0,0.95fr)_minmax(24rem,1.05fr)]">
         <div className="grid gap-3 sm:grid-cols-2">
           <DetailItem label={t('accountOperations.billing.provider')} value={billing.provider ?? t('accountOperations.billing.manual')} />
-          <DetailItem label={t('accountOperations.billing.requestedTier')} value={formatStatus(billing.requestedTier)} />
+          <DetailItem label={t('accountOperations.billing.requestedTier')} value={codeLabel(billing.requestedTier, t, 'plan')} />
           <DetailItem label={t('accountOperations.billing.currentPeriod')} value={formatPeriod(billing.currentPeriodStart, billing.currentPeriodEnd, formatDate, t)} />
-          <DetailItem label={t('accountOperations.billing.lastEvent')} value={billing.lastProviderEventType ? formatStatus(billing.lastProviderEventType) : t('accountOperations.values.none')} />
+          <DetailItem label={t('accountOperations.billing.lastEvent')} value={billing.lastProviderEventType ? codeLabel(billing.lastProviderEventType, t, 'eventType') : t('accountOperations.values.none')} />
           <DetailItem label={t('accountOperations.billing.manualOverride')} value={billing.manualOverrideSource ?? t('accountOperations.values.none')} />
           <DetailItem label={t('accountOperations.billing.cancelAtPeriodEnd')} value={billing.cancelAtPeriodEnd ? t('accountOperations.values.yes') : t('accountOperations.values.no')} />
           {supportEvidence && <DetailItem label={t('accountOperations.billing.supportAction')} value={evidenceValue(supportEvidence, 'dunning', 'supportAction', t)} />}
@@ -753,10 +753,10 @@ function ChildOperationsRow({ child }: { child: AccountOperationsChild }) {
             <p className="truncate text-sm text-muted-foreground">{child.profile.email}</p>
           </div>
         </div>
-        <ChildMetric label={t('accountOperations.children.binding')} value={formatStatus(child.binding.status)} />
-        <ChildMetric label={t('accountOperations.children.verification')} value={formatStatus(child.profile.verification?.emailVerificationStatus ?? child.verification?.emailVerificationStatus)} />
-        <ChildMetric label={t('accountOperations.children.recovery')} value={formatStatus((child.profile.verification ?? child.verification)?.supportAction)} />
-        <ChildMetric label={t('accountOperations.children.plan')} value={formatStatus(child.entitlement?.effectivePlan)} />
+        <ChildMetric label={t('accountOperations.children.binding')} value={codeLabel(child.binding.status, t, 'binding')} />
+        <ChildMetric label={t('accountOperations.children.verification')} value={codeLabel(child.profile.verification?.emailVerificationStatus ?? child.verification?.emailVerificationStatus, t)} />
+        <ChildMetric label={t('accountOperations.children.recovery')} value={codeLabel((child.profile.verification ?? child.verification)?.supportAction, t)} />
+        <ChildMetric label={t('accountOperations.children.plan')} value={codeLabel(child.entitlement?.effectivePlan, t, 'plan')} />
         <ChildMetric label={t('accountOperations.children.usage')} value={usageLabel} muted={Boolean(usage?.unreconciled)} />
       </CardContent>
     </Card>
@@ -781,7 +781,7 @@ function UsageSummary({ usage }: { usage: AccountOperationsUsage[] }) {
             <CardContent className="p-5">
               <div className="flex items-start justify-between gap-3">
                 <div>
-                  <p className="font-semibold text-foreground">{formatStatus(item.action)}</p>
+                  <p className="font-semibold text-foreground">{codeLabel(item.action, t, 'usageAction')}</p>
                   <p className="mt-1 text-sm text-muted-foreground">{item.studentId} / {item.quotaPeriod}</p>
                 </div>
                 <Badge variant={item.unreconciled ? 'outline' : 'secondary'}>
@@ -796,7 +796,7 @@ function UsageSummary({ usage }: { usage: AccountOperationsUsage[] }) {
               </p>
               {item.supportAction && (
                 <p className="mt-3 text-sm font-medium text-foreground">
-                  {t('accountOperations.usage.support', { action: formatStatus(item.supportAction) })}
+                  {t('accountOperations.usage.support', { action: codeLabel(item.supportAction, t, 'usageSupport') })}
                 </p>
               )}
               {item.explanation && (
@@ -847,18 +847,18 @@ function BillingEventRow({ event }: { event: SubscriptionBillingEvent }) {
   return (
     <div className="rounded-md border border-border/70 p-3 text-sm">
       <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
-        <span className="font-medium text-foreground">{formatStatus(event.eventType)}</span>
+        <span className="font-medium text-foreground">{codeLabel(event.eventType, t, 'eventType')}</span>
         <span className="text-muted-foreground">{formatDate(event.eventAt)}</span>
       </div>
       <div className="mt-2 grid gap-2 sm:grid-cols-2">
         <p className="text-muted-foreground">
-          {t('accountOperations.billing.eventStatus', { status: formatStatus(event.billingStatus) })}
+          {t('accountOperations.billing.eventStatus', { status: codeLabel(event.billingStatus, t, 'billingStatus') })}
         </p>
         <p className="truncate text-muted-foreground">
           {t('accountOperations.billing.providerEvent', { id: event.providerEventId ?? t('accountOperations.values.none') })}
         </p>
         <p className="text-muted-foreground">
-          {t('accountOperations.billing.processing', { result: formatStatus(event.processingResult) })}
+          {t('accountOperations.billing.processing', { result: codeLabel(event.processingResult, t) })}
         </p>
       </div>
     </div>
@@ -921,11 +921,42 @@ function formatEvidenceValue(value: unknown, t: TFunction) {
   if (value === null || value === undefined || value === '') return t('accountOperations.values.none')
   if (typeof value === 'boolean') return value ? t('accountOperations.values.yes') : t('accountOperations.values.no')
   if (typeof value === 'number') return String(value)
-  if (typeof value === 'string') return formatStatus(value)
+  if (typeof value === 'string') return codeLabel(value, t)
   return t('accountOperations.values.available')
 }
 
 /** The shared day-and-time format; a value that is not a date shows as sent. */
 function formatDate(value: string) {
   return Number.isNaN(new Date(value).getTime()) ? value : formatDayAndTime(value)
+}
+
+type CodeGroup =
+  | 'billingStatus'
+  | 'plan'
+  | 'billingMode'
+  | 'binding'
+  | 'usageAction'
+  | 'usageSupport'
+  | 'eventType'
+  | 'factKind'
+  | 'lifecycle'
+  | 'safeAction'
+  | 'commandState'
+
+/*
+ * The payload is enum codes. Title-casing them printed "Past due" and
+ * "Teacher supported" on a German screen (#262), so each code is named in
+ * `admin:accountOperations.codes.<group>`, where the same code can mean
+ * different things ("active" billing vs. an "active" link). Verification and
+ * support-state codes are the parent screen's (`getAccountStateLabel`), which
+ * is also the fallback: an unknown code still shows rather than disappearing.
+ * Provider event types carry dots, which i18next reads as nesting.
+ */
+function codeLabel(value: string | null | undefined, t: TFunction, group?: CodeGroup) {
+  const code = String(value || 'unknown')
+  if (group) {
+    const own = t(`accountOperations.codes.${group}.${code.replace(/\./g, '_')}`, { defaultValue: '' })
+    if (own) return own
+  }
+  return getAccountStateLabel(code, t)
 }

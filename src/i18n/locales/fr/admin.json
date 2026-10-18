@@ -218,7 +218,9 @@
     "minutes": "{{count}} min",
     "within": "Dans les délais",
     "atRisk": "À risque",
-    "breached": "Dépassées"
+    "breached": "Dépassées",
+    "loading": "Chargement des délais de réponse…",
+    "unavailable": "Les délais de réponse ne sont pas disponibles pour le moment. Aucun chiffre n’est affiché pour éviter des valeurs erronées."
   },
   "placeholder": {
     "eyebrow": "Administration",
@@ -326,12 +328,15 @@
     "reject": "Refuser",
     "resend": "Renvoyer l’invitation",
     "approvedSent": "Acceptée. L’e-mail d’invitation a été envoyé.",
-    "approvedNotDelivered": "Acceptée, mais l’e-mail d’invitation n’a pas été distribué. Renvoyez-le.",
+    "approvedNotDelivered": "Acceptée, mais l’e-mail d’invitation n’a pas été distribué. Renvoyez-le depuis l’onglet « acceptées ».",
     "rejected": "Candidature refusée.",
     "reviewFailed": "L’examen a échoué.",
     "resent": "Invitation renvoyée.",
     "resentNotDelivered": "Invitation créée, mais l’e-mail n’a pas été distribué.",
-    "resendFailed": "Impossible de renvoyer l’invitation."
+    "resendFailed": "Impossible de renvoyer l’invitation.",
+    "statementFailed": "La lettre de motivation n’a pas pu être chargée.",
+    "noStatement": "Aucune lettre de motivation n’a été soumise.",
+    "reasonLabel": "Motif de la décision"
   },
   "learningOps": {
     "eyebrow": "Suivi de l’apprentissage",
@@ -556,6 +561,96 @@
       "unknown": "Inconnu",
       "pending": "En attente",
       "available": "Disponible"
+    },
+    "codes": {
+      "billingStatus": {
+        "none": "Aucune facturation",
+        "checkout_pending": "Paiement en attente",
+        "active": "Actif",
+        "past_due": "En retard",
+        "canceled": "Résilié",
+        "payment_failed": "Échec du paiement",
+        "manual_override": "Défini manuellement",
+        "provider_unknown": "Inconnu chez le prestataire",
+        "billing_frozen": "Facturation suspendue"
+      },
+      "plan": {
+        "free_trial": "Essai gratuit",
+        "student": "Élève",
+        "teacher_supported": "Avec soutien enseignant",
+        "family": "Famille"
+      },
+      "billingMode": {
+        "manual": "Manuel",
+        "test": "Mode test",
+        "live": "Production"
+      },
+      "binding": {
+        "active": "Lié",
+        "pending": "Lien en attente",
+        "rejected": "Lien refusé",
+        "missing": "Aucun lien",
+        "profile_parent_link": "Lié depuis le profil"
+      },
+      "usageAction": {
+        "question_submission": "Questions posées"
+      },
+      "usageSupport": {
+        "none": "Rien à faire",
+        "contact_support": "Contacter le support STOA",
+        "review_count_mismatch": "Vérifier l’écart de comptage",
+        "review_counter_and_entitlement": "Vérifier le compteur et le droit d’accès",
+        "review_counter_without_ledger": "Vérifier le compteur sans écritures",
+        "review_if_disputed": "Vérifier en cas de contestation",
+        "review_ledger_without_counter": "Vérifier les écritures sans compteur",
+        "review_stale_counter": "Vérifier le compteur obsolète"
+      },
+      "eventType": {
+        "checkout_session_completed": "Paiement finalisé",
+        "checkout_session_expired": "Paiement expiré",
+        "customer_subscription_created": "Abonnement créé",
+        "customer_subscription_updated": "Abonnement modifié",
+        "customer_subscription_deleted": "Abonnement terminé",
+        "invoice_paid": "Facture payée",
+        "invoice_payment_failed": "Échec du paiement de la facture",
+        "charge_refunded": "Débit remboursé",
+        "refund_created": "Remboursement créé",
+        "refund_updated": "Remboursement modifié",
+        "refund_failed": "Échec du remboursement",
+        "customer_updated": "Client modifié"
+      },
+      "factKind": {
+        "checkout_session_completed": "Paiement finalisé",
+        "checkout_session_expired": "Paiement expiré",
+        "invoice_paid": "Facture payée",
+        "invoice_payment_failed": "Échec du paiement de la facture",
+        "subscription_active": "Abonnement actif",
+        "subscription_inactive": "Abonnement inactif"
+      },
+      "lifecycle": {
+        "no_paid_fact": "Aucun paiement enregistré",
+        "initial_invoice_paid": "Première facture payée",
+        "subscription_active": "Abonnement actif",
+        "grace_period": "Délai de grâce",
+        "ended": "Terminé",
+        "provider_unknown": "Inconnu chez le prestataire"
+      },
+      "safeAction": {
+        "recheck_payment": "Revérifier le paiement",
+        "contact_support": "Contacter le support STOA",
+        "view_billing": "Ouvrir la facturation",
+        "view_parent_home": "Ouvrir l’accueil parent",
+        "start_checkout": "Lancer le paiement"
+      },
+      "commandState": {
+        "intent_recorded": "Demande enregistrée",
+        "provider_create_pending": "En attente du prestataire",
+        "provider_session_open": "Paiement ouvert chez le prestataire",
+        "reconciling": "Rapprochement en cours",
+        "activation_recorded": "Activation enregistrée",
+        "terminal_without_payment": "Terminé sans paiement",
+        "operator_attention_required": "Intervention requise"
+      }
     }
   },
   "curriculum": {

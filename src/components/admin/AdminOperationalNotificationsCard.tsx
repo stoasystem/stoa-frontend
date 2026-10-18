@@ -33,7 +33,11 @@ export function AdminOperationalNotificationsCard() {
             <Bell className="h-4 w-4" aria-hidden="true" />
             {t('operationalNotifications.title')}
           </CardTitle>
-          <Badge variant="secondary">{t('operationalNotifications.count', { count: items.length })}</Badge>
+          {/* A count only once the events have been read: "0" next to the
+              error line would say there is nothing to look at (#262). */}
+          {!query.isLoading && !query.isError && (
+            <Badge variant="secondary">{t('operationalNotifications.count', { count: items.length })}</Badge>
+          )}
         </div>
       </CardHeader>
       <CardContent>
