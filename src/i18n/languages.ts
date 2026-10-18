@@ -13,7 +13,7 @@ export type LanguageOption = {
 export const languageOptions: LanguageOption[] = [
   { code: 'en', label: 'English', shortLabel: 'EN' },
   { code: 'de', label: 'Deutsch', shortLabel: 'DE' },
-  { code: 'fr', label: 'Francais', shortLabel: 'FR' },
+  { code: 'fr', label: 'Français', shortLabel: 'FR' },
   { code: 'it', label: 'Italiano', shortLabel: 'IT' },
 ]
 
