@@ -292,3 +292,85 @@ describe('the history card while an id is typed but not read', () => {
     expect(screen.queryByText(notLoaded)).not.toBeInTheDocument()
   })
 })
+
+// A batch belongs to the student and subject it was previewed for, runs once,
+// and its results and the history card never show under someone else's id
+// (review of #246, 18 Oct 2026).
+describe('the automation console keeps a batch to its own preview', () => {
+  const field = () => screen.getByLabelText('Schüler-ID')
+  const subjectField = () => screen.getByLabelText('Fach')
+  const previewButton = () => screen.getByRole('button', { name: 'Vorschläge ansehen' })
+  const executeButton = () => screen.findByRole('button', { name: 'Freigegebenen Stapel ausführen' })
+  const executed = {
+    batchId: preview.batchId, policyId: preview.policyId, studentId: 'student-123', status: 'executed',
+    results: [{ candidateId: 'candidate-0', automationKey: 'key-0', status: 'created', reason: 'Created for the review.' }],
+    summary: {}, reviewRequired: true, autonomousDecision: false,
+  }
+
+  beforeEach(() => {
+    vi.mocked(previewAssignmentAutomationBatch).mockResolvedValue(preview)
+    vi.mocked(executeAssignmentAutomationBatch).mockResolvedValue(executed)
+  })
+
+  it('executes with the subject the batch was previewed for', async () => {
+    renderConsole()
+    fireEvent.change(field(), { target: { value: 'student-123' } })
+    fireEvent.change(subjectField(), { target: { value: 'math' } })
+    fireEvent.click(previewButton())
+    await screen.findByText('Candidate 0')
+
+    fireEvent.change(subjectField(), { target: { value: 'physics' } })
+    fireEvent.click(await executeButton())
+
+    await waitFor(() => expect(executeAssignmentAutomationBatch).toHaveBeenCalledTimes(1))
+    expect(vi.mocked(executeAssignmentAutomationBatch).mock.calls[0][1].subject).toBe('math')
+  })
+
+  it('does not offer a batch that already ran', async () => {
+    renderConsole()
+    fireEvent.change(field(), { target: { value: 'student-123' } })
+    fireEvent.click(previewButton())
+    fireEvent.click(await executeButton())
+    await screen.findByText('Created for the review.')
+
+    expect(await executeButton()).toBeDisabled()
+    fireEvent.click(await executeButton())
+    expect(executeAssignmentAutomationBatch).toHaveBeenCalledTimes(1)
+  })
+
+  it('clears the results of a batch once another one is previewed', async () => {
+    renderConsole()
+    fireEvent.change(field(), { target: { value: 'student-123' } })
+    fireEvent.click(previewButton())
+    fireEvent.click(await executeButton())
+    expect(await screen.findByText('Created for the review.')).toBeInTheDocument()
+
+    vi.mocked(previewAssignmentAutomationBatch).mockResolvedValue({ ...preview, batchId: 'batch-456', studentId: 'student-456' })
+    fireEvent.change(field(), { target: { value: 'student-456' } })
+    fireEvent.click(previewButton())
+
+    await waitFor(() => expect(previewAssignmentAutomationBatch).toHaveBeenCalledTimes(2))
+    await waitFor(() => expect(screen.queryByText('Created for the review.')).not.toBeInTheDocument())
+    expect(screen.queryByRole('heading', { name: 'Ergebnisse' })).not.toBeInTheDocument()
+    expect(await executeButton()).toBeEnabled()
+  })
+
+  it('hides one student’s history while the field names another', async () => {
+    vi.mocked(getStudentAssignments).mockResolvedValue({ items: assignments, count: assignments.length })
+    renderConsole()
+    fireEvent.change(field(), { target: { value: 'student-123' } })
+    fireEvent.blur(field())
+    expect(await screen.findByText('Practice 0')).toBeInTheDocument()
+
+    fireEvent.change(field(), { target: { value: 'student-456' } })
+    expect(screen.queryByText('Practice 0')).not.toBeInTheDocument()
+    expect(screen.getByText('Verlassen Sie das Feld oder wählen Sie „Vorschläge ansehen“, um die Zuweisungen für diese ID zu laden.')).toBeInTheDocument()
+
+    fireEvent.change(field(), { target: { value: '' } })
+    expect(screen.queryByText('Practice 0')).not.toBeInTheDocument()
+    expect(screen.getByText('Geben Sie oben eine Schüler-ID ein, um die bisherigen Zuweisungen zu sehen.')).toBeInTheDocument()
+
+    fireEvent.change(field(), { target: { value: 'student-123' } })
+    expect(screen.getByText('Practice 0')).toBeInTheDocument()
+  })
+})
