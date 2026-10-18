@@ -1,3 +1,5 @@
+import i18n from 'i18next'
+
 const internalTerms = [
   /\bapi\b/gi,
   /backend/gi,
@@ -16,6 +18,31 @@ const internalTerms = [
 ]
 
 const statusOnlyMessage = /^request failed with status code \d+$/i
+
+/**
+ * What the browser or axios says when the request never got an answer. It is
+ * the transport talking, in English, under every interface language: "Network
+ * Error", "Failed to fetch" (Chrome), "Load failed" (Safari), "NetworkError
+ * when attempting to fetch resource." (Firefox), an axios timeout.
+ */
+const transportMessages = [
+  /^network ?error\b/i,
+  /^failed to fetch$/i,
+  /^load failed$/i,
+  /^timeout of \d+ms exceeded$/i,
+  /^request aborted$/i,
+]
+
+/**
+ * Whether the interface is in English. A message that arrives as prose —
+ * the server's sentence, the browser's — is English, so it is only shown to a
+ * reader of English; anyone else gets the caller's translated fallback (#265).
+ * With no language set (i18next not started) it is read as English, as before.
+ */
+function readsEnglish() {
+  const language = i18n.resolvedLanguage ?? i18n.language
+  return !language || language.toLowerCase().startsWith('en')
+}
 
 /**
  * Translate a validation issue the server marked with a code.
@@ -64,6 +91,14 @@ function isSafeMessage(message: string) {
 /** Turns a server error code into a sentence in the reader's language, or '' when unknown. */
 export type BackendMessageTranslator = (code: string) => string
 
+/**
+ * One sentence for a failed action, in the reader's language.
+ *
+ * In order: issues the server marked with a code, the error's own code, both
+ * through `translate`; then the error's message, but only in an English
+ * interface and only when it is neither the transport's nor internal; and
+ * otherwise `fallback`, which callers pass already translated.
+ */
 export function toUserFacingError(
   error: unknown,
   fallback = 'We could not complete this action right now. Please try again.',
@@ -73,8 +108,14 @@ export function toUserFacingError(
   const detailMessage = fromValidationDetail(detail, translate)
   if (detailMessage && isSafeMessage(detailMessage)) return detailMessage
 
-  const message = error instanceof Error ? error.message : ''
+  const code = error && typeof error === 'object' && 'code' in error ? (error as { code?: unknown }).code : undefined
+  const codeMessage = translate && typeof code === 'string' && code ? translate(code) : ''
+  if (codeMessage) return codeMessage
+
+  const message = error instanceof Error ? error.message.trim() : ''
   if (!message || statusOnlyMessage.test(message)) return fallback
+  if (transportMessages.some((pattern) => pattern.test(message))) return fallback
+  if (!readsEnglish()) return fallback
 
   if (!isSafeMessage(message)) return fallback
 

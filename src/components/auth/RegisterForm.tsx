@@ -274,7 +274,9 @@ export function RegisterForm({ onStepChange }: { onStepChange?: (step: RegisterS
       ? toUserFacingError(teacherApplicationMutation.error, t('auth:register.applicationFailed'))
       : null
   const registrationErrorMessage =
-    registrationError === 'Password does not meet requirements' ? t('errors:passwordRequirements') : registrationError
+    registerMutation.error?.message === 'Password does not meet requirements'
+      ? t('errors:passwordRequirements')
+      : registrationError
   const submitting = registerMutation.isPending || teacherApplicationMutation.isPending
 
   if (step === 'done' && teacherApplicationMutation.data) {

@@ -186,21 +186,27 @@
         "assigned": "Attribuée",
         "in_progress": "En cours",
         "resolved": "Terminée",
-        "cancelled": "Annulée"
+        "cancelled": "Annulée",
+        "withdrawn": "Retirée",
+        "expired": "Expirée"
       },
       "title": {
         "pending": "Aide d’un enseignant demandée",
         "assigned": "{{name}} va rejoindre cette conversation",
         "in_progress": "{{name}} t’aide",
         "resolved": "L’aide de l’enseignant est terminée",
-        "cancelled": "La demande a été annulée"
+        "cancelled": "La demande a été annulée",
+        "withdrawn": "Tu as retiré ta demande",
+        "expired": "Aucun enseignant n’était disponible à temps"
       },
       "body": {
         "pending": "Un enseignant répondra dans cette conversation. Continue en attendant.",
         "assigned": "Sa réponse apparaîtra dans cette conversation.",
         "in_progress": "Ses réponses apparaissent dans cette conversation.",
         "resolved": "Besoin de plus d’aide ? Redemande à un enseignant sous une réponse.",
-        "cancelled": "Besoin de plus d’aide ? Redemande à un enseignant sous une réponse."
+        "cancelled": "Besoin de plus d’aide ? Redemande à un enseignant sous une réponse.",
+        "withdrawn": "Finalement besoin d’aide ? Redemande à un enseignant sous une réponse.",
+        "expired": "Ta demande a expiré. Redemande à un enseignant sous une réponse."
       }
     },
     "practice": {

@@ -186,21 +186,27 @@
         "assigned": "Assigned",
         "in_progress": "In progress",
         "resolved": "Resolved",
-        "cancelled": "Cancelled"
+        "cancelled": "Cancelled",
+        "withdrawn": "Withdrawn",
+        "expired": "Expired"
       },
       "title": {
         "pending": "Teacher support requested",
         "assigned": "{{name}} will join this conversation",
         "in_progress": "{{name}} is helping you",
         "resolved": "Teacher support has ended",
-        "cancelled": "Teacher support was cancelled"
+        "cancelled": "Teacher support was cancelled",
+        "withdrawn": "You withdrew the request",
+        "expired": "No teacher was free in time"
       },
       "body": {
         "pending": "A teacher will reply in this conversation. Keep going in the meantime.",
         "assigned": "Their reply will appear in this conversation.",
         "in_progress": "Their replies appear in this conversation.",
         "resolved": "Need more help? Ask a teacher again under any answer.",
-        "cancelled": "Need more help? Ask a teacher again under any answer."
+        "cancelled": "Need more help? Ask a teacher again under any answer.",
+        "withdrawn": "Need help after all? Ask a teacher again under any answer.",
+        "expired": "Your request has closed. Ask a teacher again under any answer."
       }
     },
     "practice": {
