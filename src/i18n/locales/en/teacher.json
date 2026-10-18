@@ -121,7 +121,8 @@
     "learningAutomation": "Learning automation",
     "learningAutomationDescription": "Preview and run automatic practice assignments for your students",
     "firstAction": "First teacher action: {{time}}",
-    "firstActionNone": "First teacher action: not recorded yet"
+    "firstActionNone": "First teacher action: not recorded yet",
+    "statsLoadFailed": "The figures could not be loaded."
   },
   "assistance": {
     "title": "Preparation summary",
@@ -314,6 +315,30 @@
       "low": "Low confidence",
       "medium": "Medium confidence",
       "high": "High confidence"
+    }
+  },
+  "toasts": {
+    "statusUpdated": "Request status updated.",
+    "replySent": "Your reply was sent.",
+    "replyFailed": "Your reply could not be sent. Please try again.",
+    "replyConflict": "Your reply was not sent: another teacher has taken this request, or it has changed.",
+    "replyRefused": "Your reply was not accepted. Please check its content and format and send it again.",
+    "availabilityUpdated": "Your availability was saved.",
+    "summaryCreated": "Summary draft created.",
+    "summaryFailed": "The summary draft could not be created.",
+    "exerciseCreated": "Exercise draft created.",
+    "exerciseFailed": "The exercise draft could not be created.",
+    "regenerated": "Draft regenerated.",
+    "regenerateFailed": "The draft could not be regenerated.",
+    "reviewed": {
+      "accepted": "Draft accepted.",
+      "rejected": "Draft rejected.",
+      "archived": "Draft archived."
+    },
+    "reviewFailed": {
+      "accepted": "The draft could not be accepted.",
+      "rejected": "The draft could not be rejected.",
+      "archived": "The draft could not be archived."
     }
   }
 }

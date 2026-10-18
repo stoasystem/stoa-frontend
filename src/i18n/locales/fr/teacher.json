@@ -121,7 +121,8 @@
     "learningAutomation": "Automatisation de l’apprentissage",
     "learningAutomationDescription": "Prévisualiser et lancer les attributions automatiques d’exercices pour vos élèves",
     "firstAction": "Première action de l’enseignant : {{time}}",
-    "firstActionNone": "Première action de l’enseignant : pas encore enregistrée"
+    "firstActionNone": "Première action de l’enseignant : pas encore enregistrée",
+    "statsLoadFailed": "Les chiffres n’ont pas pu être chargés."
   },
   "assistance": {
     "title": "Résumé de préparation",
@@ -314,6 +315,30 @@
       "low": "Fiabilité faible",
       "medium": "Fiabilité moyenne",
       "high": "Fiabilité élevée"
+    }
+  },
+  "toasts": {
+    "statusUpdated": "Statut de la demande mis à jour.",
+    "replySent": "Votre réponse a été envoyée.",
+    "replyFailed": "Votre réponse n’a pas pu être envoyée. Veuillez réessayer.",
+    "replyConflict": "Votre réponse n’a pas été envoyée : un autre enseignant a pris cette demande en charge, ou elle a changé.",
+    "replyRefused": "Votre réponse n’a pas été acceptée. Veuillez vérifier son contenu et sa mise en forme, puis l’envoyer à nouveau.",
+    "availabilityUpdated": "Vos disponibilités ont été enregistrées.",
+    "summaryCreated": "Brouillon de synthèse créé.",
+    "summaryFailed": "Le brouillon de synthèse n’a pas pu être créé.",
+    "exerciseCreated": "Brouillon d’exercice créé.",
+    "exerciseFailed": "Le brouillon d’exercice n’a pas pu être créé.",
+    "regenerated": "Brouillon régénéré.",
+    "regenerateFailed": "Le brouillon n’a pas pu être régénéré.",
+    "reviewed": {
+      "accepted": "Brouillon accepté.",
+      "rejected": "Brouillon refusé.",
+      "archived": "Brouillon archivé."
+    },
+    "reviewFailed": {
+      "accepted": "Le brouillon n’a pas pu être accepté.",
+      "rejected": "Le brouillon n’a pas pu être refusé.",
+      "archived": "Le brouillon n’a pas pu être archivé."
     }
   }
 }

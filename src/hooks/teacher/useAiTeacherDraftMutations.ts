@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
+import i18n from '@/i18n'
 import { trackEvent } from '@/services/analytics/analyticsClient'
 import {
   acceptAiTeacherDraft,
@@ -18,10 +19,10 @@ export function useCreateAiTeacherSummaryDraftMutation() {
     mutationFn: createAiTeacherSummaryDraft,
     onSuccess: (draft) => {
       trackEvent('ai_teacher_summary_draft_created', { draftId: draft.draftId, questionId: draft.questionId })
-      toast.success('Summary draft created')
+      toast.success(i18n.t('teacher:toasts.summaryCreated'))
       void queryClient.invalidateQueries({ queryKey: teacherQueryKeys.aiTeacherDrafts() })
     },
-    onError: () => toast.error('Failed to create summary draft'),
+    onError: () => toast.error(i18n.t('teacher:toasts.summaryFailed')),
   })
 }
 
@@ -32,10 +33,10 @@ export function useCreateAiTeacherExerciseDraftMutation() {
     mutationFn: createAiTeacherExerciseDraft,
     onSuccess: (draft) => {
       trackEvent('ai_teacher_exercise_draft_created', { draftId: draft.draftId, studentId: draft.studentId })
-      toast.success('Exercise draft created')
+      toast.success(i18n.t('teacher:toasts.exerciseCreated'))
       void queryClient.invalidateQueries({ queryKey: teacherQueryKeys.aiTeacherDrafts() })
     },
-    onError: () => toast.error('Failed to create exercise draft'),
+    onError: () => toast.error(i18n.t('teacher:toasts.exerciseFailed')),
   })
 }
 
@@ -46,10 +47,10 @@ export function useRegenerateAiTeacherDraftMutation() {
     mutationFn: regenerateAiTeacherDraft,
     onSuccess: (draft) => {
       trackEvent('ai_teacher_draft_regenerated', { draftId: draft.draftId, previousDraftId: draft.previousDraftId })
-      toast.success('Draft regenerated')
+      toast.success(i18n.t('teacher:toasts.regenerated'))
       void queryClient.invalidateQueries({ queryKey: teacherQueryKeys.aiTeacherDrafts() })
     },
-    onError: () => toast.error('Failed to regenerate draft'),
+    onError: () => toast.error(i18n.t('teacher:toasts.regenerateFailed')),
   })
 }
 
@@ -75,10 +76,10 @@ function useReviewMutation(
     mutationFn,
     onSuccess: (draft) => {
       trackEvent('ai_teacher_draft_reviewed', { draftId: draft.draftId, status: draft.status })
-      toast.success(`Draft ${status}`)
+      toast.success(i18n.t(`teacher:toasts.reviewed.${status}`))
       void queryClient.invalidateQueries({ queryKey: teacherQueryKeys.aiTeacherDrafts() })
       void queryClient.invalidateQueries({ queryKey: teacherQueryKeys.aiTeacherDraft(draft.draftId) })
     },
-    onError: () => toast.error(`Failed to mark draft ${status}`),
+    onError: () => toast.error(i18n.t(`teacher:toasts.reviewFailed.${status}`)),
   })
 }

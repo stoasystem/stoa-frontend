@@ -121,7 +121,8 @@
     "learningAutomation": "Lernautomatisierung",
     "learningAutomationDescription": "Automatische Übungszuweisungen für Ihre Schülerinnen und Schüler prüfen und ausführen",
     "firstAction": "Erste Aktion der Lehrperson: {{time}}",
-    "firstActionNone": "Erste Aktion der Lehrperson: noch nicht erfasst"
+    "firstActionNone": "Erste Aktion der Lehrperson: noch nicht erfasst",
+    "statsLoadFailed": "Die Kennzahlen konnten nicht geladen werden."
   },
   "assistance": {
     "title": "Zusammenfassung zur Vorbereitung",
@@ -314,6 +315,30 @@
       "low": "Geringe Sicherheit",
       "medium": "Mittlere Sicherheit",
       "high": "Hohe Sicherheit"
+    }
+  },
+  "toasts": {
+    "statusUpdated": "Status der Anfrage aktualisiert.",
+    "replySent": "Ihre Antwort wurde gesendet.",
+    "replyFailed": "Ihre Antwort konnte nicht gesendet werden. Bitte versuchen Sie es erneut.",
+    "replyConflict": "Ihre Antwort wurde nicht gesendet: Die Anfrage hat inzwischen eine andere Lehrperson übernommen, oder sie hat sich geändert.",
+    "replyRefused": "Ihre Antwort wurde nicht angenommen. Bitte prüfen Sie Inhalt und Format und senden Sie sie erneut.",
+    "availabilityUpdated": "Ihre Verfügbarkeit wurde gespeichert.",
+    "summaryCreated": "Zusammenfassungsentwurf erstellt.",
+    "summaryFailed": "Der Zusammenfassungsentwurf konnte nicht erstellt werden.",
+    "exerciseCreated": "Übungsentwurf erstellt.",
+    "exerciseFailed": "Der Übungsentwurf konnte nicht erstellt werden.",
+    "regenerated": "Entwurf neu erstellt.",
+    "regenerateFailed": "Der Entwurf konnte nicht neu erstellt werden.",
+    "reviewed": {
+      "accepted": "Entwurf angenommen.",
+      "rejected": "Entwurf abgelehnt.",
+      "archived": "Entwurf archiviert."
+    },
+    "reviewFailed": {
+      "accepted": "Der Entwurf konnte nicht angenommen werden.",
+      "rejected": "Der Entwurf konnte nicht abgelehnt werden.",
+      "archived": "Der Entwurf konnte nicht archiviert werden."
     }
   }
 }
