@@ -12,7 +12,10 @@ export const adminQueryKeys = {
   accountsAll: () => [...adminQueryKeys.all, 'accounts'] as const,
   accounts: (filters: Record<string, unknown>) => [...adminQueryKeys.all, 'accounts', filters] as const,
   teacherSupportAllowance: (studentId: string) => [...adminQueryKeys.all, 'teacher-support-allowance', studentId] as const,
-  accountOperations: (parentId?: string, day?: string) => [...adminQueryKeys.all, 'account-operations', parentId ?? '', day ?? ''] as const,
+  // Every usage day of one parent: a write that changes the parent's children
+  // has to reach the query whatever `?day=` it was read with (#262).
+  accountOperationsForParent: (parentId?: string) => [...adminQueryKeys.all, 'account-operations', parentId ?? ''] as const,
+  accountOperations: (parentId?: string, day?: string) => [...adminQueryKeys.accountOperationsForParent(parentId), day ?? ''] as const,
   curriculumWorklist: (status?: string) => [...adminQueryKeys.all, 'curriculum', 'worklist', status ?? ''] as const,
   curriculumPreview: (publicLessonId: string, versionId: string) => [...adminQueryKeys.all, 'curriculum', 'preview', publicLessonId, versionId] as const,
   curriculumValidation: (publicLessonId: string, versionId: string) => [...adminQueryKeys.all, 'curriculum', 'validation', publicLessonId, versionId] as const,

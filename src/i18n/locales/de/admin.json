@@ -218,7 +218,9 @@
     "minutes": "{{count}} Min.",
     "within": "Im Ziel",
     "atRisk": "Gefährdet",
-    "breached": "Überschritten"
+    "breached": "Überschritten",
+    "loading": "Antwortzeiten werden geladen …",
+    "unavailable": "Die Antwortzeiten sind gerade nicht verfügbar. Es werden keine Zahlen angezeigt, damit keine falschen Werte erscheinen."
   },
   "placeholder": {
     "eyebrow": "Verwaltung",
@@ -326,12 +328,15 @@
     "reject": "Ablehnen",
     "resend": "Einladung erneut senden",
     "approvedSent": "Angenommen. Die Einladung wurde per E-Mail verschickt.",
-    "approvedNotDelivered": "Angenommen, aber die Einladung konnte nicht zugestellt werden. Senden Sie sie erneut.",
+    "approvedNotDelivered": "Angenommen, aber die Einladung konnte nicht zugestellt werden. Senden Sie sie im Reiter «angenommen» erneut.",
     "rejected": "Bewerbung abgelehnt.",
     "reviewFailed": "Prüfung fehlgeschlagen.",
     "resent": "Einladung erneut gesendet.",
     "resentNotDelivered": "Einladung erstellt, aber die E-Mail wurde nicht zugestellt.",
-    "resendFailed": "Die Einladung konnte nicht erneut gesendet werden."
+    "resendFailed": "Die Einladung konnte nicht erneut gesendet werden.",
+    "statementFailed": "Das Motivationsschreiben konnte nicht geladen werden.",
+    "noStatement": "Es wurde kein Motivationsschreiben eingereicht.",
+    "reasonLabel": "Begründung der Entscheidung"
   },
   "learningOps": {
     "eyebrow": "Lernbetrieb",
@@ -556,6 +561,96 @@
       "unknown": "Unbekannt",
       "pending": "Ausstehend",
       "available": "Vorhanden"
+    },
+    "codes": {
+      "billingStatus": {
+        "none": "Keine Abrechnung",
+        "checkout_pending": "Bezahlvorgang offen",
+        "active": "Aktiv",
+        "past_due": "Überfällig",
+        "canceled": "Gekündigt",
+        "payment_failed": "Zahlung fehlgeschlagen",
+        "manual_override": "Manuell gesetzt",
+        "provider_unknown": "Beim Anbieter unbekannt",
+        "billing_frozen": "Abrechnung pausiert"
+      },
+      "plan": {
+        "free_trial": "Kostenlose Testphase",
+        "student": "Schüler",
+        "teacher_supported": "Mit Lehrkraft-Unterstützung",
+        "family": "Familie"
+      },
+      "billingMode": {
+        "manual": "Manuell",
+        "test": "Testmodus",
+        "live": "Live-Betrieb"
+      },
+      "binding": {
+        "active": "Verknüpft",
+        "pending": "Verknüpfung ausstehend",
+        "rejected": "Verknüpfung abgelehnt",
+        "missing": "Keine Verknüpfung",
+        "profile_parent_link": "Über das Profil verknüpft"
+      },
+      "usageAction": {
+        "question_submission": "Gestellte Fragen"
+      },
+      "usageSupport": {
+        "none": "Nichts zu tun",
+        "contact_support": "STOA-Support kontaktieren",
+        "review_count_mismatch": "Abweichende Zählung prüfen",
+        "review_counter_and_entitlement": "Zähler und Berechtigung prüfen",
+        "review_counter_without_ledger": "Zähler ohne Journaleinträge prüfen",
+        "review_if_disputed": "Bei Beanstandung prüfen",
+        "review_ledger_without_counter": "Journaleinträge ohne Zähler prüfen",
+        "review_stale_counter": "Veralteten Zähler prüfen"
+      },
+      "eventType": {
+        "checkout_session_completed": "Bezahlvorgang abgeschlossen",
+        "checkout_session_expired": "Bezahlvorgang abgelaufen",
+        "customer_subscription_created": "Abonnement erstellt",
+        "customer_subscription_updated": "Abonnement geändert",
+        "customer_subscription_deleted": "Abonnement beendet",
+        "invoice_paid": "Rechnung bezahlt",
+        "invoice_payment_failed": "Rechnungszahlung fehlgeschlagen",
+        "charge_refunded": "Belastung erstattet",
+        "refund_created": "Rückerstattung erstellt",
+        "refund_updated": "Rückerstattung geändert",
+        "refund_failed": "Rückerstattung fehlgeschlagen",
+        "customer_updated": "Kunde geändert"
+      },
+      "factKind": {
+        "checkout_session_completed": "Bezahlvorgang abgeschlossen",
+        "checkout_session_expired": "Bezahlvorgang abgelaufen",
+        "invoice_paid": "Rechnung bezahlt",
+        "invoice_payment_failed": "Rechnungszahlung fehlgeschlagen",
+        "subscription_active": "Abonnement aktiv",
+        "subscription_inactive": "Abonnement inaktiv"
+      },
+      "lifecycle": {
+        "no_paid_fact": "Keine Zahlung erfasst",
+        "initial_invoice_paid": "Erste Rechnung bezahlt",
+        "subscription_active": "Abonnement aktiv",
+        "grace_period": "Kulanzfrist",
+        "ended": "Beendet",
+        "provider_unknown": "Beim Anbieter unbekannt"
+      },
+      "safeAction": {
+        "recheck_payment": "Zahlung erneut prüfen",
+        "contact_support": "STOA-Support kontaktieren",
+        "view_billing": "Abrechnung öffnen",
+        "view_parent_home": "Eltern-Startseite öffnen",
+        "start_checkout": "Bezahlvorgang starten"
+      },
+      "commandState": {
+        "intent_recorded": "Anfrage erfasst",
+        "provider_create_pending": "Wartet auf den Anbieter",
+        "provider_session_open": "Bezahlvorgang beim Anbieter offen",
+        "reconciling": "Wird abgeglichen",
+        "activation_recorded": "Aktivierung erfasst",
+        "terminal_without_payment": "Ohne Zahlung beendet",
+        "operator_attention_required": "Braucht eine Bearbeitung"
+      }
     }
   },
   "curriculum": {

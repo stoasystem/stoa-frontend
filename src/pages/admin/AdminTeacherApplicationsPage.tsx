@@ -32,6 +32,12 @@ export function AdminTeacherApplicationsPage() {
   const reissueMutation = useReissueTeacherInvitationMutation()
   const rows = listQuery.data?.items ?? []
   const detail = detailQuery.data
+  // Only a pending application can be decided; the other tabs are a record.
+  const decidable = reviewState === 'pending_review'
+  let statement: string
+  if (detailQuery.isError) statement = toUserFacingError(detailQuery.error, t('teacherApplications.statementFailed'))
+  else if (detailQuery.isPending) statement = t('teacherApplications.loadingStatement')
+  else statement = detail?.statement?.trim() || t('teacherApplications.noStatement')
 
   function decide(decision: 'approved' | 'rejected') {
     if (!selected) return
@@ -45,6 +51,9 @@ export function AdminTeacherApplicationsPage() {
       },
       {
         onSuccess: (result) => {
+          // The decision moves the application out of this queue; leaving it
+          // selected kept Approve and Reject live for a case already decided.
+          setSelected(null)
           if (decision === 'approved') {
             setMessage(
               result.invitationDelivered
@@ -126,20 +135,29 @@ export function AdminTeacherApplicationsPage() {
               {listQuery.isSuccess && rows.length === 0 && (
                 <p className="text-sm text-muted-foreground">{t('teacherApplications.empty')}</p>
               )}
-              {rows.map((row) => (
-                <button
-                  key={`${row.applicationId}-${row.version}`}
-                  type="button"
-                  className="flex w-full flex-col rounded-lg border bg-background/70 p-3 text-left hover:border-primary/40"
-                  onClick={() => setSelected(row)}
-                >
-                  <span className="font-medium text-foreground">{row.fullName || row.applicationId}</span>
-                  <span className="text-sm text-muted-foreground">{row.verifiedEmail}</span>
-                  <span className="mt-1 text-xs text-muted-foreground">
-                    {(row.subjects ?? []).join(', ') || t('teacherApplications.noSubjects')} · v{row.version}
-                  </span>
-                </button>
-              ))}
+              {rows.map((row) => {
+                const isSelected = selected?.applicationId === row.applicationId && selected.version === row.version
+                return (
+                  <button
+                    key={`${row.applicationId}-${row.version}`}
+                    type="button"
+                    aria-pressed={isSelected}
+                    className={`flex w-full flex-col rounded-lg border p-3 text-left hover:border-primary/40 ${
+                      isSelected ? 'border-primary bg-primary/5' : 'bg-background/70'
+                    }`}
+                    onClick={() => {
+                      setSelected(row)
+                      setMessage(null)
+                    }}
+                  >
+                    <span className="font-medium text-foreground">{row.fullName || row.applicationId}</span>
+                    <span className="text-sm text-muted-foreground">{row.verifiedEmail}</span>
+                    <span className="mt-1 text-xs text-muted-foreground">
+                      {(row.subjects ?? []).join(', ') || t('teacherApplications.noSubjects')} · v{row.version}
+                    </span>
+                  </button>
+                )
+              })}
             </CardContent>
           </Card>
           <Card>
@@ -153,24 +171,35 @@ export function AdminTeacherApplicationsPage() {
                   <p><span className="font-medium">{t('teacherApplications.name')}</span> {detail?.fullName || selected.fullName}</p>
                   <p><span className="font-medium">{t('teacherApplications.email')}</span> {selected.verifiedEmail}</p>
                   <p><span className="font-medium">{t('teacherApplications.subjects')}</span> {(detail?.subjects || selected.subjects || []).join(', ')}</p>
-                  <p className="whitespace-pre-wrap text-muted-foreground">{detail?.statement || t('teacherApplications.loadingStatement')}</p>
-                  <Textarea value={reason} onChange={(event) => setReason(event.target.value)} className="min-h-24" />
+                  <p className={`whitespace-pre-wrap ${detailQuery.isError ? 'text-destructive' : 'text-muted-foreground'}`}>{statement}</p>
+                  {decidable && (
+                    <Textarea
+                      value={reason}
+                      onChange={(event) => setReason(event.target.value)}
+                      className="min-h-24"
+                      aria-label={t('teacherApplications.reasonLabel')}
+                    />
+                  )}
                   <div className="flex flex-wrap gap-2">
-                    <Button
-                      type="button"
-                      disabled={reviewMutation.isPending || !reason.trim()}
-                      onClick={() => decide('approved')}
-                    >
-                      {t('teacherApplications.approve')}
-                    </Button>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      disabled={reviewMutation.isPending || !reason.trim()}
-                      onClick={() => decide('rejected')}
-                    >
-                      {t('teacherApplications.reject')}
-                    </Button>
+                    {decidable && (
+                      <>
+                        <Button
+                          type="button"
+                          disabled={reviewMutation.isPending || !reason.trim()}
+                          onClick={() => decide('approved')}
+                        >
+                          {t('teacherApplications.approve')}
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          disabled={reviewMutation.isPending || !reason.trim()}
+                          onClick={() => decide('rejected')}
+                        >
+                          {t('teacherApplications.reject')}
+                        </Button>
+                      </>
+                    )}
                     {reviewState === 'approved' && (
                       <Button type="button" variant="secondary" disabled={reissueMutation.isPending} onClick={resend}>
                         {t('teacherApplications.resend')}
@@ -179,7 +208,7 @@ export function AdminTeacherApplicationsPage() {
                   </div>
                 </>
               )}
-              {message && <p className="text-muted-foreground">{message}</p>}
+              <p role="status" className="text-muted-foreground empty:hidden">{message}</p>
             </CardContent>
           </Card>
         </div>
