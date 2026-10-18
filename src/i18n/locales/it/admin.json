@@ -600,7 +600,37 @@
     },
     "selectItem": "Seleziona un elemento del programma dalla lista di lavoro.",
     "requestFailed": "La richiesta all’API del programma non è riuscita.",
-    "invalidJson": "Il JSON non è valido"
+    "invalidJson": "Il JSON non è valido",
+    "errors": {
+      "code": {
+        "curriculum_capability_required": "Il tuo account non ha l’autorizzazione al programma necessaria per questa azione.",
+        "stale_pointer": "Nel frattempo è stata pubblicata un’altra versione. Ricarica la lista di lavoro e controlla la versione attuale.",
+        "active_assignments_block_archive": "Questa lezione è ancora assegnata ad allievi e non può ancora essere archiviata.",
+        "curriculum_version_not_found": "Questa versione non esiste più. Ricarica la lista di lavoro.",
+        "curriculum_unit_not_found": "Questa unità del programma non esiste più. Ricarica la lista di lavoro.",
+        "validation_failed": "Il contenuto non ha superato la validazione. Avvia la validazione per vedere i campi interessati.",
+        "draft_not_editable": "Questa versione non può più essere modificata. Crea una nuova bozza per apportare modifiche.",
+        "not_reviewable": "Questa versione non può essere inviata in revisione nel suo stato attuale.",
+        "not_in_review": "Questa versione non è in revisione, quindi non può essere approvata né rimandata indietro.",
+        "not_approved": "Solo una versione approvata può essere pubblicata.",
+        "rollback_target_not_publishable": "Questa versione non può essere ripristinata.",
+        "migration_confirmation_mismatch": "Il token di conferma non corrisponde a questa prova. Ripeti la prova e usa il suo token.",
+        "migration_not_ready": "La prova ha trovato conflitti o errori. Risolvili prima di applicare la migrazione.",
+        "migration_not_found": "Questa migrazione non è stata trovata. Controlla l’ID della migrazione.",
+        "invalid_manifest": "Il manifesto è incompleto o non valido. Controlla le lezioni e i loro ID.",
+        "session_unreachable": "Non è stato possibile rinnovare la tua sessione in questo momento. Controlla la connessione e riprova."
+      },
+      "status": {
+        "network": "Il server non è raggiungibile. Controlla la connessione e riprova.",
+        "unauthorized": "La tua sessione è cambiata. Ricarica la pagina e riprova.",
+        "forbidden": "Non hai l’autorizzazione per questa azione sul programma.",
+        "notFound": "Questo elemento non è stato trovato. Ricarica la lista di lavoro.",
+        "conflict": "Questo elemento è stato modificato nel frattempo. Ricarica la lista di lavoro e riprova.",
+        "invalid": "La richiesta contiene dati non validi. Controlla i dati inseriti e riprova.",
+        "tooMany": "Troppe richieste. Attendi un momento e riprova.",
+        "server": "Il server non è riuscito a completare la richiesta. Riprova più tardi."
+      }
+    }
   },
   "operationalNotifications": {
     "title": "Notifiche operative",

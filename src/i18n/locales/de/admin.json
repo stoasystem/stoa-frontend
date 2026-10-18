@@ -600,7 +600,37 @@
     },
     "selectItem": "Wählen Sie einen Lehrplaneintrag aus der Arbeitsliste.",
     "requestFailed": "Die Anfrage an die Lehrplan-API ist fehlgeschlagen.",
-    "invalidJson": "Das JSON ist ungültig"
+    "invalidJson": "Das JSON ist ungültig",
+    "errors": {
+      "code": {
+        "curriculum_capability_required": "Ihrem Konto fehlt die Lehrplan-Berechtigung für diese Aktion.",
+        "stale_pointer": "In der Zwischenzeit wurde eine andere Version veröffentlicht. Laden Sie die Arbeitsliste neu und prüfen Sie die aktuelle Version.",
+        "active_assignments_block_archive": "Diese Lektion ist noch Lernenden zugewiesen und kann noch nicht archiviert werden.",
+        "curriculum_version_not_found": "Diese Version existiert nicht mehr. Laden Sie die Arbeitsliste neu.",
+        "curriculum_unit_not_found": "Diese Lehrplaneinheit existiert nicht mehr. Laden Sie die Arbeitsliste neu.",
+        "validation_failed": "Der Inhalt hat die Validierung nicht bestanden. Starten Sie die Validierung, um die betroffenen Felder zu sehen.",
+        "draft_not_editable": "Diese Version kann nicht mehr bearbeitet werden. Legen Sie für Änderungen einen neuen Entwurf an.",
+        "not_reviewable": "Diese Version kann in ihrem aktuellen Zustand nicht zur Prüfung eingereicht werden.",
+        "not_in_review": "Diese Version ist nicht in Prüfung und kann daher weder freigegeben noch zurückgewiesen werden.",
+        "not_approved": "Nur eine freigegebene Version kann veröffentlicht werden.",
+        "rollback_target_not_publishable": "Diese Version kann nicht wiederhergestellt werden.",
+        "migration_confirmation_mismatch": "Das Bestätigungstoken passt nicht zu diesem Probelauf. Starten Sie den Probelauf erneut und verwenden Sie dessen Token.",
+        "migration_not_ready": "Der Probelauf hat Konflikte oder Fehler gefunden. Beheben Sie diese, bevor Sie die Migration anwenden.",
+        "migration_not_found": "Diese Migration wurde nicht gefunden. Prüfen Sie die Migrations-ID.",
+        "invalid_manifest": "Das Manifest ist unvollständig oder ungültig. Prüfen Sie die Lektionen und ihre IDs.",
+        "session_unreachable": "Ihre Sitzung konnte gerade nicht verlängert werden. Prüfen Sie Ihre Verbindung und versuchen Sie es erneut."
+      },
+      "status": {
+        "network": "Der Server ist nicht erreichbar. Prüfen Sie Ihre Verbindung und versuchen Sie es erneut.",
+        "unauthorized": "Ihre Sitzung hat sich geändert. Laden Sie die Seite neu und versuchen Sie es erneut.",
+        "forbidden": "Sie haben keine Berechtigung für diese Lehrplan-Aktion.",
+        "notFound": "Dieser Eintrag wurde nicht gefunden. Laden Sie die Arbeitsliste neu.",
+        "conflict": "Dieser Eintrag wurde in der Zwischenzeit geändert. Laden Sie die Arbeitsliste neu und versuchen Sie es erneut.",
+        "invalid": "Die Anfrage enthält ungültige Angaben. Prüfen Sie Ihre Eingaben und versuchen Sie es erneut.",
+        "tooMany": "Zu viele Anfragen. Warten Sie einen Moment und versuchen Sie es erneut.",
+        "server": "Der Server konnte die Anfrage nicht abschliessen. Versuchen Sie es später erneut."
+      }
+    }
   },
   "operationalNotifications": {
     "title": "Betriebsmeldungen",
