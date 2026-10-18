@@ -6,7 +6,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { cleanup, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import type { ReactNode } from 'react'
-import { afterEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 // Translated through the real English files, so these assert what a student
 // reads rather than the key that produced it. Both namespaces the screen uses:
@@ -453,5 +453,114 @@ describe('a question that has come back', () => {
     renderSession()
 
     expect(await screen.findByText('missed 3 times')).toBeInTheDocument()
+  })
+})
+
+describe('after a question is answered (#264)', () => {
+  // These queue one reply per request; a test that stops early must not leave
+  // its unused ones to the next.
+  beforeEach(() => {
+    mockedDue.mockReset()
+    mockedAnswer.mockReset()
+  })
+
+  // The app's defaults: a list is fresh for a minute, so a cached one is
+  // served without asking the server again.
+  function sessionClient() {
+    const client = new QueryClient({ defaultOptions: { queries: { retry: false, staleTime: 60_000 } } })
+    function Wrapper({ children }: { children: ReactNode }) {
+      return <QueryClientProvider client={client}>{children}</QueryClientProvider>
+    }
+    return { client, open: () => render(<ReviewSession unitId="brueche" />, { wrapper: Wrapper }) }
+  }
+
+  async function answerTheCard() {
+    const user = userEvent.setup()
+    await screen.findByText('Was ist 1/2 + 1/4?')
+    await user.click(screen.getByRole('radio', { name: '3/4' }))
+    await user.click(screen.getByRole('button', { name: 'Check answer' }))
+    await waitFor(() => expect(screen.getByText('Richtig!')).toBeInTheDocument())
+  }
+
+  it('is not offered again when the student comes back within the minute', async () => {
+    mockedDue
+      .mockResolvedValueOnce({ items: [card()], dueCount: 1, generatedAt: '' })
+      .mockResolvedValueOnce({ items: [], dueCount: 0, generatedAt: '' })
+    mockedAnswer.mockResolvedValue({ challengeId: 'brueche-l1-c1', correct: true, feedback: 'Richtig!', attemptsRemaining: 2 })
+    const { open } = sessionClient()
+
+    const first = open()
+    await answerTheCard()
+    // It stays on screen, with its feedback, while the student is still here.
+    expect(screen.getByText('Was ist 1/2 + 1/4?')).toBeInTheDocument()
+    first.unmount()
+
+    // Back to the map, then the same star again.
+    open()
+    expect(screen.queryByText('Was ist 1/2 + 1/4?')).not.toBeInTheDocument()
+    await screen.findByText('Nothing to review right now')
+    expect(mockedDue).toHaveBeenCalledTimes(2)
+    expect(mockedAnswer).toHaveBeenCalledTimes(1)
+  })
+
+  it('is not offered again when the student left before the reply came', async () => {
+    mockedDue
+      .mockResolvedValueOnce({ items: [card()], dueCount: 1, generatedAt: '' })
+      .mockResolvedValueOnce({ items: [], dueCount: 0, generatedAt: '' })
+    mockedAnswer.mockReturnValue(new Promise(() => {}))
+    const { open } = sessionClient()
+    const user = userEvent.setup()
+
+    const first = open()
+    await screen.findByText('Was ist 1/2 + 1/4?')
+    await user.click(screen.getByRole('radio', { name: '3/4' }))
+    await user.click(screen.getByRole('button', { name: 'Check answer' }))
+    first.unmount()
+
+    open()
+    await screen.findByText('Nothing to review right now')
+    expect(mockedDue).toHaveBeenCalledTimes(2)
+  })
+
+  it('keeps the list when nothing was answered', async () => {
+    mockedDue.mockResolvedValue({ items: [card()], dueCount: 1, generatedAt: '' })
+    const { open } = sessionClient()
+
+    const first = open()
+    await screen.findByText('Was ist 1/2 + 1/4?')
+    first.unmount()
+    open()
+
+    expect(screen.getByText('Was ist 1/2 + 1/4?')).toBeInTheDocument()
+    expect(mockedDue).toHaveBeenCalledTimes(1)
+  })
+
+  it('tells the sky, so the "Review N" on the star moves', async () => {
+    mockedDue.mockResolvedValue({ items: [card()], dueCount: 1, generatedAt: '' })
+    mockedAnswer.mockResolvedValue({ challengeId: 'brueche-l1-c1', correct: true, feedback: 'Richtig!', attemptsRemaining: 2 })
+    const { client, open } = sessionClient()
+    const sky = ['practice', 'knowledge-map', '']
+    client.setQueryData(sky, { stars: [] })
+
+    open()
+    await answerTheCard()
+
+    expect(client.getQueryState(sky)?.isInvalidated).toBe(true)
+  })
+})
+
+describe('a review list that could not be loaded', () => {
+  it('can be asked for again', async () => {
+    mockedDue
+      .mockRejectedValueOnce(new Error('offline'))
+      .mockResolvedValueOnce({ items: [card()], dueCount: 1, generatedAt: '' })
+    const user = userEvent.setup()
+    renderSession()
+
+    await screen.findByText('Your review list could not be loaded.')
+    await user.click(screen.getByRole('button', { name: 'Try again' }))
+
+    await screen.findByText('Was ist 1/2 + 1/4?')
+    expect(mockedDue).toHaveBeenCalledTimes(2)
   })
 })
