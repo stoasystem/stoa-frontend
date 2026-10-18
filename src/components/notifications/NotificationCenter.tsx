@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useId, useRef, useState } from 'react'
 import { Archive, Bell, ChevronRight, CircleAlert, Radio, WifiOff } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
@@ -56,6 +56,8 @@ export function NotificationCenter({
   const { t } = useTranslation(['common', 'chat'])
   const [open, setOpen] = useState(false)
   const shell = useRef<HTMLDivElement>(null)
+  const bell = useRef<HTMLButtonElement>(null)
+  const panelId = useId()
   const navigate = useNavigate()
   const role = useAuthStore((state) => state.user?.role)
   const query = useNotificationsQuery()
@@ -78,15 +80,23 @@ export function NotificationCenter({
   }
 
   // A panel anchored to the bell closes the way every other one does: a click
-  // outside it, or Escape.
+  // outside it, or Escape. Focus goes back to the bell (#273), not to <body>;
+  // a click outside that put focus somewhere else keeps it there.
   useEffect(() => {
     if (!open) return
 
     function onPointerDown(event: PointerEvent) {
-      if (!shell.current?.contains(event.target as Node)) setOpen(false)
+      if (shell.current?.contains(event.target as Node)) return
+      setOpen(false)
+      window.setTimeout(() => {
+        const active = document.activeElement
+        if (!active || active === document.body) bell.current?.focus()
+      })
     }
     function onKeyDown(event: KeyboardEvent) {
-      if (event.key === 'Escape') setOpen(false)
+      if (event.key !== 'Escape') return
+      setOpen(false)
+      bell.current?.focus()
     }
 
     document.addEventListener('pointerdown', onPointerDown)
@@ -101,6 +111,7 @@ export function NotificationCenter({
     <div className="relative" ref={shell}>
       {/* Sizes board: the bell in the bar is a 36 icon button with a 22 glyph. */}
       <IconButton
+        ref={bell}
         icon={Bell}
         size={36}
         hitSize={hitSize}
@@ -110,6 +121,8 @@ export function NotificationCenter({
             : t('notifications.openLabel')
         }
         aria-expanded={open}
+        aria-haspopup="dialog"
+        aria-controls={open ? panelId : undefined}
         onClick={() => setOpen((value) => !value)}
         // Over a sky page the glyph takes the bar's sky values; the panel below does not.
         data-bar-control={onSky || undefined}
@@ -125,6 +138,9 @@ export function NotificationCenter({
         // left of the screen and lost its first letters (#162). There it spans
         // the screen inside the gutters instead; wider, it hangs off the bell.
         <div
+          id={panelId}
+          role="dialog"
+          aria-label={t('notifications.title')}
           data-notification-panel
           className="fixed inset-x-4 top-14 z-50 rounded-lg border border-border/80 bg-card p-3 shadow-[var(--platform-shadow-soft)] sm:absolute sm:inset-x-auto sm:right-0 sm:top-11 sm:w-[22rem]"
         >

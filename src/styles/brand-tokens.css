@@ -490,3 +490,21 @@
   --accent-tint: var(--on-sky-selected);
   --on-accent: var(--on-accent-on-sky);
 }
+
+/*
+ * The bell's panel (#273). It is a light card, but it opens inside the bar,
+ * and over a sky page the bar carries `data-surface="sky"`: the panel inherited
+ * the sky's rose --red (2.0:1 on white for "Notifications unavailable"), its
+ * gold focus ring (1.6:1) and a dark scrollbar. This hands back the light value
+ * of every name the sky block redefines that :root also defines (a test keeps
+ * the two lists equal). check:contrast reads it as its own theme, "panel".
+ */
+[data-surface="sky"] [data-notification-panel] {
+  color-scheme: light;
+
+  --red: #C4283A;
+  --state-error-surface: #FBEDEE;
+  --state-error-rule: #F0C9CE;
+  --focus-ring: var(--accent);
+  --shadow-float: 0 1px 2px rgba(0, 0, 0, 0.04), 0 10px 30px rgba(0, 0, 0, 0.06);
+}

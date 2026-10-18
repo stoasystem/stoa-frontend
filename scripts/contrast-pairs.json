@@ -1,5 +1,5 @@
 {
-  "$comment": "Foreground/background token pairs rated by scripts/check-contrast.mjs (WCAG 2.1). kind: text >= 4.5, large >= 3 (24px, or 18.66px bold), ui >= 3 (focus rings, borders, icons that carry state). tokens.file is the one token source; tokens.themes maps each theme to the CSS blocks read for it, in order, later blocks overriding earlier ones (a block inside an at-rule is named by its path, e.g. \"@media (prefers-color-scheme: dark) :root\"); two themes may not read the same blocks, and a block no theme reads may not define a token the pairs use. Nested style rules are refused. A translucent bg needs \"over\", the opaque token it sits on; a translucent fg is composited onto the bg. \"gate\": false keeps a pair's reading in the output without failing the run; it needs a \"why\" citing an issue (#n), every theme keeps at least one gated pair, and an exempt pair that meets its threshold fails the run until the exemption is removed. The dark theme is the sky: every dark token lives in the [data-surface=\"sky\"] block and exists only inside an element that carries that attribute (#18). The one exempt pair, --on-sky-text-muted on --sky, is settled: disabled, non-interactive control labels only (#17, #18). The third theme, ask, is the Ask panel and sheet: the sky plus the block that points the light names at sky values (#125). The fourth, review, is the review of a knowledge point, built the same way and differing in one value: --separator is the rule on a control there, not a divider (#125 lane A2). The fourth theme, bar, is the top bar over a sky page: its bell and avatar read the light names as sky values (#183). Pairs come from the canvas boards Tokens, Foundations, Placement, Components and Motion and states. Not listed on purpose: --tertiary, --separator and --hairline (dividers and chevrons, decorative, never text), --lit-deep and --atmosphere (glow only).",
+  "$comment": "Foreground/background token pairs rated by scripts/check-contrast.mjs (WCAG 2.1). kind: text >= 4.5, large >= 3 (24px, or 18.66px bold), ui >= 3 (focus rings, borders, icons that carry state). tokens.file is the one token source; tokens.themes maps each theme to the CSS blocks read for it, in order, later blocks overriding earlier ones (a block inside an at-rule is named by its path, e.g. \"@media (prefers-color-scheme: dark) :root\"); two themes may not read the same blocks, and a block no theme reads may not define a token the pairs use. Nested style rules are refused. A translucent bg needs \"over\", the opaque token it sits on; a translucent fg is composited onto the bg. \"gate\": false keeps a pair's reading in the output without failing the run; it needs a \"why\" citing an issue (#n), every theme keeps at least one gated pair, and an exempt pair that meets its threshold fails the run until the exemption is removed. The dark theme is the sky: every dark token lives in the [data-surface=\"sky\"] block and exists only inside an element that carries that attribute (#18). The one exempt pair, --on-sky-text-muted on --sky, is settled: disabled, non-interactive control labels only (#17, #18). The third theme, ask, is the Ask panel and sheet: the sky plus the block that points the light names at sky values (#125). The fourth, review, is the review of a knowledge point, built the same way and differing in one value: --separator is the rule on a control there, not a divider (#125 lane A2). The fourth theme, bar, is the top bar over a sky page: its bell and avatar read the light names as sky values (#183). The fifth, panel, is the bell's panel inside that bar: a light card that hands back the light value of every name the sky redefines (#273). Pairs come from the canvas boards Tokens, Foundations, Placement, Components and Motion and states. Not listed on purpose: --tertiary, --separator and --hairline (dividers and chevrons, decorative, never text), --lit-deep and --atmosphere (glow only).",
   "tokens": {
     "file": "src/styles/brand-tokens.css",
     "themes": {
@@ -24,6 +24,11 @@
         ":root",
         "[data-surface=\"sky\"]",
         "[data-top-bar][data-surface=\"sky\"] [data-bar-control]"
+      ],
+      "panel": [
+        ":root",
+        "[data-surface=\"sky\"]",
+        "[data-surface=\"sky\"] [data-notification-panel]"
       ]
     }
   },
@@ -830,6 +835,34 @@
       "over": "--sky",
       "kind": "ui",
       "use": "Top bar on a sky page: a bar control under the pointer"
+    },
+    {
+      "theme": "panel",
+      "fg": "--red",
+      "bg": "--surface",
+      "kind": "text",
+      "use": "\"Notifications unavailable\" in the bell's panel inside the bar over a sky page (#273)"
+    },
+    {
+      "theme": "panel",
+      "fg": "--focus-ring",
+      "bg": "--surface",
+      "kind": "ui",
+      "use": "the focus ring on an item or the archive button in the bell's panel inside the bar over a sky page (#273)"
+    },
+    {
+      "theme": "panel",
+      "fg": "--ink",
+      "bg": "--surface",
+      "kind": "text",
+      "use": "item titles in the bell's panel inside the bar over a sky page (#273)"
+    },
+    {
+      "theme": "panel",
+      "fg": "--secondary",
+      "bg": "--surface",
+      "kind": "text",
+      "use": "the subtitle and item summaries in the bell's panel inside the bar over a sky page (#273)"
     }
   ]
 }

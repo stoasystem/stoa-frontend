@@ -84,7 +84,20 @@ function mergeIntoList(
 ) {
   queryClient.setQueryData<NotificationListResponse>(queryKey, (current) => {
     const items = current?.items ?? []
-    const nextItems = [event, ...items.filter((item) => item.eventId !== event.eventId)]
+    const known = items.find((item) => item.eventId === event.eventId)
+    // A redelivery (deliveryAttempt > 1) of an item already here is not news:
+    // it keeps the reader's state and its place, so a read item does not turn
+    // unread again (#273).
+    if (known) {
+      const merged: NotificationEvent = {
+        ...event,
+        status: known.status,
+        readAt: known.readAt ?? null,
+        archivedAt: known.archivedAt ?? null,
+      }
+      return { items: items.map((item) => (item === known ? merged : item)), count: items.length }
+    }
+    const nextItems = [event, ...items]
     return { items: nextItems, count: nextItems.length }
   })
 }
