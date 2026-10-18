@@ -114,6 +114,13 @@ describe('/ is the star map for a student and the front door for everyone else',
     expect(openAs('student', '/')).toMatchObject({ pathname: '/', page: 'MapHomePage' })
   })
 
+  it('waits for the account after a refresh instead of showing the sign-in page (#274)', () => {
+    const landed = openAs('pending', '/')
+
+    expect(landed).toMatchObject({ pathname: '/', page: null })
+    expect(landed.text).toContain('Loading account')
+  })
+
   it.each(['anonymous', ...OTHER_ROLES] as Viewer[])('shows %s the entry page, not the star map', (viewer) => {
     // EntryPage signs the visitor in, or sends them to their own home.
     expect(openAs(viewer, '/')).toMatchObject({ pathname: '/', page: 'EntryPage' })

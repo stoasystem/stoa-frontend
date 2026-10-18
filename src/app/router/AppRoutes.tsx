@@ -9,6 +9,7 @@
 import { useEffect, useState, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Navigate, Outlet, Route, Routes, useLocation, useParams } from 'react-router-dom'
+import { AccountLoadStatus } from '@/app/router/AccountLoadStatus'
 import { DemoSurfaceRoute } from '@/app/router/DemoSurfaceRoute'
 import { ProtectedRoute } from '@/app/router/ProtectedRoute'
 import { RoleRoute } from '@/app/router/RoleRoute'
@@ -103,11 +104,20 @@ function RoleScopedRedirect({
 /**
  * For a route with a `refusedPage`: a visitor the route admits goes on
  * through the real guards; anyone else is shown the refused page instead.
+ *
+ * Which of the two a role route is cannot be told before the account is
+ * read, so a session whose account is not in yet waits the way RoleRoute
+ * does (#274). Deciding on the missing account showed a reloading student
+ * the sign-in page until /auth/me answered, and the refused page's one-time
+ * reads of the tab (the account choice, how the last session ended) were
+ * made for a visitor who was not there.
  */
 function RefusedPageSwitch({ access, refused }: { access: RouteAccess; refused: ReactNode }) {
   const user = useAuthStore((state) => state.user)
+  const accessToken = useAuthStore((state) => state.accessToken)
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
 
+  if (access.kind === 'roles' && !user && accessToken) return <AccountLoadStatus />
   return isAdmitted(access, user, isAuthenticated) ? <Outlet /> : refused
 }
 
