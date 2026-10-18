@@ -272,6 +272,7 @@
     "resultsTitle": "Ergebnisse",
     "historyTitle": "Bisherige Zuweisungen",
     "historyNeedStudent": "Geben Sie oben eine Schüler-ID ein, um die bisherigen Zuweisungen zu sehen.",
+    "historyNotLoaded": "Verlassen Sie das Feld oder wählen Sie „{{action}}“, um die Zuweisungen für diese ID zu laden.",
     "historyLoading": "Zuweisungen werden geladen…",
     "historyFailed": "Zuweisungen konnten nicht geladen werden",
     "historyNotFound": "Keine Schülerin und kein Schüler mit dieser ID, oder Sie haben keinen Zugriff darauf.",

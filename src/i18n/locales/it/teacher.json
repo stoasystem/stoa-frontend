@@ -272,6 +272,7 @@
     "resultsTitle": "Risultati",
     "historyTitle": "Assegnazioni precedenti",
     "historyNeedStudent": "Inserisci sopra l'ID di uno studente per vedere cosa gli è stato assegnato.",
+    "historyNotLoaded": "Esci dal campo o scegli «{{action}}» per caricare le assegnazioni di questo ID.",
     "historyLoading": "Caricamento delle assegnazioni…",
     "historyFailed": "Impossibile caricare le assegnazioni",
     "historyNotFound": "Nessuno studente con questo ID, oppure non puoi vederlo.",

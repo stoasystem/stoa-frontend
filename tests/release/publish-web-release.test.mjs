@@ -204,7 +204,9 @@ test('the production workflow deploys only from main, to the publisher defaults,
     'a push to main is the only trigger',
   )
   const text = production.join('\n')
-  assert.doesNotMatch(text, /preview|planet|vars\.|environment:/, 'no preview target, no variable-driven target, no Environment')
+  // Only what GitHub runs: a comment may well mention the old preview.
+  const code = production.filter((line) => !isComment(line)).join('\n')
+  assert.doesNotMatch(code, /preview|planet|vars\.|environment:/, 'no preview target, no variable-driven target, no Environment')
   assert.match(text, /^ {10}role-to-assume: arn:aws:iam::562923011260:role\/stoa-github-frontend-deploy$/m)
   assert.match(text, /^ {12}git -C stoa-backend rev-parse HEAD \| sha256sum \| awk '\{print \$1\}'$/m,
     'the backend artifact hash comes from the checked-out backend')

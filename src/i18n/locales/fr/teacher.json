@@ -272,6 +272,7 @@
     "resultsTitle": "Résultats",
     "historyTitle": "Historique des attributions",
     "historyNeedStudent": "Saisissez l'identifiant d'un élève ci-dessus pour voir ce qui lui a été attribué.",
+    "historyNotLoaded": "Quittez le champ ou choisissez « {{action}} » pour charger les attributions de cet identifiant.",
     "historyLoading": "Chargement de l'historique…",
     "historyFailed": "Impossible de charger l'historique",
     "historyNotFound": "Aucun élève avec cet identifiant, ou vous n'y avez pas accès.",

@@ -272,6 +272,7 @@
     "resultsTitle": "Results",
     "historyTitle": "Assignment history",
     "historyNeedStudent": "Enter a student id above to see what has been assigned to them.",
+    "historyNotLoaded": "Leave the field or choose “{{action}}” to load the assignments for this id.",
     "historyLoading": "Loading assignment history…",
     "historyFailed": "Assignment history could not be loaded",
     "historyNotFound": "No student with this id, or not one you can see.",
