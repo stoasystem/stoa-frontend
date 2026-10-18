@@ -11,6 +11,7 @@
     "eyebrow": "Lehrpersonen-Bereich",
     "title": "Verfügbarkeit",
     "description": "Legen Sie Verfügbarkeit und Fächer fest, damit Anfragen klar zugewiesen werden können.",
+    "loadFailed": "Ihre Verfügbarkeit konnte nicht geladen werden.",
     "editor": {
       "subjects": "Fächer",
       "weeklySlots": "Wöchentliche Zeitfenster",
@@ -18,14 +19,20 @@
       "start": "Beginn",
       "end": "Ende",
       "addSlot": "Zeitfenster hinzufügen",
+      "removeSlot": "Entfernen",
+      "removeSlotLabel": "Zeitfenster {{day}} {{start}}–{{end}} entfernen",
       "save": "Verfügbarkeit speichern",
       "saving": "Wird gespeichert …",
+      "invalidTime": "Bitte geben Sie eine gültige Beginn- und Endzeit ein.",
+      "endBeforeStart": "Das Ende muss nach dem Beginn liegen.",
+      "saveFailed": "Ihre Verfügbarkeit konnte nicht gespeichert werden. Bitte versuchen Sie es erneut.",
       "subjectNames": {
-        "Mathematics": "Mathematik",
-        "Physics": "Physik",
-        "Chemistry": "Chemie",
-        "English": "Englisch",
-        "Biology": "Biologie"
+        "math": "Mathematik",
+        "physics": "Physik",
+        "chemistry": "Chemie",
+        "english": "Englisch",
+        "biology": "Biologie",
+        "german": "Deutsch"
       }
     },
     "summary": {
@@ -88,7 +95,8 @@
     "availabilityStatus": {
       "available": "Verfügbar für Lernende",
       "busy": "Zurzeit ausgelastet",
-      "unavailable": "Nimmt keine Lernenden an"
+      "unavailable": "Nimmt keine Lernenden an",
+      "paused": "Pausiert"
     }
   },
   "requests": {

@@ -17,6 +17,8 @@ import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { useTeacherProfileQuery } from '@/hooks/teacher/useTeacherProfileQuery'
 import { DashboardLayout } from '@/layouts/DashboardLayout'
+import { normalTeacherSubjects, teacherSubjectLabel } from '@/lib/subjects'
+import { WEEKDAYS, weekdayName } from '@/lib/weekdays'
 import type { TeacherProfile } from '@/types/teacher'
 
 export function TeacherProfilePage() {
@@ -129,9 +131,9 @@ function CoverageCard({ profile }: { profile: TeacherProfile }) {
             {profile.subjects.length === 0 && (
               <p className="text-sm text-muted-foreground">{t('profile.noSubjects')}</p>
             )}
-            {profile.subjects.map((subject) => (
+            {normalTeacherSubjects(profile.subjects).map((subject) => (
               <Badge className="max-w-full break-words" variant="outline" key={subject}>
-                {subject}
+                {teacherSubjectLabel(subject, t)}
               </Badge>
             ))}
           </div>
@@ -192,10 +194,13 @@ function formatDate(value: string | undefined, language: string, t: TFunction) {
   }).format(new Date(value))
 }
 
-// 2024-01-07 is a Sunday, so day 0 lands on it.
+// The editor saves `monday`…`sunday`; older rows may carry 0–6 from Sunday
+// (2024-01-07 is a Sunday, so day 0 lands on it).
 function formatWeekday(dayOfWeek: number | string, language: string) {
+  const named = WEEKDAYS.find((day) => day === String(dayOfWeek).trim().toLowerCase())
+  if (named) return weekdayName(named, language)
   const day = Number(dayOfWeek)
-  if (!Number.isInteger(day) || day < 0 || day > 6) return String(dayOfWeek)
+  if (String(dayOfWeek).trim() === '' || !Number.isInteger(day) || day < 0 || day > 6) return String(dayOfWeek)
 
   return new Intl.DateTimeFormat(language, { weekday: 'long', timeZone: 'UTC' }).format(
     new Date(Date.UTC(2024, 0, 7 + day)),

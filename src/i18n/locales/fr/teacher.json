@@ -11,6 +11,7 @@
     "eyebrow": "Espace enseignant",
     "title": "Disponibilité",
     "description": "Définissez vos disponibilités et vos matières pour que les demandes soient orientées clairement.",
+    "loadFailed": "Votre disponibilité n’a pas pu être chargée.",
     "editor": {
       "subjects": "Matières",
       "weeklySlots": "Créneaux hebdomadaires",
@@ -18,14 +19,20 @@
       "start": "Début",
       "end": "Fin",
       "addSlot": "Ajouter un créneau",
+      "removeSlot": "Retirer",
+      "removeSlotLabel": "Retirer le créneau {{day}} {{start}}–{{end}}",
       "save": "Enregistrer la disponibilité",
       "saving": "Enregistrement…",
+      "invalidTime": "Veuillez saisir une heure de début et une heure de fin valides.",
+      "endBeforeStart": "La fin doit être après le début.",
+      "saveFailed": "Votre disponibilité n’a pas pu être enregistrée. Veuillez réessayer.",
       "subjectNames": {
-        "Mathematics": "Mathématiques",
-        "Physics": "Physique",
-        "Chemistry": "Chimie",
-        "English": "Anglais",
-        "Biology": "Biologie"
+        "math": "Mathématiques",
+        "physics": "Physique",
+        "chemistry": "Chimie",
+        "english": "Anglais",
+        "biology": "Biologie",
+        "german": "Allemand"
       }
     },
     "summary": {
@@ -88,7 +95,8 @@
     "availabilityStatus": {
       "available": "Disponible pour les élèves",
       "busy": "Actuellement occupé",
-      "unavailable": "N’accepte pas d’élèves"
+      "unavailable": "N’accepte pas d’élèves",
+      "paused": "En pause"
     }
   },
   "requests": {

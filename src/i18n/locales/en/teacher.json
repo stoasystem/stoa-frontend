@@ -11,6 +11,7 @@
     "eyebrow": "Teacher operations",
     "title": "Availability",
     "description": "Set availability and subjects so support requests can be routed clearly.",
+    "loadFailed": "Your availability couldn’t be loaded.",
     "editor": {
       "subjects": "Subjects",
       "weeklySlots": "Weekly slots",
@@ -18,14 +19,20 @@
       "start": "Start",
       "end": "End",
       "addSlot": "Add slot",
+      "removeSlot": "Remove",
+      "removeSlotLabel": "Remove slot {{day}} {{start}}–{{end}}",
       "save": "Save availability",
       "saving": "Saving…",
+      "invalidTime": "Enter a valid start and end time.",
+      "endBeforeStart": "The end must be after the start.",
+      "saveFailed": "Your availability couldn’t be saved. Please try again.",
       "subjectNames": {
-        "Mathematics": "Mathematics",
-        "Physics": "Physics",
-        "Chemistry": "Chemistry",
-        "English": "English",
-        "Biology": "Biology"
+        "math": "Mathematics",
+        "physics": "Physics",
+        "chemistry": "Chemistry",
+        "english": "English",
+        "biology": "Biology",
+        "german": "German"
       }
     },
     "summary": {
@@ -88,7 +95,8 @@
     "availabilityStatus": {
       "available": "Available for students",
       "busy": "Currently busy",
-      "unavailable": "Not accepting students"
+      "unavailable": "Not accepting students",
+      "paused": "Paused"
     }
   },
   "requests": {

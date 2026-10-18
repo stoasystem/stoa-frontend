@@ -4,6 +4,7 @@ import { TeacherAvailabilityEditor } from '@/components/teacher/TeacherAvailabil
 import { TeacherAvailabilitySummary } from '@/components/teacher/TeacherAvailabilitySummary'
 import { PageContainer } from '@/components/common/PageContainer'
 import { PageHeader } from '@/components/common/PageHeader'
+import { PageSkeleton } from '@/components/common/PageSkeleton'
 import { useTeacherWeeklyAvailabilityQuery } from '@/hooks/teacher/useTeacherWeeklyAvailabilityQuery'
 import { DashboardLayout } from '@/layouts/DashboardLayout'
 import { trackEvent } from '@/services/analytics/analyticsClient'
@@ -24,6 +25,10 @@ export function TeacherAvailabilityPage() {
           title={t('availability.title')}
           description={t('availability.description')}
         />
+        {availabilityQuery.isLoading && <PageSkeleton rows={4} />}
+        {availabilityQuery.isError && (
+          <p role="alert" className="text-sm text-destructive">{t('availability.loadFailed')}</p>
+        )}
         {availabilityQuery.data && (
           <div className="grid gap-6 lg:grid-cols-[1fr_22rem]">
             <TeacherAvailabilityEditor availability={availabilityQuery.data} />
