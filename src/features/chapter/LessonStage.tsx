@@ -592,9 +592,10 @@ function ActionRow({ run, side }: { run: LessonRun; side: boolean }) {
 }
 
 /**
- * The backend refused the quiz, or the completion it earned: what happened, in
- * the student's own words, and the way on. Which refusals a fresh paper gets
- * past is `quiz.ts`; the rest end at the chapter.
+ * The backend refused the quiz, or the completion it earned, or the paper
+ * could not be drawn at all: what happened, in the student's own words, and
+ * the way on. Which troubles a fresh paper gets past is `quiz.ts`; the rest
+ * end at the chapter.
  */
 function QuizTrouble({ run, unitId }: { run: LessonRun; unitId: string }) {
   const { t } = useTranslation('chapter')

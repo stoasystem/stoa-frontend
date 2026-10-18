@@ -14,6 +14,10 @@
  * back of the queue (`useLessonRun`). During a quiz there are no hints, no
  * Ask and no skip. A reload abandons the quiz; the backend's session expires
  * on its own.
+ *
+ * Only a refusal the backend names ends a quiz. A dropped connection or a
+ * server error says nothing about the quiz, so the stage keeps it and lets
+ * the student try again (#266).
  */
 
 /** Every refusal the three quiz endpoints name. */
@@ -29,8 +33,12 @@ export const QUIZ_TROUBLES = [
 ] as const
 
 export type QuizTroubleCode = (typeof QUIZ_TROUBLES)[number]
-/** A refusal the stage has words for, or anything else that went wrong. */
-export type QuizTrouble = QuizTroubleCode | 'unknown'
+/**
+ * A refusal the stage has words for, or anything else that went wrong:
+ * `quiz_not_started` when drawing the paper failed without a refusal,
+ * `unknown` when finishing the lesson did.
+ */
+export type QuizTrouble = QuizTroubleCode | 'quiz_not_started' | 'unknown'
 
 const SENTENCE: Record<QuizTrouble, string> = {
   lesson_locked: 'stage.trouble.locked',
@@ -41,6 +49,7 @@ const SENTENCE: Record<QuizTrouble, string> = {
   lesson_quiz_credential_invalid: 'stage.trouble.credentialInvalid',
   lesson_quiz_credential_expired: 'stage.trouble.credentialExpired',
   lesson_exercises_unanswered: 'stage.trouble.unanswered',
+  quiz_not_started: 'stage.trouble.notStarted',
   unknown: 'stage.trouble.unknown',
 }
 
@@ -51,11 +60,18 @@ const RESTARTABLE = new Set<QuizTrouble>([
   'lesson_quiz_finished',
   'lesson_quiz_credential_invalid',
   'lesson_quiz_credential_expired',
+  'quiz_not_started',
 ])
 
 function troubleCode(error: unknown): string | undefined {
   const code = (error as { code?: unknown } | null)?.code
   return typeof code === 'string' ? code : undefined
+}
+
+/** Whether the backend refused, by name, rather than the request failing on the way. */
+export function quizRefused(error: unknown): boolean {
+  const code = troubleCode(error)
+  return QUIZ_TROUBLES.some((known) => known === code)
 }
 
 /** What the backend refused with, named, or `unknown` for anything else. */
