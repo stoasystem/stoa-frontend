@@ -71,8 +71,24 @@
       "suspended": "Sospendi",
       "archived": "Archivia"
     },
-    "reasonTitle": "Motivo della prossima azione",
     "reasonRequired": "Indica prima un motivo: ogni modifica dell'account viene registrata.",
+    "loading": "Caricamento degli account…",
+    "actionFor": "{{action}}: {{account}}",
+    "confirm": {
+      "title": {
+        "reset": "Reimpostare la password di {{account}}?",
+        "suspended": "Sospendere {{account}}?",
+        "active": "Riattivare {{account}}?",
+        "archived": "Archiviare {{account}}?"
+      },
+      "body": {
+        "reset": "Per questo account viene emessa una password temporanea, mostrata una sola volta. Ogni password temporanea precedente smette di funzionare.",
+        "suspended": "Questo account non potrà più accedere finché non lo riattivi.",
+        "active": "Questo account potrà accedere di nuovo.",
+        "archived": "L'account diventa di sola lettura e mantiene il suo numero."
+      },
+      "irreversible": "L'archiviazione non si può annullare. Non potrai più riattivare questo account."
+    },
     "errors": {
       "account_peer_admin_password_reset_forbidden": "Un'amministrazione non può reimpostare la password di un'altra amministrazione. Quell'account va reimpostato da AWS.",
       "account_last_active_admin": "Questa è l'unica amministrazione ancora attiva. Attivane un'altra prima di modificare questo account.",

@@ -71,8 +71,24 @@
       "suspended": "Suspendre",
       "archived": "Archiver"
     },
-    "reasonTitle": "Motif de la prochaine action",
     "reasonRequired": "Indiquez d'abord un motif : chaque modification de compte est consignée.",
+    "loading": "Chargement des comptes…",
+    "actionFor": "{{action}} : {{account}}",
+    "confirm": {
+      "title": {
+        "reset": "Réinitialiser le mot de passe de {{account}} ?",
+        "suspended": "Suspendre {{account}} ?",
+        "active": "Réactiver {{account}} ?",
+        "archived": "Archiver {{account}} ?"
+      },
+      "body": {
+        "reset": "Un mot de passe temporaire est émis pour ce compte et affiché une seule fois. Tout mot de passe temporaire précédent cesse de fonctionner.",
+        "suspended": "Ce compte ne pourra plus se connecter tant que vous ne l'aurez pas réactivé.",
+        "active": "Ce compte pourra de nouveau se connecter.",
+        "archived": "Le compte passe en lecture seule et conserve son numéro."
+      },
+      "irreversible": "L'archivage est irréversible. Vous ne pourrez plus réactiver ce compte."
+    },
     "errors": {
       "account_peer_admin_password_reset_forbidden": "Une administration ne peut pas réinitialiser le mot de passe d’une autre administration. Ce compte doit être réinitialisé depuis AWS.",
       "account_last_active_admin": "C’est la seule administration encore active. Activez-en une autre avant de modifier ce compte.",
