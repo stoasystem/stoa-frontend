@@ -35,6 +35,23 @@
       "started": "Übung fortsetzen",
       "skipped": "Frag deine Lehrperson, was du als Nächstes probieren sollst",
       "default": "Übung starten"
+    },
+    "untitled": "Aufgabe",
+    "failedBody": "Versuch es gleich noch einmal.",
+    "currentTarget": "dein aktuelles Lernziel",
+    "status": {
+      "draft": "Entwurf",
+      "recommended": "Empfohlen",
+      "assigned": "Zugewiesen",
+      "started": "Begonnen",
+      "completed": "Erledigt",
+      "skipped": "Übersprungen",
+      "archived": "Archiviert",
+      "unknown": "Status nicht verfügbar"
+    },
+    "automationExplanation": {
+      "teacherApproved": "Deine Lehrperson hat eine Übung zu {{topic}} freigegeben, passend zu deinen letzten Lernsignalen.",
+      "reviewed": "Zu {{topic}} wurde eine geprüfte Übung vorbereitet, passend zu deinen letzten Lernsignalen."
     }
   },
   "backToLesson": "Zurück zur Lektion",

@@ -365,7 +365,8 @@
     "accountGranted": "Granted",
     "accountNotGranted": "Not granted",
     "accountChecking": "Checking…",
-    "accountUnknown": "Could not be checked"
+    "accountUnknown": "Could not be checked",
+    "failedBody": "Please try again in a moment."
   },
   "learningProfile": {
     "eyebrow": "Learning intelligence",

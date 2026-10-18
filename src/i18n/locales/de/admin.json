@@ -365,7 +365,8 @@
     "accountGranted": "Berechtigt",
     "accountNotGranted": "Nicht berechtigt",
     "accountChecking": "Wird geprüft …",
-    "accountUnknown": "Nicht prüfbar"
+    "accountUnknown": "Nicht prüfbar",
+    "failedBody": "Bitte versuchen Sie es gleich noch einmal."
   },
   "learningProfile": {
     "eyebrow": "Lernanalyse",

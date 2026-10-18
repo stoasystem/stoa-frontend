@@ -35,6 +35,23 @@
       "started": "Continue practice",
       "skipped": "Ask your teacher what to try next",
       "default": "Start practice"
+    },
+    "untitled": "Assignment",
+    "failedBody": "Please try again in a moment.",
+    "currentTarget": "your current learning goal",
+    "status": {
+      "draft": "Draft",
+      "recommended": "Recommended",
+      "assigned": "Assigned",
+      "started": "Started",
+      "completed": "Completed",
+      "skipped": "Skipped",
+      "archived": "Archived",
+      "unknown": "Status unavailable"
+    },
+    "automationExplanation": {
+      "teacherApproved": "Teacher-approved practice was assigned for {{topic}} based on recent learning signals.",
+      "reviewed": "Reviewed practice was prepared for {{topic}} based on recent learning signals."
     }
   },
   "backToLesson": "Back to lesson",
