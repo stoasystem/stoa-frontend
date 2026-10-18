@@ -290,10 +290,14 @@ httpClient.interceptors.response.use(
   (error) => {
     const status = error.response?.status
 
-    // Logging out with a token that already expired or was revoked answers
-    // 401. That session is over either way, and the caller finishes signing
-    // out itself; clearing and reloading here as well would race it.
-    if (status === 401 && requestPath(error.config?.url) !== LOGOUT_PATH) {
+    // A 401 from a public auth path says nothing about this tab's session:
+    // those requests go out without a token. A wrong password on the sign-in
+    // page, or a wrong or expired sign-in code, is the caller's to show with
+    // its code; renewing and signing out here lost the code and recorded the
+    // tab as "session expired" (#249). Logging out with a token that already
+    // expired or was revoked answers 401 too; that session is over either way,
+    // and the caller finishes signing out itself.
+    if (status === 401 && !isPublicAuthPath(error.config?.url, error.config?.method)) {
       // `retried` keeps a request that fails again after a fresh token from
       // looping: the second 401 falls through to signing out. `resent` lets a
       // request go out once more on a session renewed meanwhile, and only once.

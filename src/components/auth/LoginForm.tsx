@@ -13,6 +13,7 @@ import { useLoginMutation } from '@/hooks/auth/useLoginMutation'
 import { markLoginSubmitted } from '@/lib/loginTiming'
 import { toUserFacingError } from '@/lib/userFacingText'
 import { createLoginSchema } from '@/lib/validation'
+import { ApiError } from '@/services/api/httpClient'
 import { isEmailVerificationRequiredError } from '@/services/auth/authApi'
 
 /*
@@ -99,7 +100,13 @@ export function LoginForm({
         <EmailVerificationPanel email={email} source="login" surface="sky" />
       )}
       {loginMutation.isError && !verificationBlocked && (
-        <FieldAlert>{toUserFacingError(loginMutation.error, t('auth:login.failed'))}</FieldAlert>
+        <FieldAlert>
+          {/* The server's sentence for a wrong password is English; the code
+              beside it has its own line in the reader's language (#249). */}
+          {isInvalidCredentials(loginMutation.error)
+            ? t('auth:login.invalidCredentials', { context })
+            : toUserFacingError(loginMutation.error, t('auth:login.failed'))}
+        </FieldAlert>
       )}
       <Button
         type="submit"
@@ -129,6 +136,10 @@ export function LoginForm({
       </p>
     </form>
   )
+}
+
+function isInvalidCredentials(error: unknown) {
+  return error instanceof ApiError && error.code === 'invalid_credentials'
 }
 
 /** An error on the sky: white, with a glyph, never red (skyFields.ts). */
