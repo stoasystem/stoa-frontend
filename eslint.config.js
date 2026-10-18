@@ -2,6 +2,7 @@ import js from '@eslint/js'
 import tseslint from 'typescript-eslint'
 import importX from 'eslint-plugin-import-x'
 import { createTypeScriptImportResolver } from 'eslint-import-resolver-typescript'
+import stoaApiPath from './scripts/eslint/api-path-template.mjs'
 
 export default tseslint.config(
   js.configs.recommended,
@@ -57,6 +58,15 @@ export default tseslint.config(
     rules: {
       // 'virtual:' ids exist only inside a Vite plugin; no resolver can see them.
       'import-x/no-unresolved': ['error', { ignore: ['^virtual:'] }],
+    },
+  },
+  {
+    // Every value in a service path goes through apiPath, so an id decoded from
+    // the address cannot leave its own segment (#251).
+    files: ['src/services/**/*.{ts,tsx}'],
+    plugins: { stoa: stoaApiPath },
+    rules: {
+      'stoa/api-path-template': 'error',
     },
   },
 )

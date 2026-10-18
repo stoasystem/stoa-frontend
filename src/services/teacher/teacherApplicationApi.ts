@@ -1,3 +1,4 @@
+import { apiPath } from '@/services/api/apiPath'
 import { httpClient } from '@/services/api/httpClient'
 
 export type TeacherReviewState = 'pending_review' | 'approved' | 'rejected'
@@ -82,7 +83,7 @@ export async function submitTeacherApplication(payload: TeacherApplicationSubmit
 
 export async function getTeacherApplicationStatus(applicationId: string) {
   const response = await httpClient.get<TeacherApplicationStatus>(
-    `/teacher-applications/${applicationId}/status`,
+    apiPath`/teacher-applications/${applicationId}/status`,
   )
   return response.data
 }
@@ -129,7 +130,7 @@ export async function listTeacherApplications(reviewState: TeacherReviewState = 
 
 export async function getTeacherApplicationDetail(applicationId: string, version: number) {
   const response = await httpClient.get<TeacherApplicationDetail>(
-    `/teacher-applications/${applicationId}/versions/${version}`,
+    apiPath`/teacher-applications/${applicationId}/versions/${version}`,
   )
   return response.data
 }
@@ -141,7 +142,7 @@ export async function reviewTeacherApplication(input: {
   reason: string
 }) {
   const response = await httpClient.post<TeacherReviewResponse>(
-    `/teacher-applications/${input.applicationId}/reviews`,
+    apiPath`/teacher-applications/${input.applicationId}/reviews`,
     { version: input.version, decision: input.decision, reason: input.reason },
   )
   return response.data
@@ -149,7 +150,7 @@ export async function reviewTeacherApplication(input: {
 
 export async function reissueTeacherInvitation(applicationId: string, version: number) {
   const response = await httpClient.post<TeacherReviewResponse>(
-    `/teacher-applications/${applicationId}/invitations`,
+    apiPath`/teacher-applications/${applicationId}/invitations`,
     { version },
   )
   return response.data

@@ -1,3 +1,4 @@
+import { apiPath } from '@/services/api/apiPath'
 import { httpClient } from '@/services/api/httpClient'
 import type {
   AssignmentListResponse,
@@ -29,7 +30,7 @@ export async function previewAssignmentAutomationBatch(
   request: AutomationPreviewRequest,
 ) {
   const response = await httpClient.post<AutomationPreviewResponse>(
-    `/adaptive/students/${encodeURIComponent(studentId)}/assignment-automation/batches/preview`,
+    apiPath`/adaptive/students/${studentId}/assignment-automation/batches/preview`,
     request,
   )
   return response.data
@@ -40,14 +41,14 @@ export async function executeAssignmentAutomationBatch(
   request: AutomationExecuteRequest,
 ) {
   const response = await httpClient.post<AutomationExecuteResponse>(
-    `/adaptive/students/${encodeURIComponent(studentId)}/assignment-automation/batches/execute`,
+    apiPath`/adaptive/students/${studentId}/assignment-automation/batches/execute`,
     request,
   )
   return response.data
 }
 
 export async function getStudentAssignments(studentId: string, includeArchived = true) {
-  const response = await httpClient.get<AssignmentListResponse>(`/adaptive/students/${encodeURIComponent(studentId)}/assignments`, {
+  const response = await httpClient.get<AssignmentListResponse>(apiPath`/adaptive/students/${studentId}/assignments`, {
     params: { includeArchived },
   })
   return response.data
@@ -61,7 +62,7 @@ export async function getMyAssignments(status?: string) {
 }
 
 export async function getParentChildProgress(studentId: string) {
-  const response = await httpClient.get<ParentProgressResponse>(`/adaptive/parents/me/children/${studentId}/progress`)
+  const response = await httpClient.get<ParentProgressResponse>(apiPath`/adaptive/parents/me/children/${studentId}/progress`)
   return response.data
 }
 

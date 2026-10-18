@@ -1,3 +1,4 @@
+import { apiPath } from '@/services/api/apiPath'
 import { httpClient } from '@/services/api/httpClient'
 
 import type {
@@ -16,7 +17,7 @@ export async function getConversations() {
 }
 
 export async function getConversation(conversationId: string) {
-  const response = await httpClient.get<Conversation>(`/conversations/${conversationId}`)
+  const response = await httpClient.get<Conversation>(apiPath`/conversations/${conversationId}`)
   return response.data
 }
 
@@ -27,7 +28,7 @@ export async function createConversation(payload: CreateConversationRequest) {
 
 export async function sendConversationMessage(conversationId: string, payload: SendMessageRequest) {
   const response = await httpClient.post<SendMessageResponse>(
-    `/conversations/${conversationId}/messages`,
+    apiPath`/conversations/${conversationId}/messages`,
     payload,
   )
   return response.data

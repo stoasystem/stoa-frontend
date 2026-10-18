@@ -1,4 +1,5 @@
 
+import { apiPath } from '@/services/api/apiPath'
 import { httpClient } from '@/services/api/httpClient'
 import { createConversation } from '@/services/chat/chatApi'
 import { createTeacherHelpRequest } from '@/services/teacherHelp/teacherHelpApi'
@@ -38,28 +39,27 @@ export async function getPracticeSubjects() {
 }
 
 export async function getSubjectPath(subjectId: string, topicId?: string) {
-  const path = topicId
-    ? `/practice/${subjectId}/${topicId}/path`
-    : `/practice/${subjectId}/${topicId ?? 'default'}/path`
-  const response = await httpClient.get<PracticePath>(path)
+  const response = await httpClient.get<PracticePath>(
+    apiPath`/practice/${subjectId}/${topicId ?? 'default'}/path`,
+  )
   return response.data
 }
 
 export async function getPracticeRoadmap(subjectId: string, topicId: string) {
   const response = await httpClient.get<PracticeRoadmap>(
-    `/practice/${subjectId}/${topicId}/roadmap`,
+    apiPath`/practice/${subjectId}/${topicId}/roadmap`,
   )
   return response.data
 }
 
 export async function getPracticeLesson(lessonId: string) {
-  const response = await httpClient.get<PracticeLesson>(`/practice/lessons/${lessonId}`)
+  const response = await httpClient.get<PracticeLesson>(apiPath`/practice/lessons/${lessonId}`)
   return response.data
 }
 
 export async function submitChallengeAnswer(challengeId: string, payload: PracticeAnswerRequest) {
   const response = await httpClient.post<PracticeAnswerResult>(
-    `/practice/challenges/${challengeId}/answer`,
+    apiPath`/practice/challenges/${challengeId}/answer`,
     payload,
   )
   return response.data
@@ -73,7 +73,7 @@ export async function submitChallengeAnswer(challengeId: string, payload: Practi
  */
 export async function startLessonQuiz(lessonId: string, kind: LessonQuizKind) {
   const response = await httpClient.post<LessonQuizSession>(
-    `/practice/lessons/${lessonId}/quiz`,
+    apiPath`/practice/lessons/${lessonId}/quiz`,
     { kind },
   )
   return response.data
@@ -92,7 +92,7 @@ export async function answerLessonQuiz(
   payload: PracticeAnswerRequest,
 ) {
   const response = await httpClient.post<LessonQuizAnswer>(
-    `/practice/lessons/${lessonId}/quiz/${quizId}/answer`,
+    apiPath`/practice/lessons/${lessonId}/quiz/${quizId}/answer`,
     payload,
   )
   return response.data
@@ -111,7 +111,7 @@ export async function completePracticeLesson(input: string | { lessonId: string;
   const lessonId = typeof input === 'string' ? input : input.lessonId
   const quizCredential = typeof input === 'string' ? undefined : input.quizCredential
   const response = await httpClient.post<PracticeLessonResult>(
-    `/practice/lessons/${lessonId}/complete`,
+    apiPath`/practice/lessons/${lessonId}/complete`,
     quizCredential ? { quizCredential } : undefined,
   )
   return response.data

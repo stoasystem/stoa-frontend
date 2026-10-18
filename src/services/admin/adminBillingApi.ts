@@ -1,3 +1,4 @@
+import { apiPath } from '@/services/api/apiPath'
 import { httpClient } from '@/services/api/httpClient'
 import type { CheckoutStatusResponse } from '@/services/billing/billingApi'
 
@@ -8,14 +9,14 @@ export type AdminCheckoutDetail = CheckoutStatusResponse & {
 
 export async function getAdminCheckoutDetail(checkoutRef: string): Promise<AdminCheckoutDetail> {
   const response = await httpClient.get<AdminCheckoutDetail>(
-    `/admin/billing/checkouts/${encodeURIComponent(checkoutRef)}`,
+    apiPath`/admin/billing/checkouts/${checkoutRef}`,
   )
   return response.data
 }
 
 export async function recheckAdminCheckout(checkoutRef: string): Promise<AdminCheckoutDetail> {
   const response = await httpClient.post<AdminCheckoutDetail>(
-    `/admin/billing/checkouts/${encodeURIComponent(checkoutRef)}/recheck`,
+    apiPath`/admin/billing/checkouts/${checkoutRef}/recheck`,
     {},
   )
   return response.data

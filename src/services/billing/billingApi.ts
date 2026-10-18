@@ -1,3 +1,4 @@
+import { apiPath } from '@/services/api/apiPath'
 import { httpClient } from '@/services/api/httpClient'
 import { currentSessionToken } from '@/store/authStore'
 import { pricingPlans } from '@/components/pricing/pricingPlans'
@@ -166,14 +167,14 @@ export async function createCheckoutSession(selection: CheckoutSelection) {
 
 export async function getCheckoutCommand(checkoutRef: string) {
   const response = await httpClient.get<CheckoutStatusResponse>(
-    `/parents/me/subscription/checkout/${encodeURIComponent(checkoutRef)}`,
+    apiPath`/parents/me/subscription/checkout/${checkoutRef}`,
   )
   return response.data
 }
 
 export async function recheckCheckoutCommand(checkoutRef: string) {
   const response = await httpClient.post<CheckoutStatusResponse>(
-    `/parents/me/subscription/checkout/${encodeURIComponent(checkoutRef)}/recheck`,
+    apiPath`/parents/me/subscription/checkout/${checkoutRef}/recheck`,
     {},
   )
   return response.data
@@ -193,7 +194,7 @@ export async function supersedeCheckoutCommand(
     selection,
   )
   const response = await httpClient.post<CheckoutSupersedeResponse>(
-    `/parents/me/subscription/checkout/${encodeURIComponent(checkoutRef)}/supersede`,
+    apiPath`/parents/me/subscription/checkout/${checkoutRef}/supersede`,
     {
       confirmed: true,
       plan: selection.plan,

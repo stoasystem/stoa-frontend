@@ -1,3 +1,4 @@
+import { apiPath } from '@/services/api/apiPath'
 import { httpClient } from '@/services/api/httpClient'
 
 import type { UserRole } from '@/types/user'
@@ -164,7 +165,7 @@ export async function assignAccount(input: {
 
 export async function reissueInvitation(input: { invitationId: string; locale?: string }) {
   const response = await httpClient.post<AccountInvitationResponse>(
-    `/admin/users/invitations/${input.invitationId}/reissue`,
+    apiPath`/admin/users/invitations/${input.invitationId}/reissue`,
     { locale: input.locale },
   )
   return response.data
@@ -172,14 +173,14 @@ export async function reissueInvitation(input: { invitationId: string; locale?: 
 
 export async function revokeInvitation(invitationId: string) {
   const response = await httpClient.delete<{ invitationId: string; status: string }>(
-    `/admin/users/invitations/${invitationId}`,
+    apiPath`/admin/users/invitations/${invitationId}`,
   )
   return response.data
 }
 
 export async function resetAccountPassword(input: { userId: string; reason: string }) {
   const response = await httpClient.post<AccountPasswordResetResponse>(
-    `/admin/users/${input.userId}/password-reset`,
+    apiPath`/admin/users/${input.userId}/password-reset`,
     { reason: input.reason },
   )
   return response.data
@@ -191,7 +192,7 @@ export async function changeAccountStatus(input: {
   reason: string
 }) {
   const response = await httpClient.post<AccountStatusResponse>(
-    `/admin/users/${input.userId}/status`,
+    apiPath`/admin/users/${input.userId}/status`,
     { status: input.status, reason: input.reason },
   )
   return response.data
@@ -203,7 +204,7 @@ export async function updateAccountProfile(input: {
   grade?: string
   school?: string
 }) {
-  const response = await httpClient.patch<{ user_id: string }>(`/admin/users/${input.userId}`, {
+  const response = await httpClient.patch<{ user_id: string }>(apiPath`/admin/users/${input.userId}`, {
     name: input.name,
     grade: input.grade,
     school: input.school,
@@ -235,7 +236,7 @@ export type TeacherSupportAllowance = {
 
 export async function readTeacherSupportAllowance(studentId: string) {
   const response = await httpClient.get<TeacherSupportAllowance>(
-    `/admin/teacher-support/allowances/${studentId}`,
+    apiPath`/admin/teacher-support/allowances/${studentId}`,
   )
   return response.data
 }
@@ -246,7 +247,7 @@ export async function setTeacherSupportAllowance(input: {
   reason: string
 }) {
   const response = await httpClient.put<TeacherSupportAllowance & { stateVersion: number }>(
-    `/admin/teacher-support/allowances/${input.studentId}`,
+    apiPath`/admin/teacher-support/allowances/${input.studentId}`,
     { weekly_cases: input.weeklyCases, reason: input.reason },
   )
   return response.data
