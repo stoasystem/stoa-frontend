@@ -5,7 +5,14 @@ import { PageHeader } from '@/components/common/PageHeader'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { VerificationRecoveryEvidence } from '@/components/parent/VerificationRecoveryEvidence'
-import { formatStatus, getAccountStateLabel, getIssueLabel, supportStateTone } from '@/components/parent/accountOperationsView'
+import {
+  getAccountStateLabel,
+  getIssueLabel,
+  getQuotaPeriodLabel,
+  getUsageActionLabel,
+  getUsageSupportActionLabel,
+  supportStateTone,
+} from '@/components/parent/accountOperationsView'
 import { useParentAccountOperationsQuery } from '@/hooks/parent/useParentAccountOperationsQuery'
 import { DashboardLayout } from '@/layouts/DashboardLayout'
 import type { AccountOperationsChild, AccountOperationsUsage, ParentAccountOperations } from '@/types/parentAccountOperations'
@@ -165,7 +172,7 @@ function ChildMetric({ label, value, muted }: { label: string; value: string; mu
 }
 
 function UsageSection({ usage }: { usage: AccountOperationsUsage[] }) {
-  const { t } = useTranslation('parent')
+  const { t, i18n } = useTranslation('parent')
 
   if (usage.length === 0) {
     return (
@@ -183,8 +190,8 @@ function UsageSection({ usage }: { usage: AccountOperationsUsage[] }) {
             <CardContent className="p-5">
               <div className="flex items-start justify-between gap-3">
                 <div>
-                  <p className="font-semibold text-foreground">{formatStatus(item.action)}</p>
-                  <p className="mt-1 text-sm text-muted-foreground">{item.quotaPeriod}</p>
+                  <p className="font-semibold text-foreground">{getUsageActionLabel(item.action, t)}</p>
+                  <p className="mt-1 text-sm text-muted-foreground">{getQuotaPeriodLabel(item.quotaPeriod, t, i18n.language)}</p>
                 </div>
                 <Badge variant={item.unreconciled ? 'outline' : 'secondary'}>
                   {item.unreconciled ? t('accountOps.reconciling') : t('accountOps.matched')}
@@ -198,7 +205,7 @@ function UsageSection({ usage }: { usage: AccountOperationsUsage[] }) {
               </p>
               {item.supportAction && (
                 <p className="mt-3 text-sm font-medium text-foreground">
-                  {t('accountOps.support', { action: formatStatus(item.supportAction) })}
+                  {t('accountOps.support', { action: getUsageSupportActionLabel(item.supportAction, t) })}
                 </p>
               )}
               {item.explanation && (

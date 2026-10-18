@@ -50,3 +50,38 @@ export function getIssueLabel(code: string, t: TFunction) {
   const translated = t(`parent:overview.issues.${key}`, { defaultValue: '' })
   return translated || formatStatus(code)
 }
+
+/*
+ * The usage cards carry three more codes: the metered action
+ * (`question_submission`), the quota period (a UTC day, `2026-10-18`) and a
+ * reconciliation support action (`review_stale_counter`). They were
+ * title-cased or printed as sent, so a German parent read "Question
+ * submission", "2026-10-18" and "Support: Review stale counter". Each code
+ * usage_ledger_service can send is named in `parent:accountOps.usageActions`
+ * and `parent:accountOps.usageSupportActions`; a new one reads as a generic
+ * phrase in the parent's language, never as the raw code.
+ */
+export function getUsageActionLabel(code: string | null | undefined, t: TFunction) {
+  const translated = code ? t(`parent:accountOps.usageActions.${code}`, { defaultValue: '' }) : ''
+  return translated || t('parent:accountOps.usageActions.unknown')
+}
+
+export function getUsageSupportActionLabel(code: string | null | undefined, t: TFunction) {
+  const translated = code ? t(`parent:accountOps.usageSupportActions.${code}`, { defaultValue: '' }) : ''
+  return translated || t('parent:accountOps.usageSupportActions.unknown')
+}
+
+const QUOTA_DAY = /^\d{4}-\d{2}-\d{2}$/
+
+export function getQuotaPeriodLabel(period: string | null | undefined, t: TFunction, language: string) {
+  if (period && QUOTA_DAY.test(period)) {
+    const day = new Date(`${period}T00:00:00Z`)
+    if (!Number.isNaN(day.getTime())) {
+      // The period is a UTC day; formatting it in the reader's zone would
+      // show the day before anywhere west of Greenwich.
+      const date = new Intl.DateTimeFormat(language, { dateStyle: 'medium', timeZone: 'UTC' }).format(day)
+      return t('parent:accountOps.quotaPeriodDay', { date })
+    }
+  }
+  return t('parent:accountOps.quotaPeriodUnknown')
+}
