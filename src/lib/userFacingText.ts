@@ -39,7 +39,7 @@ const transportMessages = [
  * reader of English; anyone else gets the caller's translated fallback (#265).
  * With no language set (i18next not started) it is read as English, as before.
  */
-function readsEnglish() {
+export function readsEnglish() {
   const language = i18n.resolvedLanguage ?? i18n.language
   return !language || language.toLowerCase().startsWith('en')
 }

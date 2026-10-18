@@ -35,6 +35,23 @@
       "started": "Riprendi l’esercitazione",
       "skipped": "Chiedi al tuo insegnante cosa provare adesso",
       "default": "Inizia l’esercitazione"
+    },
+    "untitled": "Compito",
+    "failedBody": "Riprova tra poco.",
+    "currentTarget": "il tuo obiettivo di studio attuale",
+    "status": {
+      "draft": "Bozza",
+      "recommended": "Consigliato",
+      "assigned": "Assegnato",
+      "started": "Iniziato",
+      "completed": "Completato",
+      "skipped": "Saltato",
+      "archived": "Archiviato",
+      "unknown": "Stato non disponibile"
+    },
+    "automationExplanation": {
+      "teacherApproved": "Il tuo insegnante ha approvato un esercizio su {{topic}}, in base ai tuoi segnali di studio recenti.",
+      "reviewed": "È stato preparato un esercizio verificato su {{topic}}, in base ai tuoi segnali di studio recenti."
     }
   },
   "backToLesson": "Torna alla lezione",

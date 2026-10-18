@@ -35,6 +35,23 @@
       "started": "Reprendre la pratique",
       "skipped": "Demande à ton enseignant quoi essayer ensuite",
       "default": "Commencer la pratique"
+    },
+    "untitled": "Devoir",
+    "failedBody": "Réessaie dans un instant.",
+    "currentTarget": "ton objectif d’apprentissage actuel",
+    "status": {
+      "draft": "Brouillon",
+      "recommended": "Recommandé",
+      "assigned": "Attribué",
+      "started": "Commencé",
+      "completed": "Terminé",
+      "skipped": "Passé",
+      "archived": "Archivé",
+      "unknown": "Statut indisponible"
+    },
+    "automationExplanation": {
+      "teacherApproved": "Ton enseignant a validé un exercice sur {{topic}}, d’après tes signaux d’apprentissage récents.",
+      "reviewed": "Un exercice vérifié sur {{topic}} a été préparé d’après tes signaux d’apprentissage récents."
     }
   },
   "backToLesson": "Retour à la leçon",

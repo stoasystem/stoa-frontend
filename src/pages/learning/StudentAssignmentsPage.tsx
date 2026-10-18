@@ -8,7 +8,9 @@ import { PageContainer } from '@/components/common/PageContainer'
 import { PageHeader } from '@/components/common/PageHeader'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { useMyAssignmentsQuery } from '@/hooks/learning/useLearningOperationsQueries'
+import { getRecommendationRationale, getSubjectLabel, getTopicLabel } from '@/lib/displayLabels'
 import { formatDayAndMonth } from '@/lib/formatDateTime'
+import { toUserFacingError } from '@/lib/userFacingText'
 import { DashboardLayout } from '@/layouts/DashboardLayout'
 import type { LearningAssignment } from '@/types/learningOperations'
 
@@ -28,6 +30,33 @@ function sourceLabel(assignment: LearningAssignment, t: TFunction<'practice'>) {
   return t('assignments.sources.reviewed')
 }
 
+const assignmentStatuses = new Set([
+  'draft',
+  'recommended',
+  'assigned',
+  'started',
+  'completed',
+  'skipped',
+  'archived',
+])
+
+function statusLabel(status: string, t: TFunction<'practice'>) {
+  if (assignmentStatuses.has(status)) return t(`assignments.status.${status}`)
+  return t('assignments.status.unknown')
+}
+
+function targetLabel(assignment: LearningAssignment, t: TFunction<'practice'>) {
+  const subject = assignment.subject ? getSubjectLabel(assignment.subject, t) : t('assignments.subjectPending')
+  const topics = assignment.topicIds.map((topicId) => getTopicLabel(topicId, t)).join(', ')
+  return `${subject} / ${topics || t('assignments.topicPending')}`
+}
+
+function rationaleText(assignment: LearningAssignment, t: TFunction<'practice'>) {
+  const fallback = t('assignments.defaultRationale')
+  const sentence = assignment.automation?.explanation || assignment.rationale
+  return sentence ? getRecommendationRationale(sentence, t, fallback) : fallback
+}
+
 function nextAction(status: string, t: TFunction<'practice'>) {
   if (status === 'completed') return t('assignments.nextAction.completed')
   if (status === 'started') return t('assignments.nextAction.started')
@@ -42,8 +71,10 @@ function AssignmentExplanationCard({ assignment }: { assignment: LearningAssignm
     <Card>
       <CardHeader>
         <CardTitle className="flex items-start justify-between gap-3 text-xl">
-          <span>{assignment.title || assignment.assignmentId}</span>
-          <span className="rounded-full border px-2 py-1 text-xs font-semibold text-muted-foreground">{assignment.status}</span>
+          <span>{assignment.title || t('assignments.untitled')}</span>
+          <span className="rounded-full border px-2 py-1 text-xs font-semibold text-muted-foreground">
+            {statusLabel(assignment.status, t)}
+          </span>
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -58,11 +89,7 @@ function AssignmentExplanationCard({ assignment }: { assignment: LearningAssignm
             <p className="flex items-center gap-2 text-sm font-semibold">
               <BookOpenCheck className="h-4 w-4" /> {t('assignments.target')}
             </p>
-            <p className="mt-1 text-sm text-muted-foreground">
-              {assignment.subject || t('assignments.subjectPending')}
-              {' / '}
-              {assignment.topicIds.join(', ') || t('assignments.topicPending')}
-            </p>
+            <p className="mt-1 text-sm text-muted-foreground">{targetLabel(assignment, t)}</p>
           </div>
           <div className="rounded-md border p-3">
             <p className="flex items-center gap-2 text-sm font-semibold">
@@ -73,11 +100,7 @@ function AssignmentExplanationCard({ assignment }: { assignment: LearningAssignm
         </div>
         <div className="rounded-md border bg-muted/30 p-4">
           <p className="text-sm font-semibold">{t('assignments.whyThisAppeared')}</p>
-          <p className="mt-1 text-sm leading-6 text-muted-foreground">
-            {assignment.automation?.explanation
-              || assignment.rationale
-              || t('assignments.defaultRationale')}
-          </p>
+          <p className="mt-1 text-sm leading-6 text-muted-foreground">{rationaleText(assignment, t)}</p>
         </div>
         <p className="text-sm font-semibold text-foreground">
           {nextAction(assignment.status, t)}
@@ -103,7 +126,10 @@ export function StudentAssignmentsPage() {
 
         {assignmentsQuery.isLoading && <LoadingState message={t('assignments.loading')} />}
         {assignmentsQuery.error && (
-          <ErrorState title={t('assignments.failed')} message={assignmentsQuery.error.message} />
+          <ErrorState
+            title={t('assignments.failed')}
+            message={toUserFacingError(assignmentsQuery.error, t('assignments.failedBody'))}
+          />
         )}
         {assignments.length === 0 && assignmentsQuery.isSuccess && (
           <Card>

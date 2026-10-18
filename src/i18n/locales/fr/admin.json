@@ -365,7 +365,8 @@
     "accountGranted": "Autorisé",
     "accountNotGranted": "Non autorisé",
     "accountChecking": "Vérification…",
-    "accountUnknown": "Impossible à vérifier"
+    "accountUnknown": "Impossible à vérifier",
+    "failedBody": "Veuillez réessayer dans un instant."
   },
   "learningProfile": {
     "eyebrow": "Analyse de l’apprentissage",

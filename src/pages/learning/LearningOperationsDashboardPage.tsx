@@ -16,6 +16,7 @@ import {
   useWarehouseReadinessQuery,
 } from '@/hooks/learning/useLearningOperationsQueries'
 import { DashboardLayout } from '@/layouts/DashboardLayout'
+import { toUserFacingError } from '@/lib/userFacingText'
 import { trackEvent } from '@/services/analytics/analyticsClient'
 
 function MetricTile({ label, value, detail }: { label: string, value: number | string, detail?: string }) {
@@ -146,7 +147,7 @@ export function LearningOperationsDashboardPage() {
         </Card>
 
         {analyticsQuery.isLoading && <LoadingState message={t('learningOps.loading')} />}
-        {analyticsQuery.error && <ErrorState title={t('learningOps.failed')} message={analyticsQuery.error.message} />}
+        {analyticsQuery.error && <ErrorState title={t('learningOps.failed')} message={toUserFacingError(analyticsQuery.error, t('learningOps.failedBody'))} />}
 
         {analytics && (
           <>
@@ -236,7 +237,7 @@ export function LearningOperationsDashboardPage() {
             </CardHeader>
             <CardContent className="space-y-3">
               {readinessQuery.isLoading && <LoadingState message={t('learningOps.loadingReadiness')} />}
-              {readinessQuery.error && <ErrorState title={t('learningOps.readinessFailed')} message={readinessQuery.error.message} />}
+              {readinessQuery.error && <ErrorState title={t('learningOps.readinessFailed')} message={toUserFacingError(readinessQuery.error, t('learningOps.failedBody'))} />}
               {readiness && (
                 <>
                   <div className="grid gap-3 sm:grid-cols-2">
@@ -270,7 +271,7 @@ export function LearningOperationsDashboardPage() {
             </CardHeader>
             <CardContent className="space-y-3">
               {exportQuery.isLoading && <LoadingState message={t('learningOps.loadingExport')} />}
-              {exportQuery.error && <ErrorState title={t('learningOps.exportFailed')} message={exportQuery.error.message} />}
+              {exportQuery.error && <ErrorState title={t('learningOps.exportFailed')} message={toUserFacingError(exportQuery.error, t('learningOps.failedBody'))} />}
               {exportDenied && (
                 <p className="rounded-md border border-dashed p-4 text-sm text-muted-foreground">
                   {/* The grant is a capability id, the same in every language. */}

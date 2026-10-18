@@ -3,6 +3,7 @@ import type { SubscriptionPlan, SubscriptionStatus } from '@/types/billing'
 import type { UploadedFileStatus } from '@/types/file'
 import type { SupportTicketPriority, SupportTicketStatus } from '@/types/supportTicket'
 import type { TeacherHelpStatus } from '@/types/teacherHelp'
+import { readsEnglish } from '@/lib/userFacingText'
 
 type LabelMap = Record<string, string>
 
@@ -184,6 +185,18 @@ export function getCurriculumTopicLabel(label: string, t: TFunction) {
 }
 
 /**
+ * A topic id as a reader sees it: the curriculum title when the topic is a
+ * seeded one, otherwise the slug spelled out ("linear-equations" → "Linear
+ * equations") rather than shown as sent (#278).
+ */
+export function getTopicLabel(topicId: string, t: TFunction) {
+  const curriculum = getCurriculumTopicLabel(topicId, t)
+  if (curriculum !== topicId) return curriculum
+  const words = topicId.trim().replace(/[-_]+/g, ' ').replace(/\s+/g, ' ')
+  return words.charAt(0).toUpperCase() + words.slice(1)
+}
+
+/**
  * A span of minutes in words, at most two units: minutes up to an hour, then
  * hours and minutes, then days and hours ("4 Tage 13 Stunden"). Teacher
  * figures printed the raw count and read "Breached 6576m / 30m" and
@@ -203,8 +216,37 @@ export function formatMinutes(minutes: number, t: TFunction) {
   return rest ? `${days} ${say('hours', rest)}` : days
 }
 
-export function getRecommendationRationale(rationale: string, t: TFunction) {
-  const key = rationaleKeys[rationale.trim()]
-  if (!key) return rationale
-  return t(key, { defaultValue: rationale })
+// The automation explanation names the topic inside the English sentence.
+const automationExplanations: Array<[RegExp, string]> = [
+  [
+    /^Teacher-approved practice was assigned for (.+) based on recent learning signals\.$/,
+    'practice:assignments.automationExplanation.teacherApproved',
+  ],
+  [
+    /^Reviewed practice was prepared for (.+) based on recent learning signals\.$/,
+    'practice:assignments.automationExplanation.reviewed',
+  ],
+]
+
+const unnamedAutomationTopic = 'the current learning target'
+
+/**
+ * The server's English reason for a recommendation or assignment, in the
+ * reader's language. A sentence with no translation is shown as sent to a
+ * reader of English; anyone else gets `fallback` when one is passed (#278).
+ */
+export function getRecommendationRationale(rationale: string, t: TFunction, fallback?: string) {
+  const sentence = rationale.trim()
+  const key = rationaleKeys[sentence]
+  if (key) return t(key, { defaultValue: rationale })
+  for (const [pattern, explanationKey] of automationExplanations) {
+    const match = pattern.exec(sentence)
+    if (!match) continue
+    const topic = match[1] === unnamedAutomationTopic
+      ? t('practice:assignments.currentTarget')
+      : getTopicLabel(match[1], t)
+    return t(explanationKey, { topic, defaultValue: rationale })
+  }
+  if (fallback !== undefined && !readsEnglish()) return fallback
+  return rationale
 }
