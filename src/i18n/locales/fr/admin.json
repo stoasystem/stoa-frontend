@@ -668,7 +668,13 @@
     },
     "capabilities": {
       "kicker": "Autorisation backend",
-      "description": "La console affiche les commandes, mais chaque modification est décidée par les contrôles de capacité du backend."
+      "description": "La console affiche les commandes, mais chaque modification est décidée par les contrôles de capacité du backend.",
+      "names": {
+        "curriculum_author": "Auteur",
+        "curriculum_reviewer": "Relecture",
+        "curriculum_publisher": "Publication",
+        "migration_operator": "Migration"
+      }
     },
     "worklist": {
       "loading": "Chargement de la liste de travail du programme.",
@@ -699,7 +705,17 @@
       "requestChanges": "Demander des modifications",
       "publish": "Publier",
       "loadAudit": "Charger l’audit",
-      "missingCapability": "Capacité de relecteur ou d’éditeur manquante."
+      "missingCapability": "Capacité de relecteur ou d’éditeur manquante.",
+      "status": {
+        "valid": "Valide",
+        "invalid": "Pas prête à être publiée"
+      },
+      "severity": {
+        "blocking": "Bloquant",
+        "warning": "Avertissement"
+      },
+      "issue": "{{severity}} : {{field}}",
+      "serverDetail": "Détail du serveur (en anglais) :"
     },
     "migration": {
       "manifest": "Manifeste",
@@ -707,10 +723,17 @@
       "dryRunAndApply": "Simulation et application",
       "ready": "Prêt",
       "blocked": "Bloqué",
-      "tokenPlaceholder": "jeton de confirmation",
       "apply": "Appliquer la migration",
-      "hint": "Lancez une simulation pour examiner les actions par ligne et le jeton de confirmation.",
-      "applied": "{{migration}} appliquée."
+      "hint": "Lancez une simulation pour voir ce que chaque ligne ferait avant d’appliquer la migration.",
+      "applied": "{{migration}} appliquée.",
+      "summary": {
+        "total": "Total",
+        "creates": "Nouvelles",
+        "updates": "Mises à jour",
+        "skips": "Ignorées",
+        "conflicts": "Conflits",
+        "errors": "Erreurs"
+      }
     },
     "evidence": {
       "title": "Preuves de migration",
@@ -750,6 +773,50 @@
         "tooMany": "Trop de requêtes. Patientez un instant et réessayez.",
         "server": "Le serveur n’a pas pu traiter la requête. Réessayez plus tard."
       }
+    },
+    "state": {
+      "draft": "Brouillon",
+      "in_review": "En relecture",
+      "changes_requested": "Modifications demandées",
+      "approved": "Approuvée",
+      "published": "Publiée",
+      "archived": "Archivée"
+    },
+    "reviewState": {
+      "pending": "Relecture en attente",
+      "approved": "Approuvée",
+      "changes_requested": "Modifications demandées"
+    },
+    "confirm": {
+      "title": {
+        "approve": "Approuver cette version ?",
+        "requestChanges": "Renvoyer cette version pour modifications ?",
+        "publish": "Publier cette version ?",
+        "apply": "Appliquer cette migration ?"
+      },
+      "body": {
+        "approve": "La version {{version}} de {{lesson}} sera marquée comme approuvée et pourra ensuite être publiée.",
+        "requestChanges": "La version {{version}} de {{lesson}} retourne à ses auteurs. Votre motif est consigné dans le journal d’audit.",
+        "publish": "La version {{version}} de {{lesson}} deviendra celle que voient les élèves. Votre motif est consigné dans le journal d’audit.",
+        "apply": "La migration {{migration}} écrira le manifeste que vous avez simulé. Cette action ne peut pas être annulée depuis la console."
+      },
+      "liveVersion": "Version en ligne : {{version}}. Elle sera remplacée. Si quelqu’un a publié une autre version entre-temps, la publication sera refusée.",
+      "noLiveVersion": "Aucune version de cette leçon n’est encore en ligne. Si quelqu’un en a publié une entre-temps, la publication sera refusée.",
+      "applySummary": "{{creates}} nouvelles, {{updates}} mises à jour, {{skips}} ignorées.",
+      "reason": "Motif pour le journal d’audit",
+      "cancel": "Annuler",
+      "submit": {
+        "approve": "Approuver",
+        "requestChanges": "Demander des modifications",
+        "publish": "Publier",
+        "apply": "Appliquer la migration"
+      }
+    },
+    "notice": {
+      "submitted": "{{version}} a été soumise à relecture.",
+      "approved": "{{version}} a été approuvée.",
+      "changesRequested": "{{version}} a été renvoyée pour modifications.",
+      "published": "{{version}} est maintenant publiée."
     }
   },
   "operationalNotifications": {

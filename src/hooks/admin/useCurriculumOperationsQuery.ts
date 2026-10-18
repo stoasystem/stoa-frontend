@@ -93,29 +93,51 @@ export function usePatchCurriculumDraftMutation() {
   })
 }
 
+/**
+ * After a review or publish step the worklist, the version's preview and its
+ * audit trail all say something new. Nothing refreshed them, so an admin who
+ * saw no change clicked again (#258).
+ */
+function useRefreshCurriculumVersion() {
+  const queryClient = useQueryClient()
+  return (publicLessonId: string, versionId: string) => {
+    void queryClient.invalidateQueries({ queryKey: adminQueryKeys.curriculumWorklist() })
+    void queryClient.invalidateQueries({ queryKey: adminQueryKeys.curriculumPreview(publicLessonId, versionId) })
+    void queryClient.invalidateQueries({ queryKey: adminQueryKeys.curriculumAudit(publicLessonId) })
+  }
+}
+
 export function useSubmitCurriculumReviewMutation() {
+  const refresh = useRefreshCurriculumVersion()
   return useMutation({
     mutationFn: ({ publicLessonId, versionId }: { publicLessonId: string; versionId: string }) =>
       submitCurriculumReview(publicLessonId, versionId),
+    onSuccess: (_data, { publicLessonId, versionId }) => refresh(publicLessonId, versionId),
   })
 }
 
 export function useApproveCurriculumVersionMutation() {
+  const refresh = useRefreshCurriculumVersion()
   return useMutation({
     mutationFn: ({ publicLessonId, versionId }: { publicLessonId: string; versionId: string }) =>
       approveCurriculumVersion(publicLessonId, versionId),
+    onSuccess: (_data, { publicLessonId, versionId }) => refresh(publicLessonId, versionId),
   })
 }
 
 export function useRequestCurriculumChangesMutation() {
+  const refresh = useRefreshCurriculumVersion()
   return useMutation({
     mutationFn: (input: CurriculumReviewNoteInput) => requestCurriculumChanges(input),
+    onSuccess: (_data, { publicLessonId, versionId }) => refresh(publicLessonId, versionId),
   })
 }
 
 export function usePublishCurriculumVersionMutation() {
+  const refresh = useRefreshCurriculumVersion()
   return useMutation({
     mutationFn: (input: CurriculumPublishInput) => publishCurriculumVersion(input),
+    onSuccess: (_data, { publicLessonId, versionId }) => refresh(publicLessonId, versionId),
   })
 }
 

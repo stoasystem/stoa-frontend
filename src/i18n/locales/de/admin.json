@@ -668,7 +668,13 @@
     },
     "capabilities": {
       "kicker": "Backend-Autorisierung",
-      "description": "Die Konsole zeigt die Bedienelemente, doch über jede Änderung entscheidet die Berechtigungsprüfung im Backend."
+      "description": "Die Konsole zeigt die Bedienelemente, doch über jede Änderung entscheidet die Berechtigungsprüfung im Backend.",
+      "names": {
+        "curriculum_author": "Autorin/Autor",
+        "curriculum_reviewer": "Prüfung",
+        "curriculum_publisher": "Veröffentlichung",
+        "migration_operator": "Migration"
+      }
     },
     "worklist": {
       "loading": "Arbeitsliste des Lehrplans wird geladen.",
@@ -699,7 +705,17 @@
       "requestChanges": "Änderungen anfordern",
       "publish": "Veröffentlichen",
       "loadAudit": "Audit laden",
-      "missingCapability": "Es fehlt die Berechtigung zum Prüfen oder Veröffentlichen."
+      "missingCapability": "Es fehlt die Berechtigung zum Prüfen oder Veröffentlichen.",
+      "status": {
+        "valid": "Gültig",
+        "invalid": "Nicht bereit zur Veröffentlichung"
+      },
+      "severity": {
+        "blocking": "Blockierend",
+        "warning": "Warnung"
+      },
+      "issue": "{{severity}}: {{field}}",
+      "serverDetail": "Hinweis des Servers (Englisch):"
     },
     "migration": {
       "manifest": "Manifest",
@@ -707,10 +723,17 @@
       "dryRunAndApply": "Probelauf und Anwenden",
       "ready": "Bereit",
       "blocked": "Blockiert",
-      "tokenPlaceholder": "Bestätigungstoken",
       "apply": "Migration anwenden",
-      "hint": "Starten Sie einen Probelauf, um die Zeilenaktionen und das Bestätigungstoken zu sehen.",
-      "applied": "{{migration}} angewendet."
+      "hint": "Starten Sie einen Probelauf, um vor dem Anwenden zu sehen, was mit jeder Zeile geschieht.",
+      "applied": "{{migration}} angewendet.",
+      "summary": {
+        "total": "Gesamt",
+        "creates": "Neu",
+        "updates": "Aktualisiert",
+        "skips": "Übersprungen",
+        "conflicts": "Konflikte",
+        "errors": "Fehler"
+      }
     },
     "evidence": {
       "title": "Migrationsnachweise",
@@ -750,6 +773,50 @@
         "tooMany": "Zu viele Anfragen. Warten Sie einen Moment und versuchen Sie es erneut.",
         "server": "Der Server konnte die Anfrage nicht abschliessen. Versuchen Sie es später erneut."
       }
+    },
+    "state": {
+      "draft": "Entwurf",
+      "in_review": "In Prüfung",
+      "changes_requested": "Änderungen angefordert",
+      "approved": "Freigegeben",
+      "published": "Veröffentlicht",
+      "archived": "Archiviert"
+    },
+    "reviewState": {
+      "pending": "Prüfung ausstehend",
+      "approved": "Freigegeben",
+      "changes_requested": "Änderungen angefordert"
+    },
+    "confirm": {
+      "title": {
+        "approve": "Diese Version freigeben?",
+        "requestChanges": "Diese Version zur Überarbeitung zurückgeben?",
+        "publish": "Diese Version veröffentlichen?",
+        "apply": "Diese Migration anwenden?"
+      },
+      "body": {
+        "approve": "Version {{version}} von {{lesson}} wird als freigegeben markiert und kann danach veröffentlicht werden.",
+        "requestChanges": "Version {{version}} von {{lesson}} geht an die Autorinnen und Autoren zurück. Ihre Begründung wird im Audit-Protokoll festgehalten.",
+        "publish": "Version {{version}} von {{lesson}} wird zur Version, die Schülerinnen und Schüler sehen. Ihre Begründung wird im Audit-Protokoll festgehalten.",
+        "apply": "Migration {{migration}} schreibt das Manifest, das Sie im Probelauf geprüft haben. Dies lässt sich in der Konsole nicht rückgängig machen."
+      },
+      "liveVersion": "Derzeit live: {{version}}. Sie wird ersetzt. Hat inzwischen jemand eine andere Version veröffentlicht, wird die Veröffentlichung abgelehnt.",
+      "noLiveVersion": "Von dieser Lektion ist noch keine Version live. Hat inzwischen jemand eine veröffentlicht, wird die Veröffentlichung abgelehnt.",
+      "applySummary": "{{creates}} neu, {{updates}} aktualisiert, {{skips}} übersprungen.",
+      "reason": "Begründung für das Audit-Protokoll",
+      "cancel": "Abbrechen",
+      "submit": {
+        "approve": "Freigeben",
+        "requestChanges": "Änderungen anfordern",
+        "publish": "Veröffentlichen",
+        "apply": "Migration anwenden"
+      }
+    },
+    "notice": {
+      "submitted": "{{version}} wurde zur Prüfung eingereicht.",
+      "approved": "{{version}} wurde freigegeben.",
+      "changesRequested": "{{version}} wurde zur Überarbeitung zurückgegeben.",
+      "published": "{{version}} ist jetzt veröffentlicht."
     }
   },
   "operationalNotifications": {
