@@ -22,7 +22,7 @@
  *   - Only once shown (the flare played to its end, or with reduced motion
  *     announced) is the point acknowledged to the source, so a reload does
  *     not replay it, and the moment handed to Ask as a card
- *     (`store/litMomentsStore.ts`). A star never brought on screen, or a map
+ *     (`store/litMomentsStore.ts`), for the conversation open in Ask then. A star never brought on screen, or a map
  *     left mid-flare, is not acknowledged: it comes back next time.
  *
  * `data-lighting` on the root says `idle`, `playing` or `done` (at least one
@@ -37,6 +37,7 @@ import { placeBesideStar, type LabelSide } from '@/features/starmap/lighting/lab
 import { isCelebrated, useLightingEventSource, type LitEvent } from '@/features/starmap/lighting/lightingEvents'
 import { subjectOfNebula, type Star, type StarMap } from '@/features/starmap/model/starMap'
 import { usePrefersReducedMotion } from '@/features/starmap/motion/usePrefersReducedMotion'
+import { askFor, useAskStore } from '@/store/askStore'
 import { useAuthStore } from '@/store/authStore'
 import { useLitMomentsStore } from '@/store/litMomentsStore'
 
@@ -159,7 +160,11 @@ export function LightingOverlay({ map, locate, onReveal, scheduler = animationFr
       if (seen) {
         reveal()
         source.acknowledge([event.unitId]).catch(() => {})
-        if (ownerId) addMoment(ownerId, { unitId: star.unitId, name: star.name, subjectId, nebulaId: star.nebulaId, litAt: event.litAt })
+        if (ownerId) {
+          // The card goes to the conversation the student has open in Ask now (#267).
+          const conversationId = askFor(useAskStore.getState(), ownerId).conversationId
+          addMoment(ownerId, { unitId: star.unitId, name: star.name, subjectId, nebulaId: star.nebulaId, litAt: event.litAt, conversationId })
+        }
         setShown((count) => count + 1)
       } else {
         handled.current.delete(event.unitId)

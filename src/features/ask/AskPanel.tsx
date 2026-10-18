@@ -56,7 +56,7 @@ import { chatQueryKeys } from '@/services/chat/chatQueryKeys'
 import { createTeacherHelpRequest } from '@/services/teacherHelp/teacherHelpApi'
 import { sendDetached } from '@/services/chat/detachedSend'
 import { useAuthStore } from '@/store/authStore'
-import { useLitMoments, type LitMoment } from '@/store/litMomentsStore'
+import { litMomentsFor, useLitMoments, type LitMoment } from '@/store/litMomentsStore'
 import { learningSubjectOptions } from '@/types/learningProfile'
 import { QUOTE_MAX_LENGTH, type ChatMessage } from '@/types/chat'
 
@@ -452,7 +452,13 @@ function AskThread({
   })
 
   const ownerId = useAuthStore((state) => state.user?.id)
-  const entries = threadEntries(messages, useLitMoments(ownerId))
+  // Only the moments of this conversation's subject that lit while it was open, or before it began (#267).
+  const moments = litMomentsFor(useLitMoments(ownerId), {
+    id: conversationId,
+    subject: conversationQuery.data?.subject,
+    startedAt: messages[0]?.createdAt,
+  })
+  const entries = threadEntries(messages, moments)
   const lastAnswerId = latestAnswerId(messages)
   const offerHelp = !helpActive && !isStreaming && !requestHelp.isPending
 
@@ -570,7 +576,7 @@ type ThreadEntry = { kind: 'message'; message: ChatMessage } | { kind: 'lit'; mo
 
 /**
  * The thread's entries in time order: the messages, and the knowledge points
- * lit this session (#51), each after the messages sent before it was lit.
+ * lit this session that are this conversation's (#51, #267), each after the messages sent before it was lit.
  */
 export function threadEntries(messages: readonly ChatMessage[], moments: readonly LitMoment[]): ThreadEntry[] {
   const entries: ThreadEntry[] = []
