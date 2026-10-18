@@ -13,7 +13,7 @@ import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it } from
 import { AuthBootstrap } from '@/app/router/AuthBootstrap'
 import { TAB_TOKEN_KEY } from '@/lib/devSessions'
 import { ApiError, httpClient, SESSION_UNREACHABLE } from '@/services/api/httpClient'
-import { retryAccountRead } from '@/hooks/auth/useCurrentUserQuery'
+import { retryAccountRead } from '@/hooks/auth/accountRead'
 import { rememberRefreshToken, storedRefreshToken } from '@/services/auth/sessionRefresh'
 import { TOKEN_KEY, useAuthStore } from '@/store/authStore'
 import { mswServer } from '../mswServer'

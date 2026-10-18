@@ -367,6 +367,8 @@
       "weak": "À travailler"
     },
     "loading": "Chargement...",
+    "loadFailedAccount": "Impossible de charger ton compte. Réessaie ou déconnecte-toi.",
+    "loadFailedAccount_formal": "Impossible de charger votre compte. Réessayez ou déconnectez-vous.",
     "loadingAccount": "Chargement du compte…",
     "pending": "En attente",
     "plan": {

@@ -367,6 +367,8 @@
       "weak": "Needs practice"
     },
     "loading": "Loading...",
+    "loadFailedAccount": "Your account could not be loaded. Try again, or log out.",
+    "loadFailedAccount_formal": "Your account could not be loaded. Try again, or log out.",
     "loadingAccount": "Loading account…",
     "pending": "Pending",
     "plan": {
