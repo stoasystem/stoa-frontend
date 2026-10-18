@@ -1,21 +1,5 @@
 import type { TFunction } from 'i18next'
-
-/** Subject spellings that reached DynamoDB before ids were normalised. */
-const SUBJECT_ALIASES: Record<string, string> = {
-  mathematics: 'math',
-  mathematik: 'math',
-  mathematiques: 'math',
-  matematica: 'math',
-  physik: 'physics',
-  physique: 'physics',
-  fisica: 'physics',
-  deutsch: 'german',
-  allemand: 'german',
-  tedesco: 'german',
-  englisch: 'english',
-  anglais: 'english',
-  inglese: 'english',
-}
+import { SUBJECT_ALIASES } from '@/lib/subjects'
 
 const TITLE_SEPARATORS = ['–', '—', '-']
 

@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { trackEvent } from '@/services/analytics/analyticsClient'
 import { updateTeacherWeeklyAvailability } from '@/services/teacher/teacherAvailabilityApi'
+import { teacherQueryKeys } from '@/services/teacher/teacherQueryKeys'
 import type { TeacherWeeklyAvailability } from '@/types/teacherAvailability'
 
 export function useUpdateTeacherWeeklyAvailabilityMutation() {
@@ -13,6 +14,8 @@ export function useUpdateTeacherWeeklyAvailabilityMutation() {
       trackEvent('teacher_availability_updated')
       toast.success('Availability updated')
       void queryClient.invalidateQueries({ queryKey: ['teacher', 'availability'] })
+      // The profile page shows the same subjects and hours (#270).
+      void queryClient.invalidateQueries({ queryKey: teacherQueryKeys.profile() })
     },
   })
 }

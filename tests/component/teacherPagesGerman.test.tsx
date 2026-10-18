@@ -50,7 +50,7 @@ describe('the teacher pages in German', () => {
     }
     expect(screen.queryByText('Mathematics')).toBeNull()
     await userEvent.click(screen.getByRole('checkbox', { name: 'Mathematik' }))
-    expect(changes).toEqual([['Mathematics']])
+    expect(changes).toEqual([['math']])
   })
 
   it('labels the reply composer in German', () => {

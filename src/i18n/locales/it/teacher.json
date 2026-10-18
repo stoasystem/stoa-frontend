@@ -11,6 +11,7 @@
     "eyebrow": "Area insegnante",
     "title": "Disponibilità",
     "description": "Imposta disponibilità e materie così che le richieste possano essere indirizzate con chiarezza.",
+    "loadFailed": "Non è stato possibile caricare la tua disponibilità.",
     "editor": {
       "subjects": "Materie",
       "weeklySlots": "Fasce settimanali",
@@ -18,14 +19,20 @@
       "start": "Inizio",
       "end": "Fine",
       "addSlot": "Aggiungi fascia",
+      "removeSlot": "Rimuovi",
+      "removeSlotLabel": "Rimuovi la fascia {{day}} {{start}}–{{end}}",
       "save": "Salva disponibilità",
       "saving": "Salvataggio…",
+      "invalidTime": "Inserisci un orario di inizio e di fine valido.",
+      "endBeforeStart": "La fine deve essere dopo l’inizio.",
+      "saveFailed": "Non è stato possibile salvare la tua disponibilità. Riprova.",
       "subjectNames": {
-        "Mathematics": "Matematica",
-        "Physics": "Fisica",
-        "Chemistry": "Chimica",
-        "English": "Inglese",
-        "Biology": "Biologia"
+        "math": "Matematica",
+        "physics": "Fisica",
+        "chemistry": "Chimica",
+        "english": "Inglese",
+        "biology": "Biologia",
+        "german": "Tedesco"
       }
     },
     "summary": {
@@ -88,7 +95,8 @@
     "availabilityStatus": {
       "available": "Disponibile per gli studenti",
       "busy": "Al momento occupato",
-      "unavailable": "Non accetta studenti"
+      "unavailable": "Non accetta studenti",
+      "paused": "In pausa"
     }
   },
   "requests": {

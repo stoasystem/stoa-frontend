@@ -1,13 +1,12 @@
 import { useTranslation } from 'react-i18next'
-import { subjectDisplayLabel } from '@/components/chat/conversationTitle'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { normalTeacherSubjects, teacherSubjectLabel } from '@/lib/subjects'
 import { weekdayName } from '@/lib/weekdays'
 import type { TeacherWeeklyAvailability } from '@/types/teacherAvailability'
 
 export function TeacherAvailabilitySummary({ availability }: { availability: TeacherWeeklyAvailability }) {
   const { t, i18n } = useTranslation('teacher')
-  const { t: tChat } = useTranslation('chat')
-  const subjects = availability.subjects.map((subject) => subjectDisplayLabel(subject, tChat)).join(', ')
+  const subjects = normalTeacherSubjects(availability.subjects).map((subject) => teacherSubjectLabel(subject, t)).join(', ')
   return (
     <Card>
       <CardHeader>
