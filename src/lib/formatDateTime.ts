@@ -11,13 +11,31 @@ import { activeLanguage } from '@/i18n/languages'
  * A value that is not a date - a missing field, a malformed string from the
  * API - is shown as a dash. `Intl` throws a RangeError on it, and that error
  * used to take the whole page down with it (#272).
+ *
+ * A date without a time - "2026-10-05", the start of a report week - names a
+ * calendar day, not an instant. `new Date()` reads it as UTC midnight, so west
+ * of UTC it would be shown as the day before (#254); it is read as that day in
+ * the reader's own calendar instead.
  */
 
 /** What an unreadable date is shown as. */
 export const INVALID_DATE_PLACEHOLDER = '—'
 
+const DATE_ONLY = /^(\d{4})-(\d{2})-(\d{2})$/
+
+function toDate(value: string | number | Date) {
+  const dateOnly = typeof value === 'string' ? DATE_ONLY.exec(value) : null
+  if (dateOnly) {
+    const [year, month, day] = dateOnly.slice(1).map(Number)
+    const date = new Date(year, month - 1, day)
+    // "2026-02-31" would roll over into March; it is not a date.
+    return date.getMonth() === month - 1 && date.getDate() === day ? date : new Date(NaN)
+  }
+  return new Date(value)
+}
+
 function format(value: string | number | Date, options: Intl.DateTimeFormatOptions) {
-  const date = new Date(value)
+  const date = toDate(value)
   if (Number.isNaN(date.getTime())) return INVALID_DATE_PLACEHOLDER
   return new Intl.DateTimeFormat(activeLanguage(), options).format(date)
 }

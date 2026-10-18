@@ -30,6 +30,7 @@
     "noReportTitle": "Nessun report settimanale",
     "noReportBody": "Non è ancora disponibile alcun report settimanale.",
     "summaryFallback": "I dettagli del report sono in preparazione.",
+    "summaryUnavailable": "Per questa settimana non è disponibile alcun riepilogo.",
     "emailBadge": "Email {{status}}",
     "week": "Settimana",
     "generated": "Generato",

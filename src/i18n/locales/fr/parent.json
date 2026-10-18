@@ -30,6 +30,7 @@
     "noReportTitle": "Pas encore de rapport hebdomadaire",
     "noReportBody": "Aucun rapport hebdomadaire n’est encore disponible.",
     "summaryFallback": "Les détails du rapport sont en préparation.",
+    "summaryUnavailable": "Aucun résumé n’est disponible pour cette semaine.",
     "emailBadge": "E-mail {{status}}",
     "week": "Semaine",
     "generated": "Généré",
