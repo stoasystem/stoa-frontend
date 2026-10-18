@@ -6,6 +6,7 @@
  * A test file opts in with
  *   vi.mock('@/app/router/lazyPage', () => import('./lazyPageStub'))
  */
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { render } from '@testing-library/react'
 import { MemoryRouter, useLocation, type InitialEntry } from 'react-router-dom'
 import { AppRoutes } from '@/app/router/AppRoutes'
@@ -66,11 +67,14 @@ export function openAs(
 ): Outcome {
   signInAs(viewer, options)
   let probe: Probe = { pathname: '', search: '', state: null }
+  // The app's own provider: the guard reads the account's state while it waits (#250).
   const view = render(
-    <MemoryRouter initialEntries={[entry]}>
-      <AppRoutes />
-      <LocationProbe onChange={(next) => (probe = next)} />
-    </MemoryRouter>,
+    <QueryClientProvider client={new QueryClient()}>
+      <MemoryRouter initialEntries={[entry]}>
+        <AppRoutes />
+        <LocationProbe onChange={(next) => (probe = next)} />
+      </MemoryRouter>
+    </QueryClientProvider>,
   )
   const page = view.queryByTestId('page')?.textContent ?? null
   const text = view.container.textContent ?? ''

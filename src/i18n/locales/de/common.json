@@ -367,6 +367,8 @@
       "weak": "Weiter üben"
     },
     "loading": "Wird geladen...",
+    "loadFailedAccount": "Dein Konto konnte nicht geladen werden. Versuch es noch einmal oder melde dich ab.",
+    "loadFailedAccount_formal": "Ihr Konto konnte nicht geladen werden. Versuchen Sie es noch einmal oder melden Sie sich ab.",
     "loadingAccount": "Konto wird geladen…",
     "pending": "Ausstehend",
     "plan": {

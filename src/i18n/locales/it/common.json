@@ -367,6 +367,8 @@
       "weak": "Da esercitare"
     },
     "loading": "Caricamento...",
+    "loadFailedAccount": "Non è stato possibile caricare il tuo account. Riprova o esci.",
+    "loadFailedAccount_formal": "Non è stato possibile caricare il tuo account. Riprova o esci.",
     "loadingAccount": "Caricamento dell’account…",
     "pending": "In attesa",
     "plan": {
