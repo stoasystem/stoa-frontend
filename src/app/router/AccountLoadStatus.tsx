@@ -21,7 +21,10 @@ export function AccountLoadStatus() {
   const { signOut, isSigningOut } = useSignOut()
 
   // A read the session could not be renewed for is retried, and stays pending.
-  if (!read.isError || read.isFetching) {
+  // A read paused offline or in a hidden tab is still under way. Without data
+  // a refetch goes back to pending anyway; `fetchStatus` keeps that true if a
+  // read ever starts from an error with data (PR #296 audit).
+  if (!read.isError || read.fetchStatus !== 'idle') {
     return (
       <div role="status" className="flex min-h-screen items-center justify-center bg-ground text-sm text-caption">
         {t('status.loadingAccount')}

@@ -6,8 +6,8 @@
  * cannot be renewed right now (`session_unreachable`) keeps loading, and keeps
  * retrying by itself.
  */
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { onlineManager, QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { http, HttpResponse } from 'msw'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest'
@@ -72,6 +72,7 @@ beforeEach(async () => {
   )
 })
 afterEach(() => {
+  onlineManager.setOnline(true)
   mswServer.resetHandlers()
   useAuthStore.setState({ user: null, accessToken: null, isAuthenticated: false })
 })
@@ -101,6 +102,22 @@ describe('an account read that fails without a 401 (#250)', () => {
     expect(await screen.findByText('Teacher home')).toBeInTheDocument()
     expect(meCalls).toBe(2)
     expect(useAuthStore.getState().user?.email).toBe(teacher.email)
+  })
+
+  it('keeps loading while a retry waits for the network, and reads once it is back', async () => {
+    meAnswer = () => HttpResponse.json({ detail: 'internal error' }, { status: 500 })
+    renderGuardedPage()
+    await screen.findByRole('alert')
+
+    onlineManager.setOnline(false)
+    meAnswer = () => HttpResponse.json(teacher)
+    fireEvent.click(screen.getByRole('button', { name: 'Erneut versuchen' }))
+
+    expect(await screen.findByRole('status')).toHaveTextContent('Konto wird geladen…')
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument()
+
+    act(() => onlineManager.setOnline(true))
+    expect(await screen.findByText('Teacher home')).toBeInTheDocument()
   })
 
   it('still holds the role guard when the retry brings back another role', async () => {
