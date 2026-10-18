@@ -79,7 +79,7 @@ export function useWarehouseExportSummaryQuery(contentType?: string) {
 // The student travels with each call rather than with the hook, so a batch is
 // executed for the student it was previewed for, and the history refreshed is
 // that student's, whatever the id field says by then.
-export type StudentAutomationCall<Request> = { studentId: string; request: Request }
+type StudentAutomationCall<Request> = { studentId: string; request: Request }
 
 export function useAutomationPreviewMutation() {
   return useMutation({

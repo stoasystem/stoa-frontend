@@ -29,7 +29,7 @@ export async function previewAssignmentAutomationBatch(
   request: AutomationPreviewRequest,
 ) {
   const response = await httpClient.post<AutomationPreviewResponse>(
-    `/adaptive/students/${studentId}/assignment-automation/batches/preview`,
+    `/adaptive/students/${encodeURIComponent(studentId)}/assignment-automation/batches/preview`,
     request,
   )
   return response.data
@@ -40,14 +40,14 @@ export async function executeAssignmentAutomationBatch(
   request: AutomationExecuteRequest,
 ) {
   const response = await httpClient.post<AutomationExecuteResponse>(
-    `/adaptive/students/${studentId}/assignment-automation/batches/execute`,
+    `/adaptive/students/${encodeURIComponent(studentId)}/assignment-automation/batches/execute`,
     request,
   )
   return response.data
 }
 
 export async function getStudentAssignments(studentId: string, includeArchived = true) {
-  const response = await httpClient.get<AssignmentListResponse>(`/adaptive/students/${studentId}/assignments`, {
+  const response = await httpClient.get<AssignmentListResponse>(`/adaptive/students/${encodeURIComponent(studentId)}/assignments`, {
     params: { includeArchived },
   })
   return response.data

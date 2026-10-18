@@ -126,10 +126,16 @@ export function LearningAutomationConsolePage() {
   const previewMutation = useAutomationPreviewMutation()
   const executeMutation = useAutomationExecuteMutation()
   const preview = previewMutation.data
-  // The student the shown preview was made for. Execute uses this one, not the
-  // field, which may have moved on to someone else since.
+  // The student and subject the shown preview was made for. Execute uses these,
+  // not the fields, which may have moved on since.
   const previewedStudentId = previewMutation.variables?.studentId
-  const results = executeMutation.data?.results ?? []
+  const previewedSubject = previewMutation.variables?.request.subject
+  // An execution belongs to the batch it ran: once that batch ran, it is not
+  // offered again, and its results are not shown under another preview.
+  const executedPreview = Boolean(preview && executeMutation.data?.batchId === preview.batchId)
+  const results = executedPreview ? executeMutation.data?.results ?? [] : []
+  // The history card shows the student whose id is in the field, or nothing.
+  const historyStale = trimmedStudentId !== shownStudentId
 
   const policy = useMemo<AutomationPolicy>(() => ({
     ...defaultPolicy,
@@ -154,11 +160,12 @@ export function LearningAutomationConsolePage() {
       return
     }
     setShownStudentId(trimmedStudentId)
+    executeMutation.reset()
     previewMutation.mutate({ studentId: trimmedStudentId, request: { policy, subject: subject || undefined } })
   }
 
   const handleExecute = () => {
-    if (!preview || !previewedStudentId) return
+    if (!preview || !previewedStudentId || executedPreview) return
     executeMutation.mutate({
       studentId: previewedStudentId,
       request: {
@@ -166,7 +173,7 @@ export function LearningAutomationConsolePage() {
         approved: true,
         policy: preview.policy,
         candidates: preview.selected.map((candidate) => ({ ...candidate, approved: true })),
-        subject: subject || undefined,
+        subject: previewedSubject,
       },
     }, {
       onSuccess: (data) => toast.success(t('automationConsole.executed', { count: data.results.length })),
@@ -319,7 +326,7 @@ export function LearningAutomationConsolePage() {
                     />
                   )}
                   {preview && preview.selected.length > 0 && (
-                    <Button className="mt-4" onClick={handleExecute} disabled={executeMutation.isPending}>
+                    <Button className="mt-4" onClick={handleExecute} disabled={executeMutation.isPending || executedPreview}>
                       {executeMutation.isPending ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Play className="h-4 w-4" />}
                       {t('automationConsole.execute')}
                     </Button>
@@ -379,45 +386,51 @@ export function LearningAutomationConsolePage() {
                 <CardTitle className="text-xl">{t('automationConsole.historyTitle')}</CardTitle>
               </CardHeader>
               <CardContent>
-                {!shownStudentId && !trimmedStudentId && (
+                {!trimmedStudentId && (historyStale || !shownStudentId) && (
                   <p className="rounded-md border border-dashed p-4 text-sm text-muted-foreground">
                     {t('automationConsole.historyNeedStudent')}
                   </p>
                 )}
                 {/* An id is typed but not read yet: say how to read it, not to type one. */}
-                {trimmedStudentId && trimmedStudentId !== shownStudentId && (
+                {trimmedStudentId && historyStale && (
                   <p className="rounded-md border border-dashed p-4 text-sm text-muted-foreground">
                     {t('automationConsole.historyNotLoaded', { action: t('automationConsole.preview') })}
                   </p>
                 )}
-                {assignmentsQuery.isLoading && <LoadingState message={t('automationConsole.historyLoading')} />}
-                {historyNotFound && (
-                  <p className="rounded-md border border-dashed p-4 text-sm text-muted-foreground">
-                    {t('automationConsole.historyNotFound')}
-                  </p>
-                )}
-                {assignmentsQuery.error && !historyNotFound && (
-                  <ErrorState title={t('automationConsole.historyFailed')} message={assignmentsQuery.error.message} />
-                )}
-                {assignmentsQuery.data?.items.length === 0 && (
-                  <p className="rounded-md border border-dashed p-4 text-sm text-muted-foreground">
-                    {t('automationConsole.historyEmpty')}
-                  </p>
-                )}
-                <div className="space-y-3">
-                  {assignmentsQuery.data?.items.map((assignment) => (
-                    <div key={assignment.assignmentId} className="flex flex-col gap-2 rounded-md border p-3 sm:flex-row sm:items-start sm:justify-between">
-                      <div>
-                        <p className="font-medium">{assignment.title || assignment.assignmentId}</p>
-                        <p className="text-sm text-muted-foreground">
-                          {assignment.subject || t('automationConsole.subjectPending')} / {assignment.topicIds.join(', ') || t('automationConsole.topicPending')}
-                          {assignment.automation?.explanation ? ` - ${assignment.automation.explanation}` : ''}
-                        </p>
-                      </div>
-                      <StatusPill value={assignment.status} />
+                {/* What is read belongs to the id last read; while the field names
+                    someone else, none of it is shown, so it cannot pass for theirs. */}
+                {!historyStale && (
+                  <>
+                    {assignmentsQuery.isLoading && <LoadingState message={t('automationConsole.historyLoading')} />}
+                    {historyNotFound && (
+                      <p className="rounded-md border border-dashed p-4 text-sm text-muted-foreground">
+                        {t('automationConsole.historyNotFound')}
+                      </p>
+                    )}
+                    {assignmentsQuery.error && !historyNotFound && (
+                      <ErrorState title={t('automationConsole.historyFailed')} message={assignmentsQuery.error.message} />
+                    )}
+                    {assignmentsQuery.data?.items.length === 0 && (
+                      <p className="rounded-md border border-dashed p-4 text-sm text-muted-foreground">
+                        {t('automationConsole.historyEmpty')}
+                      </p>
+                    )}
+                    <div className="space-y-3">
+                      {assignmentsQuery.data?.items.map((assignment) => (
+                        <div key={assignment.assignmentId} className="flex flex-col gap-2 rounded-md border p-3 sm:flex-row sm:items-start sm:justify-between">
+                          <div>
+                            <p className="font-medium">{assignment.title || assignment.assignmentId}</p>
+                            <p className="text-sm text-muted-foreground">
+                              {assignment.subject || t('automationConsole.subjectPending')} / {assignment.topicIds.join(', ') || t('automationConsole.topicPending')}
+                              {assignment.automation?.explanation ? ` - ${assignment.automation.explanation}` : ''}
+                            </p>
+                          </div>
+                          <StatusPill value={assignment.status} />
+                        </div>
+                      ))}
                     </div>
-                  ))}
-                </div>
+                  </>
+                )}
               </CardContent>
             </Card>
           </div>
