@@ -44,6 +44,7 @@
     "resolutionNote": "Resolution note",
     "resolutionNotePlaceholder": "Required before marking resolved.",
     "updateFailed": "Failed to update status.",
+    "changedElsewhere": "Another teacher has taken this request, or it has changed. It has been reloaded — please check where it stands now.",
     "replyTitle": "Teacher reply",
     "replyDescription": "Record the intervention, next step, or follow-up the student needs.",
     "requestSummary": "The request",

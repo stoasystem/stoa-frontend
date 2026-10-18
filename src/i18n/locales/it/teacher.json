@@ -44,6 +44,7 @@
     "resolutionNote": "Nota di risoluzione",
     "resolutionNotePlaceholder": "Obbligatoria prima di segnare come risolta.",
     "updateFailed": "Impossibile aggiornare lo stato.",
+    "changedElsewhere": "Un altro insegnante ha preso questa richiesta, oppure è cambiata. L’abbiamo ricaricata: controlla a che punto è.",
     "replyTitle": "Risposta dell’insegnante",
     "replyDescription": "Registra l’intervento, il passo successivo o il follow-up di cui lo studente ha bisogno.",
     "requestSummary": "La richiesta",

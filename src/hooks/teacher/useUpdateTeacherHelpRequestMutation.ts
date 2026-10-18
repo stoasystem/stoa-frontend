@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
+import { isHelpRequestConflict } from '@/lib/teacherHelpRequestConflict'
 import { trackEvent } from '@/services/analytics/analyticsClient'
 import { updateTeacherHelpRequestStatus } from '@/services/teacher/teacherApi'
 import { teacherQueryKeys } from '@/services/teacher/teacherQueryKeys'
@@ -18,10 +19,16 @@ export function useUpdateTeacherHelpRequestMutation() {
         trackEvent('teacher_help_resolved', { requestId: request.requestId })
       }
       toast.success('Request status updated')
+      // The list key is the detail's prefix, so this reads both again.
       void queryClient.invalidateQueries({ queryKey: teacherQueryKeys.helpRequests() })
-      void queryClient.invalidateQueries({
-        queryKey: teacherQueryKeys.helpRequestDetail(request.requestId),
-      })
+      void queryClient.invalidateQueries({ queryKey: teacherQueryKeys.stats() })
+    },
+    onError: (error) => {
+      // Someone else took it or it lapsed: what is on screen is stale, so read
+      // it again instead of leaving the same refused button in place (#269).
+      if (!isHelpRequestConflict(error)) return
+      void queryClient.invalidateQueries({ queryKey: teacherQueryKeys.helpRequests() })
+      void queryClient.invalidateQueries({ queryKey: teacherQueryKeys.stats() })
     },
   })
 }

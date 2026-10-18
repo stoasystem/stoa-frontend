@@ -44,6 +44,7 @@
     "resolutionNote": "Note de résolution",
     "resolutionNotePlaceholder": "Obligatoire avant de marquer comme résolu.",
     "updateFailed": "Impossible de mettre à jour le statut.",
+    "changedElsewhere": "Un autre enseignant a pris cette demande en charge, ou elle a changé. Elle a été rechargée : veuillez vérifier où elle en est.",
     "replyTitle": "Réponse de l’enseignant",
     "replyDescription": "Consignez l’intervention, la prochaine étape ou le suivi dont l’élève a besoin.",
     "requestSummary": "La demande",
