@@ -9,7 +9,7 @@ import {
   ASK_SURFACE_BACKGROUND,
   sheetHeightFor,
 } from '@/features/ask/askLayout'
-import { useAskQuoteStore, type AskPractice } from '@/features/ask/practiceContext'
+import { clearAskQuote, useAskQuoteStore, type AskPractice } from '@/features/ask/practiceContext'
 import { QuoteSelection } from '@/features/chapter/QuoteSelection'
 import { useAskController, type AskController } from '@/features/ask/useAskController'
 import { useAskKeyboard } from '@/features/ask/useAskKeyboard'
@@ -140,6 +140,18 @@ export function StageWithAsk({
   }, [open, off])
 
   const setQuote = useAskQuoteStore((state) => state.setQuote)
+  // A quote belongs to where it was taken from (#263): leaving the exercise --
+  // for the next one, a quiz, or off the stage altogether -- drops it, and so
+  // does leaving the conversation a quoted answer is in.
+  const challengeId = practice?.context.challengeId ?? null
+  useEffect(() => clearAskQuote, [challengeId])
+  const { conversationId } = controller
+  useEffect(
+    () => () => {
+      if (useAskQuoteStore.getState().quote?.source.kind === 'message') clearAskQuote()
+    },
+    [conversationId],
+  )
   const onKeyDown = useAskKeyboard(surface, { trap: sheet, active: open, onEscape: close })
   const drag = useSheetDrag(surface, close)
 
@@ -271,7 +283,7 @@ export function StageWithAsk({
         <QuoteSelection
           scope={host}
           onQuote={(quote) => {
-            setQuote(quote)
+            setQuote(quote.source.kind === 'message' ? { ...quote, conversationId } : quote)
             controller.openWithDraft(controller.draft)
           }}
         />
