@@ -50,11 +50,12 @@ function allowance(overrides: Partial<Awaited<ReturnType<typeof readTeacherSuppo
   }
 }
 
-function open(reason = 'exam period') {
-  return render(
-    <TeacherSupportAllowanceEditor studentId="student-b" reason={reason} onClose={() => {}} />,
-    { wrapper: Wrapper },
-  )
+// The reason is the editor's own field now (#259), not one the page shares.
+async function open(reason = 'exam period') {
+  render(<TeacherSupportAllowanceEditor studentId="student-b" onClose={() => {}} />, {
+    wrapper: Wrapper,
+  })
+  if (reason) await userEvent.type(screen.getByLabelText('accounts.reasonPrompt'), reason)
 }
 
 beforeEach(() => {
@@ -65,28 +66,28 @@ beforeEach(() => {
 describe('the weekly teacher-support figure an administrator edits', () => {
   it('opens on the figure that is in force, not on an empty box', async () => {
     mockedRead.mockResolvedValue(allowance())
-    open()
+    await open()
 
-    const field = await screen.findByRole('textbox')
+    const field = await screen.findByLabelText('accounts.teacherSupport.weeklyCases')
     await waitFor(() => expect(field).toHaveValue('7'))
     expect(screen.getByText('accounts.teacherSupport.assignedDefault:7')).toBeInTheDocument()
   })
 
   it('says when the figure came from an administrator rather than from the default', async () => {
     mockedRead.mockResolvedValue(allowance({ weeklyCases: 20, source: 'administrator' }))
-    open()
+    await open()
 
     expect(
       await screen.findByText('accounts.teacherSupport.setByAdministrator:20'),
     ).toBeInTheDocument()
   })
 
-  it('sends the number and the reason the page collected', async () => {
+  it('sends the number and the reason typed for this row', async () => {
     mockedRead.mockResolvedValue(allowance())
     mockedSet.mockResolvedValue({ ...allowance({ weeklyCases: 20, source: 'administrator' }), stateVersion: 1 })
-    open()
+    await open()
 
-    const field = await screen.findByRole('textbox')
+    const field = await screen.findByLabelText('accounts.teacherSupport.weeklyCases')
     await waitFor(() => expect(field).toHaveValue('7'))
     await userEvent.clear(field)
     await userEvent.type(field, '20')
@@ -101,13 +102,15 @@ describe('the weekly teacher-support figure an administrator edits', () => {
         reason: 'exam period',
       }),
     )
+    // #259: a saved reason does not wait to be sent again with the next change.
+    await waitFor(() => expect(screen.getByLabelText('accounts.reasonPrompt')).toHaveValue(''))
   })
 
   it('warns before zero is saved, because zero is not "none set"', async () => {
     mockedRead.mockResolvedValue(allowance())
-    open()
+    await open()
 
-    const field = await screen.findByRole('textbox')
+    const field = await screen.findByLabelText('accounts.teacherSupport.weeklyCases')
     await waitFor(() => expect(field).toHaveValue('7'))
     await userEvent.clear(field)
     await userEvent.type(field, '0')
@@ -119,9 +122,9 @@ describe('the weekly teacher-support figure an administrator edits', () => {
     // Anything past the maximum falls back to the assigned seven when it is
     // read, so storing it would be a cut dressed up as a raise.
     mockedRead.mockResolvedValue(allowance())
-    open()
+    await open()
 
-    const field = await screen.findByRole('textbox')
+    const field = await screen.findByLabelText('accounts.teacherSupport.weeklyCases')
     await waitFor(() => expect(field).toHaveValue('7'))
     await userEvent.clear(field)
     await userEvent.type(field, '201')
@@ -133,9 +136,9 @@ describe('the weekly teacher-support figure an administrator edits', () => {
 
   it('will not save without the reason the audit log records', async () => {
     mockedRead.mockResolvedValue(allowance())
-    open('')
+    await open('')
 
-    const field = await screen.findByRole('textbox')
+    const field = await screen.findByLabelText('accounts.teacherSupport.weeklyCases')
     await waitFor(() => expect(field).toHaveValue('7'))
     await userEvent.click(screen.getByRole('button', { name: 'accounts.teacherSupport.save' }))
 

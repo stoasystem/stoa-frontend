@@ -1,4 +1,4 @@
-import { Fragment, useMemo, useState } from 'react'
+import { Fragment, useMemo, useRef, useState } from 'react'
 import { ClipboardList } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { Group, Row } from '@/components/base'
@@ -18,6 +18,8 @@ import {
 } from '@/hooks/admin/useAdminAccounts'
 import { DashboardLayout } from '@/layouts/DashboardLayout'
 import { toUserFacingError } from '@/lib/userFacingText'
+import type { AccountAction } from '@/pages/admin/AccountActionDialog'
+import { AccountActionDialog, accountLabel } from '@/pages/admin/AccountActionDialog'
 import { AccountDraftFields, BlockedReason } from '@/pages/admin/AccountFormFields'
 import { AssignAccountDialog } from '@/pages/admin/AssignAccountDialog'
 import { TeacherSupportAllowanceEditor } from '@/pages/admin/TeacherSupportAllowanceEditor'
@@ -45,7 +47,7 @@ const ROLES: AccountRole[] = ['student', 'teacher', 'parent', 'admin']
 const STATUSES: AccountStatus[] = ['invited', 'active', 'suspended', 'archived']
 
 // An archived account is read-only and keeps its number; there is no delete.
-const NEXT_STATUS: Record<string, AccountStatus[]> = {
+const NEXT_STATUS: Record<string, Exclude<AccountStatus, 'invited'>[]> = {
   invited: ['archived'],
   active: ['suspended', 'archived'],
   suspended: ['active', 'archived'],
@@ -70,7 +72,8 @@ export function AdminAccountsPage() {
   const [touched, setTouched] = useState<Partial<Record<keyof AccountDraft, boolean>>>({})
   const [assignOpen, setAssignOpen] = useState(false)
   const [assignError, setAssignError] = useState<string | null>(null)
-  const [reason, setReason] = useState('')
+  const [action, setAction] = useState<AccountAction | null>(null)
+  const [actionError, setActionError] = useState<string | null>(null)
   const [notice, setNotice] = useState<string | null>(null)
   const [secret, setSecret] = useState<string | null>(null)
   const [allowanceFor, setAllowanceFor] = useState<string | null>(null)
@@ -85,7 +88,16 @@ export function AdminAccountsPage() {
   const reissueMutation = useReissueInvitationMutation()
   const resetMutation = useResetAccountPasswordMutation()
   const statusMutation = useChangeAccountStatusMutation()
+  // #259: one row action at a time. A double-clicked reset issued two temporary
+  // passwords and the first was dead on arrival; the ref closes the gap before
+  // `isPending` reaches the next render.
+  const inFlight = useRef(false)
+  const busy =
+    resetMutation.isPending || statusMutation.isPending || reissueMutation.isPending || action !== null
 
+  // #259: a list still being read is not an empty one. On a large tenant the
+  // read pages through up to twenty requests, and every group said "no accounts".
+  const loading = accountsQuery.isPending
   const rows = accountsQuery.data?.items ?? []
   const groups = accountsQuery.data?.groups ?? {}
   const grouped = ROLES.map((item) => ({ role: item, rows: rows.filter((row) => row.role === item) }))
@@ -172,12 +184,16 @@ export function AdminAccountsPage() {
     // The account id is not an invitation id: the reissue command resolves the
     // invitation through its own pointer row, so sending the account id could
     // only ever answer 404. The list hands the live invitation id back instead.
-    if (!row.invitationId) return
+    if (!row.invitationId || inFlight.current) return
+    inFlight.current = true
     setNotice(null)
     setSecret(null)
     reissueMutation.mutate(
       { invitationId: row.invitationId },
       {
+        onSettled: () => {
+          inFlight.current = false
+        },
         onSuccess: (result) => {
           setNotice(
             result.invitationDelivered
@@ -190,39 +206,61 @@ export function AdminAccountsPage() {
     )
   }
 
-  function resetPassword(row: AccountRow) {
-    if (!reason.trim()) {
-      setNotice(t('accounts.reasonRequired'))
-      return
-    }
+  function confirmAction(chosen: AccountAction, reason: string) {
+    if (inFlight.current) return
+    inFlight.current = true
     setNotice(null)
     setSecret(null)
-    resetMutation.mutate(
-      { userId: row.userId, reason: reason.trim() },
-      {
-        onSuccess: (result) => {
-          setNotice(t('accounts.passwordReset'))
-          setSecret(result.temporaryPassword)
+    setActionError(null)
+    const settle = {
+      onSettled: () => {
+        inFlight.current = false
+      },
+      // The dialog sits over the page, so a refusal is said inside it, and the
+      // reason stays for a retry. Success closes it and the reason goes with it.
+      onError: (error: unknown) =>
+        setActionError(
+          refusal(
+            error,
+            chosen.kind === 'reset' ? t('accounts.passwordResetFailed') : t('accounts.statusFailed'),
+          ),
+        ),
+    }
+    if (chosen.kind === 'reset') {
+      resetMutation.mutate(
+        { userId: chosen.row.userId, reason },
+        {
+          ...settle,
+          onSuccess: (result) => {
+            setAction(null)
+            setNotice(t('accounts.passwordReset'))
+            setSecret(result.temporaryPassword)
+          },
         },
-        onError: (error) => setNotice(refusal(error, t('accounts.passwordResetFailed'))),
+      )
+      return
+    }
+    statusMutation.mutate(
+      { userId: chosen.row.userId, status: chosen.next, reason },
+      {
+        ...settle,
+        onSuccess: () => {
+          setAction(null)
+          setNotice(t('accounts.statusChanged', { status: t(`accounts.status.${chosen.next}`) }))
+        },
       },
     )
   }
 
-  function moveStatus(row: AccountRow, next: AccountStatus) {
-    if (!reason.trim()) {
-      setNotice(t('accounts.reasonRequired'))
-      return
-    }
-    setNotice(null)
-    setSecret(null)
-    statusMutation.mutate(
-      { userId: row.userId, status: next as Exclude<AccountStatus, 'invited'>, reason: reason.trim() },
-      {
-        onSuccess: () => setNotice(t('accounts.statusChanged', { status: t(`accounts.status.${next}`) })),
-        onError: (error) => setNotice(refusal(error, t('accounts.statusFailed'))),
-      },
-    )
+  function openAction(chosen: AccountAction) {
+    if (busy) return
+    setActionError(null)
+    setAction(chosen)
+  }
+
+  /** "Archive: Lea Muster (S-0001)", so a screen reader hears which row the button acts on. */
+  function rowActionName(label: string, row: AccountRow) {
+    return t('accounts.actionFor', { action: label, account: accountLabel(row) })
   }
 
   return (
@@ -232,7 +270,11 @@ export function AdminAccountsPage() {
           eyebrow={t('accounts.eyebrow')}
           title={t('accounts.title')}
           description={t('accounts.description')}
-          actions={<Badge variant="secondary">{t('accounts.total', { count: rows.length })}</Badge>}
+          actions={
+            loading ? null : (
+              <Badge variant="secondary">{t('accounts.total', { count: rows.length })}</Badge>
+            )
+          }
         />
 
         {/* Users holds account operations too (#13 point 6): the second page of the item. */}
@@ -360,19 +402,21 @@ export function AdminAccountsPage() {
           </CardContent>
         </Card>
 
-        <Card className="mb-4">
-          <CardHeader>
-            <CardTitle>{t('accounts.reasonTitle')}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <label className="flex flex-col gap-1 text-sm">
-              {t('accounts.reasonPrompt')}
-              <Input value={reason} onChange={(event) => setReason(event.target.value)} />
-            </label>
-          </CardContent>
-        </Card>
+        <AccountActionDialog
+          action={action}
+          pending={resetMutation.isPending || statusMutation.isPending}
+          error={actionError}
+          onCancel={() => {
+            setActionError(null)
+            setAction(null)
+          }}
+          onConfirm={confirmAction}
+        />
 
-        {notice ? <p className="mb-3 text-sm">{notice}</p> : null}
+        {/* Always mounted: a live region that appears with its text is not announced. */}
+        <p role="status" className={notice ? 'mb-3 text-sm' : 'sr-only'}>
+          {notice}
+        </p>
         {secret ? (
           <p className="mb-3 break-all rounded-md border p-2 font-mono text-sm">
             {t('accounts.readOnceHint')} {secret}
@@ -393,7 +437,13 @@ export function AdminAccountsPage() {
           </p>
         ) : null}
 
-        {accountsQuery.isError ? null : grouped.map((group) => (
+        {loading ? (
+          <p role="status" className="mb-3 text-sm text-muted-foreground">
+            {t('accounts.loading')}
+          </p>
+        ) : null}
+
+        {accountsQuery.isError || loading ? null : grouped.map((group) => (
           <Card key={group.role} className="mb-4">
             <CardHeader>
               <CardTitle>
@@ -454,7 +504,14 @@ export function AdminAccountsPage() {
                         </td>
                         <td className="p-2">
                           <div className="flex flex-wrap gap-2">
-                            <Button type="button" size="sm" variant="outline" onClick={() => resetPassword(row)}>
+                            <Button
+                              type="button"
+                              size="sm"
+                              variant="outline"
+                              disabled={busy}
+                              aria-label={rowActionName(t('accounts.resetPassword'), row)}
+                              onClick={() => openAction({ kind: 'reset', row })}
+                            >
                               {t('accounts.resetPassword')}
                             </Button>
                             {row.accountStatus === 'invited' ? (
@@ -462,7 +519,8 @@ export function AdminAccountsPage() {
                                 type="button"
                                 size="sm"
                                 variant="outline"
-                                disabled={!row.invitationId}
+                                disabled={!row.invitationId || busy}
+                                aria-label={rowActionName(t('accounts.resendInvite'), row)}
                                 onClick={() => resend(row)}
                               >
                                 {t('accounts.resendInvite')}
@@ -474,7 +532,9 @@ export function AdminAccountsPage() {
                                 type="button"
                                 size="sm"
                                 variant="outline"
-                                onClick={() => moveStatus(row, next)}
+                                disabled={busy}
+                                aria-label={rowActionName(t(`accounts.moveTo.${next}`), row)}
+                                onClick={() => openAction({ kind: 'status', row, next })}
                               >
                                 {t(`accounts.moveTo.${next}`)}
                               </Button>
@@ -484,6 +544,7 @@ export function AdminAccountsPage() {
                                 type="button"
                                 size="sm"
                                 variant="outline"
+                                aria-label={rowActionName(t('accounts.teacherSupport.open'), row)}
                                 onClick={() =>
                                   setAllowanceFor(allowanceFor === row.userId ? null : row.userId)
                                 }
@@ -503,7 +564,6 @@ export function AdminAccountsPage() {
                           <td className="p-2" colSpan={10}>
                             <TeacherSupportAllowanceEditor
                               studentId={row.userId}
-                              reason={reason}
                               onClose={() => setAllowanceFor(null)}
                             />
                           </td>

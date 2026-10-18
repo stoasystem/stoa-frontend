@@ -19,20 +19,22 @@ import { ApiError } from '@/services/api/httpClient'
  *
  * Zero is a real setting and takes teacher support away entirely, which is why
  * it is spelled out here instead of reading as "none configured".
+ *
+ * The reason is this row's own (#259): it used to come from one field at the
+ * top of the page that every row shared and nothing emptied.
  */
 export function TeacherSupportAllowanceEditor({
   studentId,
-  reason,
   onClose,
 }: {
   studentId: string
-  reason: string
   onClose: () => void
 }) {
   const { t } = useTranslation('admin')
   const allowanceQuery = useTeacherSupportAllowanceQuery(studentId)
   const saveMutation = useSetTeacherSupportAllowanceMutation()
   const [draft, setDraft] = useState('')
+  const [reason, setReason] = useState('')
   const [notice, setNotice] = useState<string | null>(null)
   const current = allowanceQuery.data
 
@@ -54,8 +56,10 @@ export function TeacherSupportAllowanceEditor({
     saveMutation.mutate(
       { studentId, weeklyCases: parsed, reason: reason.trim() },
       {
-        onSuccess: (result) =>
-          setNotice(t('accounts.teacherSupport.saved', { count: result.weeklyCases })),
+        onSuccess: (result) => {
+          setReason('')
+          setNotice(t('accounts.teacherSupport.saved', { count: result.weeklyCases }))
+        },
         onError: (error) => {
           const code = error instanceof ApiError ? error.code : undefined
           setNotice(
@@ -90,6 +94,10 @@ export function TeacherSupportAllowanceEditor({
           onChange={(event) => setDraft(event.target.value)}
         />
       </label>
+      <label className="text-sm">
+        <span className="mr-2">{t('accounts.reasonPrompt')}</span>
+        <Input className="inline-block w-72" value={reason} onChange={(event) => setReason(event.target.value)} />
+      </label>
       <p className="text-sm text-muted-foreground">
         {current
           ? current.source === 'administrator'
@@ -106,7 +114,9 @@ export function TeacherSupportAllowanceEditor({
       {draft === '0' ? (
         <p className="w-full text-sm text-destructive">{t('accounts.teacherSupport.zeroWarning')}</p>
       ) : null}
-      {notice ? <p className="w-full text-sm">{notice}</p> : null}
+      <p role="status" className={notice ? 'w-full text-sm' : 'sr-only'}>
+        {notice}
+      </p>
     </div>
   )
 }

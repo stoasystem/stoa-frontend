@@ -71,8 +71,24 @@
       "suspended": "Sperren",
       "archived": "Archivieren"
     },
-    "reasonTitle": "Grund für die nächste Aktion",
     "reasonRequired": "Geben Sie zuerst einen Grund an: jede Kontoänderung wird festgehalten.",
+    "loading": "Konten werden geladen…",
+    "actionFor": "{{action}}: {{account}}",
+    "confirm": {
+      "title": {
+        "reset": "Passwort von {{account}} zurücksetzen?",
+        "suspended": "{{account}} sperren?",
+        "active": "{{account}} reaktivieren?",
+        "archived": "{{account}} archivieren?"
+      },
+      "body": {
+        "reset": "Für dieses Konto wird ein temporäres Passwort ausgestellt und einmal angezeigt. Ein früheres temporäres Passwort gilt dann nicht mehr.",
+        "suspended": "Mit diesem Konto kann man sich nicht mehr anmelden, bis Sie es reaktivieren.",
+        "active": "Mit diesem Konto kann man sich wieder anmelden.",
+        "archived": "Das Konto wird schreibgeschützt und behält seine Nummer."
+      },
+      "irreversible": "Das Archivieren lässt sich nicht rückgängig machen. Sie können das Konto danach nicht wieder aktivieren."
+    },
     "errors": {
       "account_peer_admin_password_reset_forbidden": "Eine Administration kann das Passwort einer anderen Administration nicht zurücksetzen. Dieses Konto muss über AWS zurückgesetzt werden.",
       "account_last_active_admin": "Dies ist die einzige noch aktive Administration. Aktivieren Sie zuerst eine weitere.",

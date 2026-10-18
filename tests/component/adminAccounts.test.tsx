@@ -65,6 +65,14 @@ function wrapper(initial: string) {
   }
 }
 
+/** Reset the first row's password the way an administrator has to: open, give a reason, confirm (#259). */
+async function resetThroughDialog(reason: string) {
+  await userEvent.click(screen.getAllByText('accounts.resetPassword')[0])
+  const dialog = await screen.findByRole('dialog')
+  await userEvent.type(within(dialog).getByLabelText('accounts.reasonPrompt'), reason)
+  await userEvent.click(within(dialog).getByRole('button', { name: 'accounts.resetPassword' }))
+}
+
 const ACCOUNTS = {
   count: 3,
   groups: { parent: 1, student: 1, teacher: 1 },
@@ -153,8 +161,7 @@ describe('admin accounts console', () => {
     render(<AdminAccountsPage />, { wrapper: wrapper('/admin/users') })
     await waitFor(() => expect(screen.getByText('Parent A')).toBeTruthy())
 
-    await userEvent.type(screen.getByLabelText('accounts.reasonPrompt'), 'support call 4711')
-    await userEvent.click(screen.getAllByText('accounts.resetPassword')[0])
+    await resetThroughDialog('support call 4711')
 
     await waitFor(() => expect(mockedReset).toHaveBeenCalled())
     // Groups render in role order, so the first reset button belongs to the student row.
@@ -609,8 +616,7 @@ describe('what the console says when a guard refuses', () => {
     render(<AdminAccountsPage />, { wrapper: wrapper('/admin/users') })
     await waitFor(() => expect(screen.getByText('Parent A')).toBeTruthy())
 
-    await userEvent.type(screen.getByLabelText('accounts.reasonPrompt'), 'support call 4711')
-    await userEvent.click(screen.getAllByText('accounts.resetPassword')[0])
+    await resetThroughDialog('support call 4711')
 
     await waitFor(() =>
       expect(
@@ -625,8 +631,7 @@ describe('what the console says when a guard refuses', () => {
     render(<AdminAccountsPage />, { wrapper: wrapper('/admin/users') })
     await waitFor(() => expect(screen.getByText('Parent A')).toBeTruthy())
 
-    await userEvent.type(screen.getByLabelText('accounts.reasonPrompt'), 'support call 4711')
-    await userEvent.click(screen.getAllByText('accounts.resetPassword')[0])
+    await resetThroughDialog('support call 4711')
 
     // What matters is that nothing invents a phrase key out of an absent code;
     // which wording the generic path settles on is toUserFacingError's business.
