@@ -44,6 +44,7 @@
     "resolutionNote": "Abschlussnotiz",
     "resolutionNotePlaceholder": "Erforderlich, bevor als gelöst markiert werden kann.",
     "updateFailed": "Status konnte nicht aktualisiert werden.",
+    "changedElsewhere": "Diese Anfrage hat inzwischen eine andere Lehrperson übernommen, oder sie hat sich geändert. Die Ansicht wurde neu geladen – bitte prüfen Sie den aktuellen Stand.",
     "replyTitle": "Antwort der Lehrperson",
     "replyDescription": "Halten Sie die Massnahme, den nächsten Schritt oder die Nachbetreuung fest, die die Lernenden brauchen.",
     "requestSummary": "Die Anfrage",

@@ -113,9 +113,17 @@ describe('a help request in the teacher view', () => {
   })
 
   it('still offers them while it is open', () => {
-    detail.status = 'in_progress'
+    detail.status = 'pending'
     page()
     expect(screen.getByRole('button', { name: 'Prüfung starten' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Als gelöst markieren' })).toBeInTheDocument()
+  })
+
+  // Taking a request already in progress was a no-op write (#269).
+  it('offers only finishing once it is in progress', () => {
+    detail.status = 'in_progress'
+    page()
+    expect(screen.queryByRole('button', { name: 'Prüfung starten' })).toBeNull()
     expect(screen.getByRole('button', { name: 'Als gelöst markieren' })).toBeInTheDocument()
   })
 

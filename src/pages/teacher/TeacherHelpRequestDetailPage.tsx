@@ -24,9 +24,9 @@ import { useUpdateTeacherHelpRequestMutation } from '@/hooks/teacher/useUpdateTe
 import { DashboardLayout } from '@/layouts/DashboardLayout'
 import { trackEvent } from '@/services/analytics/analyticsClient'
 import { normalizeCurriculumSubjectId } from '@/services/practice/practiceApi'
-import { acceptsTeacherReply, isOpenHelpRequest, type TeacherHelpStatus } from '@/types/teacherHelp'
+import { isHelpRequestConflict } from '@/lib/teacherHelpRequestConflict'
+import { acceptsTeacherReply, teacherStatusActions } from '@/types/teacherHelp'
 
-const statuses: TeacherHelpStatus[] = ['in_progress', 'resolved']
 const statusActionKey: Record<string, string> = {
   in_progress: 'markInProgress',
   resolved: 'markResolved',
@@ -50,6 +50,13 @@ export function TeacherHelpRequestDetailPage() {
     if (!requestId) return
     trackEvent('teacher_request_opened', { requestId })
   }, [requestId])
+
+  // A failed read keeps the last copy on screen, but that copy may no longer be
+  // this teacher's (a 403 once someone else took it): show it, offer nothing
+  // on it (#269).
+  const canAct = !requestQuery.isError
+  const statusActions = canAct ? teacherStatusActions(requestQuery.data?.status) : []
+  const changedElsewhere = isHelpRequestConflict(updateStatus.error) || isHelpRequestConflict(addNote.error)
 
   return (
     <DashboardLayout>
@@ -89,9 +96,12 @@ export function TeacherHelpRequestDetailPage() {
               isError={curriculumQuery.isError}
               contextLabel={t('curriculumRollout.teacherContext')}
             />
-            {/* A finished request takes no more status changes: the server refuses
-                them, so offering "Prüfung starten" on one only led to an error (#162). */}
-            {isOpenHelpRequest(requestQuery.data.status) && (
+            {changedElsewhere && (
+              <p role="alert" className="text-sm text-destructive">{tTeacher('detail.changedElsewhere')}</p>
+            )}
+            {/* Only the changes the server takes in this status: a finished request
+                takes none (#162), one in progress can only be finished (#269). */}
+            {statusActions.length > 0 && (
               <>
               <div className="rounded-lg border p-4">
                 <label className="text-sm font-medium" htmlFor="resolution-note">
@@ -106,7 +116,7 @@ export function TeacherHelpRequestDetailPage() {
                 />
               </div>
               <div className="flex flex-wrap gap-2">
-                {statuses.map((status) => (
+                {statusActions.map((status) => (
                   <Button
                     key={status}
                     type="button"
@@ -129,12 +139,12 @@ export function TeacherHelpRequestDetailPage() {
                   </Button>
                 ))}
               </div>
-              {updateStatus.isError && <p className="text-sm text-destructive">{tTeacher('detail.updateFailed')}</p>}
+              {updateStatus.isError && !changedElsewhere && <p className="text-sm text-destructive">{tTeacher('detail.updateFailed')}</p>}
               </>
             )}
             {/* A resolved request still takes its teacher's follow-up (#222); one
                 withdrawn or expired has no teacher and the server refuses the reply. */}
-            {acceptsTeacherReply(requestQuery.data.status) && (
+            {canAct && acceptsTeacherReply(requestQuery.data.status) && (
               <>
                 <SectionHeader
                   title={tTeacher('detail.replyTitle')}
