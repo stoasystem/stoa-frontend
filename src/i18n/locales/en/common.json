@@ -52,6 +52,7 @@
   },
   "errorBoundary": {
     "body": "Please try again or reload the page.",
+    "body_formal": "Please try again or reload the page.",
     "pageBody": "Try again, or reload the page. You can still go elsewhere from the bar above.",
     "pageTitle": "This page could not be shown",
     "reload": "Reload page",
@@ -110,6 +111,7 @@
       "email": "Email",
       "heading": "Profile",
       "managed": "Your name and email address come with your account. To change them, ask an administrator.",
+      "managed_formal": "Your name and email address come with your account. To change them, ask an administrator.",
       "name": "Name"
     }
   },
@@ -343,7 +345,8 @@
     }
   },
   "state": {
-    "notYourFault": "This isn't your fault."
+    "notYourFault": "This isn't your fault.",
+    "notYourFault_formal": "This isn't your fault."
   },
   "status": {
     "adminFeedback": {
@@ -425,7 +428,8 @@
       "title": "Star map"
     },
     "me": {
-      "title": "Your account"
+      "title": "Your account",
+      "title_formal": "Your account"
     },
     "nebula": {
       "title": "Nebula"

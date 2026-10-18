@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import i18n from '@/i18n'
 import { resolveUserLanguage } from '@/i18n/languages'
+import type { AddressContext } from '@/lib/addressForm'
 import { rememberSession } from '@/lib/devSessions'
 import { getPostLoginPath } from '@/lib/authRoutes'
 import { isSameAccount, readTabAccount } from '@/lib/tabAccount'
@@ -13,7 +14,7 @@ import { isEmailVerificationRequiredError, login, type LoginRequest } from '@/se
 import { trackEvent } from '@/services/analytics/analyticsClient'
 import { currentSessionToken, useAuthStore, waitForPendingLogout } from '@/store/authStore'
 
-export function useLoginMutation() {
+export function useLoginMutation({ context }: { context?: AddressContext } = {}) {
   const { t } = useTranslation('auth')
   const setAuth = useAuthStore((state) => state.setAuth)
   const queryClient = useQueryClient()
@@ -90,7 +91,7 @@ export function useLoginMutation() {
     onError: (error) => {
       toast.error(
         isEmailVerificationRequiredError(error)
-          ? t('login.verifyFirst')
+          ? t('login.verifyFirst', { context })
           : t('login.failed'),
       )
     },

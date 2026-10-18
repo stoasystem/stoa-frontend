@@ -32,8 +32,8 @@ export function LoginForm({
   const [email, setEmail] = useState(initialEmail)
   const [password, setPassword] = useState('')
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({})
-  const loginMutation = useLoginMutation()
-  const loginSchema = createLoginSchema(t)
+  const loginMutation = useLoginMutation({ context })
+  const loginSchema = createLoginSchema(t, context)
   const verificationBlocked = loginMutation.isError && isEmailVerificationRequiredError(loginMutation.error)
 
   return (

@@ -1,6 +1,7 @@
 import { z } from 'zod'
 import type { TFunction } from 'i18next'
 import { supportedLanguages } from '@/i18n/languages'
+import type { AddressContext } from '@/lib/addressForm'
 
 export const userRoleSchema = z.enum([
   'student',
@@ -70,9 +71,11 @@ export const chatInputSchema = z.object({
   content: z.string().min(1, 'Message cannot be empty.'),
 })
 
-export function createLoginSchema(t: TFunction) {
+export function createLoginSchema(t: TFunction, context?: AddressContext) {
   return z.object({
-    email: z.string().email(t('errors:invalidEmail')),
+    // The sign-in page's own line, in its own voice (#277); the shared
+    // errors:invalidEmail is the registration form's, which says "Sie".
+    email: z.string().email(t('auth:login.invalidEmail', { context })),
     password: z.string().min(1, t('errors:required')),
   })
 }

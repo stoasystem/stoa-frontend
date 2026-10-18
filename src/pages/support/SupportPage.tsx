@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { DashboardLayout } from '@/layouts/DashboardLayout'
 import { MarketingLayout } from '@/layouts/MarketingLayout'
+import { useAddressContext } from '@/lib/addressForm'
 import { buildContactMailtoHref, stoaContactInfo } from '@/lib/brandContact'
 import { useAuthStore } from '@/store/authStore'
 
@@ -32,6 +33,9 @@ export function SupportPage() {
   const { t } = useTranslation(['support', 'common'])
   const signedIn = useAuthStore((state) => state.isAuthenticated && state.user !== null)
   const Layout = signedIn ? DashboardLayout : MarketingLayout
+  // Signed out, the page keeps its own "Sie" / "vous"; a signed-in student
+  // reads "du" / "tu" (#277).
+  const context = useAddressContext()
   const contactHref = buildContactMailtoHref(t('support:contactSubject'))
 
   const toItems = (value: unknown) =>
@@ -43,7 +47,7 @@ export function SupportPage() {
         <PageHeader
           eyebrow={t('support:eyebrow')}
           title={t('support:title')}
-          description={t('support:description')}
+          description={t('support:description', { context })}
           actions={
             <>
               <Button variant="outline" asChild>
@@ -72,9 +76,9 @@ export function SupportPage() {
           {sectionKeys.map(({ key, icon }) => (
             <SupportInfoSection
               key={key}
-              title={t(`support:sections.${key}.title`)}
+              title={t(`support:sections.${key}.title`, { context })}
               icon={icon}
-              items={toItems(t(`support:sections.${key}.items`, { returnObjects: true }))}
+              items={toItems(t(`support:sections.${key}.items`, { returnObjects: true, context }))}
             />
           ))}
         </section>
@@ -88,7 +92,7 @@ export function SupportPage() {
               <CardTitle className="text-xl">{t('support:contact')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4 text-sm leading-6 text-muted-foreground">
-              <p>{t('support:contactCard.requestText')}</p>
+              <p>{t('support:contactCard.requestText', { context })}</p>
               <p>{t('support:contactCard.generalText')}</p>
               <p>
                 <span className="font-medium text-foreground">

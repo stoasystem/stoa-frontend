@@ -2,6 +2,7 @@
   "title": "Support and feedback",
   "eyebrow": "STOA help",
   "description": "Get help with STOA, understand teacher support in the learning path, and contact the team when you need us.",
+  "description_informal": "Get help with STOA, understand teacher support in the learning path, and contact the team when you need us.",
   "viewOnboarding": "View account setup",
   "contact": "Contact STOA",
   "contactSubject": "STOA support request",
@@ -28,6 +29,11 @@
         "Tell us about broken pages, missing data, confusing screens, or anything that stops you from working.",
         "Include the page you were on, what you expected, and what happened instead.",
         "Never send passwords, access codes, or complete chat transcripts in a support message."
+      ],
+      "items_informal": [
+        "Tell us about broken pages, missing data, confusing screens, or anything that stops you from working.",
+        "Include the page you were on, what you expected, and what happened instead.",
+        "Never send passwords, access codes, or complete chat transcripts in a support message."
       ]
     },
     "teacherHelp": {
@@ -36,11 +42,22 @@
         "Ask for teacher help when a student needs a real teacher to look at a learning question from Chat.",
         "Contact support when your account, your access, a report, or the app itself is not working.",
         "The status of a teacher help request stays in Chat; everything else belongs in support."
+      ],
+      "items_informal": [
+        "Ask for teacher help when a student needs a real teacher to look at a learning question from Chat.",
+        "Contact support when your account, your access, a report, or the app itself is not working.",
+        "The status of a teacher help request stays in Chat; everything else belongs in support."
       ]
     },
     "expectations": {
       "title": "What to expect from STOA",
+      "title_informal": "What to expect from STOA",
       "items": [
+        "STOA focuses on learning help that is reliable and easy to follow, and new features arrive step by step.",
+        "If something looks unfinished or unclear, tell us: your message helps us decide what to improve next.",
+        "If a problem is blocking a lesson right now, say so in your message so we can look at it first."
+      ],
+      "items_informal": [
         "STOA focuses on learning help that is reliable and easy to follow, and new features arrive step by step.",
         "If something looks unfinished or unclear, tell us: your message helps us decide what to improve next.",
         "If a problem is blocking a lesson right now, say so in your message so we can look at it first."
@@ -49,6 +66,7 @@
   },
   "contactCard": {
     "requestText": "Write to us about access problems, errors, questions about a report, or anything you are unsure about.",
+    "requestText_informal": "Write to us about access problems, errors, questions about a report, or anything you are unsure about.",
     "generalText": "The same address works for general questions about STOA, parent support, teacher applications, and school partnerships.",
     "emailLabel": "Email address"
   },

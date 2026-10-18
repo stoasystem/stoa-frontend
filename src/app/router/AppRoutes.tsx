@@ -22,6 +22,7 @@ import {
   type RouteAccess,
 } from '@/app/router/routeManifest'
 import { PageErrorBoundary } from '@/components/common/AppErrorBoundary'
+import { useAddressContext } from '@/lib/addressForm'
 import { useAuthStore } from '@/store/authStore'
 
 // Tests and the account menu read who a route admits from here too.
@@ -120,11 +121,13 @@ function RefusedPageSwitch({ access, refused }: { access: RouteAccess; refused: 
  */
 function PageTitle({ titleKey }: { titleKey: string }) {
   const { t, i18n } = useTranslation()
+  // /me is "Ihr Konto" to an administrator (#277).
+  const context = useAddressContext()
 
   useEffect(() => {
-    const name = t(titleKey)
+    const name = t(titleKey, { context })
     document.title = name && name !== titleKey ? `${name} · STOA` : 'STOA'
-  }, [t, titleKey, i18n.resolvedLanguage])
+  }, [t, titleKey, context, i18n.resolvedLanguage])
 
   return null
 }

@@ -52,6 +52,7 @@
   },
   "errorBoundary": {
     "body": "Riprova o ricarica la pagina.",
+    "body_formal": "Riprova o ricarica la pagina.",
     "pageBody": "Riprova o ricarica la pagina. Dalla barra in alto puoi comunque andare altrove.",
     "pageTitle": "Non è stato possibile mostrare questa pagina",
     "reload": "Ricarica la pagina",
@@ -110,6 +111,7 @@
       "email": "E-mail",
       "heading": "Profilo",
       "managed": "Nome e indirizzo e-mail fanno parte del tuo account. Per modificarli, rivolgiti a un amministratore.",
+      "managed_formal": "Nome e indirizzo e-mail fanno parte del tuo account. Per modificarli, rivolgiti a un amministratore.",
       "name": "Nome"
     }
   },
@@ -343,7 +345,8 @@
     }
   },
   "state": {
-    "notYourFault": "Non è colpa tua."
+    "notYourFault": "Non è colpa tua.",
+    "notYourFault_formal": "Non è colpa tua."
   },
   "status": {
     "adminFeedback": {
@@ -425,7 +428,8 @@
       "title": "Mappa stellare"
     },
     "me": {
-      "title": "Il tuo account"
+      "title": "Il tuo account",
+      "title_formal": "Il tuo account"
     },
     "nebula": {
       "title": "Nebulosa"

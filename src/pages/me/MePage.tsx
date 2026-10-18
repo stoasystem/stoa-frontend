@@ -22,6 +22,7 @@ import { usePasswordChange } from '@/features/account/usePasswordChange'
 import { languageNameKeys, useChangeLanguage } from '@/hooks/i18n/useChangeLanguage'
 import { supportedLanguages } from '@/i18n/languages'
 import { AppLayout } from '@/layouts/AppLayout'
+import { useAddressContext } from '@/lib/addressForm'
 import { useAuthStore } from '@/store/authStore'
 
 function LanguageGroup() {
@@ -90,7 +91,7 @@ function PasswordGroup() {
         style={{ borderRadius: ROW.groupRadius, padding: ROW.paddingX }}
       >
         <p className="m-0 text-[15px] leading-[1.45] text-caption" role="status">
-          {t(passwordChangeStatusKey(flow), { email: flow.maskedRecipient })}
+          {t(passwordChangeStatusKey(flow), { email: flow.maskedRecipient, context: flow.context })}
         </p>
         <PasswordChangeFields flow={flow} idPrefix="me-password" />
         {flow.step === 'done' && (
@@ -109,6 +110,8 @@ function PasswordGroup() {
 export function MePage({ titleKey = 'studentRoutes.me.title' }: { titleKey?: string }) {
   const { t } = useTranslation('common')
   const user = useAuthStore((state) => state.user)
+  // /me is open to students, administrators and the organisation roles (#277).
+  const context = useAddressContext()
 
   if (!user) return null
 
@@ -116,7 +119,7 @@ export function MePage({ titleKey = 'studentRoutes.me.title' }: { titleKey?: str
     <AppLayout>
       <div className="mx-auto flex w-full max-w-[640px] flex-col gap-[18px]">
         <h1 className="m-0 text-ink" style={{ font: 'var(--t-large)', letterSpacing: 'var(--t-large-tracking)' }}>
-          {t(titleKey)}
+          {t(titleKey, { context })}
         </h1>
 
         <div className="flex items-center gap-3.5 px-5 pb-1">
@@ -133,7 +136,7 @@ export function MePage({ titleKey = 'studentRoutes.me.title' }: { titleKey?: str
             <Row compact title={t('me.profile.name')} trailing={<span className="truncate">{user.name}</span>} />
             <Row compact title={t('me.profile.email')} trailing={<span className="truncate">{user.email}</span>} />
           </Group>
-          <p className="m-0 px-4 text-[13px] leading-[1.35] text-caption">{t('me.profile.managed')}</p>
+          <p className="m-0 px-4 text-[13px] leading-[1.35] text-caption">{t('me.profile.managed', { context })}</p>
         </div>
 
         {user.role === 'student' && <GradeGroup />}

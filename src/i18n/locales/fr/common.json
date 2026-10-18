@@ -52,6 +52,7 @@
   },
   "errorBoundary": {
     "body": "Réessaie ou recharge la page.",
+    "body_formal": "Réessayez ou rechargez la page.",
     "pageBody": "Réessayer ou recharger la page. La barre du haut permet toujours d’aller ailleurs.",
     "pageTitle": "Cette page n’a pas pu s’afficher",
     "reload": "Recharger la page",
@@ -110,6 +111,7 @@
       "email": "E-mail",
       "heading": "Profil",
       "managed": "Ton nom et ton adresse e-mail sont liés à ton compte. Pour les modifier, adresse-toi à un administrateur.",
+      "managed_formal": "Votre nom et votre adresse e-mail sont liés à votre compte. Pour les modifier, adressez-vous à un administrateur.",
       "name": "Nom"
     }
   },
@@ -343,7 +345,8 @@
     }
   },
   "state": {
-    "notYourFault": "Ce n'est pas de ta faute."
+    "notYourFault": "Ce n'est pas de ta faute.",
+    "notYourFault_formal": "Ce n’est pas de votre faute."
   },
   "status": {
     "adminFeedback": {
@@ -425,7 +428,8 @@
       "title": "Carte du ciel"
     },
     "me": {
-      "title": "Ton compte"
+      "title": "Ton compte",
+      "title_formal": "Votre compte"
     },
     "nebula": {
       "title": "Nébuleuse"

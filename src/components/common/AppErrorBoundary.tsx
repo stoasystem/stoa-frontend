@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { useLocation } from 'react-router-dom'
 import { retryFailedPageLoads } from '@/app/router/lazyPage'
 import { Button } from '@/components/ui/button'
+import { useAddressContext } from '@/lib/addressForm'
 import { AppLayout } from '@/layouts/AppLayout'
 import { reportFrontendError } from '@/services/monitoring'
 
@@ -26,13 +27,15 @@ function Recovery({ onRetry }: { onRetry: () => void }) {
 
 function ErrorFallback({ resetErrorBoundary }: { resetErrorBoundary: () => void }) {
   const { t } = useTranslation('common')
+  // Staff and parents read "Sie" / "vous" here too (#277).
+  const context = useAddressContext()
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-6 text-foreground">
       <div role="alert" className="max-w-md text-center">
         <h1 className="text-xl font-semibold">{t('errorBoundary.title')}</h1>
         <p className="mt-2 text-sm leading-6 text-muted-foreground">
-          {t('errorBoundary.body')}
+          {t('errorBoundary.body', { context })}
         </p>
         <Recovery onRetry={resetErrorBoundary} />
       </div>

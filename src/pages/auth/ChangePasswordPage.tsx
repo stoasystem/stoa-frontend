@@ -35,13 +35,13 @@ export function ChangePasswordPage() {
           {step === 'done' ? t('auth:changePassword.successTitle') : t('auth:changePassword.title')}
         </h1>
         <p className="m-0 max-w-xl text-[15px] leading-[1.45] text-caption" role="status">
-          {t(passwordChangeStatusKey(flow), { email: flow.maskedRecipient })}
+          {t(passwordChangeStatusKey(flow), { email: flow.maskedRecipient, context: flow.context })}
         </p>
 
         {mustChangePassword && step !== 'done' && (
           <div className="max-w-xl bg-ground px-4 py-3" style={{ borderRadius: 'var(--corner-button)' }} role="note">
             <p className="m-0 text-[15px] font-semibold text-ink">{t('auth:changePassword.forcedTitle')}</p>
-            <p className="m-0 mt-1 text-[15px] leading-[1.45] text-caption">{t('auth:changePassword.forcedBody')}</p>
+            <p className="m-0 mt-1 text-[15px] leading-[1.45] text-caption">{t('auth:changePassword.forcedBody', { context: flow.context })}</p>
           </div>
         )}
 
