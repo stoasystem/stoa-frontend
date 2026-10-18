@@ -110,6 +110,7 @@
       "email": "E-Mail",
       "heading": "Profil",
       "managed": "Name und E-Mail-Adresse gehören zu deinem Konto. Für eine Änderung wende dich an eine Administratorin oder einen Administrator.",
+      "managed_formal": "Name und E-Mail-Adresse gehören zu Ihrem Konto. Für eine Änderung wenden Sie sich an eine Administratorin oder einen Administrator.",
       "name": "Name"
     }
   },
@@ -343,7 +344,8 @@
     }
   },
   "state": {
-    "notYourFault": "Das liegt nicht an dir."
+    "notYourFault": "Das liegt nicht an dir.",
+    "notYourFault_formal": "Das liegt nicht an Ihnen."
   },
   "status": {
     "adminFeedback": {
@@ -425,7 +427,8 @@
       "title": "Sternkarte"
     },
     "me": {
-      "title": "Dein Konto"
+      "title": "Dein Konto",
+      "title_formal": "Ihr Konto"
     },
     "nebula": {
       "title": "Nebel"

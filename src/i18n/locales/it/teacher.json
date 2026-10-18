@@ -141,7 +141,7 @@
   },
   "aiTools": {
     "title": "Strumenti IA per docenti",
-    "description": "Preparate, dal contesto visibile dell’allievo, bozze che rivedete voi stessi.",
+    "description": "Prepara, dal contesto visibile dell’allievo, bozze che poi rivedi tu.",
     "draftOnly": "Solo bozza",
     "generate": "Genera",
     "noDraft": "Nessuna bozza ancora.",
@@ -189,7 +189,7 @@
   },
   "reply": {
     "label": "Risposta del/la docente",
-    "placeholder": "Scrivete il prossimo passo per l’allievo.",
+    "placeholder": "Scrivi il prossimo passo per l’allievo.",
     "queued_one": "{{count}} blocco pronto",
     "queued_other": "{{count}} blocchi pronti",
     "addBlock": "Aggiungi blocco",

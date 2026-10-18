@@ -1,6 +1,7 @@
 import { type FormEvent, useState } from 'react'
 import { useMutation } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
+import { useAddressContext } from '@/lib/addressForm'
 import { isCompliantPassword } from '@/lib/validation'
 import { toUserFacingError } from '@/lib/userFacingText'
 import { ApiError } from '@/services/api/httpClient'
@@ -22,6 +23,8 @@ export function usePasswordChange() {
   const { t } = useTranslation(['auth', 'common', 'errors'])
   const user = useAuthStore((state) => state.user)
   const setUser = useAuthStore((state) => state.setUser)
+  // The flow is shared by every role; its lines follow the reader (#277).
+  const context = useAddressContext()
   const [step, setStep] = useState<PasswordChangeStep>('verifyCurrent')
   const [currentPassword, setCurrentPassword] = useState('')
   const [code, setCode] = useState('')
@@ -108,11 +111,13 @@ export function usePasswordChange() {
   const errorCode = activeError instanceof ApiError ? activeError.code : undefined
   const errorText = activeError
     ? t(`auth:changePassword.errors.${errorCode}`, {
-      defaultValue: toUserFacingError(activeError, t('auth:changePassword.failed')),
+      context,
+      defaultValue: toUserFacingError(activeError, t('auth:changePassword.failed', { context })),
     })
     : null
 
   return {
+    context,
     step,
     mustChangePassword: user?.mustChangePassword ?? false,
     maskedRecipient,

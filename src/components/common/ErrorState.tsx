@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Murmi } from '@/components/brand/Murmi'
+import { useAddressContext } from '@/lib/addressForm'
 
 type ErrorStateProps = {
   title?: string
@@ -16,6 +17,8 @@ type ErrorStateProps = {
 
 export function ErrorState({ title, message, action, reassure = true }: ErrorStateProps) {
   const { t } = useTranslation('common')
+  // Staff and parents read it with "Sie" / "vous" (#277).
+  const context = useAddressContext()
 
   return (
     <div
@@ -33,7 +36,7 @@ export function ErrorState({ title, message, action, reassure = true }: ErrorSta
         {title && <p className="m-0 text-base font-semibold text-foreground">{title}</p>}
         <p className={`${title ? 'mt-2 ' : 'm-0 '}text-sm leading-6 text-destructive`}>{message}</p>
         {reassure && (
-          <p className="mt-2 mb-0 text-sm leading-6 text-muted-foreground">{t('state.notYourFault')}</p>
+          <p className="mt-2 mb-0 text-sm leading-6 text-muted-foreground">{t('state.notYourFault', { context })}</p>
         )}
       </div>
       {action && <div>{action}</div>}

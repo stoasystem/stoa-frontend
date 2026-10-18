@@ -2,6 +2,7 @@
   "title": "Aide et retour",
   "eyebrow": "Aide STOA",
   "description": "Obtenez de l’aide avec STOA, comprenez l’accompagnement enseignant dans le parcours d’apprentissage et contactez l’équipe si nécessaire.",
+  "description_informal": "Obtiens de l’aide avec STOA, comprends l’accompagnement enseignant dans le parcours d’apprentissage et contacte l’équipe si nécessaire.",
   "viewOnboarding": "Voir la configuration",
   "contact": "Contacter STOA",
   "contactSubject": "Demande d’assistance STOA",
@@ -28,6 +29,11 @@
         "Signalez-nous les pages cassées, les données manquantes, les écrans confus ou tout ce qui vous empêche de travailler.",
         "Indiquez la page où vous étiez, ce que vous attendiez et ce qui s’est passé à la place.",
         "N’envoyez jamais de mots de passe, de codes d’accès ou de transcriptions de chat complètes dans un message d’assistance."
+      ],
+      "items_informal": [
+        "Signale-nous les pages cassées, les données manquantes, les écrans confus ou tout ce qui t’empêche de travailler.",
+        "Indique la page où tu étais, ce que tu attendais et ce qui s’est passé à la place.",
+        "N’envoie jamais de mots de passe, de codes d’accès ou de transcriptions de chat complètes dans un message d’assistance."
       ]
     },
     "teacherHelp": {
@@ -36,19 +42,31 @@
         "Demandez l’aide d’un enseignant lorsqu’une question d’apprentissage du Chat doit être revue par une personne.",
         "Contactez l’assistance lorsque votre compte, votre accès, un rapport ou l’application elle-même ne fonctionne pas.",
         "Le suivi d’une demande d’aide reste dans le Chat ; tout le reste relève de l’assistance."
+      ],
+      "items_informal": [
+        "Demande l’aide d’un enseignant lorsqu’une question d’apprentissage du Chat doit être revue par une personne.",
+        "Contacte l’assistance lorsque ton compte, ton accès, un rapport ou l’application elle-même ne fonctionne pas.",
+        "Le suivi d’une demande d’aide reste dans le Chat ; tout le reste relève de l’assistance."
       ]
     },
     "expectations": {
       "title": "Ce que STOA vous apporte",
+      "title_informal": "Ce que STOA t’apporte",
       "items": [
         "STOA privilégie une aide à l’apprentissage fiable et facile à suivre ; les nouvelles fonctions arrivent progressivement.",
         "Si quelque chose semble inachevé ou peu clair, écrivez-nous : votre message nous aide à choisir la prochaine amélioration.",
         "Si un problème bloque un cours en ce moment, précisez-le dans votre message pour que nous le traitions en priorité."
+      ],
+      "items_informal": [
+        "STOA privilégie une aide à l’apprentissage fiable et facile à suivre ; les nouvelles fonctions arrivent progressivement.",
+        "Si quelque chose semble inachevé ou peu clair, écris-nous : ton message nous aide à choisir la prochaine amélioration.",
+        "Si un problème bloque un cours en ce moment, précise-le dans ton message pour que nous le traitions en priorité."
       ]
     }
   },
   "contactCard": {
     "requestText": "Écrivez-nous en cas de problème d’accès, d’erreur, de question sur un rapport ou de doute quelconque.",
+    "requestText_informal": "Écris-nous en cas de problème d’accès, d’erreur, de question sur un rapport ou de doute quelconque.",
     "generalText": "La même adresse répond aux questions générales sur STOA, au soutien aux parents, aux candidatures d’enseignants et aux partenariats scolaires.",
     "emailLabel": "Adresse e-mail"
   },

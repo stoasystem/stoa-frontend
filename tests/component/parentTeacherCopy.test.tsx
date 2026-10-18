@@ -296,8 +296,9 @@ describe('the student account page keeps one form of address', () => {
   )
 
   it('addresses the reader informally in every password error', () => {
+    // `_formal` lines are what staff and parents read (#277); the plain ones are the student's.
     const errors = changePassword.errors as Record<string, string>
-    const formal = Object.entries(errors).filter(([, value]) => FORMAL.test(value))
+    const formal = Object.entries(errors).filter(([key, value]) => !key.endsWith('_formal') && FORMAL.test(value))
 
     expect(formal.map(([key]) => key)).toEqual([])
   })

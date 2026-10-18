@@ -2,6 +2,7 @@
   "title": "Assistenza e feedback",
   "eyebrow": "Assistenza STOA",
   "description": "Ricevi aiuto con STOA, capisci il supporto dell’insegnante nel percorso di studio e contatta il team quando serve.",
+  "description_informal": "Ricevi aiuto con STOA, capisci il supporto dell’insegnante nel percorso di studio e contatta il team quando serve.",
   "viewOnboarding": "Vedi configurazione",
   "contact": "Contatta STOA",
   "contactSubject": "Richiesta di assistenza STOA",
@@ -28,6 +29,11 @@
         "Segnalaci pagine che non funzionano, dati mancanti, schermate poco chiare o qualsiasi cosa ti blocchi.",
         "Indica la pagina in cui ti trovavi, che cosa ti aspettavi e che cosa è successo invece.",
         "Non inviare mai password, codici di accesso o trascrizioni complete della chat in un messaggio di assistenza."
+      ],
+      "items_informal": [
+        "Segnalaci pagine che non funzionano, dati mancanti, schermate poco chiare o qualsiasi cosa ti blocchi.",
+        "Indica la pagina in cui ti trovavi, che cosa ti aspettavi e che cosa è successo invece.",
+        "Non inviare mai password, codici di accesso o trascrizioni complete della chat in un messaggio di assistenza."
       ]
     },
     "teacherHelp": {
@@ -36,11 +42,22 @@
         "Chiedi l’aiuto di un insegnante quando una domanda di studio nata in Chat deve essere vista da una persona.",
         "Contatta l’assistenza quando il tuo account, l’accesso, un report o l’app stessa non funzionano.",
         "Lo stato di una richiesta all’insegnante resta in Chat; tutto il resto riguarda l’assistenza."
+      ],
+      "items_informal": [
+        "Chiedi l’aiuto di un insegnante quando una domanda di studio nata in Chat deve essere vista da una persona.",
+        "Contatta l’assistenza quando il tuo account, l’accesso, un report o l’app stessa non funzionano.",
+        "Lo stato di una richiesta all’insegnante resta in Chat; tutto il resto riguarda l’assistenza."
       ]
     },
     "expectations": {
       "title": "Che cosa offre STOA",
+      "title_informal": "Che cosa offre STOA",
       "items": [
+        "STOA punta su un aiuto allo studio affidabile e facile da seguire, e le nuove funzioni arrivano passo dopo passo.",
+        "Se qualcosa sembra incompleto o poco chiaro, scrivici: il tuo messaggio ci aiuta a decidere che cosa migliorare.",
+        "Se un problema sta bloccando una lezione in corso, scrivilo nel messaggio così lo guardiamo per primo."
+      ],
+      "items_informal": [
         "STOA punta su un aiuto allo studio affidabile e facile da seguire, e le nuove funzioni arrivano passo dopo passo.",
         "Se qualcosa sembra incompleto o poco chiaro, scrivici: il tuo messaggio ci aiuta a decidere che cosa migliorare.",
         "Se un problema sta bloccando una lezione in corso, scrivilo nel messaggio così lo guardiamo per primo."
@@ -49,6 +66,7 @@
   },
   "contactCard": {
     "requestText": "Scrivici per problemi di accesso, errori, domande su un report o qualsiasi dubbio.",
+    "requestText_informal": "Scrivici per problemi di accesso, errori, domande su un report o qualsiasi dubbio.",
     "generalText": "Lo stesso indirizzo vale per domande generali su STOA, supporto ai genitori, candidature degli insegnanti e collaborazioni con le scuole.",
     "emailLabel": "Indirizzo e-mail"
   },

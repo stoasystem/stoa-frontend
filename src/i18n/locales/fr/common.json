@@ -110,6 +110,7 @@
       "email": "E-mail",
       "heading": "Profil",
       "managed": "Ton nom et ton adresse e-mail sont liés à ton compte. Pour les modifier, adresse-toi à un administrateur.",
+      "managed_formal": "Votre nom et votre adresse e-mail sont liés à votre compte. Pour les modifier, adressez-vous à un administrateur.",
       "name": "Nom"
     }
   },
@@ -343,7 +344,8 @@
     }
   },
   "state": {
-    "notYourFault": "Ce n'est pas de ta faute."
+    "notYourFault": "Ce n'est pas de ta faute.",
+    "notYourFault_formal": "Ce n’est pas de votre faute."
   },
   "status": {
     "adminFeedback": {
@@ -425,7 +427,8 @@
       "title": "Carte du ciel"
     },
     "me": {
-      "title": "Ton compte"
+      "title": "Ton compte",
+      "title_formal": "Votre compte"
     },
     "nebula": {
       "title": "Nébuleuse"

@@ -2,6 +2,7 @@
   "title": "Hilfe und Rückmeldung",
   "eyebrow": "STOA Hilfe",
   "description": "Hier erhalten Sie Hilfe zu STOA, zur Unterstützung durch Lehrpersonen und zum Kontakt mit dem STOA-Team.",
+  "description_informal": "Hier bekommst du Hilfe zu STOA, zur Unterstützung durch Lehrpersonen und zum Kontakt mit dem STOA-Team.",
   "viewOnboarding": "Kontoeinrichtung ansehen",
   "contact": "STOA kontaktieren",
   "contactSubject": "STOA Supportanfrage",
@@ -28,6 +29,11 @@
         "Melden Sie uns fehlerhafte Seiten, fehlende Daten, unklare Ansichten oder alles, was Sie beim Arbeiten blockiert.",
         "Nennen Sie die Seite, auf der Sie waren, was Sie erwartet haben und was stattdessen passiert ist.",
         "Senden Sie niemals Passwörter, Zugangscodes oder vollständige Chatverläufe in einer Supportnachricht."
+      ],
+      "items_informal": [
+        "Melde uns fehlerhafte Seiten, fehlende Daten, unklare Ansichten oder alles, was dich beim Arbeiten blockiert.",
+        "Nenne die Seite, auf der du warst, was du erwartet hast und was stattdessen passiert ist.",
+        "Sende niemals Passwörter, Zugangscodes oder vollständige Chatverläufe in einer Supportnachricht."
       ]
     },
     "teacherHelp": {
@@ -36,19 +42,31 @@
         "Fordern Sie die Hilfe einer Lehrperson an, wenn eine Lernfrage aus dem Chat von einem Menschen angeschaut werden soll.",
         "Wenden Sie sich an den Support, wenn Ihr Konto, Ihr Zugang, ein Bericht oder die App selbst nicht funktioniert.",
         "Der Status einer Anfrage an die Lehrperson bleibt im Chat; alles andere gehört zum Support."
+      ],
+      "items_informal": [
+        "Fordere die Hilfe einer Lehrperson an, wenn eine Lernfrage aus dem Chat von einem Menschen angeschaut werden soll.",
+        "Wende dich an den Support, wenn dein Konto, dein Zugang, ein Bericht oder die App selbst nicht funktioniert.",
+        "Der Status einer Anfrage an die Lehrperson bleibt im Chat; alles andere gehört zum Support."
       ]
     },
     "expectations": {
       "title": "Was Sie von STOA erwarten können",
+      "title_informal": "Was du von STOA erwarten kannst",
       "items": [
         "STOA setzt auf zuverlässige und gut verständliche Lernhilfe, neue Funktionen kommen Schritt für Schritt dazu.",
         "Wenn etwas unfertig oder unklar wirkt, schreiben Sie uns: Ihre Rückmeldung zeigt uns, was als Nächstes besser werden soll.",
         "Wenn ein Problem gerade eine Lernstunde blockiert, schreiben Sie das dazu, damit wir uns zuerst darum kümmern."
+      ],
+      "items_informal": [
+        "STOA setzt auf zuverlässige und gut verständliche Lernhilfe, neue Funktionen kommen Schritt für Schritt dazu.",
+        "Wenn etwas unfertig oder unklar wirkt, schreib uns: Deine Rückmeldung zeigt uns, was als Nächstes besser werden soll.",
+        "Wenn ein Problem gerade eine Lernstunde blockiert, schreib das dazu, damit wir uns zuerst darum kümmern."
       ]
     }
   },
   "contactCard": {
     "requestText": "Schreiben Sie uns bei Zugangsproblemen, Fehlern, Fragen zu einem Bericht oder wenn Sie bei etwas unsicher sind.",
+    "requestText_informal": "Schreib uns bei Zugangsproblemen, Fehlern, Fragen zu einem Bericht oder wenn du bei etwas unsicher bist.",
     "generalText": "Dieselbe Adresse gilt für allgemeine Fragen zu STOA, Elternunterstützung, Bewerbungen von Lehrpersonen und Schulpartnerschaften.",
     "emailLabel": "E-Mail-Adresse"
   },

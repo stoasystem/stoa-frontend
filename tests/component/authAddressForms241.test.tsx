@@ -21,8 +21,9 @@ import { readTabSignOut, rememberTabAccount, signOutTab } from '@/lib/tabAccount
 import { LoginPage } from '@/pages/login/LoginPage'
 
 const AUTH = { de: deAuth, en: enAuth, fr: frAuth, it: itAuth }
-const STAFF = ['admin', 'teacher', 'organization_admin', 'school_teacher', 'school_viewer'] as const
-const FAMILY = ['student', 'parent'] as const
+// Parents read "Sie" too, as parent.json does (#277).
+const STAFF = ['admin', 'teacher', 'organization_admin', 'school_teacher', 'school_viewer', 'parent'] as const
+const FAMILY = ['student'] as const
 
 function renderReauth(role: string | undefined) {
   const account = { email: 'x@test.stoaedu.ch', name: 'Xe', ...(role ? { role } : {}) }
@@ -70,7 +71,11 @@ describe('which roles are addressed formally', () => {
     expect(addressContext(role)).toBe('formal')
   })
 
-  it.each([...FAMILY, undefined, '', 'nobody_knows'])('%s is not', (role) => {
+  it.each(FAMILY)('%s is informally', (role) => {
+    expect(addressContext(role)).toBe('informal')
+  })
+
+  it.each([undefined, '', 'nobody_knows'])('%s is not known', (role) => {
     expect(addressContext(role)).toBeUndefined()
   })
 })
