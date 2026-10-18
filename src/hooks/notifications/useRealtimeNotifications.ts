@@ -40,7 +40,6 @@ export function useRealtimeNotifications() {
     }
 
     let stopped = false
-    let suppressCloseReconnect = false
 
     const invalidateNotificationQueries = () => {
       void queryClient.invalidateQueries({ queryKey: notificationQueryKeys.list() })
@@ -71,12 +70,15 @@ export function useRealtimeNotifications() {
       reconnectRef.current = window.setTimeout(() => connect(true), delay)
     }
 
-    const closeSocket = (suppressReconnect = false) => {
+    // A socket is dropped from socketRef before it is closed, so its handlers
+    // see it is no longer the current one and neither reconnect nor beat
+    // (#273: an `online` during a pending reconnect left a second socket and a
+    // second heartbeat open, and one survived sign-out).
+    const closeSocket = () => {
       clearHeartbeat()
       const socket = socketRef.current
       socketRef.current = null
       if (socket && socket.readyState !== WebSocket.CLOSED) {
-        suppressCloseReconnect = suppressReconnect
         socket.close()
       }
     }
@@ -90,15 +92,21 @@ export function useRealtimeNotifications() {
       }
 
       setStatus(retry ? 'reconnecting' : 'connecting')
+      // One connection at a time: whatever was pending or open goes first.
+      clearReconnect()
+      closeSocket()
 
       try {
         const socket = new WebSocket(buildRealtimeNotificationUrl(websocketBaseUrl, accessToken, user))
         socketRef.current = socket
+        const isCurrent = () => socketRef.current === socket
 
         socket.onopen = () => {
+          if (!isCurrent()) return
           attemptsRef.current = 0
           setStatus('live')
           socket.send(realtimeSubscriptionMessage(user))
+          clearHeartbeat()
           heartbeatRef.current = window.setInterval(() => {
             if (socket.readyState === WebSocket.OPEN) {
               socket.send(heartbeatMessage())
@@ -107,7 +115,7 @@ export function useRealtimeNotifications() {
         }
 
         socket.onmessage = (message) => {
-          if (typeof message.data !== 'string') return
+          if (!isCurrent() || typeof message.data !== 'string') return
           const event = parseRealtimeNotificationMessage(message.data)
           if (event) {
             mergeRealtimeNotification(queryClient, event, user)
@@ -115,20 +123,16 @@ export function useRealtimeNotifications() {
         }
 
         socket.onerror = () => {
+          if (!isCurrent()) return
           setStatus('fallback')
           invalidateNotificationQueries()
           socket.close()
         }
 
         socket.onclose = () => {
+          if (!isCurrent()) return
           clearHeartbeat()
-          if (suppressCloseReconnect) {
-            suppressCloseReconnect = false
-            return
-          }
-          if (!stopped) {
-            scheduleReconnect()
-          }
+          scheduleReconnect()
         }
       } catch {
         setStatus('fallback')
@@ -137,6 +141,7 @@ export function useRealtimeNotifications() {
     }
 
     const handleOnline = () => {
+      if (socketRef.current?.readyState === WebSocket.OPEN) return
       attemptsRef.current = 0
       connect(true)
     }
@@ -144,7 +149,8 @@ export function useRealtimeNotifications() {
     const handleOffline = () => {
       setStatus('offline')
       invalidateNotificationQueries()
-      closeSocket(true)
+      clearReconnect()
+      closeSocket()
     }
 
     window.addEventListener('online', handleOnline)
