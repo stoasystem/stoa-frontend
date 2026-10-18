@@ -1,8 +1,7 @@
-import { type FormEvent, useMemo, useState } from 'react'
+import { type FormEvent, useMemo, useRef, useState } from 'react'
 import type { TFunction } from 'i18next'
 import { AlertTriangle, CheckCircle2, FileText, GitCompare, History, Save, UploadCloud } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
-import { ApiError } from '@/services/api/httpClient'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -12,6 +11,9 @@ import { Textarea } from '@/components/ui/textarea'
 import { PageContainer } from '@/components/common/PageContainer'
 import { PageHeader } from '@/components/common/PageHeader'
 import { DashboardLayout } from '@/layouts/DashboardLayout'
+import { formatDateTime } from '@/lib/formatDateTime'
+import type { CurriculumAction, CurriculumReviewStep } from '@/pages/admin/CurriculumActionDialog'
+import { CurriculumActionDialog } from '@/pages/admin/CurriculumActionDialog'
 import { curriculumErrorMessage } from '@/pages/admin/curriculumErrorMessage'
 import {
   useApplyCurriculumMigrationMutation,
@@ -77,16 +79,27 @@ const starterManifest = JSON.stringify(
 export function AdminCurriculumPage() {
   const { t } = useTranslation('admin')
   const [selected, setSelected] = useState<CurriculumVersion | null>(null)
-  const [patchJson, setPatchJson] = useState('{\n  "title": "Updated title"\n}')
+  // #258: an empty patch, not an English "Updated title" a save would write.
+  const [patchJson, setPatchJson] = useState('{}')
+  const [patchJsonInvalid, setPatchJsonInvalid] = useState(false)
   const [fromVersionId, setFromVersionId] = useState('')
   const [toVersionId, setToVersionId] = useState('')
   const [validationEnabled, setValidationEnabled] = useState(false)
   const [auditEnabled, setAuditEnabled] = useState(false)
   const [diffEnabled, setDiffEnabled] = useState(false)
   const [manifestJson, setManifestJson] = useState(starterManifest)
-  const [confirmationToken, setConfirmationToken] = useState('')
+  const [manifestJsonInvalid, setManifestJsonInvalid] = useState(false)
+  // The manifest exactly as it was dry-run: apply sends this one, never the
+  // editor's text, which may have changed since (#258).
+  const [dryRunManifest, setDryRunManifest] = useState<Record<string, unknown> | null>(null)
   const [evidenceId, setEvidenceId] = useState('')
   const [evidenceEnabled, setEvidenceEnabled] = useState(false)
+  const [action, setAction] = useState<CurriculumAction | null>(null)
+  const [actionError, setActionError] = useState<string | null>(null)
+  const [notice, setNotice] = useState<string | null>(null)
+  // #258: one write at a time. A double click sent two publishes; the ref
+  // closes the gap before `isPending` reaches the next render.
+  const inFlight = useRef(false)
 
   const worklistQuery = useCurriculumWorklistQuery()
   const selectedPublicId = selected?.publicLessonId
@@ -108,6 +121,13 @@ export function AdminCurriculumPage() {
   const selectedPreview = previewQuery.data
   const worklist = worklistQuery.data?.items ?? []
   const selectedVersion = selectedPreview ?? selected
+  const reviewBusy =
+    action !== null ||
+    submitReviewMutation.isPending ||
+    approveMutation.isPending ||
+    requestChangesMutation.isPending ||
+    publishMutation.isPending
+  const dryRun = dryRunManifest ? dryRunMutation.data : undefined
 
   function selectVersion(version: CurriculumVersion) {
     setSelected(version)
@@ -115,35 +135,131 @@ export function AdminCurriculumPage() {
     setValidationEnabled(false)
     setAuditEnabled(false)
     setDiffEnabled(false)
+    setNotice(null)
   }
 
   function savePatch(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     if (!selectedPublicId || !selectedVersionId) return
+    const payload = parseJsonObject(patchJson)
+    setPatchJsonInvalid(payload === null)
+    if (!payload) return
     patchMutation.mutate({
       publicLessonId: selectedPublicId,
       versionId: selectedVersionId,
-      payload: parseJson(patchJson, t),
+      payload,
     })
+  }
+
+  function changeManifest(value: string) {
+    setManifestJson(value)
+    setManifestJsonInvalid(false)
+    // A dry run vouches for the manifest it read, not for this one.
+    setDryRunManifest(null)
+    dryRunMutation.reset()
+    applyMutation.reset()
   }
 
   function runDryRun(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    dryRunMutation.mutate(parseJson(manifestJson, t), {
+    const manifest = parseJsonObject(manifestJson)
+    setManifestJsonInvalid(manifest === null)
+    if (!manifest) return
+    setDryRunManifest(null)
+    applyMutation.reset()
+    dryRunMutation.mutate(manifest, {
       onSuccess: (data) => {
-        setConfirmationToken(data.confirmationToken)
+        setDryRunManifest(manifest)
         setEvidenceId(data.migrationId)
       },
     })
   }
 
-  function applyMigration() {
-    if (!dryRunMutation.data) return
-    applyMutation.mutate({
-      migrationId: dryRunMutation.data.migrationId,
-      manifest: parseJson(manifestJson, t),
-      confirmationToken,
+  function submitReview() {
+    if (!selectedPublicId || !selectedVersionId || inFlight.current) return
+    inFlight.current = true
+    setNotice(null)
+    submitReviewMutation.mutate(
+      { publicLessonId: selectedPublicId, versionId: selectedVersionId },
+      {
+        onSettled: () => {
+          inFlight.current = false
+        },
+        onSuccess: () => setNotice(t('curriculum.notice.submitted', { version: selectedVersionId })),
+      },
+    )
+  }
+
+  function openReviewStep(kind: CurriculumReviewStep) {
+    if (!selectedPublicId || !selectedVersionId || reviewBusy) return
+    setActionError(null)
+    setNotice(null)
+    setAction({
+      kind,
+      publicLessonId: selectedPublicId,
+      versionId: selectedVersionId,
+      liveVersionId: liveVersionOf(worklist, selectedPublicId),
     })
+  }
+
+  function openApply() {
+    if (!dryRun || action) return
+    setActionError(null)
+    setAction({ kind: 'apply', migrationId: dryRun.migrationId, summary: dryRun.summary })
+  }
+
+  function confirmAction(chosen: CurriculumAction, reason: string) {
+    if (inFlight.current) return
+    inFlight.current = true
+    setActionError(null)
+    const settle = {
+      onSettled: () => {
+        inFlight.current = false
+      },
+      // The dialog sits over the page, so a refusal is said inside it and the
+      // reason stays for a retry. Success closes it.
+      onError: (error: unknown) => setActionError(curriculumErrorMessage(error, t)),
+    }
+    const done = (message?: string) => {
+      setAction(null)
+      if (message) setNotice(message)
+    }
+    if (chosen.kind === 'apply') {
+      if (!dryRun || !dryRunManifest) {
+        inFlight.current = false
+        return
+      }
+      applyMutation.mutate(
+        { migrationId: chosen.migrationId, manifest: dryRunManifest, confirmationToken: dryRun.confirmationToken },
+        { ...settle, onSuccess: () => done() },
+      )
+      return
+    }
+    const target = { publicLessonId: chosen.publicLessonId, versionId: chosen.versionId }
+    if (chosen.kind === 'approve') {
+      approveMutation.mutate(target, {
+        ...settle,
+        onSuccess: () => done(t('curriculum.notice.approved', { version: chosen.versionId })),
+      })
+    } else if (chosen.kind === 'requestChanges') {
+      requestChangesMutation.mutate({ ...target, reason }, {
+        ...settle,
+        onSuccess: () => done(t('curriculum.notice.changesRequested', { version: chosen.versionId })),
+      })
+    } else {
+      // The version believed live goes with the publish, so the backend
+      // refuses it (409 stale_pointer) if someone else published since.
+      publishMutation.mutate({ ...target, expectedPublishedVersionId: chosen.liveVersionId, reason }, {
+        ...settle,
+        onSuccess: () => done(t('curriculum.notice.published', { version: chosen.versionId })),
+      })
+    }
+  }
+
+  function cancelAction() {
+    if (inFlight.current) return
+    setAction(null)
+    setActionError(null)
   }
 
   function loadEvidence(event: FormEvent<HTMLFormElement>) {
@@ -179,6 +295,7 @@ export function AdminCurriculumPage() {
           <TabsContent value="worklist">
             <WorklistPanel
               isLoading={worklistQuery.isLoading}
+              failed={worklistQuery.isError || Boolean(worklistQuery.data?.permissionDenied)}
               items={worklist}
               selectedVersionId={selectedVersionId}
               onSelect={selectVersion}
@@ -189,7 +306,11 @@ export function AdminCurriculumPage() {
             <EditorPanel
               version={selectedVersion}
               patchJson={patchJson}
-              onPatchJsonChange={setPatchJson}
+              onPatchJsonChange={(value) => {
+                setPatchJson(value)
+                setPatchJsonInvalid(false)
+              }}
+              jsonInvalid={patchJsonInvalid}
               onSubmit={savePatch}
               isSaving={patchMutation.isPending}
               error={patchMutation.error}
@@ -225,28 +346,30 @@ export function AdminCurriculumPage() {
                 setDiffEnabled(true)
                 void diffQuery.refetch()
               }}
-              onSubmitReview={() => selectedPublicId && selectedVersionId && submitReviewMutation.mutate({ publicLessonId: selectedPublicId, versionId: selectedVersionId })}
-              onApprove={() => selectedPublicId && selectedVersionId && approveMutation.mutate({ publicLessonId: selectedPublicId, versionId: selectedVersionId })}
-              onRequestChanges={() => selectedPublicId && selectedVersionId && requestChangesMutation.mutate({ publicLessonId: selectedPublicId, versionId: selectedVersionId, reason: 'Requested from curriculum console' })}
-              onPublish={() => selectedPublicId && selectedVersionId && publishMutation.mutate({ publicLessonId: selectedPublicId, versionId: selectedVersionId, expectedPublishedVersionId: null, reason: 'Published from curriculum console' })}
-              actionError={submitReviewMutation.error ?? approveMutation.error ?? requestChangesMutation.error ?? publishMutation.error}
+              onSubmitReview={submitReview}
+              onApprove={() => openReviewStep('approve')}
+              onRequestChanges={() => openReviewStep('requestChanges')}
+              onPublish={() => openReviewStep('publish')}
+              busy={reviewBusy}
+              // Publish waits for a refreshed worklist: the live version is read from it.
+              publishBusy={reviewBusy || worklistQuery.isFetching}
+              notice={notice}
+              actionError={submitReviewMutation.error}
             />
           </TabsContent>
 
           <TabsContent value="migration">
             <MigrationPanel
               manifestJson={manifestJson}
-              onManifestJsonChange={setManifestJson}
+              onManifestJsonChange={changeManifest}
+              jsonInvalid={manifestJsonInvalid}
               onDryRun={runDryRun}
-              dryRun={dryRunMutation.data}
+              dryRun={dryRun}
               dryRunError={dryRunMutation.error}
               dryRunLoading={dryRunMutation.isPending}
-              confirmationToken={confirmationToken}
-              onConfirmationTokenChange={setConfirmationToken}
-              onApply={applyMigration}
+              onApply={openApply}
               applyResult={applyMutation.data}
-              applyError={applyMutation.error}
-              applyLoading={applyMutation.isPending}
+              applyBusy={applyMutation.isPending || applyMutation.isSuccess || action !== null}
             />
           </TabsContent>
 
@@ -261,6 +384,18 @@ export function AdminCurriculumPage() {
             />
           </TabsContent>
         </Tabs>
+        <CurriculumActionDialog
+          action={action}
+          pending={
+            approveMutation.isPending ||
+            requestChangesMutation.isPending ||
+            publishMutation.isPending ||
+            applyMutation.isPending
+          }
+          error={actionError}
+          onCancel={cancelAction}
+          onConfirm={confirmAction}
+        />
       </PageContainer>
     </DashboardLayout>
   )
@@ -279,7 +414,7 @@ function CapabilityStrip() {
       </div>
       <div className="flex flex-wrap gap-2">
         {capabilities.map((capability) => (
-          <Badge key={capability} variant="outline">{capability}</Badge>
+          <Badge key={capability} variant="outline">{t(`curriculum.capabilities.names.${capability}`)}</Badge>
         ))}
       </div>
     </section>
@@ -288,17 +423,21 @@ function CapabilityStrip() {
 
 function WorklistPanel({
   isLoading,
+  failed,
   items,
   selectedVersionId,
   onSelect,
 }: {
   isLoading: boolean
+  /** The page already says why there is no list; an empty one would contradict it. */
+  failed: boolean
   items: CurriculumVersion[]
   selectedVersionId?: string
   onSelect: (version: CurriculumVersion) => void
 }) {
   const { t } = useTranslation('admin')
   if (isLoading) return <Card><CardContent className="p-5 text-sm text-muted-foreground">{t('curriculum.worklist.loading')}</CardContent></Card>
+  if (failed) return null
   if (items.length === 0) {
     return <Card><CardContent className="p-5 text-sm text-muted-foreground">{t('curriculum.worklist.empty')}</CardContent></Card>
   }
@@ -310,12 +449,12 @@ function WorklistPanel({
             <div className="min-w-0">
               <div className="flex flex-wrap items-center gap-2">
                 <h2 className="text-base font-semibold text-foreground">{item.publicLessonId}</h2>
-                <Badge variant="outline">{formatStatus(item.state, t)}</Badge>
-                {item.reviewState && <Badge variant="secondary">{formatStatus(item.reviewState, t)}</Badge>}
+                <Badge variant="outline">{translatedValue('curriculum.state', item.state, t)}</Badge>
+                {item.reviewState && <Badge variant="secondary">{translatedValue('curriculum.reviewState', item.reviewState, t)}</Badge>}
               </div>
               <p className="mt-2 text-sm text-muted-foreground">
                 {item.versionId} · {t('curriculum.worklist.updated', {
-                  at: item.updatedAt ?? t('curriculum.worklist.unknown'),
+                  at: item.updatedAt ? formatDateTime(item.updatedAt) : t('curriculum.worklist.unknown'),
                   by: item.updatedBy ?? t('curriculum.worklist.unknown'),
                 })}
               </p>
@@ -332,6 +471,7 @@ function EditorPanel({
   version,
   patchJson,
   onPatchJsonChange,
+  jsonInvalid,
   onSubmit,
   isSaving,
   error,
@@ -340,6 +480,7 @@ function EditorPanel({
   version?: CurriculumVersion | null
   patchJson: string
   onPatchJsonChange: (value: string) => void
+  jsonInvalid: boolean
   onSubmit: (event: FormEvent<HTMLFormElement>) => void
   isSaving: boolean
   error: unknown
@@ -359,7 +500,14 @@ function EditorPanel({
               <ReadOnlyField label={t('curriculum.editor.publicLesson')} value={version.publicLessonId} />
               <ReadOnlyField label={t('curriculum.editor.version')} value={version.versionId} />
             </div>
-            <Textarea value={patchJson} onChange={(event) => onPatchJsonChange(event.target.value)} className="min-h-72 font-mono text-xs" />
+            <Textarea
+              value={patchJson}
+              onChange={(event) => onPatchJsonChange(event.target.value)}
+              aria-label={t('curriculum.editor.title')}
+              aria-invalid={jsonInvalid || undefined}
+              className="min-h-72 font-mono text-xs"
+            />
+            <InvalidJson show={jsonInvalid} />
             <div className="flex flex-wrap gap-2">
               <Button type="submit" disabled={isSaving}>
                 <Save className="h-4 w-4" aria-hidden="true" />
@@ -412,6 +560,9 @@ function ReviewPanel(props: {
   onApprove: () => void
   onRequestChanges: () => void
   onPublish: () => void
+  busy: boolean
+  publishBusy: boolean
+  notice: string | null
   actionError: unknown
 }) {
   const { t } = useTranslation('admin')
@@ -425,11 +576,19 @@ function ReviewPanel(props: {
           <ApiErrorPanel error={props.validationError} />
           {props.validation && (
             <div className="space-y-2">
-              <Badge variant={props.validation.publishReady ? 'secondary' : 'outline'}>{props.validation.status}</Badge>
+              <Badge variant={props.validation.publishReady ? 'secondary' : 'outline'}>{translatedValue('curriculum.review.status', props.validation.status, t)}</Badge>
               {props.validation.issues.map((issue) => (
                 <div key={`${issue.field}-${issue.message}`} className="rounded-md border border-border/70 p-3 text-sm">
-                  <p className="font-medium text-foreground">{issue.field}</p>
-                  <p className="mt-1 text-muted-foreground">{issue.message}</p>
+                  <p className="font-medium text-foreground">
+                    {t('curriculum.review.issue', {
+                      severity: translatedValue('curriculum.review.severity', issue.severity, t),
+                      field: issue.field,
+                    })}
+                  </p>
+                  {/* The backend writes this detail in English and sends no code for it yet. */}
+                  <p className="mt-1 text-muted-foreground">
+                    {t('curriculum.review.serverDetail')} <span lang="en">{issue.message}</span>
+                  </p>
                 </div>
               ))}
             </div>
@@ -450,11 +609,12 @@ function ReviewPanel(props: {
         <CardHeader><CardTitle className="flex items-center gap-2 text-base"><History className="h-4 w-4" /> {t('curriculum.review.title')}</CardTitle></CardHeader>
         <CardContent className="space-y-3">
           <div className="flex flex-wrap gap-2">
-            <Button type="button" variant="outline" onClick={props.onSubmitReview}>{t('curriculum.review.submit')}</Button>
-            <Button type="button" variant="outline" onClick={props.onApprove}>{t('curriculum.review.approve')}</Button>
-            <Button type="button" variant="outline" onClick={props.onRequestChanges}>{t('curriculum.review.requestChanges')}</Button>
-            <Button type="button" onClick={props.onPublish}>{t('curriculum.review.publish')}</Button>
+            <Button type="button" variant="outline" onClick={props.onSubmitReview} disabled={props.busy}>{t('curriculum.review.submit')}</Button>
+            <Button type="button" variant="outline" onClick={props.onApprove} disabled={props.busy}>{t('curriculum.review.approve')}</Button>
+            <Button type="button" variant="outline" onClick={props.onRequestChanges} disabled={props.busy}>{t('curriculum.review.requestChanges')}</Button>
+            <Button type="button" onClick={props.onPublish} disabled={props.publishBusy}>{t('curriculum.review.publish')}</Button>
           </div>
+          <p role="status" className="text-sm text-foreground empty:hidden">{props.notice}</p>
           <Button type="button" variant="outline" onClick={props.onLoadAudit} disabled={props.auditLoading}>{t('curriculum.review.loadAudit')}</Button>
           <ApiErrorPanel error={props.actionError ?? props.auditError} />
           {props.audit?.permissionDenied && <RestrictedPanel message={t('curriculum.review.missingCapability')} />}
@@ -468,16 +628,14 @@ function ReviewPanel(props: {
 function MigrationPanel(props: {
   manifestJson: string
   onManifestJsonChange: (value: string) => void
+  jsonInvalid: boolean
   onDryRun: (event: FormEvent<HTMLFormElement>) => void
   dryRun?: CurriculumMigrationDryRunResponse
   dryRunError: unknown
   dryRunLoading: boolean
-  confirmationToken: string
-  onConfirmationTokenChange: (value: string) => void
   onApply: () => void
   applyResult?: CurriculumMigrationEvidenceResponse
-  applyError: unknown
-  applyLoading: boolean
+  applyBusy: boolean
 }) {
   const { t } = useTranslation('admin')
   return (
@@ -486,7 +644,16 @@ function MigrationPanel(props: {
         <CardHeader><CardTitle className="flex items-center gap-2 text-base"><UploadCloud className="h-4 w-4" /> {t('curriculum.migration.manifest')}</CardTitle></CardHeader>
         <CardContent>
           <form className="space-y-4" onSubmit={props.onDryRun}>
-            <Textarea value={props.manifestJson} onChange={(event) => props.onManifestJsonChange(event.target.value)} className="min-h-[32rem] font-mono text-xs" />
+            {/* Held while the dry run reads it, so the result belongs to this text. */}
+            <Textarea
+              value={props.manifestJson}
+              onChange={(event) => props.onManifestJsonChange(event.target.value)}
+              readOnly={props.dryRunLoading}
+              aria-label={t('curriculum.migration.manifest')}
+              aria-invalid={props.jsonInvalid || undefined}
+              className="min-h-[32rem] font-mono text-xs"
+            />
+            <InvalidJson show={props.jsonInvalid} />
             <Button type="submit" disabled={props.dryRunLoading}>{t('curriculum.migration.dryRun')}</Button>
           </form>
           <ApiErrorPanel error={props.dryRunError} />
@@ -502,13 +669,11 @@ function MigrationPanel(props: {
                 {props.dryRun.publishReady ? t('curriculum.migration.ready') : t('curriculum.migration.blocked')}
               </Badge>
               <CompactJson value={props.dryRun.rows} />
-              <Input value={props.confirmationToken} onChange={(event) => props.onConfirmationTokenChange(event.target.value)} placeholder={t('curriculum.migration.tokenPlaceholder')} />
-              <Button type="button" onClick={props.onApply} disabled={props.applyLoading || !props.dryRun.publishReady}>{t('curriculum.migration.apply')}</Button>
+              <Button type="button" onClick={props.onApply} disabled={props.applyBusy || !props.dryRun.publishReady}>{t('curriculum.migration.apply')}</Button>
             </>
           ) : (
             <p className="text-sm text-muted-foreground">{t('curriculum.migration.hint')}</p>
           )}
-          <ApiErrorPanel error={props.applyError} />
           {props.applyResult && <SuccessPanel message={t('curriculum.migration.applied', { migration: props.applyResult.migrationId })} />}
         </CardContent>
       </Card>
@@ -546,7 +711,7 @@ function SummaryGrid({ summary, t }: { summary: Record<string, number>; t: TFunc
     <div className="grid grid-cols-3 gap-2">
       {Object.entries(summary).map(([key, value]) => (
         <div key={key} className="rounded-md border border-border/70 p-3">
-          <p className="text-xs text-muted-foreground">{formatStatus(key, t)}</p>
+          <p className="text-xs text-muted-foreground">{translatedValue('curriculum.migration.summary', key, t)}</p>
           <p className="mt-1 text-lg font-semibold text-foreground">{value}</p>
         </div>
       ))}
@@ -593,16 +758,45 @@ function ApiErrorPanel({ error }: { error: unknown }) {
   return <div role="alert" className="mt-3 rounded-md border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive">{message}</div>
 }
 
-function parseJson(value: string, t: TFunction) {
+function InvalidJson({ show }: { show: boolean }) {
+  const { t } = useTranslation('admin')
+  if (!show) return null
+  return <p role="alert" className="text-sm text-destructive">{t('curriculum.invalidJson')}</p>
+}
+
+/**
+ * The JSON object in an editor, or `null` when it is not one. It used to throw
+ * from the click handler, outside the mutation, so the button did nothing and
+ * the error reached only the console (#258).
+ */
+function parseJsonObject(value: string): Record<string, unknown> | null {
   try {
-    return JSON.parse(value) as Record<string, unknown>
+    const parsed: unknown = JSON.parse(value)
+    return parsed !== null && typeof parsed === 'object' && !Array.isArray(parsed)
+      ? (parsed as Record<string, unknown>)
+      : null
   } catch {
-    throw new ApiError(t('curriculum.invalidJson'))
+    return null
   }
 }
 
-function formatStatus(value: string | null | undefined, t: TFunction) {
-  return String(value ?? t('curriculum.worklist.unknown')).replace(/_/g, ' ')
+/**
+ * The version the console believes is live: the newest published one in the
+ * worklist, `null` when there is none. The backend checks it against its own
+ * pointer and refuses the publish with `stale_pointer` if it is wrong, so a
+ * wrong guess is a refusal, never an overwrite (#258).
+ */
+function liveVersionOf(items: CurriculumVersion[], publicLessonId: string): string | null {
+  const published = items
+    .filter((item) => item.publicLessonId === publicLessonId && item.state === 'published')
+    .sort((a, b) => String(b.updatedAt ?? '').localeCompare(String(a.updatedAt ?? '')))
+  return published[0]?.versionId ?? null
+}
+
+/** A backend value in the reader's language; one the console has no words for yet is shown as sent. */
+function translatedValue(group: string, value: string | null | undefined, t: TFunction) {
+  if (!value) return t('curriculum.worklist.unknown')
+  return t(`${group}.${value}`, { defaultValue: value.replace(/_/g, ' ') })
 }
 
 export default AdminCurriculumPage

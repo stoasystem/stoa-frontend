@@ -668,7 +668,13 @@
     },
     "capabilities": {
       "kicker": "Autorizzazione backend",
-      "description": "La console mostra i comandi, ma ogni modifica è decisa dai controlli di capacità del backend."
+      "description": "La console mostra i comandi, ma ogni modifica è decisa dai controlli di capacità del backend.",
+      "names": {
+        "curriculum_author": "Autore",
+        "curriculum_reviewer": "Revisione",
+        "curriculum_publisher": "Pubblicazione",
+        "migration_operator": "Migrazione"
+      }
     },
     "worklist": {
       "loading": "Caricamento della lista di lavoro del programma.",
@@ -699,7 +705,17 @@
       "requestChanges": "Richiedi modifiche",
       "publish": "Pubblica",
       "loadAudit": "Carica audit",
-      "missingCapability": "Manca la capacità di revisore o di pubblicazione."
+      "missingCapability": "Manca la capacità di revisore o di pubblicazione.",
+      "status": {
+        "valid": "Valida",
+        "invalid": "Non pronta per la pubblicazione"
+      },
+      "severity": {
+        "blocking": "Bloccante",
+        "warning": "Avviso"
+      },
+      "issue": "{{severity}}: {{field}}",
+      "serverDetail": "Dettaglio del server (in inglese):"
     },
     "migration": {
       "manifest": "Manifest",
@@ -707,10 +723,17 @@
       "dryRunAndApply": "Simulazione e applicazione",
       "ready": "Pronto",
       "blocked": "Bloccato",
-      "tokenPlaceholder": "token di conferma",
       "apply": "Applica la migrazione",
-      "hint": "Avvia una simulazione per esaminare le azioni per riga e il token di conferma.",
-      "applied": "{{migration}} applicata."
+      "hint": "Avvia una simulazione per vedere cosa farebbe ogni riga prima di applicare la migrazione.",
+      "applied": "{{migration}} applicata.",
+      "summary": {
+        "total": "Totale",
+        "creates": "Nuove",
+        "updates": "Aggiornate",
+        "skips": "Saltate",
+        "conflicts": "Conflitti",
+        "errors": "Errori"
+      }
     },
     "evidence": {
       "title": "Evidenze di migrazione",
@@ -750,6 +773,50 @@
         "tooMany": "Troppe richieste. Attendi un momento e riprova.",
         "server": "Il server non è riuscito a completare la richiesta. Riprova più tardi."
       }
+    },
+    "state": {
+      "draft": "Bozza",
+      "in_review": "In revisione",
+      "changes_requested": "Modifiche richieste",
+      "approved": "Approvata",
+      "published": "Pubblicata",
+      "archived": "Archiviata"
+    },
+    "reviewState": {
+      "pending": "Revisione in attesa",
+      "approved": "Approvata",
+      "changes_requested": "Modifiche richieste"
+    },
+    "confirm": {
+      "title": {
+        "approve": "Approvare questa versione?",
+        "requestChanges": "Rimandare questa versione per modifiche?",
+        "publish": "Pubblicare questa versione?",
+        "apply": "Applicare questa migrazione?"
+      },
+      "body": {
+        "approve": "La versione {{version}} di {{lesson}} sarà segnata come approvata e potrà poi essere pubblicata.",
+        "requestChanges": "La versione {{version}} di {{lesson}} torna agli autori. Il tuo motivo viene registrato nel registro di audit.",
+        "publish": "La versione {{version}} di {{lesson}} diventerà quella che vedono gli studenti. Il tuo motivo viene registrato nel registro di audit.",
+        "apply": "La migrazione {{migration}} scriverà il manifest che hai simulato. Non si può annullare dalla console."
+      },
+      "liveVersion": "Attualmente online: {{version}}. Verrà sostituita. Se nel frattempo qualcuno ha pubblicato un’altra versione, la pubblicazione verrà rifiutata.",
+      "noLiveVersion": "Nessuna versione di questa lezione è ancora online. Se nel frattempo qualcuno ne ha pubblicata una, la pubblicazione verrà rifiutata.",
+      "applySummary": "{{creates}} nuove, {{updates}} aggiornate, {{skips}} saltate.",
+      "reason": "Motivo per il registro di audit",
+      "cancel": "Annulla",
+      "submit": {
+        "approve": "Approva",
+        "requestChanges": "Richiedi modifiche",
+        "publish": "Pubblica",
+        "apply": "Applica la migrazione"
+      }
+    },
+    "notice": {
+      "submitted": "{{version}} è stata inviata in revisione.",
+      "approved": "{{version}} è stata approvata.",
+      "changesRequested": "{{version}} è stata rimandata per modifiche.",
+      "published": "{{version}} è ora pubblicata."
     }
   },
   "operationalNotifications": {

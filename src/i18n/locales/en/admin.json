@@ -668,7 +668,13 @@
     },
     "capabilities": {
       "kicker": "Backend authorization",
-      "description": "The console shows controls, but backend capability checks decide every mutation."
+      "description": "The console shows controls, but backend capability checks decide every mutation.",
+      "names": {
+        "curriculum_author": "Author",
+        "curriculum_reviewer": "Reviewer",
+        "curriculum_publisher": "Publisher",
+        "migration_operator": "Migration operator"
+      }
     },
     "worklist": {
       "loading": "Loading curriculum worklist.",
@@ -699,7 +705,17 @@
       "requestChanges": "Request changes",
       "publish": "Publish",
       "loadAudit": "Load audit",
-      "missingCapability": "Missing reviewer or publisher capability."
+      "missingCapability": "Missing reviewer or publisher capability.",
+      "status": {
+        "valid": "Valid",
+        "invalid": "Not ready to publish"
+      },
+      "severity": {
+        "blocking": "Blocking",
+        "warning": "Warning"
+      },
+      "issue": "{{severity}}: {{field}}",
+      "serverDetail": "Server detail (English):"
     },
     "migration": {
       "manifest": "Manifest",
@@ -707,10 +723,17 @@
       "dryRunAndApply": "Dry-run and apply",
       "ready": "Ready",
       "blocked": "Blocked",
-      "tokenPlaceholder": "confirmation token",
       "apply": "Apply migration",
-      "hint": "Run dry-run to inspect row actions and confirmation token.",
-      "applied": "Applied {{migration}}."
+      "hint": "Run a dry run to see what each row would do before you apply the migration.",
+      "applied": "Applied {{migration}}.",
+      "summary": {
+        "total": "Total",
+        "creates": "New",
+        "updates": "Updated",
+        "skips": "Skipped",
+        "conflicts": "Conflicts",
+        "errors": "Errors"
+      }
     },
     "evidence": {
       "title": "Migration evidence",
@@ -750,6 +773,50 @@
         "tooMany": "Too many requests. Wait a moment and try again.",
         "server": "The server could not complete this request. Try again later."
       }
+    },
+    "state": {
+      "draft": "Draft",
+      "in_review": "In review",
+      "changes_requested": "Changes requested",
+      "approved": "Approved",
+      "published": "Published",
+      "archived": "Archived"
+    },
+    "reviewState": {
+      "pending": "Review pending",
+      "approved": "Approved",
+      "changes_requested": "Changes requested"
+    },
+    "confirm": {
+      "title": {
+        "approve": "Approve this version?",
+        "requestChanges": "Send this version back for changes?",
+        "publish": "Publish this version?",
+        "apply": "Apply this migration?"
+      },
+      "body": {
+        "approve": "Version {{version}} of {{lesson}} will be marked as approved and can then be published.",
+        "requestChanges": "Version {{version}} of {{lesson}} goes back to its authors. Your reason is recorded in the audit log.",
+        "publish": "Version {{version}} of {{lesson}} will become the version students see. Your reason is recorded in the audit log.",
+        "apply": "Migration {{migration}} will write the manifest you dry-ran. This cannot be undone from the console."
+      },
+      "liveVersion": "Currently live: {{version}}. It will be replaced. If someone has published a different version in the meantime, the publish will be refused.",
+      "noLiveVersion": "No version of this lesson is live yet. If someone has published one in the meantime, the publish will be refused.",
+      "applySummary": "{{creates}} new, {{updates}} updated, {{skips}} skipped.",
+      "reason": "Reason for the audit log",
+      "cancel": "Cancel",
+      "submit": {
+        "approve": "Approve",
+        "requestChanges": "Request changes",
+        "publish": "Publish",
+        "apply": "Apply migration"
+      }
+    },
+    "notice": {
+      "submitted": "{{version}} was submitted for review.",
+      "approved": "{{version}} was approved.",
+      "changesRequested": "{{version}} was sent back for changes.",
+      "published": "{{version}} is now published."
     }
   },
   "operationalNotifications": {
