@@ -206,6 +206,7 @@
     "missingChildMessage": "Ouvrez cette page depuis un profil d’enfant.",
     "loading": "Chargement des progrès de l’enfant...",
     "loadFailed": "Échec des progrès de l’enfant",
+    "loadFailedMessage": "Impossible de charger les activités de cet enfant. Veuillez réessayer plus tard.",
     "defaultExplanation": "Cet exercice apparaît parce que les signaux d’apprentissage actuels indiquent qu’il peut aider à consolider le sujet suivant.",
     "subjectPending": "Matière en attente",
     "topicPending": "sujet en attente",
@@ -236,6 +237,8 @@
     "noSubjects": "Aucune matière définie",
     "summary": "Résumé",
     "weeklyLinkDescription": "Questions récentes, sujets à travailler, accompagnement enseignant et prochaine action parentale.",
+    "progressLink": "Activités",
+    "progressLinkDescription": "Les exercices attribués, pourquoi ils apparaissent et ce qui est terminé.",
     "monthlyLinkDescription": "Tendances par matière, points faibles récurrents et schémas d’accompagnement à plus long terme.",
     "childReports": "Rapports pour {{name}}"
   },
