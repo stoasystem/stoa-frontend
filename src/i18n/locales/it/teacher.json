@@ -228,6 +228,7 @@
     "note": "Nota",
     "notePlaceholder": "Che cosa deve verificare l’amministrazione?",
     "submitFailed": "Impossibile inviare la segnalazione.",
+    "submitted": "Segnalazione inviata. L’amministrazione la esaminerà (caso {{caseId}}).",
     "cancel": "Annulla",
     "submitting": "Invio in corso…",
     "submit": "Invia segnalazione",

@@ -228,6 +228,7 @@
     "note": "Notiz",
     "notePlaceholder": "Was soll die Administration prüfen?",
     "submitFailed": "Die Meldung konnte nicht gesendet werden.",
+    "submitted": "Meldung gesendet. Die Administration prüft sie (Fall {{caseId}}).",
     "cancel": "Abbrechen",
     "submitting": "Wird gesendet …",
     "submit": "Meldung senden",

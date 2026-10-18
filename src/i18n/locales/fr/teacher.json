@@ -228,6 +228,7 @@
     "note": "Note",
     "notePlaceholder": "Que doit vérifier l’administration ?",
     "submitFailed": "Impossible d’envoyer le signalement.",
+    "submitted": "Signalement envoyé. L’administration va l’examiner (cas {{caseId}}).",
     "cancel": "Annuler",
     "submitting": "Envoi…",
     "submit": "Envoyer le signalement",
