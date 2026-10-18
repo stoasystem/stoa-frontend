@@ -66,7 +66,7 @@ export function TeacherDashboardPage() {
               </CardContent>
             </Card>
             */}
-            <TeacherStatsCards stats={statsQuery.data} />
+            <TeacherStatsCards stats={statsQuery.data} isError={statsQuery.isError} />
             <TeacherRequestFilters value={filter} onChange={setFilter} />
             <HelpRequestList requests={filteredRequests} />
           </div>

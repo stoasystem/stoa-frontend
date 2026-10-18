@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
+import i18n from '@/i18n'
 import { isHelpRequestConflict } from '@/lib/teacherHelpRequestConflict'
 import { trackEvent } from '@/services/analytics/analyticsClient'
 import { updateTeacherHelpRequestStatus } from '@/services/teacher/teacherApi'
@@ -18,7 +19,7 @@ export function useUpdateTeacherHelpRequestMutation() {
       if (request.status === 'resolved') {
         trackEvent('teacher_help_resolved', { requestId: request.requestId })
       }
-      toast.success('Request status updated')
+      toast.success(i18n.t('teacher:toasts.statusUpdated'))
       // The list key is the detail's prefix, so this reads both again.
       void queryClient.invalidateQueries({ queryKey: teacherQueryKeys.helpRequests() })
       void queryClient.invalidateQueries({ queryKey: teacherQueryKeys.stats() })

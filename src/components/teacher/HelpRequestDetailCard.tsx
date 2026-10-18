@@ -4,6 +4,7 @@ import { ModerationReportDialog } from '@/components/moderation/ModerationReport
 import { TeacherSlaBadge } from '@/components/teacher/TeacherSlaBadge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { getSubjectLabel } from '@/lib/displayLabels'
+import type { ChatMessage } from '@/types/chat'
 import type { TeacherHelpRequestDetail } from '@/types/teacher'
 import { isOpenHelpRequest } from '@/types/teacherHelp'
 
@@ -53,7 +54,7 @@ export function HelpRequestDetailCard({ request }: { request: TeacherHelpRequest
             <p className="mt-2 text-sm leading-6">{request.requestMessage}</p>
           </div>
         )}
-        {request.messages.map((message) => (
+        {conversationMessages(request).map((message) => (
           <div
             key={message.id}
             className={
@@ -67,17 +68,11 @@ export function HelpRequestDetailCard({ request }: { request: TeacherHelpRequest
             </p>
             {/* Served by the backend, in whatever language it wrote it. */}
             <p className="mt-2 text-sm leading-6">{message.content}</p>
-            {(message.role === 'student' || message.role === 'assistant' || message.role === 'teacher') && (
+            {(message.role === 'student' || message.role === 'assistant') && (
               <div className="mt-2 border-t pt-2">
                 <ModerationReportDialog
                   questionId={request.requestId}
-                  surface={
-                    message.role === 'assistant'
-                      ? 'ai_answer'
-                      : message.role === 'teacher'
-                        ? 'teacher_reply'
-                        : 'question'
-                  }
+                  surface={message.role === 'assistant' ? 'ai_answer' : 'question'}
                   triggerLabel={t(
                     message.role === 'student' ? 'detail.reportStudentContent' : 'detail.reportContent',
                   )}
@@ -91,4 +86,21 @@ export function HelpRequestDetailCard({ request }: { request: TeacherHelpRequest
       </CardContent>
     </Card>
   )
+}
+
+/**
+ * The conversation without the teacher replies the timeline already shows.
+ * The server writes each reply twice, as a note and as a teacher message in
+ * the student's conversation (same text, same time), and returns both; the
+ * note keeps the formatting, so the message copy is the one left out (#271).
+ */
+function conversationMessages(request: TeacherHelpRequestDetail): ChatMessage[] {
+  const noted = new Set((request.notes ?? []).map((note) => replyKey(note.createdAt, note.note)))
+  return request.messages.filter(
+    (message) => message.role !== 'teacher' || !noted.has(replyKey(message.createdAt, message.content)),
+  )
+}
+
+function replyKey(createdAt: string, text: string) {
+  return `${createdAt}\u0000${text}`
 }

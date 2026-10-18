@@ -121,7 +121,8 @@
     "learningAutomation": "Automazione dell’apprendimento",
     "learningAutomationDescription": "Visualizzare ed eseguire le assegnazioni automatiche di esercizi per i tuoi studenti",
     "firstAction": "Prima azione del docente: {{time}}",
-    "firstActionNone": "Prima azione del docente: non ancora registrata"
+    "firstActionNone": "Prima azione del docente: non ancora registrata",
+    "statsLoadFailed": "Non è stato possibile caricare i dati."
   },
   "assistance": {
     "title": "Sintesi per la preparazione",
@@ -314,6 +315,30 @@
       "low": "Affidabilità bassa",
       "medium": "Affidabilità media",
       "high": "Affidabilità alta"
+    }
+  },
+  "toasts": {
+    "statusUpdated": "Stato della richiesta aggiornato.",
+    "replySent": "La tua risposta è stata inviata.",
+    "replyFailed": "Non è stato possibile inviare la tua risposta. Riprova.",
+    "replyConflict": "La tua risposta non è stata inviata: un altro insegnante ha preso questa richiesta, oppure è cambiata.",
+    "replyRefused": "La tua risposta non è stata accettata. Controlla contenuto e formato e inviala di nuovo.",
+    "availabilityUpdated": "La tua disponibilità è stata salvata.",
+    "summaryCreated": "Bozza di riepilogo creata.",
+    "summaryFailed": "Non è stato possibile creare la bozza di riepilogo.",
+    "exerciseCreated": "Bozza di esercizio creata.",
+    "exerciseFailed": "Non è stato possibile creare la bozza di esercizio.",
+    "regenerated": "Bozza rigenerata.",
+    "regenerateFailed": "Non è stato possibile rigenerare la bozza.",
+    "reviewed": {
+      "accepted": "Bozza accettata.",
+      "rejected": "Bozza rifiutata.",
+      "archived": "Bozza archiviata."
+    },
+    "reviewFailed": {
+      "accepted": "Non è stato possibile accettare la bozza.",
+      "rejected": "Non è stato possibile rifiutare la bozza.",
+      "archived": "Non è stato possibile archiviare la bozza."
     }
   }
 }
