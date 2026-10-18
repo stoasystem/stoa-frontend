@@ -17,6 +17,12 @@ export type PendingMessage = {
   /** Sent again as it was: the same command carries the same fields (#56). */
   practiceContext?: PracticeContextRef
   quote?: MessageQuote
+  /**
+   * Sent by `sendDetached` with no conversation on screen, and not yet known
+   * to have reached the server: a tab that no longer has that request sends it
+   * again with the same key, which the server takes as the same message (#263).
+   */
+  unconfirmed?: boolean
 }
 
 export const PENDING_MESSAGE_KEY_PREFIX = 'stoa_pending_chat_message:'
@@ -36,6 +42,7 @@ export function readPendingMessage(conversationId: string): PendingMessage | nul
       askedAt: typeof value.askedAt === 'string' ? value.askedAt : new Date(0).toISOString(),
       ...(value.practiceContext ? { practiceContext: value.practiceContext } : {}),
       ...(value.quote ? { quote: value.quote } : {}),
+      ...(value.unconfirmed === true ? { unconfirmed: true } : {}),
     }
   } catch {
     return null

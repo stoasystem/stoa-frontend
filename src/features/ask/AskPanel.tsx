@@ -13,7 +13,13 @@ import { ASK_PANEL } from '@/features/ask/askLayout'
 import { TeacherHelpAction, TeacherHelpStatusCard } from '@/features/ask/TeacherHelp'
 import type { AskController } from '@/features/ask/useAskController'
 import { useAskConversation } from '@/features/ask/useAskConversation'
-import { quoteField, useAskQuoteStore, type AskPractice, type AskQuote } from '@/features/ask/practiceContext'
+import {
+  quoteBelongs,
+  quoteField,
+  useAskQuoteStore,
+  type AskPractice,
+  type AskQuote,
+} from '@/features/ask/practiceContext'
 
 /**
  * The paperclip stays off until the upload pipeline hands back an attachment.
@@ -48,20 +54,13 @@ import { cn } from '@/lib/utils'
 import { trackEvent } from '@/services/analytics/analyticsClient'
 import { chatQueryKeys } from '@/services/chat/chatQueryKeys'
 import { createTeacherHelpRequest } from '@/services/teacherHelp/teacherHelpApi'
+import { sendDetached } from '@/services/chat/detachedSend'
 import { useAuthStore } from '@/store/authStore'
 import { useLitMoments, type LitMoment } from '@/store/litMomentsStore'
 import { learningSubjectOptions } from '@/types/learningProfile'
-import { QUOTE_MAX_LENGTH, type ChatAttachment, type ChatMessage } from '@/types/chat'
+import { QUOTE_MAX_LENGTH, type ChatMessage } from '@/types/chat'
 
 export type AskLayout = 'panel' | 'sheet'
-
-/** A question the new conversation could not be created with; sent into it after. */
-type QueuedQuestion = {
-  content: string
-  quote: AskQuote | null
-  attachmentIds: string[]
-  attachments: ChatAttachment[]
-}
 
 /** The subject a new conversation is about: the planet's, else the student's first, else maths. */
 function subjectFor(subjectId: string | undefined, primarySubject: string | undefined) {
@@ -124,7 +123,9 @@ export function AskPanel({
   const phone = layout === 'sheet'
   const subject = subjectFor(subjectId, profile?.primarySubjects?.[0])
 
-  // Whether this panel is still on screen when the conversation comes back.
+  // Whether this panel is still on screen when the conversation comes back,
+  // and still on the list rather than in a conversation the student opened
+  // meanwhile.
   const mounted = useRef(true)
   useEffect(() => {
     mounted.current = true
@@ -132,35 +133,25 @@ export function AskPanel({
       mounted.current = false
     }
   }, [])
+  const openConversation = useRef(conversationId)
+  useEffect(() => {
+    openConversation.current = conversationId
+  }, [conversationId])
 
-  // The passage 「问这段」 put aside, waiting to go out with the next question.
-  const quote = useAskQuoteStore((state) => state.quote)
+  // The passage 「问这段」 put aside, waiting to go out with the next question:
+  // only where it was taken from (#263).
+  const chosenQuote = useAskQuoteStore((state) => state.quote)
   const setQuote = useAskQuoteStore((state) => state.setQuote)
+  const quote =
+    chosenQuote &&
+    quoteBelongs(chosenQuote, { challengeId: practice?.context.challengeId ?? null, conversationId })
+      ? chosenQuote
+      : null
   const clearQuote = () => setQuote(null)
   // The files chosen for the next question, uploaded as they are picked (#125).
   const attachments = useAttachmentUploads()
   const picker = useRef<HTMLInputElement>(null)
   const { clearSent } = attachments
-  // A question that `POST /conversations` cannot carry whole, waiting for the
-  // conversation it started to open: that request takes neither a quote nor a
-  // file, so both go in as a message of their own once the conversation is the
-  // open one.
-  const queued = useRef<QueuedQuestion | null>(null)
-  useEffect(() => {
-    const waiting = queued.current
-    if (!waiting || !conversationId || isStreaming) return
-    queued.current = null
-    setQuote(null)
-    clearSent()
-    void sendStreamingMessage({
-      content: waiting.content,
-      ...(practice ? { practiceContext: practice.context } : {}),
-      ...(waiting.quote ? { quote: quoteField(waiting.quote) } : {}),
-      ...(waiting.attachmentIds.length > 0
-        ? { attachmentIds: waiting.attachmentIds, attachments: waiting.attachments }
-        : {}),
-    })
-  }, [clearSent, conversationId, isStreaming, practice, sendStreamingMessage, setQuote])
 
   // The exercise on screen goes out with every question asked beside it: the
   // backend reads the exercise, the chapter and the learning state from the
@@ -179,31 +170,39 @@ export function AskPanel({
     setDraft('')
     // `POST /conversations` takes neither a quote nor a file, so a question
     // carrying either starts the conversation empty and is sent into it as a
-    // message of its own, which the effect above does once the new conversation
-    // is the open one.
-    if (quote || carried) {
-      queued.current = {
-        content,
-        quote: quote ?? null,
-        attachmentIds,
-        attachments: attachments.readyAttachments,
-      }
-    }
+    // message of its own -- into that conversation only, and whether or not
+    // Ask is still open by then (#263).
+    const held = quote || carried
+    const readyAttachments = attachments.readyAttachments
+    const practiceContext = practice?.context
     createConversation
       .mutateAsync({
         subject,
         grade: conversationGrade(profile?.grade),
-        ...(quote || carried ? {} : { initialMessage: content }),
+        ...(held ? {} : { initialMessage: content }),
         ...practiceField,
       })
       .then(
         (created) => {
-          if (!quote) clearQuote()
-          // Opened only in the panel that asked; a closed Ask stays closed.
-          if (mounted.current) select(created.id)
+          if (held) {
+            sendDetached(created.id, {
+              idempotencyKey: `held-${created.id}`,
+              content,
+              askedAt: askedAtRef.current ?? new Date().toISOString(),
+              ...(attachmentIds.length > 0 ? { attachmentIds, attachments: readyAttachments } : {}),
+              ...(practiceContext ? { practiceContext } : {}),
+              ...(quote ? { quote: quoteField(quote) } : {}),
+            })
+            // Gone with the question -- unless another was chosen meanwhile.
+            if (quote && useAskQuoteStore.getState().quote === quote) clearQuote()
+            clearSent()
+          }
+          // Opened only in the panel that asked, and only if the student is
+          // still on the list: a closed Ask stays closed, and a conversation
+          // the student opened meanwhile stays open.
+          if (mounted.current && openConversation.current === null) select(created.id)
         },
         () => {
-          queued.current = null
           // Unless the student has started another question meanwhile.
           if (!controller.readDraft()) setDraft(content)
         },

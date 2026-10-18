@@ -21,19 +21,35 @@ export type AskPractice = {
 
 /**
  * A quote waiting to go out with the next question. `truncated` is this side's
- * own note that the passage was cut to fit; it is not sent.
+ * own note that the passage was cut to fit, and `conversationId` the
+ * conversation a quoted answer is in; neither is sent.
  */
-export type AskQuote = MessageQuote & { truncated: boolean }
+export type AskQuote = MessageQuote & { truncated: boolean; conversationId?: string | null }
 
 /** The passage as it may be sent: cut to what the backend accepts. */
-export function makeQuote(text: string, source: QuoteSource): AskQuote {
+export function makeQuote(text: string, source: QuoteSource, conversationId?: string | null): AskQuote {
   const trimmed = text.trim()
   const truncated = trimmed.length > QUOTE_MAX_LENGTH
   return {
     text: truncated ? trimmed.slice(0, QUOTE_MAX_LENGTH) : trimmed,
     source,
     truncated,
+    ...(source.kind === 'message' ? { conversationId: conversationId ?? null } : {}),
   }
+}
+
+/**
+ * Whether a quote belongs where Ask is now (#263): a passage of an exercise
+ * beside that exercise only, a passage of an answer in that answer's
+ * conversation only. Anywhere else it is not shown and not sent.
+ */
+export function quoteBelongs(
+  quote: AskQuote,
+  here: { challengeId: string | null; conversationId: string | null },
+) {
+  return quote.source.kind === 'challenge'
+    ? quote.source.id === here.challengeId
+    : quote.conversationId === here.conversationId
 }
 
 /** Only the two keys the backend takes: `truncated` stays on this side. */
@@ -49,7 +65,8 @@ type AskQuoteState = {
 /**
  * 「问这段」 hands the chosen passage to Ask through here: the chip sets it,
  * the composer shows it, sending clears it. In memory only -- a quote is about
- * what is on screen now.
+ * what is on screen now -- and cleared when the stage leaves the exercise or
+ * the conversation it came from (`StageWithAsk`).
  */
 export const useAskQuoteStore = create<AskQuoteState>((set) => ({
   quote: null,

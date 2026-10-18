@@ -16,6 +16,7 @@ import {
   writePendingMessage,
   type PendingMessage,
 } from '@/lib/pendingChatMessages'
+import { detachedSendFor } from '@/services/chat/detachedSend'
 import { currentSessionToken } from '@/store/authStore'
 
 type RetryPayload = Omit<PendingMessage, 'askedAt' | 'idempotencyKey'> & {
@@ -173,9 +174,16 @@ export function useStreamingChat(conversationId: string | null) {
    * it by what its command says: the answer, or a failure the student can send
    * again - as the same message when the command allows it. True once it was
    * answered; false when it failed, was stopped or was overtaken.
+   *
+   * `sending` is a send of it still on its way from elsewhere in the tab
+   * (`sendDetached`): until it is done, not finding the message on the server
+   * means not stored yet.
    */
   const runAttempt = useCallback(
-    async (pending: PendingMessage, { send }: { send: boolean }): Promise<boolean> => {
+    async (
+      pending: PendingMessage,
+      { send, sending }: { send: boolean; sending?: Promise<void> },
+    ): Promise<boolean> => {
       if (!conversationId) return false
 
       const attempt = ++currentAttemptRef.current
@@ -204,7 +212,7 @@ export function useStreamingChat(conversationId: string | null) {
       activeAssistantMessageIdRef.current = assistantMessageId
       stoppedByUserRef.current = false
       setIsStreaming(true)
-      writePending(conversationId, pending)
+      if (send) writePending(conversationId, { ...pending, unconfirmed: undefined })
 
       setLocalMessages((messages) => [
         // A retry of the same message replaces what its earlier attempt left.
@@ -242,7 +250,7 @@ export function useStreamingChat(conversationId: string | null) {
         idempotencyKey: pending.idempotencyKey,
         askedAt: pending.askedAt,
         signal: pollController.signal,
-        requestDone: !send,
+        requestDone: !send && !sending,
         onSteps: (steps) => {
           if (!owns()) return
           const writingId = activeAssistantMessageIdRef.current ?? assistantMessageId
@@ -255,6 +263,8 @@ export function useStreamingChat(conversationId: string | null) {
           )
         },
       })
+
+      void sending?.then(() => watcher.markRequestDone())
 
       let outcome: GenerationOutcome | null = null
       let requestError: unknown = null
@@ -366,9 +376,13 @@ export function useStreamingChat(conversationId: string | null) {
     stoppedByUserRef.current = false
     // A message sent before the page was reloaded is still one command on the
     // server; wait for it instead of losing it.
+    // One sent with no conversation on screen (`sendDetached`) and not known to
+    // have arrived is waited for while its request is still going, and sent
+    // again with the same key once this tab no longer has that request.
     const pending = conversationId ? readPending(conversationId) : null
     if (pending) {
-      void runAttempt(pending, { send: false })
+      const sending = detachedSendFor(pending.idempotencyKey)
+      void runAttempt(pending, { send: Boolean(pending.unconfirmed) && !sending, sending })
     }
     return () => {
       stopRef.current?.()
