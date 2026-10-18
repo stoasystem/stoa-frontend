@@ -272,6 +272,8 @@
     "selectedBefore": "Starten Sie die Vorschau, um die ausgewählten Vorschläge zu sehen.",
     "selectedEmpty": "Kein Vorschlag erfüllt die Regeln. Prüfen Sie die Ablehnungsgründe, bevor Sie die Schwellen ändern.",
     "execute": "Freigegebenen Stapel ausführen",
+    "executeDone": "Stapel ausgeführt",
+    "executeDoneHint": "Dieser Stapel ist gelaufen. Für einen neuen Stapel wählen Sie erneut „{{action}}“.",
     "executeFailed": "Ausführen fehlgeschlagen",
     "executed_one": "Der Stapel hat {{count}} Ergebnis geliefert.",
     "executed_other": "Der Stapel hat {{count}} Ergebnisse geliefert.",

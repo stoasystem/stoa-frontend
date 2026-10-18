@@ -272,6 +272,8 @@
     "selectedBefore": "Avvia l'anteprima per vedere le proposte selezionate.",
     "selectedEmpty": "Nessuna proposta rispetta le regole. Controlla i motivi di rifiuto prima di cambiare le soglie.",
     "execute": "Esegui il lotto approvato",
+    "executeDone": "Lotto eseguito",
+    "executeDoneHint": "Questo lotto è stato eseguito. Per un nuovo lotto, scegli di nuovo «{{action}}».",
     "executeFailed": "Esecuzione non riuscita",
     "executed_one": "Il lotto ha restituito {{count}} risultato.",
     "executed_other": "Il lotto ha restituito {{count}} risultati.",
