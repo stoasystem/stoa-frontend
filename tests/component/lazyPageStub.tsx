@@ -9,3 +9,6 @@ export function lazyPage(pageName: string) {
     { pageName },
   )
 }
+
+/* Stub pages never fail to load, so there is nothing to try again. */
+export function retryFailedPageLoads() {}

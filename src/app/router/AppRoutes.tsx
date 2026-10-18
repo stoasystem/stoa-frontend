@@ -21,6 +21,7 @@ import {
   type PageRoute,
   type RouteAccess,
 } from '@/app/router/routeManifest'
+import { PageErrorBoundary } from '@/components/common/AppErrorBoundary'
 import { useAuthStore } from '@/store/authStore'
 
 // Tests and the account menu read who a route admits from here too.
@@ -137,10 +138,14 @@ function pageElement(route: PageRoute, redirects: readonly LegacyRedirect[]): Re
   const Page = route.page
   const props = route.titleKey ? { ...route.props, titleKey: route.titleKey } : route.props
   const nameKey = nameKeyOf(route)
+  // The boundary sits inside the guards (#272): a redirect is never an error
+  // here, and a page that fails keeps the app shell around it.
   const page = (
     <>
       {nameKey && <PageTitle titleKey={nameKey} />}
-      <Page {...props} />
+      <PageErrorBoundary>
+        <Page {...props} />
+      </PageErrorBoundary>
     </>
   )
   const shown = route.demoSurface ? <DemoSurfaceRoute>{page}</DemoSurfaceRoute> : page
