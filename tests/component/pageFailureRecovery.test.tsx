@@ -20,6 +20,7 @@ import { buildRoutes } from '@/app/router/AppRoutes'
 import { lazyPage, type PageComponent } from '@/app/router/lazyPage'
 import type { PageRoute } from '@/app/router/routeManifest'
 import { AppErrorBoundary, PageErrorBoundary } from '@/components/common/AppErrorBoundary'
+import { reportFrontendError } from '@/services/monitoring'
 import i18n from '@/i18n'
 import {
   INVALID_DATE_PLACEHOLDER,
@@ -130,6 +131,24 @@ describe('a page whose module failed to load', () => {
   })
 })
 
+describe('a page whose import Vite gave up on for a reload', () => {
+  it('stays loading until the reload instead of failing and reporting it', async () => {
+    vi.mocked(reportFrontendError).mockClear()
+    const Page = lazyPage('Page', () => Promise.resolve(undefined as unknown as Record<'Page', PageComponent>))
+    render(
+      <AppErrorBoundary>
+        <Suspense fallback={<p>loading</p>}>
+          <Page />
+        </Suspense>
+      </AppErrorBoundary>,
+    )
+    await settle()
+    expect(screen.getByText('loading')).toBeInTheDocument()
+    expect(screen.queryByRole('alert')).toBeNull()
+    expect(reportFrontendError).not.toHaveBeenCalled()
+  })
+})
+
 describe('the page error boundary', () => {
   function Boom(): ReactNode {
     throw new Error('render failed')
@@ -204,6 +223,70 @@ describe('the page error boundary', () => {
       withQueries(
         <MemoryRouter initialEntries={['/boom']}>
           <Routes>{buildRoutes([boomRoute], [])}</Routes>
+        </MemoryRouter>,
+      ),
+    )
+    expect(await screen.findByRole('alert')).toBeInTheDocument()
+    expect(screen.getByRole('banner')).toBeInTheDocument()
+  })
+
+  it('a failed page loads afresh after the reader leaves it for a route built differently', async () => {
+    signInAsStudent()
+    let calls = 0
+    const load = vi.fn(() => {
+      calls += 1
+      return calls === 1
+        ? Promise.reject(chunkError())
+        : Promise.resolve({ Lesson: () => <p>lesson page</p> })
+    })
+    const lesson = {
+      path: '/lesson',
+      access: { kind: 'roles', roles: ['student'] },
+      page: lazyPage('Lesson', load),
+    } as unknown as PageRoute
+    const about = {
+      path: '/about',
+      access: { kind: 'public' },
+      page: Object.assign((() => <p>about page</p>) as PageComponent, { pageName: 'About' }),
+    } as unknown as PageRoute
+    function Go() {
+      const navigate = useNavigate()
+      return (
+        <>
+          <button onClick={() => navigate('/about')}>to about</button>
+          <button onClick={() => navigate('/lesson')}>to lesson</button>
+        </>
+      )
+    }
+    render(
+      withQueries(
+        <MemoryRouter initialEntries={['/lesson']}>
+          <Go />
+          <Suspense fallback={<p>loading</p>}>
+            <Routes>{buildRoutes([lesson, about], [])}</Routes>
+          </Suspense>
+        </MemoryRouter>,
+      ),
+    )
+    expect(await screen.findByRole('alert')).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: 'to about' }))
+    expect(await screen.findByText('about page')).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: 'to lesson' }))
+    expect(await screen.findByText('lesson page')).toBeInTheDocument()
+    expect(load).toHaveBeenCalledTimes(2)
+  })
+
+  it('also stands around the page shown to a visitor a route refuses', async () => {
+    const refused = {
+      path: '/members',
+      access: { kind: 'roles', roles: ['student'] },
+      page: Object.assign((() => <p>members</p>) as PageComponent, { pageName: 'Members' }),
+      refusedPage: Object.assign(Boom as PageComponent, { pageName: 'Boom' }),
+    } as unknown as PageRoute
+    render(
+      withQueries(
+        <MemoryRouter initialEntries={['/members']}>
+          <Routes>{buildRoutes([refused], [])}</Routes>
         </MemoryRouter>,
       ),
     )

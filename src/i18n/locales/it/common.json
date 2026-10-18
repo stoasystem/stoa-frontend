@@ -52,7 +52,7 @@
   },
   "errorBoundary": {
     "body": "Riprova o ricarica la pagina.",
-    "pageBody": "Controlla la connessione e riprova. Dalla barra in alto puoi comunque andare altrove.",
+    "pageBody": "Riprova o ricarica la pagina. Dalla barra in alto puoi comunque andare altrove.",
     "pageTitle": "Non è stato possibile mostrare questa pagina",
     "reload": "Ricarica la pagina",
     "title": "Qualcosa è andato storto"

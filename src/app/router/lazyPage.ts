@@ -45,7 +45,11 @@ export function lazyPage<Name extends string>(
   const attempt = () =>
     lazy(() =>
       load().then(
-        (module) => ({ default: module[pageName] }),
+        (module) =>
+          // Vite hands back nothing when the tab is about to reload for a
+          // failed import (chunkReload.ts): stay loading until it does,
+          // rather than fail on a missing module and report that.
+          module ? { default: module[pageName] } : new Promise<never>(() => {}),
         (error: unknown) => {
           const reset = () => {
             failedLoads.delete(reset)

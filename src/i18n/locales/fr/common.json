@@ -52,7 +52,7 @@
   },
   "errorBoundary": {
     "body": "Réessaie ou recharge la page.",
-    "pageBody": "Vérifier la connexion, puis réessayer. La barre du haut permet toujours d’aller ailleurs.",
+    "pageBody": "Réessayer ou recharger la page. La barre du haut permet toujours d’aller ailleurs.",
     "pageTitle": "Cette page n’a pas pu s’afficher",
     "reload": "Recharger la page",
     "title": "Une erreur est survenue"

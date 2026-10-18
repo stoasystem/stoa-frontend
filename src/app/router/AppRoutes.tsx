@@ -199,7 +199,16 @@ export function buildRoutes(
       const Refused = route.refusedPage
       topLevel.push(
         <Route
-          element={<RefusedPageSwitch access={route.access} refused={<Refused />} />}
+          element={
+            <RefusedPageSwitch
+              access={route.access}
+              refused={
+                <PageErrorBoundary>
+                  <Refused />
+                </PageErrorBoundary>
+              }
+            />
+          }
           key={`refused:${route.path}`}
           path={route.path}
         >

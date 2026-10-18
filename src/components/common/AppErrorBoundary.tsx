@@ -1,5 +1,5 @@
 import { ErrorBoundary } from 'react-error-boundary'
-import type { ErrorInfo, ReactNode } from 'react'
+import { useEffect, type ErrorInfo, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useLocation } from 'react-router-dom'
 import { retryFailedPageLoads } from '@/app/router/lazyPage'
@@ -87,10 +87,14 @@ function PageErrorFallback({ resetErrorBoundary }: { resetErrorBoundary: () => v
  * the router, so one page failing to render replaced the whole application.
  *
  * It sits inside the route guards, so a guard's redirect is never caught
- * here, and it starts over when the reader goes to another address.
+ * here, and it starts over when the reader goes to another address. A page
+ * whose module failed loads afresh next time either way: when this boundary
+ * stays and its address changes, or when it is left for a route built
+ * differently, which replaces it.
  */
 export function PageErrorBoundary({ children }: { children: ReactNode }) {
   const { pathname } = useLocation()
+  useEffect(() => retryFailedPageLoads, [])
 
   return (
     <ErrorBoundary
