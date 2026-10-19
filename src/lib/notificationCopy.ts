@@ -20,6 +20,7 @@ import type { NotificationEvent } from '@/types/notification'
 
 type Copy = { key: string; title: string; summary: string | ((event: NotificationEvent) => string | null) }
 
+// untranslated-ok: the backend's English, matched to pick a translation, never shown.
 const KNOWN: Record<string, Copy[]> = {
   'teacher_takeover:question': [
     { key: 'takeoverQuestion', title: 'Teacher joined your question', summary: 'A teacher has started working on your question.' },
