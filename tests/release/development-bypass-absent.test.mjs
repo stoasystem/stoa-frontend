@@ -58,3 +58,12 @@ test('the reader is looking at real bundles', () => {
     'the verified startup path is missing from the build, which is not what this test is about',
   )
 })
+
+test('the markers still name the bypass the source has', () => {
+  // A renamed bypass would leave the check above looking for a name nothing
+  // carries any more, passing for ever.
+  const entry = readFileSync(path.join(ROOT, 'src/main.tsx'), 'utf8')
+  for (const marker of FORBIDDEN) {
+    assert.ok(entry.includes(`${marker}(`), `src/main.tsx no longer calls ${marker}`)
+  }
+})
