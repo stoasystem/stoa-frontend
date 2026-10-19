@@ -7,6 +7,7 @@ import {
   lstat,
   mkdir,
   mkdtemp,
+  readdir,
   readFile,
   rm,
   symlink,
@@ -167,6 +168,26 @@ test('the production deploy gate runs this file by itself, ahead of the publish 
   assert.ok(deploy.some((line) => /^\s+needs: verify\s*$/.test(line)), 'the publish job waits for the gate')
 })
 
+// Neither gate collects tests/release by glob: a file runs only if
+// `test:release` names it or a workflow step runs it by itself. The development
+// startup bypass check sat here unrun by either gate until #321.
+test('every release test runs in both gates', async () => {
+  const packageJson = JSON.parse(await readFile(path.join(repoRoot, 'package.json'), 'utf8'))
+  const listed = packageJson.scripts['test:release'].split(/\s+/)
+  const workflows = await Promise.all(['deploy-production.yml', 'redesign-gate.yml'].map(
+    (name) => readFile(path.join(repoRoot, '.github/workflows', name), 'utf8'),
+  ))
+  const files = (await readdir(path.join(repoRoot, 'tests/release')))
+    .filter((name) => name.endsWith('.test.mjs'))
+    .map((name) => `tests/release/${name}`)
+  assert.ok(files.length > 0, 'no release tests found, so this proves nothing')
+
+  const unrun = files.filter((file) => !listed.includes(file) && !workflows.every((workflow) => (
+    workflow.split(/\r?\n/).some((line) => line.trim() === `run: node --test ${file}`)
+  )))
+  assert.deepEqual(unrun, [])
+})
+
 test('package scripts and schema define one closed five-step Web gate', async () => {
   const packageJson = JSON.parse(await readFile(path.join(repoRoot, 'package.json'), 'utf8'))
   const schema = JSON.parse(await readFile(
@@ -179,6 +200,7 @@ test('package scripts and schema define one closed five-step Web gate', async ()
   assert.equal(packageJson.scripts['test:release'], [
     'node --test',
     'tests/release/contact-backend-only.test.mjs',
+    'tests/release/development-bypass-absent.test.mjs',
     'tests/release/runtime-config.test.mjs',
     'tests/release/runtime-env-projection.test.mjs',
     'tests/release/runtime-monitoring-flag.test.mjs',
