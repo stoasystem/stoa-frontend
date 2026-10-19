@@ -3,7 +3,7 @@
   "eyebrow": "STOA Hilfe",
   "description": "Hier erhalten Sie Hilfe zu STOA, zur Unterstützung durch Lehrpersonen und zum Kontakt mit dem STOA-Team.",
   "description_informal": "Hier bekommst du Hilfe zu STOA, zur Unterstützung durch Lehrpersonen und zum Kontakt mit dem STOA-Team.",
-  "viewOnboarding": "Kontoeinrichtung ansehen",
+  "viewOnboarding": "Erste Schritte ansehen",
   "contact": "STOA kontaktieren",
   "contactSubject": "STOA Supportanfrage",
   "submit": "Anfrage senden",
@@ -18,9 +18,9 @@
     "faq": {
       "title": "Häufige Fragen",
       "items": [
-        "Schülerinnen und Schüler beginnen im Chat mit Hausaufgabenfragen, Erklärungen und hochgeladenen Arbeitsblättern.",
-        "Eltern nutzen das Elterndashboard und die Kinderberichte, um Fortschritt und Schwächen zu verfolgen.",
-        "Lehrpersonen beantworten Hilfeanfragen von Schülerinnen und Schülern über das Lehrpersonen-Dashboard."
+        "Schülerinnen und Schüler lernen auf der Sternkarte und stellen ihre Fragen unter «Fragen», auch zu Hausaufgaben und Arbeitsblättern.",
+        "Eltern verfolgen im Elternbereich den Fortschritt, die Berichte und die Schwächen ihrer Kinder.",
+        "Lehrpersonen beantworten Hilfeanfragen von Schülerinnen und Schülern unter «Anfragen»."
       ]
     },
     "problems": {
@@ -28,25 +28,25 @@
       "items": [
         "Melden Sie uns fehlerhafte Seiten, fehlende Daten, unklare Ansichten oder alles, was Sie beim Arbeiten blockiert.",
         "Nennen Sie die Seite, auf der Sie waren, was Sie erwartet haben und was stattdessen passiert ist.",
-        "Senden Sie niemals Passwörter, Zugangscodes oder vollständige Chatverläufe in einer Supportnachricht."
+        "Senden Sie niemals Passwörter, Zugangscodes oder vollständige Gespräche aus «Fragen» in einer Supportnachricht."
       ],
       "items_informal": [
         "Melde uns fehlerhafte Seiten, fehlende Daten, unklare Ansichten oder alles, was dich beim Arbeiten blockiert.",
         "Nenne die Seite, auf der du warst, was du erwartet hast und was stattdessen passiert ist.",
-        "Sende niemals Passwörter, Zugangscodes oder vollständige Chatverläufe in einer Supportnachricht."
+        "Sende niemals Passwörter, Zugangscodes oder vollständige Gespräche aus «Fragen» in einer Supportnachricht."
       ]
     },
     "teacherHelp": {
       "title": "Hilfe der Lehrperson oder Support?",
       "items": [
-        "Fordern Sie die Hilfe einer Lehrperson an, wenn eine Lernfrage aus dem Chat von einem Menschen angeschaut werden soll.",
+        "Fordern Sie die Hilfe einer Lehrperson an, wenn eine Lernfrage aus «Fragen» von einem Menschen angeschaut werden soll.",
         "Wenden Sie sich an den Support, wenn Ihr Konto, Ihr Zugang, ein Bericht oder die App selbst nicht funktioniert.",
-        "Der Status einer Anfrage an die Lehrperson bleibt im Chat; alles andere gehört zum Support."
+        "Der Status einer Anfrage an die Lehrperson bleibt unter «Fragen»; alles andere gehört zum Support."
       ],
       "items_informal": [
-        "Fordere die Hilfe einer Lehrperson an, wenn eine Lernfrage aus dem Chat von einem Menschen angeschaut werden soll.",
+        "Fordere die Hilfe einer Lehrperson an, wenn eine Lernfrage aus «Fragen» von einem Menschen angeschaut werden soll.",
         "Wende dich an den Support, wenn dein Konto, dein Zugang, ein Bericht oder die App selbst nicht funktioniert.",
-        "Der Status einer Anfrage an die Lehrperson bleibt im Chat; alles andere gehört zum Support."
+        "Der Status einer Anfrage an die Lehrperson bleibt unter «Fragen»; alles andere gehört zum Support."
       ]
     },
     "expectations": {
@@ -95,16 +95,16 @@
         "audience": "Für Lernende, die mit STOA starten",
         "steps": [
           {
-            "title": "Klasse und Fächer bestätigen",
-            "description": "Halten Sie Klassenstufe und aktive Fächer im Profil aktuell, damit STOA auf dem richtigen Niveau erklärt."
+            "title": "Klassenstufe eintragen",
+            "description": "Trag in deinem Profil deine Klassenstufe ein, damit STOA auf dem richtigen Niveau erklärt."
           },
           {
-            "title": "Im Chat beginnen",
-            "description": "Öffnen Sie den Chat bei einer Hausaufgabenfrage, einem unklaren Thema oder einem Arbeitsblatt zum Hochladen."
+            "title": "Auf der Sternkarte lernen",
+            "description": "Die Sternkarte zeigt alle deine Fächer. Wähl einen Stern, arbeite die Lektionen seines Kapitels durch, und er leuchtet."
           },
           {
-            "title": "Bei Blockaden eine Lehrperson holen",
-            "description": "Fordern Sie im Chat die Hilfe einer Lehrperson an, wenn eine Erklärung unklar bleibt oder jemand die Frage prüfen soll."
+            "title": "Unter «Fragen» nachfragen",
+            "description": "Öffne «Fragen» bei einer Hausaufgabe, einem unklaren Thema oder einem Arbeitsblatt. Bleibt eine Erklärung unklar, holst du dort eine Lehrperson dazu."
           }
         ]
       },
@@ -113,12 +113,12 @@
         "audience": "Für Eltern, die ihr Kind begleiten",
         "steps": [
           {
-            "title": "Das Kinderdashboard öffnen",
-            "description": "Das Elterndashboard zeigt jedes Kinderprofil, die letzten Aktivitäten und Lernsignale auf einen Blick."
+            "title": "Den Elternbereich öffnen",
+            "description": "Der Elternbereich zeigt jedes Kinderprofil, die letzten Aktivitäten und Lernsignale auf einen Blick."
           },
           {
             "title": "Berichte durchsehen",
-            "description": "Kinderberichte zeigen Fortschritt, Stärken, Schwächen und empfohlene Unterstützung, ohne private Chatinhalte standardmässig offenzulegen."
+            "description": "Kinderberichte zeigen Fortschritt, Stärken, Schwächen und empfohlene Unterstützung, ohne private Gespräche standardmässig offenzulegen."
           },
           {
             "title": "Bei Zugangsproblemen den Support nutzen",
@@ -132,7 +132,7 @@
         "steps": [
           {
             "title": "Die Anfrageliste im Blick behalten",
-            "description": "Das Lehrpersonen-Dashboard listet offene, laufende und erledigte Anfragen, die eine menschliche Antwort brauchen."
+            "description": "Unter «Anfragen» stehen offene, laufende und erledigte Anfragen, die eine menschliche Antwort brauchen."
           },
           {
             "title": "Eine Anfrage öffnen",

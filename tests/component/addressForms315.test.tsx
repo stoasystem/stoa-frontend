@@ -99,6 +99,11 @@ const GROUPS: Record<string, Record<string, Voice>> = {
     'routes.activate.title': { de: 'informal', fr: 'formal' },
     'routes.teacherActivate.title': 'formal',
   },
+  support: {
+    // The public getting-started guide's student section speaks to students
+    // (#341); the rest of the guide stays formal for parents and teachers.
+    'onboarding.roles.student.': 'informal',
+  },
   errors: {
     // Only teachers pick the subjects they teach (#270).
     subjectRequired: 'formal',
@@ -161,6 +166,8 @@ describe('the rule itself', () => {
     expect(voiceOf('auth', 'register.stepHeadings.parent.title', 'de')).toBe('formal')
     expect(voiceOf('auth', 'login.subtitle', 'de')).toBe('informal')
     expect(voiceOf('auth', 'login.subtitle', 'fr')).toBe('formal')
+    expect(voiceOf('support', 'onboarding.roles.student.steps.0.description', 'fr')).toBe('informal')
+    expect(voiceOf('support', 'onboarding.roles.parent.steps.0.description', 'fr')).toBe('formal')
   })
 
   it('flags a line in the other form, and only that', () => {
