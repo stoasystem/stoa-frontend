@@ -85,8 +85,8 @@
       "thinking": "Sto pensando…",
       "notSent": "Non inviato",
       "sendAgain": "Invia di nuovo",
-      "stopped": "Interrotto",
-      "stop": "Interrompi",
+      "stopped": "Hai smesso di aspettare. La risposta può ancora comparire qui più tardi.",
+      "stop": "Smetti di aspettare",
       "starting": "Avvio della conversazione…",
       "startFailed": "Non è stato possibile avviare la conversazione. Riprova.",
       "answerFailed": "Al momento non è stato possibile preparare la spiegazione. Riprova o chiedi a un docente."

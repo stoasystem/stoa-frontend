@@ -85,8 +85,8 @@
       "thinking": "Denkt nach…",
       "notSent": "Nicht gesendet",
       "sendAgain": "Erneut senden",
-      "stopped": "Angehalten",
-      "stop": "Anhalten",
+      "stopped": "Du wartest nicht mehr. Die Antwort kann später noch hier erscheinen.",
+      "stop": "Nicht mehr warten",
       "starting": "Die Unterhaltung wird gestartet…",
       "startFailed": "Die Unterhaltung konnte nicht gestartet werden. Versuch es noch einmal.",
       "answerFailed": "Die Erklärung konnte gerade nicht erstellt werden. Versuch es noch einmal oder frag eine Lehrperson."

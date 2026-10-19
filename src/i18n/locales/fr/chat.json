@@ -85,8 +85,8 @@
       "thinking": "Réflexion…",
       "notSent": "Non envoyé",
       "sendAgain": "Renvoyer",
-      "stopped": "Arrêté",
-      "stop": "Arrêter",
+      "stopped": "Tu n’attends plus. La réponse peut encore apparaître ici plus tard.",
+      "stop": "Ne plus attendre",
       "starting": "La conversation démarre…",
       "startFailed": "La conversation n’a pas pu démarrer. Réessaie.",
       "answerFailed": "L’explication n’a pas pu être préparée pour le moment. Réessaie ou demande à un enseignant."

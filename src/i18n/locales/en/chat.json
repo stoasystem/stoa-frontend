@@ -85,8 +85,8 @@
       "thinking": "Thinking…",
       "notSent": "Not sent",
       "sendAgain": "Send again",
-      "stopped": "Stopped",
-      "stop": "Stop",
+      "stopped": "You stopped waiting. The answer may still appear here later.",
+      "stop": "Stop waiting",
       "starting": "Starting the conversation…",
       "startFailed": "The conversation could not be started. Try again.",
       "answerFailed": "The explanation could not be prepared right now. Please try again or ask a teacher."
