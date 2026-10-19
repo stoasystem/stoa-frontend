@@ -265,7 +265,7 @@ function ModerationCaseDetail({
               type="button"
               variant="outline"
               className="mt-3 w-full"
-              disabled={busy || !trimmedAssignee}
+              disabled={busy || !trimmedAssignee || trimmedAssignee === item.assigned_admin_id}
               onClick={assign}
             >
               {t('moderation.assign')}
@@ -289,7 +289,9 @@ function ModerationCaseDetail({
                   type="button"
                   variant={nextStatus === 'actioned' ? 'default' : 'outline'}
                   size="sm"
-                  disabled={busy}
+                  // The case's own status is not a change: the backend keeps the
+                  // case as it is, and "set to …" would be a claim (#337).
+                  disabled={busy || nextStatus === item.status}
                   onClick={() => transition(nextStatus)}
                 >
                   {statusLabel(nextStatus, t)}
@@ -440,10 +442,9 @@ function ModerationContext({ item }: { item: ModerationCase }) {
   const context = item.question_context
   return (
     <div className="grid gap-3 md:grid-cols-3">
-      <ContextBlock
-        label={t('moderation.question')}
-        value={context?.content_preview ?? item.report_note ?? t('moderation.noQuestion')}
-      />
+      {/* The reporter's note is not the student's question; it shows in the
+          history under "Reported" (#337). */}
+      <ContextBlock label={t('moderation.question')} value={context?.content_preview ?? t('moderation.noQuestion')} />
       <ContextBlock label={t('moderation.aiAnswer')} value={context?.ai_answer_preview ?? t('moderation.noAiAnswer')} />
       <ContextBlock
         label={t('moderation.teacherReply')}
@@ -479,12 +480,32 @@ function ModerationHistory({ item }: { item: ModerationCase }) {
               <span className="font-medium">{t(`moderation.events.${event.event_type}`, { defaultValue: formatLabel(event.event_type) })}</span>
               <span className="text-xs text-muted-foreground">{formatDate(event.created_at, t)}</span>
             </div>
+            {historyChanges(event.changes, t).map((line) => (
+              <p key={line} className="mt-1">
+                {line}
+              </p>
+            ))}
             {event.note && <p className="mt-1 text-muted-foreground">{event.note}</p>}
           </div>
         ))}
       </div>
     </div>
   )
+}
+
+/*
+ * "Updated" alone does not say what changed. The backend records a field in
+ * `changes` only when its value moved; the resolution note is the event's note.
+ */
+function historyChanges(changes: Record<string, unknown> | null | undefined, t: TFunction) {
+  const lines: string[] = []
+  if (typeof changes?.status === 'string') {
+    lines.push(t('admin:moderation.historyChanges.status', { status: statusLabel(changes.status, t) }))
+  }
+  if (typeof changes?.assigned_admin_id === 'string') {
+    lines.push(t('admin:moderation.historyChanges.assigned', { admin: changes.assigned_admin_id }))
+  }
+  return lines
 }
 
 function StatusBadge({ status }: { status: ModerationCaseStatus }) {

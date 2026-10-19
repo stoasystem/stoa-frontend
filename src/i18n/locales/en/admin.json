@@ -272,6 +272,10 @@
     "noAiAnswer": "No AI answer snapshot",
     "noTeacherReply": "No teacher reply snapshot",
     "history": "History",
+    "historyChanges": {
+      "status": "Status: {{status}}",
+      "assigned": "Assigned to {{admin}}"
+    },
     "noHistory": "No history events yet.",
     "unknownTime": "Unknown time",
     "status": {
