@@ -89,6 +89,7 @@ const REQUIRED_PACKAGE_SCRIPTS = Object.freeze({
   'test:release': [
     'node --test',
     'tests/release/contact-backend-only.test.mjs',
+    'tests/release/development-bypass-absent.test.mjs',
     'tests/release/runtime-config.test.mjs',
     'tests/release/runtime-env-projection.test.mjs',
     'tests/release/runtime-monitoring-flag.test.mjs',

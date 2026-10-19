@@ -7,6 +7,7 @@ import {
   lstat,
   mkdir,
   mkdtemp,
+  readdir,
   readFile,
   rm,
   symlink,
@@ -167,6 +168,55 @@ test('the production deploy gate runs this file by itself, ahead of the publish 
   assert.ok(deploy.some((line) => /^\s+needs: verify\s*$/.test(line)), 'the publish job waits for the gate')
 })
 
+// Neither gate collects tests/release by glob: a file runs only if
+// `test:release` names it or a workflow step runs it by itself. The development
+// startup bypass check sat here unrun by either gate until #321. A step only
+// counts if it is in the job that gates (not the publish job) and nothing on
+// the step or the job can skip it or let its failure through.
+const GATES = [
+  { workflow: 'deploy-production.yml', job: 'verify' },
+  { workflow: 'redesign-gate.yml', job: 'gate' },
+]
+
+function gatingRuns(workflow, job) {
+  const lines = workflow.split(/\r?\n/)
+  const jobAt = lines.findIndex((line) => line === `  ${job}:`)
+  assert.ok(jobAt >= 0, `the workflow has a ${job} job`)
+  const nextJob = lines.findIndex((line, index) => index > jobAt && /^ {2}[A-Za-z][\w-]*:\s*$/.test(line))
+  const jobLines = lines.slice(jobAt, nextJob < 0 ? undefined : nextJob)
+  assert.ok(
+    !jobLines.some((line) => /^ {4}(if|continue-on-error):/.test(line)),
+    `the ${job} job has no \`if:\` or \`continue-on-error:\``,
+  )
+  const starts = jobLines.flatMap((line, index) => (/^ {6}- /.test(line) ? [index] : []))
+  return starts
+    .map((at, index) => jobLines.slice(at, starts[index + 1]))
+    .filter((step) => !step.some((line) => /^ {6}(- )?(if|continue-on-error):/.test(line) || /^ {8}(if|continue-on-error):/.test(line)))
+    .flatMap((step) => step.flatMap((line) => {
+      const run = /^\s+(?:- )?run: (.+?)\s*$/.exec(line)
+      return run ? [run[1]] : []
+    }))
+}
+
+test('every release test runs in both gates', async () => {
+  const packageJson = JSON.parse(await readFile(path.join(repoRoot, 'package.json'), 'utf8'))
+  const listed = packageJson.scripts['test:release'].split(/\s+/)
+  const gates = await Promise.all(GATES.map(async ({ workflow, job }) => ({
+    name: `${workflow} ${job}`,
+    runs: gatingRuns(await readFile(path.join(repoRoot, '.github/workflows', workflow), 'utf8'), job),
+  })))
+  const files = (await readdir(path.join(repoRoot, 'tests/release')))
+    .filter((name) => name.endsWith('.test.mjs'))
+    .map((name) => `tests/release/${name}`)
+  assert.ok(files.length > 0, 'no release tests found, so this proves nothing')
+
+  const unrun = files.flatMap((file) => gates
+    .filter(({ runs }) => !runs.includes(`node --test ${file}`)
+      && !(listed.includes(file) && runs.includes('npm run test:release')))
+    .map(({ name }) => `${file} in ${name}`))
+  assert.deepEqual(unrun, [])
+})
+
 test('package scripts and schema define one closed five-step Web gate', async () => {
   const packageJson = JSON.parse(await readFile(path.join(repoRoot, 'package.json'), 'utf8'))
   const schema = JSON.parse(await readFile(
@@ -179,6 +229,7 @@ test('package scripts and schema define one closed five-step Web gate', async ()
   assert.equal(packageJson.scripts['test:release'], [
     'node --test',
     'tests/release/contact-backend-only.test.mjs',
+    'tests/release/development-bypass-absent.test.mjs',
     'tests/release/runtime-config.test.mjs',
     'tests/release/runtime-env-projection.test.mjs',
     'tests/release/runtime-monitoring-flag.test.mjs',
