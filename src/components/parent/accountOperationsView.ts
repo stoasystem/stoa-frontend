@@ -1,3 +1,4 @@
+import { formattingLocale } from '@/i18n/languages'
 import type { TFunction } from 'i18next'
 
 export function formatStatus(value: string | null | undefined) {
@@ -79,7 +80,7 @@ export function getQuotaPeriodLabel(period: string | null | undefined, t: TFunct
     if (!Number.isNaN(day.getTime())) {
       // The period is a UTC day; formatting it in the reader's zone would
       // show the day before anywhere west of Greenwich.
-      const date = new Intl.DateTimeFormat(language, { dateStyle: 'medium', timeZone: 'UTC' }).format(day)
+      const date = new Intl.DateTimeFormat(formattingLocale(language), { dateStyle: 'medium', timeZone: 'UTC' }).format(day)
       return t('parent:accountOps.quotaPeriodDay', { date })
     }
   }

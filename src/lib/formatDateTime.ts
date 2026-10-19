@@ -1,4 +1,4 @@
-import { activeLanguage } from '@/i18n/languages'
+import { formattingLocale } from '@/i18n/languages'
 
 /**
  * Date and time formatting in the language the reader chose.
@@ -37,7 +37,7 @@ function toDate(value: string | number | Date) {
 function format(value: string | number | Date, options: Intl.DateTimeFormatOptions) {
   const date = toDate(value)
   if (Number.isNaN(date.getTime())) return INVALID_DATE_PLACEHOLDER
-  return new Intl.DateTimeFormat(activeLanguage(), options).format(date)
+  return new Intl.DateTimeFormat(formattingLocale(), options).format(date)
 }
 
 /** "14:30" — the clock time of a chat message. */

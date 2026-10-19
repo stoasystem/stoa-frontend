@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next'
+import { formattingLocale } from '@/i18n/languages'
 import { Group, Pill, Row, type PillTone } from '@/components/base'
 import { SafeStatusLabel } from '@/components/common/SafeStatusLabel'
 import { getSubjectLabel } from '@/lib/displayLabels'
@@ -42,14 +43,14 @@ export function HelpRequestList({ requests }: { requests: TeacherHelpRequestSumm
   }
 
   const opened = (iso: string) =>
-    new Date(iso).toLocaleString(i18n.resolvedLanguage, { dateStyle: 'short', timeStyle: 'short' })
+    new Date(iso).toLocaleString(formattingLocale(i18n.resolvedLanguage), { dateStyle: 'short', timeStyle: 'short' })
   // A phone row has room for a few characters: today's requests show the time,
   // older ones the day.
   const openedShort = (iso: string) => {
     const date = new Date(iso)
     const today = date.toDateString() === new Date().toDateString()
     return date.toLocaleString(
-      i18n.resolvedLanguage,
+      formattingLocale(i18n.resolvedLanguage),
       today ? { timeStyle: 'short' } : { day: 'numeric', month: 'numeric' },
     )
   }

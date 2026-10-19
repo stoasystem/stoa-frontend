@@ -9,7 +9,7 @@
     "retry": "Riprova",
     "retryFile": "Riprova {{fileName}}",
     "cancel": "Annulla",
-    "askLearningAssistant": "Chiedi al Learning Assistant"
+    "askLearningAssistant": "Chiedi in «Domanda»"
   },
   "status": {
     "idle": "Pronto",
@@ -34,7 +34,7 @@
   },
   "modal": {
     "title": "Carica una domanda",
-    "description": "Scatta una foto o allega un PDF, poi chiedi al Learning Assistant."
+    "description": "Scatta una foto o allega un PDF, poi fai la tua domanda in «Domanda»."
   },
   "preview": {
     "attachedFiles": "File allegati",
@@ -50,7 +50,7 @@
   "learning": {
     "uploadKicker": "Compito da scuola",
     "uploadOwnQuestionTitle": "Hai una tua domanda?",
-    "uploadOwnQuestionDescription": "Carica una foto o un PDF e chiedi al Learning Assistant.",
+    "uploadOwnQuestionDescription": "Carica una foto o un PDF e fai la tua domanda in «Domanda».",
     "schoolworkHelpTitle": "Porta il tuo esercizio",
     "schoolworkHelpDescription": "Carica una domanda da scuola e ricevi una guida passo per passo."
   },

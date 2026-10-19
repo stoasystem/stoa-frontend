@@ -1,3 +1,4 @@
+import { formattingLocale } from '@/i18n/languages'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import type { BillingOverview } from '@/types/billing'
 
@@ -24,7 +25,7 @@ function AllowanceRow({
       <div className="flex items-center justify-between gap-4 text-sm">
         <span className="font-medium text-foreground">{label}</span>
         <span className="text-right text-muted-foreground">
-          {formatPercent(percentUsed)} used · {remaining.toLocaleString()} tokens remaining
+          {formatPercent(percentUsed)} used · {remaining.toLocaleString(formattingLocale('en'))} tokens remaining
         </span>
       </div>
       <div
@@ -109,14 +110,14 @@ function TeacherCases({ usage }: { usage: BillingOverview }) {
       className="rounded-md border border-border/70 p-3 text-sm text-muted-foreground"
       data-testid="allowance-teacher-cases"
     >
-      {remaining.toLocaleString()} of {support.limit.toLocaleString()} support cases remaining
+      {remaining.toLocaleString(formattingLocale('en'))} of {support.limit.toLocaleString(formattingLocale('en'))} support cases remaining
       {support.scope === 'shared_family' ? ' · shared family allowance' : ''}
     </div>
   )
 }
 
 function formatPercent(value: number) {
-  return `${value.toLocaleString(undefined, { maximumFractionDigits: 2 })}%`
+  return `${value.toLocaleString(formattingLocale('en'), { maximumFractionDigits: 2 })}%`
 }
 
 function formatPlan(value: string) {
@@ -124,7 +125,7 @@ function formatPlan(value: string) {
 }
 
 function formatWindowDate(value: string) {
-  return new Intl.DateTimeFormat(undefined, {
+  return new Intl.DateTimeFormat(formattingLocale('en'), {
     dateStyle: 'medium',
     timeZone: 'Europe/Zurich',
   }).format(new Date(value))

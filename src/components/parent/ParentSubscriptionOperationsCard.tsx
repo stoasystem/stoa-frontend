@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { CheckCircle2, Clock3, XCircle } from 'lucide-react'
+import { formattingLocale } from '@/i18n/languages'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -297,7 +298,7 @@ function formatBenefit(value: string) {
 }
 
 function formatDate(value: string) {
-  return new Intl.DateTimeFormat('en', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }).format(new Date(value))
+  return new Intl.DateTimeFormat(formattingLocale('en'), { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }).format(new Date(value))
 }
 
 function billingStatusCopy(status: string, billing?: SubscriptionBilling) {

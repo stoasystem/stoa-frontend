@@ -9,7 +9,7 @@
   "gradeRequired": "Klasse ist erforderlich.",
   "subjectRequired": "Fügen Sie mindestens ein Fach hinzu.",
   "messageEmpty": "Nachricht darf nicht leer sein.",
-  "fileTooLarge": "Die Datei ist zu groß.",
+  "fileTooLarge": "Die Datei ist zu gross.",
   "unsupportedFileType": "Dieser Dateityp wird nicht unterstützt.",
   "uploadFailed": "Der Datei-Upload ist fehlgeschlagen.",
   "schoolGradeRequired": "Schule und Klasse sind erforderlich.",

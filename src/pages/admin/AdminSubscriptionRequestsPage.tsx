@@ -1,6 +1,7 @@
 import { type FormEvent, useMemo, useState } from 'react'
 import { ArrowDownCircle, ArrowUpCircle, CreditCard, Search, XCircle } from 'lucide-react'
 import { Link } from 'react-router-dom'
+import { formattingLocale } from '@/i18n/languages'
 import { PageContainer } from '@/components/common/PageContainer'
 import { PageHeader } from '@/components/common/PageHeader'
 import { Badge } from '@/components/ui/badge'
@@ -496,5 +497,5 @@ function formatEvidenceValue(value: unknown) {
 }
 
 function formatDate(value: string) {
-  return new Intl.DateTimeFormat('en', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }).format(new Date(value))
+  return new Intl.DateTimeFormat(formattingLocale('en'), { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }).format(new Date(value))
 }

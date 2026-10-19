@@ -54,3 +54,30 @@ export function activeLanguage(): SupportedLanguage {
 export function getInitialLanguage(): SupportedLanguage {
   return activeLanguage()
 }
+
+/**
+ * The locale every date, number and currency is formatted in (#280).
+ *
+ * Every reader is in Switzerland, so each UI language formats the Swiss way:
+ * 12'345.5, CHF 1'234.50, a 24-hour clock with the day before the month, also
+ * in English. i18next keeps the bare language code; this is the one place that
+ * turns it into the formatting locale, so no `Intl` or `toLocale*` call names
+ * a locale of its own.
+ */
+export const formattingLocales: Record<SupportedLanguage, string> = {
+  de: 'de-CH',
+  en: 'en-CH',
+  fr: 'fr-CH',
+  it: 'it-CH',
+}
+
+/**
+ * The formatting locale for a UI language: `i18n.language`, a stored code, or
+ * nothing for the language the app is read in right now. A regional code such
+ * as "de-DE" is read by its language; anything unsupported falls back to the
+ * active language.
+ */
+export function formattingLocale(language?: string | null): string {
+  const code = language?.slice(0, 2).toLowerCase()
+  return formattingLocales[isSupportedLanguage(code) ? code : activeLanguage()]
+}

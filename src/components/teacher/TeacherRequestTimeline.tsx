@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next'
+import { formattingLocale } from '@/i18n/languages'
 import { RichTeacherReply } from '@/components/teacher/RichTeacherReply'
 import type { TeacherHelpRequestNote } from '@/types/teacher'
 
@@ -19,7 +20,7 @@ export function TeacherRequestTimeline({ notes }: { notes: TeacherHelpRequestNot
         <article key={note.id} className="rounded-md border bg-card p-4">
           <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
             <p className="text-sm font-medium">{note.teacher.name}</p>
-            <time className="text-xs text-muted-foreground">{new Date(note.createdAt).toLocaleString(i18n.resolvedLanguage)}</time>
+            <time className="text-xs text-muted-foreground">{new Date(note.createdAt).toLocaleString(formattingLocale(i18n.resolvedLanguage))}</time>
           </div>
           <div className="mt-3">
             <RichTeacherReply content={note.richContent} fallback={note.note} />
