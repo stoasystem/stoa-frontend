@@ -43,10 +43,15 @@ afterEach(() => {
 // with it they are Node's Storage, which jsdom's StorageEvent refuses as a
 // storageArea, Storage.prototype spies never see, and every test file shares
 // through the one file. Point both at the jsdom window's own, as on Node 22:
-// a fresh pair for each test file, of the Storage class the page sees.
-for (const name of ['localStorage', 'sessionStorage'] as const) {
-  const storage = (globalThis as unknown as { jsdom: { window: Window } }).jsdom.window[name]
-  Object.defineProperty(globalThis, name, { configurable: true, enumerable: true, get: () => storage })
+// a fresh pair for each test file, of the Storage class the page sees. Read
+// only, like the browser's: no setter of Node's is left to swallow an
+// assignment. A test file in another environment has no jsdom and keeps its own.
+const dom = (globalThis as unknown as { jsdom?: { window: Window } }).jsdom?.window
+if (dom) {
+  for (const name of ['localStorage', 'sessionStorage'] as const) {
+    const storage = dom[name]
+    Object.defineProperty(globalThis, name, { configurable: true, enumerable: true, get: () => storage, set: undefined })
+  }
 }
 
 // jsdom implements neither, and Radix/scroll-area primitives touch both.
