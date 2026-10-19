@@ -3,39 +3,17 @@ import {
   claimTeacherInvitation,
   consumeTeacherInvitation,
   getTeacherApplicationDetail,
-  getTeacherApplicationStatus,
   listTeacherApplications,
   reissueTeacherInvitation,
   reviewTeacherApplication,
-  submitTeacherApplication,
-  type TeacherApplicationSubmitRequest,
   type TeacherReviewState,
 } from '@/services/teacher/teacherApplicationApi'
 
 export const teacherApplicationQueryKeys = {
   all: ['teacher-applications'] as const,
-  status: (applicationId: string) => [...teacherApplicationQueryKeys.all, 'status', applicationId] as const,
   list: (reviewState: TeacherReviewState) => [...teacherApplicationQueryKeys.all, 'list', reviewState] as const,
   detail: (applicationId: string, version: number) =>
     [...teacherApplicationQueryKeys.all, 'detail', applicationId, version] as const,
-}
-
-export function useSubmitTeacherApplicationMutation() {
-  return useMutation({
-    mutationFn: (payload: TeacherApplicationSubmitRequest) => submitTeacherApplication(payload),
-  })
-}
-
-export function useTeacherApplicationStatusQuery(applicationId: string | null) {
-  return useQuery({
-    queryKey: teacherApplicationQueryKeys.status(applicationId ?? ''),
-    queryFn: () => getTeacherApplicationStatus(applicationId as string),
-    enabled: Boolean(applicationId),
-    refetchInterval: (query) => {
-      const state = query.state.data?.reviewState
-      return state === 'pending_review' ? 15_000 : false
-    },
-  })
 }
 
 export function useClaimTeacherInvitationMutation() {

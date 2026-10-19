@@ -13,7 +13,8 @@ import itParent from '@/i18n/locales/it/parent.json'
 const COMMON = { de: deCommon, en: enCommon, fr: frCommon, it: itCommon }
 const PARENT = { de: deParent, en: enParent, fr: frParent, it: itParent }
 
-// `RoleBadge` looks a role up as `roles.<role>`, and the role it is handed is
+// The account menu, /me and the account chooser look a role up as
+// `roles.<role>` (RoleBadge did too, until #315 deleted it), and the role is
 // the backend's canonical one. The map was written with `teacher`, the backend
 // says `teacher`, and so a signed-in teacher's own header read `roles.teacher`
 // on every screen, in all four languages.

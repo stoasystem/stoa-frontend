@@ -3,27 +3,11 @@ import { httpClient } from '@/services/api/httpClient'
 
 export type TeacherReviewState = 'pending_review' | 'approved' | 'rejected'
 
-export type TeacherApplicationSubmitRequest = {
-  email: string
-  emailVerified: true
-  fullName: string
-  subjects: string[]
-  statement: string
-}
-
 export type TeacherApplicationSubmitResponse = {
   applicationId: string
   version: number
   status: string
   createdAt?: string
-}
-
-export type TeacherApplicationStatus = {
-  applicationId: string
-  version: number
-  reviewState: TeacherReviewState | string
-  createdAt?: string
-  decidedAt?: string | null
 }
 
 export type TeacherApplicationListItem = TeacherApplicationSubmitResponse & {
@@ -61,31 +45,6 @@ export type TeacherActivationResponse = {
   applicationId: string
   applicationVersion: number
   evidenceReference?: string
-}
-
-function toSnakeApplication(payload: TeacherApplicationSubmitRequest) {
-  return {
-    email: payload.email,
-    email_verified: payload.emailVerified,
-    full_name: payload.fullName,
-    subjects: payload.subjects,
-    statement: payload.statement,
-  }
-}
-
-export async function submitTeacherApplication(payload: TeacherApplicationSubmitRequest) {
-  const response = await httpClient.post<TeacherApplicationSubmitResponse>(
-    '/teacher-applications',
-    toSnakeApplication(payload),
-  )
-  return response.data
-}
-
-export async function getTeacherApplicationStatus(applicationId: string) {
-  const response = await httpClient.get<TeacherApplicationStatus>(
-    apiPath`/teacher-applications/${applicationId}/status`,
-  )
-  return response.data
 }
 
 export async function claimTeacherInvitation(invitationToken: string, password: string) {
@@ -154,19 +113,4 @@ export async function reissueTeacherInvitation(applicationId: string, version: n
     { version },
   )
   return response.data
-}
-
-export function buildTeacherStatement(input: {
-  introduction: string
-  educationBackground: string
-  yearsOfExperience?: number
-}) {
-  const parts = [input.introduction.trim()]
-  if (input.educationBackground.trim()) {
-    parts.push(`Education: ${input.educationBackground.trim()}`)
-  }
-  if (typeof input.yearsOfExperience === 'number' && Number.isFinite(input.yearsOfExperience)) {
-    parts.push(`Experience: ${input.yearsOfExperience} years`)
-  }
-  return parts.filter(Boolean).join('\n\n').slice(0, 2000)
 }

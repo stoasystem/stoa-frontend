@@ -1,7 +1,4 @@
-import { apiPath } from '@/services/api/apiPath'
 import { httpClient } from '@/services/api/httpClient'
-
-import { type LearningProfile } from '@/types/learningProfile'
 import type { LearningHistoryItem, StudentEntitlement, StudentProfile } from '@/types/student'
 
 export async function getStudentProfile() {
@@ -20,12 +17,6 @@ export async function getStudentLearningHistory() {
   )
   return response.data
 }
-
-export async function getStudentLearningProfile(studentId: string) {
-  const response = await httpClient.get<LearningProfile>(apiPath`/students/${studentId}/learning-profile`)
-  return response.data
-}
-
 
 export async function getStudentEntitlement() {
   const response = await httpClient.get<StudentEntitlement>('/students/me/entitlement')

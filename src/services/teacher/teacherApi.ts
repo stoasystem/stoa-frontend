@@ -11,7 +11,6 @@ import type {
   TeacherReplyRichContent,
   TeacherAssistanceSummary,
   AiTeacherDraft,
-  AiTeacherDraftList,
   CreateExerciseDraftPayload,
   ReviewAiTeacherDraftPayload,
 } from '@/types/teacher'
@@ -89,16 +88,6 @@ export async function createAiTeacherSummaryDraft(questionId: string) {
 
 export async function createAiTeacherExerciseDraft(payload: CreateExerciseDraftPayload) {
   const response = await httpClient.post<AiTeacherDraft>('/teachers/ai-tools/exercise-drafts', payload)
-  return response.data
-}
-
-export async function getAiTeacherDrafts() {
-  const response = await httpClient.get<AiTeacherDraftList>('/teachers/ai-tools/drafts')
-  return response.data
-}
-
-export async function getAiTeacherDraft(draftId: string) {
-  const response = await httpClient.get<AiTeacherDraft>(apiPath`/teachers/ai-tools/drafts/${draftId}`)
   return response.data
 }
 
