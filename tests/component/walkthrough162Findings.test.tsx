@@ -206,9 +206,10 @@ describe('the new keys exist in all four languages', () => {
     expect(Object.keys(common.notifications.subtitleByRole).sort()).toEqual(
       ['admin', 'organization_admin', 'parent', 'school_teacher', 'school_viewer', 'teacher'],
     )
+    // The plural forms are the ones each language needs (#315): fr/it add _many.
+    const counts = new Intl.PluralRules(lang).resolvedOptions().pluralCategories.map((form) => `count_${form}`)
     expect(Object.keys(admin.operationalNotifications).sort()).toEqual([
-      'count_one',
-      'count_other',
+      ...counts.sort(),
       'empty',
       'eventTypes',
       'loading',
