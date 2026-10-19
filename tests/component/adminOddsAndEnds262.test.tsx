@@ -13,7 +13,7 @@ import { render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import type { ReactNode } from 'react'
 import { MemoryRouter } from 'react-router-dom'
-import { afterAll, afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { AdminOperationalNotificationsCard } from '@/components/admin/AdminOperationalNotificationsCard'
 import { AdminTeacherSlaCard } from '@/components/admin/AdminTeacherSlaCard'
 import i18n from '@/i18n'
@@ -126,15 +126,6 @@ beforeEach(async () => {
 afterEach(async () => {
   await i18n.changeLanguage('en')
 })
-afterAll(() => {
-  // On Node 26 the language persists into the --localstorage-file.
-  try {
-    localStorage.clear()
-  } catch {
-    // no storage in this environment
-  }
-})
-
 describe('linking a child while a usage day is set', () => {
   it('reads the child list again for that day', async () => {
     mockedOperations.mockResolvedValue(operations())

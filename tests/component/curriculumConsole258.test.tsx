@@ -116,8 +116,6 @@ afterEach(() => {
 })
 afterAll(async () => {
   await i18n.changeLanguage('en')
-  // i18next writes the language into the --localstorage-file; leave none behind.
-  localStorage.clear()
 })
 
 function renderPage() {
