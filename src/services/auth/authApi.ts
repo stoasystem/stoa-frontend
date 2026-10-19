@@ -1,7 +1,6 @@
 import { ApiError, LOGOUT_PATH, httpClient } from '@/services/api/httpClient'
 import { LANGUAGE_STORAGE_KEY, isSupportedLanguage, type SupportedLanguage } from '@/i18n/languages'
 import type { AuthResponse, EmailVerificationResponse, LocalePreferenceResponse, User, UserRole } from '@/types/user'
-import type { RegisterPayload } from '@/types/onboarding'
 import { currentSessionToken } from '@/store/authStore'
 import { allowDemoFallback } from '@/lib/env'
 
@@ -37,24 +36,6 @@ export type PasswordChangeRequestResponse = {
 
 export type PasswordChangeConfirmResponse = {
   status: 'changed'
-}
-
-export type RegisterRequest = RegisterPayload | {
-  name: string
-  email: string
-  password: string
-  role: UserRole
-  preferredLanguage?: string
-  acceptedTerms?: true
-  termsVersion?: string
-  acceptedAt?: string
-  referralCode?: string
-  utm?: {
-    source?: string
-    medium?: string
-    campaign?: string
-    content?: string
-  } | null
 }
 
 export async function login(payload: LoginRequest) {
@@ -116,14 +97,6 @@ function classifyLogoutFailure(error: unknown): LogoutOutcome {
   const transportCode = error instanceof ApiError ? error.transportCode : undefined
   if (transportCode === 'ETIMEDOUT') return { kind: 'timeout' }
   return { kind: 'network', transportCode }
-}
-
-// Public registration is closed: the backend answers 410 and there is no route
-// left that reaches this. It stays only so the unused legacy form still builds,
-// and it no longer falls back to a demo session.
-export async function register(payload: RegisterRequest) {
-  const response = await httpClient.post<AuthResponse>('/auth/register', payload)
-  return response.data
 }
 
 export async function resendEmailVerification(payload: EmailVerificationRequest) {

@@ -70,6 +70,7 @@
     "noWeakAreaEvidence": "Nessuna evidenza di aree deboli per ora.",
     "lessonBankSample": "Esempio dalla banca lezioni",
     "exerciseCount_one": "{{count}} esercizio",
+    "exerciseCount_many": "{{count}} esercizi",
     "exerciseCount_other": "{{count}} esercizi",
     "source": {
       "practice_backfill": "Dalla banca degli esercizi"
@@ -106,6 +107,7 @@
     "weakTopicEvidence": "Indizi sugli argomenti deboli",
     "noWeakTopics": "Nessun argomento debole ha ancora indizi sufficienti.",
     "signals_one": "{{count}} segnale",
+    "signals_many": "{{count}} segnali",
     "signals_other": "{{count}} segnali",
     "freshness": "Aggiornamento del profilo",
     "freshnessBody": "Aggiornato il {{date}} da domande, escalation agli insegnanti e prove di esercitazione.",
@@ -148,6 +150,7 @@
     "comesBackLater": "Questa tornerà più avanti, più in là dell’ultima volta.",
     "description": "Le domande tornano poco prima di essere dimenticate. Una risposta giusta le allontana, una sbagliata le riporta indietro.",
     "due_one": "{{count}} domanda da rivedere",
+    "due_many": "{{count}} domande da rivedere",
     "due_other": "{{count}} domande da rivedere",
     "emptyBody": "Le domande a cui rispondi tornano quando è il momento. Fai una lezione e appariranno qui.",
     "emptyTitle": "Per ora non c’è nulla da rivedere",
@@ -155,6 +158,7 @@
     "loadFailed": "Non è stato possibile caricare il tuo ripasso.",
     "loading": "Cerco le domande da rivedere …",
     "missed_one": "sbagliata una volta",
+    "missed_many": "sbagliata {{count}} volte",
     "missed_other": "sbagliata {{count}} volte",
     "title": "Le domande che tornano"
   },
@@ -173,6 +177,7 @@
     "openQuestion": "Apri l’esercizio {{number}}",
     "finishPractice": "Concludi l’esercitazione",
     "withoutFeedback_one": "Ti resta {{count}} esercizio senza riscontro.",
+    "withoutFeedback_many": "Ti restano {{count}} esercizi senza riscontro.",
     "withoutFeedback_other": "Ti restano {{count}} esercizi senza riscontro.",
     "reviewUnanswered": "Rivedi gli esercizi senza risposta",
     "finishAnyway": "Concludi comunque",

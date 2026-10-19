@@ -427,10 +427,13 @@
   },
   "duration": {
     "minutes_one": "{{count}} minuto",
+    "minutes_many": "{{count}} minuti",
     "minutes_other": "{{count}} minuti",
     "hours_one": "{{count}} ora",
+    "hours_many": "{{count}} ore",
     "hours_other": "{{count}} ore",
     "days_one": "{{count}} giorno",
+    "days_many": "{{count}} giorni",
     "days_other": "{{count}} giorni"
   },
   "errorPages": {

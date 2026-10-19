@@ -70,6 +70,7 @@
     "noWeakAreaEvidence": "Aucun point faible identifié pour l'instant.",
     "lessonBankSample": "Aperçu de la banque de leçons",
     "exerciseCount_one": "{{count}} exercice",
+    "exerciseCount_many": "{{count}} exercices",
     "exerciseCount_other": "{{count}} exercices",
     "source": {
       "practice_backfill": "Depuis la banque d'exercices"
@@ -106,6 +107,7 @@
     "weakTopicEvidence": "Indices de thèmes faibles",
     "noWeakTopics": "Aucun thème faible ne réunit encore assez d’indices.",
     "signals_one": "{{count}} signal",
+    "signals_many": "{{count}} signaux",
     "signals_other": "{{count}} signaux",
     "freshness": "Fraîcheur du profil",
     "freshnessBody": "Mis à jour le {{date}} à partir des questions, des escalades vers un enseignant et des preuves de pratique.",
@@ -148,6 +150,7 @@
     "comesBackLater": "Celle-ci reviendra plus tard, plus loin que la dernière fois.",
     "description": "Les questions reviennent juste avant d’être oubliées. Une bonne réponse les éloigne, une erreur les ramène.",
     "due_one": "{{count}} question à revoir",
+    "due_many": "{{count}} questions à revoir",
     "due_other": "{{count}} questions à revoir",
     "emptyBody": "Les questions auxquelles tu réponds reviennent quand c’est le moment. Fais une leçon et elles apparaîtront ici.",
     "emptyTitle": "Rien à revoir pour le moment",
@@ -155,6 +158,7 @@
     "loadFailed": "Tes révisions n’ont pas pu être chargées.",
     "loading": "Recherche des questions à revoir …",
     "missed_one": "ratée une fois",
+    "missed_many": "ratée {{count}} fois",
     "missed_other": "ratée {{count}} fois",
     "title": "Les questions qui reviennent"
   },
@@ -173,6 +177,7 @@
     "openQuestion": "Ouvrir l’exercice {{number}}",
     "finishPractice": "Terminer la pratique",
     "withoutFeedback_one": "Il te reste {{count}} exercice sans retour.",
+    "withoutFeedback_many": "Il te reste {{count}} exercices sans retour.",
     "withoutFeedback_other": "Il te reste {{count}} exercices sans retour.",
     "reviewUnanswered": "Revoir les exercices sans réponse",
     "finishAnyway": "Terminer quand même",

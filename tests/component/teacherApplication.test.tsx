@@ -4,7 +4,6 @@ import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { TeacherActivatePage } from '@/pages/auth/TeacherActivatePage'
-import { buildTeacherStatement } from '@/services/teacher/teacherApplicationApi'
 import { claimTeacherInvitation } from '@/services/teacher/teacherApplicationApi'
 
 vi.mock('react-i18next', () => ({
@@ -20,28 +19,12 @@ vi.mock('@/services/teacher/teacherApplicationApi', async () => {
   )
   return {
     ...actual,
-    submitTeacherApplication: vi.fn(),
-    getTeacherApplicationStatus: vi.fn(),
     claimTeacherInvitation: vi.fn(),
     consumeTeacherInvitation: vi.fn(),
   }
 })
 
 const mockedClaim = vi.mocked(claimTeacherInvitation)
-
-describe('buildTeacherStatement', () => {
-  it('joins introduction, education, and experience without exceeding 2000 characters', () => {
-    const statement = buildTeacherStatement({
-      introduction: 'I teach algebra.',
-      educationBackground: 'MSc Mathematics',
-      yearsOfExperience: 4,
-    })
-    expect(statement).toContain('I teach algebra.')
-    expect(statement).toContain('Education: MSc Mathematics')
-    expect(statement).toContain('Experience: 4 years')
-    expect(statement.length).toBeLessThanOrEqual(2000)
-  })
-})
 
 describe('teacher activation page', () => {
   beforeEach(() => {

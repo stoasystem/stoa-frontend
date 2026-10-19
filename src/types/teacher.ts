@@ -135,11 +135,6 @@ export type AiTeacherDraft = {
   explanations: AiTeacherExplanationItem[]
 }
 
-export type AiTeacherDraftList = {
-  items: AiTeacherDraft[]
-  count: number
-}
-
 export type CreateExerciseDraftPayload = {
   studentId: string
   subject: string

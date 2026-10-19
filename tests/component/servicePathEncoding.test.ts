@@ -24,7 +24,6 @@ import * as notificationApi from '@/services/notifications/notificationApi'
 import * as parentApi from '@/services/parent/parentApi'
 import * as parentReportApi from '@/services/parent/parentReportApi'
 import * as practiceApi from '@/services/practice/practiceApi'
-import * as studentApi from '@/services/student/studentApi'
 import * as teacherApi from '@/services/teacher/teacherApi'
 import * as teacherApplicationApi from '@/services/teacher/teacherApplicationApi'
 import * as teacherHelpApi from '@/services/teacherHelp/teacherHelpApi'
@@ -196,21 +195,16 @@ const cases: Record<string, Case[]> = {
     { name: 'answerLessonQuiz', call: (id) => practiceApi.answerLessonQuiz(id, id, any({})), requests: (id) => [`POST /practice/lessons/${id}/quiz/${id}/answer`] },
     { name: 'completePracticeLesson', call: (id) => practiceApi.completePracticeLesson(id), requests: (id) => [`POST /practice/lessons/${id}/complete`] },
   ],
-  studentApi: [
-    { name: 'getStudentLearningProfile', call: (id) => studentApi.getStudentLearningProfile(id), requests: (id) => [`GET /students/${id}/learning-profile`] },
-  ],
   teacherApi: [
     { name: 'getTeacherHelpRequestDetail', call: (id) => teacherApi.getTeacherHelpRequestDetail(id), requests: (id) => [`GET /teachers/me/help-requests/${id}`] },
     { name: 'updateTeacherHelpRequestStatus', call: (id) => teacherApi.updateTeacherHelpRequestStatus(any({ requestId: id, status: 'resolved' })), requests: (id) => [`PATCH /teachers/me/help-requests/${id}`] },
     { name: 'addTeacherHelpRequestNote', call: (id) => teacherApi.addTeacherHelpRequestNote(any({ requestId: id, content: 'c' })), requests: (id) => [`POST /teachers/me/help-requests/${id}/notes`] },
     { name: 'getTeacherAssistanceSummary', call: (id) => teacherApi.getTeacherAssistanceSummary(id), requests: (id) => [`GET /teachers/questions/${id}/assistance-summary`] },
     { name: 'createAiTeacherSummaryDraft', call: (id) => teacherApi.createAiTeacherSummaryDraft(id), requests: (id) => [`POST /teachers/questions/${id}/ai-tools/summary-draft`] },
-    { name: 'getAiTeacherDraft', call: (id) => teacherApi.getAiTeacherDraft(id), requests: (id) => [`GET /teachers/ai-tools/drafts/${id}`] },
     { name: 'regenerateAiTeacherDraft', call: (id) => teacherApi.regenerateAiTeacherDraft(id), requests: (id) => [`POST /teachers/ai-tools/drafts/${id}/regenerate`] },
     { name: 'acceptAiTeacherDraft', call: (id) => teacherApi.acceptAiTeacherDraft(any({ draftId: id })), requests: (id) => [`POST /teachers/ai-tools/drafts/${id}/accept`] },
   ],
   teacherApplicationApi: [
-    { name: 'getTeacherApplicationStatus', call: (id) => teacherApplicationApi.getTeacherApplicationStatus(id), requests: (id) => [`GET /teacher-applications/${id}/status`] },
     { name: 'getTeacherApplicationDetail', call: (id) => teacherApplicationApi.getTeacherApplicationDetail(id, 2), requests: (id) => [`GET /teacher-applications/${id}/versions/2`] },
     { name: 'reviewTeacherApplication', call: (id) => teacherApplicationApi.reviewTeacherApplication(any({ applicationId: id })), requests: (id) => [`POST /teacher-applications/${id}/reviews`] },
     { name: 'reissueTeacherInvitation', call: (id) => teacherApplicationApi.reissueTeacherInvitation(id, 2), requests: (id) => [`POST /teacher-applications/${id}/invitations`] },

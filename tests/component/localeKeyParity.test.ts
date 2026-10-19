@@ -24,9 +24,14 @@ function leafKeys(value: unknown, prefix = ''): string[] {
   )
 }
 
+// Plural forms differ by language: French and Italian need `_many`, German
+// and English do not (#315). A plural family counts once, by its base key;
+// `localePlurals315.test.ts` checks each language has the forms it needs.
+const PLURAL_FORM = /_(zero|one|two|few|many|other)$/
+
 function keysOf(locale: string, file: string): string[] {
   const contents = readFileSync(path.join(LOCALES_DIR, locale, file), 'utf8')
-  return leafKeys(JSON.parse(contents)).sort()
+  return [...new Set(leafKeys(JSON.parse(contents)).map((key) => key.replace(PLURAL_FORM, '_<plural>')))].sort()
 }
 
 const NAMESPACES = readdirSync(path.join(LOCALES_DIR, 'en')).filter((name) =>

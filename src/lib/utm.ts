@@ -34,18 +34,3 @@ export function captureAttributionFromUrl() {
     localStorage.setItem(REFERRAL_STORAGE_KEY, referralCode)
   }
 }
-
-export function getStoredUTM(): UTMParams | null {
-  const raw = localStorage.getItem(UTM_STORAGE_KEY)
-  if (!raw) return null
-
-  try {
-    return JSON.parse(raw) as UTMParams
-  } catch {
-    return null
-  }
-}
-
-export function getStoredReferralCode() {
-  return localStorage.getItem(REFERRAL_STORAGE_KEY)
-}
