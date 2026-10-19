@@ -1,4 +1,4 @@
-import { FormEvent, useMemo, useState } from 'react'
+import { FormEvent, useEffect, useMemo, useState } from 'react'
 import { Code2, List, Pilcrow, Send, Sigma } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
@@ -13,24 +13,70 @@ const modeOptions: { mode: ComposerMode; Icon: typeof Pilcrow }[] = [
   { mode: 'code', Icon: Code2 },
 ]
 
+type ComposerDraft = { mode: ComposerMode; value: string; blocks: TeacherReplyBlock[] }
+
+const emptyDraft: ComposerDraft = { mode: 'paragraph', value: '', blocks: [] }
+
+/*
+ * The draft outlives the composer: the page takes it away while a request
+ * cannot be acted on, and a teacher may leave and come back (#331). Kept per
+ * request for this tab only; storage that throws (private mode) just keeps
+ * nothing.
+ */
+const draftStorageKey = (draftKey: string) => `stoa.teacherReplyDraft.${draftKey}`
+
+function readDraft(draftKey: string | undefined): ComposerDraft {
+  if (!draftKey) return emptyDraft
+  try {
+    const stored = JSON.parse(sessionStorage.getItem(draftStorageKey(draftKey)) ?? 'null') as Partial<ComposerDraft> | null
+    if (!stored || typeof stored.value !== 'string' || !Array.isArray(stored.blocks)) return emptyDraft
+    const mode = modeOptions.some((option) => option.mode === stored.mode) ? (stored.mode as ComposerMode) : 'paragraph'
+    return { mode, value: stored.value, blocks: stored.blocks }
+  } catch {
+    return emptyDraft
+  }
+}
+
+function writeDraft(draftKey: string | undefined, draft: ComposerDraft) {
+  if (!draftKey) return
+  try {
+    if (!draft.value && draft.blocks.length === 0) sessionStorage.removeItem(draftStorageKey(draftKey))
+    else sessionStorage.setItem(draftStorageKey(draftKey), JSON.stringify(draft))
+  } catch {
+    // Nothing kept; the draft still lives on screen.
+  }
+}
+
 export function TeacherReplyComposer({
   isSubmitting,
   onSubmit,
+  disabled = false,
+  draftKey,
 }: {
   isSubmitting: boolean
   onSubmit: (content: string, richContent: TeacherReplyRichContent, onSuccess: () => void) => void
+  /** Keeps the draft on screen but takes nothing in or out. */
+  disabled?: boolean
+  /** Keeps the draft in this tab's storage under this key, usually the request id. */
+  draftKey?: string
 }) {
   const { t } = useTranslation('teacher')
-  const [mode, setMode] = useState<ComposerMode>('paragraph')
-  const [value, setValue] = useState('')
-  const [blocks, setBlocks] = useState<TeacherReplyBlock[]>([])
+  const [initialDraft] = useState(() => readDraft(draftKey))
+  const [mode, setMode] = useState<ComposerMode>(initialDraft.mode)
+  const [value, setValue] = useState(initialDraft.value)
+  const [blocks, setBlocks] = useState<TeacherReplyBlock[]>(initialDraft.blocks)
+
+  useEffect(() => {
+    writeDraft(draftKey, { mode, value, blocks })
+  }, [draftKey, mode, value, blocks])
 
   const previewBlocks = useMemo(() => {
     const trimmed = value.trim()
     return trimmed ? [...blocks, blockFromInput(mode, trimmed)] : blocks
   }, [blocks, mode, value])
   const unsafeReason = useMemo(() => unsafeReplyReason(previewBlocks), [previewBlocks])
-  const canSubmit = previewBlocks.length > 0 && !isSubmitting && !unsafeReason
+  const locked = isSubmitting || disabled
+  const canSubmit = previewBlocks.length > 0 && !locked && !unsafeReason
 
   function addBlock() {
     const trimmed = value.trim()
@@ -63,9 +109,10 @@ export function TeacherReplyComposer({
               title={t(`reply.modes.${option.mode}`)}
               aria-label={t(`reply.modes.${option.mode}`)}
               aria-pressed={active}
-              className={`inline-flex h-9 w-9 items-center justify-center rounded-md border transition-colors ${
+              className={`inline-flex h-9 w-9 items-center justify-center rounded-md border transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${
                 active ? 'border-primary bg-primary text-primary-foreground' : 'bg-background hover:bg-secondary'
               }`}
+              disabled={disabled}
               onClick={() => setMode(option.mode)}
             >
               <Icon className="h-4 w-4" aria-hidden="true" />
@@ -82,7 +129,7 @@ export function TeacherReplyComposer({
         placeholder={mode === 'formula' ? '2x + 4 = 10' : t('reply.placeholder')}
         value={value}
         onChange={(event) => setValue(event.target.value)}
-        disabled={isSubmitting}
+        disabled={locked}
       />
       {blocks.length > 0 && (
         <div className="rounded-md border bg-secondary/40 p-3 text-xs text-muted-foreground">
@@ -95,7 +142,7 @@ export function TeacherReplyComposer({
           type="button"
           variant="outline"
           onClick={addBlock}
-          disabled={isSubmitting || !value.trim() || Boolean(unsafeReason)}
+          disabled={locked || !value.trim() || Boolean(unsafeReason)}
         >
           {t('reply.addBlock')}
         </Button>

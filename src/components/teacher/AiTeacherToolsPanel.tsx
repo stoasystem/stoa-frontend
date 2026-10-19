@@ -15,19 +15,28 @@ import {
   useRejectAiTeacherDraftMutation,
 } from '@/hooks/teacher/useAiTeacherDraftMutations'
 import type { AiTeacherDraft, TeacherHelpRequestDetail } from '@/types/teacher'
+import { acceptsTeacherReply } from '@/types/teacherHelp'
 
 const difficulties = ['targeted', 'standard', 'stretch']
 
 type Props = {
   request: TeacherHelpRequestDetail
+  /** False while the page cannot act on the request: refused, or not read again yet. */
+  canAct: boolean
 }
 
-export function AiTeacherToolsPanel({ request }: Props) {
+export function AiTeacherToolsPanel({ request, canAct }: Props) {
   const { t } = useTranslation('teacher')
   const [summaryDraft, setSummaryDraft] = useState<AiTeacherDraft>()
   const [exerciseDraft, setExerciseDraft] = useState<AiTeacherDraft>()
   const [difficulty, setDifficulty] = useState('targeted')
-  const [exerciseCount, setExerciseCount] = useState(3)
+  // What the teacher typed; held as text so "" or "1" on the way to "12" is
+  // not snapped while typing, and clamped when the field is left (#331).
+  const [exerciseCountInput, setExerciseCountInput] = useState('3')
+  const exerciseCount = clampExerciseCount(Number.parseInt(exerciseCountInput, 10))
+  // Drafts are for a request this teacher works on: not one taken from them,
+  // nor one withdrawn or expired, which has no teacher (#331).
+  const canGenerate = canAct && acceptsTeacherReply(request.status)
   const topicIds = useMemo(() => {
     const topicId = request.practiceContext?.topicId
     return topicId ? [topicId] : [request.subject.toLowerCase().replace(/\s+/g, '-')]
@@ -42,6 +51,7 @@ export function AiTeacherToolsPanel({ request }: Props) {
   const isReviewing = accept.isPending || reject.isPending || archive.isPending || regenerate.isPending
 
   function handleCreateExercise() {
+    setExerciseCountInput(String(exerciseCount))
     createExercise.mutate(
       {
         studentId: request.student.id,
@@ -95,6 +105,9 @@ export function AiTeacherToolsPanel({ request }: Props) {
         </div>
       </CardHeader>
       <CardContent className="space-y-5">
+        {!canGenerate && (
+          <p role="status" className="text-sm text-muted-foreground">{t('aiTools.notApplicable')}</p>
+        )}
         <div className="grid gap-4 lg:grid-cols-2">
           <div className="space-y-3 rounded-md border border-border/70 p-3">
             <div className="flex flex-col items-start justify-between gap-3 sm:flex-row">
@@ -108,7 +121,7 @@ export function AiTeacherToolsPanel({ request }: Props) {
                 type="button"
                 size="sm"
                 aria-label={t('aiTools.summary.generateLabel')}
-                disabled={createSummary.isPending}
+                disabled={!canGenerate || createSummary.isPending}
                 onClick={() => createSummary.mutate(request.requestId, { onSuccess: setSummaryDraft })}
               >
                 <FileText className="h-4 w-4" aria-hidden="true" />
@@ -125,6 +138,7 @@ export function AiTeacherToolsPanel({ request }: Props) {
                 <DraftActions
                   draft={summaryDraft}
                   isPending={isReviewing}
+                  canRegenerate={canGenerate}
                   onAccept={() => handleReview(summaryDraft, 'accept')}
                   onReject={() => handleReview(summaryDraft, 'reject')}
                   onArchive={() => handleReview(summaryDraft, 'archive')}
@@ -146,7 +160,7 @@ export function AiTeacherToolsPanel({ request }: Props) {
                 type="button"
                 size="sm"
                 aria-label={t('aiTools.exercise.generateLabel')}
-                disabled={createExercise.isPending}
+                disabled={!canGenerate || createExercise.isPending}
                 onClick={handleCreateExercise}
               >
                 <Sparkles className="h-4 w-4" aria-hidden="true" />
@@ -179,8 +193,9 @@ export function AiTeacherToolsPanel({ request }: Props) {
                   type="number"
                   min={1}
                   max={5}
-                  value={exerciseCount}
-                  onChange={(event) => setExerciseCount(clampExerciseCount(event.target.valueAsNumber))}
+                  value={exerciseCountInput}
+                  onChange={(event) => setExerciseCountInput(event.target.value)}
+                  onBlur={() => setExerciseCountInput(String(exerciseCount))}
                 />
               </div>
             </div>
@@ -204,6 +219,7 @@ export function AiTeacherToolsPanel({ request }: Props) {
                 <DraftActions
                   draft={exerciseDraft}
                   isPending={isReviewing}
+                  canRegenerate={canGenerate}
                   onAccept={() => handleReview(exerciseDraft, 'accept')}
                   onReject={() => handleReview(exerciseDraft, 'reject')}
                   onArchive={() => handleReview(exerciseDraft, 'archive')}
@@ -253,6 +269,7 @@ function SummaryLine({ label, value }: { label: string; value?: string | null })
 function DraftActions({
   draft,
   isPending,
+  canRegenerate,
   onAccept,
   onReject,
   onArchive,
@@ -260,6 +277,7 @@ function DraftActions({
 }: {
   draft: AiTeacherDraft
   isPending: boolean
+  canRegenerate: boolean
   onAccept: () => void
   onReject: () => void
   onArchive: () => void
@@ -270,7 +288,7 @@ function DraftActions({
 
   return (
     <div className="flex flex-wrap gap-2">
-      <Button type="button" variant="outline" size="sm" disabled={isPending} onClick={onRegenerate}>
+      <Button type="button" variant="outline" size="sm" disabled={isPending || !canRegenerate} onClick={onRegenerate}>
         <RefreshCw className="h-4 w-4" aria-hidden="true" />
         {t('aiTools.actions.regenerate')}
       </Button>

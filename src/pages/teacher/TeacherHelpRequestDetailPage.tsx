@@ -18,7 +18,10 @@ import { CurriculumRolloutPanel } from '@/components/practice/CurriculumRolloutP
 import { Button } from '@/components/ui/button'
 import { useCurriculumCatalogQuery } from '@/hooks/practice/useCurriculumCatalogQuery'
 import { useAddTeacherHelpRequestNoteMutation } from '@/hooks/teacher/useAddTeacherHelpRequestNoteMutation'
-import { useTeacherHelpRequestDetailQuery } from '@/hooks/teacher/useTeacherHelpRequestDetailQuery'
+import {
+  isHelpRequestOutOfReach,
+  useTeacherHelpRequestDetailQuery,
+} from '@/hooks/teacher/useTeacherHelpRequestDetailQuery'
 import { useTeacherAssistanceSummaryQuery } from '@/hooks/teacher/useTeacherAssistanceSummaryQuery'
 import { useUpdateTeacherHelpRequestMutation } from '@/hooks/teacher/useUpdateTeacherHelpRequestMutation'
 import { DashboardLayout } from '@/layouts/DashboardLayout'
@@ -51,10 +54,12 @@ export function TeacherHelpRequestDetailPage() {
     trackEvent('teacher_request_opened', { requestId })
   }, [requestId])
 
-  // A failed read keeps the last copy on screen, but that copy may no longer be
-  // this teacher's (a 403 once someone else took it): show it, offer nothing
-  // on it (#269).
-  const canAct = !requestQuery.isError
+  // A failed read keeps the last copy on screen. Refused (403/404), that copy is
+  // no longer this teacher's: show it, offer nothing on it (#269). Any other
+  // failure may pass at the next poll: keep everything, the reply draft above
+  // all, but take nothing until a read succeeds again (#331).
+  const canAct = !isHelpRequestOutOfReach(requestQuery.error)
+  const readFailed = requestQuery.isError && canAct
   const statusActions = canAct ? teacherStatusActions(requestQuery.data?.status) : []
   const changedElsewhere = isHelpRequestConflict(updateStatus.error) || isHelpRequestConflict(addNote.error)
 
@@ -87,7 +92,7 @@ export function TeacherHelpRequestDetailPage() {
               isLoading={assistanceQuery.isLoading}
               isError={assistanceQuery.isError}
             />
-            <AiTeacherToolsPanel request={requestQuery.data} />
+            <AiTeacherToolsPanel request={requestQuery.data} canAct={canAct && !readFailed} />
             <CurriculumRolloutPanel
               title={t('curriculumRollout.teacherTitle')}
               description={t('curriculumRollout.teacherDescription')}
@@ -122,6 +127,7 @@ export function TeacherHelpRequestDetailPage() {
                     type="button"
                     variant="outline"
                     disabled={
+                      readFailed ||
                       updateStatus.isPending ||
                       !requestId ||
                       (status === 'resolved' && resolutionNote.trim().length === 0)
@@ -150,7 +156,13 @@ export function TeacherHelpRequestDetailPage() {
                   title={tTeacher('detail.replyTitle')}
                   description={tTeacher('detail.replyDescription')}
                 />
+                {readFailed && (
+                  <p role="status" className="text-sm text-muted-foreground">{tTeacher('detail.replyPaused')}</p>
+                )}
                 <TeacherReplyComposer
+                  key={requestId}
+                  draftKey={requestId}
+                  disabled={readFailed}
                   isSubmitting={addNote.isPending}
                   onSubmit={(content, richContent, onSuccess) =>
                     requestId && addNote.mutate({ requestId, content, richContent }, { onSuccess })
