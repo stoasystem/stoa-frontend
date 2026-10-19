@@ -119,6 +119,21 @@ describe('the ß guard', () => {
     expect(result.stderr).toContain(`${path.join(planted, 'planted.json')}:3:`)
     expect(result.stderr).not.toContain('clean.json')
   })
+
+  it('also catches a capital ẞ and an escaped ß', () => {
+    planted = mkdtempSync(path.join(os.tmpdir(), 'eszett-'))
+    writeFileSync(path.join(planted, 'capital.json'), '{ "a": "GROẞ" }\n')
+    writeFileSync(path.join(planted, 'escaped.json'), '{ "a": "Stra\\u00dfe" }\n')
+    const result = run(planted)
+    expect(result.status).toBe(1)
+    expect(result.stderr).toContain('capital.json:1:')
+    expect(result.stderr).toContain('escaped.json:1:')
+  })
+
+  it('fails when there is nothing to read', () => {
+    planted = mkdtempSync(path.join(os.tmpdir(), 'eszett-'))
+    expect(run(planted).status).toBe(1)
+  })
 })
 
 describe('plain words instead of anglicisms', () => {

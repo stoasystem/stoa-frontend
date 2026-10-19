@@ -14,20 +14,27 @@ import { join } from 'node:path'
 
 const dir = process.argv[2] ?? 'src/i18n/locales/de'
 
+// ß, capital ẞ, and either written as a JSON escape.
+const ESZETT = /[ßẞ]|\\u00df|\\u1e9e/i
+
+const files = readdirSync(dir).filter((name) => name.endsWith('.json')).sort()
 const hits = []
-for (const name of readdirSync(dir).sort()) {
-  if (!name.endsWith('.json')) continue
+for (const name of files) {
   readFileSync(join(dir, name), 'utf8')
     .split('\n')
     .forEach((line, index) => {
-      if (line.includes('ß')) hits.push(`${join(dir, name)}:${index + 1}: ${line.trim()}`)
+      if (ESZETT.test(line)) hits.push(`${join(dir, name)}:${index + 1}: ${line.trim()}`)
     })
 }
 
-if (hits.length > 0) {
+if (files.length === 0) {
+  // A guard that read nothing has checked nothing.
+  console.error(`No .json locale files in ${dir}.`)
+  process.exitCode = 1
+} else if (hits.length > 0) {
   console.error(`${hits.length} line(s) use ß; Swiss German writes ss:`)
   for (const hit of hits) console.error(`  ${hit}`)
   process.exitCode = 1
 } else {
-  console.log(`No ß in ${dir}.`)
+  console.log(`No ß in ${files.length} files in ${dir}.`)
 }
