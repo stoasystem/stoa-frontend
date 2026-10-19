@@ -160,12 +160,9 @@ describe('plain words instead of anglicisms', () => {
     expect(practice.curriculumRollout.rolloutSubjects).toBe('Verfügbare Fächer')
   })
 
-  it('calls the assistant by its feature name, Fragen', () => {
-    const uploads = JSON.parse(readFileSync(path.join(LOCALES, 'de/uploads.json'), 'utf8'))
-    expect(uploads.actions.askLearningAssistant).toBe('In «Fragen» nachfragen')
-    expect(uploads.modal.description).toContain('«Fragen»')
-    expect(uploads.learning.uploadOwnQuestionDescription).toContain('«Fragen»')
-  })
+  // The three uploads keys that named the assistant «Fragen» were read by no
+  // screen and went with the other unused keys in #281; the check above still
+  // keeps "Learning Assistant" out of every bundle.
 
   it('keeps the noun Upload', () => {
     expect(values('de').some((value) => /\bUpload\b/.test(value))).toBe(true)

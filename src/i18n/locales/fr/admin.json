@@ -1,9 +1,6 @@
 {
-  "overviewTitle": "Vue admin",
-  "overviewDescription": "Consulter l’activité d’apprentissage, les tickets support et les demandes enseignant.",
   "analytics": "Analyses",
   "supportTickets": "Tickets support",
-  "helpRequests": "Demandes enseignant",
   "accounts": {
     "eyebrow": "Gestion des comptes",
     "title": "Comptes",

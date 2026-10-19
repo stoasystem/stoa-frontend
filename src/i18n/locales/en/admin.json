@@ -1,9 +1,6 @@
 {
-  "overviewTitle": "Admin overview",
-  "overviewDescription": "Review learning activity, support tickets, and teacher request signals.",
   "analytics": "Analytics",
   "supportTickets": "Support tickets",
-  "helpRequests": "Teacher requests",
   "accounts": {
     "eyebrow": "Account administration",
     "title": "Accounts",

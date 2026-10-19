@@ -1,54 +1,19 @@
 {
   "title": "Lernraum",
-  "emptyTitle": "Beginne mit einer Lernfrage.",
-  "emptyDescription": "Stelle eine Frage, beschreibe, wo du nicht weiterkommst, oder lade ein Arbeitsblatt hoch.",
-  "welcome": "Willkommen bei STOA. Stelle eine Frage oder beschreibe, wo du Unterstützung brauchst.",
   "placeholder": "Schreibe hier deine Lernfrage...",
-  "inputLabel": "Lernfrage",
   "newConversationLabel": "Erste Lernfrage",
-  "messageListLabel": "Nachrichten der Unterhaltung",
   "studentMessageLabel": "Nachricht des Schülers",
-  "assistantMessageLabel": "STOA Nachricht",
-  "preparing": "Der Lernassistent bereitet eine Erklärung vor...",
-  "loadFailed": "Wir konnten deine Lernunterhaltungen gerade nicht laden. Bitte versuche es erneut.",
-  "conversationLoadFailed": "Wir konnten diese Lernunterhaltung gerade nicht öffnen. Bitte versuche es erneut.",
-  "createFailed": "Wir konnten keine neue Lernunterhaltung starten. Bitte versuche es erneut.",
   "starting": "Wird gestartet...",
   "startConversation": "Gespräch starten",
-  "quotaReached": "Die Lernnachrichten in diesem Plan sind aufgebraucht.",
-  "fileQuotaReached": "Die Datei-Uploads in diesem Plan sind aufgebraucht.",
-  "emptyMessage": "Nachricht darf nicht leer sein.",
-  "upload": "Hausaufgabendatei hochladen",
-  "uploadFailed": "Wir konnten diese Datei nicht hochladen. Bitte versuche es erneut.",
   "retry": "Erneut versuchen",
   "newConversation": "Neue Unterhaltung",
   "practiceContext": {
     "title": "Du wiederholst einen Übungsschritt.",
     "topic": "Thema",
     "question": "Aufgabe",
-    "recentAnswer": "Letzte Antwort",
-    "backToLesson": "Zurück zur Lektion",
-    "welcome": "Besprich diesen Übungsschritt mit dem Lernassistenten.",
-    "placeholder": "Bitte um den nächsten Schritt, nicht nur um das Ergebnis...",
-    "attempts": "Versuche: {{attempts}}",
-    "hintViewed": "Tipp angesehen"
-  },
-  "availability": {
-    "checking": "Lehrpersonen werden geprüft",
-    "online": "Lehrperson online",
-    "offline": "Keine Lehrperson online",
-    "onlineDetail": "{{count}} jetzt verfügbar",
-    "offlineDetail": "Lehrpersonen prüfen Anfragen später.",
-    "nextWindow": "Nächstes Zeitfenster {{nextWindow}}"
+    "attempts": "Versuche: {{attempts}}"
   },
   "teacher": {
-    "title": "Soll eine Lehrperson helfen?",
-    "description": "Sende diese Unterhaltung an eine qualifizierte Lehrperson, wenn du mehr Orientierung brauchst.",
-    "cta": "Lehrperson fragen",
-    "submitted": "Deine Anfrage wurde an eine Lehrperson gesendet.",
-    "failed": "Wir konnten die Anfrage an die Lehrperson nicht senden. Bitte versuche es erneut.",
-    "requested": "Deine Anfrage an eine Lehrperson wurde gesendet.",
-    "retry": "Erneut versuchen",
     "errors": {
       "planDenied": "Lehrpersonen-Unterstützung ist für dieses Konto noch nicht freigeschaltet. Die STOA-Administration kann sie hinzufügen.",
       "allowanceExhausted": "Die Anfragen an Lehrpersonen für diese Woche sind aufgebraucht. Nächste Woche stehen wieder welche zur Verfügung.",
@@ -76,60 +41,15 @@
     "foundation": "Basis-Unterstützung"
   },
   "conversations": "Unterhaltungen",
-  "conversationsSubtitle": "Deine Lernunterhaltungen",
-  "backToConversations": "Zurück zu den Unterhaltungen",
   "newConversationReady": "Bereit für eine neue Frage.",
   "stopGenerating": "Erstellung stoppen",
-  "loadingChat": "Chat wird geladen",
-  "teacherSupport": "Unterstützung durch Lehrpersonen",
-  "uploadedMaterial": "Hochgeladenes Lernmaterial",
-  "back": "Zurück",
   "needHelpFromTeacher": "Brauchst du Hilfe von einer Lehrperson?",
-  "escalation": {
-    "prompt": "Fordere Unterstützung durch eine Lehrperson an, wenn die Erklärung nicht ausreicht.",
-    "requesting": "Wird angefragt...",
-    "requestTeacher": "Lehrperson anfragen",
-    "planRestricted": "Unterstützung durch eine Lehrperson ist nicht Teil deines aktuellen Plans."
-  },
   "roles": {
     "teacher": "Lehrperson",
     "system": "System",
     "assistant": "STOA Lernassistent"
   },
-  "messageStatus": {
-    "sending": "Wird gesendet",
-    "stopped": "Generierung gestoppt",
-    "failed": "Erneut versuchen"
-  },
   "thinking": "Denkt nach …",
-  "report": {
-    "trigger": "Antwort melden",
-    "context": "Diese Antwort des Assistenten an die interne Moderationsprüfung senden."
-  },
-  "questionBankContext": {
-    "welcome": "Sieh diesen Aufgabenschritt gemeinsam mit dem Lernassistenten durch.",
-    "placeholder": "Frag, was an dieser Aufgabe unklar ist ..."
-  },
-  "uploadContext": {
-    "placeholder": "Sag dem Lernassistenten, welcher Teil unklar ist ..."
-  },
-  "defaultPrompt": {
-    "practice": "Kannst du diesen Schritt erklären?",
-    "questionBank": "Kannst du diesen Schritt aus der Übungsbibliothek erklären?",
-    "questionStep": "Kannst du diesen Aufgabenschritt erklären?"
-  },
-  "teacherEscalation": {
-    "requestedTitle": "Unterstützung durch eine Lehrperson angefragt",
-    "requestedBody": "Eine Lehrperson tritt diesem Gespräch bei, sobald jemand verfügbar ist. Du kannst in der Zwischenzeit mit dem Lernassistenten weiterarbeiten."
-  },
-  "followUp": {
-    "label": "Vorschläge für Rückfragen",
-    "explainStep": "Einen der Schritte verstehe ich nicht",
-    "simpler": "Kannst du das einfacher erklären?",
-    "similar": "Gib mir eine ähnliche Aufgabe",
-    "why": "Warum funktioniert das?"
-  },
-  "duplicateReopened": "Das hast du schon gefragt. Hier ist das Gespräch dazu.",
   "ask": {
     "title": "Fragen",
     "close": "Schliessen",

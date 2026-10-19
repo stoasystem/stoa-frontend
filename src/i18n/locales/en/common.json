@@ -8,7 +8,6 @@
   "accountMenu": {
     "addAccount": "Add another account",
     "billing": "Billing and payments",
-    "forgetAccount": "Remove account",
     "help": "Help and support",
     "open": "Account",
     "switchAccount": "Switch account",
@@ -16,31 +15,16 @@
     "switchUnreachable": "Could not reach the server. The account is still held."
   },
   "actions": {
-    "askTeacher": "Ask a Teacher",
     "back": "Back",
     "changePassword": "Change password",
-    "choosePlan": "Choose a plan",
     "continue": "Continue",
-    "createAccount": "Create account",
     "creatingAccount": "Creating account...",
     "logOut": "Log out",
-    "register": "Register",
     "saving": "Saving...",
-    "send": "Send message",
     "sending": "Sending...",
     "signIn": "Sign in",
     "signingIn": "Signing in...",
-    "startLearning": "Start learning",
-    "startLearningShort": "Start",
-    "stop": "Stop",
-    "tryAgain": "Try again",
-    "viewPricing": "View pricing"
-  },
-  "brand": {
-    "learningAssistant": "Learning Assistant",
-    "name": "STOA",
-    "platform": "STOA Learning Platform",
-    "teacherSupport": "Teacher support"
+    "tryAgain": "Try again"
   },
   "composer": {
     "attach": "Add a photo or file",
@@ -61,7 +45,6 @@
   "footer": {
     "address": "Locations",
     "backToHomepage": "Back to STOA homepage",
-    "contact": "Contact",
     "contactInfo": "Contact",
     "copyright": "© 2026 STOA. All rights reserved.",
     "description": "A calm learning platform for questions, clear explanations, parent visibility, and professional teacher support.",

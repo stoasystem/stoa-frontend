@@ -8,7 +8,6 @@
   "accountMenu": {
     "addAccount": "Aggiungi un altro account",
     "billing": "Fatturazione e pagamenti",
-    "forgetAccount": "Rimuovi account",
     "help": "Aiuto e supporto",
     "open": "Account",
     "switchAccount": "Cambia account",
@@ -16,31 +15,16 @@
     "switchUnreachable": "Server non raggiungibile. L’account resta salvato."
   },
   "actions": {
-    "askTeacher": "Chiedi a un insegnante",
     "back": "Indietro",
     "changePassword": "Cambia password",
-    "choosePlan": "Scegli un piano",
     "continue": "Continua",
-    "createAccount": "Crea account",
     "creatingAccount": "Creazione account...",
     "logOut": "Esci",
-    "register": "Registrati",
     "saving": "Salvataggio...",
-    "send": "Invia messaggio",
     "sending": "Invio...",
     "signIn": "Accedi",
     "signingIn": "Accesso...",
-    "startLearning": "Inizia a studiare",
-    "startLearningShort": "Inizia",
-    "stop": "Ferma",
-    "tryAgain": "Riprova",
-    "viewPricing": "Vedi i prezzi"
-  },
-  "brand": {
-    "learningAssistant": "Assistente all’apprendimento",
-    "name": "STOA",
-    "platform": "Piattaforma di apprendimento STOA",
-    "teacherSupport": "Supporto di un insegnante qualificato"
+    "tryAgain": "Riprova"
   },
   "composer": {
     "attach": "Aggiungi una foto o un file",
@@ -61,7 +45,6 @@
   "footer": {
     "address": "Sedi",
     "backToHomepage": "Torna al sito STOA",
-    "contact": "Contatto",
     "contactInfo": "Contatto",
     "copyright": "© 2026 STOA. Tutti i diritti riservati.",
     "description": "Una piattaforma di apprendimento chiara per fare domande, ricevere spiegazioni, seguire i progressi e ottenere supporto da un insegnante qualificato.",

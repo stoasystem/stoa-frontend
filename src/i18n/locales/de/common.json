@@ -8,7 +8,6 @@
   "accountMenu": {
     "addAccount": "Weiteres Konto hinzufügen",
     "billing": "Abrechnung und Zahlung",
-    "forgetAccount": "Konto entfernen",
     "help": "Hilfe und Support",
     "open": "Konto",
     "switchAccount": "Konto wechseln",
@@ -16,31 +15,16 @@
     "switchUnreachable": "Server nicht erreichbar. Das Konto bleibt gespeichert."
   },
   "actions": {
-    "askTeacher": "Lehrperson fragen",
     "back": "Zurück",
     "changePassword": "Passwort ändern",
-    "choosePlan": "Plan wählen",
     "continue": "Weiter",
-    "createAccount": "Konto erstellen",
     "creatingAccount": "Konto wird erstellt...",
     "logOut": "Abmelden",
-    "register": "Registrieren",
     "saving": "Speichern...",
-    "send": "Nachricht senden",
     "sending": "Senden...",
     "signIn": "Einloggen",
     "signingIn": "Einloggen...",
-    "startLearning": "Lernen starten",
-    "startLearningShort": "Starten",
-    "stop": "Stoppen",
-    "tryAgain": "Erneut versuchen",
-    "viewPricing": "Preise ansehen"
-  },
-  "brand": {
-    "learningAssistant": "Lernassistent",
-    "name": "STOA",
-    "platform": "STOA Lernplattform",
-    "teacherSupport": "Professionelle Unterstützung durch Lehrpersonen"
+    "tryAgain": "Erneut versuchen"
   },
   "composer": {
     "attach": "Foto oder Datei hinzufügen",
@@ -61,7 +45,6 @@
   "footer": {
     "address": "Standorte",
     "backToHomepage": "Zur STOA Website",
-    "contact": "Kontakt",
     "contactInfo": "Kontakt",
     "copyright": "© 2026 STOA. Alle Rechte vorbehalten.",
     "description": "Eine ruhige Lernplattform für Fragen, klare Erklärungen, Einblick für Eltern und professionelle Unterstützung durch Lehrpersonen.",

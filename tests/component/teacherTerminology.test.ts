@@ -67,12 +67,8 @@ const KEPT: Record<string, Kept> = {
     why: 'the same organisation type, narrowed for the partnership form',
     marker: new RegExp(`'${LEGACY_TERM}ing_center'`),
   },
-  // Italian for a legal guardian, not a teacher.
-  'i18n/locales/it/practice.json': {
-    count: 2,
-    why: 'Italian "tutore" = legal guardian, in the parent-link copy',
-    marker: new RegExp(`genitore o ${LEGACY_TERM}e`, 'i'),
-  },
+  // it/practice.json's "genitore o tutore" (a legal guardian) was in a key no
+  // screen read, deleted with the other unused keys in #281.
 }
 
 function filesUnder(dir: string): string[] {

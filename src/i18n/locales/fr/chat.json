@@ -1,54 +1,19 @@
 {
   "title": "Espace d’apprentissage",
-  "emptyTitle": "Pose ta première question d’apprentissage.",
-  "emptyDescription": "Pose une question, explique où tu bloques ou téléverse une fiche pour commencer.",
-  "welcome": "Bienvenue sur STOA. Commence par poser une question ou expliquer où tu bloques.",
   "placeholder": "Écris ta question d’apprentissage...",
-  "inputLabel": "Question d’apprentissage",
   "newConversationLabel": "Première question d’apprentissage",
-  "messageListLabel": "Messages de la conversation",
   "studentMessageLabel": "Message de l’élève",
-  "assistantMessageLabel": "Message STOA",
-  "preparing": "L’Assistant d’apprentissage prépare une explication...",
-  "loadFailed": "Nous n’avons pas pu charger tes conversations d’apprentissage pour le moment. Réessaie.",
-  "conversationLoadFailed": "Nous n’avons pas pu ouvrir cette conversation d’apprentissage pour le moment. Réessaie.",
-  "createFailed": "Nous n’avons pas pu démarrer une nouvelle conversation d’apprentissage. Réessaie.",
   "starting": "Démarrage...",
   "startConversation": "Démarrer la conversation",
-  "quotaReached": "Les messages d’apprentissage de cette formule ont été utilisés.",
-  "fileQuotaReached": "Les téléversements de cette formule ont été utilisés.",
-  "emptyMessage": "Le message ne peut pas être vide.",
-  "upload": "Téléverser un devoir",
-  "uploadFailed": "Nous n’avons pas pu téléverser ce fichier. Réessaie.",
   "retry": "Réessayer",
   "newConversation": "Nouvelle conversation",
   "practiceContext": {
     "title": "Tu révises une étape d’exercice.",
     "topic": "Sujet",
     "question": "Question",
-    "recentAnswer": "Réponse récente",
-    "backToLesson": "Retour à la leçon",
-    "welcome": "Revois cette étape avec l’Assistant d’apprentissage.",
-    "placeholder": "Demande l’étape suivante, pas seulement la réponse finale...",
-    "attempts": "Tentatives : {{attempts}}",
-    "hintViewed": "Indice consulté"
-  },
-  "availability": {
-    "checking": "Vérification des enseignants",
-    "online": "Enseignant en ligne",
-    "offline": "Aucun enseignant en ligne",
-    "onlineDetail": "{{count}} disponible maintenant",
-    "offlineDetail": "L’équipe enseignante traitera les demandes plus tard.",
-    "nextWindow": "Prochain créneau {{nextWindow}}"
+    "attempts": "Tentatives : {{attempts}}"
   },
   "teacher": {
-    "title": "Un enseignant peut-il clarifier ce point ?",
-    "description": "Envoie cette conversation à un enseignant qualifié si tu as besoin d’un accompagnement plus clair.",
-    "cta": "Demander à un enseignant",
-    "submitted": "Votre demande a été envoyée à un enseignant.",
-    "failed": "Nous n’avons pas pu envoyer la demande à l’enseignant. Réessaie.",
-    "requested": "Ta demande a été envoyée à un enseignant.",
-    "retry": "Réessayer",
     "errors": {
       "planDenied": "L’accompagnement par un enseignant n’est pas encore activé pour ce compte. Une administration STOA peut l’ajouter.",
       "allowanceExhausted": "Les demandes d’enseignant de cette semaine sont épuisées. Elles reviennent la semaine prochaine.",
@@ -76,60 +41,15 @@
     "foundation": "Prise en charge de base"
   },
   "conversations": "Conversations",
-  "conversationsSubtitle": "Tes conversations d’apprentissage",
-  "backToConversations": "Retour aux conversations",
   "newConversationReady": "Prêt pour une nouvelle question.",
   "stopGenerating": "Arrêter la génération",
-  "loadingChat": "Chargement du chat",
-  "teacherSupport": "Aide enseignante",
-  "uploadedMaterial": "Document pédagogique déposé",
-  "back": "Retour",
   "needHelpFromTeacher": "Besoin de l'aide d'un enseignant ?",
-  "escalation": {
-    "prompt": "Demandez l'aide d'un enseignant lorsque l'explication n'est pas assez claire.",
-    "requesting": "Demande en cours...",
-    "requestTeacher": "Demander un enseignant",
-    "planRestricted": "L'aide enseignante ne fait pas partie de votre offre actuelle."
-  },
   "roles": {
     "teacher": "Enseignant",
     "system": "Système",
     "assistant": "Assistant d’apprentissage STOA"
   },
-  "messageStatus": {
-    "sending": "Envoi en cours",
-    "stopped": "Génération arrêtée",
-    "failed": "Nouvelle tentative requise"
-  },
   "thinking": "Réflexion…",
-  "report": {
-    "trigger": "Signaler la réponse",
-    "context": "Envoyer cette réponse de l’assistant à la file de modération interne."
-  },
-  "questionBankContext": {
-    "welcome": "Revois cette étape de l’exercice avec l’assistant d’apprentissage.",
-    "placeholder": "Demande ce qui n’est pas clair dans cet exercice..."
-  },
-  "uploadContext": {
-    "placeholder": "Indique à l’assistant d’apprentissage quelle partie n’est pas claire..."
-  },
-  "defaultPrompt": {
-    "practice": "Peux-tu expliquer cette étape ?",
-    "questionBank": "Peux-tu expliquer cette étape de la bibliothèque d’exercices ?",
-    "questionStep": "Peux-tu expliquer cette étape de l’exercice ?"
-  },
-  "teacherEscalation": {
-    "requestedTitle": "Aide d’un enseignant demandée",
-    "requestedBody": "Un enseignant rejoindra cette conversation dès qu’il sera disponible. Tu peux continuer avec l’assistant d’apprentissage en attendant."
-  },
-  "followUp": {
-    "label": "Suggestions de questions",
-    "explainStep": "Je ne comprends pas une des étapes",
-    "simpler": "Peux-tu l’expliquer plus simplement ?",
-    "similar": "Donne-moi un exercice similaire",
-    "why": "Pourquoi est-ce que cela marche ?"
-  },
-  "duplicateReopened": "Tu as déjà posé cette question. Voici la conversation correspondante.",
   "ask": {
     "title": "Question",
     "close": "Fermer",

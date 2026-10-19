@@ -1,9 +1,6 @@
 {
-  "overviewTitle": "Panoramica admin",
-  "overviewDescription": "Controlla attività di studio, ticket supporto e richieste insegnante.",
   "analytics": "Analisi",
   "supportTickets": "Ticket supporto",
-  "helpRequests": "Richieste insegnante",
   "accounts": {
     "eyebrow": "Gestione account",
     "title": "Account",

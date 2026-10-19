@@ -2,8 +2,6 @@
   "dashboardTitle": "Lehrpersonen-Anfragen",
   "dashboardDescription": "Prüfen Sie Schülerfragen, bei denen qualifizierte fachliche Orientierung hilft.",
   "loadRequestsFailed": "Anfragen konnten nicht geladen werden.",
-  "availabilityTitle": "Verfügbarkeit der Lehrperson",
-  "detailTitle": "Anfragedetails",
   "markInProgress": "Prüfung starten",
   "markResolved": "Als gelöst markieren",
   "notes": "Notizen der Lehrperson",
