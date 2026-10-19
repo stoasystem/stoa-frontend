@@ -1,5 +1,6 @@
 import { apiPath } from '@/services/api/apiPath'
-import { answerUnauthorized, apiErrorFromBody, httpClient } from '@/services/api/httpClient'
+import { ApiError, answerUnauthorized, apiErrorFromBody, httpClient } from '@/services/api/httpClient'
+import { signOutIfReplacedElsewhere } from '@/services/auth/browserSignInChanges'
 import { storedRefreshToken } from '@/services/auth/sessionRefresh'
 import { currentSessionToken } from '@/store/authStore'
 import { allowDemoFallback, apiBaseUrl } from '@/lib/env'
@@ -56,8 +57,8 @@ export async function streamConversationMessage({
   onEvent: (event: ChatStreamEvent) => void
 }): Promise<StreamOutcome> {
   // This request bypasses httpClient, so it answers for the session itself: the
-  // token of the account this tab is on - a tab pinned to one account sends
-  // that one's, not the browser's (#215) - and an expired one is renewed and
+  // token of the account this tab is on (#215), never once another tab has
+  // signed out or signed in as someone else (#320), and an expired one is renewed and
   // the message sent again, by the same rules as every other request. The
   // idempotency key makes sending it again safe.
   const send = async (
@@ -67,6 +68,9 @@ export async function streamConversationMessage({
     // Read beside the token, so a 401 can tell this session renewed since
     // from another one signed in (#218, #219).
     const refresh = token ? storedRefreshToken() : null
+    if (token && signOutIfReplacedElsewhere()) {
+      throw new ApiError('Signed out in another tab.', { status: 401, code: 'session_changed' })
+    }
     const response = await fetch(
       `${apiBaseUrl}${apiPath`/conversations/${conversationId}/messages/stream`}`,
       {

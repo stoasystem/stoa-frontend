@@ -5,10 +5,11 @@ import { StudentWorld } from './support/student'
 // #162 production walkthrough at 375 px: "Switch account" opened its list to
 // the left of the account menu, at x = -152, so more than half of it was off
 // the screen and the account in it could not be tapped. The language list sat
-// the same way. jsdom lays nothing out, so this is checked in a real browser.
+// the same way, and is the one submenu left since #320 removed switching
+// accounts. jsdom lays nothing out, so this is checked in a real browser.
 const PHONE = { width: 375, height: 812 }
 
-for (const submenu of ['Language', 'Switch account']) {
+for (const submenu of ['Language']) {
   test(`on a phone, the "${submenu}" list opens on the screen`, async ({ page, backend }) => {
     new StudentWorld(backend).install()
     await page.setViewportSize(PHONE)

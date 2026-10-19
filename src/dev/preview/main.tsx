@@ -74,12 +74,6 @@ async function start() {
       import('@/dev/preview/lighting'),
     ])
 
-  // The other accounts this browser holds, for the account menu's "Switch account" (#184).
-  if (signedIn) {
-    const [{ rememberSession }, { demoHeldAccounts }] = await Promise.all([import('@/lib/devSessions'), import('@/dev/demo/data')])
-    for (const account of demoHeldAccounts) rememberSession(account)
-  }
-
   // Signed in the way the login form leaves it: a token in the store, the
   // account read back from `/auth/me` by the real AuthBootstrap.
   useAuthStore.setState(

@@ -5,6 +5,9 @@
  * token ran out, the renewal was refused, the tab was signed out and sent to
  * /login, and the sign-in page found A's session and took the tab straight
  * into A's home. Nothing said anything had happened.
+ *
+ * With one account per browser (#320) the refused sign-in is the browser's,
+ * so it ends for every tab, and nothing else is there to fall back on.
  */
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { act, fireEvent, render, screen } from '@testing-library/react'
@@ -25,15 +28,21 @@ vi.mock('@/components/auth/LoginForm', () => ({
 }))
 
 import { queryClient } from '@/app/query/queryClient'
-import { forgetHeldRefreshToken, readSessions, rememberSession, tabToken } from '@/lib/devSessions'
-import { bindTab, initializeTab, readTabSignOut, signOutTab, tabNeedsAccountChoice, tabSignedOut } from '@/lib/tabAccount'
+import {
+  initializeTab,
+  readBrowserSignIn,
+  readTabSignOut,
+  signInTab,
+  signOutTab,
+  tabSignedOut,
+  tabToken,
+} from '@/lib/tabAccount'
 import { EntryPage } from '@/pages/entry/EntryPage'
 import { httpClient, SESSION_UNREACHABLE } from '@/services/api/httpClient'
 import { storedRefreshToken } from '@/services/auth/sessionRefresh'
 import { currentSessionToken, useAuthStore } from '@/store/authStore'
 import { mswServer } from '../mswServer'
 
-const parentA = { email: 'a@test.stoaedu.ch', role: 'parent', name: 'Ada', accessToken: 'a-access', refreshToken: 'a-refresh' }
 const childB = { id: 'b-id', email: 'b@test.stoaedu.ch', role: 'student', name: 'Bea', accessToken: 'b-access', refreshToken: 'b-refresh' }
 
 let refreshAnswer: () => Response = () => HttpResponse.json({ detail: 'refused' }, { status: 401 })
@@ -56,11 +65,9 @@ afterEach(() => {
   queryClient.clear()
 })
 
-/** Parent A and child B are both saved; this tab is B's, on the page `path`. */
+/** The browser is signed in as child B, and this tab is on the page `path`. */
 function childTabOn(path: string) {
-  rememberSession(parentA)
-  rememberSession(childB)
-  bindTab(childB.accessToken, childB.refreshToken, childB)
+  signInTab(childB.accessToken, childB.refreshToken, childB)
   useAuthStore.setState({ accessToken: childB.accessToken, isAuthenticated: true })
   const assign = vi.fn()
   const [pathname, search = ''] = path.split('?')
@@ -88,25 +95,30 @@ describe('the session ending under the reader (#217)', () => {
     initializeTab()
     expect(currentSessionToken()).toBeNull()
     expect(tabSignedOut()).toBe(true)
-    expect(tabNeedsAccountChoice()).toBe(false)
   })
 
-  it('drops the saved account whose refresh token was refused, and only that one', async () => {
+  it('ends the browser\'s sign-in with it, so every other tab signs out too (#320)', async () => {
     childTabOn('/')
 
     await expect(httpClient.get('/things')).rejects.toBeDefined()
 
-    expect(readSessions().map((entry) => entry.email)).toEqual(['a@test.stoaedu.ch'])
+    expect(readBrowserSignIn()).toBeNull()
   })
 
-  it('keeps a saved account that has signed in again elsewhere since', async () => {
-    childTabOn('/')
-    // B signed in again in another tab: a new session under the same address.
-    rememberSession({ ...childB, accessToken: 'b-access-new', refreshToken: 'b-refresh-new' })
+  it('keeps a sign-in made in another tab since: it is not the one refused', async () => {
+    const assign = childTabOn('/')
+    // B signed in again in another tab: a new sign-in, the browser's now.
+    const mine = Object.fromEntries(Object.keys(sessionStorage).map((key) => [key, sessionStorage.getItem(key) as string]))
+    sessionStorage.clear()
+    signInTab('b-access-new', 'b-refresh-new', childB)
+    sessionStorage.clear()
+    for (const [key, value] of Object.entries(mine)) sessionStorage.setItem(key, value)
 
     await expect(httpClient.get('/things')).rejects.toBeDefined()
 
-    expect(readSessions().map((entry) => entry.refreshToken).sort()).toEqual(['a-refresh', 'b-refresh-new'])
+    expect(readBrowserSignIn()).toMatchObject({ accessToken: 'b-access-new', refreshToken: 'b-refresh-new' })
+    expect(tabToken()).toBeNull()
+    expect(assign).toHaveBeenCalledWith('/login')
   })
 
   it('is not an ending when the server cannot be reached', async () => {
@@ -118,7 +130,7 @@ describe('the session ending under the reader (#217)', () => {
     expect(assign).not.toHaveBeenCalled()
     expect(tabSignedOut()).toBe(false)
     expect(tabToken()).toBe('b-access')
-    expect(readSessions()).toHaveLength(2)
+    expect(readBrowserSignIn()).toMatchObject({ accessToken: 'b-access', refreshToken: 'b-refresh' })
   })
 
   it('forgets everything of the account’s the tab kept, and its cached answers', async () => {
@@ -135,11 +147,15 @@ describe('the session ending under the reader (#217)', () => {
 })
 
 describe('signing out', () => {
-  it('is remembered without naming anyone, and a refresh does not take the only saved account', () => {
-    rememberSession(childB)
-    bindTab(childB.accessToken, childB.refreshToken, childB)
+  it('is remembered without naming anyone, and a refresh does not join a sign-in by itself', () => {
+    signInTab(childB.accessToken, childB.refreshToken, childB)
 
     useAuthStore.getState().clearAuth()
+    // Someone signs in again in another tab; this tab is left to its sign-in page.
+    sessionStorage.clear()
+    signInTab('c-access', 'c-refresh', { email: 'c@test.stoaedu.ch' })
+    sessionStorage.clear()
+    signOutTab()
     initializeTab()
 
     expect(readTabSignOut()).toEqual({ reason: 'signed-out' })
@@ -219,7 +235,7 @@ describe('the sign-in page after the session ended', () => {
     await endChildSessionOn('/me')
     renderLogin()
 
-    fireEvent.click(screen.getByRole('button', { name: 'auth:chooser.signInOther' }))
+    fireEvent.click(screen.getByRole('button', { name: 'auth:login.signInOther' }))
     expect(screen.getByRole('form', { name: 'sign in' })).toHaveAttribute('data-email', '')
     signIn({ id: 'b-id', email: 'b@test.stoaedu.ch', role: 'student', name: 'Bea' })
 
@@ -236,25 +252,12 @@ describe('the sign-in page after the session ended', () => {
   })
 
   it('shows the plain sign-in after signing out', () => {
-    bindTab(childB.accessToken, childB.refreshToken, childB)
+    signInTab(childB.accessToken, childB.refreshToken, childB)
     useAuthStore.getState().clearAuth()
 
     renderLogin()
 
     expect(screen.getByText('auth:login.title')).toBeInTheDocument()
     expect(screen.getByRole('form', { name: 'sign in' })).toHaveAttribute('data-email', '')
-  })
-})
-
-describe('forgetting a refused saved session', () => {
-  it('matches the refresh token, not the address', () => {
-    rememberSession(childB)
-    rememberSession(parentA)
-
-    forgetHeldRefreshToken('b-refresh-old')
-    expect(readSessions()).toHaveLength(2)
-
-    forgetHeldRefreshToken('b-refresh')
-    expect(readSessions().map((entry) => entry.email)).toEqual(['a@test.stoaedu.ch'])
   })
 })

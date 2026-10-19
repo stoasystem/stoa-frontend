@@ -4,7 +4,6 @@ import { toast } from 'sonner'
 import i18n from '@/i18n'
 import { resolveUserLanguage } from '@/i18n/languages'
 import type { AddressContext } from '@/lib/addressForm'
-import { rememberSession } from '@/lib/devSessions'
 import { getPostLoginPath } from '@/lib/authRoutes'
 import { isSameAccount, readTabAccount } from '@/lib/tabAccount'
 import { markLoginAuthenticated } from '@/lib/loginTiming'
@@ -33,27 +32,15 @@ export function useLoginMutation({ context }: { context?: AddressContext } = {})
       }
       // A tab still on another account (one whose account had not loaded
       // yet, so the sign-in form was up) is changing account, not signing in
-      // from nothing: like 「添加账号」 it lands with a full load, so nothing
-      // of the account left behind - cached answers, a read still in flight
-      // - reaches the new one (tab-account audit F2).
+      // from nothing: it lands with a full load, so nothing of the account
+      // left behind - cached answers, a read still in flight - reaches the
+      // new one (tab-account audit F2).
       const replacing = currentSessionToken() !== null && !isSameAccount(data.user, readTabAccount())
       // Signing in is all this does. The login screen (EntryPage) sees the
       // session and picks the destination: the password change for a reset
       // account, else a permitted `?next=` or `from`, else the role's home.
+      // It becomes the browser's one sign-in; nothing else is kept (#320).
       setAuth(data.user, data.accessToken, data.refreshToken)
-      // Hold the account that just signed in, so the account menu has
-      // something to switch back to. Nothing did this except the developer
-      // switcher's own form, which is why 「添加账号」 signed you in and then
-      // offered you nothing. The refresh token travels with it: without one
-      // the held account is over an hour later, whatever anyone does with it.
-      rememberSession({
-        id: data.user.id,
-        email: data.user.email,
-        role: data.user.role,
-        name: data.user.name,
-        accessToken: data.accessToken,
-        refreshToken: data.refreshToken,
-      })
       markLoginAuthenticated(data.user.role)
       trackEvent('user_login', { role: data.user.role, userId: data.user.id })
       // Read off the instance, not the `t` this hook closed over: react-i18next
@@ -61,19 +48,13 @@ export function useLoginMutation({ context }: { context?: AddressContext } = {})
       // above has just changed the language. A German account signing in on an
       // English sign-in page got an English "Signed in" over a German app.
       toast.success(i18n.t('auth:login.signedIn'))
-      // Signing in from 「添加账号」 lands on the new account rather than
-      // waiting for the login screen to move: that screen is deliberately not
-      // moving while `?add=1` is up. A full load, not a route change, so the
-      // account being left behind takes its cached answers with it — the same
-      // reason switching to a held account reloads.
-      const params = new URLSearchParams(window.location.search)
-      if (replacing || params.get('add') === '1') {
+      // A full load, not a route change, so the account being left behind
+      // takes its cached answers with it.
+      if (replacing) {
         // A `?next=` or the page sign-in was asked from still counts, checked
-        // for the new account as always; `add` itself is not a destination.
-        params.delete('add')
-        const query = params.toString()
+        // for the new account as always.
         const from = (window.history.state as { usr?: unknown } | null)?.usr
-        window.location.assign(getPostLoginPath(data.user, { search: query ? `?${query}` : '', state: from }))
+        window.location.assign(getPostLoginPath(data.user, { search: window.location.search, state: from }))
         return
       }
 

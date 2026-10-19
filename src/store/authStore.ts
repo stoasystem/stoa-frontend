@@ -1,13 +1,22 @@
 import { create } from 'zustand'
 import { endRefreshToken } from '@/services/auth/sessionRefresh'
-import { pinTabToSession, TAB_TOKEN_KEY, tabToken } from '@/lib/devSessions'
-import { bindTab, initializeTab, rememberTabAccount, signOutTab, type TabSignOut } from '@/lib/tabAccount'
+import {
+  initializeTab,
+  pinTabToSession,
+  rememberTabAccount,
+  renewBrowserSignIn,
+  signInTab,
+  signOutTab,
+  TAB_TOKEN_KEY,
+  tabToken,
+  type TabSignOut,
+} from '@/lib/tabAccount'
 import type { User, UserRole } from '@/types/user'
 
 export type CurrentUser = User
 export type { UserRole }
 
-/** Where this tab keeps its access token: sessionStorage, never shared (#216). */
+/** Where this tab keeps its copy of the access token (#216, #320). */
 export const TOKEN_KEY = TAB_TOKEN_KEY
 
 // This tab's logout can outlive the account menu. Keep only its completion,
@@ -61,8 +70,8 @@ function normalizeCurrentUser(user: CurrentUser): CurrentUser {
   return { ...user, role: normalizeUserRole(user.role) }
 }
 
-// Each tab holds its own token, so several accounts can be open at once and
-// no tab's account changes because of another (#216).
+// Each tab sends its own copy of the browser's sign-in, so what another tab
+// does can sign it out but never change who it sends requests as (#320).
 const getStoredToken = () => {
   if (typeof window === 'undefined') return null
   return tabToken()
@@ -100,8 +109,9 @@ type AuthState = {
 }
 
 export const useAuthStore = create<AuthState>((set) => {
-  // Before anything reads this tab's account: a new tab may take the only
-  // saved one here, and the session tabs used to share is retired.
+  // Before anything reads this tab's account: a new tab joins the browser's
+  // sign-in here, a tab left on an ended one signs out, and the saved
+  // accounts of ADR 0002 are retired (#320).
   initializeTab()
   const storedToken = getStoredToken()
 
@@ -115,8 +125,9 @@ export const useAuthStore = create<AuthState>((set) => {
       // "keep the one there". Kept, the previous account's would be spent at
       // the next 401 and turn the tab back into that account (#208). A renewal
       // goes through updateAccessToken and keeps its refresh token there.
-      // This tab only: no other tab's account changes because of it (#216).
-      bindTab(accessToken, refreshToken, user)
+      // The browser's sign-in from now on: the other tabs on the previous
+      // one sign out when they see it (#320).
+      signInTab(accessToken, refreshToken, user)
       set({ user: normalizeCurrentUser(user), accessToken, isAuthenticated: true })
     },
     updateAccessToken: (accessToken) => {
@@ -125,6 +136,8 @@ export const useAuthStore = create<AuthState>((set) => {
       // (passing a null user to setAuth threw, and the app never got past
       // "Konto wird geladen…").
       pinTabToSession(accessToken)
+      // New tabs join with the renewed token rather than the expired one.
+      renewBrowserSignIn(accessToken)
       set({ accessToken, isAuthenticated: true })
     },
     setUser: (user) => {
@@ -134,9 +147,8 @@ export const useAuthStore = create<AuthState>((set) => {
       set({ user: normalizeCurrentUser(user), isAuthenticated: true })
     },
     clearAuth: (ending) => {
-      // Only the session this tab is using ends, and the tab stays signed
-      // out: it does not fall back on a saved account, not after a refresh
-      // either (#216, #217). Other tabs keep theirs.
+      // The tab stays signed out, after a refresh too (#217). If it held the
+      // browser's sign-in, that ends with it and the other tabs follow (#320).
       endRefreshToken()
       signOutTab(ending)
       set({ user: null, accessToken: null, isAuthenticated: false })

@@ -4,11 +4,10 @@ import { useNavigate } from 'react-router-dom'
 import { clearAskQuote } from '@/features/ask/practiceContext'
 import { clearUploadHandoff } from '@/features/uploads/utils/uploadHandoff'
 import { clearPendingMessages } from '@/lib/pendingChatMessages'
-import { forgetHeldSignIn, forgetSessionHolding } from '@/lib/devSessions'
-import { signInOf } from '@/lib/signIn'
-import { announceSignInEnded } from '@/lib/tabAccount'
+import { forgetTestRolesHolding } from '@/lib/testRoles'
 import { rotateAnalyticsSession } from '@/services/analytics/analyticsClient'
 import { logout, type LogoutOutcome } from '@/services/auth/authApi'
+import { storedRefreshToken } from '@/services/auth/sessionRefresh'
 import { forgetCheckoutOperation } from '@/services/billing/billingApi'
 import { logger } from '@/services/logging/logger'
 import { resetAsk } from '@/store/askStore'
@@ -34,9 +33,10 @@ function logOutcome(outcome: LogoutOutcome) {
 // This device is cleared first and the backend told afterwards, without waiting
 // for it: a backend that hangs must not leave the token in storage for as long
 // as it hangs, or for good if the tab is closed meanwhile. The token the backend
-// revokes is read before anything is cleared - the pinned tab's own if it holds
-// one, otherwise the shared one, the same precedence every request uses - and
-// handed to the call, which is sent once and never retried.
+// revokes is read before anything is cleared - this tab's copy of the browser's
+// sign-in, the one every request uses - and handed to the call, which is sent
+// once and never retried. Clearing ends the browser's sign-in, so every other
+// tab signs out with this one (#320).
 export function useSignOut() {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
@@ -52,7 +52,7 @@ export function useSignOut() {
     setIsSigningOut(true)
 
     const accessToken = currentSessionToken()
-    const signIn = signInOf(accessToken)
+    const refreshToken = storedRefreshToken()
 
     clearAuth()
     // Query keys do not name the user, so whoever signs in next on this tab
@@ -73,15 +73,8 @@ export function useSignOut() {
     // too (#34).
     forgetCheckoutOperation()
     rotateAnalyticsSession()
-    // Saved accounts of other sign-ins stay: signing out ends this sign-in
-    // only (#34). Every saved copy of it goes, and the other tabs holding it
-    // are told, so they sign out now rather than fail at their next request
-    // (#232).
-    if (accessToken) forgetSessionHolding(accessToken)
-    if (signIn) {
-      forgetHeldSignIn(signIn)
-      announceSignInEnded(signIn)
-    }
+    // A test role the switcher held for this sign-in is over too.
+    forgetTestRolesHolding({ accessToken, refreshToken })
     // Register before navigation unmounts this menu. The login mutation waits
     // for completion or the request's 8 s timeout; server work may outlive it.
     const pending = trackPendingLogout(

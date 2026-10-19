@@ -1,7 +1,6 @@
 /* The demo student (#116): the signed-in user and the profile /me shows. A made-up person. */
 import { demoSky } from '@/dev/demo/sky/demoSky'
 import { supportedLanguages, type SupportedLanguage } from '@/i18n/languages'
-import type { HeldSession } from '@/lib/devSessions'
 import type { StudentProfile } from '@/types/student'
 import type { User } from '@/types/user'
 
@@ -48,12 +47,3 @@ export function demoProfileFor(language: SupportedLanguage): StudentProfile {
     updatedAt: '2026-09-30T18:00:00.000Z',
   }
 }
-
-/**
- * Another account this browser holds a session for (#184): a brother on the
- * same family computer, so the account menu's "Switch account" has someone to
- * list. Shown only; the preview does not switch to him.
- */
-export const demoHeldAccounts: readonly Omit<HeldSession, 'savedAt'>[] = [
-  { email: 'noah.muster@example.com', role: 'student', name: 'Noah Muster', accessToken: 'design-preview-held' },
-]

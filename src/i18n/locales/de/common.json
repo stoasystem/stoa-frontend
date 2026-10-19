@@ -6,13 +6,9 @@
     "close": "Schliessen"
   },
   "accountMenu": {
-    "addAccount": "Weiteres Konto hinzufügen",
     "billing": "Abrechnung und Zahlung",
     "help": "Hilfe und Support",
-    "open": "Konto",
-    "switchAccount": "Konto wechseln",
-    "switchExpired": "Diese Sitzung ist abgelaufen. Bitte erneut anmelden.",
-    "switchUnreachable": "Server nicht erreichbar. Das Konto bleibt gespeichert."
+    "open": "Konto"
   },
   "actions": {
     "back": "Zurück",

@@ -9,7 +9,7 @@
  */
 import { http, HttpResponse } from 'msw'
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
-import { readSessions, rememberSession } from '@/lib/devSessions'
+import { readBrowserSignIn } from '@/lib/tabAccount'
 import { httpClient } from '@/services/api/httpClient'
 import { rememberRefreshToken } from '@/services/auth/sessionRefresh'
 import { TOKEN_KEY, useAuthStore } from '@/store/authStore'
@@ -112,15 +112,15 @@ describe('a renewal that hands back the same access token', () => {
         HttpResponse.json({ accessToken: 'expired-access', refreshToken: 'refresh-2' }),
       ),
     )
-    rememberSession({ email: 's@test.stoaedu.ch', role: 'student', name: 'S', accessToken: 'expired-access', refreshToken: 'refresh-1' })
+    localStorage.setItem('stoa_sign_in', JSON.stringify({ id: 's', accessToken: 'expired-access', refreshToken: 'refresh-1' }))
+    sessionStorage.setItem('stoa_tab_sign_in', 's')
     const assign = vi.fn()
     vi.stubGlobal('location', { ...window.location, pathname: '/', assign })
 
     await expect(httpClient.get('/things/a')).rejects.toBeDefined()
 
-    // The held entry follows the renewal: it holds the refresh token the
-    // server sent, not the one that was spent.
-    expect(readSessions()[0]).toMatchObject({ refreshToken: 'refresh-2' })
+    // The session ended, and with it the browser's sign-in (#320).
+    expect(readBrowserSignIn()).toBeNull()
     expect(assign).toHaveBeenCalledWith('/login')
     vi.unstubAllGlobals()
   })

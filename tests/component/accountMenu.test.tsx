@@ -3,9 +3,8 @@
  * gets, a role's extras between Help and Sign out, every link a registered
  * route, the menu keyboard model, and the one shared sign-out.
  *
- * "Switch account" joined the fixed set when holding more than one account
- * stopped being a testing aid: a parent with their children's accounts, a
- * shared family computer. It sits between Language and Change password.
+ * "Switch account" and "Add account" are gone: one account per browser, and
+ * to switch person you sign out and sign in again (#320, ADR 0003).
  */
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { render, screen, waitFor, within } from '@testing-library/react'
@@ -83,7 +82,6 @@ const itemNames = (menu: HTMLElement) =>
 const FIXED = [
   'navigation.profile',
   'language.label',
-  'accountMenu.switchAccount',
   'actions.changePassword',
   'accountMenu.help',
 ]
@@ -258,31 +256,18 @@ describe('the account menu from the keyboard', () => {
   })
 })
 
-describe('switching account from the menu', () => {
-  it('lists the other accounts this browser holds, never the open one', async () => {
+describe('no other account from the menu (#320)', () => {
+  it('offers neither switching nor adding an account, whatever an old browser saved', async () => {
     localStorage.setItem(
       'stoa_dev_sessions',
-      JSON.stringify([
-        { email: 'lina@example.com', role: 'student', name: 'Open One', accessToken: 'a', savedAt: '' },
-        { email: 'other@example.com', role: 'parent', name: 'Other One', accessToken: 'b', savedAt: '' },
-      ]),
+      JSON.stringify([{ email: 'other@example.com', role: 'parent', name: 'Other One', accessToken: 'b', savedAt: '' }]),
     )
 
     const menu = await openWithMouse('student')
-    await userEvent.click(within(menu).getByText('accountMenu.switchAccount'))
 
-    const panel = await screen.findByText('Other One')
-    expect(panel).toBeInTheDocument()
-    // The account already open is not something to switch to.
-    expect(screen.queryByText('Open One')).toBeNull()
-  })
-
-  it('offers adding one when none are held', async () => {
-    localStorage.removeItem('stoa_dev_sessions')
-
-    const menu = await openWithMouse('student')
-    await userEvent.click(within(menu).getByText('accountMenu.switchAccount'))
-
-    expect(await screen.findByText('accountMenu.addAccount')).toBeInTheDocument()
+    expect(within(menu).queryByText('accountMenu.switchAccount')).toBeNull()
+    expect(within(menu).queryByText('accountMenu.addAccount')).toBeNull()
+    expect(screen.queryByText('Other One')).toBeNull()
+    expect(menu.querySelector('[data-account-switch]')).toBeNull()
   })
 })
