@@ -2,6 +2,7 @@ import type { TFunction } from 'i18next'
 import { useTranslation } from 'react-i18next'
 import { BookOpenCheck, CircleAlert, Gauge, HelpCircle } from 'lucide-react'
 import i18n from '@/i18n'
+import { formattingLocale } from '@/i18n/languages'
 import { SectionHeader } from '@/components/common/SectionHeader'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
@@ -163,8 +164,11 @@ function formatRolloutState(state: string, t: TFunction) {
   return state === 'active' ? t('practice:profile.rolloutCore') : t('practice:profile.rolloutFoundation')
 }
 
-function formatFeedback(value: number | null | undefined, t: TFunction) {
-  return typeof value === 'number' ? `${value.toFixed(1)}/5` : t('practice:profile.noScore')
+// One decimal in the reader's locale: 4.5 in German, 4,5 in French (#280).
+export function formatFeedback(value: number | null | undefined, t: TFunction) {
+  if (typeof value !== 'number') return t('practice:profile.noScore')
+  const score = new Intl.NumberFormat(formattingLocale(), { minimumFractionDigits: 1, maximumFractionDigits: 1 }).format(value)
+  return `${score}/5`
 }
 
 function formatSubjectLabel(profile: LearningProfile, subjectId: string) {

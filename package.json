@@ -18,6 +18,7 @@
     "test:watch": "NODE_OPTIONS=--no-experimental-webstorage vitest --config vitest.config.ts",
     "check:api-contract": "node ./scripts/check-api-contract.mjs",
     "check:untranslated": "node ./scripts/check-untranslated.mjs",
+    "check:eszett": "node ./scripts/check-german-eszett.mjs",
     "check:contrast": "node ./scripts/check-contrast.mjs",
     "test:smoke": "playwright test --config=playwright.smoke.config.ts",
     "test:e2e:dist": "playwright test --config=playwright.dist.config.ts"

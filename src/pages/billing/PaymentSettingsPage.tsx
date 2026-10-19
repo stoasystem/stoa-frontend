@@ -8,6 +8,7 @@ import {
   UserRound,
   type LucideIcon,
 } from 'lucide-react'
+import { formattingLocale } from '@/i18n/languages'
 import { BackButton } from '@/components/common/BackButton'
 import { PageActions } from '@/components/common/PageActions'
 import { PageContainer } from '@/components/common/PageContainer'
@@ -146,7 +147,7 @@ function SettingDetail({
 function formatDate(value?: string) {
   if (!value) return 'Not available'
 
-  return new Intl.DateTimeFormat('en', {
+  return new Intl.DateTimeFormat(formattingLocale('en'), {
     month: 'short',
     day: 'numeric',
     year: 'numeric',

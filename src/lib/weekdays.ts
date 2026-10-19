@@ -1,3 +1,4 @@
+import { formattingLocale } from '@/i18n/languages'
 import type { TeacherAvailabilitySlot } from '@/types/teacherAvailability'
 
 export const WEEKDAYS: TeacherAvailabilitySlot['dayOfWeek'][] = [
@@ -14,7 +15,7 @@ export const WEEKDAYS: TeacherAvailabilitySlot['dayOfWeek'][] = [
 export function weekdayName(day: TeacherAvailabilitySlot['dayOfWeek'], language: string): string {
   const index = WEEKDAYS.indexOf(day)
   if (index < 0) return day
-  return new Intl.DateTimeFormat(language, { weekday: 'long', timeZone: 'UTC' }).format(
+  return new Intl.DateTimeFormat(formattingLocale(language), { weekday: 'long', timeZone: 'UTC' }).format(
     new Date(Date.UTC(2024, 0, 1 + index)),
   )
 }

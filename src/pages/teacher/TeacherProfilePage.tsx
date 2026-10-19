@@ -10,6 +10,7 @@ import {
 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import type { TFunction } from 'i18next'
+import { formattingLocale } from '@/i18n/languages'
 import { PageContainer } from '@/components/common/PageContainer'
 import { PageHeader } from '@/components/common/PageHeader'
 import { PageSkeleton } from '@/components/common/PageSkeleton'
@@ -187,7 +188,7 @@ function ProfileDetail({
 function formatDate(value: string | undefined, language: string, t: TFunction) {
   if (!value) return t('profile.notProvided')
 
-  return new Intl.DateTimeFormat(language, {
+  return new Intl.DateTimeFormat(formattingLocale(language), {
     month: 'short',
     day: 'numeric',
     year: 'numeric',
@@ -202,7 +203,7 @@ function formatWeekday(dayOfWeek: number | string, language: string) {
   const day = Number(dayOfWeek)
   if (String(dayOfWeek).trim() === '' || !Number.isInteger(day) || day < 0 || day > 6) return String(dayOfWeek)
 
-  return new Intl.DateTimeFormat(language, { weekday: 'long', timeZone: 'UTC' }).format(
+  return new Intl.DateTimeFormat(formattingLocale(language), { weekday: 'long', timeZone: 'UTC' }).format(
     new Date(Date.UTC(2024, 0, 7 + day)),
   )
 }

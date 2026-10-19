@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { CheckCircle2, Clock, HelpCircle, Loader2, RefreshCw, Search, XCircle } from 'lucide-react'
+import { formattingLocale } from '@/i18n/languages'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -157,7 +158,7 @@ export function AdminBillingCheckoutPage() {
                     label="Beneficiaries"
                     value={data.beneficiaries.join(', ') || <span className="text-muted-foreground">—</span>}
                   />
-                  <DetailRow label="Last rechecked" value={new Date(data.lastRecheckedAt).toLocaleString()} />
+                  <DetailRow label="Last rechecked" value={new Date(data.lastRecheckedAt).toLocaleString(formattingLocale('en'))} />
                   {data.commandState && (
                     <DetailRow label="Command state" value={<span className="font-mono text-xs">{data.commandState}</span>} />
                   )}

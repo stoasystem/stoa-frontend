@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next'
+import { formattingLocale } from '@/i18n/languages'
 import { HelpRequestStatusBadge } from '@/components/teacher/HelpRequestStatusBadge'
 import { ModerationReportDialog } from '@/components/moderation/ModerationReportDialog'
 import { TeacherSlaBadge } from '@/components/teacher/TeacherSlaBadge'
@@ -12,7 +13,7 @@ export function HelpRequestDetailCard({ request }: { request: TeacherHelpRequest
   const { t, i18n } = useTranslation('teacher')
   const firstAction = request.firstTeacherActionAt
     ? t('requests.firstAction', {
-        time: new Date(request.firstTeacherActionAt).toLocaleString(i18n.resolvedLanguage, {
+        time: new Date(request.firstTeacherActionAt).toLocaleString(formattingLocale(i18n.resolvedLanguage), {
           dateStyle: 'short',
           timeStyle: 'short',
         }),

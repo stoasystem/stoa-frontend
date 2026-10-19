@@ -9,7 +9,7 @@
     "retry": "Erneut versuchen",
     "retryFile": "{{fileName}} erneut versuchen",
     "cancel": "Abbrechen",
-    "askLearningAssistant": "Learning Assistant fragen"
+    "askLearningAssistant": "In «Fragen» nachfragen"
   },
   "status": {
     "idle": "Bereit",
@@ -21,7 +21,7 @@
   },
   "errors": {
     "unsupportedType": "Dieser Dateityp wird nicht unterstützt.",
-    "fileTooLarge": "Diese Datei ist zu groß.",
+    "fileTooLarge": "Diese Datei ist zu gross.",
     "tooManyFiles": "Du kannst bis zu {{count}} Dateien hochladen.",
     "uploadFailed": "Der Upload ist fehlgeschlagen. Bitte versuche es erneut.",
     "emptyFile": "Diese Datei scheint leer zu sein.",
@@ -34,7 +34,7 @@
   },
   "modal": {
     "title": "Frage hochladen",
-    "description": "Nimm ein Foto auf oder hänge ein PDF an. Danach kannst du den Learning Assistant fragen."
+    "description": "Nimm ein Foto auf oder hänge ein PDF an. Danach kannst du deine Frage in «Fragen» stellen."
   },
   "preview": {
     "attachedFiles": "Angehängte Dateien",
@@ -50,7 +50,7 @@
   "learning": {
     "uploadKicker": "Schulaufgabe hochladen",
     "uploadOwnQuestionTitle": "Hast du eine eigene Frage?",
-    "uploadOwnQuestionDescription": "Lade ein Foto oder PDF hoch und frage den Learning Assistant.",
+    "uploadOwnQuestionDescription": "Lade ein Foto oder PDF hoch und stelle deine Frage in «Fragen».",
     "schoolworkHelpTitle": "Eigene Schulaufgabe mitbringen",
     "schoolworkHelpDescription": "Lade eine Frage aus der Schule hoch und erhalte Schritt-für-Schritt-Hilfe."
   },

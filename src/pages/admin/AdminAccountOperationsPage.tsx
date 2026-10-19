@@ -16,7 +16,7 @@ import { ApiError } from '@/services/api/httpClient'
 import { useAdminAccountsQuery, useAssignParentLinkMutation } from '@/hooks/admin/useAdminAccounts'
 import { useAdminParentAccountOperationsQuery } from '@/hooks/admin/useAdminAccountOperationsQuery'
 import { useAdminBillingOperation } from '@/hooks/admin/useAdminBillingOperation'
-import { activeLanguage } from '@/i18n/languages'
+import { formattingLocale } from '@/i18n/languages'
 import { DashboardLayout } from '@/layouts/DashboardLayout'
 import { formatDayAndTime } from '@/lib/formatDateTime'
 import { toUserFacingError } from '@/lib/userFacingText'
@@ -514,7 +514,7 @@ function BillingFactEvidence({ data }: { data: AdminBillingOperationDetail }) {
 
 function ProviderUsageEvidence({ data }: { data: AdminBillingOperationDetail }) {
   const { t } = useTranslation('admin')
-  const formatCount = (value: number) => new Intl.NumberFormat(activeLanguage()).format(value)
+  const formatCount = (value: number) => new Intl.NumberFormat(formattingLocale()).format(value)
   return (
     <div>
       <h3 className="text-base font-semibold text-foreground">{t('accountOperations.recovery.providerUsage.title')}</h3>

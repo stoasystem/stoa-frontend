@@ -1,5 +1,6 @@
 import type { TFunction } from 'i18next'
 import { useTranslation } from 'react-i18next'
+import { formattingLocale } from '@/i18n/languages'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { getAccountStateLabel } from '@/components/parent/accountOperationsView'
 import type { AccountOperationsChild, AccountOperationsProfile, AccountOperationsVerification } from '@/types/parentAccountOperations'
@@ -112,5 +113,5 @@ function formatDate(value: string | null | undefined, locale: string | undefined
   if (!value) return t('accountOps.evidence.noDate')
   const date = new Date(value)
   if (Number.isNaN(date.getTime())) return value
-  return new Intl.DateTimeFormat(locale, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }).format(date)
+  return new Intl.DateTimeFormat(formattingLocale(locale), { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }).format(date)
 }

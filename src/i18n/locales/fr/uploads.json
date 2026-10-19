@@ -9,7 +9,7 @@
     "retry": "Réessayer",
     "retryFile": "Réessayer {{fileName}}",
     "cancel": "Annuler",
-    "askLearningAssistant": "Demander au Learning Assistant"
+    "askLearningAssistant": "Demander dans « Question »"
   },
   "status": {
     "idle": "Prêt",
@@ -34,7 +34,7 @@
   },
   "modal": {
     "title": "Importer une question",
-    "description": "Prends une photo ou joins un PDF, puis demande au Learning Assistant."
+    "description": "Prends une photo ou joins un PDF, puis pose ta question dans « Question »."
   },
   "preview": {
     "attachedFiles": "Fichiers joints",
@@ -50,7 +50,7 @@
   "learning": {
     "uploadKicker": "Support scolaire",
     "uploadOwnQuestionTitle": "Tu as ta propre question ?",
-    "uploadOwnQuestionDescription": "Importe une photo ou un PDF et demande au Learning Assistant.",
+    "uploadOwnQuestionDescription": "Importe une photo ou un PDF et pose ta question dans « Question ».",
     "schoolworkHelpTitle": "Apporte ton exercice",
     "schoolworkHelpDescription": "Importe une question de l'école et reçois une aide étape par étape."
   },

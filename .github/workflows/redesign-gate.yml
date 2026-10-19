@@ -61,6 +61,10 @@ jobs:
       - name: Translation guard
         run: npm run check:untranslated
 
+      # Swiss German writes ss, never ß (#280). Reads the German locale files.
+      - name: Swiss German spelling guard
+        run: npm run check:eszett
+
       # Rates the token pairs in scripts/contrast-pairs.json against the token
       # file it names (#17). Reads two repo files; no network, no secrets.
       - name: Contrast guard

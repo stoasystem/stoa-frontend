@@ -35,6 +35,7 @@ import { ArrowUp, ChevronLeft, Minus, Plus, X } from 'lucide-react'
 import { useCallback, useDeferredValue, useEffect, useLayoutEffect, useMemo, useRef, useState, type KeyboardEvent, type PointerEvent, type ReactNode } from 'react'
 import { useTranslation, type UseTranslationResponse } from 'react-i18next'
 import { Link, useLocation } from 'react-router-dom'
+import { formattingLocale } from '@/i18n/languages'
 import { SegmentedNav } from '@/components/base'
 import { StarCard } from '@/features/starmap/components/StarCard'
 import { StarSheet } from '@/features/starmap/components/StarSheet'
@@ -607,7 +608,7 @@ export function StarMapView({ map, demo = false, target, onNavigate, land, onFir
   const parallelDomGone = useDeferredValue(target.layer === 'star')
   const currentNebula = target.layer === 'map' ? undefined : nebulae.find((n) => n.topicId === target.nebulaId)
   const currentStar = target.layer === 'star' ? stars.find((s) => s.unitId === target.unitId) : undefined
-  const numberFormat = useMemo(() => new Intl.NumberFormat(i18n.language), [i18n.language])
+  const numberFormat = useMemo(() => new Intl.NumberFormat(formattingLocale(i18n.language)), [i18n.language])
   const mapPath = here(pathForTarget(subjectId, { layer: 'map' }))
   const subjects = map.subjects
   const activeSubject = subjects.findIndex((subject) => subject.subjectId === subjectId)
