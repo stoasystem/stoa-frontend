@@ -131,6 +131,16 @@ export function AdminCurriculumPage() {
   const dryRun = dryRunManifest ? dryRunMutation.data : undefined
 
   function selectVersion(version: CurriculumVersion) {
+    if (version.versionId !== selectedVersionId) {
+      // #328: the editor belongs to one version. A patch typed (or loaded)
+      // for lesson A and saved after opening lesson B wrote A's content,
+      // exercises included, into B.
+      setPatchJson('{}')
+      setPatchJsonInvalid(false)
+      setFromVersionId('')
+      patchMutation.reset()
+      submitReviewMutation.reset()
+    }
     setSelected(version)
     setToVersionId(version.versionId)
     setValidationEnabled(false)
@@ -314,6 +324,12 @@ export function AdminCurriculumPage() {
               jsonInvalid={patchJsonInvalid}
               onSubmit={savePatch}
               isSaving={patchMutation.isPending}
+              // #328: until the preview is read, the version's content is
+              // unknown, not empty; loading or saving it would erase it.
+              previewLoading={previewQuery.isPending}
+              previewError={previewQuery.isError ? previewQuery.error : null}
+              previewReady={previewQuery.isSuccess}
+              onRetryPreview={() => void previewQuery.refetch()}
               error={patchMutation.error}
               result={patchMutation.data}
             />
@@ -475,6 +491,10 @@ function EditorPanel({
   jsonInvalid,
   onSubmit,
   isSaving,
+  previewLoading,
+  previewError,
+  previewReady,
+  onRetryPreview,
   error,
   result,
 }: {
@@ -484,6 +504,10 @@ function EditorPanel({
   jsonInvalid: boolean
   onSubmit: (event: FormEvent<HTMLFormElement>) => void
   isSaving: boolean
+  previewLoading: boolean
+  previewError: unknown
+  previewReady: boolean
+  onRetryPreview: () => void
   error: unknown
   result?: CurriculumVersion
 }) {
@@ -510,13 +534,14 @@ function EditorPanel({
             />
             <InvalidJson show={jsonInvalid} />
             <div className="flex flex-wrap gap-2">
-              <Button type="submit" disabled={isSaving}>
+              <Button type="submit" disabled={isSaving || !previewReady}>
                 <Save className="h-4 w-4" aria-hidden="true" />
                 {t('curriculum.editor.save')}
               </Button>
               <Button
                 type="button"
                 variant="outline"
+                disabled={!previewReady}
                 onClick={() => onPatchJsonChange(JSON.stringify({ lesson: version.lesson ?? {}, exercises: version.exercises ?? [] }, null, 2))}
               >
                 {t('curriculum.editor.loadCurrent')}
@@ -529,10 +554,22 @@ function EditorPanel({
       </Card>
       <Card>
         <CardHeader><CardTitle className="text-base">{t('curriculum.editor.current')}</CardTitle></CardHeader>
-        <CardContent>
-          <pre className="max-h-[32rem] overflow-auto rounded-md bg-muted p-3 text-xs text-muted-foreground">
-            {JSON.stringify({ lesson: version.lesson ?? {}, exercises: version.exercises ?? [] }, null, 2)}
-          </pre>
+        <CardContent className="space-y-3">
+          {previewReady ? (
+            <pre className="max-h-[32rem] overflow-auto rounded-md bg-muted p-3 text-xs text-muted-foreground">
+              {JSON.stringify({ lesson: version.lesson ?? {}, exercises: version.exercises ?? [] }, null, 2)}
+            </pre>
+          ) : previewError ? (
+            <>
+              <ApiErrorPanel error={previewError} />
+              <p className="text-sm text-muted-foreground">{t('curriculum.editor.currentFailed')}</p>
+              <Button type="button" variant="outline" onClick={onRetryPreview}>{t('curriculum.editor.currentRetry')}</Button>
+            </>
+          ) : (
+            <p role="status" className="text-sm text-muted-foreground">
+              {previewLoading ? t('curriculum.editor.currentLoading') : null}
+            </p>
+          )}
         </CardContent>
       </Card>
     </div>

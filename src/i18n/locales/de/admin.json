@@ -687,7 +687,10 @@
       "save": "Entwurf speichern",
       "loadCurrent": "Aktuellen Inhalt laden",
       "saved": "{{version}} gespeichert.",
-      "current": "Aktueller Inhalt"
+      "current": "Aktueller Inhalt",
+      "currentLoading": "Der aktuelle Inhalt wird geladen.",
+      "currentFailed": "Der aktuelle Inhalt konnte nicht geladen werden. Laden und Speichern bleiben deshalb gesperrt.",
+      "currentRetry": "Erneut versuchen"
     },
     "review": {
       "validation": "Validierung",

@@ -687,7 +687,10 @@
       "save": "Save draft",
       "loadCurrent": "Load current content",
       "saved": "Saved {{version}}.",
-      "current": "Current content"
+      "current": "Current content",
+      "currentLoading": "Loading the current content.",
+      "currentFailed": "The current content could not be loaded, so loading it into the editor and saving stay off.",
+      "currentRetry": "Try again"
     },
     "review": {
       "validation": "Validation",
