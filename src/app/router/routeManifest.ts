@@ -447,6 +447,7 @@ export const pageRoutes: readonly PageRoute[] = [
   { path: '/admin/learning-operations', access: ADMIN, page: LearningOperationsDashboardPage, titleKey: 'routes.learningOperations.title', meta: { module: 'Admin', status: 'core', purpose: 'Platform learning operations.' } },
   { path: '/admin/learning-automation', access: ADMIN, page: LearningAutomationConsolePage, titleKey: 'routes.learningAutomation.title', meta: { module: 'Admin', status: 'core', purpose: 'Platform learning automation.' } },
   { path: '/admin/account-operations', access: ADMIN, page: AdminAccountOperationsPage, titleKey: 'routes.accountOperations.title', meta: { module: 'Admin', status: 'core', purpose: 'Account operations queue.' } },
+  // untranslated-ok: OperationsPlaceholder shows routes.systemStatus.title for this path; the English is its fallback.
   { path: '/admin/system', access: ADMIN, page: AdminOperationsPlaceholderPage, props: { title: 'System status' }, titleKey: 'routes.systemStatus.title', meta: { module: 'Admin', status: 'placeholder', purpose: 'Future system status admin placeholder.' } },
 ]
 

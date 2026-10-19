@@ -154,6 +154,7 @@ export function LearningAutomationConsolePage() {
     sourceTypes: splitList(sourceTypes) as AutomationPolicy['sourceTypes'],
     maxAssignmentsPerStudent: maxAssignments,
     confidenceThreshold: confidence,
+    // untranslated-ok: stored with the policy, like its name above.
     pausedReason: policyStatus === 'paused' ? pausedReason || 'Paused from console.' : undefined,
   }), [confidence, maxAssignments, pausedReason, policyStatus, sourceTypes, trimmedStudentId, trimmedSubject, topicIds])
 

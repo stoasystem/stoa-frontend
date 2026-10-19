@@ -83,8 +83,6 @@ describe('no second focus ring in src (#83)', () => {
 const BORDER_ON_FOCUS: [string, string][] = [
   ['components/ui/input.tsx', 'focus-visible:border-primary/45'],
   ['components/ui/textarea.tsx', 'focus-visible:border-primary/45'],
-  ['components/auth/StudentProfileStep.tsx', 'focus-visible:border-primary/45'],
-  ['pages/profile/StudentProfilePage.tsx', 'focus-visible:border-primary/45'],
   ['components/auth/skyFields.ts', 'focus-visible:border-on-sky'],
 ]
 

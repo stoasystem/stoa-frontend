@@ -1,9 +1,6 @@
 {
-  "overviewTitle": "Admin-Übersicht",
-  "overviewDescription": "Lernaktivität, Support-Tickets und Lehrpersonen-Anfragen prüfen.",
   "analytics": "Analysen",
   "supportTickets": "Support-Tickets",
-  "helpRequests": "Lehrpersonen-Anfragen",
   "accounts": {
     "eyebrow": "Kontoverwaltung",
     "title": "Konten",

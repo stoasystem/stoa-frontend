@@ -1,36 +1,9 @@
 {
   "required": "This field is required.",
-  "invalidEmail": "Please enter a valid email address.",
-  "passwordRequired": "Password is required.",
-  "passwordTooShort": "Password must be at least 8 characters.",
   "passwordRequirements": "Password must be at least 8 characters and include uppercase and lowercase letters, a number, and one of these symbols: ! @ # $ % ^ & *.",
   "nameTooShort": "Name must be at least 2 characters.",
-  "acceptTerms": "Accept the privacy policy and terms to continue.",
-  "gradeRequired": "Grade is required.",
   "subjectRequired": "Add at least one subject.",
-  "messageEmpty": "Message cannot be empty.",
-  "fileTooLarge": "The file is too large.",
-  "unsupportedFileType": "This file type is not supported.",
-  "uploadFailed": "File upload failed.",
   "schoolGradeRequired": "School and grade are required.",
-  "parentRequired": "Parent name and email are required.",
-  "childRequired": "Child name and grade are required.",
-  "teachingSubjectRequired": "Add at least one teaching subject.",
-  "educationRequired": "Education background is required.",
-  "introductionRequired": "Short introduction is required.",
-  "credentialRequired": "Upload at least one credential document.",
   "nameRequired": "Name is required.",
-  "emailRequired": "Email is required.",
-  "ageInvalid": "Enter a whole number between {{min}} and {{max}}.",
-  "schoolRequired": "School is required.",
-  "parentNameRequired": "Parent name is required for students under 18.",
-  "parentEmailRequired": "Parent email is required for students under 18.",
-  "childNameRequired": "Child name is required.",
-  "childGradeRequired": "Child grade is required.",
-  "confirmEmailOwnershipRequired": "Confirm that you can receive email at this address.",
-  "fixHighlightedFields": "Please correct the highlighted fields.",
-  "backend": {
-    "age_out_of_range": "Enter an age between 1 and 120.",
-    "parent_contact_required": "A parent's name and email are required for students under 18."
-  }
+  "schoolRequired": "School is required."
 }

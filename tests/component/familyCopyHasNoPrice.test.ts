@@ -6,9 +6,10 @@ import enParent from '@/i18n/locales/en/parent.json'
 import frParent from '@/i18n/locales/fr/parent.json'
 import itParent from '@/i18n/locales/it/parent.json'
 
-// Card 007 again, on the family side. `billingHiddenFromFamilies` renders the
-// student profile and reads the output; the parent screens need query doubles
-// this does not have, so this judges them from the other end: which keys does a
+// Card 007 again, on the family side. (`billingHiddenFromFamilies` rendered the
+// old student profile and read the output; #281 deleted that unreachable page
+// with it.) The parent screens need query doubles this does not have, so this
+// judges them from the other end: which keys does a
 // live page actually render, and does the phrase behind each one - in every
 // language - say anything about money.
 //

@@ -123,7 +123,7 @@ export function CurriculumRolloutPanel({
                         <div>
                           <p className="text-sm font-medium">{lesson.title}</p>
                           <p className="mt-1 text-xs text-muted-foreground">
-                            {lesson.subjectId} / {lesson.topicId} / {lesson.estimatedMinutes} min
+                            {lesson.subjectId} / {lesson.topicId} / {t('set.minutes', { minutes: lesson.estimatedMinutes })}
                           </p>
                         </div>
                         <Badge variant="secondary">

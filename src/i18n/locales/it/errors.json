@@ -1,36 +1,9 @@
 {
   "required": "Questo campo è obbligatorio.",
-  "invalidEmail": "Inserisci un indirizzo email valido.",
-  "passwordRequired": "La password è obbligatoria.",
-  "passwordTooShort": "La password deve contenere almeno 8 caratteri.",
   "passwordRequirements": "La password deve contenere almeno 8 caratteri e includere lettere maiuscole e minuscole, un numero e uno di questi simboli: ! @ # $ % ^ & *.",
   "nameTooShort": "Il nome deve contenere almeno 2 caratteri.",
-  "acceptTerms": "Accetta privacy e termini per continuare.",
-  "gradeRequired": "La classe è obbligatoria.",
   "subjectRequired": "Aggiungi almeno una materia.",
-  "messageEmpty": "Il messaggio non può essere vuoto.",
-  "fileTooLarge": "Il file è troppo grande.",
-  "unsupportedFileType": "Questo tipo di file non è supportato.",
-  "uploadFailed": "Caricamento del file non riuscito.",
   "schoolGradeRequired": "Scuola e classe sono obbligatorie.",
-  "parentRequired": "Nome ed email del genitore sono obbligatori.",
-  "childRequired": "Nome e classe del figlio sono obbligatori.",
-  "teachingSubjectRequired": "Aggiungi almeno una materia insegnata.",
-  "educationRequired": "La formazione è obbligatoria.",
-  "introductionRequired": "La breve presentazione è obbligatoria.",
-  "credentialRequired": "Carica almeno un documento di qualifica.",
   "nameRequired": "Il nome è obbligatorio.",
-  "emailRequired": "L’indirizzo e-mail è obbligatorio.",
-  "ageInvalid": "Inserisci un numero intero tra {{min}} e {{max}}.",
-  "schoolRequired": "La scuola è obbligatoria.",
-  "parentNameRequired": "Il nome di un genitore è obbligatorio per gli studenti sotto i 18 anni.",
-  "parentEmailRequired": "L’e-mail di un genitore è obbligatoria per gli studenti sotto i 18 anni.",
-  "childNameRequired": "Il nome del figlio è obbligatorio.",
-  "childGradeRequired": "La classe del figlio è obbligatoria.",
-  "confirmEmailOwnershipRequired": "Conferma di poter ricevere e-mail a questo indirizzo.",
-  "fixHighlightedFields": "Correggi i campi evidenziati.",
-  "backend": {
-    "age_out_of_range": "Inserisci un’età compresa tra 1 e 120.",
-    "parent_contact_required": "Per gli studenti sotto i 18 anni sono richiesti nome ed e-mail di un genitore."
-  }
+  "schoolRequired": "La scuola è obbligatoria."
 }

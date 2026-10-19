@@ -1,54 +1,19 @@
 {
   "title": "Spazio domande",
-  "emptyTitle": "Fai la tua prima domanda di studio.",
-  "emptyDescription": "Fai una domanda, spiega dove hai difficoltà o carica una scheda per iniziare.",
-  "welcome": "Benvenuto in STOA. Inizia facendo una domanda o spiegando dove hai difficoltà.",
   "placeholder": "Scrivi la tua domanda di studio...",
-  "inputLabel": "Domanda di studio",
   "newConversationLabel": "Prima domanda di studio",
-  "messageListLabel": "Messaggi della conversazione",
   "studentMessageLabel": "Messaggio dello studente",
-  "assistantMessageLabel": "Messaggio STOA",
-  "preparing": "L’Assistente all’apprendimento sta preparando una spiegazione...",
-  "loadFailed": "Non siamo riusciti a caricare le conversazioni di studio. Riprova.",
-  "conversationLoadFailed": "Non siamo riusciti ad aprire questa conversazione di studio. Riprova.",
-  "createFailed": "Non siamo riusciti ad avviare una nuova conversazione di studio. Riprova.",
   "starting": "Avvio...",
   "startConversation": "Avvia conversazione",
-  "quotaReached": "Hai usato i messaggi di studio inclusi in questo piano.",
-  "fileQuotaReached": "Hai usato i caricamenti file inclusi in questo piano.",
-  "emptyMessage": "Il messaggio non può essere vuoto.",
-  "upload": "Carica file dei compiti",
-  "uploadFailed": "Non siamo riusciti a caricare il file. Riprova.",
   "retry": "Riprova",
   "newConversation": "Nuova conversazione",
   "practiceContext": {
     "title": "Stai rivedendo un passaggio di esercizio.",
     "topic": "Argomento",
     "question": "Domanda",
-    "recentAnswer": "Risposta recente",
-    "backToLesson": "Torna alla lezione",
-    "welcome": "Rivedi questo passaggio con l’Assistente all’apprendimento.",
-    "placeholder": "Chiedi il passaggio successivo, non solo la risposta finale...",
-    "attempts": "Tentativi: {{attempts}}",
-    "hintViewed": "Suggerimento consultato"
-  },
-  "availability": {
-    "checking": "Verifica insegnanti",
-    "online": "Insegnante online",
-    "offline": "Nessun insegnante online",
-    "onlineDetail": "{{count}} disponibile ora",
-    "offlineDetail": "Il supporto insegnanti controllerà le richieste più tardi.",
-    "nextWindow": "Prossima finestra {{nextWindow}}"
+    "attempts": "Tentativi: {{attempts}}"
   },
   "teacher": {
-    "title": "Un insegnante può chiarire questo punto?",
-    "description": "Invia questa conversazione a un insegnante qualificato per una guida più chiara.",
-    "cta": "Chiedi a un insegnante",
-    "submitted": "La tua richiesta è stata inviata a un insegnante.",
-    "failed": "Non siamo riusciti a inviare la richiesta all’insegnante. Riprova.",
-    "requested": "La tua richiesta è stata inviata a un insegnante.",
-    "retry": "Riprova",
     "errors": {
       "planDenied": "Il supporto dell’insegnante non è ancora attivo per questo account. Un’amministrazione STOA può aggiungerlo.",
       "allowanceExhausted": "Le richieste di questa settimana sono esaurite. Torneranno disponibili la prossima settimana.",
@@ -76,60 +41,15 @@
     "foundation": "Supporto di base"
   },
   "conversations": "Conversazioni",
-  "conversationsSubtitle": "Le tue conversazioni di apprendimento",
-  "backToConversations": "Torna alle conversazioni",
   "newConversationReady": "Pronto per una nuova domanda.",
   "stopGenerating": "Interrompi generazione",
-  "loadingChat": "Caricamento della chat",
-  "teacherSupport": "Supporto insegnante",
-  "uploadedMaterial": "Materiale didattico caricato",
-  "back": "Indietro",
   "needHelpFromTeacher": "Hai bisogno dell'aiuto di un insegnante?",
-  "escalation": {
-    "prompt": "Richiedi il supporto di un insegnante quando la spiegazione non è abbastanza chiara.",
-    "requesting": "Richiesta in corso...",
-    "requestTeacher": "Richiedi insegnante",
-    "planRestricted": "Il supporto dell'insegnante non fa parte del tuo piano attuale."
-  },
   "roles": {
     "teacher": "Insegnante",
     "system": "Sistema",
     "assistant": "Assistente di apprendimento STOA"
   },
-  "messageStatus": {
-    "sending": "Invio in corso",
-    "stopped": "Generazione interrotta",
-    "failed": "Da riprovare"
-  },
   "thinking": "Sto pensando…",
-  "report": {
-    "trigger": "Segnala la risposta",
-    "context": "Invia questa risposta dell’assistente alla coda di moderazione interna."
-  },
-  "questionBankContext": {
-    "welcome": "Rivedi questo passaggio dell’esercizio con l’assistente di apprendimento.",
-    "placeholder": "Chiedi che cosa non è chiaro in questo esercizio..."
-  },
-  "uploadContext": {
-    "placeholder": "Indica all’assistente di apprendimento quale parte non è chiara..."
-  },
-  "defaultPrompt": {
-    "practice": "Puoi spiegare questo passaggio?",
-    "questionBank": "Puoi spiegare questo passaggio della biblioteca di esercizi?",
-    "questionStep": "Puoi spiegare questo passaggio dell’esercizio?"
-  },
-  "teacherEscalation": {
-    "requestedTitle": "Supporto dell’insegnante richiesto",
-    "requestedBody": "Un insegnante si unirà a questa conversazione appena sarà disponibile. Nel frattempo puoi continuare con l’assistente di apprendimento."
-  },
-  "followUp": {
-    "label": "Suggerimenti per continuare",
-    "explainStep": "Non capisco uno dei passaggi",
-    "simpler": "Puoi spiegarlo in modo più semplice?",
-    "similar": "Dammi un esercizio simile",
-    "why": "Perché funziona così?"
-  },
-  "duplicateReopened": "L’hai già chiesto. Ecco la conversazione corrispondente.",
   "ask": {
     "title": "Domanda",
     "close": "Chiudi",

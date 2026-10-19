@@ -27,8 +27,8 @@ export function AdminTeacherApplicationsPage() {
     subjects.map((subject) => teacherSubjectLabel(subject, tTeacher)).join(', ')
   const [reviewState, setReviewState] = useState<TeacherReviewState>('pending_review')
   const [selected, setSelected] = useState<TeacherApplicationListItem | null>(null)
-  // The review reason is stored with the decision, so its starting text is
-  // data and stays in one language; the reviewer can overwrite it.
+  // untranslated-ok: the review reason is stored with the decision, so its
+  // starting text is data and stays in one language; the reviewer can overwrite it.
   const [reason, setReason] = useState('Reviewed against teacher onboarding criteria.')
   const [message, setMessage] = useState<string | null>(null)
   const listQuery = useTeacherApplicationsQuery(reviewState)

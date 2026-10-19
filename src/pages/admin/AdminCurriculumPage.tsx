@@ -39,6 +39,7 @@ import type {
   CurriculumVersion,
 } from '@/types/curriculumOperations'
 
+// untranslated-ok: a starter manifest the admin edits as JSON; its lesson text is curriculum data, not interface copy.
 const starterManifest = JSON.stringify(
   {
     source: {
