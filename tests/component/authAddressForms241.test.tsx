@@ -38,12 +38,20 @@ function renderReauth(role: string | undefined) {
   )
 }
 
-function renderChooser() {
+function renderSwitched() {
   render(
     <I18nextProvider i18n={i18n}>
       <QueryClientProvider client={new QueryClient()}>
         <MemoryRouter>
-          <LoginPage mode={{ kind: 'choose', onSignInOther: () => {} }} />
+          <LoginPage
+            mode={{
+              kind: 'switched',
+              account: { email: 'pa@test.stoaedu.ch', name: 'Pa', role: 'parent' },
+              previous: { email: 'ada@test.stoaedu.ch', name: 'Ada', role: 'student' },
+              onContinue: () => {},
+              onSignInOther: () => {},
+            }}
+          />
         </MemoryRouter>
       </QueryClientProvider>
     </I18nextProvider>,
@@ -126,17 +134,19 @@ describe('the sign-in-again page in the other languages', () => {
   })
 })
 
-describe('the account chooser', () => {
-  it('asks who uses the tab, not who learns, without du', () => {
-    renderChooser()
+describe('another account signed in elsewhere (#320)', () => {
+  it('says who is signed in now and who the tab showed, without du', () => {
+    renderSwitched()
 
-    expect(screen.getByRole('heading', { name: 'Wer nutzt diesen Tab?' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'In einem anderen Tab ist jetzt Pa angemeldet.' })).toBeInTheDocument()
+    expect(document.body.textContent).toContain('Ada')
+    expect(screen.getByRole('button', { name: 'Weiter als Pa' })).toBeInTheDocument()
     expect(document.body.textContent).not.toMatch(/\blernt\b/)
     expect(document.body.textContent).not.toMatch(/\b(du|dich|dein|deine|Wähle)\b/)
   })
 
   it.each(Object.entries(AUTH))('%s does not assume the reader is learning', (_lang, bundle) => {
-    expect(bundle.chooser.title).not.toMatch(/lern|learn|apprend|impar|studi/i)
+    expect(`${bundle.switched.title} ${bundle.switched.subtitle}`).not.toMatch(/lern|learn|apprend|impar|studi/i)
   })
 })
 

@@ -2,9 +2,9 @@ import axios from 'axios'
 import { apiBaseUrl } from '@/lib/env'
 import { activeLanguage } from '@/i18n/languages'
 import { currentSessionToken, useAuthStore } from '@/store/authStore'
-import { forgetHeldRefreshToken, renewHeldSession } from '@/lib/devSessions'
 import { isSameSession, renewSession, storedRefreshToken } from '@/services/auth/sessionRefresh'
 import { queryClient } from '@/app/query/queryClient'
+import { signOutIfReplacedElsewhere } from '@/services/auth/browserSignInChanges'
 
 export class ApiError extends Error {
   status?: number
@@ -117,7 +117,7 @@ function isPublicAuthPath(url?: string, method?: string) {
 const refreshSent = new WeakMap<object, string>()
 
 httpClient.interceptors.request.use((config) => {
-  // This tab's own token: no other tab's sign-in changes it (#216).
+  // This tab's own copy of the browser's sign-in (#320).
   const token = currentSessionToken()
   refreshSent.delete(config)
 
@@ -125,6 +125,10 @@ httpClient.interceptors.request.use((config) => {
 
   if (isPublicAuthPath(config.url, config.method)) {
     delete config.headers.Authorization
+  } else if (token && signOutIfReplacedElsewhere()) {
+    // Another tab signed out or signed in as someone since this tab joined:
+    // nothing more goes out as the account this tab was showing.
+    throw new ApiError('Signed out in another tab.', { status: 401, code: 'session_changed' })
   } else if (token) {
     config.headers.Authorization = `Bearer ${token}`
     // Which session the request went out under. The access token alone cannot
@@ -156,9 +160,9 @@ export const SESSION_UNREACHABLE = 'session_unreachable'
 /**
  * The session is over: drop it and go to sign-in.
  *
- * Only this tab's session: clearAuth leaves other tabs as they are, and this
- * tab stays signed out rather than falling back on a saved account (#216,
- * #217). The sign-in page says whose session ended and offers it again; the
+ * The browser's sign-in ends with it, and the other tabs on it sign out when
+ * they see that (#320). This tab stays signed out across a refresh (#217).
+ * The sign-in page says whose session ended and offers it again; the
  * page the tab was on is kept for that account to come back to. Everything
  * else of the account's goes, as on signing out: the stored part with the
  * tab's own storage, what is held in memory here and by the page load.
@@ -264,10 +268,6 @@ function renewAndRetry<T>(sent: SentSession, retry: Retry<T>): Promise<T> {
     // that first caller still takes the ordinary path below.)
     const renewedByThisRenewal =
       token !== null && token !== sent.token && currentSessionToken() === token
-    // The server refused this refresh token: the saved account holding it is
-    // over too, whoever this tab is by now. Only that one, and only while it
-    // still holds it (#217, tab-account audit F3).
-    if (renewal.status === 'ended' && renewal.refused) forgetHeldRefreshToken(renewal.refused)
     // Signed out, or another account signed in, while the renewal was in
     // flight: the token it brings back is the old session's, and storing
     // it would sign that account straight back in (#34, #172 audit).
@@ -295,22 +295,19 @@ function renewAndRetry<T>(sent: SentSession, retry: Retry<T>): Promise<T> {
       return Promise.reject(new ApiError('The session changed while it was being renewed.', { status: 401, code: 'session_changed' }))
     }
     // The server could not be reached (network, timeout, 5xx, 429). It
-    // refused nothing, so the session stays — access token, refresh
-    // tokens, held accounts — and this request fails on its own. The
+    // refused nothing, so the session stays — access token and refresh
+    // token — and this request fails on its own. The
     // next 401 tries the renewal again (#214). No status: this is not a
     // 401 a caller should read as "signed out".
     if (renewal.status === 'unreachable') {
       return Promise.reject(new ApiError('The session could not be renewed right now.', { code: SESSION_UNREACHABLE }))
     }
     if (!token) return endSession()
-    // The first caller stores the token and moves the held entry; the
-    // others find both done.
+    // The first caller stores the token (and the browser's sign-in takes
+    // it); the others find it done.
     if (!renewedByThisRenewal) {
       // Only the token: at start-up the account has not been read yet.
       useAuthStore.getState().updateAccessToken(token)
-      // The account menu holds this account too; keep it on the same pair,
-      // or signing out leaves it there dead (#162).
-      if (sent.token && renewal.status === 'renewed') renewHeldSession(sent.token, renewal)
     }
     return retry(token, true)
   })

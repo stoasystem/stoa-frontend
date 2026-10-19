@@ -1,6 +1,7 @@
 /**
  * The switcher is a convenience for the test accounts. What matters is that
- * nobody who registers is offered it, and that a tab keeps its own role.
+ * nobody who registers is offered it, that its list never holds a real
+ * account, and that switching is an ordinary sign-in of the browser (#320).
  */
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { render, screen, waitFor } from '@testing-library/react'
@@ -12,15 +13,8 @@ vi.mock('@/services/auth/authApi', () => ({ login: vi.fn() }))
 
 import { login } from '@/services/auth/authApi'
 import { RoleSwitcher } from '@/components/dev/RoleSwitcher'
-import {
-  isTestAccount,
-  switcherEnabledHere,
-  pinTabToSession,
-  readSessions,
-  rememberSession,
-  tabToken,
-} from '@/lib/devSessions'
-import { tabSignedOut } from '@/lib/tabAccount'
+import { holdTestRole, isTestAccount, readTestRoles, switcherEnabledHere } from '@/lib/testRoles'
+import { pinTabToSession, readBrowserSignIn, tabSignedOut, tabToken } from '@/lib/tabAccount'
 import { resetAsk, useAskStore } from '@/store/askStore'
 import { useAuthStore } from '@/store/authStore'
 
@@ -84,39 +78,46 @@ describe('switching between the test roles', () => {
     expect(screen.getByRole('button', { name: /student/i })).toBeInTheDocument()
   })
 
-  it('holds a session for an ordinary account too', () => {
-    // Switching accounts used to be a testing aid gated on a test address.
-    // It is a feature of the account menu now: a parent with two children's
-    // accounts, a shared family computer. What is held is still only the
-    // session the server issued, never a password.
-    rememberSession({
+  it('never holds an ordinary account (#320)', () => {
+    holdTestRole({
       email: 'a.real.parent@gmail.com',
       role: 'parent',
       name: 'Real',
       accessToken: 'token',
     })
 
-    expect(readSessions().map((entry) => entry.email)).toEqual(['a.real.parent@gmail.com'])
+    expect(readTestRoles()).toEqual([])
+    // Not even written: the token of a real account never lands in its list.
+    expect(localStorage.getItem('stoa_test_roles') ?? '').not.toContain('a.real.parent')
+  })
+
+  it('reads back no ordinary account, whatever wrote it there', () => {
+    localStorage.setItem(
+      'stoa_test_roles',
+      JSON.stringify([{ email: 'a.real.parent@gmail.com', role: 'parent', name: 'Real', accessToken: 't', savedAt: '' }]),
+    )
+
+    expect(readTestRoles()).toEqual([])
   })
 
   it('refuses one with no address to hold it under', () => {
-    rememberSession({ email: '  ', role: 'parent', name: 'Nobody', accessToken: 'token' })
+    holdTestRole({ email: '  ', role: 'parent', name: 'Nobody', accessToken: 'token' })
 
-    expect(readSessions()).toEqual([])
+    expect(readTestRoles()).toEqual([])
   })
 
   it('holds a session for a test account', () => {
-    rememberSession({
+    holdTestRole({
       email: 'teacher@test.stoaedu.ch',
       role: 'teacher',
       name: 'Demo',
       accessToken: 'token-t',
     })
 
-    expect(readSessions().map((entry) => entry.email)).toEqual(['teacher@test.stoaedu.ch'])
+    expect(readTestRoles().map((entry) => entry.email)).toEqual(['teacher@test.stoaedu.ch'])
   })
 
-  it('keeps one role per tab rather than one per browser', () => {
+  it('keeps this tab\'s copy of the sign-in in the tab, not where tabs used to share one', () => {
     pinTabToSession('this-tab-only')
 
     expect(tabToken()).toBe('this-tab-only')
@@ -151,7 +152,7 @@ describe('switching between the test roles', () => {
       value: { assign, href: 'https://app.stoaedu.ch/chat' },
       writable: true,
     })
-    rememberSession({
+    holdTestRole({
       email: 'parent@test.stoaedu.ch',
       role: 'parent',
       name: 'Demo Parent',
@@ -168,6 +169,83 @@ describe('switching between the test roles', () => {
     // The store is untouched; the reload establishes the role.
     expect(useAuthStore.getState().user?.email).toBe('student@test.stoaedu.ch')
     expect(sessionStorage.getItem('stoa_tab_access_token')).toBe('parent-token')
+    // An ordinary sign-in of the browser: every other tab follows it (#320).
+    expect(readBrowserSignIn()).toMatchObject({ accessToken: 'parent-token', account: { email: 'parent@test.stoaedu.ch' } })
+  })
+
+  it('holds the role being left, and does not end it on the server', async () => {
+    askedFor()
+    const calls: string[] = []
+    globalThis.fetch = vi.fn().mockImplementation(async (url: string) => {
+      calls.push(String(url))
+      return { ok: true, status: 200 }
+    }) as never
+    const assign = vi.fn()
+    Object.defineProperty(window, 'location', {
+      value: { assign, href: 'https://app.stoaedu.ch/chat' },
+      writable: true,
+    })
+    localStorage.setItem(
+      'stoa_sign_in',
+      JSON.stringify({
+        id: 's',
+        accessToken: 'student-token',
+        refreshToken: 'student-refresh',
+        account: { email: 'student@test.stoaedu.ch' },
+      }),
+    )
+    sessionStorage.setItem('stoa_tab_sign_in', 's')
+    sessionStorage.setItem('stoa_tab_refresh_token', 'student-refresh')
+    pinTabToSession('student-token')
+    holdTestRole({ email: 'parent@test.stoaedu.ch', role: 'parent', name: 'Demo Parent', accessToken: 'parent-token' })
+    signedInAs('student@test.stoaedu.ch')
+    const user = (await import('@testing-library/user-event')).default.setup()
+    renderSwitcher()
+
+    await user.click(screen.getByRole('button', { name: /student/i }))
+    await user.click(screen.getByRole('button', { name: /parent · parent/i }))
+
+    await waitFor(() => expect(assign).toHaveBeenCalledWith('/parent'))
+    expect(readTestRoles().find((role) => role.email === 'student@test.stoaedu.ch')).toMatchObject({
+      accessToken: 'student-token',
+      refreshToken: 'student-refresh',
+    })
+    expect(calls.some((url) => url.includes('/auth/logout'))).toBe(false)
+  })
+
+  it('never files another sign-in under the test account the tab shows (#320 audit F1)', async () => {
+    askedFor()
+    const calls: string[] = []
+    globalThis.fetch = vi.fn().mockImplementation(async (url: string) => {
+      calls.push(String(url))
+      return { ok: true, status: 200 }
+    }) as never
+    const assign = vi.fn()
+    Object.defineProperty(window, 'location', {
+      value: { assign, pathname: '/', search: '', hash: '', href: 'https://app.stoaedu.ch/' },
+      writable: true,
+    })
+    // This tab joined the student's sign-in, then missed the event: another
+    // tab has since signed the browser in as a real account.
+    sessionStorage.setItem('stoa_tab_sign_in', 'student-sign-in')
+    pinTabToSession('student-token')
+    localStorage.setItem(
+      'stoa_sign_in',
+      JSON.stringify({ id: 'real', accessToken: 'real-token', refreshToken: 'real-refresh', account: { email: 'parent@gmail.com' } }),
+    )
+    holdTestRole({ email: 'parent@test.stoaedu.ch', role: 'parent', name: 'Demo Parent', accessToken: 'parent-token' })
+    signedInAs('student@test.stoaedu.ch')
+    const user = (await import('@testing-library/user-event')).default.setup()
+    renderSwitcher()
+
+    await user.click(screen.getByRole('button', { name: /student/i }))
+    await user.click(screen.getByRole('button', { name: /parent · parent/i }))
+
+    expect(localStorage.getItem('stoa_test_roles') ?? '').not.toContain('real-')
+    expect(tabToken()).toBeNull()
+    expect(assign).toHaveBeenCalledWith('/login')
+    expect(readBrowserSignIn()).toMatchObject({ accessToken: 'real-token' })
+    expect(calls).toEqual([])
   })
 
   it('keeps the browser signed in when the held session has expired', async () => {
@@ -181,7 +259,7 @@ describe('switching between the test roles', () => {
       writable: true,
     })
     pinTabToSession('this-tab-only')
-    rememberSession({
+    holdTestRole({
       email: 'parent@test.stoaedu.ch',
       role: 'parent',
       name: 'Demo Parent',
@@ -198,7 +276,7 @@ describe('switching between the test roles', () => {
     expect(assign).not.toHaveBeenCalled()
     // The tab stays on its own account.
     expect(tabToken()).toBe('this-tab-only')
-    expect(readSessions()).toHaveLength(0)
+    expect(readTestRoles()).toHaveLength(0)
   })
 
   it('keeps the refresh token of a role it has just been given', async () => {
@@ -220,8 +298,8 @@ describe('switching between the test roles', () => {
     await user.type(screen.getByPlaceholderText(/password/i), 'secret')
     await user.click(screen.getByRole('button', { name: /hold this role/i }))
 
-    await waitFor(() => expect(readSessions()).toHaveLength(1))
-    expect(readSessions()[0].refreshToken).toBe('parent-refresh')
+    await waitFor(() => expect(readTestRoles()).toHaveLength(1))
+    expect(readTestRoles()[0].refreshToken).toBe('parent-refresh')
   })
 
   it('renews a held account whose access token has run out, instead of dropping it', async () => {
@@ -243,7 +321,7 @@ describe('switching between the test roles', () => {
       value: { assign, href: 'https://app.stoaedu.ch/chat' },
       writable: true,
     })
-    rememberSession({
+    holdTestRole({
       email: 'parent@test.stoaedu.ch',
       role: 'parent',
       name: 'Demo Parent',
@@ -263,7 +341,7 @@ describe('switching between the test roles', () => {
     expect(sessionStorage.getItem('stoa_tab_access_token')).toBe('fresh-parent')
     // Kept on its new token, so the next switch does not spend a round trip
     // finding out the old one is dead.
-    const held = readSessions().find((entry) => entry.email === 'parent@test.stoaedu.ch')
+    const held = readTestRoles().find((entry) => entry.email === 'parent@test.stoaedu.ch')
     expect(held?.accessToken).toBe('fresh-parent')
     expect(held?.refreshToken).toBe('r-2')
   })
@@ -276,7 +354,7 @@ describe('switching between the test roles', () => {
       value: { assign, href: 'https://app.stoaedu.ch/chat' },
       writable: true,
     })
-    rememberSession({
+    holdTestRole({
       email: 'parent@test.stoaedu.ch',
       role: 'parent',
       name: 'Demo Parent',
@@ -292,7 +370,7 @@ describe('switching between the test roles', () => {
 
     await waitFor(() => expect(screen.getByText(/expired/i)).toBeInTheDocument())
     expect(assign).not.toHaveBeenCalled()
-    expect(readSessions()).toHaveLength(0)
+    expect(readTestRoles()).toHaveLength(0)
   })
 
   it('keeps a held account when the renewal could not be made', async () => {
@@ -308,7 +386,7 @@ describe('switching between the test roles', () => {
       value: { assign, href: 'https://app.stoaedu.ch/chat' },
       writable: true,
     })
-    rememberSession({
+    holdTestRole({
       email: 'parent@test.stoaedu.ch',
       role: 'parent',
       name: 'Demo Parent',
@@ -323,7 +401,7 @@ describe('switching between the test roles', () => {
     await user.click(screen.getByRole('button', { name: /parent · parent/i }))
 
     await waitFor(() => expect(screen.getByText(/could not reach/i)).toBeInTheDocument())
-    expect(readSessions()).toHaveLength(1)
+    expect(readTestRoles()).toHaveLength(1)
   })
 
   it('keeps the held role when the check could not be made', async () => {
@@ -336,7 +414,7 @@ describe('switching between the test roles', () => {
       value: { assign, href: 'https://app.stoaedu.ch/chat' },
       writable: true,
     })
-    rememberSession({
+    holdTestRole({
       email: 'parent@test.stoaedu.ch',
       role: 'parent',
       name: 'Demo Parent',
@@ -351,7 +429,7 @@ describe('switching between the test roles', () => {
 
     await waitFor(() => expect(screen.getByText(/could not reach/i)).toBeInTheDocument())
     expect(assign).not.toHaveBeenCalled()
-    expect(readSessions()).toHaveLength(1)
+    expect(readTestRoles()).toHaveLength(1)
     expect(sessionStorage.getItem('stoa_tab_access_token')).toBeNull()
   })
 
@@ -364,7 +442,7 @@ describe('switching between the test roles', () => {
       value: { assign, href: 'https://app.stoaedu.ch/chat' },
       writable: true,
     })
-    rememberSession({
+    holdTestRole({
       email: 'parent@test.stoaedu.ch',
       role: 'parent',
       name: 'Demo Parent',
@@ -378,7 +456,7 @@ describe('switching between the test roles', () => {
     await user.click(screen.getByRole('button', { name: /parent · parent/i }))
 
     await waitFor(() => expect(screen.getByText(/could not reach/i)).toBeInTheDocument())
-    expect(readSessions()).toHaveLength(1)
+    expect(readTestRoles()).toHaveLength(1)
   })
 
   it('sends each role to its own home rather than through the root', async () => {
@@ -446,15 +524,15 @@ describe('a tab holding its own role', () => {
     expect(config.headers.Authorization).toBeUndefined()
   })
 
-  it('signs out only this tab when its token is refused, and keeps it signed out', async () => {
-    // Other tabs and the saved accounts are not this tab's to end; and the
-    // tab does not fall back on any of them (#217).
+  it('signs out when its token is refused, keeps it signed out, and leaves the held roles', async () => {
+    // The tab does not fall back on any held role (#217); the held roles are
+    // the switcher's, not this sign-in's to end.
     const assign = vi.fn()
     Object.defineProperty(window, 'location', {
       value: { assign, pathname: '/chat' },
       writable: true,
     })
-    rememberSession({ email: 'parent@test.stoaedu.ch', role: 'parent', name: 'P', accessToken: 'parent-token' })
+    holdTestRole({ email: 'parent@test.stoaedu.ch', role: 'parent', name: 'P', accessToken: 'parent-token' })
     pinTabToSession('this-tab-only')
 
     const { httpClient } = await import('@/services/api/httpClient')
@@ -471,7 +549,7 @@ describe('a tab holding its own role', () => {
 
     expect(tabToken()).toBeNull()
     expect(tabSignedOut()).toBe(true)
-    expect(readSessions().map((entry) => entry.accessToken)).toEqual(['parent-token'])
+    expect(readTestRoles().map((entry) => entry.accessToken)).toEqual(['parent-token'])
   })
 
   it('still signs the store out and goes to sign-in', async () => {
@@ -544,15 +622,14 @@ describe('the per-browser opt-in', () => {
     expect(switcherEnabledHere()).toBe(false)
   })
 
-  it('offers the switcher to an ordinary address once this browser asked', () => {
-    // The accounts an administrator opens carry ordinary addresses, so the
-    // domain rule would otherwise mean the real accounts cannot be tested.
+  it('withholds the switcher from an ordinary address even once this browser asked (#320)', () => {
     atUrl('/?roleswitcher=on')
     signedInAs('someone@stoaedu.ch', 'admin')
 
     renderSwitcher()
 
-    expect(screen.getByRole('button', { name: /Testing as/ })).toBeInTheDocument()
+    expect(switcherEnabledHere()).toBe(true)
+    expect(screen.queryByRole('button', { name: /Testing as/ })).not.toBeInTheDocument()
   })
 
   it('still hides it from an ordinary address in a browser that never asked', () => {

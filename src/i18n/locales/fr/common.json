@@ -6,13 +6,9 @@
     "close": "Fermer"
   },
   "accountMenu": {
-    "addAccount": "Ajouter un autre compte",
     "billing": "Facturation et paiement",
     "help": "Aide et assistance",
-    "open": "Compte",
-    "switchAccount": "Changer de compte",
-    "switchExpired": "Cette session a expiré. Nouvelle connexion nécessaire.",
-    "switchUnreachable": "Serveur injoignable. Le compte reste enregistré."
+    "open": "Compte"
   },
   "actions": {
     "back": "Retour",

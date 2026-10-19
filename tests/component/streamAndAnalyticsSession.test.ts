@@ -10,7 +10,7 @@
  */
 import { http, HttpResponse } from 'msw'
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
-import { pinTabToSession, readSessions, rememberSession, TAB_TOKEN_KEY } from '@/lib/devSessions'
+import { pinTabToSession, readBrowserSignIn, TAB_TOKEN_KEY } from '@/lib/tabAccount'
 import { SESSION_UNREACHABLE } from '@/services/api/httpClient'
 import { rememberRefreshToken } from '@/services/auth/sessionRefresh'
 import { trackEvent } from '@/services/analytics/analyticsClient'
@@ -69,9 +69,10 @@ function refreshAnswers(answer: () => Response | Promise<Response>) {
   )
 }
 
-/** Parent A is saved in this browser, open in another tab; this tab is child B. */
+/** The browser is signed in as child B, and this tab is on that sign-in (#320). */
 function pinnedToChild() {
-  rememberSession({ email: 'a@test.stoaedu.ch', role: 'parent', name: 'A', accessToken: 'parent-access', refreshToken: 'parent-refresh' })
+  localStorage.setItem('stoa_sign_in', JSON.stringify({ id: 'child', accessToken: 'child-access', refreshToken: 'child-refresh' }))
+  sessionStorage.setItem('stoa_tab_sign_in', 'child')
   pinTabToSession('child-access')
   rememberRefreshToken('child-refresh')
   useAuthStore.setState({ accessToken: 'child-access', isAuthenticated: true })
@@ -135,11 +136,10 @@ describe('an expired token on the stream', () => {
 
     expect(streamAuth).toEqual(['Bearer child-access', 'Bearer child-fresh'])
     expect(refreshCalls).toBe(1)
-    // The renewal is this tab's account's, kept in the tab; the parent's saved
-    // session is untouched.
+    // The renewal is kept in the tab, and new tabs join the renewed sign-in.
     expect(sessionStorage.getItem(TAB_TOKEN_KEY)).toBe('child-fresh')
     expect(sessionStorage.getItem(TAB_REFRESH)).toBe('child-refresh-2')
-    expect(readSessions().map((entry) => [entry.accessToken, entry.refreshToken])).toEqual([['parent-access', 'parent-refresh']])
+    expect(readBrowserSignIn()).toMatchObject({ id: 'child', accessToken: 'child-fresh', refreshToken: 'child-refresh-2' })
   })
 
   it('ends the session when the renewal is refused', async () => {
@@ -156,7 +156,7 @@ describe('an expired token on the stream', () => {
     expect(assign).toHaveBeenCalledWith('/login')
   })
 
-  it('a refusal ends only this tab\'s session and leaves the parent\'s saved one', async () => {
+  it('a refusal ends the browser\'s sign-in, so the other tabs follow (#320)', async () => {
     pinnedToChild()
     const assign = stubLocation()
     streamAccepts('never')
@@ -167,7 +167,7 @@ describe('an expired token on the stream', () => {
     expect(streamAuth).toEqual(['Bearer child-access'])
     expect(sessionStorage.getItem(TAB_TOKEN_KEY)).toBeNull()
     expect(sessionStorage.getItem(TAB_REFRESH)).toBeNull()
-    expect(readSessions().map((entry) => [entry.accessToken, entry.refreshToken])).toEqual([['parent-access', 'parent-refresh']])
+    expect(readBrowserSignIn()).toBeNull()
     expect(assign).toHaveBeenCalledWith('/login')
   })
 

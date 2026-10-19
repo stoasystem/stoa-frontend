@@ -20,7 +20,7 @@
 import { http, HttpResponse } from 'msw'
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 import { httpClient } from '@/services/api/httpClient'
-import { pinTabToSession, TAB_TOKEN_KEY } from '@/lib/devSessions'
+import { pinTabToSession, TAB_TOKEN_KEY } from '@/lib/tabAccount'
 import { rememberRefreshToken, replaceRefreshToken } from '@/services/auth/sessionRefresh'
 import { type CurrentUser, TOKEN_KEY, useAuthStore } from '@/store/authStore'
 import { mswServer } from '../mswServer'

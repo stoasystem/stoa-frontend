@@ -5,23 +5,25 @@
  * F2 a sign-in over a tab still on another account replaced it in place, and
  *    that account's late /auth/me put it back on screen;
  * F3 a refusal answered after the tab changed account left the refused saved
- *    account in the list;
+ *    account in the list (now: must not end the sign-in that replaced it);
  * F4 storage the browser refuses stopped the app;
- * F5 a saved account's refresh token was taken without checking it.
+ * F5 a saved account's refresh token was taken without checking it (now: by
+ *    the one-off move off the saved accounts, #320).
+ *
+ * The saved accounts and switching between them are gone (#320); what these
+ * findings guard still applies to a sign-in over another account.
  */
 import { QueryClientProvider } from '@tanstack/react-query'
-import { act, fireEvent, render, renderHook, screen, waitFor } from '@testing-library/react'
+import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { http, HttpResponse } from 'msw'
 import { MemoryRouter } from 'react-router-dom'
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 import { queryClient } from '@/app/query/queryClient'
 import { UPLOAD_HANDOFF_STORAGE_KEY } from '@/features/uploads/utils/uploadHandoff'
 import { readCurrentAccount } from '@/hooks/auth/accountRead'
-import { useHeldAccounts } from '@/hooks/auth/useHeldAccounts'
 import { useLoginMutation } from '@/hooks/auth/useLoginMutation'
-import { pinTabToSession, readSessions, rememberSession, releaseTab, tabToken } from '@/lib/devSessions'
 import { PENDING_MESSAGE_KEY_PREFIX } from '@/lib/pendingChatMessages'
-import { bindTab, initializeTab } from '@/lib/tabAccount'
+import { initializeTab, pinTabToSession, readBrowserSignIn, signInTab, tabToken } from '@/lib/tabAccount'
 import { httpClient } from '@/services/api/httpClient'
 import { storedRefreshToken } from '@/services/auth/sessionRefresh'
 import { CHECKOUT_OPERATION_STORAGE_KEY } from '@/services/billing/billingApi'
@@ -70,24 +72,8 @@ afterEach(() => {
 })
 
 describe('F1: changing account takes nothing of the first one along', () => {
-  it('on a switch to a saved account', async () => {
-    bindTab('a-access', 'a-refresh', accountA)
-    leaveAsState()
-    rememberSession({ ...accountB, accessToken: 'b-access', refreshToken: 'b-refresh' })
-    vi.stubGlobal('fetch', vi.fn(async () => new Response('{}', { status: 200 })))
-    vi.stubGlobal('location', { ...window.location, assign: vi.fn() })
-    const { result } = renderHook(() => useHeldAccounts())
-
-    await act(() => result.current.switchTo(result.current.sessions[0]))
-
-    expect(currentSessionToken()).toBe('b-access')
-    expectNoneOfAs()
-    // The sign-in timing names nobody and is still running.
-    expect(sessionStorage.getItem('stoa.login.submittedAt')).toBe('123')
-  })
-
-  it('on a sign-in over it (「添加账号」)', () => {
-    bindTab('a-access', 'a-refresh', accountA)
+  it('on a sign-in over it', () => {
+    signInTab('a-access', 'a-refresh', accountA)
     leaveAsState()
 
     useAuthStore.getState().setAuth(accountB as never, 'b-access', 'b-refresh')
@@ -97,7 +83,7 @@ describe('F1: changing account takes nothing of the first one along', () => {
   })
 
   it('but a renewal of the same account keeps it all', () => {
-    bindTab('a-access', 'a-refresh', accountA)
+    signInTab('a-access', 'a-refresh', accountA)
     leaveAsState()
 
     useAuthStore.getState().updateAccessToken('a-access-2')
@@ -108,7 +94,7 @@ describe('F1: changing account takes nothing of the first one along', () => {
 
 describe('F2: a sign-in over a tab still on another account', () => {
   it('drops that account’s read still in flight instead of showing it', async () => {
-    bindTab('a-access', 'a-refresh', accountA)
+    signInTab('a-access', 'a-refresh', accountA)
     const answer = gate()
     const asked = gate()
     mswServer.use(
@@ -121,14 +107,14 @@ describe('F2: a sign-in over a tab still on another account', () => {
 
     const read = readCurrentAccount()
     await asked.opened
-    bindTab('c-access', 'c-refresh', { email: 'c@test.stoaedu.ch' })
+    signInTab('c-access', 'c-refresh', { email: 'c@test.stoaedu.ch' })
     answer.open()
 
     await expect(read).rejects.toMatchObject({ code: 'session_changed' })
   })
 
   it('keeps the read when only a renewal of the same session happened meanwhile', async () => {
-    bindTab('a-access', 'a-refresh', accountA)
+    signInTab('a-access', 'a-refresh', accountA)
     const answer = gate()
     const asked = gate()
     mswServer.use(
@@ -147,8 +133,8 @@ describe('F2: a sign-in over a tab still on another account', () => {
     await expect(read).resolves.toMatchObject({ email: 'a@test.stoaedu.ch' })
   })
 
-  it('lands with a full load, like adding an account', async () => {
-    bindTab('a-access', 'a-refresh', accountA)
+  it('lands with a full load', async () => {
+    signInTab('a-access', 'a-refresh', accountA)
     useAuthStore.setState({ accessToken: 'a-access', isAuthenticated: true })
     const assign = vi.fn()
     vi.stubGlobal('location', { ...window.location, search: '', assign })
@@ -201,7 +187,7 @@ describe('re-audit of the fixes', () => {
   }
 
   it('a sign-in over another account still honours ?next=', async () => {
-    bindTab('a-access', 'a-refresh', accountA)
+    signInTab('a-access', 'a-refresh', accountA)
     useAuthStore.setState({ accessToken: 'a-access', isAuthenticated: true })
 
     const assign = signInAs({ ...accountB, role: 'parent' }, '?next=/parent/reports')
@@ -210,7 +196,7 @@ describe('re-audit of the fixes', () => {
   })
 
   it('the same account signing in again keeps its own state and is not reloaded', async () => {
-    bindTab('a-access', 'a-refresh', accountA)
+    signInTab('a-access', 'a-refresh', accountA)
     useAuthStore.setState({ accessToken: 'a-access', isAuthenticated: true })
     leaveAsState()
 
@@ -221,19 +207,19 @@ describe('re-audit of the fixes', () => {
     expect(sessionStorage.getItem(CHECKOUT_OPERATION_STORAGE_KEY)).not.toBeNull()
   })
 
-  it('saving an account with storage blocked does not stop the sign-in', () => {
+  it('signing in with storage blocked does not stop the sign-in', () => {
     vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
       throw new DOMException('blocked', 'QuotaExceededError')
     })
 
-    expect(() => rememberSession({ ...accountB, accessToken: 'b-access' })).not.toThrow()
+    expect(() => useAuthStore.getState().setAuth(accountB as never, 'b-access', 'b-refresh')).not.toThrow()
+    expect(useAuthStore.getState().isAuthenticated).toBe(true)
   })
 })
 
 describe('F3: a refusal answered after the tab changed account', () => {
-  it('still drops the saved account holding the refused refresh token', async () => {
-    rememberSession({ ...accountB, accessToken: 'b-access', refreshToken: 'b-refresh' })
-    bindTab('b-access', 'b-refresh', accountB)
+  it('does not end the sign-in that replaced the refused one', async () => {
+    signInTab('b-access', 'b-refresh', accountB)
     useAuthStore.setState({ accessToken: 'b-access', isAuthenticated: true })
     const refused = gate()
     const asked = gate()
@@ -248,11 +234,11 @@ describe('F3: a refusal answered after the tab changed account', () => {
 
     const request = httpClient.get('/things')
     await asked.opened
-    bindTab('c-access', 'c-refresh', { email: 'c@test.stoaedu.ch' })
+    signInTab('c-access', 'c-refresh', { email: 'c@test.stoaedu.ch' })
     refused.open()
 
     await expect(request).rejects.toMatchObject({ code: 'session_changed' })
-    expect(readSessions()).toEqual([])
+    expect(readBrowserSignIn()).toMatchObject({ accessToken: 'c-access', refreshToken: 'c-refresh' })
     expect(currentSessionToken()).toBe('c-access')
   })
 })
@@ -269,7 +255,6 @@ describe('F4: storage the browser refuses', () => {
     try {
       expect(tabToken()).toBeNull()
       expect(() => pinTabToSession('x')).not.toThrow()
-      expect(() => releaseTab()).not.toThrow()
       expect(() => initializeTab()).not.toThrow()
       expect(storedRefreshToken()).toBeNull()
     } finally {
@@ -279,7 +264,7 @@ describe('F4: storage the browser refuses', () => {
 })
 
 describe('F5: a saved account with a malformed refresh token', () => {
-  it('is taken without one', () => {
+  it('is kept by the move off the saved accounts without one', () => {
     localStorage.setItem(
       'stoa_dev_sessions',
       JSON.stringify([{ ...accountB, accessToken: 'b-access', refreshToken: 42 }]),

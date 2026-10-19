@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { useCurrentUserQuery } from '@/hooks/auth/useCurrentUserQuery'
-import { listenForSignInsEndedElsewhere } from '@/services/auth/signInEndedElsewhere'
+import { listenForBrowserSignInChanges } from '@/services/auth/browserSignInChanges'
 import { useAuthStore } from '@/store/authStore'
 
 export function AuthBootstrap() {
@@ -11,8 +11,8 @@ export function AuthBootstrap() {
     hydrateFromStorage()
   }, [hydrateFromStorage])
 
-  // Another tab signing out of this tab's sign-in signs this tab out (#232).
-  useEffect(() => listenForSignInsEndedElsewhere(), [])
+  // Another tab signing out, or signing in as someone, signs this tab out (#320).
+  useEffect(() => listenForBrowserSignInChanges(), [])
 
   return null
 }

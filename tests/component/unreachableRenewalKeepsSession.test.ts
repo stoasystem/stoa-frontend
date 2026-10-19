@@ -12,14 +12,13 @@
  */
 import { http, HttpResponse } from 'msw'
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
-import { readSessions, rememberSession } from '@/lib/devSessions'
+import { readBrowserSignIn } from '@/lib/tabAccount'
 import { httpClient, SESSION_UNREACHABLE } from '@/services/api/httpClient'
 import { rememberRefreshToken } from '@/services/auth/sessionRefresh'
 import { TOKEN_KEY, useAuthStore } from '@/store/authStore'
 import { mswServer } from '../mswServer'
 
 const TAB_REFRESH = 'stoa_tab_refresh_token'
-const HELD = { email: 'reader@test.stoaedu.ch', role: 'student', name: 'Reader' }
 
 let refreshCalls = 0
 
@@ -44,7 +43,8 @@ afterEach(() => {
 function onSession() {
   sessionStorage.setItem(TOKEN_KEY, 's-access')
   rememberRefreshToken('s-refresh')
-  rememberSession({ ...HELD, accessToken: 's-access', refreshToken: 's-refresh' })
+  localStorage.setItem('stoa_sign_in', JSON.stringify({ id: 's', accessToken: 's-access', refreshToken: 's-refresh' }))
+  sessionStorage.setItem('stoa_tab_sign_in', 's')
   useAuthStore.setState({ accessToken: 's-access', isAuthenticated: true })
 }
 
@@ -57,7 +57,7 @@ function stubLocation() {
 function expectEverythingKept() {
   expect(sessionStorage.getItem(TOKEN_KEY)).toBe('s-access')
   expect(sessionStorage.getItem(TAB_REFRESH)).toBe('s-refresh')
-  expect(readSessions().map((entry) => [entry.accessToken, entry.refreshToken])).toEqual([['s-access', 's-refresh']])
+  expect(readBrowserSignIn()).toMatchObject({ accessToken: 's-access', refreshToken: 's-refresh' })
   expect(useAuthStore.getState().accessToken).toBe('s-access')
 }
 
@@ -152,7 +152,7 @@ describe('in a tab on its account', () => {
     expect(refreshCalls).toBe(2)
     expect(assign).not.toHaveBeenCalled()
     expect(useAuthStore.getState().accessToken).toBe('s-access-2')
-    expect(readSessions().map((entry) => [entry.accessToken, entry.refreshToken])).toEqual([['s-access-2', 's-refresh-2']])
+    expect(readBrowserSignIn()).toMatchObject({ accessToken: 's-access-2', refreshToken: 's-refresh-2' })
   })
 
   it('a refused refresh still ends the session', async () => {

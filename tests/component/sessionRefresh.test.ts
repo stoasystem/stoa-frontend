@@ -5,7 +5,7 @@ import {
   replaceRefreshToken,
   storedRefreshToken,
 } from '@/services/auth/sessionRefresh'
-import { TAB_TOKEN_KEY } from '@/lib/devSessions'
+import { TAB_TOKEN_KEY } from '@/lib/tabAccount'
 
 // A reader's session used to end with their access token, an hour after they
 // signed in. `/auth/refresh` and the refresh token were both there; nothing

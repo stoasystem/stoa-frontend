@@ -6,13 +6,9 @@
     "close": "Close"
   },
   "accountMenu": {
-    "addAccount": "Add another account",
     "billing": "Billing and payments",
     "help": "Help and support",
-    "open": "Account",
-    "switchAccount": "Switch account",
-    "switchExpired": "This session has expired. Please sign in again.",
-    "switchUnreachable": "Could not reach the server. The account is still held."
+    "open": "Account"
   },
   "actions": {
     "back": "Back",

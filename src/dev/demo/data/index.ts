@@ -9,7 +9,6 @@
  *
  *   demoStudent        User              the signed-in demo student (`GET /auth/me`)
  *   demoProfile        StudentProfile    their profile on /me (`GET /students/me/profile`)
- *   demoHeldAccounts   HeldSession[]     other accounts this browser holds, for "Switch account"
  *   demoNotifications  NotificationListResponse   the bell (`GET /notifications`)
  *   demoConversations  Conversation[]    Ask's conversations, with their messages
  *   demoChapter        DemoChapter       the demo knowledge point's chapter: the catalog,
@@ -86,7 +85,7 @@ export {
   demoTeacherAvailability,
   demoTeacherHelpRequests,
 } from '@/dev/demo/data/conversations'
-export { DEMO_STUDENT_ID, demoHeldAccounts } from '@/dev/demo/data/student'
+export { DEMO_STUDENT_ID } from '@/dev/demo/data/student'
 export {
   DEMO_BRIDGE_STAR,
   DEMO_KNOWLEDGE_POINT,

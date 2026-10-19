@@ -5,7 +5,6 @@
  * the backend does, so each state of the form can be seen.
  */
 import { beforeEach, describe, expect, it } from 'vitest'
-import { demoHeldAccounts } from '@/dev/demo/data'
 import { resetDemoServer } from '@/dev/preview/demoSource'
 import { answer, DEMO_FAIL_ONCE } from '@/dev/preview/handlers'
 
@@ -61,23 +60,5 @@ describe('the password change in the design preview', () => {
     expect(refused).toMatchObject({ status: 400, data: { detail: { code: 'password_change_credentials_invalid' } } })
     const badCode = await post('/auth/password-change/confirm', { currentPassword: 'x', code: DEMO_FAIL_ONCE, newPassword: 'Neu-Passwort1' })
     expect(badCode).toMatchObject({ status: 400, data: { detail: { code: 'password_change_verification_failed' } } })
-  })
-})
-
-describe('the accounts the preview holds', () => {
-  it('holds another account, never the demo student', () => {
-    expect(demoHeldAccounts.length).toBeGreaterThan(0)
-    expect(demoHeldAccounts.map((account) => account.email)).not.toContain('lena.muster@example.com')
-  })
-  it('refuses a held account\'s session, so switching to it stays in the preview (#184 review)', async () => {
-    // Accepted, the switch would load the real app's start page off the
-    // preview, where the real backend is. Refused, it takes the app's own
-    // "session expired" path and stays here.
-    const [held] = demoHeldAccounts
-    const asHeld = await Promise.resolve(answer({ method: 'GET', path: '/auth/me', query: new URLSearchParams(), body: null, token: held.accessToken }))
-    expect(asHeld?.status).toBe(401)
-    expect(held.refreshToken).toBeUndefined()
-    const asDemo = await Promise.resolve(answer({ method: 'GET', path: '/auth/me', query: new URLSearchParams(), body: null, token: 'design-preview' }))
-    expect(asDemo?.status).toBe(200)
   })
 })

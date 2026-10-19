@@ -78,12 +78,14 @@ describe('on the deployed site', () => {
     expect(screen.queryByRole('button', { name: /Testing as/ })).not.toBeInTheDocument()
   })
 
-  it('is offered to a real address once that browser has asked', () => {
+  it('is withheld from a real address even once that browser has asked (#320)', () => {
+    // A test tool for the test accounts only: a real account is never shown
+    // it, so it can never be held in the switcher's list.
     localStorage.setItem('stoa_role_switcher', 'on')
     signedInAs('a.real.parent@gmail.com', 'parent')
 
     renderSwitcher()
 
-    expect(screen.getByRole('button', { name: /Testing as/ })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /Testing as/ })).not.toBeInTheDocument()
   })
 })

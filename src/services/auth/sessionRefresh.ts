@@ -7,8 +7,8 @@
  * when they come back to the tab.
  *
  * The refresh token is stored beside the access token and under the same
- * rule: each tab keeps its own, in sessionStorage, and no tab reads another's
- * (#216). It is a credential — it is never logged, never put in a URL, and it
+ * rule: each tab keeps its own copy of the browser's sign-in, in
+ * sessionStorage (#216, #320). It is a credential — it is never logged, never put in a URL, and it
  * is cleared whenever the session it belongs to is, and only then.
  *
  * One refresh runs at a time. A page that fires six requests into an expired
@@ -56,10 +56,10 @@ function forgetHandedOn(): void {
 
 /**
  * Put `token` in this tab's place for a refresh token, or empty that place
- * when there is none. Switching to a held account that has no refresh token
- * (one held before they were kept, or a sign-in that returned none) used to
- * leave the previous account's refresh token in the tab, and the next renewal
- * spent it (#205 audit). Only this tab's place is touched.
+ * when there is none. A session that has no refresh token (a sign-in that
+ * returned none) used to leave the previous account's refresh token in the
+ * tab, and the next renewal spent it (#205 audit). Only this tab's place is
+ * touched.
  */
 export function replaceRefreshToken(token: string | null | undefined): void {
   // A new session, or none: the old one's renewals say nothing about it.
@@ -86,8 +86,8 @@ export function endRefreshToken(): void {
  *
  * The three outcomes have to stay apart, because only one of them means the
  * session is over: a refusal. A network that could not be reached must not
- * cost anyone their session, and the account switcher turns that distinction
- * into "sign in again" or "try again in a moment".
+ * cost anyone their session, and the role switcher turns that distinction
+ * into "add the role again" or "try again in a moment".
  */
 export type RefreshOutcome =
   | { status: 'renewed'; accessToken: string; refreshToken?: string }
@@ -97,8 +97,9 @@ export type RefreshOutcome =
 /**
  * Offer one refresh token to the server, storing nothing.
  *
- * The stored-token path below is one caller. The other is a held account in
- * the switcher, whose own refresh token is not the one this tab is using.
+ * The stored-token path below is one caller. The others hold a refresh token
+ * that is not the one this tab is using: a test role in the role switcher, and
+ * a dropped sign-in being ended on the server (revokeSignIn).
  */
 export async function exchangeRefreshToken(refreshToken: string): Promise<RefreshOutcome> {
   const abort = new AbortController()
@@ -196,10 +197,7 @@ export function refreshAccessToken(): Promise<string | null> {
 }
 
 /**
- * The same renewal, saying which refresh token it spent. A held account in the
- * account menu is moved onto the new tokens only if it holds that refresh
- * token: matching on the access token alone let one account's renewal be
- * written under another's name (#205 audit).
+ * The same renewal, saying which refresh token it spent.
  */
 export function renewSession(): Promise<SessionRenewal> {
   if (inFlight) return inFlight
@@ -222,8 +220,8 @@ async function attempt(): Promise<SessionRenewal> {
     if (storedRefreshToken() === refreshToken) endRefreshToken()
     return { status: 'ended', refused: refreshToken }
   }
-  // A network failure is not a refusal: every token stays — this tab's and the
-  // held accounts' — and the next 401 tries again (#214).
+  // A network failure is not a refusal: every token stays — this tab's and
+  // the browser's sign-in — and the next 401 tries again (#214).
   if (outcome.status === 'unreachable') return { status: 'unreachable' }
   // Kept only for the session that asked: one signed out meanwhile has
   // forgotten its refresh token, and writing the rotated one back would leave

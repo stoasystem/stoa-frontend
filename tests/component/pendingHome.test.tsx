@@ -5,7 +5,7 @@
  * of the two a tab is cannot be told before /auth/me answers. Until #274 the
  * router decided on the missing account: a reloading student was shown the
  * sign-in page until the answer came, and the entry page's one-time reads of
- * the tab (the account choice, how the last session ended) were made then,
+ * the tab (how the last session ended) were made then,
  * for nobody. Now "/" waits like every other role route, and the entry page
  * opens only once there is something to decide.
  *
@@ -19,8 +19,7 @@ import { MemoryRouter, useLocation } from 'react-router-dom'
 import { afterAll, beforeEach, describe, expect, it, vi } from 'vitest'
 import '@/i18n'
 import { AppRoutes } from '@/app/router/AppRoutes'
-import { rememberSession } from '@/lib/devSessions'
-import { readTabSignOut, tabNeedsAccountChoice } from '@/lib/tabAccount'
+import { readTabSignOut, tabToken } from '@/lib/tabAccount'
 import { EntryPage } from '@/pages/entry/EntryPage'
 import { type CurrentUser, useAuthStore } from '@/store/authStore'
 
@@ -46,7 +45,6 @@ vi.mock('@/lib/tabAccount', async (importOriginal) => {
   return {
     ...actual,
     readTabSignOut: vi.fn(actual.readTabSignOut),
-    tabNeedsAccountChoice: vi.fn(actual.tabNeedsAccountChoice),
   }
 })
 
@@ -89,7 +87,6 @@ beforeEach(() => {
   sessionStorage.clear()
   localStorage.clear()
   vi.mocked(readTabSignOut).mockClear()
-  vi.mocked(tabNeedsAccountChoice).mockClear()
 })
 afterAll(() => {
   useAuthStore.setState({ user: null, accessToken: null, isAuthenticated: false })
@@ -110,7 +107,6 @@ describe('"/" while the account is being read', () => {
     reloadHome()
 
     expect(readTabSignOut).not.toHaveBeenCalled()
-    expect(tabNeedsAccountChoice).not.toHaveBeenCalled()
   })
 
   it('opens the star map once the account turns out to be a student', () => {
@@ -165,11 +161,12 @@ describe('"/" while the account is being read', () => {
   })
 })
 
-describe('"/" in a tab without a session is unchanged', () => {
-  it('asks a new tab which saved account it is (ADR 0002)', () => {
-    for (const email of ['ada@test.stoaedu.ch', 'bob@test.stoaedu.ch']) {
-      rememberSession({ email, name: email, role: 'student', accessToken: `held-${email}` })
-    }
+describe('"/" in a tab without a session', () => {
+  it('joins the browser\'s sign-in, and reads its account (ADR 0003)', () => {
+    localStorage.setItem(
+      'stoa_sign_in',
+      JSON.stringify({ id: 'b', accessToken: 'browser-access', account: { email: 'ada@test.stoaedu.ch', name: 'Ada' } }),
+    )
     useAuthStore.setState({ user: null, accessToken: null, isAuthenticated: false })
     render(
       <QueryClientProvider client={new QueryClient()}>
@@ -179,7 +176,8 @@ describe('"/" in a tab without a session is unchanged', () => {
       </QueryClientProvider>,
     )
 
-    expect(screen.getByText('Who is using this tab?')).toBeInTheDocument()
-    expect(screen.queryByRole('status')).toBeNull()
+    expect(tabToken()).toBe('browser-access')
+    expect(screen.getByRole('status')).toHaveTextContent('Loading account')
+    expect(screen.queryByRole('form', { name: 'sign in' })).toBeNull()
   })
 })

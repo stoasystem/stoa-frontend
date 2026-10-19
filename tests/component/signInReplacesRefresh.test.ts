@@ -10,7 +10,7 @@
  */
 import { http, HttpResponse } from 'msw'
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
-import { pinTabToSession } from '@/lib/devSessions'
+import { pinTabToSession } from '@/lib/tabAccount'
 import { httpClient } from '@/services/api/httpClient'
 import { rememberRefreshToken, storedRefreshToken } from '@/services/auth/sessionRefresh'
 import { TOKEN_KEY, useAuthStore } from '@/store/authStore'

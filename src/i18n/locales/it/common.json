@@ -6,13 +6,9 @@
     "close": "Chiudi"
   },
   "accountMenu": {
-    "addAccount": "Aggiungi un altro account",
     "billing": "Fatturazione e pagamenti",
     "help": "Aiuto e supporto",
-    "open": "Account",
-    "switchAccount": "Cambia account",
-    "switchExpired": "Questa sessione è scaduta. È necessario accedere di nuovo.",
-    "switchUnreachable": "Server non raggiungibile. L’account resta salvato."
+    "open": "Account"
   },
   "actions": {
     "back": "Indietro",

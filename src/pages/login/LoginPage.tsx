@@ -1,7 +1,6 @@
 import { useLayoutEffect, useRef, type RefObject } from 'react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { AccountChooser } from '@/components/auth/AccountChooser'
 import { Button } from '@/components/base/Button'
 import { LoginForm } from '@/components/auth/LoginForm'
 import { TOP_BAR, TOP_BAR_PHONE } from '@/components/base/sizes'
@@ -26,15 +25,23 @@ import type { SignOutReason, TabAccount } from '@/lib/tabAccount'
  * small beside the caption below it.
  *
  * Signing in itself is LoginForm's, unchanged; this page only places it.
- * A new tab with several saved accounts gets the account chooser in the
- * form's place first (#216); its "sign in with another account" brings the
- * form back. A tab whose session ended says whose it was and has the form
- * ready for that account, with the same way out to another (#217).
+ * A tab whose session ended says whose it was and has the form ready for that
+ * account, with a way out to another (#217). A tab that last showed somebody
+ * else than the account the browser is signed in as now says who that is and
+ * offers to continue as them, or to sign in as someone else (#320).
  */
 
 export type LoginMode =
   | { kind: 'signIn' }
-  | { kind: 'choose'; onSignInOther: () => void }
+  | {
+      kind: 'switched'
+      /** Who the browser is signed in as now. */
+      account: TabAccount
+      /** Who this tab last showed. */
+      previous: TabAccount
+      onContinue: () => void
+      onSignInOther: () => void
+    }
   | {
       kind: 'reauth'
       reason: Exclude<SignOutReason, 'signed-out'>
@@ -75,8 +82,8 @@ function usePaintDocumentWithSky(surface: RefObject<HTMLElement | null>) {
 
 export function LoginPage({ mode = { kind: 'signIn' } }: { mode?: LoginMode } = {}) {
   const heading =
-    mode.kind === 'choose'
-      ? { eyebrow: 'auth:chooser.eyebrow', title: 'auth:chooser.title', subtitle: 'auth:chooser.subtitle' }
+    mode.kind === 'switched'
+      ? { eyebrow: 'auth:switched.eyebrow', title: 'auth:switched.title', subtitle: 'auth:switched.subtitle' }
       : mode.kind === 'reauth'
         ? {
             eyebrow: 'auth:reauth.eyebrow',
@@ -84,7 +91,8 @@ export function LoginPage({ mode = { kind: 'signIn' } }: { mode?: LoginMode } = 
             subtitle: 'auth:reauth.subtitle',
           }
         : { eyebrow: 'auth:login.eyebrow', title: 'auth:login.title', subtitle: 'auth:login.subtitle' }
-  const name = mode.kind === 'reauth' ? (mode.account.name ?? mode.account.email) : undefined
+  const name = mode.kind !== 'signIn' ? (mode.account.name ?? mode.account.email) : undefined
+  const previous = mode.kind === 'switched' ? (mode.previous.name ?? mode.previous.email) : undefined
   // A page that knows whose sign-in it is speaks to staff formally (#241).
   const context = mode.kind === 'reauth' ? addressContext(mode.account.role) : undefined
   const { t } = useTranslation(['auth', 'common'])
@@ -126,16 +134,23 @@ export function LoginPage({ mode = { kind: 'signIn' } }: { mode?: LoginMode } = 
             {t(heading.title, { name })}
           </h1>
           <p className="mt-3 mb-0 text-[17px] leading-[1.45] text-[color:var(--on-sky-text-body)]">
-            {t(heading.subtitle, { context })}
+            {t(heading.subtitle, { context, previous })}
           </p>
           <div className="mt-8">
-            {mode.kind === 'choose' ? (
-              <AccountChooser onSignInOther={mode.onSignInOther} />
+            {mode.kind === 'switched' ? (
+              <div className="space-y-3">
+                <Button type="button" variant="onSky" fullWidth onClick={mode.onContinue}>
+                  {t('auth:switched.continue', { name })}
+                </Button>
+                <Button type="button" variant="onSkyPlain" fullWidth onClick={mode.onSignInOther}>
+                  {t('auth:login.signInOther')}
+                </Button>
+              </div>
             ) : mode.kind === 'reauth' ? (
               <div className="space-y-3">
                 <LoginForm initialEmail={mode.account.email} context={context} />
                 <Button type="button" variant="onSkyPlain" fullWidth onClick={mode.onSignInOther}>
-                  {t('auth:chooser.signInOther')}
+                  {t('auth:login.signInOther')}
                 </Button>
               </div>
             ) : (

@@ -9,7 +9,7 @@ import { queryClient } from '@/app/query/queryClient'
 import { UPLOAD_HANDOFF_STORAGE_KEY } from '@/features/uploads/utils/uploadHandoff'
 import { useSignOut } from '@/hooks/auth/useSignOut'
 import { useCreateConversationMutation } from '@/hooks/chat/useCreateConversationMutation'
-import { TAB_TOKEN_KEY } from '@/lib/devSessions'
+import { TAB_TOKEN_KEY } from '@/lib/tabAccount'
 import { CHECKOUT_OPERATION_STORAGE_KEY } from '@/services/billing/billingApi'
 import { httpClient } from '@/services/api/httpClient'
 import { getConversations } from '@/services/chat/chatApi'
@@ -322,11 +322,13 @@ describe('useSignOut', () => {
     )
     sessionStorage.setItem('stoa_analytics_session_id', 'analytics-session-of-a')
     localStorage.setItem('stoa_role_switcher', 'on')
+    localStorage.setItem('stoa_sign_in', JSON.stringify({ id: 'sign-in-a', accessToken: 'shared-token' }))
+    sessionStorage.setItem('stoa_tab_sign_in', 'sign-in-a')
     localStorage.setItem(
-      'stoa_dev_sessions',
+      'stoa_test_roles',
       JSON.stringify([
-        { email: 'ada@example.com', role: 'student', name: 'Ada', accessToken: 'shared-token', savedAt: '' },
-        { email: 'pa@example.com', role: 'parent', name: 'Pa', accessToken: 'parent-token', savedAt: '' },
+        { email: 'ada@test.stoaedu.ch', role: 'student', name: 'Ada', accessToken: 'shared-token', savedAt: '' },
+        { email: 'pa@test.stoaedu.ch', role: 'parent', name: 'Pa', accessToken: 'parent-token', savedAt: '' },
       ]),
     )
 
@@ -337,10 +339,12 @@ describe('useSignOut', () => {
     expect(sessionStorage.getItem(CHECKOUT_OPERATION_STORAGE_KEY)).toBeNull()
     // The next person's events start an analytics session of their own.
     expect(sessionStorage.getItem('stoa_analytics_session_id')).toBeNull()
-    // The signed-out session goes; another role held on purpose stays (#34
-    // decided to keep them: see forgetSessionHolding).
-    expect(JSON.parse(localStorage.getItem('stoa_dev_sessions') ?? '[]')).toEqual([
-      expect.objectContaining({ email: 'pa@example.com', accessToken: 'parent-token' }),
+    // The browser's sign-in ends with it, so the other tabs sign out (#320).
+    expect(localStorage.getItem('stoa_sign_in')).toBeNull()
+    // A test role the switcher held for this sign-in goes; another held role
+    // stays (#34 decided to keep them).
+    expect(JSON.parse(localStorage.getItem('stoa_test_roles') ?? '[]')).toEqual([
+      expect.objectContaining({ email: 'pa@test.stoaedu.ch', accessToken: 'parent-token' }),
     ])
   })
 })

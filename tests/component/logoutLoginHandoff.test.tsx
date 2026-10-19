@@ -122,11 +122,7 @@ it('sends login immediately when no logout is pending', async () => {
   await waitFor(() => expect(loginRequests).toBe(1))
 })
 
-it('holds the account that just signed in, with its refresh token', async () => {
-  // 「添加账号」 in the account menu goes to the login screen and nothing put
-  // the result in the list the switcher reads, so signing in a second account
-  // offered you nothing to switch to. The refresh token goes with it: without
-  // one, a held account is over an hour later whatever anyone does with it.
+it('makes the account that just signed in the browser\'s one sign-in, and keeps no list (#320)', async () => {
   mswServer.use(http.post('https://api.test/auth/login', () =>
     HttpResponse.json({
       accessToken: 'access-for-parent',
@@ -140,37 +136,15 @@ it('holds the account that just signed in, with its refresh token', async () => 
   fireEvent.click(screen.getByText('Sign in'))
 
   await waitFor(() => {
-    const held = JSON.parse(localStorage.getItem('stoa_dev_sessions') ?? '[]')
-    expect(held).toHaveLength(1)
-    expect(held[0].email).toBe('parent@example.com')
-    expect(held[0].accessToken).toBe('access-for-parent')
-    expect(held[0].refreshToken).toBe('refresh-for-parent')
-  })
-})
-
-it('lands on the new account when signing in from 「添加账号」', async () => {
-  // The login screen deliberately does not move while ?add=1 is up — that is
-  // what keeps the form on screen for someone who is already signed in — so
-  // the login itself has to leave. A full load, so the account being left
-  // behind takes its cached answers with it.
-  const assign = vi.fn()
-  Object.defineProperty(window, 'location', {
-    value: { assign, search: '?add=1', href: 'https://app.stoaedu.ch/login?add=1' },
-    writable: true,
-  })
-  mswServer.use(http.post('https://api.test/auth/login', () =>
-    HttpResponse.json({
+    const signIn = JSON.parse(localStorage.getItem('stoa_sign_in') ?? 'null')
+    expect(signIn).toMatchObject({
       accessToken: 'access-for-parent',
       refreshToken: 'refresh-for-parent',
-      user: { id: 'u-2', email: 'parent@example.com', role: 'parent', name: 'A Parent' },
-    }),
-  ))
-  renderPages('/login')
-  useAuthStore.getState().clearAuth()
-
-  fireEvent.click(screen.getByText('Sign in'))
-
-  await waitFor(() => expect(assign).toHaveBeenCalledWith('/parent'))
+      account: { email: 'parent@example.com' },
+    })
+    expect(sessionStorage.getItem('stoa_tab_sign_in')).toBe(signIn.id)
+  })
+  expect(localStorage.getItem('stoa_dev_sessions')).toBeNull()
 })
 
 it('does not reload when signing in the ordinary way', async () => {

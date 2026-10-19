@@ -8,7 +8,6 @@
  * lesson, so the chapter moves on, and Ask's conversations and messages with
  * their answers, so the thread read back holds them.
  */
-import { demoHeldAccounts } from '@/dev/demo/data'
 import {
   checkDemoAnswer,
   completeLesson,
@@ -102,13 +101,7 @@ const askedForTeacher = new Map<string, { requestId: string; conversationId: str
 
 const routes: Array<[method: string, pattern: string, handler: Handler]> = [
   // Account
-  // A held account's session is refused, as an expired one is: accepted, the
-  // switch to it would load the real app's start page, off the preview and on
-  // to the real backend (#184 review). Refused, the app says it has expired.
-  ['GET', '/auth/me', ({ token }) =>
-    demoHeldAccounts.some((account) => account.accessToken === token)
-      ? refuse(401, 'token_invalid', 'The session has expired.')
-      : demo().demoStudent],
+  ['GET', '/auth/me', () => demo().demoStudent],
   // Login review: #fail refuses credentials; the unverified demo address opens
   // the existing verification panel. These replies never contact an identity provider.
   ['POST', '/auth/login', ({ body }) =>
