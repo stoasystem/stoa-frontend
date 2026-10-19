@@ -18,6 +18,9 @@ export function ChildSummaryHeader({ summary }: { summary: ChildLearningSummary 
         <Button asChild variant="outline">
           <Link to={`/parent/children/${summary.student.id}/history`}>{t('summary.learningHistoryLink')}</Link>
         </Button>
+        <Button asChild variant="outline">
+          <Link to={`/parent/children/${summary.student.id}/progress`}>{t('summary.progressLink')}</Link>
+        </Button>
       </div>
     </div>
   )

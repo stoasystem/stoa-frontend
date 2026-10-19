@@ -48,9 +48,6 @@
   "curriculumRollout": {
     "title": "Materie e curriculum",
     "description": "Copertura attiva del curriculum, ampiezza della banca lezioni e segnali di progresso.",
-    "parentTitle": "Materie e curriculum",
-    "parentDescription": "Copertura del curriculum visibile ai genitori e segnali sulle aree deboli per le materie attive.",
-    "parentContext": "Vista curriculum per i genitori",
     "teacherTitle": "Contesto del curriculum",
     "teacherDescription": "Copertura del curriculum visibile all'insegnante per la materia della richiesta corrente.",
     "teacherContext": "Anteprima insegnante",
@@ -117,7 +114,8 @@
     "signalsUnavailable": "I segnali di apprendimento non sono disponibili al momento.",
     "rolloutCore": "Supporto completo della materia",
     "rolloutFoundation": "Supporto di base nel profilo",
-    "noScore": "Nessun punteggio"
+    "noScore": "Nessun punteggio",
+    "questionsAsked": "Domande fatte"
   },
   "progress": {
     "subjectActive": "Attivo",

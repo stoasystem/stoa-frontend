@@ -48,9 +48,6 @@
   "curriculumRollout": {
     "title": "Fächer und Lehrplan",
     "description": "Aktive Lehrplanabdeckung, Umfang der Aufgabenbank und Fortschrittssignale.",
-    "parentTitle": "Fächer und Lehrplan",
-    "parentDescription": "Für Eltern sichtbare Lehrplanabdeckung und Signale zu Schwachstellen für aktive Fächer.",
-    "parentContext": "Elternansicht Lehrplan",
     "teacherTitle": "Lehrplan-Kontext",
     "teacherDescription": "Für Lehrkräfte sichtbare Lehrplanabdeckung für das aktuelle Anfragefach.",
     "teacherContext": "Lehrpersonen-Vorschau",
@@ -115,7 +112,8 @@
     "signalsUnavailable": "Lernsignale sind gerade nicht verfügbar.",
     "rolloutCore": "Volle Unterstützung im Fach",
     "rolloutFoundation": "Grundlegende Unterstützung im Profil",
-    "noScore": "Keine Bewertung"
+    "noScore": "Keine Bewertung",
+    "questionsAsked": "Gestellte Fragen"
   },
   "progress": {
     "subjectActive": "Aktiv",

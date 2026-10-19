@@ -2,19 +2,33 @@ import { useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import type { TFunction } from 'i18next'
 import { BookMarked, CheckCircle2, Target } from 'lucide-react'
+import { BackButton } from '@/components/common/BackButton'
+import { Breadcrumbs } from '@/components/common/Breadcrumbs'
 import { ErrorState } from '@/components/common/ErrorState'
 import { LoadingState } from '@/components/common/LoadingState'
 import { PageContainer } from '@/components/common/PageContainer'
+import { PageActions } from '@/components/common/PageActions'
 import { PageHeader } from '@/components/common/PageHeader'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { useParentChildProgressQuery } from '@/hooks/learning/useLearningOperationsQueries'
+import { useChildLearningSummaryQuery } from '@/hooks/parent/useChildLearningSummaryQuery'
 import { DashboardLayout } from '@/layouts/DashboardLayout'
+import { getRecommendationRationale, getSubjectLabel, getTopicLabel } from '@/lib/displayLabels'
 import type { LearningAssignment } from '@/types/learningOperations'
 
+// The backend's reason is an English sentence; the same helpers as the
+// student's assignment list put it, the subject and the topics in the
+// parent's language, never as ids (#339).
 function familyExplanation(assignment: LearningAssignment, t: TFunction) {
-  return assignment.automation?.explanation
-    || assignment.rationale
-    || t('progress.defaultExplanation')
+  const fallback = t('progress.defaultExplanation')
+  const sentence = assignment.automation?.explanation || assignment.rationale
+  return sentence ? getRecommendationRationale(sentence, t, fallback) : fallback
+}
+
+function familyTarget(assignment: LearningAssignment, t: TFunction) {
+  const subject = assignment.subject ? getSubjectLabel(assignment.subject, t) : t('progress.subjectPending')
+  const topics = assignment.topicIds.map((topicId) => getTopicLabel(topicId, t)).join(', ')
+  return `${subject} / ${topics || t('progress.topicPending')}`
 }
 
 // The same statuses the student's assignment list names (practice namespace);
@@ -42,10 +56,8 @@ function FamilyAssignmentRow({ assignment }: { assignment: LearningAssignment })
     <div className="rounded-md border p-4">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <p className="font-semibold">{assignment.title || assignment.assignmentId}</p>
-          <p className="mt-1 text-sm text-muted-foreground">
-            {assignment.subject || t('progress.subjectPending')} / {assignment.topicIds.join(', ') || t('progress.topicPending')}
-          </p>
+          <p className="font-semibold">{assignment.title || tPractice('assignments.untitled')}</p>
+          <p className="mt-1 text-sm text-muted-foreground">{familyTarget(assignment, t)}</p>
         </div>
         <span className="rounded-full border px-2 py-1 text-xs font-semibold text-muted-foreground">{statusLabel(assignment.status, tPractice)}</span>
       </div>
@@ -59,12 +71,26 @@ export function ParentChildProgressPage() {
   const { childId } = useParams()
   const progressQuery = useParentChildProgressQuery(childId ?? '')
   const progress = progressQuery.data
+  // The same query the child page reads, so the name is usually cached already.
+  const childName = useChildLearningSummaryQuery(childId).data?.student.name
 
   return (
     <DashboardLayout>
       <PageContainer size="wide" className="p-0">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <Breadcrumbs
+            items={[
+              { label: t('dashboardTitle'), to: '/parent' },
+              { label: childName || t('child'), to: childId ? `/parent/children/${childId}` : undefined },
+              { label: t('progress.title') },
+            ]}
+          />
+          <PageActions
+            secondary={childId && <BackButton label={t('childSummary')} to={`/parent/children/${childId}`} />}
+          />
+        </div>
         <PageHeader
-          eyebrow={t('progress.eyebrow')}
+          eyebrow={childName || t('progress.eyebrow')}
           title={t('progress.title')}
           description={t('progress.description')}
         />

@@ -48,9 +48,6 @@
   "curriculumRollout": {
     "title": "Matières et programme",
     "description": "Couverture active du programme, profondeur de la banque de leçons et signaux de progression.",
-    "parentTitle": "Matières et programme",
-    "parentDescription": "Couverture du programme et signaux de points faibles visibles par les parents pour les matières actives.",
-    "parentContext": "Vue parent du programme",
     "teacherTitle": "Contexte du programme",
     "teacherDescription": "Couverture du programme visible par l'enseignant pour la matière de la demande en cours.",
     "teacherContext": "Aperçu enseignant",
@@ -117,7 +114,8 @@
     "signalsUnavailable": "Les signaux d’apprentissage sont indisponibles pour le moment.",
     "rolloutCore": "Accompagnement complet de la matière",
     "rolloutFoundation": "Accompagnement de base dans le profil",
-    "noScore": "Aucune note"
+    "noScore": "Aucune note",
+    "questionsAsked": "Questions posées"
   },
   "progress": {
     "subjectActive": "Actif",

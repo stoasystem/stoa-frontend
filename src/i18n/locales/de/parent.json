@@ -80,7 +80,8 @@
     "teacherHelp": "Unterstützung durch Lehrpersonen",
     "teacherHelpDescription": "In dieser Woche erfasste Anfragen oder Weiterleitungen.",
     "weeklyReportLink": "Wochenbericht",
-    "learningHistoryLink": "Lernverlauf"
+    "learningHistoryLink": "Lernverlauf",
+    "progressLink": "Übungsfortschritt"
   },
   "accountOps": {
     "eyebrow": "Kontoverwaltung",

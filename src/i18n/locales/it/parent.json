@@ -80,7 +80,8 @@
     "teacherHelp": "Supporto insegnante",
     "teacherHelpDescription": "Richieste o passaggi registrati questa settimana.",
     "weeklyReportLink": "Report settimanale",
-    "learningHistoryLink": "Storico di apprendimento"
+    "learningHistoryLink": "Storico di apprendimento",
+    "progressLink": "Progressi negli esercizi"
   },
   "accountOps": {
     "eyebrow": "Gestione account",

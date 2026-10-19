@@ -64,7 +64,7 @@ export function LearningProfileSignals({
                     <div className="mt-4 grid grid-cols-2 gap-3 text-sm">
                       <SignalMetric
                         icon={BookOpenCheck}
-                        label={tPractice('set.metricQuestions')}
+                        label={tPractice('profile.questionsAsked')}
                         value={String(subjectActivity?.questionCount ?? 0)}
                       />
                       <SignalMetric
