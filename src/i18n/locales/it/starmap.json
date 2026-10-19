@@ -26,6 +26,7 @@
   "marker": {
     "recommended": "Suggerita come prossima",
     "reviewDue_one": "{{count}} scheda da ripassare",
+    "reviewDue_many": "{{count}} schede da ripassare",
     "reviewDue_other": "{{count}} schede da ripassare"
   },
   "nav": {
@@ -46,8 +47,10 @@
     "progress": "{{percent}}% delle lezioni svolte",
     "lessons": "{{done}} lezioni svolte su {{total}}",
     "unmet_one": "Tutte le lezioni svolte: ancora {{count}} esercizio da risolvere correttamente",
+    "unmet_many": "Tutte le lezioni svolte: ancora {{count}} esercizi da risolvere correttamente",
     "unmet_other": "Tutte le lezioni svolte: ancora {{count}} esercizi da risolvere correttamente",
     "unmetPartial_one": "Ancora {{count}} esercizio da risolvere correttamente",
+    "unmetPartial_many": "Ancora {{count}} esercizi da risolvere correttamente",
     "unmetPartial_other": "Ancora {{count}} esercizi da risolvere correttamente",
     "nextLesson": "Prossima lezione: {{title}}",
     "skills": "Abilità",
@@ -59,6 +62,7 @@
     "open": "Apri il capitolo",
     "inNebula": "{{nebula}} · {{state}}",
     "review_one": "Ripassa {{count}} esercizio",
+    "review_many": "Ripassa {{count}} esercizi",
     "review_other": "Ripassa {{count}} esercizi",
     "reviewSoon": "Disponibile a breve",
     "sheetDetails": "Mostra o nasconde i dettagli di questa stella"
@@ -75,8 +79,10 @@
   "summary": {
     "lit": "{{lit}} su {{total}} accese",
     "streak_one": "{{count}} giorno di fila",
+    "streak_many": "{{count}} giorni di fila",
     "streak_other": "{{count}} giorni di fila",
     "score_one": "{{formatted}} punto",
+    "score_many": "{{formatted}} punti",
     "score_other": "{{formatted}} punti"
   },
   "zoom": {

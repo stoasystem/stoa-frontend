@@ -93,6 +93,7 @@
     },
     "presence": {
       "online_one": "{{count}} insegnante online",
+      "online_many": "{{count}} insegnanti online",
       "online_other": "{{count}} insegnanti online",
       "offline": "Nessun insegnante online"
     },
