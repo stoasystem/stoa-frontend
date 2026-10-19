@@ -48,8 +48,6 @@ beforeAll(() => mswServer.listen({ onUnhandledRequest: 'bypass' }))
 afterAll(async () => {
   mswServer.close()
   await i18n.changeLanguage('en')
-  // i18next writes the language into the --localstorage-file; leave none behind.
-  localStorage.clear()
 })
 beforeEach(() => {
   refreshCalls = 0
