@@ -53,13 +53,11 @@ export function EntryPage() {
   const otherPerson = Boolean(browser && named && !(browser.account && isSameAccount(browser.account, named)))
   const joinNow = !isAuthenticated && browser !== null && !otherPerson && !choseOther
 
-  const [joined, setJoined] = useState(false)
   // Only the sign-in this render decided on: one another tab put there since
   // gets its own render, and its own decision (#320 audit F3).
   const browserId = browser?.id
   const join = useCallback(() => {
     if (!browserId || !joinBrowserSignIn(browserId)) return
-    setJoined(true)
     useAuthStore.getState().hydrateFromStorage()
   }, [browserId])
   useEffect(() => {
@@ -79,8 +77,10 @@ export function EntryPage() {
     return <Navigate replace to={getPostLoginPath(user, location)} />
   }
 
-  // Joined: the account is being read; the sign-in form has nothing to do.
-  if (joined && isAuthenticated) return <AccountLoadStatus />
+  // Signed in, the account still being read (or its read failed): the
+  // sign-in form has nothing to do here, and signing in from it would replace
+  // the browser's sign-in (#343). Joined or opened while signed in alike.
+  if (isAuthenticated && !user) return <AccountLoadStatus />
 
   if (!isAuthenticated && browser?.account && named && otherPerson && !choseOther) {
     return (
