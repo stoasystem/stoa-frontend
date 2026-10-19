@@ -264,11 +264,16 @@ describe('a parent\'s Overview and Reports', () => {
     expect(row.querySelector('[data-tone]')).toBeNull()
   })
 
-  it('offers each child\'s summary and reports as rows', () => {
+  it('offers each child\'s summary, reports and progress as rows', () => {
     renderAs('parent', '/parent/reports', <ParentReportsPage />)
 
     // The monthly report has no route yet (#78 review), so it has no row.
-    expect(rowLinks()).toEqual(['/parent/children/ch-1', '/parent/children/ch-1/report'])
+    // The progress page is reached from here (#256).
+    expect(rowLinks()).toEqual([
+      '/parent/children/ch-1',
+      '/parent/children/ch-1/report',
+      '/parent/children/ch-1/progress',
+    ])
     expect(screen.queryByText('Monthly trends')).toBeNull()
   })
 })

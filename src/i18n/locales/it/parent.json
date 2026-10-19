@@ -206,6 +206,7 @@
     "missingChildMessage": "Apri questa pagina dal profilo di un figlio.",
     "loading": "Caricamento dei progressi...",
     "loadFailed": "Progressi del figlio non riusciti",
+    "loadFailedMessage": "Non è stato possibile caricare le assegnazioni di questo figlio. Riprova più tardi.",
     "defaultExplanation": "Questo esercizio compare perché i segnali di apprendimento attuali indicano che può aiutare a consolidare l’argomento successivo.",
     "subjectPending": "Materia in attesa",
     "topicPending": "argomento in attesa",
@@ -236,6 +237,8 @@
     "noSubjects": "Nessuna materia impostata",
     "summary": "Riepilogo",
     "weeklyLinkDescription": "Domande recenti, argomenti deboli, supporto degli insegnanti e prossima azione per i genitori.",
+    "progressLink": "Assegnazioni",
+    "progressLinkDescription": "Quali esercizi sono stati assegnati, perché compaiono e cosa è già fatto.",
     "monthlyLinkDescription": "Tendenze per materia, punti deboli ricorrenti e modelli di supporto a lungo termine.",
     "childReports": "Rapporti per {{name}}"
   },

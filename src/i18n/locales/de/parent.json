@@ -206,6 +206,7 @@
     "missingChildMessage": "Öffnen Sie diese Seite über ein Kinderprofil.",
     "loading": "Lernfortschritt wird geladen...",
     "loadFailed": "Lernfortschritt konnte nicht geladen werden",
+    "loadFailedMessage": "Die Aufgaben dieses Kindes konnten nicht geladen werden. Bitte versuchen Sie es später erneut.",
     "defaultExplanation": "Diese Übung erscheint, weil aktuelle Lernsignale zeigen, dass sie das nächste Thema festigen kann.",
     "subjectPending": "Fach ausstehend",
     "topicPending": "Thema ausstehend",
@@ -236,6 +237,8 @@
     "noSubjects": "Keine Fächer festgelegt",
     "summary": "Übersicht",
     "weeklyLinkDescription": "Aktuelle Fragen, schwache Themen, Unterstützung durch Lehrpersonen und der nächste Schritt für Eltern.",
+    "progressLink": "Aufgaben",
+    "progressLinkDescription": "Welche Übungen zugewiesen wurden, warum sie erscheinen und was erledigt ist.",
     "monthlyLinkDescription": "Fachtrends, wiederkehrende Schwachstellen und längerfristige Unterstützungsmuster.",
     "childReports": "Berichte für {{name}}"
   },

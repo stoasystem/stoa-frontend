@@ -206,6 +206,7 @@
     "missingChildMessage": "Open this page from a child profile.",
     "loading": "Loading child progress...",
     "loadFailed": "Child progress failed",
+    "loadFailedMessage": "We couldn't load this child's assignments. Please try again later.",
     "defaultExplanation": "This practice appears because current learning signals show it may help reinforce the next topic.",
     "subjectPending": "Subject pending",
     "topicPending": "topic pending",
@@ -236,6 +237,8 @@
     "noSubjects": "No subjects set",
     "summary": "Summary",
     "weeklyLinkDescription": "Recent questions, weak topics, teacher support, and the next parent action.",
+    "progressLink": "Assignments",
+    "progressLinkDescription": "What practice was assigned, why it appeared, and what is done.",
     "monthlyLinkDescription": "Subject trends, recurring weak points, and longer-term support patterns.",
     "childReports": "Reports for {{name}}"
   },

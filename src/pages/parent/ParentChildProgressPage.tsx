@@ -17,8 +17,26 @@ function familyExplanation(assignment: LearningAssignment, t: TFunction) {
     || t('progress.defaultExplanation')
 }
 
+// The same statuses the student's assignment list names (practice namespace);
+// anything else reads as "Status unavailable", never the raw code (#256).
+const assignmentStatuses = new Set([
+  'draft',
+  'recommended',
+  'assigned',
+  'started',
+  'completed',
+  'skipped',
+  'archived',
+])
+
+function statusLabel(status: string, t: TFunction<'practice'>) {
+  if (assignmentStatuses.has(status)) return t(`assignments.status.${status}`)
+  return t('assignments.status.unknown')
+}
+
 function FamilyAssignmentRow({ assignment }: { assignment: LearningAssignment }) {
   const { t } = useTranslation('parent')
+  const { t: tPractice } = useTranslation('practice')
 
   return (
     <div className="rounded-md border p-4">
@@ -29,7 +47,7 @@ function FamilyAssignmentRow({ assignment }: { assignment: LearningAssignment })
             {assignment.subject || t('progress.subjectPending')} / {assignment.topicIds.join(', ') || t('progress.topicPending')}
           </p>
         </div>
-        <span className="rounded-full border px-2 py-1 text-xs font-semibold text-muted-foreground">{assignment.status}</span>
+        <span className="rounded-full border px-2 py-1 text-xs font-semibold text-muted-foreground">{statusLabel(assignment.status, tPractice)}</span>
       </div>
       <p className="mt-3 text-sm leading-6 text-muted-foreground">{familyExplanation(assignment, t)}</p>
     </div>
@@ -56,7 +74,8 @@ export function ParentChildProgressPage() {
         )}
         {progressQuery.isLoading && <LoadingState message={t('progress.loading')} />}
         {progressQuery.error && (
-          <ErrorState title={t('progress.loadFailed')} message={progressQuery.error.message} />
+          // The ApiError's own text is the backend's English (#256).
+          <ErrorState title={t('progress.loadFailed')} message={t('progress.loadFailedMessage')} />
         )}
 
         {progress && (

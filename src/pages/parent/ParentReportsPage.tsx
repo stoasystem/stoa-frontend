@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next'
 // CalendarDays goes back into this import with the monthly report row below.
-import { FileText, UserRound } from 'lucide-react'
+import { FileText, ListChecks, UserRound } from 'lucide-react'
 import { Group, Row, Stats } from '@/components/base'
 import { PageContainer } from '@/components/common/PageContainer'
 import { PageHeader } from '@/components/common/PageHeader'
@@ -26,17 +26,21 @@ export function ParentReportsPage() {
       <PageContainer className="max-w-[880px] space-y-6 p-0">
         <PageHeader eyebrow={t('reports.eyebrow')} title={t('reports.title')} description={t('reports.description')} />
 
-        <Stats
-          items={[
-            { key: 'children', value: children.length, label: t('reports.children') },
-            // `Stats` is a row of figures. The weekly-report item put the word
-            // "Ready" where a figure goes, so it read as "0 / Children" beside
-            // a broken value; every child's weekly report is a row below.
-            // { key: 'weekly', value: t('reports.weeklyReportsValue'), label: t('reports.weeklyReports') },
-            // Monthly trends come back with the monthly report's route (see ChildReports).
-            // { key: 'monthly', value: t('reports.monthlyTrendsValue'), label: t('reports.monthlyTrends') },
-          ]}
-        />
+        {/* The count only once the children have loaded: while loading and after
+          * an error it would be a confident "0" above the skeleton or the error (#256). */}
+        {childrenQuery.data && (
+          <Stats
+            items={[
+              { key: 'children', value: children.length, label: t('reports.children') },
+              // `Stats` is a row of figures. The weekly-report item put the word
+              // "Ready" where a figure goes, so it read as "0 / Children" beside
+              // a broken value; every child's weekly report is a row below.
+              // { key: 'weekly', value: t('reports.weeklyReportsValue'), label: t('reports.weeklyReports') },
+              // Monthly trends come back with the monthly report's route (see ChildReports).
+              // { key: 'monthly', value: t('reports.monthlyTrendsValue'), label: t('reports.monthlyTrends') },
+            ]}
+          />
+        )}
 
         <section className="space-y-4">
           {/* The line telling a parent to open a report only makes sense once
@@ -78,6 +82,13 @@ function ChildReports({ child }: { child: ParentChild }) {
         leading={{ kind: 'icon', icon: FileText }}
         title={t('weeklyReport')}
         subtitle={t('reports.weeklyLinkDescription')}
+      />
+      {/* The progress page had no way in (#256). */}
+      <Row
+        to={`/parent/children/${child.id}/progress`}
+        leading={{ kind: 'icon', icon: ListChecks }}
+        title={t('reports.progressLink')}
+        subtitle={t('reports.progressLinkDescription')}
       />
       {/*
         * The monthly report row comes back when /parent/children/:id/monthly-report
