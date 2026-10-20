@@ -99,6 +99,10 @@ function fakeFailureTarget() {
     setAttribute(name, value) {
       attributes.set(name, value)
     },
+    removeAttribute(name) {
+      attributes.delete(name)
+    },
+    ownerDocument: { documentElement: { lang: 'en' } },
   }
 }
 
@@ -116,6 +120,7 @@ test('main statically imports only the barrier and dynamically loads the applica
   assert.match(source, /import\(['"]react-dom\/client['"]\)/)
   assert.match(source, /import\(['"]@\/i18n['"]\)/)
   assert.match(source, /startWebApplication\(/)
+  assert.match(source, /clearFailure: \(\) => clearStartupFailure\(rootElement\)/)
   assert.doesNotMatch(source, /VITE_/)
   const metaEnvReads = source.match(/import\.meta\.env\.[A-Z0-9_]+/g) ?? []
   assert.equal(metaEnvReads.every((value) => value === 'import.meta.env.DEV'), true)
@@ -189,41 +194,217 @@ test('descriptor and config failures never import or start the application', asy
   }
 })
 
-test('timeout and concurrent duplicate initialization fail one attempt before App import', async () => {
-  for (const mode of ['timeout', 'duplicate']) {
-    const gate = deferred()
+test('concurrent duplicate initialization fails one attempt before App import', async () => {
+  const gate = deferred()
+  const events = []
+  const delegate = baseDelegate(events)
+  delegate.loadServedRelease = async () => {
+    events.push(['descriptor'])
+    return gate.promise
+  }
+  const harness = await loadBootstrap(delegate)
+  let failures = 0
+  let imports = 0
+  try {
+    const options = {
+      webOrigin: 'https://staging.stoaedu.ch',
+      timeoutMs: 1_000,
+      renderFailure: () => { failures += 1 },
+      loadApplication: async () => {
+        imports += 1
+        return () => undefined
+      },
+    }
+    const first = harness.module.startWebApplication(options)
+    const second = harness.module.startWebApplication(options)
+    gate.resolve(delegate.descriptor)
+
+    assert.equal(await first, false)
+    assert.equal(await second, false)
+    assert.equal(failures, 1)
+    assert.equal(imports, 0)
+    assert.deepEqual(events.map(([name]) => name), ['descriptor'])
+  } finally {
+    harness.cleanup()
+  }
+})
+
+// #344: running out of time used to end the start for good, so a release that
+// was proven a moment late - or code that downloaded slowly - left the failure
+// text up over an application that never mounted.
+test('a release proven after its budget still mounts and takes the failure text down', async () => {
+  const gate = deferred()
+  const events = []
+  const delegate = baseDelegate(events)
+  delegate.loadServedRelease = async () => {
+    events.push(['descriptor'])
+    return gate.promise
+  }
+  const harness = await loadBootstrap(delegate)
+  try {
+    const started = harness.module.startWebApplication({
+      webOrigin: 'https://staging.stoaedu.ch',
+      timeoutMs: 5,
+      renderFailure: () => events.push(['failure']),
+      clearFailure: () => events.push(['clear']),
+      loadApplication: async () => {
+        events.push(['import-app'])
+        return () => { events.push(['start-app']) }
+      },
+    })
+    await delay(20)
+    assert.deepEqual(events.map(([name]) => name), ['descriptor', 'failure'])
+    gate.resolve(delegate.descriptor)
+
+    assert.equal(await started, true)
+    assert.deepEqual(events.map(([name]) => name), [
+      'descriptor', 'failure', 'project', 'config', 'import-app', 'clear', 'start-app',
+    ])
+  } finally {
+    harness.cleanup()
+  }
+})
+
+test('loading the application code is not timed by the release budget', async () => {
+  const events = []
+  const delegate = baseDelegate(events)
+  const harness = await loadBootstrap(delegate)
+  try {
+    const started = await harness.module.startWebApplication({
+      webOrigin: 'https://staging.stoaedu.ch',
+      timeoutMs: 5,
+      applicationTimeoutMs: 1_000,
+      renderFailure: () => events.push(['failure']),
+      clearFailure: () => events.push(['clear']),
+      loadApplication: async () => {
+        await delay(30)
+        events.push(['import-app'])
+        return () => { events.push(['start-app']) }
+      },
+    })
+    assert.equal(started, true)
+    assert.deepEqual(events.map(([name]) => name), [
+      'descriptor', 'project', 'config', 'import-app', 'start-app',
+    ])
+  } finally {
+    harness.cleanup()
+  }
+})
+
+test('application code past its own budget shows the failure, then mounts over it', async () => {
+  const gate = deferred()
+  const events = []
+  const delegate = baseDelegate(events)
+  const harness = await loadBootstrap(delegate)
+  try {
+    const started = harness.module.startWebApplication({
+      webOrigin: 'https://staging.stoaedu.ch',
+      timeoutMs: 1_000,
+      applicationTimeoutMs: 5,
+      renderFailure: () => events.push(['failure']),
+      clearFailure: () => events.push(['clear']),
+      loadApplication: async () => {
+        await gate.promise
+        return () => { events.push(['start-app']) }
+      },
+    })
+    await delay(20)
+    assert.equal(events.at(-1)[0], 'failure')
+    gate.resolve()
+    assert.equal(await started, true)
+    assert.deepEqual(events.slice(-3).map(([name]) => name), ['failure', 'clear', 'start-app'])
+  } finally {
+    harness.cleanup()
+  }
+})
+
+test('a start that fails outright after running out of time stays failed', async () => {
+  const gate = deferred()
+  const events = []
+  const delegate = baseDelegate(events)
+  delegate.loadServedRelease = async () => gate.promise
+  const harness = await loadBootstrap(delegate)
+  try {
+    const started = harness.module.startWebApplication({
+      webOrigin: 'https://staging.stoaedu.ch',
+      timeoutMs: 5,
+      renderFailure: () => events.push(['failure']),
+      clearFailure: () => events.push(['clear']),
+      loadApplication: async () => {
+        events.push(['import-app'])
+        return () => undefined
+      },
+    })
+    await delay(20)
+    gate.reject(new Error('descriptor refused'))
+    assert.equal(await started, false)
+    assert.deepEqual(events.map(([name]) => name), ['failure'])
+  } finally {
+    harness.cleanup()
+  }
+})
+
+// #344: a descriptor and a config from two releases - what a visitor got
+// between two uploads of the old publisher - ask for the descriptor once more.
+test('a release mismatch asks for the descriptor once more, and only once', async () => {
+  for (const code of ['runtime_config_digest_mismatch', 'runtime_config_release_mismatch']) {
     const events = []
     const delegate = baseDelegate(events)
-    delegate.loadServedRelease = async () => {
-      events.push(['descriptor'])
-      return gate.promise
+    let configCalls = 0
+    delegate.initializeRuntimeConfig = async () => {
+      configCalls += 1
+      events.push(['config'])
+      if (configCalls === 1) throw Object.assign(new Error(code), { code })
+      return { environment: 'staging' }
     }
     const harness = await loadBootstrap(delegate)
-    let failures = 0
+    let starts = 0
+    try {
+      const started = await harness.module.startWebApplication({
+        webOrigin: 'https://staging.stoaedu.ch',
+        timeoutMs: 1_000,
+        renderFailure: () => events.push(['failure']),
+        loadApplication: async () => () => { starts += 1 },
+      })
+      assert.equal(started, true, code)
+      assert.equal(starts, 1, code)
+      assert.deepEqual(events.map(([name]) => name), [
+        'descriptor', 'project', 'config', 'descriptor', 'project', 'config',
+      ], code)
+    } finally {
+      harness.cleanup()
+    }
+  }
+
+  for (const [label, codes] of [
+    ['mismatch twice', ['runtime_config_digest_mismatch', 'runtime_config_digest_mismatch']],
+    ['anything else', ['runtime_config_invalid']],
+  ]) {
+    const events = []
+    const delegate = baseDelegate(events)
+    let configCalls = 0
+    delegate.initializeRuntimeConfig = async () => {
+      const code = codes[configCalls]
+      configCalls += 1
+      events.push(['config'])
+      throw Object.assign(new Error(code), { code })
+    }
+    const harness = await loadBootstrap(delegate)
     let imports = 0
     try {
-      const options = {
+      const started = await harness.module.startWebApplication({
         webOrigin: 'https://staging.stoaedu.ch',
-        timeoutMs: mode === 'timeout' ? 5 : 1_000,
-        renderFailure: () => { failures += 1 },
+        timeoutMs: 1_000,
+        renderFailure: () => events.push(['failure']),
         loadApplication: async () => {
           imports += 1
           return () => undefined
         },
-      }
-      const first = harness.module.startWebApplication(options)
-      let second
-      if (mode === 'duplicate') second = harness.module.startWebApplication(options)
-      if (mode === 'timeout') {
-        await delay(15)
-      }
-      gate.resolve(delegate.descriptor)
-
-      assert.equal(await first, false)
-      if (second) assert.equal(await second, false)
-      assert.equal(failures, 1)
-      assert.equal(imports, 0)
-      assert.deepEqual(events.map(([name]) => name), ['descriptor'])
+      })
+      assert.equal(started, false, label)
+      assert.equal(imports, 0, label)
+      assert.equal(events.filter(([name]) => name === 'descriptor').length, codes.length, label)
+      assert.equal(events.at(-1)[0], 'failure', label)
     } finally {
       harness.cleanup()
     }
@@ -292,6 +473,22 @@ test('failure renderer exposes only one fixed friendly actionable message', asyn
     const unknown = fakeFailureTarget()
     harness.module.renderStartupFailure(unknown, 'ja')
     assert.match(unknown.textContent, /cannot start/i)
+
+    // The page says which language the sentence is in (#344): index.html says
+    // `en`, and a screen reader would read German as English.
+    for (const [language, expected] of [['de-CH', 'de'], ['fr', 'fr'], ['it-IT', 'it'], ['en-GB', 'en'], ['ja', 'en']]) {
+      const target = fakeFailureTarget()
+      harness.module.renderStartupFailure(target, language)
+      assert.equal(target.ownerDocument.documentElement.lang, expected, language)
+    }
+
+    // Taken down again when a late start mounts over it.
+    const cleared = fakeFailureTarget()
+    harness.module.renderStartupFailure(cleared, 'de')
+    harness.module.clearStartupFailure(cleared)
+    assert.equal(cleared.textContent, '')
+    assert.equal(cleared.attributes.has('role'), false)
+    assert.equal(cleared.attributes.has('aria-live'), false)
   } finally {
     harness.cleanup()
   }

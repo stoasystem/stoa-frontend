@@ -1,4 +1,4 @@
-import { renderStartupFailure, startWebApplication } from './bootstrap'
+import { clearStartupFailure, renderStartupFailure, startWebApplication } from './bootstrap'
 
 const rootElement = document.getElementById('root')
 
@@ -29,6 +29,7 @@ void (import.meta.env.DEV
   : startWebApplication({
       webOrigin: window.location.origin,
       renderFailure: () => renderStartupFailure(rootElement),
+      clearFailure: () => clearStartupFailure(rootElement),
       loadApplication,
     }))
 

@@ -162,6 +162,54 @@ test('validated descriptor maps exactly to the Plan 72 runtime-config loader con
   )
 })
 
+// #344: the publisher names the config by its own digest so it never overwrites
+// an object a live descriptor names. The name must carry the descriptor's own
+// digest, and the loader is pointed at exactly that name.
+test('a digest-named runtime config is accepted only under its own digest', async () => {
+  const served = await loadServedReleaseModule()
+  const named = (value, digest) => {
+    value.runtimeConfig.key = `runtime-config.${digest}.json`
+    value.runtimeConfig.url = `https://staging.stoaedu.ch/runtime-config.${digest}.json`
+    return value
+  }
+  const parsed = served.validateServedRelease(named(validDescriptor(), sha('5')), {
+    expectedWebOrigin: 'https://staging.stoaedu.ch',
+  })
+  assert.equal(parsed.runtimeConfig.key, `runtime-config.${sha('5')}.json`)
+  const runtimeOptions = served.toRuntimeConfigLoadOptions(parsed, {
+    expectedWebOrigin: 'https://staging.stoaedu.ch',
+  })
+  assert.equal(runtimeOptions.configUrl, `/runtime-config.${sha('5')}.json`)
+  assert.equal(runtimeOptions.expectedDigest, sha('5'))
+
+  const cases = [
+    ['another digest', (value) => named(value, sha('7'))],
+    ['uppercase digest', (value) => named(value, sha('A'))],
+    ['short digest', (value) => named(value, '5'.repeat(63))],
+    ['url names another object', (value) => {
+      named(value, sha('5'))
+      value.runtimeConfig.url = 'https://staging.stoaedu.ch/runtime-config.json'
+    }],
+    ['nested key', (value) => {
+      value.runtimeConfig.key = `runtime-config/${sha('5')}.json`
+      value.runtimeConfig.url = `https://staging.stoaedu.ch/runtime-config/${sha('5')}.json`
+    }],
+    ['index.html under a digest', (value) => {
+      value.webEntry.key = `index.${sha('6')}.html`
+      value.webEntry.url = `https://staging.stoaedu.ch/index.${sha('6')}.html`
+    }],
+  ]
+  for (const [name, mutate] of cases) {
+    const value = validDescriptor()
+    mutate(value)
+    assert.throws(
+      () => served.validateServedRelease(value, { expectedWebOrigin: 'https://staging.stoaedu.ch' }),
+      { name: 'ServedReleaseError' },
+      name,
+    )
+  }
+})
+
 test('closed validation rejects unknown, secret, provider, demo, and native fields', async () => {
   const served = await loadServedReleaseModule()
   const cases = [
