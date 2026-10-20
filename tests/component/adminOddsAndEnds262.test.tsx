@@ -139,6 +139,8 @@ describe('linking a child while a usage day is set', () => {
     await waitFor(() => expect(studentSelect).toHaveTextContent('Nina Vogt'))
     await user.selectOptions(studentSelect, 'student-1')
     await user.click(screen.getByRole('button', { name: enAdmin.parentLinks.submit }))
+    const dialog = await screen.findByRole('dialog')
+    await user.click(within(dialog).getByRole('button', { name: enAdmin.parentLinks.confirm.submit }))
 
     await screen.findByTestId('parent-link-notice')
     await waitFor(() => expect(mockedOperations).toHaveBeenCalledTimes(2))

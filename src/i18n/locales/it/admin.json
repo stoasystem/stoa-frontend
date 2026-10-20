@@ -166,7 +166,13 @@
     "loading": "Caricamento degli account…",
     "loadFailed": "Non è stato possibile caricare l’elenco degli account.",
     "noParents": "Nessun account genitore attivo corrisponde a questo filtro.",
-    "noStudents": "Nessun account studente attivo corrisponde a questo filtro."
+    "noStudents": "Nessun account studente attivo corrisponde a questo filtro.",
+    "confirm": {
+      "title": "Collegare questi due account?",
+      "body": "{{student}} verrà collegato a {{parent}}, relazione: «{{relationship}}». Il collegamento vale subito e nessuno dei due account deve confermarlo.",
+      "cancel": "Annulla",
+      "submit": "Collega ora"
+    }
   },
   "activation": {
     "eyebrow": "Invito all'account",

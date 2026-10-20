@@ -11,11 +11,20 @@ import { VerificationRecoveryEvidence } from '@/components/parent/VerificationRe
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { ApiError } from '@/services/api/httpClient'
 import { useAdminAccountsQuery, useAssignParentLinkMutation } from '@/hooks/admin/useAdminAccounts'
 import { useAdminParentAccountOperationsQuery } from '@/hooks/admin/useAdminAccountOperationsQuery'
 import { useAdminBillingOperation } from '@/hooks/admin/useAdminBillingOperation'
+import { useDebouncedValue } from '@/hooks/admin/useDebouncedValue'
 import { formattingLocale } from '@/i18n/languages'
 import { DashboardLayout } from '@/layouts/DashboardLayout'
 import { formatDayAndTime } from '@/lib/formatDateTime'
@@ -131,6 +140,10 @@ export function AdminAccountOperationsPage() {
  * filtered to the active ones: the backend refuses an invited, suspended or
  * archived account as a target, and offering one would only produce a refusal
  * nobody could act on.
+ *
+ * #336: because the link takes effect at once, it is confirmed in a dialog
+ * that names both accounts. The filters wait for a pause in typing rather
+ * than re-reading the account list on every key.
  */
 function ParentLinkAssignment({ parentId }: { parentId: string }) {
   const { t } = useTranslation('admin')
@@ -140,19 +153,24 @@ function ParentLinkAssignment({ parentId }: { parentId: string }) {
   // Null means "follow the account the console is looking at"; once an
   // administrator picks one themselves, their choice stands.
   const [parentChoice, setParentChoice] = useState<string | null>(null)
+  // #336: a hand-picked parent used to outlive the lookup, so after looking up
+  // a second parent the form still linked to the first one. A new lookup
+  // takes the choice back.
+  const [followedParentId, setFollowedParentId] = useState(parentId)
+  if (followedParentId !== parentId) {
+    setFollowedParentId(parentId)
+    setParentChoice(null)
+  }
+  const [confirming, setConfirming] = useState(false)
   const [studentChoice, setStudentChoice] = useState('')
   const [relationship, setRelationship] = useState('child')
   const [notice, setNotice] = useState<string | null>(null)
   const [failure, setFailure] = useState<string | null>(null)
 
-  const parentFilters = useMemo(
-    () => ({ role: 'parent', status: 'active', q: parentKeyword.trim() }),
-    [parentKeyword],
-  )
-  const studentFilters = useMemo(
-    () => ({ role: 'student', status: 'active', q: studentKeyword.trim() }),
-    [studentKeyword],
-  )
+  const parentQ = useDebouncedValue(parentKeyword.trim(), 300)
+  const studentQ = useDebouncedValue(studentKeyword.trim(), 300)
+  const parentFilters = useMemo(() => ({ role: 'parent', status: 'active', q: parentQ }), [parentQ])
+  const studentFilters = useMemo(() => ({ role: 'student', status: 'active', q: studentQ }), [studentQ])
   const parents = useAdminAccountsQuery(parentFilters)
   const students = useAdminAccountsQuery(studentFilters)
   const assignment = useAssignParentLinkMutation()
@@ -165,6 +183,12 @@ function ParentLinkAssignment({ parentId }: { parentId: string }) {
   function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     if (!ready || assignment.isPending) return
+    setConfirming(true)
+  }
+
+  function confirm() {
+    if (!ready || assignment.isPending) return
+    setConfirming(false)
     setNotice(null)
     setFailure(null)
     assignment.mutate(
@@ -252,6 +276,29 @@ function ParentLinkAssignment({ parentId }: { parentId: string }) {
             </Button>
           </div>
         </form>
+
+        <Dialog open={confirming} onOpenChange={setConfirming}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>{t('parentLinks.confirm.title')}</DialogTitle>
+              <DialogDescription>
+                {t('parentLinks.confirm.body', {
+                  student: accountLabel(studentRows, studentChoice),
+                  parent: accountLabel(parentRows, selectedParent),
+                  relationship: relationship.trim(),
+                })}
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter className="gap-2">
+              <Button type="button" variant="outline" onClick={() => setConfirming(false)}>
+                {t('parentLinks.confirm.cancel')}
+              </Button>
+              <Button type="button" onClick={confirm} disabled={!ready || assignment.isPending}>
+                {t('parentLinks.confirm.submit')}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
 
         {notice && (
           <p className="mt-4 text-sm text-foreground" role="status" data-testid="parent-link-notice">
