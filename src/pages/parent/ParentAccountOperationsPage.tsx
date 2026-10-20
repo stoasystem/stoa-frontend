@@ -113,7 +113,7 @@ function AccountOperationsContent({ data }: { data: ParentAccountOperations }) {
         </section>
       )}
 
-      <UsageSection usage={data.usage} />
+      <UsageSection usage={data.usage} children={data.children} />
     </>
   )
 }
@@ -171,8 +171,12 @@ function ChildMetric({ label, value, muted }: { label: string; value: string; mu
   )
 }
 
-function UsageSection({ usage }: { usage: AccountOperationsUsage[] }) {
+function UsageSection({ usage, children }: { usage: AccountOperationsUsage[]; children: AccountOperationsChild[] }) {
   const { t, i18n } = useTranslation('parent')
+  // Each card says whose usage it counts; with two children the cards were
+  // otherwise indistinguishable (#340).
+  const childName = (studentId: string) =>
+    children.find((child) => child.studentId === studentId)?.profile.name || t('child')
 
   if (usage.length === 0) {
     return (
@@ -190,6 +194,7 @@ function UsageSection({ usage }: { usage: AccountOperationsUsage[] }) {
             <CardContent className="p-5">
               <div className="flex items-start justify-between gap-3">
                 <div>
+                  <p className="text-sm font-medium text-muted-foreground">{childName(item.studentId)}</p>
                   <p className="font-semibold text-foreground">{getUsageActionLabel(item.action, t)}</p>
                   <p className="mt-1 text-sm text-muted-foreground">{getQuotaPeriodLabel(item.quotaPeriod, t, i18n.language)}</p>
                 </div>

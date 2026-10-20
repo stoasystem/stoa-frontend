@@ -221,7 +221,7 @@
   "reports": {
     "eyebrow": "Rapports parents",
     "title": "Rapports",
-    "description": "Choisissez un rapport d’enfant et consultez les progrès hebdomadaires, les tendances mensuelles, les sujets à travailler et l’accompagnement enseignant.",
+    "description": "Choisissez un rapport d’enfant et consultez les progrès hebdomadaires, les sujets à travailler et l’accompagnement enseignant.",
     "children": "Enfants",
     "weeklyReports": "Rapports hebdomadaires",
     "weeklyReportsValue": "Prêt",

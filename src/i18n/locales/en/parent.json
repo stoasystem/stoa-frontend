@@ -220,7 +220,7 @@
   "reports": {
     "eyebrow": "Parent reports",
     "title": "Reports",
-    "description": "Choose a child report and review weekly progress, monthly trends, weak topics, and teacher-support activity.",
+    "description": "Choose a child report and review weekly progress, weak topics, and teacher-support activity.",
     "children": "Children",
     "weeklyReports": "Weekly reports",
     "weeklyReportsValue": "Ready",

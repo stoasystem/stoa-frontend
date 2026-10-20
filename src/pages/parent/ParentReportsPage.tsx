@@ -50,7 +50,7 @@ export function ParentReportsPage() {
             <p className="m-0 text-[15px] leading-[1.45] text-caption">{t('reports.studentReportsDescription')}</p>
           )}
           {childrenQuery.isLoading && <PageSkeleton rows={3} />}
-          {childrenQuery.isError && <p className="text-sm text-red">{t('loadChildrenFailed')}</p>}
+          {childrenQuery.isError && <p role="alert" className="text-sm text-red">{t('loadChildrenFailed')}</p>}
           {childrenQuery.data && children.length === 0 && (
             <NoLinkedChildrenNotice headline={t('reports.noChildren')} />
           )}

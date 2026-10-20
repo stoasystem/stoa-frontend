@@ -68,7 +68,7 @@ export function ChildReportPage() {
           />
         </div>
         {reportQuery.isLoading && <PageSkeleton rows={4} />}
-        {reportQuery.isError && <p className="text-sm text-destructive">{t('loadReportFailed')}</p>}
+        {reportQuery.isError && <p role="alert" className="text-sm text-destructive">{t('loadReportFailed')}</p>}
         {reportState?.status === 'missing' && (
           <Card>
             <CardHeader>
