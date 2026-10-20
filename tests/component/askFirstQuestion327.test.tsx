@@ -1,7 +1,8 @@
 /**
  * The first question of a new Ask conversation (#327): sent again with the
  * exercise it was asked beside (K3), and after a refusal asked again in the
- * conversation the refusal names rather than in a new empty one (K4).
+ * conversation the refusal names rather than in a new empty one (K4) -- that
+ * question only; any other starts a conversation of its own (#370).
  */
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { act, render, screen, waitFor, within } from '@testing-library/react'
@@ -11,7 +12,7 @@ import { I18nextProvider } from 'react-i18next'
 import { MemoryRouter } from 'react-router-dom'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { StageWithAsk } from '@/features/chapter/StageAsk'
-import { useAskQuoteStore } from '@/features/ask/practiceContext'
+import { makeQuote, useAskQuoteStore } from '@/features/ask/practiceContext'
 import i18n from '@/i18n'
 import { readPendingMessage } from '@/lib/pendingChatMessages'
 import { ApiError } from '@/services/api/httpClient'
@@ -56,18 +57,20 @@ function conversation(id: string) {
 
 function mount(node: ReactNode) {
   const client = new QueryClient({ defaultOptions: { queries: { retry: false } } })
-  return render(
+  const wrap = (inner: ReactNode) => (
     <I18nextProvider i18n={i18n}>
       <QueryClientProvider client={client}>
-        <MemoryRouter>{node}</MemoryRouter>
+        <MemoryRouter>{inner}</MemoryRouter>
       </QueryClientProvider>
-    </I18nextProvider>,
+    </I18nextProvider>
   )
+  const view = render(wrap(node))
+  return { ...view, rerender: (next: ReactNode) => view.rerender(wrap(next)) }
 }
 
 const practice = { unitId: 'u', lessonId: 'l', challengeId: 'ch-1' }
-const Stage = () => (
-  <StageWithAsk practice={{ context: practice }}>
+const Stage = ({ challengeId = practice.challengeId }: { challengeId?: string }) => (
+  <StageWithAsk practice={{ context: { ...practice, challengeId } }}>
     <p>exercise</p>
   </StageWithAsk>
 )
@@ -154,22 +157,6 @@ describe('K4: a first question refused after its conversation was made', () => {
     expect(screen.queryByText(shown)).toBeNull()
   })
 
-  it('sends a question changed meanwhile as a message of its own', async () => {
-    vi.mocked(createConversation).mockRejectedValueOnce(refusal('made-1'))
-    mount(<Stage />)
-    const panel = await ask('Why subtract 3 first?')
-    await waitFor(() => expect(panel.getByRole('textbox')).toHaveValue('Why subtract 3 first?'))
-
-    await ask('Why not divide first?')
-
-    await waitFor(() => expect(streamConversationMessage).toHaveBeenCalledTimes(1))
-    expect(createConversation).toHaveBeenCalledTimes(1)
-    const [call] = vi.mocked(streamConversationMessage).mock.calls[0]
-    expect(call.conversationId).toBe('made-1')
-    expect(call.payload.content).toBe('Why not divide first?')
-    expect(call.payload.idempotencyKey).not.toBe('initial-made-1')
-  })
-
   it('starts a new conversation when the refusal names none', async () => {
     vi.mocked(createConversation).mockRejectedValueOnce(refusal()).mockResolvedValueOnce(conversation('new-2') as never)
     mount(<Stage />)
@@ -180,5 +167,65 @@ describe('K4: a first question refused after its conversation was made', () => {
     await userEvent.keyboard('{Enter}')
 
     await waitFor(() => expect(createConversation).toHaveBeenCalledTimes(2))
+  })
+})
+
+describe('#370: only the refused question goes into the conversation made for it', () => {
+  // The backend titles a conversation after its first question, so the one a
+  // refusal leaves behind carries the refused question's title.
+  const titled: Record<string, string> = { 'made-1': 'Why subtract 3 first?', 'new-2': 'Why not divide first?' }
+  const sentTo = () => vi.mocked(streamConversationMessage).mock.calls.map(([call]) => call.conversationId)
+
+  beforeEach(() => {
+    vi.mocked(getConversation).mockImplementation(async (id: string) => ({ ...conversation(id), title: titled[id] ?? id }) as never)
+    vi.mocked(createConversation).mockReset().mockRejectedValueOnce(refusal('made-1')).mockResolvedValueOnce(conversation('new-2') as never)
+  })
+
+  it('starts a new conversation for a different question, under its own title', async () => {
+    mount(<Stage />)
+    const panel = await ask('Why subtract 3 first?')
+    await waitFor(() => expect(panel.getByRole('textbox')).toHaveValue('Why subtract 3 first?'))
+
+    await ask('Why not divide first?')
+
+    await waitFor(() => expect(createConversation).toHaveBeenCalledTimes(2))
+    expect(vi.mocked(createConversation).mock.calls[1][0]).toMatchObject({ initialMessage: 'Why not divide first?', practiceContext: practice })
+    expect(await panel.findByRole('heading', { name: 'Why not divide first?' })).toBeInTheDocument()
+    expect(panel.queryByRole('heading', { name: 'Why subtract 3 first?' })).toBeNull()
+    expect(sentTo()).not.toContain('made-1')
+  })
+
+  it('starts a new conversation for the same words asked beside another exercise', async () => {
+    const view = mount(<Stage />)
+    const panel = await ask('Why subtract 3 first?')
+    await waitFor(() => expect(panel.getByRole('textbox')).toHaveValue('Why subtract 3 first?'))
+
+    // The same panel, now beside the next exercise.
+    view.rerender(<Stage challengeId="ch-2" />)
+    await userEvent.click(panel.getByRole('textbox'))
+    await userEvent.keyboard('{Enter}')
+
+    await waitFor(() => expect(createConversation).toHaveBeenCalledTimes(2))
+    expect(vi.mocked(createConversation).mock.calls[1][0]).toMatchObject({ initialMessage: 'Why subtract 3 first?', practiceContext: { ...practice, challengeId: 'ch-2' } })
+    expect(sentTo()).not.toContain('made-1')
+  })
+
+  it('starts a new conversation for the same words asked about a passage', async () => {
+    mount(<Stage />)
+    const panel = await ask('Why subtract 3 first?')
+    await waitFor(() => expect(panel.getByRole('textbox')).toHaveValue('Why subtract 3 first?'))
+
+    act(() => useAskQuoteStore.getState().setQuote(makeQuote('2x + 3 = 7', { kind: 'challenge', id: 'ch-1' })))
+    await userEvent.click(panel.getByRole('textbox'))
+    await userEvent.keyboard('{Enter}')
+
+    // A quote does not go out with `POST /conversations`: the new one starts
+    // empty and the question is sent into it.
+    await waitFor(() => expect(streamConversationMessage).toHaveBeenCalledTimes(1))
+    expect(createConversation).toHaveBeenCalledTimes(2)
+    expect(vi.mocked(createConversation).mock.calls[1][0]).not.toHaveProperty('initialMessage')
+    const [call] = vi.mocked(streamConversationMessage).mock.calls[0]
+    expect(call.conversationId).toBe('new-2')
+    expect(call.payload.idempotencyKey).toBe('held-new-2')
   })
 })

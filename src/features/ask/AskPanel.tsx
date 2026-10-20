@@ -123,7 +123,7 @@ export function AskPanel({
   const creatingRef = useRef(false)
   const askedAtRef = useRef<string | null>(null)
   // The conversation a refused first question left behind (#327 K4): asking
-  // again goes into it, not into another empty one.
+  // that question again goes into it, not into another empty one.
   const refusedRef = useRef<RefusedConversation | null>(null)
   const ask = useAskConversation(conversationId)
   const { sendStreamingMessage, isStreaming, conversation } = ask
@@ -200,18 +200,23 @@ export function AskPanel({
       if (mounted.current && openConversation.current === null) select(id)
     }
 
+    // The refused question asked again as it was goes into the conversation
+    // made for it, under the key the server named for it. Any other question
+    // starts a conversation of its own, as usual: in the refused one it would
+    // sit under the refused question's title (#370).
     const refused = refusedRef.current
-    if (refused && refused.subject === subject && refused.grade === grade) {
+    if (
+      refused &&
+      refused.subject === subject &&
+      refused.grade === grade &&
+      refused.content === content &&
+      !quote &&
+      !carried &&
+      sameContext(refused.practiceContext, practiceContext)
+    ) {
       refusedRef.current = null
       createConversation.reset()
-      // The key the server named for the refused question when it is asked
-      // again as it was; a question changed meanwhile is a message of its own.
-      const same =
-        refused.content === content &&
-        !quote &&
-        !carried &&
-        sameContext(refused.practiceContext, practiceContext)
-      sendInto(refused.id, same ? `initial-${refused.id}` : `again-${refused.id}-${Date.now()}`)
+      sendInto(refused.id, `initial-${refused.id}`)
       open(refused.id)
       return
     }

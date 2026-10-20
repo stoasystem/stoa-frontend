@@ -38,8 +38,11 @@ export type MathSegment =
 export function parseSegments(text: string): MathSegment[] {
   const segments: MathSegment[] = []
 
-  // Match $$...$$ first (greedy-free), then $...$
-  const RE = /(\$\$[\s\S]+?\$\$|\$[^$\n]+?\$)/g
+  // Match $$...$$ first (greedy-free), then $...$. An inline formula hugs its
+  // dollars -- no space just inside either one -- and its closing dollar is
+  // not followed by a digit, as in Pandoc: so "it costs $5 and the book $10"
+  // stays a sentence about money (#370).
+  const RE = /(\$\$[\s\S]+?\$\$|\$[^\s$](?:[^$\n]*?[^\s$])?\$(?!\d))/g
   let lastIndex = 0
   let match: RegExpExecArray | null
 

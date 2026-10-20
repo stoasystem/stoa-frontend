@@ -234,3 +234,63 @@ describe('plain: what a person typed (#183)', () => {
     expect(container.textContent).toBe('2*3*4 is *not* emphasis here')
   })
 })
+
+describe('money is not a formula (#370)', () => {
+  // Any two dollars on a line were read as one inline formula, so an answer or
+  // a teacher's reply about prices showed the words between them as maths.
+  beforeAll(async () => {
+    await import('@/components/ui/katexLoader')
+  })
+
+  it.each([
+    'it costs $5 and the book $10',
+    'Das Heft kostet $5, das Buch $10.',
+    'Le cahier coûte 5$ et le livre 10$.',
+    'between $20,000 and $30,000 a year',
+    'from $3-$4 each',
+    'pay $ 5 or $ 10',
+  ])('leaves %j as text', (sentence) => {
+    expect(parseSegments(sentence)).toEqual([{ type: 'text', value: sentence }])
+  })
+
+  it.each([
+    ['$x$', 'x'],
+    ['$x^2 + 1$', 'x^2 + 1'],
+    ['$\\frac{1}{2}$', '\\frac{1}{2}'],
+    ['$a = b$.', 'a = b'],
+    ['($x$)', 'x'],
+  ])('still reads %j as an inline formula', (written, tex) => {
+    expect(parseSegments(written).filter((segment) => segment.type !== 'text')).toEqual([{ type: 'inline', value: tex }])
+  })
+
+  it('still reads block formulas, spaced or not', () => {
+    expect(parseSegments('$$ a + b $$')).toEqual([{ type: 'block', value: 'a + b' }])
+    expect(parseSegments('so\n$$\\sum_{i=1}^n i$$\ndone')).toEqual([
+      { type: 'text', value: 'so\n' },
+      { type: 'block', value: '\\sum_{i=1}^n i' },
+      { type: 'text', value: '\ndone' },
+    ])
+  })
+
+  it('reads a formula beside a price on the same line', () => {
+    expect(parseSegments('It costs $5, so $x = 5$ here')).toEqual([
+      { type: 'text', value: 'It costs $5, so ' },
+      { type: 'inline', value: 'x = 5' },
+      { type: 'text', value: ' here' },
+    ])
+  })
+
+  it('shows a reply about prices exactly as written', () => {
+    const sentence = 'it costs $5 and the book $10'
+    const { container } = render(<MathRenderer plain>{sentence}</MathRenderer>)
+    expect(container.querySelector('.math-inline, .katex')).toBeNull()
+    expect(container.textContent).toBe(sentence)
+  })
+
+  it('typesets the formula and keeps the price as text', async () => {
+    const { container } = render(<MathRenderer>{'It costs $5, so $x = 5$ here'}</MathRenderer>)
+    await waitFor(() => expect(container.querySelector('.katex')).not.toBeNull())
+    expect(container.querySelectorAll('.math-inline')).toHaveLength(1)
+    expect(container.textContent).toContain('It costs $5, so ')
+  })
+})
