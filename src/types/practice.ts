@@ -93,6 +93,8 @@ export type PracticeChallenge = {
   type: PracticeChallengeType
   prompt: string
   options?: string[]
+  /** Whether `POST /practice/hints` has a hint for this exercise. */
+  hintAvailable: boolean
   correctAnswer: string | string[]
   hint?: string
   explanation?: string
@@ -250,19 +252,22 @@ export type PracticeOverview = {
   }>
 }
 
+/**
+ * One press of Hint. The key names the press, not the exercise: the backend
+ * counts each new key against the day's hints, so a press that failed on the
+ * way is sent again with the same key (#325).
+ */
 export type PracticeHintRequest = {
-  subjectId: string
-  gradeLevel?: string
-  topicId?: string
-  lessonId: string
   challengeId: string
-  answer: string | string[]
+  /** 1-64 of `[A-Za-z0-9._~-]`. */
+  idempotencyKey: string
 }
 
+/** `hint` is null when the exercise has no approved hint. */
 export type PracticeHintResponse = {
-  title: string
-  hint: string
-  nextStep: string
+  challengeId: string
+  hintAvailable: boolean
+  hint: string | null
 }
 
 export type CurriculumRolloutState = 'seed' | 'draft' | 'reviewed' | 'active' | 'archived'

@@ -85,6 +85,7 @@
     "finishing": "Chiusura in corso…",
     "hint": "Suggerimento",
     "hintFailed": "Nessun suggerimento al momento. Riprova tra poco.",
+    "noHint": "Non c’è un suggerimento per questo esercizio.",
     "lessonOf": "Lezione {{lesson}} di {{lessons}}",
     "loading": "Caricamento della lezione…",
     "locked": {

@@ -85,6 +85,7 @@
     "finishing": "En cours…",
     "hint": "Indice",
     "hintFailed": "Pas d’indice pour le moment. Réessaie dans un instant.",
+    "noHint": "Il n’y a pas d’indice pour cet exercice.",
     "lessonOf": "Leçon {{lesson}} sur {{lessons}}",
     "loading": "Chargement de la leçon…",
     "locked": {

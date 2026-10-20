@@ -28,8 +28,8 @@ const lesson = {
   title: 'L',
   topic: 'T',
   challenges: [
-    { challengeId: 'c1', type: 'text_input', prompt: '1+1', options: [] },
-    { challengeId: 'c2', type: 'text_input', prompt: '2+2', options: [] },
+    { challengeId: 'c1', type: 'text_input', prompt: '1+1', options: [], hintAvailable: true },
+    { challengeId: 'c2', type: 'text_input', prompt: '2+2', options: [], hintAvailable: true },
   ],
 } as never
 

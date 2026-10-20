@@ -81,6 +81,7 @@
     "finishing": "Finishing…",
     "hint": "Hint",
     "hintFailed": "No hint right now. Try again in a moment.",
+    "noHint": "There’s no hint for this exercise.",
     "lessonOf": "Lesson {{lesson}} of {{lessons}}",
     "loading": "Loading the lesson…",
     "locked": {

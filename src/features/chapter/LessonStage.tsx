@@ -257,7 +257,7 @@ function StageStrip({
         {chapter && chapter.total > 0 && <LessonDots chapter={chapter} lessonId={lesson.id} width={side ? 220 : 150} />}
       </div>
       <div className="justify-self-end">
-        {run.quiz ? <Hearts left={run.quiz.hearts} total={run.quiz.total} /> : !side && !run.finished && run.challenge && !run.feedback && <HintButton run={run} />}
+        {run.quiz ? <Hearts left={run.quiz.hearts} total={run.quiz.total} /> : !side && !run.finished && run.hintOffered && !run.feedback && <HintButton run={run} />}
       </div>
     </div>
   )
@@ -449,13 +449,7 @@ function Exercise({
               />
             </form>
 
-            {run.hint && (
-              <Nudge>
-                {run.hint.title && <strong className="block">{run.hint.title}</strong>}
-                {run.hint.hint}
-                {run.hint.nextStep && <span className={cn('mt-1 block', bodyOnSky)}>{run.hint.nextStep}</span>}
-              </Nudge>
-            )}
+            {run.hint && <Nudge>{run.hint.hint ?? t('stage.noHint')}</Nudge>}
             {run.hintFailed && !run.hint && (
               <p role="alert" className={cn('m-0 text-[13px]', bodyOnSky)}>
                 {t('stage.hintFailed')}
@@ -572,7 +566,7 @@ function ActionRow({ run, side }: { run: LessonRun; side: boolean }) {
           {secondary.label}
         </Button>
       )}
-      {side && !feedback && !quiz && (
+      {side && !feedback && run.hintOffered && (
         <>
           <span className="flex-1" />
           <HintButton run={run} />

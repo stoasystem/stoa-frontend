@@ -81,6 +81,7 @@
     "finishing": "Wird abgeschlossen…",
     "hint": "Tipp",
     "hintFailed": "Gerade gibt es keinen Tipp. Versuch es gleich noch einmal.",
+    "noHint": "Für diese Aufgabe gibt es keinen Tipp.",
     "lessonOf": "Lektion {{lesson}} von {{lessons}}",
     "loading": "Die Lektion wird geladen…",
     "locked": {
