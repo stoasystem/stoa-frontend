@@ -1,4 +1,10 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import {
+  keepPreviousData,
+  useInfiniteQuery,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from '@tanstack/react-query'
 import {
   assignAccount,
   assignParentLink,
@@ -13,13 +19,50 @@ import {
   setTeacherSupportAllowance,
   updateAccountProfile,
   type AccountListFilters,
+  type AccountListResponse,
 } from '@/services/admin/accountsApi'
 import { adminQueryKeys } from '@/services/admin/adminQueryKeys'
 
 export function useAdminAccountsQuery(filters: AccountListFilters) {
   return useQuery({
     queryKey: adminQueryKeys.accounts(filters),
-    queryFn: () => listAccounts(filters),
+    queryFn: ({ signal }) => listAccounts(filters, { signal }),
+    retry: false,
+  })
+}
+
+/**
+ * The accounts page's list (#335): one query per filter, and the next one
+ * keeps the previous answer on screen while it is read instead of flashing
+ * "loading"; a superseded read is aborted rather than left to finish.
+ *
+ * Each page here is one budgeted walk of `listAccounts`. When a walk stops
+ * with a continuation key still in hand, `hasNextPage` says so and
+ * `fetchNextPage` carries on from it; the pages come back merged into one list.
+ */
+export function useAdminAccountListQuery(filters: AccountListFilters) {
+  return useInfiniteQuery({
+    queryKey: [...adminQueryKeys.accountsAll(), 'list', filters] as const,
+    queryFn: ({ pageParam, signal }) =>
+      listAccounts(filters, { signal, after: pageParam }),
+    initialPageParam: undefined as string | undefined,
+    getNextPageParam: (last: AccountListResponse) => last.nextCursor ?? undefined,
+    placeholderData: keepPreviousData,
+    select: (data): AccountListResponse => {
+      const groups: Record<string, number> = {}
+      for (const page of data.pages) {
+        for (const [role, count] of Object.entries(page.groups)) {
+          groups[role] = (groups[role] ?? 0) + count
+        }
+      }
+      const items = data.pages.flatMap((page) => page.items)
+      return {
+        items,
+        count: items.length,
+        groups,
+        nextCursor: data.pages[data.pages.length - 1]?.nextCursor ?? null,
+      }
+    },
     retry: false,
   })
 }

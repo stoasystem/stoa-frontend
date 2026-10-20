@@ -90,3 +90,37 @@ describe('the account list is every account, not the first page of them', () => 
     expect(result.nextCursor).toBe('always-more')
   })
 })
+
+describe('#335: what each request carries', () => {
+  it('passes the abort signal to every request of the walk', async () => {
+    mockedGet
+      .mockResolvedValueOnce(page([row('a@t', 'student')], 'cursor-2'))
+      .mockResolvedValueOnce(page([row('b@t', 'student')], null))
+    const controller = new AbortController()
+
+    await listAccounts({}, { signal: controller.signal })
+
+    for (const call of mockedGet.mock.calls) {
+      expect(call[1]?.signal).toBe(controller.signal)
+    }
+  })
+
+  it('carries on from `after` with a fresh budget', async () => {
+    mockedGet.mockResolvedValueOnce(page([row('c@t', 'student')], null))
+
+    await listAccounts({}, { after: 'cursor-21' })
+
+    expect(mockedGet.mock.calls[0][1]?.params?.cursor).toBe('cursor-21')
+  })
+
+  it('sends the "created to" day as the end of that Zurich day', async () => {
+    mockedGet.mockResolvedValueOnce(page([], null))
+
+    await listAccounts({ createdFrom: '2026-10-20', createdTo: '2026-10-20' })
+
+    expect(mockedGet.mock.calls[0][1]?.params).toMatchObject({
+      created_from: '2026-10-19T22:00:00',
+      created_to: '2026-10-20T21:59:59.999999+00:00',
+    })
+  })
+})

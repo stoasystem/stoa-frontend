@@ -70,6 +70,9 @@
     },
     "reasonRequired": "Enter a reason first: every account change is recorded.",
     "loading": "Loading accounts…",
+    "incomplete": "The list stopped after {{shown}} accounts and is not complete. Narrow the filters or load more.",
+    "loadMore": "Load more",
+    "loadingMore": "Loading more accounts…",
     "actionFor": "{{action}}: {{account}}",
     "confirm": {
       "title": {

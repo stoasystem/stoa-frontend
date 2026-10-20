@@ -70,6 +70,9 @@
     },
     "reasonRequired": "Indica prima un motivo: ogni modifica dell'account viene registrata.",
     "loading": "Caricamento degli account…",
+    "incomplete": "L’elenco si è fermato dopo {{shown}} account e non è completo. Restringi i filtri o caricane altri.",
+    "loadMore": "Carica altri",
+    "loadingMore": "Caricamento di altri account…",
     "actionFor": "{{action}}: {{account}}",
     "confirm": {
       "title": {

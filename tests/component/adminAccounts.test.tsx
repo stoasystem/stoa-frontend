@@ -241,7 +241,11 @@ describe('admin accounts console', () => {
     expect(mockedInvite.mock.calls[0][0].dateOfBirth).toBe('2012-05-06')
 
     // Card 014: assigning directly now opens the registration form, seeded
-    // from what was already typed into the card.
+    // from what was already typed into the card. A successful invite empties
+    // the card (#335), so it is typed again.
+    await waitFor(() => expect(screen.getByLabelText('accounts.emailLabel')).toHaveValue(''))
+    await userEvent.type(screen.getByLabelText('accounts.emailLabel'), 'second@stoa.test')
+    await userEvent.type(screen.getByLabelText('accounts.dateOfBirthLabel'), '2012-05-06')
     await userEvent.click(screen.getByText('accounts.assign'))
     const dialog = await screen.findByRole('dialog')
     await userEvent.click(within(dialog).getByText('accounts.assignDialogSubmit'))

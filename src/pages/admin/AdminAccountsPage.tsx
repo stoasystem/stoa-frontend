@@ -9,13 +9,14 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import {
-  useAdminAccountsQuery,
+  useAdminAccountListQuery,
   useAssignAccountMutation,
   useChangeAccountStatusMutation,
   useInviteAccountMutation,
   useReissueInvitationMutation,
   useResetAccountPasswordMutation,
 } from '@/hooks/admin/useAdminAccounts'
+import { useDebouncedValue } from '@/hooks/admin/useDebouncedValue'
 import { DashboardLayout } from '@/layouts/DashboardLayout'
 import { toUserFacingError } from '@/lib/userFacingText'
 import type { AccountAction } from '@/pages/admin/AccountActionDialog'
@@ -47,6 +48,8 @@ const ROLES: AccountRole[] = ['student', 'teacher', 'parent', 'admin']
 const STATUSES: AccountStatus[] = ['invited', 'active', 'suspended', 'archived']
 
 // An archived account is read-only and keeps its number; there is no delete.
+const EMPTY_DRAFT: AccountDraft = { role: 'student', email: '', fullName: '', dateOfBirth: '' }
+
 const NEXT_STATUS: Record<string, Exclude<AccountStatus, 'invited'>[]> = {
   invited: ['archived'],
   active: ['suspended', 'archived'],
@@ -63,12 +66,7 @@ export function AdminAccountsPage() {
   const [createdTo, setCreatedTo] = useState('')
   // Card 008: a date, not an age. An age goes stale; the date lets the server
   // recompute "is this a minor today" at every decision.
-  const [draft, setDraft] = useState<AccountDraft>({
-    role: 'student',
-    email: '',
-    fullName: '',
-    dateOfBirth: '',
-  })
+  const [draft, setDraft] = useState<AccountDraft>(EMPTY_DRAFT)
   const [touched, setTouched] = useState<Partial<Record<keyof AccountDraft, boolean>>>({})
   const [assignOpen, setAssignOpen] = useState(false)
   const [assignError, setAssignError] = useState<string | null>(null)
@@ -78,11 +76,14 @@ export function AdminAccountsPage() {
   const [secret, setSecret] = useState<string | null>(null)
   const [allowanceFor, setAllowanceFor] = useState<string | null>(null)
 
+  // #335: the list used to be read in full on every key typed. The keyword
+  // now waits for a pause, and the previous answer stays up meanwhile.
+  const settledKeyword = useDebouncedValue(keyword.trim(), 300)
   const filters = useMemo(
-    () => ({ role, status, q: keyword, createdFrom, createdTo }),
-    [role, status, keyword, createdFrom, createdTo],
+    () => ({ role, status, q: settledKeyword, createdFrom, createdTo }),
+    [role, status, settledKeyword, createdFrom, createdTo],
   )
-  const accountsQuery = useAdminAccountsQuery(filters)
+  const accountsQuery = useAdminAccountListQuery(filters)
   const inviteMutation = useInviteAccountMutation()
   const assignMutation = useAssignAccountMutation()
   const reissueMutation = useReissueInvitationMutation()
@@ -98,6 +99,9 @@ export function AdminAccountsPage() {
   // #259: a list still being read is not an empty one. On a large tenant the
   // read pages through up to twenty requests, and every group said "no accounts".
   const loading = accountsQuery.isPending
+  // #335: the read stops after a budget of requests. A list cut there used to
+  // look complete; now it says so and offers to read on.
+  const incomplete = Boolean(accountsQuery.data?.nextCursor)
   const rows = accountsQuery.data?.items ?? []
   const groups = accountsQuery.data?.groups ?? {}
   const grouped = ROLES.map((item) => ({ role: item, rows: rows.filter((row) => row.role === item) }))
@@ -117,12 +121,23 @@ export function AdminAccountsPage() {
   const inviteTooltip =
     inviteBlocking.length > 0 ? inviteReasons.join(' · ') : t('accounts.inviteExplainer')
 
+  /**
+   * #335: after a success the form is emptied. Left filled, a second press
+   * invited the same address again, which replaced the invitation and with it
+   * the one-time activation code still on screen.
+   */
+  function clearDraft() {
+    setDraft(EMPTY_DRAFT)
+    setTouched({})
+  }
+
   function invite() {
-    if (inviteBlocking.length > 0) return
+    if (inviteBlocking.length > 0 || inviteMutation.isPending) return
     setNotice(null)
     setSecret(null)
     inviteMutation.mutate(accountDraftPayload(draft), {
       onSuccess: (result) => {
+        clearDraft()
         setNotice(
           result.invitationDelivered
             ? t('accounts.inviteSent', { accountNumber: result.accountNumber })
@@ -164,7 +179,7 @@ export function AdminAccountsPage() {
     assignMutation.mutate(accountDraftPayload(filled), {
       onSuccess: (result) => {
         setAssignOpen(false)
-        setDraft(filled)
+        clearDraft()
         setNotice(t('accounts.assigned', { accountNumber: result.accountNumber }))
         setSecret(result.initialPassword)
       },
@@ -441,6 +456,21 @@ export function AdminAccountsPage() {
           <p role="status" className="mb-3 text-sm text-muted-foreground">
             {t('accounts.loading')}
           </p>
+        ) : null}
+
+        {incomplete && !accountsQuery.isError ? (
+          <div className="mb-3 flex flex-wrap items-center gap-3 rounded-md border p-3 text-sm">
+            <p>{t('accounts.incomplete', { shown: rows.length })}</p>
+            <Button
+              type="button"
+              size="sm"
+              variant="outline"
+              disabled={accountsQuery.isFetchingNextPage}
+              onClick={() => void accountsQuery.fetchNextPage()}
+            >
+              {accountsQuery.isFetchingNextPage ? t('accounts.loadingMore') : t('accounts.loadMore')}
+            </Button>
+          </div>
         ) : null}
 
         {accountsQuery.isError || loading ? null : grouped.map((group) => (
