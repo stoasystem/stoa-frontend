@@ -63,11 +63,12 @@ async function start() {
     import('react-dom/client'),
     import('react-router-dom'),
   ])
-  const [{ AppProviders }, { AppRoutes }, { AuthBootstrap }, { PageSkeleton }, { useAuthStore }, { PreviewChrome }, { PreviewLighting }] =
+  const [{ AppProviders }, { AppRoutes }, { AuthBootstrap }, { RouteArrival }, { PageSkeleton }, { useAuthStore }, { PreviewChrome }, { PreviewLighting }] =
     await Promise.all([
       import('@/app/providers/AppProviders'),
       import('@/app/router/AppRoutes'),
       import('@/app/router/AuthBootstrap'),
+      import('@/app/router/RouteArrival'),
       import('@/components/common/PageSkeleton'),
       import('@/store/authStore'),
       import('@/dev/preview/PreviewChrome'),
@@ -91,9 +92,11 @@ async function start() {
           <MemoryRouter initialEntries={[path]}>
             <AuthBootstrap />
             <PreviewChrome initialPath={path} open={surface?.open} focus={surface?.focus} pending={surface?.pending} readyWhen={surface?.readyWhen} />
-            <Suspense fallback={<PageSkeleton rows={4} />}>
-              <AppRoutes />
-            </Suspense>
+            <RouteArrival>
+              <Suspense fallback={<PageSkeleton rows={4} />}>
+                <AppRoutes />
+              </Suspense>
+            </RouteArrival>
           </MemoryRouter>
         </PreviewLighting>
       </AppProviders>
