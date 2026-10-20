@@ -1,6 +1,6 @@
 {
   "required": "This field is required.",
-  "passwordRequirements": "Password must be at least 8 characters and include uppercase and lowercase letters, a number, and one of these symbols: ! @ # $ % ^ & *.",
+  "passwordRequirements": "Password must be at least 8 characters and include uppercase and lowercase letters and a number.",
   "nameTooShort": "Name must be at least 2 characters.",
   "subjectRequired": "Add at least one subject.",
   "schoolGradeRequired": "School and grade are required.",

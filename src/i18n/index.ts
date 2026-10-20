@@ -151,7 +151,12 @@ syncDocumentLanguage(i18n.language)
 i18n.on('languageChanged', (language) => {
   syncDocumentLanguage(language)
   if (typeof window !== 'undefined') {
-    window.localStorage.setItem(LANGUAGE_STORAGE_KEY, language as SupportedLanguage)
+    try {
+      window.localStorage.setItem(LANGUAGE_STORAGE_KEY, language as SupportedLanguage)
+    } catch {
+      // Storage is blocked or full (#345): the switch still applies to this
+      // page, it just is not remembered for the next one.
+    }
   }
 })
 

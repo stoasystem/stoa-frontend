@@ -31,6 +31,19 @@ export function resolveUserLanguage(user: {
 }
 
 /**
+ * The language saved by the last switch, or null. A browser that blocks site
+ * storage throws on any access to localStorage; that must not stop the app
+ * from starting (#345), so it reads as nothing saved.
+ */
+export function storedLanguage(): string | null {
+  try {
+    return window.localStorage.getItem(LANGUAGE_STORAGE_KEY)
+  } catch {
+    return null
+  }
+}
+
+/**
  * The language the app is being read in right now.
  *
  * Read from storage rather than from the i18n instance, so modules that only
@@ -41,7 +54,7 @@ export function resolveUserLanguage(user: {
 export function activeLanguage(): SupportedLanguage {
   if (typeof window === 'undefined') return 'en'
 
-  const stored = window.localStorage.getItem(LANGUAGE_STORAGE_KEY)
+  const stored = storedLanguage()
   if (isSupportedLanguage(stored)) return stored
 
   const browserLanguage = window.navigator.language.slice(0, 2)

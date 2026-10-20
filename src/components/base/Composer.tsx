@@ -139,17 +139,22 @@ export function Composer({
   /*
    * Above the pill, not inside it: the docked composer is one row 46 high with
    * nowhere to put a sentence, and both hosts leave the space over it free.
+   *
+   * Always mounted, only its text changes: a live region added to the page
+   * together with its words is not announced, so the reason was shown but
+   * never read out (#345).
    */
-  const hint = blocked && (
+  const hint = (
     <p
       id={hintId}
-      data-composer-hint={blocked}
+      data-composer-hint={blocked ?? undefined}
       role="status"
       className="pointer-events-none absolute inset-x-0 bottom-full m-0 mb-1.5 text-center text-[13px] text-[color:var(--on-sky-text-body,var(--secondary))]"
     >
-      {t(`composer.sendBlocked.${blocked}`)}
+      {blocked ? t(`composer.sendBlocked.${blocked}`) : null}
     </p>
   )
+  const fieldDescribedBy = [describedBy, blocked ? hintId : undefined].filter(Boolean).join(' ') || undefined
   const fieldParts = (
     <>
       <label htmlFor={fieldId} className="sr-only">
@@ -163,7 +168,7 @@ export function Composer({
         value={value}
         placeholder={placeholder}
         disabled={disabled}
-        aria-describedby={describedBy}
+        aria-describedby={fieldDescribedBy}
         onChange={(event) => change(event.target.value)}
         onKeyDown={onKeyDown}
         onCompositionStart={onCompositionStart}

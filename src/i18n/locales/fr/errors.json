@@ -1,6 +1,6 @@
 {
   "required": "Ce champ est obligatoire.",
-  "passwordRequirements": "Le mot de passe doit contenir au moins 8 caractères, des lettres majuscules et minuscules, un chiffre et l’un de ces symboles : ! @ # $ % ^ & *.",
+  "passwordRequirements": "Le mot de passe doit contenir au moins 8 caractères, des lettres majuscules et minuscules et un chiffre.",
   "nameTooShort": "Le nom doit contenir au moins 2 caractères.",
   "subjectRequired": "Ajoutez au moins une matière.",
   "schoolGradeRequired": "L’école et le niveau sont obligatoires.",
