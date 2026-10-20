@@ -1,18 +1,26 @@
 import { BookOpenCheck, Clock, Compass } from 'lucide-react'
 import type { TFunction } from 'i18next'
+import { useId } from 'react'
 import { useTranslation } from 'react-i18next'
+import { Link } from 'react-router-dom'
 import { EmptyState } from '@/components/common/EmptyState'
 import { ErrorState } from '@/components/common/ErrorState'
 import { LoadingState } from '@/components/common/LoadingState'
 import { PageContainer } from '@/components/common/PageContainer'
 import { PageHeader } from '@/components/common/PageHeader'
+import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { chapterPath } from '@/features/chapter/useChapter'
+import { pathForTarget } from '@/features/starmap/view/layers'
 import { useMyAssignmentsQuery } from '@/hooks/learning/useLearningOperationsQueries'
+import { useCurriculumCatalogQuery } from '@/hooks/practice/useCurriculumCatalogQuery'
 import { getRecommendationRationale, getSubjectLabel, getTopicLabel } from '@/lib/displayLabels'
 import { formatDayAndMonth } from '@/lib/formatDateTime'
+import { normalSubjectId } from '@/lib/subjects'
 import { toUserFacingError } from '@/lib/userFacingText'
 import { DashboardLayout } from '@/layouts/DashboardLayout'
 import type { LearningAssignment } from '@/types/learningOperations'
+import type { CurriculumCatalog } from '@/types/practice'
 
 function dueLabel(value: string | null | undefined, t: TFunction<'practice'>) {
   if (!value) return t('assignments.noDueDate')
@@ -64,14 +72,40 @@ function nextAction(status: string, t: TFunction<'practice'>) {
   return t('assignments.nextAction.default')
 }
 
-function AssignmentExplanationCard({ assignment }: { assignment: LearningAssignment }) {
+type AssignmentLink = { to: string; labelKey: 'assignments.openChapter' | 'assignments.openTopic' }
+
+/*
+ * Where an assignment's work lives (#400). The backend sets work from a
+ * curriculum exercise, which names its lesson, or from a reviewed AI draft,
+ * which names only a subject and topics. A lesson the catalog knows opens its
+ * chapter; otherwise the first of its topics the catalog knows opens as a
+ * nebula on the star map. Anything the catalog cannot place has no link.
+ */
+function assignmentLink(assignment: LearningAssignment, catalog: CurriculumCatalog | undefined): AssignmentLink | null {
+  if (!catalog) return null
+  const lesson = assignment.lessonId ? catalog.lessons.find((candidate) => candidate.id === assignment.lessonId) : undefined
+  if (lesson) return { to: chapterPath(lesson.unitId), labelKey: 'assignments.openChapter' }
+  const subject = normalSubjectId(assignment.subject)
+  const topic = assignment.topicIds
+    .map((topicId) =>
+      catalog.topics.find(
+        (candidate) => candidate.id === topicId && (!subject || normalSubjectId(candidate.subjectId) === subject),
+      ),
+    )
+    .find((candidate) => candidate !== undefined)
+  if (topic) return { to: pathForTarget(topic.subjectId, { layer: 'nebula', nebulaId: topic.id }), labelKey: 'assignments.openTopic' }
+  return null
+}
+
+function AssignmentExplanationCard({ assignment, link }: { assignment: LearningAssignment; link: AssignmentLink | null }) {
   const { t } = useTranslation('practice')
+  const titleId = useId()
 
   return (
     <Card>
       <CardHeader>
         <CardTitle className="flex items-start justify-between gap-3 text-xl">
-          <span>{assignment.title || t('assignments.untitled')}</span>
+          <span id={titleId}>{assignment.title || t('assignments.untitled')}</span>
           <span className="rounded-full border px-2 py-1 text-xs font-semibold text-muted-foreground">
             {statusLabel(assignment.status, t)}
           </span>
@@ -102,9 +136,19 @@ function AssignmentExplanationCard({ assignment }: { assignment: LearningAssignm
           <p className="text-sm font-semibold">{t('assignments.whyThisAppeared')}</p>
           <p className="mt-1 text-sm leading-6 text-muted-foreground">{rationaleText(assignment, t)}</p>
         </div>
-        <p className="text-sm font-semibold text-foreground">
-          {nextAction(assignment.status, t)}
-        </p>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <p className="text-sm font-semibold text-foreground">
+            {nextAction(assignment.status, t)}
+          </p>
+          {link && (
+            // One per card, the same words on each: the card's title tells them apart.
+            <Button asChild variant="tinted" size="sm">
+              <Link to={link.to} aria-describedby={titleId}>
+                {t(link.labelKey)}
+              </Link>
+            </Button>
+          )}
+        </div>
       </CardContent>
     </Card>
   )
@@ -114,6 +158,8 @@ export function StudentAssignmentsPage() {
   const { t } = useTranslation('practice')
   const assignmentsQuery = useMyAssignmentsQuery()
   const assignments = assignmentsQuery.data?.items ?? []
+  // The chapter's own catalog read: opening one finds it already loaded.
+  const catalog = useCurriculumCatalogQuery().data
 
   return (
     <DashboardLayout>
@@ -140,7 +186,11 @@ export function StudentAssignmentsPage() {
         )}
         <div className="grid gap-4 xl:grid-cols-2">
           {assignments.map((assignment) => (
-            <AssignmentExplanationCard key={assignment.assignmentId} assignment={assignment} />
+            <AssignmentExplanationCard
+              key={assignment.assignmentId}
+              assignment={assignment}
+              link={assignmentLink(assignment, catalog)}
+            />
           ))}
         </div>
       </PageContainer>

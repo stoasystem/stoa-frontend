@@ -6,6 +6,7 @@
     "close": "Close"
   },
   "accountMenu": {
+    "assignments": "Assignments",
     "billing": "Billing and payments",
     "help": "Help and support",
     "open": "Account"

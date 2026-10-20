@@ -34,6 +34,11 @@ vi.mock('@/hooks/learning/useLearningOperationsQueries', () => ({
   useWarehouseExportSummaryQuery: () => ({ isLoading: false, error: state.opsError }),
 }))
 
+// Where each row leads is studentAssignmentLinks400's; here no catalog, so no link.
+vi.mock('@/hooks/practice/useCurriculumCatalogQuery', () => ({
+  useCurriculumCatalogQuery: () => ({ data: undefined }),
+}))
+
 vi.mock('@/services/analytics/analyticsClient', () => ({ trackEvent: vi.fn() }))
 
 function assignment(overrides: Partial<LearningAssignment>): LearningAssignment {

@@ -26,6 +26,8 @@
       "skipped": "Ask your teacher what to try next",
       "default": "Start practice"
     },
+    "openChapter": "Open chapter",
+    "openTopic": "Show on the star map",
     "untitled": "Assignment",
     "failedBody": "Please try again in a moment.",
     "currentTarget": "your current learning goal",

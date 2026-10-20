@@ -26,6 +26,8 @@
       "skipped": "Frag deine Lehrperson, was du als Nächstes probieren sollst",
       "default": "Übung starten"
     },
+    "openChapter": "Kapitel öffnen",
+    "openTopic": "Auf der Sternkarte zeigen",
     "untitled": "Aufgabe",
     "failedBody": "Versuch es gleich noch einmal.",
     "currentTarget": "dein aktuelles Lernziel",

@@ -2,11 +2,11 @@
  * What the avatar menu offers each role (#13 point 4, #46).
  *
  * Five fixed items for everybody: Profile, Language, Change password, Help,
- * Sign out. A role's extra items sit between Help and Sign out; today only the
- * parent has one, "Billing and payments". Every link must be a route the
- * manifest registers, and an entry whose route is not registered is left out:
- * billing is withdrawn (card 007), so the parent's extra stays hidden until
- * its routes come back.
+ * Sign out. A role's extra items sit between Help and Sign out: the student's
+ * "Assignments" (#400) and the parent's "Billing and payments". Every link
+ * must be a route the manifest registers, and an entry whose route is not
+ * registered is left out: billing is withdrawn (card 007), so the parent's
+ * extra stays hidden until its routes come back.
  */
 import { matchPath } from 'react-router-dom'
 import { CHANGE_PASSWORD_PATH, pageRoutes, type AppNavArea } from '@/app/router/routeManifest'
@@ -48,13 +48,17 @@ const PASSWORD_PATHS: Record<AppNavArea, string> = {
 export type AccountMenuExtra = { key: string; labelKey: string; to: string }
 
 /*
+ * Assignments: the work a teacher or administrator set the student. The
+ * backend sends no notification for it, so without this item nothing led
+ * there (#400).
+ *
  * Billing and payments: one item, opening /billing. /billing/payment-settings
  * is not a second item and not a submenu: the billing page links to it (its
  * "Manage billing" button), so the menu keeps its one extra row (decided in
  * #46). Neither route may carry a `nav` entry in the manifest.
  */
 const EXTRAS: Record<AppNavArea, readonly AccountMenuExtra[]> = {
-  student: [],
+  student: [{ key: 'assignments', labelKey: 'accountMenu.assignments', to: '/assignments' }],
   teacher: [],
   parent: [{ key: 'billing', labelKey: 'accountMenu.billing', to: '/billing' }],
   admin: [],

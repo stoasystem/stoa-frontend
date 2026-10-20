@@ -1,5 +1,5 @@
 import * as Menu from '@radix-ui/react-dropdown-menu'
-import { Check, ChevronRight, CircleHelp, CreditCard, Globe, KeyRound, LogOut, UserRound, type LucideIcon } from 'lucide-react'
+import { Check, ChevronRight, CircleHelp, ClipboardList, CreditCard, Globe, KeyRound, LogOut, UserRound, type LucideIcon } from 'lucide-react'
 import { createContext, useContext, useRef, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
@@ -68,7 +68,7 @@ function LinkItem({ to, icon, children }: { to: string | null; icon: LucideIcon;
   )
 }
 
-const extraIcons: Record<string, LucideIcon> = { billing: CreditCard }
+const extraIcons: Record<string, LucideIcon> = { assignments: ClipboardList, billing: CreditCard }
 
 export function AccountMenu({
   avatarSize = 30,
