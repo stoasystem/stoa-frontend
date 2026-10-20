@@ -13,7 +13,8 @@ export const languageNameKeys: Record<SupportedLanguage, string> = {
 
 /**
  * Switch the app's language, and for a signed-in account record the choice
- * for next time. The screen changes at once; the write is fire and forget.
+ * for next time. The screen changes at once; the writes go out one after
+ * another, the last choice is the one stored, and a failed one says so.
  */
 export function useChangeLanguage() {
   const { i18n } = useTranslation('common')

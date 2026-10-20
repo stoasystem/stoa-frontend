@@ -1,6 +1,6 @@
 import i18n from 'i18next'
 import { initReactI18next } from 'react-i18next'
-import { getInitialLanguage, LANGUAGE_STORAGE_KEY, type SupportedLanguage } from '@/i18n/languages'
+import { getInitialLanguage, LANGUAGE_STORAGE_KEY, setShownLanguage, type SupportedLanguage } from '@/i18n/languages'
 import { namespaces } from '@/i18n/namespaces'
 import enCommon from '@/i18n/locales/en/common.json'
 import enAuth from '@/i18n/locales/en/auth.json'
@@ -147,9 +147,15 @@ void i18n
   })
 
 syncDocumentLanguage(i18n.language)
+setShownLanguage(i18n.language)
 
 i18n.on('languageChanged', (language) => {
   syncDocumentLanguage(language)
+  // Before anything else hears of the switch: AppProviders refetches every
+  // query on it, and those requests must already go out in the new language.
+  setShownLanguage(language)
+  // The choice for the next page load, in any tab. Other tabs open now keep
+  // the language they show (#403).
   if (typeof window !== 'undefined') {
     try {
       window.localStorage.setItem(LANGUAGE_STORAGE_KEY, language as SupportedLanguage)
