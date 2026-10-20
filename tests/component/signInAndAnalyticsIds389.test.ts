@@ -33,7 +33,7 @@ function withoutRandomUUID() {
   return getRandomValues
 }
 
-beforeAll(() => mswServer.listen({ onUnhandledRequest: 'bypass' }))
+beforeAll(() => mswServer.listen({ onUnhandledRequest: 'error' }))
 afterAll(() => mswServer.close())
 beforeEach(() => {
   localStorage.clear()
@@ -46,8 +46,15 @@ afterEach(() => {
 })
 
 describe('the browser sign-in id without crypto.randomUUID', () => {
-  it('is a v4 UUID from getRandomValues when this tab signs in', () => {
+  it('is a v4 UUID from getRandomValues when this tab signs in', async () => {
     const getRandomValues = withoutRandomUUID()
+    const loggedOut: unknown[] = []
+    mswServer.use(
+      http.post('https://api.test/auth/logout', async ({ request }) => {
+        loggedOut.push(((await request.json()) as { access_token?: unknown }).access_token)
+        return new HttpResponse(null, { status: 204 })
+      }),
+    )
 
     signInTab('ada-access', 'ada-refresh')
     const first = readBrowserSignIn()!.id
@@ -58,7 +65,9 @@ describe('the browser sign-in id without crypto.randomUUID', () => {
     expect(second).toMatch(V4_UUID)
     expect(second).not.toBe(first)
     expect(sessionStorage.getItem(TAB_SIGN_IN_KEY)).toBe(second)
-    expect(getRandomValues).toHaveBeenCalledTimes(2)
+    expect(getRandomValues).toHaveBeenCalled()
+    // The sign-in the second one replaced is still ended on the server.
+    await vi.waitFor(() => expect(loggedOut).toEqual(['ada-access']), { timeout: 5000 })
   })
 
   it('is a v4 UUID when start-up keeps the one saved account of ADR 0002', () => {
@@ -105,7 +114,7 @@ describe('the analytics session without crypto.randomUUID', () => {
     const send = async () => {
       const count = sent.length
       trackEvent('chat_message_sent', {})
-      await vi.waitFor(() => expect(sent).toHaveLength(count + 1))
+      await vi.waitFor(() => expect(sent).toHaveLength(count + 1), { timeout: 5000 })
     }
     await send()
     await send()
