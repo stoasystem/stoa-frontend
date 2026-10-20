@@ -62,7 +62,8 @@
     "reportContent": "Signaler ce contenu",
     "reportStudentContent": "Signaler le message de l’élève",
     "reportContext": "Envoyer le contexte de cette demande à la modération interne.",
-    "noNotes": "Aucune note d’enseignant pour l’instant."
+    "noNotes": "Aucune note d’enseignant pour l’instant.",
+    "replyPaused": "Impossible d’actualiser la demande pour le moment. Votre brouillon est conservé ; vous pourrez l’envoyer dès que la connexion sera rétablie."
   },
   "profile": {
     "eyebrow": "Compte enseignant",
@@ -185,7 +186,8 @@
       "accept": "Accepter",
       "reject": "Refuser",
       "archive": "Archiver"
-    }
+    },
+    "notApplicable": "Vous ne pouvez pas créer de brouillons pour cette demande pour le moment."
   },
   "reply": {
     "label": "Réponse de l’enseignant·e",

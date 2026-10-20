@@ -62,7 +62,8 @@
     "reportContent": "Report content",
     "reportStudentContent": "Report student content",
     "reportContext": "Send this request context to the internal moderation queue.",
-    "noNotes": "No teacher notes yet."
+    "noNotes": "No teacher notes yet.",
+    "replyPaused": "This request could not be refreshed just now. Your draft is kept; you can send it once the connection is back."
   },
   "profile": {
     "eyebrow": "Teacher account",
@@ -184,7 +185,8 @@
       "accept": "Accept",
       "reject": "Reject",
       "archive": "Archive"
-    }
+    },
+    "notApplicable": "You can’t create drafts for this request right now."
   },
   "reply": {
     "label": "Teacher reply",

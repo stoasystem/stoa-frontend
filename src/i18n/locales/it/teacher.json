@@ -62,7 +62,8 @@
     "reportContent": "Segnala il contenuto",
     "reportStudentContent": "Segnala il messaggio dello studente",
     "reportContext": "Invia il contesto di questa richiesta alla moderazione interna.",
-    "noNotes": "Ancora nessuna nota dell’insegnante."
+    "noNotes": "Ancora nessuna nota dell’insegnante.",
+    "replyPaused": "Al momento non è possibile aggiornare la richiesta. La tua bozza resta salvata: potrai inviarla appena la connessione torna."
   },
   "profile": {
     "eyebrow": "Account insegnante",
@@ -185,7 +186,8 @@
       "accept": "Accetta",
       "reject": "Rifiuta",
       "archive": "Archivia"
-    }
+    },
+    "notApplicable": "Al momento non puoi creare bozze per questa richiesta."
   },
   "reply": {
     "label": "Risposta del/la docente",

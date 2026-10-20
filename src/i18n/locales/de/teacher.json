@@ -62,7 +62,8 @@
     "reportContent": "Inhalt melden",
     "reportStudentContent": "Beitrag der lernenden Person melden",
     "reportContext": "Diesen Anfragekontext an die interne Moderation senden.",
-    "noNotes": "Noch keine Notizen der Lehrperson."
+    "noNotes": "Noch keine Notizen der Lehrperson.",
+    "replyPaused": "Die Anfrage konnte gerade nicht neu geladen werden. Ihr Entwurf bleibt erhalten; Sie können ihn senden, sobald die Verbindung wieder steht."
   },
   "profile": {
     "eyebrow": "Lehrpersonen-Konto",
@@ -184,7 +185,8 @@
       "accept": "Annehmen",
       "reject": "Ablehnen",
       "archive": "Archivieren"
-    }
+    },
+    "notApplicable": "Für diese Anfrage können Sie gerade keine Entwürfe erstellen."
   },
   "reply": {
     "label": "Antwort der Lehrperson",
