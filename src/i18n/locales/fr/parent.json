@@ -80,7 +80,8 @@
     "teacherHelp": "Aide enseignant",
     "teacherHelpDescription": "Demandes ou transmissions enregistrées cette semaine.",
     "weeklyReportLink": "Rapport hebdomadaire",
-    "learningHistoryLink": "Historique d’apprentissage"
+    "learningHistoryLink": "Historique d’apprentissage",
+    "progressLink": "Progression des exercices"
   },
   "accountOps": {
     "eyebrow": "Gestion du compte",

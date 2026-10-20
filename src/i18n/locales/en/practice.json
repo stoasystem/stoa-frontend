@@ -48,9 +48,6 @@
   "curriculumRollout": {
     "title": "Curriculum rollout",
     "description": "Active curriculum coverage, lesson bank depth, and progress signals.",
-    "parentTitle": "Curriculum rollout",
-    "parentDescription": "Parent-visible curriculum coverage and weak-area signals for active subjects.",
-    "parentContext": "Parent curriculum view",
     "teacherTitle": "Curriculum context",
     "teacherDescription": "Teacher-visible curriculum coverage for the current request subject.",
     "teacherContext": "Teacher preview",
@@ -115,7 +112,8 @@
     "signalsUnavailable": "Learning signals are unavailable right now.",
     "rolloutCore": "Core subject support",
     "rolloutFoundation": "Foundation profile support",
-    "noScore": "No score"
+    "noScore": "No score",
+    "questionsAsked": "Questions asked"
   },
   "progress": {
     "subjectActive": "Active",

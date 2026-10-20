@@ -155,7 +155,6 @@ describe('plain words instead of anglicisms', () => {
   it('names the curriculum panel in plain German', () => {
     const practice = JSON.parse(readFileSync(path.join(LOCALES, 'de/practice.json'), 'utf8'))
     expect(practice.curriculumRollout.title).toBe('Fächer und Lehrplan')
-    expect(practice.curriculumRollout.parentTitle).toBe('Fächer und Lehrplan')
     expect(practice.curriculumRollout.heading).toBe('Verfügbar: Mathematik, Physik, Deutsch und Englisch')
     expect(practice.curriculumRollout.rolloutSubjects).toBe('Verfügbare Fächer')
   })

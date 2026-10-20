@@ -1,3 +1,4 @@
+import type { TFunction } from 'i18next'
 import { useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { BackButton } from '@/components/common/BackButton'
@@ -6,23 +7,42 @@ import { PageActions } from '@/components/common/PageActions'
 import { ChildSummaryHeader } from '@/components/parent/ChildSummaryHeader'
 import { getActivityTypeLabel } from '@/components/parent/activityLabels'
 import { LearningProfileSignals } from '@/components/learning/LearningProfileSignals'
-import { CurriculumRolloutPanel } from '@/components/practice/CurriculumRolloutPanel'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { useCurriculumCatalogQuery } from '@/hooks/practice/useCurriculumCatalogQuery'
 import { useChildLearningProfileQuery } from '@/hooks/parent/useChildLearningProfileQuery'
 import { useChildLearningSummaryQuery } from '@/hooks/parent/useChildLearningSummaryQuery'
 import { DashboardLayout } from '@/layouts/DashboardLayout'
-import { getSubjectLabel } from '@/lib/displayLabels'
+import { getSubjectLabel, getTopicLabel } from '@/lib/displayLabels'
+import type { LearningProfile } from '@/types/learningProfile'
+import type { ChildLearningSummary } from '@/types/parent'
+
+/**
+ * A weak topic as a parent reads it. The summary's list mixes topic ids,
+ * subject ids and free-text knowledge points ("linear-equations", "math",
+ * "Brüche"); a subject reads as its name, an id as words, prose as sent (#339).
+ */
+function readableTopic(value: string, t: TFunction) {
+  const subject = getSubjectLabel(value, t)
+  if (subject !== value) return subject
+  if (/\s/.test(value.trim())) return value.trim()
+  return getTopicLabel(value, t)
+}
+
+// The learning profile's labelled topics first; the summary's ids only when
+// the profile has none to give.
+function weakTopicLabels(profile: LearningProfile | undefined, summary: ChildLearningSummary, t: TFunction) {
+  const source = profile && profile.weakTopics.length > 0
+    ? profile.weakTopics.map((topic) => topic.label || topic.topicId)
+    : summary.weakTopics
+  return [...new Set(source.map((value) => readableTopic(value, t)).filter(Boolean))]
+}
 
 export function ChildSummaryPage() {
-  const { t } = useTranslation('practice')
   const { t: tParent } = useTranslation('parent')
   const { childId } = useParams()
   const summaryQuery = useChildLearningSummaryQuery(childId)
   const learningProfileQuery = useChildLearningProfileQuery(childId)
-  const curriculumQuery = useCurriculumCatalogQuery()
   const summary = summaryQuery.data
-  const weakTopicLabels = learningProfileQuery.data?.weakTopics.map((topic) => topic.label) ?? summary?.weakTopics ?? []
+  const weakTopics = summary ? weakTopicLabels(learningProfileQuery.data, summary, tParent) : []
 
   return (
     <DashboardLayout>
@@ -36,8 +56,14 @@ export function ChildSummaryPage() {
           />
           <PageActions secondary={<BackButton label={tParent('summary.backLabel')} to="/parent" />} />
         </div>
-        {summaryQuery.isLoading && <p className="text-sm text-muted-foreground">{tParent('summary.loading')}</p>}
-        {summaryQuery.isError && <p className="text-sm text-destructive">{tParent('summary.loadFailed')}</p>}
+        {/* The page keeps a heading while the child loads or fails to (#339). */}
+        {!summary && <h1 className="text-2xl font-semibold">{tParent('childSummary')}</h1>}
+        {summaryQuery.isLoading && (
+          <p role="status" className="text-sm text-muted-foreground">{tParent('summary.loading')}</p>
+        )}
+        {summaryQuery.isError && (
+          <p role="alert" className="text-sm text-destructive">{tParent('summary.loadFailed')}</p>
+        )}
         {summary && (
           <>
             <ChildSummaryHeader summary={summary} />
@@ -75,25 +101,16 @@ export function ChildSummaryPage() {
               isLoading={learningProfileQuery.isLoading}
               isError={learningProfileQuery.isError}
             />
-            <CurriculumRolloutPanel
-              title={t('curriculumRollout.parentTitle')}
-              description={t('curriculumRollout.parentDescription')}
-              catalog={curriculumQuery.data}
-              isLoading={curriculumQuery.isLoading}
-              isError={curriculumQuery.isError}
-              contextLabel={t('curriculumRollout.parentContext')}
-              weakTopicLabels={weakTopicLabels}
-            />
             <div className="grid gap-4 lg:grid-cols-2">
               <Card>
                 <CardHeader>
                   <CardTitle className="text-lg">{tParent('summary.weakTopics')}</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-2">
-                  {summary.weakTopics.length === 0 && (
+                  {weakTopics.length === 0 && (
                     <p className="text-sm text-muted-foreground">{tParent('summary.noWeakTopics')}</p>
                   )}
-                  {summary.weakTopics.map((topic) => (
+                  {weakTopics.map((topic) => (
                     <p key={topic} className="text-sm">
                       {topic}
                     </p>

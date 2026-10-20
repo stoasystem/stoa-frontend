@@ -80,7 +80,8 @@
     "teacherHelp": "Teacher help",
     "teacherHelpDescription": "Requests or escalations recorded this week.",
     "weeklyReportLink": "Weekly report",
-    "learningHistoryLink": "Learning history"
+    "learningHistoryLink": "Learning history",
+    "progressLink": "Practice progress"
   },
   "accountOps": {
     "eyebrow": "Account operations",
