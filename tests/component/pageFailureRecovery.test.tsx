@@ -405,28 +405,46 @@ describe('vite:preloadError', () => {
     expect(target.location.reload).toHaveBeenCalledTimes(2)
   })
 
-  it('does not reload again in the document its reload made, however late that page fails', () => {
-    let now = 1_000_000
-    const target = Object.assign(fakeWindow(), { performance: { timeOrigin: 0 } })
-    stop = installChunkReload(target as unknown as Window, () => now)
+  /** A window whose document began at `began`, on the same clock as `now`. */
+  function windowBegunAt(clock: { now: number; began: number }) {
+    return Object.assign(fakeWindow(), { performance: { now: () => clock.now - clock.began } })
+  }
+
+  it('does not reload again in the document its reload made, even when its page fails after the window', () => {
+    const clock = { now: 1_000_000, began: 0 }
+    const target = windowBegunAt(clock)
+    stop = installChunkReload(target as unknown as Window, () => clock.now)
     expect(reloadForFailedPage(fire(target).error)).toBe(true)
 
     // The reloaded document began just after; its page hung past the window, then failed.
-    target.performance.timeOrigin = now + 150
-    now += CHUNK_RELOAD_WINDOW_MS + 5_000
+    clock.began = clock.now + 150
+    clock.now += CHUNK_RELOAD_WINDOW_MS + 5_000
+    expect(reloadForFailedPage(fire(target).error)).toBe(false)
+    expect(target.location.reload).toHaveBeenCalledTimes(1)
+  })
+
+  it('counts a document that seems to have begun a moment before the reload as the one it made', () => {
+    const clock = { now: 1_000_000, began: 0 }
+    const target = windowBegunAt(clock)
+    stop = installChunkReload(target as unknown as Window, () => clock.now)
+    expect(reloadForFailedPage(fire(target).error)).toBe(true)
+
+    // Worked out from two clocks, the start can come out a little early.
+    clock.began = clock.now - 5
+    clock.now += CHUNK_RELOAD_WINDOW_MS + 5_000
     expect(reloadForFailedPage(fire(target).error)).toBe(false)
     expect(target.location.reload).toHaveBeenCalledTimes(1)
   })
 
   it('may reload again in a document begun long after its last reload', () => {
-    let now = 1_000_000
-    const target = Object.assign(fakeWindow(), { performance: { timeOrigin: 0 } })
-    stop = installChunkReload(target as unknown as Window, () => now)
+    const clock = { now: 1_000_000, began: 0 }
+    const target = windowBegunAt(clock)
+    stop = installChunkReload(target as unknown as Window, () => clock.now)
     expect(reloadForFailedPage(fire(target).error)).toBe(true)
 
     // The reader opened the app afresh a minute later.
-    target.performance.timeOrigin = now + 60_000
-    now += 65_000
+    clock.began = clock.now + 60_000
+    clock.now += 65_000
     expect(reloadForFailedPage(fire(target).error)).toBe(true)
     expect(target.location.reload).toHaveBeenCalledTimes(2)
   })

@@ -25,18 +25,26 @@
 export const CHUNK_RELOAD_KEY = 'stoa_chunk_reload_at'
 
 /**
- * A failure this soon after our own reload is the same one again, and so is
- * any failure in a document that began this soon after it -- the document the
- * reload made -- however long its page took to fail. Counting only from the
- * reload, a page whose module hung past the window before it failed reloaded
- * the tab again and again, and never showed its error (#401 audit).
+ * A failure this soon after our own reload is the same one again, and so is a
+ * failure in a document that began this soon after it: the document the
+ * reload made, judged by when it began rather than when its page failed.
+ * Counted only from the reload, a page whose module hung past the window
+ * before it failed reloaded the tab again and again, and never showed its
+ * error (#401 audit).
  */
 export const CHUNK_RELOAD_WINDOW_MS = 30_000
 
+/**
+ * How far before our reload the document it made may seem to have begun.
+ * Worked out as `Date.now() - performance.now()`, the start comes out up to a
+ * millisecond or so early in Chromium; a clock set back a little does the same.
+ */
+const CLOCK_SLACK_MS = 1_000
+
 type ReloadTarget = Pick<Window, 'addEventListener' | 'removeEventListener' | 'sessionStorage'> & {
   location: Pick<Location, 'reload'>
-  /** When this document began, if it can be read. */
-  performance?: Pick<Performance, 'timeOrigin'>
+  /** Time since this document began, if it can be read. */
+  performance?: Pick<Performance, 'now'>
 }
 
 type Listening = {
@@ -98,8 +106,14 @@ export function reloadForFailedPage(error: unknown): boolean {
   const at = now()
   const previous = lastReload(target)
   if (previous !== null) {
-    const soonAfter = (time: number) => time - previous >= 0 && time - previous < CHUNK_RELOAD_WINDOW_MS
-    if (soonAfter(at) || soonAfter(target.performance?.timeOrigin ?? NaN)) return false
+    // When this document began, on the same clock as the reload's record.
+    // Not `performance.timeOrigin`: Firefox's source works that out from a
+    // clock fixed once per process, which can fall behind `Date.now()` -- by
+    // hours, once the computer has slept.
+    const began = at - (target.performance?.now() ?? NaN)
+    const sinceReload = at - previous
+    if (sinceReload >= 0 && sinceReload < CHUNK_RELOAD_WINDOW_MS) return false
+    if (began - previous >= -CLOCK_SLACK_MS && began - previous < CHUNK_RELOAD_WINDOW_MS) return false
   }
   // Without a record of this reload the next failure could not tell it was
   // the same one, so with blocked storage nothing reloads at all.

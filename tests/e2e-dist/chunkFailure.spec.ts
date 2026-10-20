@@ -143,6 +143,13 @@ test('a page whose chunk hangs past the window before it fails again after the r
 }) => {
   test.setTimeout(120_000)
   new StudentWorld(backend).install()
+  // As if the page's two clocks disagreed by half a second: when the reloaded
+  // document began, worked out from them, comes out before the reload that
+  // made it, as it does by a millisecond in about a third of Chromium's reloads.
+  await page.addInitScript(() => {
+    const elapsed = performance.now.bind(performance)
+    Object.defineProperty(performance, 'now', { value: () => elapsed() + 500 })
+  })
   const documents = documentLoads(page)
   let requests = 0
   await page.route('**/assets/MapPages-*.js', async (route) => {
