@@ -34,6 +34,13 @@ export type MathSegment =
   | { type: 'inline'; value: string }
   | { type: 'block'; value: string }
 
+/**
+ * What a pair of dollars with space just inside must hold to be a formula: a
+ * TeX command or mark, a letter beside an operator (x + 1, 2x - 3), or one term
+ * with no space in it (x, 2x, f(x)). The words between two prices have none.
+ */
+const PADDED_MATHS_RE = /[\\^_{}=]|\p{L}\s*[-+*/<>]|[-+*/<>]\s*\p{L}|^\S+$/u
+
 /** Split a string into text / inline-math / block-math segments. */
 export function parseSegments(text: string): MathSegment[] {
   const segments: MathSegment[] = []
@@ -42,16 +49,28 @@ export function parseSegments(text: string): MathSegment[] {
   // dollars -- no space just inside either one -- and its closing dollar is
   // not followed by a digit, as in Pandoc: so "it costs $5 and the book $10"
   // stays a sentence about money (#370).
-  const RE = /(\$\$[\s\S]+?\$\$|\$[^\s$](?:[^$\n]*?[^\s$])?\$(?!\d))/g
+  //
+  // Models and teachers also write "$ x^2 + 1 $", so a pair with space inside
+  // is read too when what it holds is maths, its opening dollar does not follow
+  // a number ("5 $ et 10 $") and its closing one is not followed by a number,
+  // even after a space ("$ 5 or $ 10") (#386).
+  const RE = /(\$\$[\s\S]+?\$\$|\$[^\s$](?:[^$\n]*?[^\s$])?\$(?!\d))|((?<!\d[ \t]*)\$[^$\n]*?\$(?![ \t]*\d))/g
   let lastIndex = 0
   let match: RegExpExecArray | null
 
   while ((match = RE.exec(text)) !== null) {
+    const padded = match[2]
+    if (padded && !PADDED_MATHS_RE.test(padded.slice(1, -1).trim())) {
+      // Not a formula; its closing dollar may still open one.
+      RE.lastIndex = match.index + 1
+      continue
+    }
+
     if (match.index > lastIndex) {
       segments.push({ type: 'text', value: text.slice(lastIndex, match.index) })
     }
 
-    const raw = match[1]
+    const raw = match[0]
     if (raw.startsWith('$$')) {
       segments.push({ type: 'block', value: raw.slice(2, -2).trim() })
     } else {

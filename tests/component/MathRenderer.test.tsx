@@ -294,3 +294,77 @@ describe('money is not a formula (#370)', () => {
     expect(container.textContent).toContain('It costs $5, so ')
   })
 })
+
+describe('a formula with space inside its dollars (#386)', () => {
+  // #370 asked for no space just inside an inline formula's dollars, so what
+  // models and teachers often write, "$ x^2 + 1 $", showed as written.
+  beforeAll(async () => {
+    await import('@/components/ui/katexLoader')
+  })
+
+  it.each([
+    ['$ 2x $', '2x'],
+    ['$ x^2 + 1 $', 'x^2 + 1'],
+    ['$ x + 1 $', 'x + 1'],
+    ['$ a = b $.', 'a = b'],
+    ['$ \\frac{1}{2} $', '\\frac{1}{2}'],
+    ['$ x $', 'x'],
+    ['$ f(x) $', 'f(x)'],
+    ['$ 12 $', '12'],
+    ['$x^2 $', 'x^2'],
+    ['$ 2x$', '2x'],
+    ['($ a_1 $)', 'a_1'],
+  ])('reads %j as an inline formula', (written, tex) => {
+    expect(parseSegments(written).filter((segment) => segment.type !== 'text')).toEqual([{ type: 'inline', value: tex }])
+  })
+
+  it('reads each padded formula of a sentence on its own', () => {
+    expect(parseSegments('Berechne $ 2x $ für $ x = 3 $.')).toEqual([
+      { type: 'text', value: 'Berechne ' },
+      { type: 'inline', value: '2x' },
+      { type: 'text', value: ' für ' },
+      { type: 'inline', value: 'x = 3' },
+      { type: 'text', value: '.' },
+    ])
+  })
+
+  it.each([
+    'from $ 3 - $ 4 each',
+    'from $3 – $4 each',
+    'from $ 3 – $ 4 each',
+    'between $ 20,000 and $ 30,000 a year',
+    'costs $ 5k or $ 10k',
+    'costs $ 5 + tax, so $ 6 in all',
+    'costs $ 5 or $10',
+    'costs $5 or $ 10',
+    'Le cahier coûte 5 $ et le livre 10 $.',
+    'Le cahier coûte 5 $ et le livre bien-aimé 10 $.',
+    'Il paie 5 $ + 2 $ = 7 $.',
+    'It costs $ 5 today, and that is $ all',
+  ])('still leaves %j as text', (sentence) => {
+    expect(parseSegments(sentence)).toEqual([{ type: 'text', value: sentence }])
+  })
+
+  it('reads a padded formula beside a padded price on the same line', () => {
+    expect(parseSegments('It costs $ 5, so $ x = 5 $ here')).toEqual([
+      { type: 'text', value: 'It costs $ 5, so ' },
+      { type: 'inline', value: 'x = 5' },
+      { type: 'text', value: ' here' },
+    ])
+  })
+
+  it('typesets a padded formula in an answer', async () => {
+    const { container } = render(<MathRenderer>{'Also ist $ x^2 + 1 $ immer positiv.'}</MathRenderer>)
+    await waitFor(() => expect(container.querySelector('.katex')).not.toBeNull())
+    expect(container.querySelectorAll('.math-inline')).toHaveLength(1)
+    expect(container.textContent).not.toContain('$')
+  })
+
+  it("typesets a padded formula in a teacher's reply", async () => {
+    const { container } = render(<MathRenderer plain>{'Setze $ 2x $ ein, dann 2*3*4.'}</MathRenderer>)
+    await waitFor(() => expect(container.querySelector('.katex')).not.toBeNull())
+    expect(container.querySelectorAll('.math-inline')).toHaveLength(1)
+    expect(container.textContent).toContain(' ein, dann 2*3*4.')
+    expect(container.textContent).not.toContain('$')
+  })
+})
