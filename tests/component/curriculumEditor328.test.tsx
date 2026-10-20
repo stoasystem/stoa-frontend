@@ -133,7 +133,7 @@ describe('switching versions', () => {
   })
 
   it('drops the submit-review error and the diff base of lesson A', async () => {
-    submit.mockRejectedValue(new ApiError('nope', 409, 'not_draft', { detail: 'not_draft' }))
+    submit.mockRejectedValue(new ApiError('nope', { status: 409, code: 'not_draft' }))
     const user = userEvent.setup()
     renderPage()
     await open(user, 'lesson-a', 'Review')
@@ -177,7 +177,7 @@ describe('the current content', () => {
   })
 
   it('says it failed instead of showing an empty lesson, and offers a retry', async () => {
-    preview.mockRejectedValueOnce(new ApiError('down', 503))
+    preview.mockRejectedValueOnce(new ApiError('down', { status: 503 }))
     const user = userEvent.setup()
     renderPage()
     await open(user, 'lesson-a', 'Editor')
