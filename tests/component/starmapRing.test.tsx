@@ -422,6 +422,24 @@ describe('across the seam: taps, the lighting overlay, the switcher, keyboard fo
     }
   })
 
+  it('stays where the student is looking when the galaxy asked for is not on the band (#329)', () => {
+    // A subject with no knowledge points has no galaxy. Flying to the first
+    // one instead took the student somewhere they had not asked to go.
+    for (const from of ['physics', 'chemistry']) {
+      const s = session(1440, 900, 1000, from, false)
+      s.clock.advance(2000)
+      const before = s.engine.currentView
+      s.centred.mockClear()
+      s.engine.setData({ ...s.map, subject: { subjectId: 'history', name: 'History' } }, { layer: 'map' })
+      s.clock.advance(2000)
+      expect(s.engine.currentView.cx, from).toBeCloseTo(before.cx, 9)
+      expect(s.engine.currentView.k, from).toBeCloseTo(before.k, 9)
+      // At rest the route follows the galaxy in view, not the first one.
+      expect(s.centred.mock.calls.map(([id]) => id), from).toEqual([from])
+      s.engine.destroy()
+    }
+  })
+
   it('lands on the clicked galaxy, not back on the old one, when the switch brings another sky (#123)', () => {
     // A link that drops `?points=` (or a backend answer of another size) hands
     // over a sky of a different layout with another galaxy in focus.

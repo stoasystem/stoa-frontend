@@ -9,6 +9,12 @@
     "title": "La tua mappa stellare sta arrivando",
     "body": "Le tue materie e i tuoi punti di conoscenza appariranno qui appena saranno pronti."
   },
+  "loadingSky": "Caricamento della tua mappa stellare…",
+  "skyError": {
+    "title": "Non è stato possibile caricare la tua mappa stellare",
+    "body": "Controlla la connessione e riprova.",
+    "retry": "Riprova"
+  },
   "help": {
     "open": "Come funziona la mappa stellare",
     "close": "Chiudi"

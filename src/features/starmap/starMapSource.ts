@@ -42,11 +42,18 @@ export type StarMapRequest = {
   longNames: boolean
 }
 
+/** Where the sky is (#329): still on the wire, could not be read, or here (perhaps empty). */
+export type StarMapReadStatus = 'pending' | 'error' | 'success'
+
 export type StarMapSource = {
   /** The map to draw. Must be pure; a new source means the states changed. */
   read: (request: StarMapRequest) => StarMap
   /** The map is demo content: the view shows the Demo notice and the placeholder-star note. */
   demo: boolean
+  /** Whether `read` has the sky yet. A source that has it at once leaves this out: `success`. */
+  status?: StarMapReadStatus
+  /** Ask for the sky again after an `error`. */
+  retry?: () => void
 }
 
 /** A sky with nothing in it yet: what the application draws until #48. */

@@ -9,6 +9,12 @@
     "title": "Your star map is on its way",
     "body": "Your subjects and knowledge points will appear here as soon as they are ready."
   },
+  "loadingSky": "Loading your star map…",
+  "skyError": {
+    "title": "Your star map didn’t load",
+    "body": "Check your connection and try again.",
+    "retry": "Try again"
+  },
   "help": {
     "open": "How the star map works",
     "close": "Close"

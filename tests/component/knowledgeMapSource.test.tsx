@@ -116,17 +116,36 @@ describe('the star map source behind a signed-in student', () => {
     expect(map.stars).toEqual([])
     expect(map.subjects).toEqual([])
     expect(map.subject.name).toBe('')
+    // ...and says so, so the route can draw a skeleton rather than "on its way" (#329).
+    expect(result.current.status).toBe('pending')
   })
 
-  it('is the empty sky when the read fails, rather than an error page', async () => {
+  it('says the sky is here once it is, even when it came back empty (#329)', async () => {
+    signIn('student')
+    mockedGet.mockResolvedValue(sky({ galaxies: [], nebulae: [], stars: [] }))
+
+    const { result } = renderHook(() => useStarMapSource(), { wrapper })
+
+    await waitFor(() => expect(result.current.status).toBe('success'))
+    expect(result.current.read(request('math')).subjects).toEqual([])
+  })
+
+  it('reads as the empty sky when the read fails, and says it failed', async () => {
     signIn('student')
     mockedGet.mockRejectedValue(new Error('nope'))
 
     const { result } = renderHook(() => useStarMapSource(), { wrapper })
 
-    await waitFor(() => expect(mockedGet).toHaveBeenCalled())
+    // The source tries once more on its own before it gives up.
+    await waitFor(() => expect(result.current.status).toBe('error'), { timeout: 5000 })
     expect(result.current.read(request('math')).stars).toEqual([])
-  })
+
+    // The route's retry asks again (#329).
+    mockedGet.mockResolvedValue(sky())
+    result.current.retry?.()
+    await waitFor(() => expect(result.current.status).toBe('success'))
+    expect(result.current.read(request('math')).stars).toHaveLength(3)
+  }, 10_000)
 
   it('never says it is demo content', async () => {
     signIn('student')
@@ -216,6 +235,76 @@ describe('where the stars are put', () => {
     const xs = map.stars.map((s) => s.x)
 
     expect(Math.max(...xs) - Math.min(...xs)).toBeGreaterThan(0.01)
+  })
+})
+
+describe('a subject with no knowledge points yet (#329)', () => {
+  const withHistory = () =>
+    sky({
+      galaxies: [
+        { subjectId: 'math', name: 'Mathematik', lit: 1, total: 2, enrolled: true },
+        { subjectId: 'history', name: 'Geschichte', lit: 0, total: 0, enrolled: true },
+        { subjectId: 'physics', name: 'Physik', lit: 0, total: 1, enrolled: false },
+      ],
+    })
+
+  it('does not collapse the sky: every star keeps a place of its own', () => {
+    // On main 5a4f41d9 a galaxy with no nebulae made the whole layout NaN and
+    // every star in the sky was drawn at (0, 0.5).
+    const map = projectStarMap(withHistory(), request('math'))
+
+    expect(map.stars.every((s) => Number.isFinite(s.x) && Number.isFinite(s.y))).toBe(true)
+    expect(new Set(map.stars.map((s) => `${s.x},${s.y}`)).size).toBe(3)
+  })
+
+  it('is left out of the switcher, which has no galaxy to fly to for it', () => {
+    expect(projectStarMap(withHistory(), request('math')).subjects.map((g) => g.subjectId)).toEqual(['math', 'physics'])
+  })
+
+  it('also when it has topics but no knowledge points under them', () => {
+    const topicsOnly = sky({
+      galaxies: [...sky().galaxies, { subjectId: 'history', name: 'Geschichte', lit: 0, total: 0, enrolled: true }],
+      nebulae: [...sky().nebulae, { topicId: 't3', name: 'Rom', order: 0, subjectId: 'history' }],
+    })
+    expect(projectStarMap(topicsOnly, request('math')).subjects.map((g) => g.subjectId)).toEqual(['math', 'physics'])
+  })
+})
+
+describe('one placement per sky (#329)', () => {
+  // The engine keeps its scene while the stars array is the same one; a new
+  // array rebuilds it, blinking the names and dropping a drag in progress.
+  it('hands over the same stars when only the galaxy in focus changes', () => {
+    const response = sky()
+    const math = projectStarMap(response, request('math'))
+    const physics = projectStarMap(response, request('physics'))
+
+    expect(physics.stars).toBe(math.stars)
+    expect(physics.subjects).toBe(math.subjects)
+  })
+
+  it('and when an acknowledgement hands over a new response with the same sky in it', () => {
+    const response = sky()
+    const before = projectStarMap(response, request('math'))
+    const acknowledged = { ...response, unacknowledgedLit: [] }
+
+    expect(projectStarMap(acknowledged, request('math')).stars).toBe(before.stars)
+  })
+
+  it('places afresh when the sky itself changed', () => {
+    const response = sky()
+    const before = projectStarMap(response, request('math'))
+    const regrouped = { ...response, nebulae: [...response.nebulae] }
+
+    expect(projectStarMap(regrouped, request('math')).stars).not.toBe(before.stars)
+  })
+
+  it('is the same object through the source for every read of one response', async () => {
+    signIn('student')
+    mockedGet.mockResolvedValue(sky())
+    const { result } = renderHook(() => useStarMapSource(), { wrapper })
+
+    await waitFor(() => expect(result.current.status).toBe('success'))
+    expect(result.current.read(request('physics')).stars).toBe(result.current.read(request('math')).stars)
   })
 })
 

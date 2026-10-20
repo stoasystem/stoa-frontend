@@ -1080,8 +1080,12 @@ export class StarMapEngine {
     if (!this.map || this.viewport.width === 0) return overviewView(this.bounds, this.viewport)
     if (target.layer === 'map') {
       if (this.skyGalaxies.length === 0) return this.limit(overviewView(this.bounds, this.viewport))
-      const galaxy = this.skyGalaxies.find((candidate) => candidate.subjectId === this.map!.subject.subjectId) ?? this.skyGalaxies[0]
-      return this.limit(this.onRing(galaxyView(galaxy, this.skyGalaxies, this.bounds, this.viewport)))
+      const galaxy = this.skyGalaxies.find((candidate) => candidate.subjectId === this.map!.subject.subjectId)
+      // A subject with no galaxy on the band (no knowledge points, #329): once
+      // the sky is drawn, stay where the student is looking rather than fly
+      // to the first galaxy; at rest the route follows the galaxy in view.
+      if (!galaxy && this.drewFirstFrame) return this.view
+      return this.limit(this.onRing(galaxyView(galaxy ?? this.skyGalaxies[0], this.skyGalaxies, this.bounds, this.viewport)))
     }
     const glyphK = (glyph: number) => kForGlyph(glyph, this.viewport, this.bounds, this.spacing)
     if (target.layer === 'nebula' && target.whole) {

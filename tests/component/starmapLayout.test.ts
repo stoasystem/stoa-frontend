@@ -329,3 +329,50 @@ describe('the zoom flight between layers', () => {
     }
   })
 })
+
+describe('a subject with no topics yet (#329)', () => {
+  const finite = (p: { x: number; y: number }) => Number.isFinite(p.x) && Number.isFinite(p.y)
+  const stars = [
+    { unitId: 'u1', nebulaId: 't1', order: 0 },
+    { unitId: 'u2', nebulaId: 't1', order: 1 },
+    { unitId: 'u3', nebulaId: 't2', order: 0 },
+  ]
+
+  it('takes no room on the band and leaves the other galaxies where they would be', () => {
+    // On main 5a4f41d9 an empty galaxy's bounds were Infinity to -Infinity:
+    // the band's length went NaN and every star landed on (0, 0.5).
+    const withEmpty = layoutSky(
+      [
+        { id: 'math', nebulae: [{ id: 't1', order: 0, size: 2 }] },
+        { id: 'history', nebulae: [] },
+        { id: 'physics', nebulae: [{ id: 't2', order: 0, size: 1 }] },
+      ],
+      stars,
+      [],
+      116,
+    )
+    const without = layoutSky(
+      [
+        { id: 'math', nebulae: [{ id: 't1', order: 0, size: 2 }] },
+        { id: 'physics', nebulae: [{ id: 't2', order: 0, size: 1 }] },
+      ],
+      stars,
+      [],
+      116,
+    )
+
+    expect([...withEmpty.stars.values()].every(finite)).toBe(true)
+    expect([...withEmpty.nebulae.values()].every(finite)).toBe(true)
+    expect(new Set([...withEmpty.stars.values()].map((p) => `${p.x},${p.y}`)).size).toBe(3)
+    expect(withEmpty.galaxies.has('history')).toBe(false)
+    expect([...withEmpty.stars]).toEqual([...without.stars])
+  })
+
+  it('is an empty layout when no subject has a topic, never NaN', () => {
+    const none = layoutSky([{ id: 'history', nebulae: [] }], [], [], 116)
+    expect(none.galaxies.size).toBe(0)
+    expect(none.nebulae.size).toBe(0)
+    expect(none.stars.size).toBe(0)
+    expect(layoutSky([], [], [], 116).galaxies.size).toBe(0)
+  })
+})

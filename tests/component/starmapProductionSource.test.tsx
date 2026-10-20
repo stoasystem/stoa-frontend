@@ -16,11 +16,18 @@ import { AppRouter } from '@/app/router/AppRouter'
 import { DemoStarMapSource } from '@/dev/demo/sky/source'
 import i18n from '@/i18n'
 import { getCurrentUser } from '@/services/auth/authApi'
+import { getKnowledgeMap } from '@/services/practice/practiceApi'
 import { TOKEN_KEY, useAuthStore, type CurrentUser } from '@/store/authStore'
 
 vi.mock('@/services/auth/authApi', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@/services/auth/authApi')>()),
   getCurrentUser: vi.fn(),
+}))
+// A sky with nothing in it yet: the read model answered, and no subject has knowledge points.
+// (Loading and a failed read draw a skeleton and an error instead, #329.)
+vi.mock('@/services/practice/practiceApi', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@/services/practice/practiceApi')>()),
+  getKnowledgeMap: vi.fn(),
 }))
 // The bell polls the backend; it has nothing to do with the map.
 vi.mock('@/components/notifications/NotificationCenter', () => ({ NotificationCenter: () => null }))
@@ -55,6 +62,14 @@ describe('the star map in the application (#131)', () => {
   beforeEach(async () => {
     await i18n.changeLanguage('en')
     vi.mocked(getCurrentUser).mockResolvedValue(student)
+    vi.mocked(getKnowledgeMap).mockResolvedValue({
+      subjectId: 'math',
+      galaxies: [],
+      nebulae: [],
+      stars: [],
+      prerequisites: [],
+      summary: { lit: 0, total: 0, streakDays: 0, score: 0 },
+    })
     // jsdom has no 2D canvas; the demo sky draws nothing but keeps its DOM.
     vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue(null)
   })
