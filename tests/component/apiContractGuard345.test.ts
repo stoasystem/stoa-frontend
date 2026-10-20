@@ -80,6 +80,7 @@ describe('the method a fetch sends (#374)', () => {
       "fetch(`${apiBaseUrl}/auth/logout`, { ...init, method: 'POST' } as RequestInit)",
       [post],
     ],
+    ['a method held as a constant type', "fetch(`${apiBaseUrl}/auth/logout`, { method: 'POST' as const })", [post]],
   ])('%s', (_form, source, calls) => {
     expect(one(source)).toEqual({ calls, unparsed: [] })
   })
@@ -90,6 +91,8 @@ describe('the method a fetch sends (#374)', () => {
     ['spread options after the method', "fetch(`${apiBaseUrl}/auth/logout`, { method: 'POST', ...init })"],
     ['a method held in a variable', 'fetch(`${apiBaseUrl}/auth/logout`, { method: verb })'],
     ['a method in shorthand', 'fetch(`${apiBaseUrl}/auth/logout`, { method })'],
+    ['a method under a computed key', "fetch(`${apiBaseUrl}/auth/logout`, { [key]: 'POST' })"],
+    ['a computed key after the method', "fetch(`${apiBaseUrl}/auth/logout`, { method: 'POST', [key]: value })"],
     // Seen by the scan but not a call to the parser: reported, never dropped.
     ['a fetch in a comment', '// fetch(`${apiBaseUrl}/auth/logout`)'],
   ])('refuses %s', (_form, source) => {

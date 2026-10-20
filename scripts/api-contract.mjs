@@ -115,26 +115,31 @@ function fetchMethods(file, source) {
   return methods
 }
 
-// GET when there are no options or they name no method; null when the method
-// could come from somewhere this cannot see (a variable, a spread after it).
-function methodOf(options) {
+// `x as T`, `x satisfies T` and `(x)` are x.
+function unwrap(node) {
   while (
-    options &&
-    (ts.isParenthesizedExpression(options) || ts.isAsExpression(options) || ts.isSatisfiesExpression(options))
+    node &&
+    (ts.isParenthesizedExpression(node) || ts.isAsExpression(node) || ts.isSatisfiesExpression(node))
   ) {
-    options = options.expression
+    node = node.expression
   }
+  return node
+}
+
+// GET when there are no options or they name no method; null when the method
+// could come from somewhere this cannot see (a variable, a spread or a
+// computed key after it).
+function methodOf(argument) {
+  const options = unwrap(argument)
   if (!options) return 'GET'
   if (!ts.isObjectLiteralExpression(options)) return null
   let method = 'GET'
   for (const property of options.properties) {
-    if (ts.isSpreadAssignment(property)) {
+    if (ts.isSpreadAssignment(property) || ts.isComputedPropertyName(property.name)) {
       method = null
-    } else if (property.name && !ts.isComputedPropertyName(property.name) && property.name.text === 'method') {
-      method =
-        ts.isPropertyAssignment(property) && ts.isStringLiteralLike(property.initializer)
-          ? property.initializer.text.toUpperCase()
-          : null
+    } else if (property.name.text === 'method') {
+      const value = ts.isPropertyAssignment(property) && unwrap(property.initializer)
+      method = value && ts.isStringLiteralLike(value) ? value.text.toUpperCase() : null
     }
   }
   return method
