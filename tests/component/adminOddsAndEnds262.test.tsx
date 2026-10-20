@@ -142,7 +142,7 @@ describe('linking a child while a usage day is set', () => {
     const dialog = await screen.findByRole('dialog')
     await user.click(within(dialog).getByRole('button', { name: enAdmin.parentLinks.confirm.submit }))
 
-    await screen.findByTestId('parent-link-notice')
+    await waitFor(() => expect(screen.getByTestId('parent-link-notice')).not.toBeEmptyDOMElement())
     await waitFor(() => expect(mockedOperations).toHaveBeenCalledTimes(2))
     expect(mockedOperations).toHaveBeenLastCalledWith('parent-1', '2026-07-03')
   })

@@ -13,7 +13,7 @@
  * and shows the account number the administrator finds them by.
  */
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { render, screen, waitFor, within } from '@testing-library/react'
+import { act, render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import type { ReactNode } from 'react'
 import { MemoryRouter } from 'react-router-dom'
@@ -177,8 +177,8 @@ describe('the administrator assigns a child to a parent', () => {
       relationship: 'child',
     })
 
-    const notice = await screen.findByTestId('parent-link-notice')
-    expect(notice).toHaveTextContent('Nina Vogt')
+    const notice = screen.getByTestId('parent-link-notice')
+    await waitFor(() => expect(notice).toHaveTextContent('Nina Vogt'))
     expect(notice).toHaveTextContent('Rita Vogt')
   })
 
@@ -229,6 +229,20 @@ describe('the administrator assigns a child to a parent', () => {
     const failure = await screen.findByTestId('parent-link-error')
     expect(failure).toHaveTextContent(enAdmin.parentLinks.failed)
     expect(failure).not.toHaveTextContent('Field required')
+  })
+
+  it('says who was linked in a status line already on the page (#410)', async () => {
+    let finish: (value: unknown) => void = () => {}
+    mockedAssign.mockReturnValue(new Promise((resolve) => { finish = resolve }) as never)
+    await assignOnConsole()
+
+    // A live region put on the page together with its words is not read out.
+    const line = screen.getByTestId('parent-link-notice')
+    expect(line).toHaveAttribute('role', 'status')
+    expect(line).toBeEmptyDOMElement()
+    await act(async () => finish({}))
+    await waitFor(() => expect(line).toHaveTextContent('Nina Vogt'))
+    expect(screen.getByTestId('parent-link-notice')).toBe(line)
   })
 })
 

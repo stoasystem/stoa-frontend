@@ -736,8 +736,8 @@
       "validation": "Validation",
       "runValidation": "Lancer la validation",
       "diff": "Comparaison",
-      "fromVersion": "depuis la version",
-      "toVersion": "vers la version",
+      "fromVersion": "Depuis la version",
+      "toVersion": "Vers la version",
       "compare": "Comparer",
       "title": "Relecture et audit",
       "submit": "Soumettre",
@@ -777,7 +777,7 @@
     },
     "evidence": {
       "title": "Preuves de migration",
-      "idPlaceholder": "ID de migration",
+      "idLabel": "ID de migration",
       "load": "Charger les preuves",
       "missingCapability": "Capacité d’opérateur de migration ou d’éditeur manquante."
     },

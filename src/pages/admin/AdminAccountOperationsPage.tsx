@@ -325,11 +325,11 @@ function ParentLinkAssignment({ parentId, lookedUp }: { parentId: string; looked
           </DialogContent>
         </Dialog>
 
-        {notice && (
-          <p className="mt-4 text-sm text-foreground" role="status" data-testid="parent-link-notice">
-            {notice}
-          </p>
-        )}
+        {/* Always mounted, only its text changes: a live region added together
+            with its words is not announced (#410). */}
+        <p className={notice ? 'mt-4 text-sm text-foreground' : 'sr-only'} role="status" data-testid="parent-link-notice">
+          {notice}
+        </p>
         {failure && (
           <p className="mt-4 text-sm text-destructive" role="alert" data-testid="parent-link-error">
             {failure}

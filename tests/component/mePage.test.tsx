@@ -678,7 +678,7 @@ describe('the year group on /me (#154)', () => {
     await user.type(field, '  Year 6 ')
     await user.click(save)
 
-    expect(await within(section).findByRole('status')).toHaveTextContent(grade.saved)
+    await waitFor(() => expect(within(section).getByRole('status')).toHaveTextContent(grade.saved))
     expect(seen.profile).toEqual([{ grade: 'Year 6' }])
     expect(field).toHaveValue('Year 6')
     expect(save).toBeDisabled()
@@ -706,6 +706,24 @@ describe('the year group on /me (#154)', () => {
     expect(await within(section).findByRole('alert')).toHaveTextContent(grade.saveFailed)
     expect(seen.profile).toHaveLength(1)
     expect(field).toHaveValue('Year 6')
+  })
+
+  it('says it is saved in a status line already on the page (#410)', async () => {
+    backend()
+    const user = userEvent.setup()
+    openAt('/me')
+
+    const section = await screen.findByRole('region', { name: grade.heading })
+    const field = within(section).getByRole('textbox', { name: grade.label })
+    await waitFor(() => expect(field).toBeEnabled())
+    // A live region put on the page together with its words is not read out.
+    const line = within(section).getByRole('status')
+    expect(line).toBeEmptyDOMElement()
+
+    await user.type(field, 'Year 6')
+    await user.click(within(section).getByRole('button', { name: grade.save }))
+    await waitFor(() => expect(line).toHaveTextContent(grade.saved))
+    expect(within(section).getByRole('status')).toBe(line)
   })
 
   it('is where Ask\'s hint leads, with the field ready to type in', async () => {

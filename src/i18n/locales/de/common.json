@@ -155,7 +155,7 @@
   },
   "nextStep": "Empfohlener nächster Schritt",
   "notifications": {
-    "archive": "Archivieren",
+    "archiveItem": "«{{title}}» archivieren",
     "connection": {
       "checking": "Sucht nach Neuem",
       "connecting": "Verbindung wird aufgebaut",

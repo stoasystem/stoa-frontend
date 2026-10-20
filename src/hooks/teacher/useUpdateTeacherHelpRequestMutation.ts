@@ -27,6 +27,8 @@ export function useUpdateTeacherHelpRequestMutation() {
     onError: (error) => {
       // Someone else took it or it lapsed: what is on screen is stale, so read
       // it again instead of leaving the same refused button in place (#269).
+      // Any failure, this one or another, is said on the page, as an alert that
+      // takes the focus (#410); a toast as well would say it twice.
       if (!isHelpRequestConflict(error)) return
       void queryClient.invalidateQueries({ queryKey: teacherQueryKeys.helpRequests() })
       void queryClient.invalidateQueries({ queryKey: teacherQueryKeys.stats() })

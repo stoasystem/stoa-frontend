@@ -644,8 +644,16 @@ function ReviewPanel(props: {
       <Card>
         <CardHeader><CardTitle className="flex items-center gap-2 text-base"><GitCompare className="h-4 w-4" /> {t('curriculum.review.diff')}</CardTitle></CardHeader>
         <CardContent className="space-y-3">
-          <Input placeholder={t('curriculum.review.fromVersion')} value={props.fromVersionId} onChange={(event) => props.onFromVersionIdChange(event.target.value)} />
-          <Input placeholder={t('curriculum.review.toVersion')} value={props.toVersionId} onChange={(event) => props.onToVersionIdChange(event.target.value)} />
+          {/* Visible labels, not placeholders: a placeholder is gone once the
+              field has text, and with it the field's only name (#410). */}
+          <label className="block space-y-2 text-sm font-medium text-foreground">
+            {t('curriculum.review.fromVersion')}
+            <Input value={props.fromVersionId} onChange={(event) => props.onFromVersionIdChange(event.target.value)} />
+          </label>
+          <label className="block space-y-2 text-sm font-medium text-foreground">
+            {t('curriculum.review.toVersion')}
+            <Input value={props.toVersionId} onChange={(event) => props.onToVersionIdChange(event.target.value)} />
+          </label>
           <Button type="button" variant="outline" onClick={props.onDiff} disabled={props.diffLoading}>{t('curriculum.review.compare')}</Button>
           <ApiErrorPanel error={props.diffError} />
           <CompactJson value={props.diff?.changes ?? []} />
@@ -747,8 +755,12 @@ function EvidencePanel(props: {
     <Card>
       <CardHeader><CardTitle className="flex items-center gap-2 text-base"><FileText className="h-4 w-4" /> {t('curriculum.evidence.title')}</CardTitle></CardHeader>
       <CardContent className="space-y-4">
-        <form className="flex flex-col gap-3 sm:flex-row" onSubmit={props.onSubmit}>
-          <Input value={props.evidenceId} onChange={(event) => props.onEvidenceIdChange(event.target.value)} placeholder={t('curriculum.evidence.idPlaceholder')} />
+        <form className="flex flex-col gap-3 sm:flex-row sm:items-end" onSubmit={props.onSubmit}>
+          {/* A visible label, not a placeholder (#410). */}
+          <label className="block flex-1 space-y-2 text-sm font-medium text-foreground">
+            {t('curriculum.evidence.idLabel')}
+            <Input value={props.evidenceId} onChange={(event) => props.onEvidenceIdChange(event.target.value)} />
+          </label>
           <Button type="submit" disabled={props.isLoading}>{t('curriculum.evidence.load')}</Button>
         </form>
         <ApiErrorPanel error={props.error} />

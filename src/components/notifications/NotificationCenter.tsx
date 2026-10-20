@@ -58,6 +58,11 @@ export function NotificationCenter({
   const [open, setOpen] = useState(false)
   const shell = useRef<HTMLDivElement>(null)
   const bell = useRef<HTMLButtonElement>(null)
+  const panel = useRef<HTMLDivElement>(null)
+  const itemButtons = useRef(new Map<string, HTMLButtonElement>())
+  // The item being archived and the list as it stood then: once the item is
+  // gone, focus goes on to a neighbour in that list still there (#410).
+  const archiving = useRef<{ eventId: string; order: string[] } | null>(null)
   const panelId = useId()
   const navigate = useNavigate()
   const role = useAuthStore((state) => state.user?.role)
@@ -86,6 +91,33 @@ export function NotificationCenter({
     setOpen(false)
     navigate(target)
   }
+
+  function archiveItem(event: NotificationEvent) {
+    archiving.current = { eventId: event.eventId, order: items.map((item) => item.eventId) }
+    archive.mutate(event.eventId, {
+      onError: () => {
+        archiving.current = null
+      },
+    })
+  }
+
+  // An archived item leaves the list with its button, and focus fell to
+  // <body> (#410). It goes to the next item, else the one before, else the
+  // panel - unless it has been put somewhere else meanwhile.
+  useEffect(() => {
+    const pending = archiving.current
+    if (!pending || items.some((item) => item.eventId === pending.eventId)) return
+    archiving.current = null
+    const active = document.activeElement
+    if (active && active !== document.body) return
+    const listed = new Set(items.map((item) => item.eventId))
+    const at = pending.order.indexOf(pending.eventId)
+    const neighbour =
+      pending.order.slice(at + 1).find((id) => listed.has(id)) ??
+      pending.order.slice(0, at).reverse().find((id) => listed.has(id))
+    const next = neighbour ? itemButtons.current.get(neighbour) : panel.current
+    next?.focus()
+  }, [items])
 
   // A panel anchored to the bell closes the way every other one does: a click
   // outside it, or Escape. Focus goes back to the bell (#273), not to <body>;
@@ -146,7 +178,9 @@ export function NotificationCenter({
         // left of the screen and lost its first letters (#162). There it spans
         // the screen inside the gutters instead; wider, it hangs off the bell.
         <div
+          ref={panel}
           id={panelId}
+          tabIndex={-1}
           role="dialog"
           aria-label={t('notifications.title')}
           data-notification-panel
@@ -193,6 +227,10 @@ export function NotificationCenter({
                   className="flex items-start gap-1 rounded-md border border-border/70 p-1"
                 >
                   <button
+                    ref={(node) => {
+                      if (node) itemButtons.current.set(event.eventId, node)
+                      else itemButtons.current.delete(event.eventId)
+                    }}
                     type="button"
                     data-notification-target={target ?? undefined}
                     onClick={() => choose(event)}
@@ -218,9 +256,11 @@ export function NotificationCenter({
                     icon={Archive}
                     size={28}
                     hitSize={hitSize}
-                    label={t('notifications.archive')}
+                    // Named for its notification: a list of buttons all called
+                    // "Archive" did not say which one each removes (#410).
+                    label={t('notifications.archiveItem', { title: text.title })}
                     disabled={archive.isPending}
-                    onClick={() => archive.mutate(event.eventId)}
+                    onClick={() => archiveItem(event)}
                   />
                 </div>
               )

@@ -147,7 +147,7 @@ describe('a list short of a page gives the bell its count (#387 item 2)', () => 
 
     await userEvent.click(bell())
     const panel = screen.getByRole('dialog', { name: 'Notifications' })
-    await userEvent.click(within(panel).getByRole('button', { name: /Notice 3/ }))
+    await userEvent.click(within(panel).getByRole('button', { name: /^Notice 3/ }))
 
     await waitFor(() => expect(bell()).toHaveAccessibleName('Notifications, 1 unread'))
     expect(within(panel).getByText('1 unread')).toBeInTheDocument()

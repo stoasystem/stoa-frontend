@@ -145,7 +145,7 @@ describe('the bell counts every unread notification, not only the newest 50 (#37
     await waitFor(() => expect(bell()).toHaveAccessibleName('Notifications, 11 unread'))
 
     const panel = await openPanel()
-    await userEvent.click(within(panel).getByRole('button', { name: /Notice 61/ }))
+    await userEvent.click(within(panel).getByRole('button', { name: /^Notice 61/ }))
 
     await waitFor(() => expect(bell()).toHaveAccessibleName('Notifications, 10 unread'))
     expect(within(panel).getByText('10 unread')).toBeInTheDocument()
@@ -157,7 +157,7 @@ describe('the bell counts every unread notification, not only the newest 50 (#37
 
     const panel = await openPanel()
     const row = panel.querySelector<HTMLElement>('[data-notification="e-61"]')!
-    await userEvent.click(within(row).getByRole('button', { name: 'Archive' }))
+    await userEvent.click(within(row).getByRole('button', { name: 'Archive “Notice 61”' }))
 
     await waitFor(() => expect(bell()).toHaveAccessibleName('Notifications, 10 unread'))
   })

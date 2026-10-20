@@ -16,6 +16,10 @@ import { I18nextProvider } from 'react-i18next'
 import { MemoryRouter } from 'react-router-dom'
 import { afterAll, beforeEach, describe, expect, it, vi } from 'vitest'
 import i18n from '@/i18n'
+import de from '@/i18n/locales/de/admin.json'
+import en from '@/i18n/locales/en/admin.json'
+import fr from '@/i18n/locales/fr/admin.json'
+import italian from '@/i18n/locales/it/admin.json'
 import { AdminCurriculumPage } from '@/pages/admin/AdminCurriculumPage'
 import {
   getCurriculumPreview,
@@ -137,14 +141,14 @@ describe('switching versions', () => {
     const user = userEvent.setup()
     renderPage()
     await open(user, 'lesson-a', 'Review')
-    fireEvent.change(screen.getByPlaceholderText('from version'), { target: { value: 'va0' } })
+    fireEvent.change(screen.getByLabelText('From version'), { target: { value: 'va0' } })
     await user.click(screen.getByRole('button', { name: 'Submit' }))
     expect(await screen.findByRole('alert')).toBeInTheDocument()
 
     await open(user, 'lesson-b', 'Review')
     expect(screen.queryByRole('alert')).not.toBeInTheDocument()
-    expect(screen.getByPlaceholderText('from version')).toHaveValue('')
-    expect(screen.getByPlaceholderText('to version')).toHaveValue('vb1')
+    expect(screen.getByLabelText('From version')).toHaveValue('')
+    expect(screen.getByLabelText('To version')).toHaveValue('vb1')
   })
 
   it('keeps the patch when the same version is opened again', async () => {
@@ -194,5 +198,31 @@ describe('the current content', () => {
     await waitFor(() => expect(loadCurrent()).toBeEnabled())
     expect(save()).toBeEnabled()
     expect(screen.queryByRole('alert')).not.toBeInTheDocument()
+  })
+})
+
+describe('#410: the review and evidence fields', () => {
+  it('are named by labels on screen, not by placeholders', async () => {
+    const user = userEvent.setup()
+    renderPage()
+    await open(user, 'lesson-a', 'Review')
+    for (const name of ['From version', 'To version']) {
+      const field = screen.getByRole('textbox', { name })
+      expect(field).not.toHaveAttribute('placeholder')
+      fireEvent.change(field, { target: { value: 'v1' } })
+      expect(screen.getByRole('textbox', { name })).toBe(field)
+    }
+
+    await user.click(screen.getByRole('tab', { name: 'Evidence' }))
+    const evidence = screen.getByRole('textbox', { name: 'Migration ID' })
+    expect(evidence).not.toHaveAttribute('placeholder')
+  })
+
+  it('have their labels in all four languages', () => {
+    for (const [language, bundle] of Object.entries({ de, en, fr, it: italian })) {
+      for (const label of [bundle.curriculum.review.fromVersion, bundle.curriculum.review.toVersion, bundle.curriculum.evidence.idLabel]) {
+        expect(label, language).toMatch(/^\p{Lu}/u)
+      }
+    }
   })
 })

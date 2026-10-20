@@ -1,7 +1,7 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useId, useMemo, useState } from 'react'
 import type { TFunction } from 'i18next'
 import { useTranslation } from 'react-i18next'
-import { CheckCircle2, Clock, Flag, MessageSquare, UserCheck } from 'lucide-react'
+import { Check, CheckCircle2, Clock, Flag, MessageSquare, UserCheck } from 'lucide-react'
 import { PageContainer } from '@/components/common/PageContainer'
 import { PageHeader } from '@/components/common/PageHeader'
 import { Badge } from '@/components/ui/badge'
@@ -173,10 +173,13 @@ function ModerationCaseDetail({
   const [assignee, setAssignee] = useState(item.assigned_admin_id ?? '')
   const [resolutionNote, setResolutionNote] = useState('')
   const [caseNote, setCaseNote] = useState('')
+  const noteHeading = useId()
   const { updateCase, addNote, busy } = writes
   const caseId = item.case_id
   const setFeedback = (kind: CaseFeedback['kind'], message: string) => writes.setFeedback({ caseId, kind, message })
   const trimmedAssignee = assignee.trim()
+  const success = feedback?.kind === 'success' ? feedback.message : null
+  const failure = feedback?.kind === 'error' ? feedback.message : null
 
   const fail = (error: unknown, fallbackKey: string) => setFeedback('error', toUserFacingError(error, t(fallbackKey)))
 
@@ -236,14 +239,15 @@ function ModerationCaseDetail({
         </div>
       </CardHeader>
       <CardContent className="space-y-5">
-        {feedback && (
-          <p
-            role={feedback.kind === 'error' ? 'alert' : 'status'}
-            className={`rounded-md border p-3 text-sm ${
-              feedback.kind === 'error' ? 'border-destructive/40 bg-destructive/5 text-destructive' : 'bg-secondary/40'
-            }`}
-          >
-            {feedback.message}
+        {/* Always mounted, only its text changes: a live region added together
+            with its words is not announced (#410). A failure is an alert, which
+            is read out as it appears. */}
+        <p role="status" className={success ? 'rounded-md border bg-secondary/40 p-3 text-sm' : 'sr-only'}>
+          {success}
+        </p>
+        {failure && (
+          <p role="alert" className="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-sm text-destructive">
+            {failure}
           </p>
         )}
         <ModerationContext item={item} />
@@ -276,12 +280,16 @@ function ModerationCaseDetail({
               <CheckCircle2 className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
               <h2 className="text-sm font-semibold">{t('moderation.statusAction')}</h2>
             </div>
-            <Textarea
-              value={resolutionNote}
-              onChange={(event) => setResolutionNote(event.target.value)}
-              placeholder={t('moderation.resolutionNote')}
-              className="mt-3 min-h-20"
-            />
+            {/* Named by a placeholder alone, the field lost its name as soon
+                as anything was typed in it (#410). */}
+            <label className="mt-3 grid gap-2 text-sm">
+              {t('moderation.resolutionNote')}
+              <Textarea
+                value={resolutionNote}
+                onChange={(event) => setResolutionNote(event.target.value)}
+                className="min-h-20"
+              />
+            </label>
             <div className="mt-3 flex flex-wrap gap-2">
               {actionStatuses.map((nextStatus) => (
                 <Button
@@ -303,9 +311,10 @@ function ModerationCaseDetail({
         <div className="rounded-md border p-4">
           <div className="flex items-center gap-2">
             <MessageSquare className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
-            <h2 className="text-sm font-semibold">{t('moderation.internalNote')}</h2>
+            <h2 id={noteHeading} className="text-sm font-semibold">{t('moderation.internalNote')}</h2>
           </div>
           <Textarea
+            aria-labelledby={noteHeading}
             value={caseNote}
             onChange={(event) => setCaseNote(event.target.value)}
             placeholder={t('moderation.notePlaceholder')}
@@ -416,15 +425,21 @@ function ModerationQueueItem({
 }) {
   const { t } = useTranslation('admin')
   return (
+    // The case open on the right is told by more than its colour (#410): a tick
+    // on screen, and aria-current for a screen reader.
     <button
       type="button"
       onClick={onSelect}
+      aria-current={selected || undefined}
       className={`w-full rounded-md border p-3 text-left transition-colors ${
         selected ? 'border-primary bg-primary/5' : 'hover:bg-secondary/50'
       }`}
     >
       <div className="flex items-center justify-between gap-2">
-        <span className="truncate text-sm font-medium">{item.case_id}</span>
+        <span className="flex min-w-0 items-center gap-1.5 text-sm font-medium">
+          {selected && <Check data-selected-mark className="h-4 w-4 shrink-0 text-primary" aria-hidden="true" />}
+          <span className="truncate">{item.case_id}</span>
+        </span>
         <SeverityBadge severity={item.severity} />
       </div>
       <p className="mt-1 text-xs text-muted-foreground">

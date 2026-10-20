@@ -38,6 +38,11 @@ export function TeacherHelpRequestDetailPage() {
   const { requestId } = useParams()
   const [resolutionNote, setResolutionNote] = useState('')
   const requestCardRef = useRef<HTMLDivElement>(null)
+  // A change that failed takes focus to the failure, not to the request: there a
+  // screen reader read the card out and the teacher took it for done (#410).
+  // Moved after the commit, when the failure line is on the page.
+  const failureLine = useRef<HTMLParagraphElement>(null)
+  const [refocus, setRefocus] = useState<{ failed: boolean } | null>(null)
   const requestQuery = useTeacherHelpRequestDetailQuery(requestId)
   const updateStatus = useUpdateTeacherHelpRequestMutation()
   const addNote = useAddTeacherHelpRequestNoteMutation()
@@ -51,6 +56,10 @@ export function TeacherHelpRequestDetailPage() {
     if (!requestId) return
     trackEvent('teacher_request_opened', { requestId })
   }, [requestId])
+
+  useEffect(() => {
+    if (refocus) (refocus.failed ? failureLine.current : requestCardRef.current)?.focus()
+  }, [refocus])
 
   // A failed read keeps the last copy on screen. Refused (403/404), that copy is
   // no longer this teacher's: show it, offer nothing on it (#269). Any other
@@ -78,7 +87,7 @@ export function TeacherHelpRequestDetailPage() {
           ]}
         />
         {requestQuery.isLoading && <TeacherDashboardSkeleton showHeader={false} />}
-        {requestQuery.isError && <p className="text-sm text-destructive">{tTeacher('detail.loadFailed')}</p>}
+        {requestQuery.isError && <p role="alert" className="text-sm text-destructive">{tTeacher('detail.loadFailed')}</p>}
         {requestQuery.data && (
           <div className="space-y-6">
             {requestQuery.data.practiceContext && (
@@ -113,7 +122,9 @@ export function TeacherHelpRequestDetailPage() {
               contextLabel={t('curriculumRollout.teacherContext')}
             />
             {changedElsewhere && (
-              <p role="alert" className="text-sm text-destructive">{tTeacher('detail.changedElsewhere')}</p>
+              <p ref={failureLine} tabIndex={-1} role="alert" className="text-sm text-destructive">
+                {tTeacher('detail.changedElsewhere')}
+              </p>
             )}
             {/* Only the changes the server takes in this status: a finished request
                 takes none (#162), one in progress can only be finished (#269). */}
@@ -157,7 +168,13 @@ export function TeacherHelpRequestDetailPage() {
                           status,
                           resolutionNote: status === 'resolved' ? resolutionNote.trim() : undefined,
                         },
-                        { onSettled: () => focusIfLost(requestCardRef.current) },
+                        {
+                          // Whether focus was lost is read now, while the pressed
+                          // button is still disabled; where it goes, once rendered.
+                          onSettled: (_request, error) => {
+                            if (focusLost()) setRefocus({ failed: Boolean(error) })
+                          },
+                        },
                       )
                     }
                   >
@@ -165,7 +182,11 @@ export function TeacherHelpRequestDetailPage() {
                   </Button>
                 ))}
               </div>
-              {updateStatus.isError && !changedElsewhere && <p className="text-sm text-destructive">{tTeacher('detail.updateFailed')}</p>}
+              {updateStatus.isError && !changedElsewhere && (
+                <p ref={failureLine} tabIndex={-1} role="alert" className="text-sm text-destructive">
+                  {tTeacher('detail.updateFailed')}
+                </p>
+              )}
               </>
             )}
             {/* A resolved request still takes its teacher's follow-up (#222); one
@@ -200,7 +221,7 @@ export function TeacherHelpRequestDetailPage() {
 
 // Lost: on the page itself, or still on a control that is now disabled or
 // gone (browsers differ in which).
-function focusIfLost(target: HTMLElement | null) {
+function focusLost() {
   const active = document.activeElement as (HTMLElement & { disabled?: boolean }) | null
-  if (!active || active === document.body || active.disabled || !active.isConnected) target?.focus()
+  return !active || active === document.body || Boolean(active.disabled) || !active.isConnected
 }
