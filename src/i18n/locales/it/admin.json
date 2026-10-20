@@ -700,7 +700,10 @@
       "save": "Salva bozza",
       "loadCurrent": "Carica il contenuto attuale",
       "saved": "{{version}} salvata.",
-      "current": "Contenuto attuale"
+      "current": "Contenuto attuale",
+      "currentLoading": "Caricamento del contenuto attuale.",
+      "currentFailed": "Non è stato possibile caricare il contenuto attuale: caricarlo nell’editor e salvare restano disattivati.",
+      "currentRetry": "Riprova"
     },
     "review": {
       "validation": "Convalida",

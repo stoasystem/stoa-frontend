@@ -700,7 +700,10 @@
       "save": "Enregistrer le brouillon",
       "loadCurrent": "Charger le contenu actuel",
       "saved": "{{version}} enregistrée.",
-      "current": "Contenu actuel"
+      "current": "Contenu actuel",
+      "currentLoading": "Chargement du contenu actuel.",
+      "currentFailed": "Le contenu actuel n’a pas pu être chargé : le chargement dans l’éditeur et l’enregistrement restent désactivés.",
+      "currentRetry": "Réessayer"
     },
     "review": {
       "validation": "Validation",
