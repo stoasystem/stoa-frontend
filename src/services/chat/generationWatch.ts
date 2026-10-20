@@ -73,7 +73,10 @@ export function watchGeneration({
       await wait(POLL_DELAYS_MS[reads] ?? POLL_STEADY_MS, signal)
       reads += 1
       if (signal.aborted) return { kind: 'aborted' }
-      if (Date.now() - startedAt > GENERATION_WAIT_LIMIT_MS) return { kind: 'timed_out' }
+      // On the wall clock, as the lease runs. A device that slept or a tab held
+      // in the background wakes past it all at once, with the answer perhaps
+      // already there, so the command is read before the wait is given up (#402).
+      const overdue = Date.now() - startedAt > GENERATION_WAIT_LIMIT_MS
       try {
         const state = await getGenerationProgress(conversationId, signal, idempotencyKey)
         failures = 0
@@ -84,14 +87,19 @@ export function watchGeneration({
         if (state.status === 'failed') {
           return { kind: 'failed', retryable: state.retryable === true }
         }
+        if (overdue) return { kind: 'timed_out' }
       } catch (error) {
         if (signal.aborted) return { kind: 'aborted' }
         if (error instanceof ApiError && error.code === 'message_command_not_found') {
           if (settled) return { kind: 'missing' }
+          if (overdue) return { kind: 'timed_out' }
           continue
         }
         failures += 1
-        if (settled && failures >= MAX_CONSECUTIVE_READ_FAILURES) return { kind: 'timed_out' }
+        // A read that did not get through says nothing either way - the network
+        // may still be waking up - so past the limit too, only reads that keep
+        // failing end the wait.
+        if ((settled || overdue) && failures >= MAX_CONSECUTIVE_READ_FAILURES) return { kind: 'timed_out' }
       }
     }
   })()
