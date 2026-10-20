@@ -16,10 +16,18 @@ export const adminQueryKeys = {
   // has to reach the query whatever `?day=` it was read with (#262).
   accountOperationsForParent: (parentId?: string) => [...adminQueryKeys.all, 'account-operations', parentId ?? ''] as const,
   accountOperations: (parentId?: string, day?: string) => [...adminQueryKeys.accountOperationsForParent(parentId), day ?? ''] as const,
-  curriculumWorklist: (status?: string) => [...adminQueryKeys.all, 'curriculum', 'worklist', status ?? ''] as const,
-  curriculumPreview: (publicLessonId: string, versionId: string) => [...adminQueryKeys.all, 'curriculum', 'preview', publicLessonId, versionId] as const,
-  curriculumValidation: (publicLessonId: string, versionId: string) => [...adminQueryKeys.all, 'curriculum', 'validation', publicLessonId, versionId] as const,
-  curriculumAudit: (publicLessonId: string) => [...adminQueryKeys.all, 'curriculum', 'audit', publicLessonId] as const,
-  curriculumDiff: (publicLessonId: string, fromVersionId: string, toVersionId: string) => [...adminQueryKeys.all, 'curriculum', 'diff', publicLessonId, fromVersionId, toVersionId] as const,
-  curriculumMigrationEvidence: (migrationId: string) => [...adminQueryKeys.all, 'curriculum', 'migration', migrationId] as const,
+  // Every read of the curriculum console: a migration apply can write any
+  // lesson, so it refreshes all of them (#404).
+  curriculumAll: () => [...adminQueryKeys.all, 'curriculum'] as const,
+  // Every worklist, whatever status it was filtered by.
+  curriculumWorklistAll: () => [...adminQueryKeys.curriculumAll(), 'worklist'] as const,
+  curriculumWorklist: (status?: string) => [...adminQueryKeys.curriculumWorklistAll(), status ?? ''] as const,
+  curriculumPreview: (publicLessonId: string, versionId: string) => [...adminQueryKeys.curriculumAll(), 'preview', publicLessonId, versionId] as const,
+  curriculumValidation: (publicLessonId: string, versionId: string) => [...adminQueryKeys.curriculumAll(), 'validation', publicLessonId, versionId] as const,
+  curriculumAudit: (publicLessonId: string) => [...adminQueryKeys.curriculumAll(), 'audit', publicLessonId] as const,
+  // Every comparison of one lesson's versions: a patch changes each pair that
+  // holds the draft, on either side (#404).
+  curriculumDiffsOf: (publicLessonId: string) => [...adminQueryKeys.curriculumAll(), 'diff', publicLessonId] as const,
+  curriculumDiff: (publicLessonId: string, fromVersionId: string, toVersionId: string) => [...adminQueryKeys.curriculumDiffsOf(publicLessonId), fromVersionId, toVersionId] as const,
+  curriculumMigrationEvidence: (migrationId: string) => [...adminQueryKeys.curriculumAll(), 'migration', migrationId] as const,
 }
