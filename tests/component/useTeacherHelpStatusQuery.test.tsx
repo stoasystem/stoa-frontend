@@ -7,6 +7,7 @@ import { act, renderHook } from '@testing-library/react'
 import type { ReactNode } from 'react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { useTeacherHelpStatusQuery } from '@/hooks/chat/useTeacherHelpStatusQuery'
+import { ApiError } from '@/services/api/httpClient'
 import { getTeacherHelpRequest } from '@/services/teacherHelp/teacherHelpApi'
 
 vi.mock('@/services/teacherHelp/teacherHelpApi', () => ({ getTeacherHelpRequest: vi.fn() }))
@@ -120,5 +121,46 @@ describe('polling cadence', () => {
 
     await advancePolls(5_000, 2)
     expect(mockedGet).toHaveBeenCalledTimes(4)
+  })
+})
+
+// #405: a conversation that was never escalated is answered 404. That is its
+// answer, not a failure: kept as no help, and not asked again each time the
+// conversation opens.
+describe('a conversation never escalated', () => {
+  function sharedClient() {
+    // The app's own staleTime (src/app/query/queryClient.ts).
+    const client = new QueryClient({ defaultOptions: { queries: { retry: false, staleTime: 60_000 } } })
+    return ({ children }: { children: ReactNode }) => (
+      <QueryClientProvider client={client}>{children}</QueryClientProvider>
+    )
+  }
+
+  it('is kept as no help, and not read again when it opens again', async () => {
+    mockedGet.mockRejectedValue(new ApiError('This conversation was never escalated to a teacher', { status: 404 }))
+    const shared = sharedClient()
+
+    const first = renderHook(() => useTeacherHelpStatusQuery('c1'), { wrapper: shared })
+    await settle()
+    expect(first.result.current.data).toBeNull()
+    expect(first.result.current.isError).toBe(false)
+    first.unmount()
+
+    const again = renderHook(() => useTeacherHelpStatusQuery('c1'), { wrapper: shared })
+    await settle()
+    expect(again.result.current.data).toBeNull()
+    expect(mockedGet).toHaveBeenCalledTimes(1)
+
+    await advancePolls(15_000, 2)
+    expect(mockedGet).toHaveBeenCalledTimes(1)
+  })
+
+  it('still fails on any other answer', async () => {
+    mockedGet.mockRejectedValue(new ApiError('Service unavailable', { status: 503 }))
+
+    const { result } = renderHook(() => useTeacherHelpStatusQuery('c1'), { wrapper: sharedClient() })
+    await settle()
+    expect(result.current.isError).toBe(true)
+    expect(result.current.data).toBeUndefined()
   })
 })

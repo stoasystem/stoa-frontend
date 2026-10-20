@@ -165,17 +165,16 @@ export function useStreamingChat(conversationId: string | null) {
   // later, and must not undo the state of the one that replaced it.
   const currentAttemptRef = useRef(0)
 
+  // The conversation only. The list follows the conversation as it is read
+  // (useAskConversation), whoever changed it; the list's key is a prefix of
+  // this one, and invalidating it as well read the conversation twice (#405).
   const invalidateConversation = useCallback(async () => {
     if (!conversationId) return
 
-    await Promise.all([
-      queryClient.invalidateQueries({
-        queryKey: chatQueryKeys.conversation(conversationId),
-      }),
-      queryClient.invalidateQueries({
-        queryKey: chatQueryKeys.conversations(),
-      }),
-    ])
+    await queryClient.invalidateQueries({
+      queryKey: chatQueryKeys.conversation(conversationId),
+      exact: true,
+    })
   }, [conversationId, queryClient])
 
   const handleStreamEvent = useCallback((event: ChatStreamEvent) => {

@@ -30,13 +30,16 @@ export function teacherHelpPollInterval(status: string | null | undefined): numb
 export function useTeacherHelpStatusQuery(conversationId: string | null) {
   return useQuery({
     queryKey: chatQueryKeys.teacherHelpRequest(conversationId ?? ''),
-    queryFn: () => getTeacherHelpRequest(conversationId ?? ''),
+    // 404 is the answer for a conversation that was never escalated: no help,
+    // kept like any other answer. Taken for an error, it was asked again each
+    // time the conversation opened (#405).
+    queryFn: () =>
+      getTeacherHelpRequest(conversationId ?? '').catch((error: unknown) => {
+        if (error instanceof ApiError && error.status === 404) return null
+        throw error
+      }),
     enabled: Boolean(conversationId),
     refetchInterval: (query) => teacherHelpPollInterval(query.state.data?.status),
-    // 404 is the answer for a conversation that was never escalated: asking
-    // again will not change it.
-    retry: (failures, error) =>
-      !(error instanceof ApiError && error.status === 404) && failures < 1,
     // Only poll when the tab is visible — no background traffic
     refetchIntervalInBackground: false,
   })
