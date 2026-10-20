@@ -70,9 +70,12 @@ export function LessonStage({ unitId, lessonId }: { unitId: string | undefined; 
     setOpenWhenEntered({ lessonId: lesson.id, open: isOpenLesson(status) })
   }
   const testOut = askedForQuiz && openWhenEntered?.lessonId === lesson?.id && openWhenEntered?.open === true
+  // A lesson already on screen stays there when a refetch in the background
+  // fails (finishing one refetches every practice query): only a lesson that
+  // never arrived is "could not be loaded" (#342).
   const notice: StageNoticeKind | null = lessonQuery.isLoading
     ? 'loading'
-    : lessonQuery.isError
+    : lessonQuery.isError && !lesson
       ? 'failed'
       : !lesson || !inUnit
         ? 'missing'
@@ -94,7 +97,12 @@ export function LessonStage({ unitId, lessonId }: { unitId: string | undefined; 
         />
       ) : (
         <div data-surface="sky" className="flex min-h-0 flex-1 flex-col items-start gap-3 bg-sky p-6 text-on-sky">
-          <StageNotice unitId={unitId} kind={notice ?? 'missing'} retry={() => void lessonQuery.refetch()} />
+          <StageNotice
+            unitId={unitId}
+            kind={notice ?? 'missing'}
+            retry={() => void lessonQuery.refetch()}
+            starPath={chapter ? starPathOf(chapter.subjectId, chapter.topicId, chapter.unitId) : undefined}
+          />
         </div>
       )}
     </AppLayout>
@@ -103,7 +111,11 @@ export function LessonStage({ unitId, lessonId }: { unitId: string | undefined; 
 
 type StageNoticeKind = 'loading' | 'failed' | 'missing' | 'locked'
 
-function StageNotice({ unitId, kind, retry }: { unitId?: string; kind: StageNoticeKind; retry: () => void }) {
+/** The knowledge point's own address on the star map. */
+const starPathOf = (subjectId: string, topicId: string, unitId: string) =>
+  pathForTarget(subjectId, { layer: 'star', nebulaId: topicId, unitId })
+
+function StageNotice({ unitId, kind, retry, starPath }: { unitId?: string; kind: StageNoticeKind; retry: () => void; starPath?: string }) {
   const { t } = useTranslation('chapter')
   return (
     <>
@@ -137,6 +149,13 @@ function StageNotice({ unitId, kind, retry }: { unitId?: string; kind: StageNoti
             {t('stage.locked.title')}
           </h1>
           <p className={cn('m-0 text-[15px]', bodyOnSky)}>{t('stage.locked.body')}</p>
+          {/* What it builds on is found on the map: back to the chapter only
+            * leads to the same locked lessons again (#342). */}
+          {starPath && (
+            <Link to={starPath} className={plainOnSky}>
+              {t('chapter.backToMap')}
+            </Link>
+          )}
         </div>
       ) : (
         <>
@@ -189,9 +208,9 @@ function LessonRunStage({
       <StageWithAsk practice={practice} subjectId={lesson.subjectId} off={inQuiz ? t('quiz.askOff') : undefined}>
         <StageStrip lesson={lesson} unitId={unitId} chapter={chapter} lessonNumber={lessonNumber} run={run} side={side} />
         {run.finished ? (
-          <LessonDone lesson={lesson} unitId={unitId} chapter={chapter} testedOut={testOut} />
+          <LessonDone lesson={lesson} unitId={unitId} chapter={chapter} testedOut={run.passedQuiz} />
         ) : run.trouble?.inQuiz ? (
-          <QuizTrouble run={run} unitId={unitId} />
+          <QuizTrouble run={run} unitId={unitId} starPath={starPathOf(lesson.subjectId, lesson.topicId, unitId)} />
         ) : run.failed ? (
           <QuizFailed run={run} unitId={unitId} />
         ) : run.quizPending ? (
@@ -379,16 +398,26 @@ function Exercise({
   // the answer instead, the first field or option still open.
   // Only for the same exercise: moving on to the next one (a quiz goes on after
   // a wrong answer) puts the keyboard on its question, above.
+  // The first control of the answer, whatever kind it is: a field, an
+  // option, or an ordering's first piece (#342: an ordering kept none).
   const exercise = useRef<HTMLDivElement>(null)
   const wrongOn = useRef<string | null>(null)
   useEffect(() => {
     if (wrongOn.current === challenge.challengeId && !run.feedback) {
       exercise.current
-        ?.querySelector<HTMLElement>('input:not([disabled]), textarea:not([disabled])')
+        ?.querySelector<HTMLElement>('form input:not([disabled]), form textarea:not([disabled]), form button:not([disabled])')
         ?.focus()
     }
     wrongOn.current = run.feedback && !run.feedback.correct ? challenge.challengeId : null
   }, [run.feedback, challenge.challengeId])
+
+  // Checking turns the answer off (and Check with it while it is on its way),
+  // so the keyboard was left on the page (#342). With the verdict it goes to
+  // the one lit button, which now says what comes next.
+  const verdict = run.feedback ? `${challenge.challengeId}:${run.feedback.correct}` : null
+  useEffect(() => {
+    if (verdict) document.querySelector<HTMLElement>('[data-stage-primary]')?.focus()
+  }, [verdict])
 
   const long = challenge.prompt.length > 48
   // Keep the checked answer with its result; another attempt starts with Try again.
@@ -546,6 +575,7 @@ function ActionRow({ run, side }: { run: LessonRun; side: boolean }) {
     >
       <Button
         lift
+        data-stage-primary
         variant="onSky"
         size="large"
         fullWidth={!side}
@@ -591,7 +621,7 @@ function ActionRow({ run, side }: { run: LessonRun; side: boolean }) {
  * the way on. Which troubles a fresh paper gets past is `quiz.ts`; the rest
  * end at the chapter.
  */
-function QuizTrouble({ run, unitId }: { run: LessonRun; unitId: string }) {
+function QuizTrouble({ run, unitId, starPath }: { run: LessonRun; unitId: string; starPath: string }) {
   const { t } = useTranslation('chapter')
   const heading = useRef<HTMLHeadingElement>(null)
   useEffect(() => heading.current?.focus(), [])
@@ -628,8 +658,14 @@ function QuizTrouble({ run, unitId }: { run: LessonRun; unitId: string }) {
               </Link>
             </>
           ) : (
+            // A locked point is opened on the map: its chapter only leads back
+            // to the same locked lessons (#342).
             <Button asChild lift variant="onSky" size="large" style={{ minWidth: 200 }}>
-              <Link to={chapterPath(unitId)}>{t('stage.done.backToChapter')}</Link>
+              {code === 'lesson_locked' ? (
+                <Link to={starPath}>{t('chapter.backToMap')}</Link>
+              ) : (
+                <Link to={chapterPath(unitId)}>{t('stage.done.backToChapter')}</Link>
+              )}
             </Button>
           )}
         </div>
@@ -689,7 +725,8 @@ function QuizFailed({ run, unitId }: { run: LessonRun; unitId: string }) {
 
 /**
  * The lesson is done: how far the chapter is now, and where to go on. Done by
- * testing out, it also says that the star is not lit by that alone (#81).
+ * passing a quiz, testing out or after skips, it also says that the star is
+ * not lit by that alone (#81, #342).
  */
 function LessonDone({
   lesson,

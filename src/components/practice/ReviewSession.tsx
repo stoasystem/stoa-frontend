@@ -123,6 +123,21 @@ function ReviewQuestion({ card, onAnswer }: { card: ReviewCard; onAnswer: () => 
   const queryClient = useQueryClient()
   const [answerValue, setAnswerValue] = useState<AnswerValue>(() => emptyAnswer(card.type))
   const [result, setResult] = useState<PracticeAnswerResult | null>(null)
+  // Check goes away with the verdict, and Try again with the next attempt, so
+  // the keyboard was left on the page (#342): it goes to what took their
+  // place -- Try again, or the verdict -- and back to the answer.
+  const answerArea = useRef<HTMLDivElement>(null)
+  const verdictArea = useRef<HTMLDivElement>(null)
+  const tryAgain = useRef<HTMLButtonElement>(null)
+  const retried = useRef(false)
+  useEffect(() => {
+    if (result) {
+      ;(result.correct ? verdictArea.current : tryAgain.current)?.focus()
+    } else if (retried.current) {
+      retried.current = false
+      answerArea.current?.querySelector<HTMLElement>('input:not([disabled]), textarea:not([disabled]), button:not([disabled])')?.focus()
+    }
+  }, [result])
 
   const answer = useMutation({
     mutationFn: (value: AnswerValue) => submitChallengeAnswer(card.challengeId, { answer: value }),
@@ -162,16 +177,25 @@ function ReviewQuestion({ card, onAnswer }: { card: ReviewCard; onAnswer: () => 
         <p className={cn('m-0 text-[15px]', bodyOnSky)}>{t('review.answerInLesson')}</p>
       ) : (
         <>
-          <AnswerInput
-            challenge={card}
-            value={answerValue}
-            onChange={setAnswerValue}
-            verdict={result ? (result.correct ? 'right' : 'wrong') : null}
-            disabled={result !== null || answer.isPending}
-          />
+          <div ref={answerArea} className="contents">
+            <AnswerInput
+              challenge={card}
+              value={answerValue}
+              onChange={setAnswerValue}
+              verdict={result ? (result.correct ? 'right' : 'wrong') : null}
+              disabled={result !== null || answer.isPending}
+            />
+          </div>
 
           {result ? (
-            <div role="status" aria-live="polite" data-review-feedback={result.correct ? 'correct' : 'wrong'} className="flex flex-col gap-3">
+            <div
+              ref={verdictArea}
+              tabIndex={-1}
+              role="status"
+              aria-live="polite"
+              data-review-feedback={result.correct ? 'correct' : 'wrong'}
+              className="flex flex-col gap-3 outline-none"
+            >
               {/* The explanation states the answer, so the card holds it back
                   until the student has found it; the feedback points the way. */}
               <FeedbackCard correct={result.correct} feedback={result.feedback} explanation={result.explanation}>
@@ -179,10 +203,12 @@ function ReviewQuestion({ card, onAnswer }: { card: ReviewCard; onAnswer: () => 
               </FeedbackCard>
               {!result.correct && (
                 <Button
+                  ref={tryAgain}
                   lift
                   variant="onSky"
                   className="self-start"
                   onClick={() => {
+                    retried.current = true
                     setResult(null)
                     setAnswerValue(emptyAnswer(card.type))
                   }}

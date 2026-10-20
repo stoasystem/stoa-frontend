@@ -1,6 +1,7 @@
 {
   "chapter": {
     "again": "S’exercer encore",
+    "allDone": "Toutes les leçons sont terminées.",
     "backToMap": "Carte du ciel",
     "continue": "Continuer : {{title}}",
     "empty": "Ce chapitre n’a pas encore de leçons.",
@@ -13,11 +14,15 @@
     "listLabel": "Leçons",
     "lit": "Ce point de savoir est allumé.",
     "loading": "Chargement du chapitre…",
+    "locked": "Ce point de savoir est encore verrouillé. Allume d’abord, sur la carte du ciel, les points sur lesquels il s’appuie.",
     "missing": "Ce chapitre est introuvable.",
     "progress": "Progression du chapitre",
-    "remaining_one": "Encore {{count}} leçon avant que ce point s’allume.",
-    "remaining_many": "Encore {{count}} leçons avant que ce point s’allume.",
-    "remaining_other": "Encore {{count}} leçons avant que ce point s’allume.",
+    "unmet_one": "Encore {{count}} exercice à réussir avant que ce point s’allume.",
+    "unmet_other": "Encore {{count}} exercices à réussir avant que ce point s’allume.",
+    "unmet_many": "Encore {{count}} exercices à réussir avant que ce point s’allume.",
+    "toGo_one": "Encore {{count}} leçon.",
+    "toGo_other": "Encore {{count}} leçons.",
+    "toGo_many": "Encore {{count}} leçons.",
     "retry": "Réessayer",
     "start": "Commencer : {{title}}",
     "status": {
@@ -89,7 +94,7 @@
     "lessonOf": "Leçon {{lesson}} sur {{lessons}}",
     "loading": "Chargement de la leçon…",
     "locked": {
-      "body": "Termine d’abord les leçons qui la précèdent dans ce chapitre.",
+      "body": "Ce point de savoir s’appuie sur d’autres qui ne sont pas encore allumés. Allume-les d’abord sur la carte du ciel.",
       "title": "Cette leçon est verrouillée"
     },
     "missing": "Cette leçon est introuvable.",
@@ -108,7 +113,7 @@
       "credentialInvalid": "Le laissez-passer de ce quiz ne vaut pas pour cette leçon. Refais le quiz.",
       "expired": "Le quiz a duré trop longtemps et a expiré. Lances-en un nouveau.",
       "finished": "Ce quiz est déjà terminé. Lances-en un nouveau.",
-      "locked": "Termine d’abord les leçons précédentes : cette leçon est encore verrouillée.",
+      "locked": "Ce point de savoir est encore verrouillé : allume d’abord, sur la carte du ciel, les points sur lesquels il s’appuie.",
       "notFound": "Ce quiz n’est plus ouvert. Lances-en un nouveau.",
       "notStarted": "Le quiz n’a pas pu démarrer. Vérifie ta connexion et réessaie.",
       "restart": "Recommencer le quiz",

@@ -246,6 +246,17 @@ function backend() {
       }),
     ),
     http.get(`${API}/practice/lessons/:lessonId`, ({ params }) => HttpResponse.json(lessonBody(String(params.lessonId)))),
+    // The chapter's star, unlit: what the chapter and the stage say about lit and locked is the sky's.
+    http.get(`${API}/practice/knowledge-map`, () =>
+      HttpResponse.json({
+        subjectId: 'math',
+        galaxies: [],
+        nebulae: [],
+        stars: [{ unitId: 'u-5', name: 'Multiply', nebulaId: 'algebra', order: 1, state: 'in_progress', progress: 0, unmetExercises: 6, reviewDue: 0, recommendation: null, x: 0, y: 0, skills: [], chapter: { lessonCount: 4, lessonsDone: 1, nextLesson: null } }],
+        prerequisites: [],
+        summary: { lit: 0, total: 1, streakDays: 0, score: 0 },
+      }),
+    ),
     http.post(`${API}/practice/challenges/:challengeId/answer`, async ({ params, request }) => {
       const id = String(params.challengeId)
       const { answer } = (await request.json()) as { answer: unknown }
@@ -611,6 +622,20 @@ describe('passing the quiz completes the lesson with its credential', () => {
     expect(await screen.findByRole('heading', { name: 'Lesson complete' })).toBeInTheDocument()
     expect(screen.getByText(TEST_OUT_NOTE)).toBeInTheDocument()
   })
+
+  it('says it after the skip quiz too: the skipped exercises were never answered (#342)', async () => {
+    await skipIntoQuiz(2)
+    await passQuiz()
+    expect(await screen.findByRole('heading', { name: 'Lesson complete' })).toBeInTheDocument()
+    expect(screen.getByText(TEST_OUT_NOTE)).toBeInTheDocument()
+  })
+
+  it('does not say it after a lesson answered through', async () => {
+    open('/chapter/u-5/l-2')
+    for (let n = 1; n <= 6; n += 1) await answerRight()
+    expect(await screen.findByRole('heading', { name: 'Lesson complete' })).toBeInTheDocument()
+    expect(screen.queryByText(TEST_OUT_NOTE)).not.toBeInTheDocument()
+  })
 })
 
 describe('what the student reads when it goes wrong', () => {
@@ -618,10 +643,13 @@ describe('what the student reads when it goes wrong', () => {
     rules.startRefusal = { status: 409, code: 'lesson_locked' }
     open('/chapter/u-5/l-2?mode=quiz')
 
-    expect(await screen.findByText('Finish the lessons before this one first: this lesson is still locked.')).toBeInTheDocument()
+    // The point is locked, not the lesson: back to the chapter led to the same locked lessons (#342).
+    expect(
+      await screen.findByText('This knowledge point is still locked: light the ones it builds on first, on the star map.'),
+    ).toBeInTheDocument()
     expect(trouble()).toHaveAttribute('data-quiz-trouble', 'lesson_locked')
     expect(screen.queryByRole('button', { name: 'Start the quiz again' })).not.toBeInTheDocument()
-    expect(screen.getByRole('link', { name: 'Back to the chapter' })).toBeInTheDocument()
+    expect(within(trouble() as HTMLElement).getByRole('link', { name: 'Star map' })).toHaveAttribute('href', '/map/math/algebra/u-5')
   })
 
   it('a lesson with nothing to ask: its own sentence', async () => {

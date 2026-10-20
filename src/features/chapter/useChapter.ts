@@ -9,9 +9,19 @@
  * exist today; nothing here changes their contract. When the star map's read
  * model lands (#48) it may carry the chapter itself, and this can read it
  * from there instead.
+ *
+ * Whether the knowledge point is lit, or locked, is the star map's to say
+ * (`GET /practice/knowledge-map`), not the lessons': a point lights once
+ * every exercise in it has been answered right at least once, and a lesson
+ * finished by passing a quiz leaves some unanswered (#342). A point is locked
+ * while one it builds on is unlit; the roadmap does not say so, so its lessons
+ * not done yet are read as locked here. Without the sky the chapter still
+ * opens, and says neither.
  */
 import { useMemo } from 'react'
+import type { LearningState } from '@/features/starmap/model/starMap'
 import { useCurriculumCatalogQuery } from '@/hooks/practice/useCurriculumCatalogQuery'
+import { useKnowledgeMapQuery } from '@/hooks/practice/useKnowledgeMapQuery'
 import { usePracticeRoadmapQuery } from '@/hooks/practice/usePracticeRoadmapQuery'
 import type { RoadmapLessonStatus } from '@/types/practice'
 
@@ -37,6 +47,8 @@ export type Chapter = {
   total: number
   /** The lesson to go on with: the one in progress, else the first open one. */
   nextLessonId: string | null
+  /** The knowledge point as the star map has it, or null while the sky cannot be read. */
+  star: { state: LearningState; unmetExercises: number } | null
 }
 
 export type ChapterQuery =
@@ -78,13 +90,21 @@ export function useChapter(unitId: string | undefined): ChapterQuery {
   // on every render, which would rebuild the chapter every time.
   const { isLoading: catalogLoading, isError: catalogFailed, refetch: refetchCatalog } = catalogQuery
   const { isLoading: roadmapLoading, isError: roadmapFailed, refetch: refetchRoadmap } = roadmapQuery
+  const skyQuery = useKnowledgeMapQuery()
+  // Waited for on the first read only: a sky that failed once goes back to
+  // pending on every refetch (an answer asks for one), and the stage would
+  // take the exercise away each time.
+  const skyLoading = skyQuery.isLoading && skyQuery.errorUpdateCount === 0
+  const found = skyQuery.data?.stars.find((candidate) => candidate.unitId === unitId)
+  const starState = found?.state
+  const unmetExercises = found?.unmetExercises ?? 0
 
   return useMemo<ChapterQuery>(() => {
     if (!unitId) return { status: 'missing' }
     if (catalogLoading) return { status: 'loading' }
     if (catalogFailed) return { status: 'error', retry: () => void refetchCatalog() }
     if (!unit) return { status: 'missing' }
-    if (roadmapLoading) return { status: 'loading' }
+    if (roadmapLoading || skyLoading) return { status: 'loading' }
     if (roadmapFailed || !roadmap) return { status: 'error', retry: () => void refetchRoadmap() }
     const roadmapUnit = roadmap.units.find((candidate) => candidate.id === unitId)
     if (!roadmapUnit) return { status: 'missing' }
@@ -94,13 +114,14 @@ export function useChapter(unitId: string | undefined): ChapterQuery {
         .filter((lesson) => lesson.unitId === unitId)
         .map((lesson) => [lesson.id, lesson.exerciseCount] as const),
     )
+    const locked = starState === 'locked'
     const lessons = [...roadmapUnit.lessons]
       .sort((a, b) => a.order - b.order)
       .map<ChapterLesson>((lesson) => ({
         id: lesson.id,
         title: lesson.title,
         order: lesson.order,
-        status: lesson.status,
+        status: locked && lesson.status !== 'completed' ? 'locked' : lesson.status,
         estimatedMinutes: lesson.estimatedMinutes,
         exerciseCount: counts.get(lesson.id) ?? lesson.challengeCount,
       }))
@@ -115,9 +136,10 @@ export function useChapter(unitId: string | undefined): ChapterQuery {
         done: lessons.filter((lesson) => lesson.status === 'completed').length,
         total: lessons.length,
         nextLessonId: nextLessonOf(lessons),
+        star: starState ? { state: starState, unmetExercises } : null,
       },
     }
-  }, [unitId, unit, catalog, catalogLoading, catalogFailed, refetchCatalog, roadmap, roadmapLoading, roadmapFailed, refetchRoadmap])
+  }, [unitId, unit, catalog, catalogLoading, catalogFailed, refetchCatalog, roadmap, roadmapLoading, roadmapFailed, refetchRoadmap, skyLoading, starState, unmetExercises])
 }
 
 /** `/chapter/:unitId` and `/chapter/:unitId/:lessonId`, each segment encoded once. */
