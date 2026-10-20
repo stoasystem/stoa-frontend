@@ -187,13 +187,16 @@ describe('A6: the pickers wait for a pause in typing', () => {
     const keywords = mockedList.mock.calls.map(([filters]) => filters?.q)
     expect(keywords).not.toContain('k')
     expect(keywords).not.toContain('ke')
-    // Still the earlier list, not a blank picker with "loading" under it.
+    // Still the earlier list, not a blank picker. It answers the previous
+    // keyword, though, so it says so and cannot be picked from (#372).
     expect(parentSelect).toHaveTextContent('Rita Vogt')
-    expect(screen.queryByText(enAdmin.parentLinks.loading)).toBeNull()
+    expect(parentSelect).toBeDisabled()
+    expect(screen.getByText(enAdmin.parentLinks.loading)).toBeInTheDocument()
 
     release({ items: [ROWS[1]], count: 1, groups: {}, nextCursor: null })
     await waitFor(() => expect(parentSelect).not.toHaveTextContent('Rita Vogt'))
     expect(parentSelect).toHaveTextContent('Marco Keller')
+    expect(parentSelect).toBeEnabled()
   })
 
   it('hands each read its abort signal', async () => {
