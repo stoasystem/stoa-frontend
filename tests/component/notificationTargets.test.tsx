@@ -27,6 +27,7 @@ const { items, markRead, archive } = vi.hoisted(() => ({
 }))
 vi.mock('@/hooks/notifications/useNotificationsQuery', () => ({
   useNotificationsQuery: () => ({ data: { items: items.current }, isLoading: false, isError: false }),
+  useUnreadNotificationCountQuery: () => ({ data: 0 }),
   useMarkNotificationReadMutation: () => ({ mutate: markRead, isPending: false }),
   useArchiveNotificationMutation: () => ({ mutate: archive, isPending: false }),
 }))

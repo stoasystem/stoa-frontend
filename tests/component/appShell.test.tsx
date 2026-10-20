@@ -23,6 +23,7 @@ vi.mock('react-i18next', () => ({
 // The bell's own data is not what this is about.
 vi.mock('@/hooks/notifications/useNotificationsQuery', () => ({
   useNotificationsQuery: () => ({ data: { items: [] }, isLoading: false, isError: false }),
+  useUnreadNotificationCountQuery: () => ({ data: 0 }),
   useMarkNotificationReadMutation: () => ({ mutate: vi.fn(), isPending: false }),
   useArchiveNotificationMutation: () => ({ mutate: vi.fn(), isPending: false }),
 }))

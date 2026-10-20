@@ -3,6 +3,7 @@ import {
   archiveNotification,
   getAdminNotifications,
   getNotifications,
+  getUnreadNotificationCount,
   markNotificationRead,
 } from '@/services/notifications/notificationApi'
 import { notificationQueryKeys } from '@/services/notifications/notificationQueryKeys'
@@ -13,6 +14,15 @@ export function useNotificationsQuery(enabled = true) {
     queryFn: getNotifications,
     staleTime: 30_000,
     enabled,
+    retry: false,
+  })
+}
+
+export function useUnreadNotificationCountQuery() {
+  return useQuery({
+    queryKey: notificationQueryKeys.unreadCount(),
+    queryFn: getUnreadNotificationCount,
+    staleTime: 30_000,
     retry: false,
   })
 }

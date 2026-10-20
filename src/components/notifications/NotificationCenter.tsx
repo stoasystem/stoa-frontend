@@ -11,6 +11,7 @@ import {
   useArchiveNotificationMutation,
   useMarkNotificationReadMutation,
   useNotificationsQuery,
+  useUnreadNotificationCountQuery,
 } from '@/hooks/notifications/useNotificationsQuery'
 import {
   type RealtimeNotificationStatus,
@@ -61,11 +62,17 @@ export function NotificationCenter({
   const navigate = useNavigate()
   const role = useAuthStore((state) => state.user?.role)
   const query = useNotificationsQuery()
+  const unreadCount = useUnreadNotificationCountQuery()
   const realtime = useRealtimeNotifications()
   const markRead = useMarkNotificationReadMutation()
   const archive = useArchiveNotificationMutation()
   const items = query.data?.items ?? []
-  const unread = items.filter((item) => item.status === 'created').length
+  // Read on its own, not counted among the list's items: the list is the
+  // newest 50, and older unread ones went uncounted (#373). The count stops at
+  // the backend's limit of 100, so above 99 the number reads "99+"; `count`
+  // still picks the plural form.
+  const unread = unreadCount.data ?? 0
+  const unreadCopy = { count: unread, replace: { count: unread > 99 ? '99+' : String(unread) } }
   const RealtimeIcon = realtime.status === 'offline' ? WifiOff : Radio
   const targetOf = (event: NotificationEvent) => (role ? notificationTargetPath(event, role) : null)
 
@@ -117,7 +124,7 @@ export function NotificationCenter({
         hitSize={hitSize}
         label={
           unread
-            ? t('notifications.openLabelUnread', { count: unread })
+            ? t('notifications.openLabelUnread', unreadCopy)
             : t('notifications.openLabel')
         }
         aria-expanded={open}
@@ -159,7 +166,7 @@ export function NotificationCenter({
                 <RealtimeIcon className="h-3 w-3 shrink-0" aria-hidden="true" />
                 <span>{t(connectionKeys[realtime.status])}</span>
               </Badge>
-              <Badge variant="secondary">{t('notifications.unread', { count: unread })}</Badge>
+              <Badge variant="secondary">{t('notifications.unread', unreadCopy)}</Badge>
             </div>
           </div>
           <div className="mt-3 max-h-80 space-y-2 overflow-y-auto">
