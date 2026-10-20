@@ -1,4 +1,5 @@
 import { createElement, lazy, type ComponentType } from 'react'
+import { reloadForFailedPage } from '@/app/chunkReload'
 
 /* The props a page receives from the route manifest: whatever its entry lists
  * under `props`, plus the entry's `titleKey` when it has one. */
@@ -65,14 +66,16 @@ export function lazyPage<Name extends string>(
   const attempt = () =>
     lazy(() =>
       load()
-        .then((module) =>
-          // Vite hands back nothing when the tab is about to reload for a
-          // failed import (chunkReload.ts): stay loading until it does, rather
-          // than fail on a missing module and report that. A reload that never
-          // comes -- the reader chose to stay on a "Leave site?" prompt -- is a
-          // failure after all, so the page offers "Try again" instead of
-          // loading for good.
-          module ? { default: module[pageName] } : reloadThatNeverCame(pageName),
+        .then(
+          (module) => ({ default: module[pageName] }),
+          (error: unknown) =>
+            // A module that could not be fetched may be one an older release
+            // named, so the tab reloads (chunkReload.ts) and the page stays
+            // loading until it does, rather than fail and report that. A
+            // reload that never comes -- the reader chose to stay on a "Leave
+            // site?" prompt -- is a failure after all, so the page offers
+            // "Try again" instead of loading for good.
+            reloadForFailedPage(error) ? reloadThatNeverCame(pageName) : Promise.reject(error),
         )
         .catch(failed),
     )

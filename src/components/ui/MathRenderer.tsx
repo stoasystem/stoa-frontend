@@ -15,16 +15,19 @@ let katexPromise: Promise<Katex> | null = null
 
 // A failed load (a dropped connection, a chunk gone after a deploy) is not
 // kept: the next formula asks again rather than staying plain text until a
-// reload (#345).
+// reload (#345). Nor is a module that came back empty, which is what Vite
+// hands over when a `vite:preloadError` listener prevents the failure (#401).
 function loadKatex(): Promise<Katex> {
   if (!katexPromise) {
-    katexPromise = import('./katexLoader').then(
-      (module) => module.default as unknown as Katex,
-      (error: unknown) => {
+    katexPromise = import('./katexLoader')
+      .then((module) => {
+        if (!module?.default) throw new Error('KaTeX did not load')
+        return module.default as unknown as Katex
+      })
+      .catch((error: unknown) => {
         katexPromise = null
         throw error
-      },
-    )
+      })
   }
   return katexPromise
 }
