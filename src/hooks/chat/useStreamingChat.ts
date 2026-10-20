@@ -335,7 +335,7 @@ export function useStreamingChat(conversationId: string | null) {
             if (settled.kind !== 'aborted') abandon()
           })
           const aborted = new Promise<never>((_, reject) => {
-            const fail = () => reject(new DOMException('The send request was let go.', 'AbortError'))
+            const fail = () => reject(requestController.signal.reason)
             if (requestController.signal.aborted) fail()
             else requestController.signal.addEventListener('abort', fail, { once: true })
           })
