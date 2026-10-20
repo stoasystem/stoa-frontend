@@ -61,10 +61,11 @@ let failed = false
 
 if (unparsed.length > 0) {
   failed = true
-  console.error(`\n${unparsed.length} request(s) whose path this check cannot read:\n`)
+  console.error(`\n${unparsed.length} request(s) whose path or method this check cannot read:\n`)
   for (const call of unparsed) console.error(`  ${call.file}:${call.line}  ${call.text}`)
   console.error(
     '\nWrite the path as apiPath`...`, a string, or a `const NAME = \'/path\'` in src/services,' +
+      " give a fetch its options inline with `method: 'POST'` (or none for GET)," +
       ' or teach scripts/api-contract.mjs the new form.',
   )
 }

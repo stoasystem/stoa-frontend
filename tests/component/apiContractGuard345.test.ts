@@ -2,6 +2,8 @@
  * The API contract gate read only httpClient calls with a literal path, so it
  * skipped fetch() and constant paths, and passed with nothing checked if the
  * way services are written changed (#345). Each blind spot is fed in here.
+ * A fetch's method then came from the first `method:` after its URL, which
+ * could belong to the next call (#374).
  */
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { join } from 'node:path'
@@ -40,6 +42,64 @@ describe('what the gate reads', () => {
       { file: 'src/services/b.ts', source: 'httpClient.post(LOGOUT_PATH, {})' },
     ])
     expect(calls).toEqual([{ method: 'POST', path: '/auth/logout', file: 'src/services/b.ts' }])
+  })
+})
+
+describe('the method a fetch sends (#374)', () => {
+  const get = { method: 'GET', path: '/students/${id}', file: 'src/services/x.ts' }
+  const post = { method: 'POST', path: '/auth/logout', file: 'src/services/x.ts' }
+
+  it.each([
+    [
+      'a GET fetch followed by a POST fetch',
+      "await fetch(`${apiBaseUrl}/students/${id}`)\nawait fetch(`${apiBaseUrl}/auth/logout`, { method: 'POST' })",
+      [get, post],
+    ],
+    [
+      'a POST fetch followed by a GET fetch',
+      "await fetch(`${apiBaseUrl}/auth/logout`, { method: 'POST' })\nawait fetch(`${apiBaseUrl}/students/${id}`, {})",
+      [post, get],
+    ],
+    [
+      'a GET fetch followed by another object holding a method',
+      "const r = await fetch(`${apiBaseUrl}/students/${id}`, { signal })\nconst init = { method: 'POST' }",
+      [get],
+    ],
+    [
+      'a GET fetch whose body holds a method',
+      "fetch(`${apiBaseUrl}/students/${id}`, { body: JSON.stringify({ method: 'POST' }) })",
+      [get],
+    ],
+    [
+      'a method after nested headers, on its own line, in lower case',
+      "fetch(\n  `${apiBaseUrl}/auth/logout`,\n  { headers: { ...h, 'X-A': `${a})` }, method: 'post' },\n)",
+      [post],
+    ],
+    [
+      'a method after spread options, which it overrides',
+      "fetch(`${apiBaseUrl}/auth/logout`, { ...init, method: 'POST' } as RequestInit)",
+      [post],
+    ],
+    ['a method held as a constant type', "fetch(`${apiBaseUrl}/auth/logout`, { method: 'POST' as const })", [post]],
+  ])('%s', (_form, source, calls) => {
+    expect(one(source)).toEqual({ calls, unparsed: [] })
+  })
+
+  it.each([
+    ['options passed as a variable', 'fetch(`${apiBaseUrl}/auth/logout`, init)'],
+    ['options that spread another object', 'fetch(`${apiBaseUrl}/auth/logout`, { ...init })'],
+    ['spread options after the method', "fetch(`${apiBaseUrl}/auth/logout`, { method: 'POST', ...init })"],
+    ['a method held in a variable', 'fetch(`${apiBaseUrl}/auth/logout`, { method: verb })'],
+    ['a method in shorthand', 'fetch(`${apiBaseUrl}/auth/logout`, { method })'],
+    ['a method under a computed key', "fetch(`${apiBaseUrl}/auth/logout`, { [key]: 'POST' })"],
+    ['a computed key after the method', "fetch(`${apiBaseUrl}/auth/logout`, { method: 'POST', [key]: value })"],
+    // Seen by the scan but not a call to the parser: reported, never dropped.
+    ['a fetch in a comment', '// fetch(`${apiBaseUrl}/auth/logout`)'],
+  ])('refuses %s', (_form, source) => {
+    const { calls, unparsed } = one(source)
+    expect(calls).toEqual([])
+    expect(unparsed).toHaveLength(1)
+    expect(unparsed[0]).toMatchObject({ file: 'src/services/x.ts', line: 1 })
   })
 })
 
