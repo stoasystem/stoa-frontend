@@ -81,29 +81,29 @@ export function useCurriculumMigrationEvidenceQuery(migrationId?: string, enable
 }
 
 export function usePatchCurriculumDraftMutation() {
-  const queryClient = useQueryClient()
+  const refresh = useRefreshCurriculumVersion()
   return useMutation({
     mutationFn: (input: CurriculumPatchInput) => patchCurriculumDraft(input),
-    onSuccess: (version) => {
-      void queryClient.invalidateQueries({ queryKey: adminQueryKeys.curriculumWorklist() })
-      void queryClient.invalidateQueries({
-        queryKey: adminQueryKeys.curriculumPreview(version.publicLessonId, version.versionId),
-      })
-    },
+    onSuccess: (_version, { publicLessonId, versionId }) => refresh(publicLessonId, versionId, { content: true }),
   })
 }
 
 /**
- * After a review or publish step the worklist, the version's preview and its
+ * After a write to a version the worklist, the version's preview and its
  * audit trail all say something new. Nothing refreshed them, so an admin who
- * saw no change clicked again (#258).
+ * saw no change clicked again (#258). A write that changes the content also
+ * changes the version's validation and every diff of the lesson; a patch left
+ * them showing the verdict from before the fix (#404).
  */
 function useRefreshCurriculumVersion() {
   const queryClient = useQueryClient()
-  return (publicLessonId: string, versionId: string) => {
-    void queryClient.invalidateQueries({ queryKey: adminQueryKeys.curriculumWorklist() })
+  return (publicLessonId: string, versionId: string, { content = false } = {}) => {
+    void queryClient.invalidateQueries({ queryKey: adminQueryKeys.curriculumWorklistAll() })
     void queryClient.invalidateQueries({ queryKey: adminQueryKeys.curriculumPreview(publicLessonId, versionId) })
     void queryClient.invalidateQueries({ queryKey: adminQueryKeys.curriculumAudit(publicLessonId) })
+    if (!content) return
+    void queryClient.invalidateQueries({ queryKey: adminQueryKeys.curriculumValidation(publicLessonId, versionId) })
+    void queryClient.invalidateQueries({ queryKey: adminQueryKeys.curriculumDiffsOf(publicLessonId) })
   }
 }
 
@@ -137,7 +137,10 @@ export function usePublishCurriculumVersionMutation() {
   const refresh = useRefreshCurriculumVersion()
   return useMutation({
     mutationFn: (input: CurriculumPublishInput) => publishCurriculumVersion(input),
-    onSuccess: (_data, { publicLessonId, versionId }) => refresh(publicLessonId, versionId),
+    // A refusal counts too: the backend writes `publish_refused` to the audit,
+    // and a 409 stale_pointer means the worklist's live version is out of
+    // date, so the next publish read from it would be refused again (#404).
+    onSettled: (_data, _error, { publicLessonId, versionId }) => refresh(publicLessonId, versionId),
   })
 }
 
@@ -151,10 +154,13 @@ export function useApplyCurriculumMigrationMutation() {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (input: CurriculumMigrationApplyInput) => applyCurriculumMigration(input),
-    onSuccess: (evidence) => {
-      void queryClient.invalidateQueries({
-        queryKey: adminQueryKeys.curriculumMigrationEvidence(evidence.migrationId),
-      })
+    // An apply writes versions, live pointers and audit entries for any lesson
+    // in the manifest, so everything the console has read may be out of date:
+    // with `publish: true` the worklist kept the old live version and the next
+    // publish was refused with stale_pointer. The backend writes one row at a
+    // time, so a refusal part-way leaves the earlier rows written (#404).
+    onSettled: () => {
+      void queryClient.invalidateQueries({ queryKey: adminQueryKeys.curriculumAll() })
     },
   })
 }
