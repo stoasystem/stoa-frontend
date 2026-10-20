@@ -241,7 +241,7 @@ describe('where the message stands', () => {
 
     mockedStream.mockResolvedValueOnce('streamed')
     await act(async () => {
-      result.current.retryMessage(failed!.id)
+      result.current.retryMessage!(failed!.id)
       await vi.advanceTimersByTimeAsync(100)
     })
 
@@ -262,7 +262,7 @@ describe('where the message stands', () => {
 
     mockedStream.mockResolvedValueOnce('streamed')
     await act(async () => {
-      result.current.retryMessage(failed!.id)
+      result.current.retryMessage!(failed!.id)
       await vi.advanceTimersByTimeAsync(100)
     })
 
@@ -282,7 +282,7 @@ describe('where the message stands', () => {
 
     mockedStream.mockResolvedValueOnce('streamed')
     await act(async () => {
-      result.current.retryMessage(failed!.id)
+      result.current.retryMessage!(failed!.id)
       await vi.advanceTimersByTimeAsync(100)
     })
     const keys = mockedStream.mock.calls.map((call) => call[0].payload.idempotencyKey)
@@ -464,7 +464,7 @@ describe('a message that is replaced before it ends', () => {
 
     mockedStream.mockImplementationOnce(() => new Promise<StreamOutcome>(() => {}))
     act(() => {
-      result.current.retryMessage(failed.id)
+      result.current.retryMessage!(failed.id)
     })
     await waitFor(() => expect(result.current.isStreaming).toBe(true))
 

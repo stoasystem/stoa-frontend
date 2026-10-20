@@ -1,4 +1,4 @@
-import type { ChatAttachment, MessageQuote, PracticeContextRef } from '@/types/chat'
+import type { ChatAttachment, ChatMessage, MessageQuote, PracticeContextRef } from '@/types/chat'
 
 /**
  * One message on its way: what was asked, and the idempotency key that makes
@@ -81,15 +81,92 @@ export function rememberPendingMessage(
 }
 
 /**
- * Signing out: the questions still waiting for an answer are this account's
- * words, and must not be left in the tab for the next one.
+ * A message that did not go through, with what sending it again takes: kept
+ * in the tab until the student sends it again or signs out, so a later answer,
+ * another conversation or closing Ask does not wipe it (#326 K1).
+ */
+export type FailedMessage = {
+  /** The student's bubble, `failed`, carrying its retry. */
+  student: ChatMessage & {
+    retryPayload: Omit<PendingMessage, 'askedAt' | 'idempotencyKey' | 'unconfirmed'> & { idempotencyKey?: string }
+  }
+  /** What stood in the answer's place, if anything. */
+  answer?: ChatMessage
+}
+
+type StoredFailedMessage = FailedMessage & { owner: string }
+
+export const FAILED_MESSAGE_KEY_PREFIX = 'stoa_failed_chat_messages:'
+const failedKey = (conversationId: string) => `${FAILED_MESSAGE_KEY_PREFIX}${conversationId}`
+
+function readStoredFailed(conversationId: string): StoredFailedMessage[] {
+  try {
+    const value: unknown = JSON.parse(sessionStorage.getItem(failedKey(conversationId)) ?? '[]')
+    if (!Array.isArray(value)) return []
+    return value.filter(
+      (entry): entry is StoredFailedMessage =>
+        typeof entry === 'object' &&
+        entry !== null &&
+        typeof (entry as StoredFailedMessage).owner === 'string' &&
+        typeof (entry as StoredFailedMessage).student?.id === 'string' &&
+        typeof (entry as StoredFailedMessage).student?.retryPayload?.content === 'string',
+    )
+  } catch {
+    return []
+  }
+}
+
+function writeStoredFailed(conversationId: string, entries: StoredFailedMessage[]) {
+  try {
+    if (entries.length > 0) {
+      sessionStorage.setItem(failedKey(conversationId), JSON.stringify(entries))
+    } else {
+      sessionStorage.removeItem(failedKey(conversationId))
+    }
+  } catch {
+    // Without storage the failed message lasts as long as the conversation is open.
+  }
+}
+
+/**
+ * The conversation's failed messages, oldest first: only `owner`'s, the
+ * account that wrote them. Nobody signed in reads none.
+ */
+export function readFailedMessages(conversationId: string, owner: string | null | undefined): FailedMessage[] {
+  if (!owner) return []
+  return readStoredFailed(conversationId)
+    .filter((entry) => entry.owner === owner)
+    .map(({ student, answer }) => (answer ? { student, answer } : { student }))
+}
+
+/** Keep `failed` for `owner`, in place of an earlier record of the same bubble. */
+export function keepFailedMessage(conversationId: string, owner: string | null | undefined, failed: FailedMessage) {
+  if (!owner) return
+  writeStoredFailed(conversationId, [
+    ...readStoredFailed(conversationId).filter((entry) => entry.student.id !== failed.student.id),
+    { ...failed, owner },
+  ])
+}
+
+/** Forget the failed message whose student bubble is `studentMessageId`. */
+export function dropFailedMessage(conversationId: string, studentMessageId: string) {
+  writeStoredFailed(
+    conversationId,
+    readStoredFailed(conversationId).filter((entry) => entry.student.id !== studentMessageId),
+  )
+}
+
+/**
+ * Signing out: the questions still waiting for an answer, and the ones that
+ * did not go through, are this account's words, and must not be left in the
+ * tab for the next one.
  */
 export function clearPendingMessages() {
   try {
     const keys: string[] = []
     for (let index = 0; index < sessionStorage.length; index += 1) {
       const key = sessionStorage.key(index)
-      if (key?.startsWith(PENDING_MESSAGE_KEY_PREFIX)) keys.push(key)
+      if (key?.startsWith(PENDING_MESSAGE_KEY_PREFIX) || key?.startsWith(FAILED_MESSAGE_KEY_PREFIX)) keys.push(key)
     }
     for (const key of keys) sessionStorage.removeItem(key)
   } catch {
