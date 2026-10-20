@@ -166,7 +166,13 @@
     "loading": "Chargement des comptes…",
     "loadFailed": "La liste des comptes n’a pas pu être chargée.",
     "noParents": "Aucun compte parent actif ne correspond à ce filtre.",
-    "noStudents": "Aucun compte élève actif ne correspond à ce filtre."
+    "noStudents": "Aucun compte élève actif ne correspond à ce filtre.",
+    "confirm": {
+      "title": "Lier ces deux comptes ?",
+      "body": "{{student}} sera lié à {{parent}}, relation : « {{relationship}} ». Le lien prend effet immédiatement, et aucun des deux comptes n’a à le confirmer.",
+      "cancel": "Annuler",
+      "submit": "Lier maintenant"
+    }
   },
   "activation": {
     "eyebrow": "Invitation de compte",

@@ -27,6 +27,9 @@ export function useAdminAccountsQuery(filters: AccountListFilters) {
   return useQuery({
     queryKey: adminQueryKeys.accounts(filters),
     queryFn: ({ signal }) => listAccounts(filters, { signal }),
+    // #336: the account-operations pickers filter as the administrator types;
+    // the list on screen stays while the next one is read.
+    placeholderData: keepPreviousData,
     retry: false,
   })
 }

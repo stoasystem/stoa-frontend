@@ -13,7 +13,7 @@
  * and shows the account number the administrator finds them by.
  */
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { render, screen, waitFor } from '@testing-library/react'
+import { render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import type { ReactNode } from 'react'
 import { MemoryRouter } from 'react-router-dom'
@@ -145,6 +145,9 @@ async function assignOnConsole() {
   await user.selectOptions(parentSelect, 'parent-1')
   await user.selectOptions(studentSelect, 'student-1')
   await user.click(screen.getByRole('button', { name: enAdmin.parentLinks.submit }))
+  // #336: the link takes effect at once, so it is confirmed first.
+  const dialog = await screen.findByRole('dialog')
+  await user.click(within(dialog).getByRole('button', { name: enAdmin.parentLinks.confirm.submit }))
   return user
 }
 

@@ -165,7 +165,13 @@
     "loading": "Konten werden geladen …",
     "loadFailed": "Die Kontoliste konnte nicht geladen werden.",
     "noParents": "Kein aktives Elternkonto passt zu diesem Filter.",
-    "noStudents": "Kein aktives Schülerkonto passt zu diesem Filter."
+    "noStudents": "Kein aktives Schülerkonto passt zu diesem Filter.",
+    "confirm": {
+      "title": "Diese zwei Konten verknüpfen?",
+      "body": "{{student}} wird mit {{parent}} verknüpft, Beziehung: «{{relationship}}». Die Verknüpfung gilt sofort, und keines der beiden Konten muss sie bestätigen.",
+      "cancel": "Abbrechen",
+      "submit": "Jetzt verknüpfen"
+    }
   },
   "activation": {
     "eyebrow": "Kontoeinladung",

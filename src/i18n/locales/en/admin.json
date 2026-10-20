@@ -165,7 +165,13 @@
     "loading": "Loading accounts…",
     "loadFailed": "The account list could not be loaded.",
     "noParents": "No active parent account matches this filter.",
-    "noStudents": "No active student account matches this filter."
+    "noStudents": "No active student account matches this filter.",
+    "confirm": {
+      "title": "Link these two accounts?",
+      "body": "{{student}} will be linked to {{parent}} as “{{relationship}}”. The link takes effect at once, and neither account is asked to confirm it.",
+      "cancel": "Cancel",
+      "submit": "Link now"
+    }
   },
   "activation": {
     "eyebrow": "Account invitation",
