@@ -3,6 +3,11 @@ import tseslint from 'typescript-eslint'
 import importX from 'eslint-plugin-import-x'
 import { createTypeScriptImportResolver } from 'eslint-import-resolver-typescript'
 import stoaApiPath from './scripts/eslint/api-path-template.mjs'
+import stoaRegexpSafari from './scripts/eslint/regexp-safari.mjs'
+
+// One `stoa` plugin for the repository's own rules: flat config refuses two
+// different plugins under the same name.
+const stoa = { rules: { ...stoaApiPath.rules, ...stoaRegexpSafari.rules } }
 
 export default tseslint.config(
   js.configs.recommended,
@@ -64,9 +69,17 @@ export default tseslint.config(
     // Every value in a service path goes through apiPath, so an id decoded from
     // the address cannot leave its own segment (#251).
     files: ['src/services/**/*.{ts,tsx}'],
-    plugins: { stoa: stoaApiPath },
+    plugins: { stoa },
     rules: {
       'stoa/api-path-template': 'error',
+    },
+  },
+  {
+    // What src holds must parse on iPadOS 15: no regex lookbehind or `v` flag (#398).
+    files: ['src/**/*.{js,jsx,ts,tsx}'],
+    plugins: { stoa },
+    rules: {
+      'stoa/regexp-safari': 'error',
     },
   },
 )

@@ -41,6 +41,17 @@ export type MathSegment =
  */
 const PADDED_MATHS_RE = /[\\^_{}=]|\p{L}\s*[-+*/<>]|[-+*/<>]\s*\p{L}|^\S+$/u
 
+/**
+ * Whether a number, maybe then spaces or tabs, ends just before `index`. A
+ * check in code rather than a lookbehind in the pattern: Safari before 16.4
+ * cannot parse one, and the whole module then fails to load (#398).
+ */
+function followsNumber(text: string, index: number): boolean {
+  let at = index
+  while (at > 0 && (text[at - 1] === ' ' || text[at - 1] === '\t')) at -= 1
+  return at > 0 && /\d/.test(text[at - 1])
+}
+
 /** Split a string into text / inline-math / block-math segments. */
 export function parseSegments(text: string): MathSegment[] {
   const segments: MathSegment[] = []
@@ -54,13 +65,13 @@ export function parseSegments(text: string): MathSegment[] {
   // is read too when what it holds is maths, its opening dollar does not follow
   // a number ("5 $ et 10 $") and its closing one is not followed by a number,
   // even after a space ("$ 5 or $ 10") (#386).
-  const RE = /(\$\$[\s\S]+?\$\$|\$[^\s$](?:[^$\n]*?[^\s$])?\$(?!\d))|((?<!\d[ \t]*)\$[^$\n]*?\$(?![ \t]*\d))/g
+  const RE = /(\$\$[\s\S]+?\$\$|\$[^\s$](?:[^$\n]*?[^\s$])?\$(?!\d))|(\$[^$\n]*?\$(?![ \t]*\d))/g
   let lastIndex = 0
   let match: RegExpExecArray | null
 
   while ((match = RE.exec(text)) !== null) {
     const padded = match[2]
-    if (padded && !PADDED_MATHS_RE.test(padded.slice(1, -1).trim())) {
+    if (padded && (followsNumber(text, match.index) || !PADDED_MATHS_RE.test(padded.slice(1, -1).trim()))) {
       // Not a formula; its closing dollar may still open one.
       RE.lastIndex = match.index + 1
       continue
@@ -94,8 +105,11 @@ export function parseSegments(text: string): MathSegment[] {
 const BOLD_RE = /\*\*(?=\S)([\s\S]*?\S)\*\*/g
 // A single asterisk, not part of a pair, with no space just inside it: the same
 // flanking rule as bold, so `2 * 3 * 4` stays an expression and a list marker
-// (`* item`) stays a list marker. It does not run across a line.
-const ITALIC_RE = /(?<!\*)\*(?=[^\s*])([^*\n]*?[^\s*])\*(?!\*)/g
+// (`* item`) stays a list marker. It does not run across a line. A run of two
+// or more asterisks is matched first, capturing nothing, and passed over whole,
+// so none of its asterisks opens one: that stands in for a lookbehind,
+// `(?<!\*)`, which Safari before 16.4 cannot parse (#398).
+const ITALIC_RE = /\*{2,}|\*(?=[^\s*])([^*\n]*?[^\s*])\*(?!\*)/g
 
 type Leaf = (text: string, key: string) => React.ReactNode[]
 
@@ -115,6 +129,8 @@ function splitBy(
   const matches: RegExpExecArray[] = []
   while ((match = re.exec(value)) !== null) matches.push(match)
   for (const found of matches) {
+    // A match that captured nothing is passed over: ITALIC_RE's runs of asterisks.
+    if (found[1] === undefined) continue
     if (found.index > lastIndex) nodes.push(...rest(value.slice(lastIndex, found.index), `${key}-${lastIndex}`))
     const at = `${key}-${found.index}`
     nodes.push(wrap(inner(found[1], at), at))
