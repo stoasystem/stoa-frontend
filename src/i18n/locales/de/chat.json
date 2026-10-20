@@ -103,6 +103,7 @@
       "cardLabel": "Unterstützung durch eine Lehrperson",
       "status": {
         "pending": "Wartet",
+        "waiting_no_teacher": "Wartet",
         "assigned": "Zugewiesen",
         "in_progress": "In Bearbeitung",
         "resolved": "Erledigt",
@@ -112,6 +113,7 @@
       },
       "title": {
         "pending": "Lehrperson angefragt",
+        "waiting_no_teacher": "Gerade ist keine Lehrperson frei",
         "assigned": "{{name}} kommt in diese Unterhaltung",
         "in_progress": "{{name}} hilft dir",
         "resolved": "Die Unterstützung ist abgeschlossen",
@@ -121,12 +123,18 @@
       },
       "body": {
         "pending": "Eine Lehrperson antwortet in dieser Unterhaltung. Mach in der Zwischenzeit weiter.",
+        "waiting_no_teacher": "Deine Anfrage bleibt offen. Sobald eine Lehrperson frei ist, übernimmt sie die Anfrage und antwortet in dieser Unterhaltung.",
         "assigned": "Die Antwort erscheint in dieser Unterhaltung.",
         "in_progress": "Die Antworten erscheinen in dieser Unterhaltung.",
         "resolved": "Brauchst du mehr Hilfe? Frag unter einer Antwort erneut eine Lehrperson.",
         "cancelled": "Brauchst du mehr Hilfe? Frag unter einer Antwort erneut eine Lehrperson.",
         "withdrawn": "Brauchst du doch Hilfe? Frag unter einer Antwort erneut eine Lehrperson.",
         "expired": "Deine Anfrage ist abgelaufen. Frag unter einer Antwort erneut eine Lehrperson."
+      },
+      "fallback": {
+        "title": "Lehrperson angefragt",
+        "status": "Angefragt",
+        "body": "Antworten einer Lehrperson erscheinen in dieser Unterhaltung."
       }
     },
     "practice": {

@@ -76,8 +76,28 @@ describe('polling cadence', () => {
     expect(mockedGet).toHaveBeenCalledTimes(2)
   })
 
-  it('stops polling once the request reaches a terminal state', async () => {
-    mockedGet.mockResolvedValue({ status: 'resolved' } as never)
+  // #397: nobody could be offered the request yet, and a teacher takes it once
+  // one is free -- so it is read again like pending. A status this app does
+  // not know yet is read again too, rather than taken for ended.
+  it.each(['waiting_no_teacher', 'reassigning'])('keeps polling every fifteen seconds while it is %s', async (status) => {
+    mockedGet.mockResolvedValue({ status } as never)
+
+    renderHook(() => useTeacherHelpStatusQuery('req-1'), { wrapper })
+    await settle()
+    expect(mockedGet).toHaveBeenCalledTimes(1)
+
+    await advancePolls(5_000, 1)
+    expect(mockedGet).toHaveBeenCalledTimes(1)
+
+    await advancePolls(10_000, 1)
+    expect(mockedGet).toHaveBeenCalledTimes(2)
+
+    await advancePolls(15_000, 2)
+    expect(mockedGet).toHaveBeenCalledTimes(4)
+  })
+
+  it.each(['resolved', 'cancelled', 'withdrawn', 'expired'])('stops polling once the request is %s', async (status) => {
+    mockedGet.mockResolvedValue({ status } as never)
 
     renderHook(() => useTeacherHelpStatusQuery('req-1'), { wrapper })
     await settle()

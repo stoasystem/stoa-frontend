@@ -5,10 +5,16 @@ import {
   teacherHelpPollInterval,
   useTeacherHelpStatusQuery,
 } from '@/hooks/chat/useTeacherHelpStatusQuery'
-import type { TeacherHelpRequest, TeacherHelpStatus } from '@/types/teacherHelp'
+import type { TeacherHelpRequest } from '@/types/teacherHelp'
 
-/** Help that has not ended: the card is pinned and the thread is read again. */
-export const ACTIVE_HELP: ReadonlySet<TeacherHelpStatus> = new Set(['pending', 'assigned', 'in_progress'])
+/**
+ * Help that has not ended: the thread is read again and help is not offered
+ * again. That is every status still read again, so waiting_no_teacher and a
+ * status this app does not know yet count as waiting (#397).
+ */
+function isActiveHelp(help: TeacherHelpRequest | null): boolean {
+  return help !== null && teacherHelpPollInterval(help.status) !== false
+}
 
 /**
  * One Ask conversation: its messages as the server has them plus the ones on
@@ -52,7 +58,7 @@ export function useAskConversation(conversationId: string | null) {
     conversation: conversationQuery.data ?? null,
     messages,
     help,
-    helpActive: help !== null && ACTIVE_HELP.has(help.status),
+    helpActive: isActiveHelp(help),
     ...streaming,
   }
 }

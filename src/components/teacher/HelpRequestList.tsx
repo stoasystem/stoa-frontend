@@ -18,6 +18,8 @@ import type { TeacherHelpRequestSummary } from '@/types/teacher'
  */
 const statusTones: Record<TeacherHelpStatus, PillTone> = {
   pending: 'accent',
+  // Only the student's view says it; listed for the type, never on this list.
+  waiting_no_teacher: 'accent',
   assigned: 'gold',
   in_progress: 'green',
   resolved: 'neutral',

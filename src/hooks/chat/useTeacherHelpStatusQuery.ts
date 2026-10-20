@@ -6,8 +6,8 @@ import { chatQueryKeys } from '@/services/chat/chatQueryKeys'
 /** Active statuses where the teacher is still engaging — poll more frequently. */
 const ACTIVE_STATUSES = new Set(['assigned', 'in_progress'])
 
-/** Pending status — teacher hasn't responded yet, lower priority. */
-const WAITING_STATUSES = new Set(['pending'])
+/** Ended — nothing more will happen to the request, so it is not read again. */
+const ENDED_STATUSES = new Set(['resolved', 'cancelled', 'withdrawn', 'expired'])
 
 /**
  * How often a conversation with help in this state is read again: 5 s while a
@@ -19,10 +19,12 @@ export function teacherHelpPollInterval(status: string | null | undefined): numb
   if (!status) return false
   // Active: teacher is engaged → fast 5s poll for near-real-time updates
   if (ACTIVE_STATUSES.has(status)) return 5_000
-  // Waiting: request submitted, teacher not yet assigned → 15s is enough
-  if (WAITING_STATUSES.has(status)) return 15_000
-  // Resolved / cancelled / any terminal state → stop polling
-  return false
+  // Resolved / cancelled / withdrawn / expired → stop polling
+  if (ENDED_STATUSES.has(status)) return false
+  // Waiting: pending, waiting_no_teacher (no teacher free yet), and a status
+  // this app does not know yet, which is read as waiting rather than as ended
+  // (#397) → 15s is enough
+  return 15_000
 }
 
 export function useTeacherHelpStatusQuery(conversationId: string | null) {

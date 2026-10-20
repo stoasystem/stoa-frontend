@@ -104,6 +104,7 @@
       "cardLabel": "Aiuto di un insegnante",
       "status": {
         "pending": "In attesa",
+        "waiting_no_teacher": "In attesa",
         "assigned": "Assegnata",
         "in_progress": "In corso",
         "resolved": "Risolta",
@@ -113,6 +114,7 @@
       },
       "title": {
         "pending": "Aiuto di un insegnante richiesto",
+        "waiting_no_teacher": "Al momento nessun insegnante è libero",
         "assigned": "{{name}} si unirà a questa conversazione",
         "in_progress": "{{name}} ti sta aiutando",
         "resolved": "L’aiuto dell’insegnante è terminato",
@@ -122,12 +124,18 @@
       },
       "body": {
         "pending": "Un insegnante risponderà in questa conversazione. Nel frattempo continua pure.",
+        "waiting_no_teacher": "La tua richiesta resta aperta. Appena un insegnante sarà libero, la prenderà in carico e risponderà in questa conversazione.",
         "assigned": "La risposta apparirà in questa conversazione.",
         "in_progress": "Le risposte appaiono in questa conversazione.",
         "resolved": "Ti serve altro aiuto? Chiedi di nuovo a un insegnante sotto una risposta.",
         "cancelled": "Ti serve altro aiuto? Chiedi di nuovo a un insegnante sotto una risposta.",
         "withdrawn": "Ti serve aiuto comunque? Chiedi di nuovo a un insegnante sotto una risposta.",
         "expired": "La tua richiesta è scaduta. Chiedi di nuovo a un insegnante sotto una risposta."
+      },
+      "fallback": {
+        "title": "Aiuto di un insegnante richiesto",
+        "status": "Richiesta",
+        "body": "Le risposte di un insegnante appaiono in questa conversazione."
       }
     },
     "practice": {

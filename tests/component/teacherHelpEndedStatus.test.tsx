@@ -10,6 +10,7 @@ import type { TeacherHelpStatus } from '@/types/teacherHelp'
 // in every language. Every status the server can report has its words.
 const STATUSES: TeacherHelpStatus[] = [
   'pending',
+  'waiting_no_teacher',
   'assigned',
   'in_progress',
   'resolved',
@@ -23,6 +24,10 @@ const initialLanguage = i18n.language
 afterAll(async () => {
   await i18n.changeLanguage(initialLanguage)
 })
+
+// #397: a status the server may add later. Each would build a key that does
+// not exist -- and `constructor` would pass an `in` check on a plain object.
+const UNKNOWN = ['reassigning', 'constructor', 'title.pending']
 
 function renderCard(status: TeacherHelpStatus) {
   return render(
@@ -44,6 +49,32 @@ describe('the pinned teacher help card', () => {
       expect(container.textContent?.trim()).not.toBe('')
     })
   }
+
+  for (const language of LANGUAGES) {
+    it.each(UNKNOWN)(`says %s, a status it does not know, in general ${language} words`, async (status) => {
+      await i18n.changeLanguage(language)
+      const { container } = renderCard(status as never)
+      expect(container.textContent).not.toMatch(/ask\.help\./)
+      expect(container.textContent).not.toContain(status)
+      expect(container.textContent).toContain(i18n.t('chat:ask.help.fallback.body'))
+    })
+  }
+
+  it('tells an English student, in general words, that a teacher was asked', async () => {
+    await i18n.changeLanguage('en')
+    const { container } = renderCard('reassigning' as never)
+    expect(container.textContent).toContain('Teacher support requested')
+    expect(container.textContent).toContain('Replies from a teacher appear in this conversation.')
+    expect(container.textContent).toContain('Requested')
+  })
+
+  it('tells a German student, in du, that no teacher is free yet and the request stays open', async () => {
+    await i18n.changeLanguage('de')
+    const { container } = renderCard('waiting_no_teacher')
+    expect(container.textContent).toContain('Gerade ist keine Lehrperson frei')
+    expect(container.textContent).toContain('Deine Anfrage bleibt offen.')
+    expect(container.textContent).toContain('Wartet')
+  })
 
   it('tells a German student, in du, that nobody was free in time', async () => {
     await i18n.changeLanguage('de')

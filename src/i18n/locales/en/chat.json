@@ -103,6 +103,7 @@
       "cardLabel": "Teacher support",
       "status": {
         "pending": "Waiting",
+        "waiting_no_teacher": "Waiting",
         "assigned": "Assigned",
         "in_progress": "In progress",
         "resolved": "Resolved",
@@ -112,6 +113,7 @@
       },
       "title": {
         "pending": "Teacher support requested",
+        "waiting_no_teacher": "No teacher is free right now",
         "assigned": "{{name}} will join this conversation",
         "in_progress": "{{name}} is helping you",
         "resolved": "Teacher support has ended",
@@ -121,12 +123,18 @@
       },
       "body": {
         "pending": "A teacher will reply in this conversation. Keep going in the meantime.",
+        "waiting_no_teacher": "Your request stays open. As soon as a teacher is free, they will take it and reply in this conversation.",
         "assigned": "Their reply will appear in this conversation.",
         "in_progress": "Their replies appear in this conversation.",
         "resolved": "Need more help? Ask a teacher again under any answer.",
         "cancelled": "Need more help? Ask a teacher again under any answer.",
         "withdrawn": "Need help after all? Ask a teacher again under any answer.",
         "expired": "Your request has closed. Ask a teacher again under any answer."
+      },
+      "fallback": {
+        "title": "Teacher support requested",
+        "status": "Requested",
+        "body": "Replies from a teacher appear in this conversation."
       }
     },
     "practice": {

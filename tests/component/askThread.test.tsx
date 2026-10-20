@@ -295,12 +295,80 @@ describe('the teacher status card', () => {
     expect(ask.getByRole('button', { name: 'Ask a teacher' })).toBeInTheDocument()
   })
 
+  // #397: the server says waiting_no_teacher when no teacher could be offered
+  // the request, both in answer to it and when it is read. It is still open:
+  // read again every 15 s like pending, and not offered again.
+  it('waits while no teacher is free, and moves on when one takes the request', async () => {
+    getConversationMock.mockResolvedValue(
+      conversation([message('s1', 'student', 'Is x = 5?'), message('a1', 'assistant', 'Yes.')]),
+    )
+    requestHelpMock.mockImplementation(async () => {
+      helpStatusMock.mockResolvedValue(help('waiting_no_teacher'))
+      return help('waiting_no_teacher')
+    })
+    const ask = openAsk()
+    await ask.findByText('Yes.')
+
+    await userEvent.click(ask.getByRole('button', { name: 'Ask a teacher' }))
+
+    const card = await ask.findByRole('region', { name: 'Teacher support' })
+    await waitFor(() => expect(card).toHaveAttribute('data-help-status', 'waiting_no_teacher'))
+    expect(within(card).getByText('No teacher is free right now')).toBeInTheDocument()
+    expect(
+      within(card).getByText(
+        'Your request stays open. As soon as a teacher is free, they will take it and reply in this conversation.',
+      ),
+    ).toBeInTheDocument()
+    expect(within(card).getByText('Waiting')).toBeInTheDocument()
+    expect(card.textContent).not.toMatch(/ask\.help\./)
+    expect(ask.queryByRole('button', { name: 'Ask a teacher' })).not.toBeInTheDocument()
+
+    // Read again at the waiting pace: not after 5 s, after 15 s.
+    const helpReads = helpStatusMock.mock.calls.length
+    const conversationReads = getConversationMock.mock.calls.length
+    await advance(5_100)
+    expect(helpStatusMock.mock.calls.length).toBe(helpReads)
+    await advance(10_000)
+    await waitFor(() => expect(helpStatusMock.mock.calls.length).toBe(helpReads + 1))
+    await waitFor(() => expect(getConversationMock.mock.calls.length).toBe(conversationReads + 1))
+    expect(ask.queryByRole('button', { name: 'Ask a teacher' })).not.toBeInTheDocument()
+
+    helpStatusMock.mockResolvedValue(help('assigned', 'Ms Bergmann'))
+    await advance(15_100)
+    await waitFor(() => expect(card).toHaveAttribute('data-help-status', 'assigned'))
+    expect(within(card).getByText('Ms Bergmann will join this conversation')).toBeInTheDocument()
+  })
+
+  // #397: a status this app does not know yet is read as waiting -- general
+  // words on the card, read again, and help not offered on top of it.
+  it('treats a status it does not know yet as waiting', async () => {
+    getConversationMock.mockResolvedValue(
+      conversation([message('s1', 'student', 'Is x = 5?'), message('a1', 'assistant', 'Yes.')]),
+    )
+    helpStatusMock.mockResolvedValue(help('reassigning' as never))
+    const ask = openAsk()
+    await ask.findByText('Yes.')
+
+    const card = await ask.findByRole('region', { name: 'Teacher support' })
+    expect(card).toHaveAttribute('data-help-status', 'reassigning')
+    expect(within(card).getByText('Teacher support requested')).toBeInTheDocument()
+    expect(within(card).getByText('Replies from a teacher appear in this conversation.')).toBeInTheDocument()
+    expect(within(card).getByText('Requested')).toBeInTheDocument()
+    expect(card.textContent).not.toMatch(/ask\.help\.|reassigning/)
+    expect(ask.queryByRole('button', { name: 'Ask a teacher' })).not.toBeInTheDocument()
+
+    const helpReads = helpStatusMock.mock.calls.length
+    await advance(15_100)
+    await waitFor(() => expect(helpStatusMock.mock.calls.length).toBe(helpReads + 1))
+  })
+
   // #75: the request is read for every conversation that is opened, not only
   // one escalated while it was open -- including one whose help has ended.
   // Every status the card can carry, so showing it only while ACTIVE_HELP
   // would go red on the two ended ones.
   it.each([
     ['pending', 'Teacher support requested'],
+    ['waiting_no_teacher', 'No teacher is free right now'],
     ['assigned', 'Ms Bergmann will join this conversation'],
     ['in_progress', 'Ms Bergmann is helping you'],
     ['resolved', 'Teacher support has ended'],
