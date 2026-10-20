@@ -135,7 +135,8 @@ describe('a list short of a page gives the bell its count (#387 item 2)', () => 
     const client = renderBell(fewUnread())
     await waitFor(() => expect(bell()).toHaveAccessibleName('Notifications, 2 unread'))
 
-    // What the fallback poll does every 30 seconds.
+    // A refresh of the whole list, as a read or a dropped socket does; the
+    // fallback poll's own requests are counted in notificationPoll413.
     await act(() => client.invalidateQueries({ queryKey: notificationQueryKeys.list() }))
 
     expect(requests).toEqual([LIST, LIST])
