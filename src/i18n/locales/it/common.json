@@ -56,7 +56,9 @@
     "french": "Français",
     "german": "Deutsch",
     "italian": "Italiano",
-    "label": "Lingua"
+    "label": "Lingua",
+    "saveFailed": "La tua scelta della lingua non è stata salvata. Alla prossima apertura STOA potrebbe tornare alla lingua precedente.",
+    "saveFailed_formal": "La tua scelta della lingua non è stata salvata. Alla prossima apertura STOA potrebbe tornare alla lingua precedente."
   },
   "me": {
     "grade": {

@@ -11,18 +11,21 @@ import path from 'node:path'
 import type { TFunction } from 'i18next'
 import { afterEach, describe, expect, it } from 'vitest'
 import { formatFeedback } from '@/components/learning/LearningProfileSignals'
-import { formattingLocale, LANGUAGE_STORAGE_KEY, type SupportedLanguage } from '@/i18n/languages'
+import i18n from '@/i18n'
+import { formattingLocale, type SupportedLanguage } from '@/i18n/languages'
 import { formatDateTime, formatTimeOfDay } from '@/lib/formatDateTime'
 
 const ROOT = path.resolve(__dirname, '../..')
 const LOCALES = path.join(ROOT, 'src/i18n/locales')
 
+// The language this tab shows, not the stored key another tab may have
+// written (#403). The resources are bundled, so the switch is synchronous.
 function readAs(language: SupportedLanguage) {
-  window.localStorage.setItem(LANGUAGE_STORAGE_KEY, language)
+  void i18n.changeLanguage(language)
 }
 
-afterEach(() => {
-  window.localStorage.removeItem(LANGUAGE_STORAGE_KEY)
+afterEach(async () => {
+  await i18n.changeLanguage('en')
 })
 
 describe('formattingLocale', () => {

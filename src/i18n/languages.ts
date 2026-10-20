@@ -44,14 +44,33 @@ export function storedLanguage(): string | null {
 }
 
 /**
- * The language the app is being read in right now.
+ * The language this tab shows, once i18n has started (i18n/index.ts sets it
+ * then and on every `languageChanged`). Kept here rather than read off the
+ * i18n instance, so modules that only need to label a request — the HTTP
+ * clients, which every screen imports — do not pull in i18next.
  *
- * Read from storage rather than from the i18n instance, so modules that only
- * need to label a request — the HTTP clients, which every screen imports —
- * do not have to pull in i18next and its initialisation. `languageChanged`
- * writes this key synchronously (see i18n/index.ts), so it stays current.
+ * Not the stored key: that is shared by every tab of the browser, so one
+ * tab's switch relabelled another tab's requests while its screen stayed in
+ * the old language, and with storage blocked it never changed at all (#403).
  */
+let shownLanguage: SupportedLanguage | null = null
+
+/**
+ * Record the language this tab now shows. Only i18n/index.ts calls this. A
+ * code i18n has no copy for is shown in English, its fallback language.
+ */
+export function setShownLanguage(language: string) {
+  const code = language.slice(0, 2).toLowerCase()
+  shownLanguage = isSupportedLanguage(code) ? code : 'en'
+}
+
+/** The language the app is being read in right now, in this tab. */
 export function activeLanguage(): SupportedLanguage {
+  return shownLanguage ?? getInitialLanguage()
+}
+
+/** The language to start i18next in: the last one chosen, else the browser's. */
+export function getInitialLanguage(): SupportedLanguage {
   if (typeof window === 'undefined') return 'en'
 
   const stored = storedLanguage()
@@ -61,11 +80,6 @@ export function activeLanguage(): SupportedLanguage {
   if (isSupportedLanguage(browserLanguage)) return browserLanguage
 
   return 'en'
-}
-
-/** The language to start i18next in. Same resolution as activeLanguage(). */
-export function getInitialLanguage(): SupportedLanguage {
-  return activeLanguage()
 }
 
 /**

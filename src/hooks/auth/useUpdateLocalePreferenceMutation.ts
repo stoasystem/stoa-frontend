@@ -1,16 +1,25 @@
 import { useMutation } from '@tanstack/react-query'
-import { queryClient } from '@/app/query/queryClient'
+import { useTranslation } from 'react-i18next'
+import { toast } from 'sonner'
+import { queryClient, SignedOutMutationError } from '@/app/query/queryClient'
+import { activeLanguage, type SupportedLanguage } from '@/i18n/languages'
+import { addressContext } from '@/lib/addressForm'
 import { updateLocalePreference } from '@/services/auth/authApi'
 import { useAuthStore } from '@/store/authStore'
-import type { SupportedLanguage } from '@/i18n/languages'
 
 export function useUpdateLocalePreferenceMutation() {
   const setUser = useAuthStore((state) => state.setUser)
-  const user = useAuthStore((state) => state.user)
+  const { i18n } = useTranslation()
 
-  return useMutation({
+  const mutation = useMutation({
+    // One write at a time, in the order they were chosen: switching
+    // de → fr → it quickly sent three PATCHes at once, and whichever landed
+    // last was stored, not necessarily Italian (#403).
+    scope: { id: 'locale-preference' },
     mutationFn: (preferredLocale: SupportedLanguage) => updateLocalePreference(preferredLocale),
     onSuccess: (locale) => {
+      // The account as it is now, not as it was when this write was queued.
+      const user = useAuthStore.getState().user
       if (user) {
         setUser({
           ...user,
@@ -28,5 +37,25 @@ export function useUpdateLocalePreferenceMutation() {
       // This call now only persists the preference for the student's next
       // session and their other devices.
     },
+    // The screen already shows the new language, but the next page load takes
+    // the stored one from /auth/me and would switch back without a word.
+    onError: (error, language) => {
+      if (error instanceof SignedOutMutationError) return
+      // A later choice is queued behind this one and reports for itself.
+      if (language !== activeLanguage()) return
+      const context = addressContext(useAuthStore.getState().user?.role)
+      // Off the instance: the language has just changed under any `t` a
+      // component holds.
+      toast.error(i18n.t('common:language.saveFailed', { context }), {
+        action: {
+          label: i18n.t('common:actions.tryAgain'),
+          onClick: () => {
+            if (useAuthStore.getState().user) mutation.mutate(activeLanguage())
+          },
+        },
+      })
+    },
   })
+
+  return mutation
 }
