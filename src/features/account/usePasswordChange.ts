@@ -12,7 +12,9 @@ export type PasswordChangeStep = 'verifyCurrent' | 'enterCode' | 'done'
 export type PasswordChangeField = 'current' | 'code' | 'password' | 'confirm'
 
 // The field a backend refusal is about. Any other refusal -- a rate limit, an
-// undelivered code -- is about the whole form and marks no field.
+// undelivered code -- is about the whole form and marks no field. So does one
+// about a field the step does not show: the confirmation checks the current
+// password again.
 const REFUSAL_FIELDS: ReadonlyMap<string, PasswordChangeField> = new Map([
   ['password_change_credentials_invalid', 'current'],
   ['password_change_verification_failed', 'code'],
@@ -83,6 +85,9 @@ export function usePasswordChange({
       if (current?.mustChangePassword) {
         setUser({ ...current, mustChangePassword: false })
       }
+      // The finished screen needs nothing that was typed, and on /me it stays
+      // up as long as the page does.
+      forgetSecrets()
     },
   })
 
@@ -118,20 +123,28 @@ export function usePasswordChange({
   function requestNewCode() {
     setCode('')
     setFormError(null)
+    // The refusal of the code given up on is not about the next one, and the
+    // attempt carried both passwords.
+    confirmMutation.reset()
     setStep('verifyCurrent')
+  }
+
+  /** Drops the passwords and the code: from the fields, and with both requests from the cache. */
+  function forgetSecrets() {
+    setCurrentPassword('')
+    setCode('')
+    setPassword('')
+    setConfirmPassword('')
+    requestMutation.reset()
+    confirmMutation.reset()
   }
 
   /** Back to an empty first step, for another change on the same page. */
   function reset() {
     setStep('verifyCurrent')
-    setCurrentPassword('')
-    setCode('')
-    setPassword('')
-    setConfirmPassword('')
     setMaskedRecipient('')
     setFormError(null)
-    requestMutation.reset()
-    confirmMutation.reset()
+    forgetSecrets()
   }
 
   const activeError = step === 'enterCode' ? confirmMutation.error : requestMutation.error

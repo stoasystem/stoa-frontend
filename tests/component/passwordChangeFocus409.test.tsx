@@ -55,6 +55,7 @@ function backend({
 }
 
 let pathname = ''
+let client: QueryClient
 function LocationProbe() {
   pathname = useLocation().pathname
   return null
@@ -66,7 +67,7 @@ function openAt(path: string, role: UserRole, mustChangePassword = false) {
     accessToken: 'token',
     isAuthenticated: true,
   })
-  const client = new QueryClient({ defaultOptions: { queries: { retry: false }, mutations: { retry: false } } })
+  client = new QueryClient({ defaultOptions: { queries: { retry: false }, mutations: { retry: false } } })
   render(
     <I18nextProvider i18n={i18n}>
       <QueryClientProvider client={client}>
@@ -178,6 +179,73 @@ describe.each(SCREENS)('the password change on $name moves focus with its steps'
 
     const heading = await screen.findByRole('heading', { ...outcome, name: copy.successTitle })
     await waitFor(() => expect(heading).toHaveFocus())
+  })
+})
+
+describe.each(SCREENS)('the password change on $name, after the audit', ({ path, role, outcome }) => {
+  it('drops the passwords from the cache while the finished screen is still up', async () => {
+    const user = userEvent.setup()
+    backend()
+    openAt(path, role)
+    await sendCode(user)
+
+    await submitNew(user)
+
+    await screen.findByRole('heading', { ...outcome, name: copy.successTitle })
+    await waitFor(() => expect(client.getMutationCache().getAll()).toHaveLength(0))
+  })
+
+  it('forgets a refused code when a new one is asked for', async () => {
+    const user = userEvent.setup()
+    let refuse = true
+    backend({ confirm: () => (refuse ? refusal('password_change_verification_failed')() : HttpResponse.json({ status: 'changed' })) })
+    openAt(path, role)
+    await sendCode(user)
+    await submitNew(user, { code: '000000' })
+    await expectOnlyInvalid(copy.codeLabel, copy.errors.password_change_verification_failed)
+    refuse = false
+
+    await user.click(screen.getByRole('button', { name: copy.requestNewCode }))
+    await user.click(screen.getByRole('button', { name: copy.sendCodeCta }))
+
+    const codeField = await screen.findByLabelText(copy.codeLabel)
+    await waitFor(() => expect(codeField).toHaveFocus())
+    expect(screen.queryByRole('alert')).toBeNull()
+    expect(codeField).not.toHaveAttribute('aria-invalid')
+    expect(codeField).toHaveAccessibleDescription(copy.codeHelp)
+  })
+
+  it('offers no way back for another code while the change is on its way', async () => {
+    const user = userEvent.setup()
+    let answer: () => void = () => {}
+    backend()
+    mswServer.use(
+      http.post('https://api.test/auth/password-change/confirm', async () => {
+        await new Promise<void>((resolve) => {
+          answer = resolve
+        })
+        return HttpResponse.json({ status: 'changed' })
+      }),
+    )
+    openAt(path, role)
+    await sendCode(user)
+
+    await submitNew(user)
+
+    await waitFor(() => expect(screen.getByRole('button', { name: copy.requestNewCode })).toBeDisabled())
+    answer()
+    expect(await screen.findByRole('heading', { ...outcome, name: copy.successTitle })).toBeInTheDocument()
+  })
+
+  it('marks no field when the confirmation refuses the current password, which that step does not show', async () => {
+    const user = userEvent.setup()
+    backend({ confirm: refusal('password_change_credentials_invalid') })
+    openAt(path, role)
+    await sendCode(user)
+
+    await submitNew(user)
+
+    await expectOnlyInvalid(null, copy.errors.password_change_credentials_invalid)
   })
 })
 

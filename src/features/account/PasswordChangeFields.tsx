@@ -104,7 +104,9 @@ export function PasswordChangeFields({
           <Button type="submit" disabled={flow.isConfirming}>
             {flow.isConfirming ? t('common:actions.saving') : t('auth:changePassword.submit')}
           </Button>
-          <Button variant="plain" onClick={flow.requestNewCode}>
+          {/* Not while the change is on its way: it could still go through
+              after the visitor has gone back for another code. */}
+          <Button variant="plain" onClick={flow.requestNewCode} disabled={flow.isConfirming}>
             {t('auth:changePassword.requestNewCode')}
           </Button>
         </div>

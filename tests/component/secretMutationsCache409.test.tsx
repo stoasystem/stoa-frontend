@@ -91,4 +91,33 @@ describe.each(CASES)('$name', ({ url, reply, secret, use, variables }) => {
 
     await waitFor(() => expect(client.getMutationCache().getAll()).toHaveLength(0))
   })
+
+  it('keeps no variables in the cache once it settles after its page has gone', async () => {
+    let answer: () => void = () => {}
+    let answered = false
+    mswServer.use(
+      http.post(url, async () => {
+        await new Promise<void>((resolve) => {
+          answer = resolve
+        })
+        answered = true
+        return reply()
+      }),
+    )
+    const client = new QueryClient({ defaultOptions: { mutations: { retry: false } } })
+    const wrapper = ({ children }: { children: ReactNode }) => (
+      <QueryClientProvider client={client}>{children}</QueryClientProvider>
+    )
+    const { result, unmount } = renderHook(() => use() as UseMutationResult<unknown, Error, unknown>, { wrapper })
+
+    result.current.mutate(variables)
+    await waitFor(() => expect(result.current.isPending).toBe(true))
+    unmount()
+    // Still on its way: the request needs its variables until it settles.
+    expect(client.getMutationCache().getAll()).toHaveLength(1)
+
+    answer()
+    await waitFor(() => expect(answered).toBe(true))
+    await waitFor(() => expect(client.getMutationCache().getAll()).toHaveLength(0))
+  })
 })
