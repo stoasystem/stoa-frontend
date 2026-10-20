@@ -83,18 +83,63 @@ export function mergeWithServerMessages<T extends ChatMessage>(
   serverMessages: ChatMessage[],
   localMessages: T[],
 ): Array<ChatMessage | T> {
+  const answered = answeredOnServer(serverMessages)
   const failedLocalIds = new Set(
     localMessages
-      .filter((message) => message.role === 'student' && message.status === 'failed')
+      .filter((message) => message.role === 'student' && message.status === 'failed' && !answered.has(message.id))
       .map((message) => message.id),
   )
   const serverIds = new Set(serverMessages.map((message) => message.id))
+  // What stood for the answer of a failed question the server has answered since.
+  const supersededAnswers = new Set(
+    localMessages.flatMap((message) => {
+      const answerId = (message as { failedAnswerId?: string }).failedAnswerId
+      return answerId && answered.has(message.id) ? [answerId] : []
+    }),
+  )
   return [
     ...serverMessages.filter((message) => !failedLocalIds.has(message.id)),
     ...localMessages.filter(
-      (message) => failedLocalIds.has(message.id) || !serverIds.has(message.id),
+      (message) =>
+        failedLocalIds.has(message.id) || (!serverIds.has(message.id) && !supersededAnswers.has(message.id)),
     ),
   ]
+}
+
+/**
+ * The student messages the server holds with an answer after them: one kept
+ * here as failed reached the server after all - a stop or a let-go request
+ * that raced it - and is the server's now, not "not sent".
+ */
+function answeredOnServer(serverMessages: ChatMessage[]): Set<string> {
+  const answered = new Set<string>()
+  let answerFollows = false
+  for (let index = serverMessages.length - 1; index >= 0; index -= 1) {
+    const message = serverMessages[index]
+    if (message.role === 'assistant' && message.status !== 'failed' && message.status !== 'streaming') {
+      answerFollows = true
+    } else if (message.role === 'student') {
+      if (answerFollows) answered.add(message.id)
+      answerFollows = false
+    }
+  }
+  return answered
+}
+
+/** Of the local messages, the failed ones still to be sent again, with what stood for their answer. */
+function stillFailed<T extends ChatMessage & { retryPayload?: unknown; failedAnswerId?: string }>(
+  messages: T[],
+  serverMessages: ChatMessage[],
+): T[] {
+  const answered = answeredOnServer(serverMessages)
+  const kept = new Set<string>()
+  for (const message of messages) {
+    if (message.role !== 'student' || message.status !== 'failed' || !message.retryPayload) continue
+    if (answered.has(message.id)) continue
+    kept.add(message.id)
+    if (message.failedAnswerId) kept.add(message.failedAnswerId)
+  }
+  return messages.filter((message) => kept.has(message.id))
 }
 
 export function useStreamingChat(conversationId: string | null) {
@@ -404,12 +449,17 @@ export function useStreamingChat(conversationId: string | null) {
           // Stopping only stops the waiting: a message the server has is still
           // answered, and shows as the server's. One it does not have is kept
           // as not sent, to send again under the same key (#326 K5).
+          // Kept as not sent before the server is asked: a switch of
+          // conversation or a reload meanwhile must not lose it.
+          const student = { ...studentBubble(), status: 'failed' as const, retryPayload: sameMessageRetry(true) }
+          keepFailedMessage(conversationId, owner, { student })
           await invalidateConversation()
           if (!owns()) return false
           const held = queryClient
             .getQueryData<Conversation>(chatQueryKeys.conversation(conversationId))
             ?.messages.some((message) => message.id === studentMessageId)
           if (held) {
+            dropFailedMessage(conversationId, studentMessageId)
             setLocalMessages((messages) =>
               messages
                 .filter((message) => message.id !== studentMessageId)
@@ -419,8 +469,6 @@ export function useStreamingChat(conversationId: string | null) {
             )
             return false
           }
-          const student = { ...studentBubble(), status: 'failed' as const, retryPayload: sameMessageRetry(true) }
-          keepFailedMessage(conversationId, owner, { student })
           setLocalMessages((messages) => [
             ...messages.filter(
               (message) => message.id !== studentMessageId && message.id !== settledAssistantId,
@@ -438,8 +486,11 @@ export function useStreamingChat(conversationId: string | null) {
           trackEvent('chat_response_completed', { conversationId })
           if (!currentSessionToken()?.startsWith('demo:')) {
             // The server holds this message and its answer now; the ones that
-            // did not go through stay, with their retry (#326 K1).
-            setLocalMessages(localFailedMessages(conversationId))
+            // did not go through stay, with their retry (#326 K1) - from what
+            // is on screen, which holds them even where storage could not.
+            const server = queryClient.getQueryData<Conversation>(chatQueryKeys.conversation(conversationId))?.messages ?? []
+            for (const id of answeredOnServer(server)) dropFailedMessage(conversationId, id)
+            setLocalMessages((messages) => stillFailed(messages, server))
           }
           return true
         }

@@ -31,7 +31,7 @@ import {
   type GenerationState,
   type StreamOutcome,
 } from '@/services/chat/chatStreamApi'
-import { SEND_REQUEST_LIMIT_MS, useStreamingChat } from '@/hooks/chat/useStreamingChat'
+import { mergeWithServerMessages, SEND_REQUEST_LIMIT_MS, useStreamingChat } from '@/hooks/chat/useStreamingChat'
 import { clearPendingMessages, FAILED_MESSAGE_KEY_PREFIX } from '@/lib/pendingChatMessages'
 import { chatQueryKeys } from '@/services/chat/chatQueryKeys'
 import { useAuthStore } from '@/store/authStore'
@@ -332,5 +332,83 @@ describe('K6: a send request that hangs', () => {
     })
     await waitFor(() => expect(result.current.isStreaming).toBe(false))
     expect(failedStudent(result)).toBeUndefined()
+  })
+})
+
+// The independent audit of this change (#326) found these three.
+describe('a failed message, after the audit', () => {
+  it('is kept when the conversation is left while a stop is still asking the server (B1)', async () => {
+    mockedStream.mockImplementationOnce(() => new Promise<StreamOutcome>(() => {}))
+    mockedProgress.mockResolvedValue(state({ status: 'ai_running' }))
+    const { result, client, rerender } = setup()
+    act(() => {
+      void result.current.sendStreamingMessage({ content: 'Was ist eine Primzahl?' })
+    })
+    await waitFor(() => expect(mockedStream).toHaveBeenCalled())
+    // The read of the conversation that the stop waits for never comes back.
+    vi.spyOn(client, 'invalidateQueries').mockImplementation(() => new Promise<void>(() => {}))
+
+    await act(async () => {
+      result.current.stopStreaming()
+      await vi.advanceTimersByTimeAsync(50)
+    })
+    rerender({ id: 'c2' })
+    rerender({ id: 'c1' })
+
+    expect(failedStudent(result)?.content).toBe('Was ist eine Primzahl?')
+  })
+
+  it('is the server\u2019s once the server has answered it (B2)', async () => {
+    const merged = mergeWithServerMessages(
+      [
+        { id: 's-1', conversationId: 'c1', role: 'student', content: 'Frage', createdAt: '', status: 'completed' },
+        { id: 'a-1', conversationId: 'c1', role: 'assistant', content: 'Antwort', createdAt: '', status: 'completed' },
+      ],
+      [
+        { id: 's-1', conversationId: 'c1', role: 'student' as const, content: 'Frage', createdAt: '', status: 'failed' as const, failedAnswerId: 'a-local' },
+        { id: 'a-local', conversationId: 'c1', role: 'assistant' as const, content: 'failed', createdAt: '', status: 'failed' as const },
+      ],
+    )
+    expect(merged.map((message) => [message.id, message.status])).toEqual([
+      ['s-1', 'completed'],
+      ['a-1', 'completed'],
+    ])
+
+    const { result, client } = setup()
+    await failOnce(result)
+    const failed = failedStudent(result)!
+    client.setQueryData(chatQueryKeys.conversation('c1'), {
+      id: 'c1', title: '', subject: 'math', grade: '', updatedAt: '',
+      messages: [
+        { ...failed, status: 'completed' },
+        { id: 'a-late', conversationId: 'c1', role: 'assistant', content: '4', createdAt: '', status: 'completed' },
+      ],
+    } as Conversation)
+    mockedStream.mockResolvedValueOnce('streamed')
+    await act(async () => {
+      await result.current.sendStreamingMessage({ content: 'Und 3 + 3?' })
+    })
+
+    expect(failedStudent(result)).toBeUndefined()
+    expect(Object.keys(sessionStorage).filter((key) => key.startsWith(FAILED_MESSAGE_KEY_PREFIX))).toEqual([])
+  })
+
+  it('stays on screen through a later answer when the tab cannot store it (B4)', async () => {
+    const setItem = Storage.prototype.setItem
+    const blocked = vi.spyOn(Storage.prototype, 'setItem').mockImplementation(function (this: Storage, key: string, value: string) {
+      if (key.startsWith(FAILED_MESSAGE_KEY_PREFIX)) throw new DOMException('full', 'QuotaExceededError')
+      setItem.call(this, key, value)
+    })
+    try {
+      const { result } = setup()
+      await failOnce(result)
+      mockedStream.mockResolvedValueOnce('streamed')
+      await act(async () => {
+        await result.current.sendStreamingMessage({ content: 'Und 3 + 3?' })
+      })
+      expect(failedStudent(result)?.content).toBe('Was ist 2 + 2?')
+    } finally {
+      blocked.mockRestore()
+    }
   })
 })
