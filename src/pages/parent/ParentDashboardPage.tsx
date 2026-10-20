@@ -33,7 +33,7 @@ export function ParentDashboardPage() {
       <PageContainer className="max-w-[880px] space-y-6 p-0">
         <PageHeader title={t('dashboardTitle')} description={t('dashboardDescription')} />
         {childrenQuery.isLoading && <ParentDashboardSkeleton showHeader={false} />}
-        {childrenQuery.isError && <p className="text-sm text-red">{t('loadChildrenFailed')}</p>}
+        {childrenQuery.isError && <p role="alert" className="text-sm text-red">{t('loadChildrenFailed')}</p>}
         {childrenQuery.data && children.length === 0 && (
           <NoLinkedChildrenNotice headline={t('noChildren')} />
         )}

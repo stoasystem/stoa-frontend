@@ -220,7 +220,7 @@
   "reports": {
     "eyebrow": "Elternberichte",
     "title": "Berichte",
-    "description": "Wählen Sie einen Kinderbericht und prüfen Sie Wochenfortschritt, Monatstrends, schwache Themen und Unterstützung durch Lehrpersonen.",
+    "description": "Wählen Sie einen Kinderbericht und prüfen Sie Wochenfortschritt, schwache Themen und Unterstützung durch Lehrpersonen.",
     "children": "Kinder",
     "weeklyReports": "Wochenberichte",
     "weeklyReportsValue": "Bereit",
