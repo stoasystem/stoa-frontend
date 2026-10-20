@@ -287,6 +287,69 @@ describe('the queue', () => {
   })
 })
 
+describe('the case says what it is and what changed (#337)', () => {
+  const contextBlock = (label: string) => screen.getByText(label, { selector: 'p' }).parentElement as HTMLElement
+
+  it('shows the new status and the assignee in the history, not just "Updated"', async () => {
+    listOf([
+      moderationCase('case-a', {
+        history: [
+          {
+            event_id: 'e-1',
+            event_type: 'updated',
+            created_at: '2026-10-02T10:00:00Z',
+            changes: { status: 'in_review', assigned_admin_id: 'admin-ana' },
+          },
+        ],
+      }),
+    ])
+    renderPage()
+    await caseHeading('case-a')
+
+    const event = screen.getByText('Updated').closest('div.rounded-md') as HTMLElement
+    expect(within(event).getByText('Status: In review')).toBeInTheDocument()
+    expect(within(event).getByText('Assigned to admin-ana')).toBeInTheDocument()
+  })
+
+  it('does not present the reporter’s note as the student’s question', async () => {
+    listOf([moderationCase('case-a', { report_note: 'the AI was rude', question_context: null })])
+    renderPage()
+    await caseHeading('case-a')
+
+    const question = contextBlock('Question')
+    expect(question).toHaveTextContent('No question preview')
+    expect(question).not.toHaveTextContent('the AI was rude')
+  })
+
+  it('still shows the question when there is a preview', async () => {
+    listOf([moderationCase('case-a', { question_context: { content_preview: 'What is 2 + 2?' } })])
+    renderPage()
+    await caseHeading('case-a')
+    expect(contextBlock('Question')).toHaveTextContent('What is 2 + 2?')
+  })
+
+  it('cannot set a case to the status it already has', async () => {
+    listOf([moderationCase('case-a', { status: 'in_review' })])
+    renderPage()
+    await caseHeading('case-a')
+
+    const actions = screen.getByText('Status action').closest('div.rounded-md') as HTMLElement
+    expect(within(actions).getByRole('button', { name: 'In review' })).toBeDisabled()
+    expect(within(actions).getByRole('button', { name: 'Dismissed' })).toBeEnabled()
+  })
+
+  it('cannot assign a case to the admin it is already assigned to', async () => {
+    listOf([moderationCase('case-a', { assigned_admin_id: 'admin-ana' })])
+    renderPage()
+    await caseHeading('case-a')
+
+    const assign = screen.getByRole('button', { name: 'Assign case' })
+    expect(assign).toBeDisabled()
+    fireEvent.change(screen.getByLabelText('Admin'), { target: { value: 'admin-bo' } })
+    expect(assign).toBeEnabled()
+  })
+})
+
 describe('the new copy in German', () => {
   beforeAll(async () => {
     await i18n.changeLanguage('de')
@@ -302,5 +365,16 @@ describe('the new copy in German', () => {
     expect(alert).toHaveTextContent('Ihr Konto darf keine Moderationsfälle sehen.')
     await act(async () => {})
     expect(within(document.body).queryByText(/\bdu\b|\bdein/i)).toBeNull()
+  })
+
+  it('says in German what an update changed', async () => {
+    listOf([
+      moderationCase('case-a', {
+        history: [{ event_id: 'e-1', event_type: 'updated', changes: { status: 'dismissed', assigned_admin_id: 'admin-ana' } }],
+      }),
+    ])
+    renderPage()
+    expect(await screen.findByText('Zugewiesen an admin-ana')).toBeInTheDocument()
+    expect(screen.getByText(/^Status: /)).toBeInTheDocument()
   })
 })

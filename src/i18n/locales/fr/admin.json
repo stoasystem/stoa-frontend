@@ -274,6 +274,10 @@
     "noAiAnswer": "Aucune réponse de l’IA enregistrée",
     "noTeacherReply": "Aucune réponse d’enseignant enregistrée",
     "history": "Historique",
+    "historyChanges": {
+      "status": "Statut : {{status}}",
+      "assigned": "Attribué à {{admin}}"
+    },
     "noHistory": "Aucun événement pour l’instant.",
     "unknownTime": "Heure inconnue",
     "status": {

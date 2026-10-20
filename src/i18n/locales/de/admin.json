@@ -272,6 +272,10 @@
     "noAiAnswer": "Keine gespeicherte KI-Antwort",
     "noTeacherReply": "Keine gespeicherte Antwort der Lehrperson",
     "history": "Verlauf",
+    "historyChanges": {
+      "status": "Status: {{status}}",
+      "assigned": "Zugewiesen an {{admin}}"
+    },
     "noHistory": "Noch keine Einträge im Verlauf.",
     "unknownTime": "Unbekannter Zeitpunkt",
     "status": {

@@ -274,6 +274,10 @@
     "noAiAnswer": "Nessuna risposta dell’IA salvata",
     "noTeacherReply": "Nessuna risposta del docente salvata",
     "history": "Cronologia",
+    "historyChanges": {
+      "status": "Stato: {{status}}",
+      "assigned": "Assegnato a {{admin}}"
+    },
     "noHistory": "Ancora nessun evento.",
     "unknownTime": "Ora sconosciuta",
     "status": {
