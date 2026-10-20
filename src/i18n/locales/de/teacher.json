@@ -353,7 +353,8 @@
       "html": "Ihre Antwort wurde nicht angenommen: Ein Teil davon sieht für den Server wie HTML-Code aus. Bitte formulieren Sie diese Stelle um.",
       "privateMarkers": "Ihre Antwort wurde nicht angenommen: Sie enthält interne Kennungen oder Zugangsdaten. Bitte entfernen Sie diese.",
       "tooManyBlocks": "Ihre Antwort wurde nicht angenommen: Sie hat zu viele Blöcke. Bitte fassen Sie Blöcke zusammen.",
-      "tooLong": "Ihre Antwort wurde nicht angenommen: Sie ist zu lang. Bitte kürzen Sie sie oder teilen Sie sie auf."
+      "blockTooLong": "Ihre Antwort wurde nicht angenommen: Einer ihrer Blöcke ist zu lang. Bitte kürzen Sie diesen Block oder teilen Sie ihn auf.",
+      "tooLong": "Ihre Antwort wurde nicht angenommen: Sie ist insgesamt zu lang. Bitte kürzen Sie sie oder teilen Sie sie auf."
     }
   }
 }
