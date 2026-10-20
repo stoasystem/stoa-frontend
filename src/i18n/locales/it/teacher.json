@@ -63,7 +63,8 @@
     "reportStudentContent": "Segnala il messaggio dello studente",
     "reportContext": "Invia il contesto di questa richiesta alla moderazione interna.",
     "noNotes": "Ancora nessuna nota dell’insegnante.",
-    "replyPaused": "Al momento non è possibile aggiornare la richiesta. La tua bozza resta salvata: potrai inviarla appena la connessione torna."
+    "replyPaused": "Al momento non è possibile aggiornare la richiesta. La tua bozza resta salvata: potrai inviarla appena la connessione torna.",
+    "openAutomation": "Assegna esercizi a {{name}} nell’automazione dell’apprendimento"
   },
   "profile": {
     "eyebrow": "Account insegnante",
@@ -105,6 +106,7 @@
     "filterLabel": "Filtra le richieste",
     "all": "Tutte",
     "empty": "Nessuna richiesta di supporto disponibile.",
+    "emptyFiltered": "Nessuna richiesta con lo stato «{{status}}».",
     "listLabel": "Richieste",
     "row": "{{subject}} · {{grade}}",
     "priority": "Priorità: {{priority}}",

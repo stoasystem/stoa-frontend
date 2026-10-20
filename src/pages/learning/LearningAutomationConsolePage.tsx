@@ -1,5 +1,6 @@
 import { FormEvent, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useSearchParams } from 'react-router-dom'
 import { AlertTriangle, CheckCircle2, Play, RefreshCw, Search, SlidersHorizontal } from 'lucide-react'
 import { toast } from 'sonner'
 import { ErrorState } from '@/components/common/ErrorState'
@@ -100,14 +101,18 @@ function CandidateList({
 
 export function LearningAutomationConsolePage() {
   const { t } = useTranslation('teacher')
+  // A help request links here with its student (#333): teachers never see an
+  // id anywhere else, so the field could not be filled from the teacher side.
+  const [searchParams] = useSearchParams()
+  const linkedStudentId = searchParams.get('studentId')?.trim() ?? ''
   // Empty, not a sample id: `useStudentAssignmentsQuery` is enabled by a
   // non-empty id, so a placeholder made every visit open on a red "Assignment
   // history failed" from a student that does not exist (card 124).
-  const [studentId, setStudentId] = useState('')
+  const [studentId, setStudentId] = useState(linkedStudentId)
   // The history is read for the id the operator settled on (leaving the
   // field, or previewing), not on every key: half an id is an unknown student,
   // and the panel flashed "could not be loaded" while it was being typed.
-  const [shownStudentId, setShownStudentId] = useState('')
+  const [shownStudentId, setShownStudentId] = useState(linkedStudentId)
   const [subject, setSubject] = useState('')
   const [topicIds, setTopicIds] = useState('')
   const [sourceTypes, setSourceTypes] = useState('ai_draft,curriculum_exercise')

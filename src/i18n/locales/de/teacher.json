@@ -63,7 +63,8 @@
     "reportStudentContent": "Beitrag der lernenden Person melden",
     "reportContext": "Diesen Anfragekontext an die interne Moderation senden.",
     "noNotes": "Noch keine Notizen der Lehrperson.",
-    "replyPaused": "Die Anfrage konnte gerade nicht neu geladen werden. Ihr Entwurf bleibt erhalten; Sie können ihn senden, sobald die Verbindung wieder steht."
+    "replyPaused": "Die Anfrage konnte gerade nicht neu geladen werden. Ihr Entwurf bleibt erhalten; Sie können ihn senden, sobald die Verbindung wieder steht.",
+    "openAutomation": "Übungen für {{name}} in der Lernautomatisierung zuweisen"
   },
   "profile": {
     "eyebrow": "Lehrpersonen-Konto",
@@ -105,6 +106,7 @@
     "filterLabel": "Anfragen filtern",
     "all": "Alle",
     "empty": "Es liegen keine Anfragen vor.",
+    "emptyFiltered": "Keine Anfragen mit dem Status „{{status}}“.",
     "listLabel": "Anfragen",
     "row": "{{subject}} · {{grade}}",
     "priority": "Priorität: {{priority}}",
