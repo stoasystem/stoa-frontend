@@ -1,3 +1,4 @@
+import { useRef } from 'react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/base/Button'
@@ -15,7 +16,8 @@ import { useAuthStore } from '@/store/authStore'
 export function ChangePasswordPage() {
   const { t } = useTranslation(['auth', 'common', 'errors'])
   const user = useAuthStore((state) => state.user)
-  const flow = usePasswordChange()
+  const heading = useRef<HTMLHeadingElement>(null)
+  const flow = usePasswordChange({ outcomeRef: heading })
   const { step, mustChangePassword } = flow
   // The route sits inside ProtectedRoute, so whoever reaches this page is
   // signed in, and Cognito's change_password does not revoke their tokens.
@@ -31,7 +33,7 @@ export function ChangePasswordPage() {
         <p className="m-0 text-caption uppercase" style={{ font: 'var(--t-section)', letterSpacing: 'var(--t-section-tracking)' }}>
           {t('auth:changePassword.eyebrow')}
         </p>
-        <h1 className="m-0 text-ink" style={{ font: 'var(--t-large)', letterSpacing: 'var(--t-large-tracking)' }}>
+        <h1 ref={heading} tabIndex={-1} className="m-0 text-ink" style={{ font: 'var(--t-large)', letterSpacing: 'var(--t-large-tracking)' }}>
           {step === 'done' ? t('auth:changePassword.successTitle') : t('auth:changePassword.title')}
         </h1>
         <p className="m-0 max-w-xl text-[15px] leading-[1.45] text-caption" role="status">

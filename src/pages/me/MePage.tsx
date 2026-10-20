@@ -64,9 +64,10 @@ function LanguageGroup() {
 
 function PasswordGroup() {
   const { t } = useTranslation(['auth', 'common'])
-  const flow = usePasswordChange()
   const location = useLocation()
   const heading = useRef<HTMLHeadingElement>(null)
+  // Its text turns to "Password updated" once the change is through.
+  const flow = usePasswordChange({ outcomeRef: heading })
 
   // The account menu's "Change password" lands here.
   useEffect(() => {

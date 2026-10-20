@@ -16,8 +16,12 @@ export const teacherApplicationQueryKeys = {
     [...teacherApplicationQueryKeys.all, 'detail', applicationId, version] as const,
 }
 
+// Both carry the invitation token, and the claim a password, which a mutation
+// keeps in the query client's cache until it is collected, five minutes by
+// default; gcTime 0 drops them as soon as the page no longer shows them (#409).
 export function useClaimTeacherInvitationMutation() {
   return useMutation({
+    gcTime: 0,
     mutationFn: ({ token, password }: { token: string; password: string }) =>
       claimTeacherInvitation(token, password),
   })
@@ -25,6 +29,7 @@ export function useClaimTeacherInvitationMutation() {
 
 export function useConsumeTeacherInvitationMutation() {
   return useMutation({
+    gcTime: 0,
     mutationFn: (token: string) => consumeTeacherInvitation(token),
   })
 }

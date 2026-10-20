@@ -2,7 +2,7 @@ import type { ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/base/Button'
 import { TextField } from '@/components/base/TextField'
-import type { PasswordChangeFlow } from '@/features/account/usePasswordChange'
+import type { PasswordChangeField, PasswordChangeFlow } from '@/features/account/usePasswordChange'
 
 /*
  * The two forms of the password change, drawn with the base components. What
@@ -23,9 +23,15 @@ export function PasswordChangeFields({
 }) {
   const { t } = useTranslation(['auth', 'common', 'errors'])
   const { fields } = flow
+  const errorId = `${idPrefix}-error`
+
+  // The field an error is about is marked invalid and reads the error with
+  // its label (#409, WCAG 3.3.1); one about the whole form marks none.
+  const invalid = (field: PasswordChangeField) =>
+    flow.error && flow.errorField === field ? { 'aria-invalid': true, 'aria-describedby': errorId } : {}
 
   const alert = flow.error && (
-    <p className="m-0 text-[15px] leading-[1.4] text-red" role="alert">
+    <p id={errorId} className="m-0 text-[15px] leading-[1.4] text-red" role="alert">
       {flow.error}
     </p>
   )
@@ -34,6 +40,7 @@ export function PasswordChangeFields({
     return (
       <form className="grid max-w-md gap-4" onSubmit={flow.submitCurrent} noValidate>
         <TextField
+          ref={flow.fieldRef}
           id={`${idPrefix}-current`}
           label={t('auth:changePassword.currentPasswordLabel')}
           type="password"
@@ -41,6 +48,7 @@ export function PasswordChangeFields({
           value={fields.currentPassword}
           onChange={(event) => fields.setCurrentPassword(event.target.value)}
           required
+          {...invalid('current')}
         />
         {alert}
         <div className="flex flex-wrap items-center gap-4">
@@ -57,6 +65,7 @@ export function PasswordChangeFields({
     return (
       <form className="grid max-w-md gap-4" onSubmit={flow.submitNew} noValidate>
         <TextField
+          ref={flow.fieldRef}
           id={`${idPrefix}-code`}
           label={t('auth:changePassword.codeLabel')}
           hint={t('auth:changePassword.codeHelp')}
@@ -67,6 +76,7 @@ export function PasswordChangeFields({
           maxLength={6}
           placeholder={t('auth:changePassword.codePlaceholder')}
           required
+          {...invalid('code')}
         />
         <TextField
           id={`${idPrefix}-new`}
@@ -77,6 +87,7 @@ export function PasswordChangeFields({
           value={fields.password}
           onChange={(event) => fields.setPassword(event.target.value)}
           required
+          {...invalid('password')}
         />
         <TextField
           id={`${idPrefix}-confirm`}
@@ -86,6 +97,7 @@ export function PasswordChangeFields({
           value={fields.confirmPassword}
           onChange={(event) => fields.setConfirmPassword(event.target.value)}
           required
+          {...invalid('confirm')}
         />
         {alert}
         <div className="flex flex-wrap items-center gap-4">

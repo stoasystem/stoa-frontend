@@ -141,16 +141,19 @@ describe('signing in from /login', () => {
     expect(window.location.hash).toBe('#algebra')
   })
 
-  it('resumes a teacher activation with its token', async () => {
+  it.each([
+    ['act-9f3c2e', '?token=act-9f3c2e'],
+    // A `#` or `&` in the token used to end it there (#409).
+    ['act#9f&3c=2e', '?token=act%239f%263c%3D2e'],
+  ])('resumes a teacher activation with its token %s', async (token, search) => {
     // Built exactly as TeacherActivatePage builds its "sign in to resume" link.
-    const token = 'act-9f3c2e'
     serve(account('teacher'))
-    openAt(`/login?next=${encodeURIComponent(`/teacher-activate?token=${token}`)}`)
+    openAt(`/login?next=${encodeURIComponent(`/teacher-activate?token=${encodeURIComponent(token)}`)}`)
 
     await signIn()
 
     await expectToLandOn('/teacher-activate', `teacher activation ${token}`)
-    expect(window.location.search).toBe(`?token=${token}`)
+    expect(window.location.search).toBe(search)
   })
 
   it.each([

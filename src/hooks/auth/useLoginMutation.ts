@@ -19,6 +19,10 @@ export function useLoginMutation({ context }: { context?: AddressContext } = {})
   const queryClient = useQueryClient()
 
   return useMutation({
+    // A mutation keeps its variables -- the password -- in the query client's
+    // cache until it is collected, five minutes by default; gcTime 0 drops it
+    // as soon as nothing shows it any more, as usePasswordChange does (#409).
+    gcTime: 0,
     mutationFn: async (payload: LoginRequest) => {
       await waitForPendingLogout()
       return login(payload)
