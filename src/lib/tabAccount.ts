@@ -23,6 +23,7 @@
  * whose session ended and take them back there.
  */
 import { LOGIN_SUBMITTED_AT_KEY } from '@/lib/loginTimingKey'
+import { newRandomId } from '@/lib/randomId'
 import { signInOf } from '@/lib/signIn'
 import { isHeldTestRole } from '@/lib/testRoles'
 import { revokeSignIn, type DroppedSignIn } from '@/services/auth/revokeSignIn'
@@ -93,14 +94,6 @@ function asAccount(value: unknown): TabAccount | undefined {
     ...(typeof entry.id === 'string' && entry.id ? { id: entry.id } : {}),
     ...(typeof entry.name === 'string' && entry.name ? { name: entry.name } : {}),
     ...(typeof entry.role === 'string' && entry.role ? { role: entry.role } : {}),
-  }
-}
-
-function newSignInId(): string {
-  try {
-    return crypto.randomUUID()
-  } catch {
-    return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`
   }
 }
 
@@ -337,7 +330,7 @@ export function signInTab(
 ): void {
   const previous = readBrowserSignIn()
   const signIn: BrowserSignIn = {
-    id: newSignInId(),
+    id: newRandomId(),
     accessToken,
     ...(refreshToken ? { refreshToken } : {}),
     ...(account && asAccount(account) ? { account: asAccount(account) } : {}),
@@ -514,7 +507,7 @@ export function migrateSavedAccounts(): void {
     const chosen = tab ?? lastUsed ?? null
     if (chosen) {
       const signIn: BrowserSignIn = {
-        id: newSignInId(),
+        id: newRandomId(),
         accessToken: chosen.accessToken,
         ...(chosen.refreshToken ? { refreshToken: chosen.refreshToken } : {}),
         ...(chosen.account ? { account: chosen.account } : {}),
@@ -563,7 +556,7 @@ export function initializeTab(): void {
       // A tab from before #320 in a browser that recorded no sign-in: it is
       // the one this browser keeps.
       const claimed: BrowserSignIn = {
-        id: newSignInId(),
+        id: newRandomId(),
         accessToken: token,
         ...(storedRefreshToken() ? { refreshToken: storedRefreshToken() as string } : {}),
       }
