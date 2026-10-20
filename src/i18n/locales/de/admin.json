@@ -313,7 +313,9 @@
     },
     "queue": "Warteschlange",
     "review": "Prüfung",
-    "loadFailed": "Bewerbungen konnten nicht geladen werden. Dafür ist eine Prüfberechtigung nötig.",
+    "loadFailed": "Bewerbungen konnten nicht geladen werden.",
+    "loading": "Bewerbungen werden geladen …",
+    "forbidden": "Ihr Konto darf keine Bewerbungen von Lehrpersonen prüfen.",
     "empty": "Keine Bewerbungen in diesem Status.",
     "noSubjects": "Keine Fächer",
     "selectPrompt": "Wählen Sie eine Bewerbung zur Prüfung aus.",
@@ -333,7 +335,19 @@
     "resendFailed": "Die Einladung konnte nicht erneut gesendet werden.",
     "statementFailed": "Das Motivationsschreiben konnte nicht geladen werden.",
     "noStatement": "Es wurde kein Motivationsschreiben eingereicht.",
-    "reasonLabel": "Begründung der Entscheidung"
+    "reasonLabel": "Begründung der Entscheidung",
+    "confirm": {
+      "title": {
+        "approved": "Bewerbung von {{name}} annehmen?",
+        "rejected": "Bewerbung von {{name}} ablehnen?"
+      },
+      "body": {
+        "approved": "Eine Einladung wird an {{email}} verschickt. Die Entscheidung lässt sich hier danach nicht mehr ändern.",
+        "rejected": "Die Bewerbung wechselt zu «abgelehnt». Die Entscheidung lässt sich hier danach nicht mehr ändern."
+      },
+      "reason": "Begründung:",
+      "cancel": "Abbrechen"
+    }
   },
   "learningOps": {
     "eyebrow": "Lernbetrieb",

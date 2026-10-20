@@ -315,7 +315,9 @@
     },
     "queue": "Coda",
     "review": "Revisione",
-    "loadFailed": "Impossibile caricare le candidature. È necessario l’accesso da revisore.",
+    "loadFailed": "Impossibile caricare le candidature.",
+    "loading": "Caricamento delle candidature…",
+    "forbidden": "Il tuo account non può esaminare le candidature dei docenti.",
     "empty": "Nessuna candidatura in questo stato.",
     "noSubjects": "Nessuna materia",
     "selectPrompt": "Selezionare una candidatura da esaminare.",
@@ -335,7 +337,19 @@
     "resendFailed": "Impossibile inviare di nuovo l’invito.",
     "statementFailed": "Non è stato possibile caricare la lettera di motivazione.",
     "noStatement": "Non è stata inviata alcuna lettera di motivazione.",
-    "reasonLabel": "Motivazione della decisione"
+    "reasonLabel": "Motivazione della decisione",
+    "confirm": {
+      "title": {
+        "approved": "Approvare la candidatura di {{name}}?",
+        "rejected": "Rifiutare la candidatura di {{name}}?"
+      },
+      "body": {
+        "approved": "Un invito viene inviato a {{email}}. La decisione non si potrà più cambiare qui.",
+        "rejected": "La candidatura passa tra le «rifiutate». La decisione non si potrà più cambiare qui."
+      },
+      "reason": "Motivazione:",
+      "cancel": "Annulla"
+    }
   },
   "learningOps": {
     "eyebrow": "Gestione dell’apprendimento",
