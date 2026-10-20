@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { PageContainer } from '@/components/common/PageContainer'
 import { PageHeader } from '@/components/common/PageHeader'
@@ -48,6 +48,9 @@ export function AdminTeacherApplicationsPage() {
   // buttons used to act on the first click, and neither can be undone here.
   const [pendingDecision, setPendingDecision] = useState<Decision | null>(null)
   const [decisionError, setDecisionError] = useState<string | null>(null)
+  // #407: a decision takes the application, and the buttons with it, out of
+  // view, so focus goes to the line that says what happened.
+  const messageLine = useRef<HTMLParagraphElement>(null)
   const listQuery = useTeacherApplicationsQuery(reviewState)
   const detailQuery = useTeacherApplicationDetailQuery(selected?.applicationId ?? null, selected?.version ?? null)
   const reviewMutation = useReviewTeacherApplicationMutation()
@@ -252,7 +255,9 @@ export function AdminTeacherApplicationsPage() {
                   </div>
                 </>
               )}
-              <p role="status" className="text-muted-foreground empty:hidden">{message}</p>
+              <p ref={messageLine} tabIndex={-1} role="status" className="text-muted-foreground empty:hidden">
+                {message}
+              </p>
             </CardContent>
           </Card>
         </div>
@@ -261,7 +266,7 @@ export function AdminTeacherApplicationsPage() {
           onOpenChange={(open) => (open || reviewMutation.isPending ? null : setPendingDecision(null))}
         >
           {pendingDecision && selected ? (
-            <DialogContent>
+            <DialogContent returnFocusFallback={messageLine}>
               <DialogHeader>
                 <DialogTitle>
                   {t(`teacherApplications.confirm.title.${pendingDecision}`, { name: applicantName })}

@@ -1,4 +1,4 @@
-import { type FormEvent, useMemo, useRef, useState } from 'react'
+import { type FormEvent, type RefObject, useMemo, useRef, useState } from 'react'
 import type { TFunction } from 'i18next'
 import { AlertTriangle, CheckCircle2, FileText, GitCompare, History, Save, UploadCloud } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
@@ -101,6 +101,10 @@ export function AdminCurriculumPage() {
   // #258: one write at a time. A double click sent two publishes; the ref
   // closes the gap before `isPending` reaches the next render.
   const inFlight = useRef(false)
+  // #407: where focus goes when a confirmed step leaves its button disabled:
+  // a publish while the worklist is read again, an apply for good.
+  const reviewNotice = useRef<HTMLParagraphElement>(null)
+  const applyHeading = useRef<HTMLHeadingElement>(null)
 
   const worklistQuery = useCurriculumWorklistQuery()
   const selectedPublicId = selected?.publicLessonId
@@ -371,6 +375,7 @@ export function AdminCurriculumPage() {
               // Publish waits for a refreshed worklist: the live version is read from it.
               publishBusy={reviewBusy || worklistQuery.isFetching}
               notice={notice}
+              noticeRef={reviewNotice}
               actionError={submitReviewMutation.error}
             />
           </TabsContent>
@@ -387,6 +392,7 @@ export function AdminCurriculumPage() {
               onApply={openApply}
               applyResult={applyMutation.data}
               applyBusy={applyMutation.isPending || applyMutation.isSuccess || action !== null}
+              headingRef={applyHeading}
             />
           </TabsContent>
 
@@ -410,6 +416,7 @@ export function AdminCurriculumPage() {
             applyMutation.isPending
           }
           error={actionError}
+          returnFocusFallback={action?.kind === 'apply' ? applyHeading : reviewNotice}
           onCancel={cancelAction}
           onConfirm={confirmAction}
         />
@@ -601,6 +608,7 @@ function ReviewPanel(props: {
   busy: boolean
   publishBusy: boolean
   notice: string | null
+  noticeRef: RefObject<HTMLParagraphElement | null>
   actionError: unknown
 }) {
   const { t } = useTranslation('admin')
@@ -652,7 +660,9 @@ function ReviewPanel(props: {
             <Button type="button" variant="outline" onClick={props.onRequestChanges} disabled={props.busy}>{t('curriculum.review.requestChanges')}</Button>
             <Button type="button" onClick={props.onPublish} disabled={props.publishBusy}>{t('curriculum.review.publish')}</Button>
           </div>
-          <p role="status" className="text-sm text-foreground empty:hidden">{props.notice}</p>
+          <p ref={props.noticeRef} tabIndex={-1} role="status" className="text-sm text-foreground empty:hidden">
+            {props.notice}
+          </p>
           <Button type="button" variant="outline" onClick={props.onLoadAudit} disabled={props.auditLoading}>{t('curriculum.review.loadAudit')}</Button>
           <ApiErrorPanel error={props.actionError ?? props.auditError} />
           {props.audit?.permissionDenied && <RestrictedPanel message={t('curriculum.review.missingCapability')} />}
@@ -674,6 +684,7 @@ function MigrationPanel(props: {
   onApply: () => void
   applyResult?: CurriculumMigrationEvidenceResponse
   applyBusy: boolean
+  headingRef: RefObject<HTMLHeadingElement | null>
 }) {
   const { t } = useTranslation('admin')
   return (
@@ -698,7 +709,11 @@ function MigrationPanel(props: {
         </CardContent>
       </Card>
       <Card>
-        <CardHeader><CardTitle className="text-base">{t('curriculum.migration.dryRunAndApply')}</CardTitle></CardHeader>
+        <CardHeader>
+          <CardTitle ref={props.headingRef} tabIndex={-1} className="text-base">
+            {t('curriculum.migration.dryRunAndApply')}
+          </CardTitle>
+        </CardHeader>
         <CardContent className="space-y-4">
           {props.dryRun ? (
             <>
