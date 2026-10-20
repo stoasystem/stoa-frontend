@@ -10,6 +10,7 @@ import type { TeacherHelpRequest, TeacherHelpStatus } from '@/types/teacherHelp'
  */
 const PILL_TONE: Record<TeacherHelpStatus, PillTone> = {
   pending: 'accent',
+  waiting_no_teacher: 'accent',
   assigned: 'gold',
   in_progress: 'green',
   resolved: 'neutral',
@@ -20,6 +21,7 @@ const PILL_TONE: Record<TeacherHelpStatus, PillTone> = {
 
 const TILE_TONE: Record<TeacherHelpStatus, string> = {
   pending: 'bg-accent-tint text-accent',
+  waiting_no_teacher: 'bg-accent-tint text-accent',
   assigned: 'bg-gold-tint text-gold',
   in_progress: 'bg-green-tint text-green',
   resolved: 'bg-fill text-pill-neutral',
@@ -27,6 +29,9 @@ const TILE_TONE: Record<TeacherHelpStatus, string> = {
   withdrawn: 'bg-fill text-pill-neutral',
   expired: 'bg-fill text-pill-neutral',
 }
+
+/** The statuses with words of their own: every one the type names. */
+const KNOWN_STATUSES: ReadonlySet<string> = new Set(Object.keys(PILL_TONE))
 
 /**
  * The card pinned under the Ask header once a teacher was asked (#12 point 2):
@@ -36,6 +41,10 @@ const TILE_TONE: Record<TeacherHelpStatus, string> = {
  * other input: there is no local "the teacher has joined" state, and nothing
  * here to confirm it. Components board, "Status": a white card, a 32 tile, a
  * 14/600 title over a 13 caption, and the state as a pill.
+ *
+ * A status this app does not know yet is still waiting as far as Ask can tell
+ * (it is read again every 15 s): the card says so in general words, never
+ * with a key built from the status (#397).
  */
 export function TeacherHelpStatusCard({
   request,
@@ -46,31 +55,37 @@ export function TeacherHelpStatusCard({
   teachersOnline: boolean | undefined
 }) {
   const { t } = useTranslation('chat')
-  const status = request.status
+  const status = KNOWN_STATUSES.has(request.status) ? request.status : null
   const name = request.teacherName?.trim() || t('ask.thread.teacherFallback')
+  const title = status ? t(`ask.help.title.${status}`, { name }) : t('ask.help.fallback.title')
+  const pill = status ? t(`ask.help.status.${status}`) : t('ask.help.fallback.status')
   const body =
-    status === 'pending' && teachersOnline === false ? t('ask.help.offline') : t(`ask.help.body.${status}`)
+    status === 'pending' && teachersOnline === false
+      ? t('ask.help.offline')
+      : status
+        ? t(`ask.help.body.${status}`)
+        : t('ask.help.fallback.body')
 
   return (
     <section
       aria-label={t('ask.help.cardLabel')}
       aria-live="polite"
-      data-help-status={status}
+      data-help-status={request.status}
       className="flex items-center gap-3 border border-[color:var(--card-border)] bg-surface"
       style={{ padding: '12px 14px', borderRadius: ROW.groupRadius }}
     >
       <span
         aria-hidden="true"
-        className={`inline-flex shrink-0 items-center justify-center ${TILE_TONE[status]}`}
+        className={`inline-flex shrink-0 items-center justify-center ${TILE_TONE[status ?? 'pending']}`}
         style={{ width: ROW.tile, height: ROW.tile, borderRadius: ROW.tileRadius }}
       >
         <GraduationCap size={ICON.rowLeading} strokeWidth={ICON.stroke} />
       </span>
       <div className="flex min-w-0 flex-1 flex-col gap-px">
-        <p className="text-[14px] font-semibold leading-[1.3] text-ink">{t(`ask.help.title.${status}`, { name })}</p>
+        <p className="text-[14px] font-semibold leading-[1.3] text-ink">{title}</p>
         <p className="text-[13px] leading-[1.4] text-caption">{body}</p>
       </div>
-      <Pill tone={PILL_TONE[status]}>{t(`ask.help.status.${status}`)}</Pill>
+      <Pill tone={PILL_TONE[status ?? 'pending']}>{pill}</Pill>
     </section>
   )
 }

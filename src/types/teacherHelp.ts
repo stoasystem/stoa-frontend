@@ -1,5 +1,9 @@
 export type TeacherHelpStatus =
   | 'pending'
+  // Waiting like `pending`, but nobody could be offered it when it was sent or
+  // read: no teacher is free. A teacher takes it once one is (stoa-backend #86).
+  // Only the student's view says it; the teacher list carries the stored status.
+  | 'waiting_no_teacher'
   | 'assigned'
   | 'in_progress'
   | 'resolved'
@@ -11,7 +15,9 @@ export type TeacherHelpStatus =
 
 /** Still with a teacher: not yet resolved, not withdrawn or expired. */
 export function isOpenHelpRequest(status: TeacherHelpStatus | undefined): boolean {
-  return status === 'pending' || status === 'assigned' || status === 'in_progress'
+  return (
+    status === 'pending' || status === 'waiting_no_teacher' || status === 'assigned' || status === 'in_progress'
+  )
 }
 
 /**
