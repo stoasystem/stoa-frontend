@@ -311,7 +311,8 @@ export async function streamedAnswer(conversationId: string, content: string, id
   const messages = await exchange(conversationId, idempotencyKey, content)
   recordDemoExchange(conversationId, messages)
   const reply = messages[1]
-  const words = reply.content.split(/(?<= )/)
+  // Each word with the space after it; no lookbehind, which Safari before 16.4 cannot parse (#398).
+  const words = reply.content.match(/[^ ]* |[^ ]+$/g) ?? ['']
   const events: (readonly [string, object])[] = [
     ['message_start', { messageId: reply.id, conversationId, role: 'assistant', createdAt: reply.createdAt }],
     ...words.map((delta) => ['message_delta', { messageId: reply.id, delta }] as const),

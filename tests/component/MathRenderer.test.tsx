@@ -368,3 +368,68 @@ describe('a formula with space inside its dollars (#386)', () => {
     expect(container.textContent).not.toContain('$')
   })
 })
+
+describe('without a lookbehind, which Safari before 16.4 cannot parse (#398)', () => {
+  // The number before an opening dollar and the asterisk before an italic one
+  // were each checked with a lookbehind, and the module failed to load on
+  // iPadOS 15. These pin what those checks did, now made another way.
+  beforeAll(async () => {
+    await import('@/components/ui/katexLoader')
+  })
+
+  it.each([
+    '5 $ x + 1 $',
+    '5\t$ x + 1 $',
+    '5 \t $ x + 1 $',
+    '5$ x + 1 $',
+    'a $ x + 1 $ 5',
+    'a $ x + 1 $\t5',
+    'a $x$5',
+  ])('leaves %j as text: a number before or after the dollars', (sentence) => {
+    expect(parseSegments(sentence)).toEqual([{ type: 'text', value: sentence }])
+  })
+
+  it.each([
+    ['5\n$ x + 1 $', 'x + 1'],
+    ['5a $ x + 1 $', 'x + 1'],
+    ['a5 b $ x $', 'x'],
+    ['a $ x + 1 $\n5', 'x + 1'],
+    ['a $ x + 1 $ b5', 'x + 1'],
+  ])('reads %j: no number just before or after the dollars', (written, tex) => {
+    expect(parseSegments(written).filter((segment) => segment.type !== 'text')).toEqual([{ type: 'inline', value: tex }])
+  })
+
+  it('passes over a dollar after a number and reads the next one', () => {
+    expect(parseSegments('Für 10 $ gilt $ x + 1 $.')).toEqual([
+      { type: 'text', value: 'Für 10 $ gilt ' },
+      { type: 'inline', value: 'x + 1' },
+      { type: 'text', value: '.' },
+    ])
+  })
+
+  it.each(['a **b* c', 'x***y*', '****', '*a**'])('opens no italic in %j: no single asterisk to open one', (written) => {
+    const { container } = render(<MathRenderer>{written}</MathRenderer>)
+    expect(container.querySelector('em, strong')).toBeNull()
+    expect(container.textContent).toBe(written)
+  })
+
+  it('italicises a single pair after a run of asterisks that opened nothing', () => {
+    const { container } = render(<MathRenderer>{'**x* und *y*'}</MathRenderer>)
+    expect([...container.querySelectorAll('em')].map((node) => node.textContent)).toEqual(['y'])
+    expect(container.querySelector('strong')).toBeNull()
+    expect(container.textContent).toBe('**x* und y')
+  })
+
+  it('keeps a bold pair and an italic pair side by side', () => {
+    const { container } = render(<MathRenderer>{'*a* **b** *c*'}</MathRenderer>)
+    expect([...container.querySelectorAll('em')].map((node) => node.textContent)).toEqual(['a', 'c'])
+    expect([...container.querySelectorAll('strong')].map((node) => node.textContent)).toEqual(['b'])
+  })
+
+  it('italicises around a formula after a run of asterisks', async () => {
+    const { container } = render(<MathRenderer>{'** *mit $a * b$ hier*'}</MathRenderer>)
+    await waitFor(() => expect(container.querySelector('.katex')).not.toBeNull())
+    expect(container.querySelector('em')?.querySelectorAll('.math-inline')).toHaveLength(1)
+    expect(container.textContent?.startsWith('** mit ')).toBe(true)
+  })
+})
