@@ -19,7 +19,8 @@
  *     chapter's way back to the map), the map opens on its nebula seen whole
  *     instead -- no card -- so the star lights up among its neighbours; the
  *     route is put right to the nebula's (in place, not a new history entry),
- *     and the student zooms in if they want to. Decided once, on arrival.
+ *     and the student zooms in if they want to. Decided once, on arrival:
+ *     the first render that has the sky.
  *   - Chosen on the map before its moment (C6): a tap on that star (or its
  *     link) lands on the same view, decided before the flight takes off
  *     (`land`, which the map asks before it flies, #139), so the flight
@@ -134,10 +135,19 @@ export function useLightingStage(map: StarMap, target: LayerTarget): LightingSta
   const shown = useMemo(() => presentHeld(map, held, recommended), [map, held, recommended])
 
   // On arrival: the route's star waits to be celebrated, so its nebula seen whole instead.
-  const [landing, setLanding] = useState<Landing | null>(() => {
+  // Arrival is the first render with a sky: after a refresh or from a link the
+  // sky is still on its way on the first one, and deciding then found no star
+  // and never looked again (#330 M8).
+  const arriving = (): Landing | null => {
     const whole = landingFor(map, held, target)
     return whole && target.layer === 'star' ? { from: target.unitId, target: whole } : null
-  })
+  }
+  const [arrived, setArrived] = useState(() => map.stars.length > 0)
+  const [landing, setLanding] = useState<Landing | null>(arriving)
+  if (!arrived && map.stars.length > 0) {
+    setArrived(true)
+    setLanding(arriving())
+  }
   const navigate = useNavigate()
   const { search } = useLocation()
   const landed = landing !== null && (sameTarget(landing.target, target) || (target.layer === 'star' && target.unitId === landing.from))

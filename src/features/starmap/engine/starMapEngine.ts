@@ -260,6 +260,8 @@ export class StarMapEngine {
   private orientation: Orientation = 'landscape'
   private map: StarMap | null = null
   private stars: Star[] = []
+  /** Each star's index in `stars`, by unit id. */
+  private starIndex = new Map<string, number>()
   private nebulaIndex = new Map<string, number>()
   private nebulaIds: string[] = []
   private discs = new Map<string, NebulaDisc>()
@@ -346,6 +348,8 @@ export class StarMapEngine {
   private visibleKey = ''
   private emittedOnce = false
   private positionsStale = false
+  /** What the last visible list was measured against: the same view, viewport and choice give the same list (#330 M9). */
+  private emittedFor: { view: View; viewport: unknown; layer: LayerTarget['layer'] } | null = null
 
   constructor(options: StarMapEngineOptions) {
     this.options = options
@@ -419,6 +423,7 @@ export class StarMapEngine {
     const map = sky ? source : orient(source, this.orientation)
     this.map = map
     this.stars = orderedStars(map)
+    this.starIndex = new Map(this.stars.map((star, index) => [star.unitId, index]))
     const nebulae = orderedNebulae(map).filter((nebula) => map.stars.some((star) => star.nebulaId === nebula.topicId))
     this.nebulaIds = nebulae.map((nebula) => nebula.topicId)
     this.nebulaIndex = new Map(this.nebulaIds.map((id, index) => [id, index]))
@@ -1027,7 +1032,7 @@ export class StarMapEngine {
 
   /** Where `unitId`'s star was drawn in the last frame; null before one, or for a star not on this map (#51). */
   starOnScreen(unitId: string): StarOnScreen | null {
-    const index = this.drewFirstFrame ? this.stars.findIndex((star) => star.unitId === unitId) : -1
+    const index = this.drewFirstFrame ? (this.starIndex.get(unitId) ?? -1) : -1
     return index < 0 ? null : { x: this.x[index], y: this.y[index], size: this.glyphSize, keepClear: this.renderer.stats.edgeLabels }
   }
 
@@ -1725,6 +1730,10 @@ export class StarMapEngine {
       this.positionsStale = true
       return
     }
+    // At rest with nothing changed (the recommended star breathing, a name
+    // fading): the list would be the same one. Not rebuilt every frame.
+    const was = this.emittedFor
+    if (this.emittedOnce && !this.positionsStale && was && was.view === this.view && was.viewport === this.viewport && was.layer === this.target.layer) return
     const margin = 8
     const list: VisibleStar[] = []
     const keys: number[] = []
@@ -1739,10 +1748,14 @@ export class StarMapEngine {
       }
     }
     const key = keys.join(',')
-    if (this.emittedOnce && key === this.visibleKey && !this.positionsStale) return
+    if (this.emittedOnce && key === this.visibleKey && !this.positionsStale) {
+      this.emittedFor = { view: this.view, viewport: this.viewport, layer: this.target.layer }
+      return
+    }
     this.emittedOnce = true
     this.visibleKey = key
     this.positionsStale = false
+    this.emittedFor = { view: this.view, viewport: this.viewport, layer: this.target.layer }
     const nebulae: NebulaDiscOnScreen[] = []
     for (let n = 0; n < this.nebulaX.length; n += 1) nebulae.push({ x: this.nebulaX[n], y: this.nebulaY[n], r: this.nebulaR[n] })
     listener(list, this.glyphSize, nebulae, this.zoom)

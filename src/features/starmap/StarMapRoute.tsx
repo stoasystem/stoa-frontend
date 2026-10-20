@@ -78,7 +78,7 @@ export function StarMapRoute({ relations = false, longNames = false }: { relatio
 
   return (
     <StarMapView demo={demo} map={stage.map} target={stage.target} onNavigate={onNavigate} land={stage.land} onFirstFrame={onFirstFrame} onCentreGalaxy={onCentreGalaxy} foveate={search.has('foveation') ? foveationFrom(search) : false}
-      overlay={(locate) => <LightingOverlay map={map} locate={locate} onReveal={stage.reveal} />} />
+      overlay={(locate, watch) => <LightingOverlay map={map} locate={locate} watch={watch} onReveal={stage.reveal} />} />
   )
 }
 

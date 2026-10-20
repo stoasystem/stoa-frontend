@@ -112,7 +112,7 @@ export type StarMapViewProps = {
   scheduler?: FrameScheduler
   createRendererFor?: (canvas: HTMLCanvasElement) => StarMapRenderer
   /** Drawn above the canvas, below the controls: the lighting layer (#51), told where a star is drawn. */
-  overlay?: (locate: (unitId: string) => StarOnScreen | null) => ReactNode
+  overlay?: (locate: (unitId: string) => StarOnScreen | null, watch: (listener: () => void) => () => void) => ReactNode
 }
 
 /**
@@ -207,6 +207,7 @@ export function StarMapView({ map, demo = false, target, onNavigate, land, onFir
   const here = (path: string) => path + search
   const reducedMotion = usePrefersReducedMotion()
   const stageRef = useRef<HTMLDivElement>(null)
+  const watchers = useRef(new Set<() => void>())
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const engineRef = useRef<StarMapEngine | null>(null)
   const [visible, setVisible] = useState<{ stars: VisibleStar[]; glyph: number; nebulae: NebulaDiscOnScreen[]; focus: StarOnScreen | null; zoom: ZoomState }>({
@@ -273,7 +274,10 @@ export function StarMapView({ map, demo = false, target, onNavigate, land, onFir
       scheduler,
       onRequestTarget: (next) => chooseRef.current(next),
       // A chosen star lists no stars, but says where its star is: panned away, a hint points back (#132).
-      onVisibleChange: (list, glyph, discs, zoom) => setVisible({ stars: list, glyph, nebulae: discs, focus: engine.focusedStarOnScreen, zoom }),
+      onVisibleChange: (list, glyph, discs, zoom) => {
+        setVisible({ stars: list, glyph, nebulae: discs, focus: engine.focusedStarOnScreen, zoom })
+        for (const listener of [...watchers.current]) listener()
+      },
       onFirstFrame: () => firstFrameRef.current?.(),
       onCentreGalaxy: (id) => centreRef.current?.(id),
     })
@@ -323,7 +327,10 @@ export function StarMapView({ map, demo = false, target, onNavigate, land, onFir
 
     // Nothing moves by itself while the map cannot be used: an ancestor is
     // `inert` (the phone's Ask sheet is open, #49) or the tab is hidden.
-    const syncPaused = () => engine.setPaused(Boolean(stage.closest('[inert]')) || document.hidden)
+    const syncPaused = () => {
+      engine.setPaused(Boolean(stage.closest('[inert]')) || document.hidden)
+      for (const listener of [...watchers.current]) listener()
+    }
     const inertWatch = new MutationObserver(syncPaused)
     for (let node: Element | null = stage; node; node = node.parentElement) {
       inertWatch.observe(node, { attributes: true, attributeFilter: ['inert'] })
@@ -492,6 +499,13 @@ export function StarMapView({ map, demo = false, target, onNavigate, land, onFir
     } else if (event.key === 'Escape' && target.layer !== 'map') {
       event.preventDefault()
       letGo()
+    } else if (target.layer === 'nebula' && event.target === event.currentTarget && !event.shiftKey && arrowDirection(event.key)) {
+      // On the stage after a nebula was chosen: an arrow goes into its stars.
+      const nebula = [...event.currentTarget.querySelectorAll<HTMLLIElement>('li[data-nebula]')].find((li) => li.dataset.nebula === target.nebulaId)
+      const first = nebula?.querySelector<HTMLAnchorElement>('a[data-unit]')
+      if (!first) return
+      event.preventDefault()
+      first.focus()
     } else if (target.layer === 'star' && !event.shiftKey && !event.defaultPrevented && !typing(event.target)) {
       // With a star chosen, an arrow goes to the nearest star of its nebula in
       // that direction, by where the stars are (#141; #132 went by course
@@ -507,7 +521,26 @@ export function StarMapView({ map, demo = false, target, onNavigate, land, onFir
     }
   }
 
+  // A choice made from the keyboard takes away the link it was made on: the
+  // chosen nebula's becomes its name, a chosen star's whole parallel DOM goes
+  // (#139). Focus fell to the page and the arrows stopped working (#330 M2).
+  // It goes to the stage instead, whose keys step from star to star.
+  const focusWithin = useRef(false)
+  useLayoutEffect(() => {
+    const stage = stageRef.current
+    const active = document.activeElement
+    if (!stage || !focusWithin.current || (active && active !== document.body)) return
+    stage.focus({ preventScroll: true })
+  })
+
   const focusStar = useCallback((index: number) => engineRef.current?.setFocusStar(index), [])
+  // For the overlay: told when the map comes to rest, or is covered or uncovered, so it need not ask every frame (#330 M4).
+  const watchMap = useCallback((listener: () => void) => {
+    watchers.current.add(listener)
+    return () => {
+      watchers.current.delete(listener)
+    }
+  }, [])
   const locateStar = useCallback((unitId: string) => engineRef.current?.starOnScreen(unitId) ?? null, [])
   const focusNebula = useCallback((index: number) => engineRef.current?.setFocusNebula(index), [])
 
@@ -679,9 +712,17 @@ export function StarMapView({ map, demo = false, target, onNavigate, land, onFir
     <div data-starmap-frame className="relative h-full min-h-[320px] w-full flex-1">
       <div
         ref={stageRef}
-        className="absolute inset-0 touch-none overflow-hidden select-none [-webkit-touch-callout:none]"
+        className="absolute inset-0 touch-none overflow-hidden outline-none select-none [-webkit-touch-callout:none]"
         data-starmap-stage
         data-layer={target.layer}
+        // Focusable only from code: where focus goes when a choice removes the link it was on.
+        tabIndex={-1}
+        onFocus={() => {
+          focusWithin.current = true
+        }}
+        onBlur={(event) => {
+          if (!event.currentTarget.contains(event.relatedTarget)) focusWithin.current = false
+        }}
         data-zoom-band={visible.zoom.band}
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
@@ -695,7 +736,7 @@ export function StarMapView({ map, demo = false, target, onNavigate, land, onFir
         onKeyDown={onKeyDown}
       >
         <canvas ref={canvasRef} aria-hidden="true" className="absolute inset-0 block h-full w-full" />
-        {overlay?.(locateStar)}
+        {overlay?.(locateStar, watchMap)}
 
         {demo && (
           <p className="absolute inset-x-0 top-0 m-0 flex h-8 items-center justify-center border-b border-white/10 px-2 text-[12px] text-[color:var(--on-sky-text-body)]">
