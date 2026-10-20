@@ -337,8 +337,9 @@ export const pageRoutes: readonly PageRoute[] = [
     titleKey: 'studentRoutes.me.title',
     meta: { module: 'Account', status: 'core', purpose: 'Account page: profile, language, notification preferences, password change.' },
   },
-  // Kept, but out of navigation: reached from the bell (#13 point 3).
-  { path: '/assignments', access: STUDENT, page: StudentAssignmentsPage, titleKey: 'routes.assignments.title', meta: { module: 'Learning', status: 'core', purpose: 'Teacher-assigned work, reached from a notification.' } },
+  // Out of the bar's navigation (#13 point 3): the avatar menu leads here, as
+  // the bell would, but the backend sends no assignment notification (#400).
+  { path: '/assignments', access: STUDENT, page: StudentAssignmentsPage, titleKey: 'routes.assignments.title', meta: { module: 'Learning', status: 'core', purpose: 'Teacher-assigned work, reached from the avatar menu; each opens its chapter.' } },
   // One knowledge point's due questions, opened from its star (#48).
   { path: '/review/:unitId', access: STUDENT, page: ReviewPage, titleKey: 'routes.review.title', meta: { module: 'Learning', status: 'core', purpose: "One knowledge point's review session." } },
 

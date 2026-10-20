@@ -6,6 +6,7 @@
     "close": "Schliessen"
   },
   "accountMenu": {
+    "assignments": "Aufgaben",
     "billing": "Abrechnung und Zahlung",
     "help": "Hilfe und Support",
     "open": "Konto"

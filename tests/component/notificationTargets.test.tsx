@@ -107,7 +107,8 @@ describe('a notification in the bell', () => {
     expect(pathname).toBe('/ask')
   })
 
-  it('opens /assignments, which only the bell leads to (#13 point 3)', async () => {
+  // The avatar menu leads there too (#400); the backend sends none of these yet.
+  it('opens /assignments for an assignment notification (#13 point 3)', async () => {
     renderBell('student', [event({ targetType: 'assignment', targetId: 'a-1', title: 'New assignment' })])
     await openBell()
 

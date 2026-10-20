@@ -26,6 +26,8 @@
       "skipped": "Demande à ton enseignant quoi essayer ensuite",
       "default": "Commencer la pratique"
     },
+    "openChapter": "Ouvrir le chapitre",
+    "openTopic": "Voir sur la carte du ciel",
     "untitled": "Devoir",
     "failedBody": "Réessaie dans un instant.",
     "currentTarget": "ton objectif d’apprentissage actuel",

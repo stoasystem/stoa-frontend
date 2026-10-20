@@ -6,6 +6,7 @@
     "close": "Fermer"
   },
   "accountMenu": {
+    "assignments": "Devoirs",
     "billing": "Facturation et paiement",
     "help": "Aide et assistance",
     "open": "Compte"

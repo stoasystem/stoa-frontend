@@ -9,7 +9,7 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { MemoryRouter, matchPath } from 'react-router-dom'
+import { MemoryRouter, matchPath, useLocation } from 'react-router-dom'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { isAdmitted } from '@/app/router/AppRoutes'
 import { navAreaForRole, pageRoutes, type AppNavArea } from '@/app/router/routeManifest'
@@ -52,6 +52,12 @@ beforeEach(() => {
 })
 afterEach(() => useAuthStore.setState({ user: null, accessToken: null, isAuthenticated: false }))
 
+let pathname = ''
+function LocationProbe() {
+  pathname = useLocation().pathname
+  return null
+}
+
 function renderMenu(role: UserRole) {
   useAuthStore.setState({
     user: { id: 'u-1', name: 'Lina Meier', email: 'lina@example.com', role } as CurrentUser,
@@ -63,6 +69,7 @@ function renderMenu(role: UserRole) {
       <MemoryRouter>
         <button type="button">before</button>
         <AccountMenu />
+        <LocationProbe />
       </MemoryRouter>
     </QueryClientProvider>,
   )
@@ -87,11 +94,39 @@ const FIXED = [
 ]
 
 describe('the account menu', () => {
-  it.each(['student', 'teacher', 'parent', 'admin', 'organization_admin'] as const)(
+  it.each(['teacher', 'parent', 'admin', 'organization_admin'] as const)(
     'offers a %s the fixed items, sign-out last',
     async (role) => {
       const menu = await openWithMouse(role)
       expect(itemNames(menu)).toEqual([...FIXED, 'actions.logOut'])
+    },
+  )
+
+  // The backend sends no assignment notification, so the bell never led a
+  // student to /assignments; the menu does (#400).
+  it('puts the student Assignments item between Help and Sign out (#400)', async () => {
+    const menu = await openWithMouse('student')
+    expect(itemNames(menu)).toEqual([...FIXED, 'accountMenu.assignments', 'actions.logOut'])
+  })
+
+  it('takes a student to /assignments from the Assignments item (#400)', async () => {
+    const menu = await openWithMouse('student')
+    const item = within(menu).getByRole('menuitem', { name: 'accountMenu.assignments' })
+    expect(item).toHaveAttribute('href', '/assignments')
+    expect(item).toHaveStyle({ height: '34px', borderRadius: '7px' })
+
+    await userEvent.click(item)
+
+    expect(pathname).toBe('/assignments')
+    await waitFor(() => expect(screen.queryByRole('menu')).toBeNull())
+  })
+
+  it.each(['teacher', 'parent', 'admin', 'organization_admin', 'school_teacher', 'school_viewer'] as const)(
+    'offers a %s no Assignments item (#400)',
+    async (role) => {
+      const menu = await openWithMouse(role)
+      expect(within(menu).queryByRole('menuitem', { name: 'accountMenu.assignments' })).toBeNull()
+      expect(menu.querySelector('a[href="/assignments"]')).toBeNull()
     },
   )
 
@@ -158,10 +193,16 @@ describe('the account menu', () => {
     expect(within(menu).getByRole('menuitem', { name: 'accountMenu.billing' })).toHaveAttribute('href', '/billing')
   })
 
-  it.each(['student', 'teacher', 'admin'] as const)('gives a %s no extra item even then', async (role) => {
+  it.each(['teacher', 'admin'] as const)('gives a %s no extra item even then', async (role) => {
     registry.everything = true
     const menu = await openWithMouse(role)
     expect(itemNames(menu)).toEqual([...FIXED, 'actions.logOut'])
+  })
+
+  it('gives a student only Assignments even then', async () => {
+    registry.everything = true
+    const menu = await openWithMouse('student')
+    expect(itemNames(menu)).toEqual([...FIXED, 'accountMenu.assignments', 'actions.logOut'])
   })
 
   it('signs out through the one shared sign-out', async () => {

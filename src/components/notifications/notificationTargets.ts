@@ -24,7 +24,8 @@ export const NOTIFICATION_TARGETS: Record<AppNavArea, Readonly<Record<string, Re
   student: {
     conversation: (id) => askPathFor(id),
     question: () => ASK_PATH,
-    // Reached only from here (#13 point 3).
+    // The avatar menu leads there too (#400): the backend sends no
+    // `assignment` notification today.
     assignment: () => '/assignments',
     recommendation: () => '/assignments',
   },

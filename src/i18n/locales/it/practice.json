@@ -26,6 +26,8 @@
       "skipped": "Chiedi al tuo insegnante cosa provare adesso",
       "default": "Inizia l’esercitazione"
     },
+    "openChapter": "Apri il capitolo",
+    "openTopic": "Mostra sulla mappa stellare",
     "untitled": "Compito",
     "failedBody": "Riprova tra poco.",
     "currentTarget": "il tuo obiettivo di studio attuale",
