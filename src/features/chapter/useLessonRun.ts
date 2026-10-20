@@ -201,19 +201,18 @@ export function useLessonRun(lesson: PracticeLesson | undefined, { testOut = fal
     dispatch({ type: 'feedback', feedback: judged })
   }, [answered, answering, challenge, quiz, refuse, state.answer, submitAnswer, wrong])
 
+  // The press a hint is being asked for. One that fails on the way is sent
+  // again with the same key, so the backend counts it once (#325).
+  const hintPress = useRef<{ challengeId: string; key: string } | null>(null)
   const askHint = useCallback(async () => {
-    if (!challenge || !lesson || quiz || hintMutation.isPending) return
-    const response = await hintMutation.mutateAsync({
-      subjectId: lesson.subjectId,
-      gradeLevel: lesson.gradeLevel,
-      topicId: lesson.topicId,
-      lessonId: lesson.id,
-      challengeId: challenge.challengeId,
-      answer: state.answer,
-    })
-    setHint({ challengeId: challenge.challengeId, hint: response })
+    if (!challenge || quiz || !challenge.hintAvailable || hintMutation.isPending) return
+    const { challengeId } = challenge
+    if (hintPress.current?.challengeId !== challengeId) hintPress.current = { challengeId, key: crypto.randomUUID() }
+    const response = await hintMutation.mutateAsync({ challengeId, idempotencyKey: hintPress.current.key })
+    hintPress.current = null
+    setHint({ challengeId, hint: response })
     dispatch({ type: 'hint' })
-  }, [challenge, hintMutation, lesson, quiz, state.answer])
+  }, [challenge, hintMutation, quiz])
 
   /**
    * On from the feedback. In a quiz the backend has already said what the
@@ -292,7 +291,10 @@ export function useLessonRun(lesson: PracticeLesson | undefined, { testOut = fal
     answer: state.answer,
     answered,
     feedback,
+    /** What the backend said to Hint; `hint.hint` is null when the exercise has none. */
     hint: hintForChallenge,
+    /** Hint is offered: an ordinary exercise the backend has a hint for. */
+    hintOffered: !quiz && challenge?.hintAvailable === true,
     wrong,
     finished,
     /** The quiz under way, as the backend sees it. */

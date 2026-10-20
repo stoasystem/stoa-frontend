@@ -226,7 +226,6 @@ const NOT_YET = L(
   'Pas encore. Regarde à nouveau le triangle.',
   'Non ancora. Guarda di nuovo il triangolo.',
 )
-const HINT_TITLE = L('Hint', 'Tipp', 'Indice', 'Suggerimento')
 
 const { unitId, subjectId, topicId, gradeLevel } = DEMO_KNOWLEDGE_POINT
 const ESTIMATED_MINUTES = 10
@@ -252,6 +251,7 @@ function challengeOf(spec: ExerciseSpec, lesson: number, exercise: number, langu
     type: spec.type,
     prompt: localize(spec.prompt, language),
     ...(options ? { options } : {}),
+    hintAvailable: true,
     correctAnswer,
     hint: localize(spec.hint, language),
     explanation: localize(spec.explanation, language),
@@ -402,7 +402,7 @@ export function checkDemoAnswer(id: string, answer: string | string[], language:
 export function demoHint(id: string, language: SupportedLanguage = 'en'): PracticeHintResponse | null {
   const found = findSpec(id)
   if (!found) return null
-  return { title: localize(HINT_TITLE, language), hint: localize(found.spec.hint, language), nextStep: '' }
+  return { challengeId: id, hintAvailable: true, hint: localize(found.spec.hint, language) }
 }
 
 /** `POST /practice/lessons/:id/complete` for a demo lesson. Null for any other id. */

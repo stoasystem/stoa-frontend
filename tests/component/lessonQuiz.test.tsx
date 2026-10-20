@@ -92,7 +92,7 @@ type Seen = {
   quizAnswers: { quizId: string; answer: unknown }[]
   answers: { id: string; answer: unknown }[]
   completes: { lessonId: string; credential: unknown }[]
-  hints: number
+  hints: unknown[]
 }
 
 /** What the mocked backend decides. Each test bends only what it is about. */
@@ -103,6 +103,10 @@ type Rules = {
   startRefusal: Refusal | null
   answerRefusal: Refusal | null
   completeRefusal: Refusal | null
+  /** The approved hint for an exercise, null for none; `fail` drops the request. */
+  hint: (challengeId: string) => string | null | 'fail'
+  /** Exercises the backend lists with `hintAvailable: false`. */
+  noHint: string[]
 }
 
 let completed: Set<string>
@@ -144,6 +148,7 @@ function exerciseBody(challengeId: string) {
     topic: 'Multiply.',
     type: 'text_input',
     prompt: `Exercise ${n}: what is ${n} × 2?`,
+    hintAvailable: !rules.noHint.includes(challengeId),
   }
 }
 
@@ -330,9 +335,17 @@ function backend() {
       completed.add(lessonId)
       return HttpResponse.json({ lessonId, completed: true, nextLessonId: null, progressPoints: 10, studyStreak: 1, dailyGoalCompleted: false })
     }),
-    http.post(`${API}/practice/hints`, () => {
-      seen.hints += 1
-      return HttpResponse.json({ title: 'Double it', hint: 'Add it to itself.', nextStep: '' })
+    // As stoa-backend's PracticeHintRequest: the key is required, and a 422 otherwise.
+    http.post(`${API}/practice/hints`, async ({ request }) => {
+      const body = (await request.json()) as { challengeId?: unknown; idempotencyKey?: unknown }
+      seen.hints.push(body)
+      const { challengeId, idempotencyKey } = body
+      if (typeof challengeId !== 'string' || !challengeId) return HttpResponse.json({ detail: 'challengeId' }, { status: 422 })
+      if (typeof idempotencyKey !== 'string' || !/^[A-Za-z0-9._~-]{1,64}$/.test(idempotencyKey))
+        return HttpResponse.json({ detail: 'idempotencyKey' }, { status: 422 })
+      const hint = rules.hint(challengeId)
+      if (hint === 'fail') return HttpResponse.error()
+      return HttpResponse.json({ challengeId, hintAvailable: hint !== null, hint })
     }),
   )
 }
@@ -470,7 +483,7 @@ beforeEach(async () => {
   quizzes = new Map()
   credentials = new Map()
   quizCounter = 0
-  seen = { starts: [], quizAnswers: [], answers: [], completes: [], hints: 0 }
+  seen = { starts: [], quizAnswers: [], answers: [], completes: [], hints: [] }
   rules = {
     mistakesAllowed: 1,
     judge: (challengeId, value) => value === right(challengeId),
@@ -478,6 +491,8 @@ beforeEach(async () => {
     startRefusal: null,
     answerRefusal: null,
     completeRefusal: null,
+    hint: () => 'Add it to itself.',
+    noHint: [],
   }
   useAuthStore.setState({
     user: { id: 'u-1', name: 'Lina Meier', email: 'lina@example.com', role: 'student' } as CurrentUser,
@@ -892,7 +907,7 @@ describe('what a quiz turns off', () => {
     expect(screen.getByRole('textbox', { name: 'Your answer' })).toBeDisabled()
     expect(hearts()).toHaveAccessibleName('1 of 2 hearts left')
     expect(screen.getByText('That cost a heart. 1 heart left.')).toBeInTheDocument()
-    expect(seen.hints).toBe(0)
+    expect(seen.hints).toEqual([])
 
     await user.click(screen.getByRole('button', { name: 'Continue' }))
     await passQuiz()
@@ -1004,5 +1019,63 @@ describe('testing out of a lesson from the chapter', () => {
     open('/chapter/u-5/l-2?mode=quiz')
     await screen.findByText(/Quiz · Question 1 of 5$/)
     expect(hearts()).toHaveAttribute('data-motion', 'beat')
+  })
+})
+
+describe('Hint (#325)', () => {
+  const hintButton = () => screen.getByRole('button', { name: 'Hint' })
+
+  it('names the exercise and the press, and shows the hint that comes back', async () => {
+    open('/chapter/u-5/l-2')
+    await onScreen()
+    await user.click(hintButton())
+
+    expect(await screen.findByText('Add it to itself.')).toBeInTheDocument()
+    expect(seen.hints).toEqual([{ challengeId: 'l-2-e1', idempotencyKey: expect.stringMatching(/^[A-Za-z0-9._~-]{1,64}$/) }])
+    expect(screen.queryByText('No hint right now. Try again in a moment.')).not.toBeInTheDocument()
+  })
+
+  it('says so when the exercise has no hint, instead of an empty bubble', async () => {
+    rules.hint = () => null
+    open('/chapter/u-5/l-2')
+    await onScreen()
+    await user.click(hintButton())
+
+    expect(await screen.findByText('There’s no hint for this exercise.')).toBeInTheDocument()
+    expect(screen.queryByText('No hint right now. Try again in a moment.')).not.toBeInTheDocument()
+  })
+
+  it('has no Hint button on an exercise the backend has no hint for', async () => {
+    rules.noHint = ['l-2-e1']
+    open('/chapter/u-5/l-2')
+    expect(await onScreen()).toBe('l-2-e1')
+    expect(screen.queryByRole('button', { name: 'Hint' })).not.toBeInTheDocument()
+
+    await skip()
+    expect(await onScreen()).toBe('l-2-e2')
+    expect(hintButton()).toBeInTheDocument()
+  })
+
+  it('sends a press that failed on the way again with the same key, and a new press with a new one', async () => {
+    let fail = true
+    rules.hint = () => (fail ? 'fail' : 'Add it to itself.')
+    open('/chapter/u-5/l-2')
+    await onScreen()
+    await user.click(hintButton())
+    expect(await screen.findByText('No hint right now. Try again in a moment.')).toBeInTheDocument()
+
+    fail = false
+    await user.click(hintButton())
+    expect(await screen.findByText('Add it to itself.')).toBeInTheDocument()
+    const [first, again] = seen.hints as { idempotencyKey: string }[]
+    expect(again.idempotencyKey).toBe(first.idempotencyKey)
+
+    await skip()
+    await onScreen()
+    await user.click(hintButton())
+    await waitFor(() => expect(seen.hints).toHaveLength(3))
+    const [, , next] = seen.hints as { challengeId: string; idempotencyKey: string }[]
+    expect(next.challengeId).toBe('l-2-e2')
+    expect(next.idempotencyKey).not.toBe(first.idempotencyKey)
   })
 })

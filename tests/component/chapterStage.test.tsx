@@ -78,7 +78,7 @@ vi.mock('@/services/practice/practiceApi', async (importOriginal) => ({
   getPracticeLesson: vi.fn(),
   submitChallengeAnswer: vi.fn(),
   completePracticeLesson: vi.fn(),
-  getPracticeHint: vi.fn(async () => ({ title: 'Undo the + 5 first', hint: 'Take 5 from both sides.', nextStep: '' })),
+  getPracticeHint: vi.fn(async () => ({ challengeId: 'ch-1', hintAvailable: true, hint: 'Take 5 from both sides.' })),
 }))
 
 // ---------------------------------------------------------------------------
@@ -168,6 +168,7 @@ const challenge = (id: string, rest: Partial<PracticeLesson['challenges'][number
   topic: 'Solve for x.',
   type: 'multiple_choice' as const,
   prompt: '3x + 5 = 20',
+  hintAvailable: true,
   // What only the backend's check should know: none of it goes to Ask.
   correctAnswer: 'x = 5',
   hint: 'Subtract 5 from both sides first.',
