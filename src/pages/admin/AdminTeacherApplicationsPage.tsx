@@ -5,6 +5,14 @@ import { PageHeader } from '@/components/common/PageHeader'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
 import { Textarea } from '@/components/ui/textarea'
 import {
   useReissueTeacherInvitationMutation,
@@ -15,9 +23,12 @@ import {
 import { DashboardLayout } from '@/layouts/DashboardLayout'
 import { teacherSubjectLabel } from '@/lib/subjects'
 import { toUserFacingError } from '@/lib/userFacingText'
+import { ApiError } from '@/services/api/httpClient'
 import type { TeacherApplicationListItem, TeacherReviewState } from '@/services/teacher/teacherApplicationApi'
 
 const states: TeacherReviewState[] = ['pending_review', 'approved', 'rejected']
+
+type Decision = 'approved' | 'rejected'
 
 export function AdminTeacherApplicationsPage() {
   const { t } = useTranslation('admin')
@@ -27,10 +38,16 @@ export function AdminTeacherApplicationsPage() {
     subjects.map((subject) => teacherSubjectLabel(subject, tTeacher)).join(', ')
   const [reviewState, setReviewState] = useState<TeacherReviewState>('pending_review')
   const [selected, setSelected] = useState<TeacherApplicationListItem | null>(null)
-  // untranslated-ok: the review reason is stored with the decision, so its
-  // starting text is data and stays in one language; the reviewer can overwrite it.
-  const [reason, setReason] = useState('Reviewed against teacher onboarding criteria.')
+  // The reason belongs to one application (#334). It used to start as an English
+  // sentence and outlive every decision, so the next applicant was approved or
+  // rejected under the last one's reason; it now starts empty and is emptied
+  // whenever the application in view changes.
+  const [reason, setReason] = useState('')
   const [message, setMessage] = useState<string | null>(null)
+  // A decision is confirmed in a dialog that names the applicant (#334): both
+  // buttons used to act on the first click, and neither can be undone here.
+  const [pendingDecision, setPendingDecision] = useState<Decision | null>(null)
+  const [decisionError, setDecisionError] = useState<string | null>(null)
   const listQuery = useTeacherApplicationsQuery(reviewState)
   const detailQuery = useTeacherApplicationDetailQuery(selected?.applicationId ?? null, selected?.version ?? null)
   const reviewMutation = useReviewTeacherApplicationMutation()
@@ -39,14 +56,22 @@ export function AdminTeacherApplicationsPage() {
   const detail = detailQuery.data
   // Only a pending application can be decided; the other tabs are a record.
   const decidable = reviewState === 'pending_review'
+  const applicantName = selected ? detail?.fullName || selected.fullName || selected.applicationId : ''
   let statement: string
   if (detailQuery.isError) statement = toUserFacingError(detailQuery.error, t('teacherApplications.statementFailed'))
   else if (detailQuery.isPending) statement = t('teacherApplications.loadingStatement')
   else statement = detail?.statement?.trim() || t('teacherApplications.noStatement')
 
-  function decide(decision: 'approved' | 'rejected') {
+  function select(row: TeacherApplicationListItem | null) {
+    setSelected(row)
+    setReason('')
+    setMessage(null)
+  }
+
+  function decide(decision: Decision) {
     if (!selected) return
     setMessage(null)
+    setDecisionError(null)
     reviewMutation.mutate(
       {
         applicationId: selected.applicationId,
@@ -58,7 +83,8 @@ export function AdminTeacherApplicationsPage() {
         onSuccess: (result) => {
           // The decision moves the application out of this queue; leaving it
           // selected kept Approve and Reject live for a case already decided.
-          setSelected(null)
+          setPendingDecision(null)
+          select(null)
           if (decision === 'approved') {
             setMessage(
               result.invitationDelivered
@@ -69,7 +95,7 @@ export function AdminTeacherApplicationsPage() {
             setMessage(t('teacherApplications.rejected'))
           }
         },
-        onError: (error) => setMessage(toUserFacingError(error, t('teacherApplications.reviewFailed'))),
+        onError: (error) => setDecisionError(toUserFacingError(error, t('teacherApplications.reviewFailed'))),
       },
     )
   }
@@ -118,8 +144,7 @@ export function AdminTeacherApplicationsPage() {
               variant={reviewState === state ? 'default' : 'outline'}
               onClick={() => {
                 setReviewState(state)
-                setSelected(null)
-                setMessage(null)
+                select(null)
               }}
             >
               {t(`teacherApplications.states.${state}`)}
@@ -132,9 +157,18 @@ export function AdminTeacherApplicationsPage() {
               <CardTitle className="text-base">{t('teacherApplications.queue')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-2">
+              {/* The queue said nothing while it loaded, and every failure read as
+                  missing reviewer access, unannounced (#334). */}
+              {listQuery.isPending && (
+                <p role="status" className="text-sm text-muted-foreground">
+                  {t('teacherApplications.loading')}
+                </p>
+              )}
               {listQuery.isError && (
-                <p className="text-sm text-destructive">
-                  {toUserFacingError(listQuery.error, t('teacherApplications.loadFailed'))}
+                <p role="alert" className="text-sm text-destructive">
+                  {listQuery.error instanceof ApiError && listQuery.error.status === 403
+                    ? t('teacherApplications.forbidden')
+                    : toUserFacingError(listQuery.error, t('teacherApplications.loadFailed'))}
                 </p>
               )}
               {listQuery.isSuccess && rows.length === 0 && (
@@ -151,8 +185,7 @@ export function AdminTeacherApplicationsPage() {
                       isSelected ? 'border-primary bg-primary/5' : 'bg-background/70'
                     }`}
                     onClick={() => {
-                      setSelected(row)
-                      setMessage(null)
+                      if (!isSelected) select(row)
                     }}
                   >
                     <span className="font-medium text-foreground">{row.fullName || row.applicationId}</span>
@@ -173,7 +206,7 @@ export function AdminTeacherApplicationsPage() {
               {!selected && <p className="text-muted-foreground">{t('teacherApplications.selectPrompt')}</p>}
               {selected && (
                 <>
-                  <p><span className="font-medium">{t('teacherApplications.name')}</span> {detail?.fullName || selected.fullName}</p>
+                  <p><span className="font-medium">{t('teacherApplications.name')}</span> {applicantName}</p>
                   <p><span className="font-medium">{t('teacherApplications.email')}</span> {selected.verifiedEmail}</p>
                   <p><span className="font-medium">{t('teacherApplications.subjects')}</span> {subjectList(detail?.subjects || selected.subjects || [])}</p>
                   <p className={`whitespace-pre-wrap ${detailQuery.isError ? 'text-destructive' : 'text-muted-foreground'}`}>{statement}</p>
@@ -191,7 +224,10 @@ export function AdminTeacherApplicationsPage() {
                         <Button
                           type="button"
                           disabled={reviewMutation.isPending || !reason.trim()}
-                          onClick={() => decide('approved')}
+                          onClick={() => {
+                            setDecisionError(null)
+                            setPendingDecision('approved')
+                          }}
                         >
                           {t('teacherApplications.approve')}
                         </Button>
@@ -199,7 +235,10 @@ export function AdminTeacherApplicationsPage() {
                           type="button"
                           variant="outline"
                           disabled={reviewMutation.isPending || !reason.trim()}
-                          onClick={() => decide('rejected')}
+                          onClick={() => {
+                            setDecisionError(null)
+                            setPendingDecision('rejected')
+                          }}
                         >
                           {t('teacherApplications.reject')}
                         </Button>
@@ -217,6 +256,50 @@ export function AdminTeacherApplicationsPage() {
             </CardContent>
           </Card>
         </div>
+        <Dialog
+          open={pendingDecision !== null && selected !== null}
+          onOpenChange={(open) => (open || reviewMutation.isPending ? null : setPendingDecision(null))}
+        >
+          {pendingDecision && selected ? (
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>
+                  {t(`teacherApplications.confirm.title.${pendingDecision}`, { name: applicantName })}
+                </DialogTitle>
+                <DialogDescription>
+                  {t(`teacherApplications.confirm.body.${pendingDecision}`, { email: selected.verifiedEmail })}
+                </DialogDescription>
+              </DialogHeader>
+              <div className="text-sm">
+                <p className="font-medium">{t('teacherApplications.confirm.reason')}</p>
+                <p className="whitespace-pre-wrap text-muted-foreground">{reason.trim()}</p>
+              </div>
+              {decisionError ? (
+                <p role="alert" className="text-sm text-destructive">
+                  {decisionError}
+                </p>
+              ) : null}
+              <DialogFooter className="gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  disabled={reviewMutation.isPending}
+                  onClick={() => setPendingDecision(null)}
+                >
+                  {t('teacherApplications.confirm.cancel')}
+                </Button>
+                <Button
+                  type="button"
+                  variant={pendingDecision === 'rejected' ? 'destructive' : 'default'}
+                  disabled={reviewMutation.isPending || !reason.trim()}
+                  onClick={() => decide(pendingDecision)}
+                >
+                  {t(pendingDecision === 'approved' ? 'teacherApplications.approve' : 'teacherApplications.reject')}
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          ) : null}
+        </Dialog>
       </PageContainer>
     </DashboardLayout>
   )

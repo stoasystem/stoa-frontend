@@ -249,7 +249,10 @@ describe('reviewing a teacher application', () => {
     expect(row).toHaveAttribute('aria-pressed', 'false')
     await user.click(row)
     expect(row).toHaveAttribute('aria-pressed', 'true')
+    await user.type(screen.getByRole('textbox', { name: enAdmin.teacherApplications.reasonLabel }), 'Meets the criteria.')
     await user.click(screen.getByRole('button', { name: enAdmin.teacherApplications.approve }))
+    // The decision is confirmed in a dialog since #334.
+    await user.click(within(screen.getByRole('dialog')).getByRole('button', { name: enAdmin.teacherApplications.approve }))
 
     expect(reviewMutate).toHaveBeenCalledTimes(1)
     expect(screen.queryByRole('button', { name: enAdmin.teacherApplications.approve })).toBeNull()

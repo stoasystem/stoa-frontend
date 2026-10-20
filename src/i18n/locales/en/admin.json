@@ -313,7 +313,9 @@
     },
     "queue": "Queue",
     "review": "Review",
-    "loadFailed": "Could not load applications. Reviewer access is required.",
+    "loadFailed": "Could not load applications.",
+    "loading": "Loading applications…",
+    "forbidden": "Your account is not allowed to review teacher applications.",
     "empty": "No applications in this state.",
     "noSubjects": "No subjects",
     "selectPrompt": "Select an application to review.",
@@ -333,7 +335,19 @@
     "resendFailed": "Could not resend the invitation.",
     "statementFailed": "The statement could not be loaded.",
     "noStatement": "No statement was submitted.",
-    "reasonLabel": "Reason for the decision"
+    "reasonLabel": "Reason for the decision",
+    "confirm": {
+      "title": {
+        "approved": "Approve the application from {{name}}?",
+        "rejected": "Reject the application from {{name}}?"
+      },
+      "body": {
+        "approved": "An invitation is sent to {{email}}. The decision cannot be changed here afterwards.",
+        "rejected": "The application moves to “rejected”. The decision cannot be changed here afterwards."
+      },
+      "reason": "Reason:",
+      "cancel": "Cancel"
+    }
   },
   "learningOps": {
     "eyebrow": "Learning operations",

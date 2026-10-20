@@ -315,7 +315,9 @@
     },
     "queue": "File d’attente",
     "review": "Examen",
-    "loadFailed": "Impossible de charger les candidatures. Un accès d’examinateur est requis.",
+    "loadFailed": "Impossible de charger les candidatures.",
+    "loading": "Chargement des candidatures…",
+    "forbidden": "Votre compte n’est pas autorisé à examiner les candidatures d’enseignants.",
     "empty": "Aucune candidature dans cet état.",
     "noSubjects": "Aucune matière",
     "selectPrompt": "Sélectionnez une candidature à examiner.",
@@ -335,7 +337,19 @@
     "resendFailed": "Impossible de renvoyer l’invitation.",
     "statementFailed": "La lettre de motivation n’a pas pu être chargée.",
     "noStatement": "Aucune lettre de motivation n’a été soumise.",
-    "reasonLabel": "Motif de la décision"
+    "reasonLabel": "Motif de la décision",
+    "confirm": {
+      "title": {
+        "approved": "Accepter la candidature de {{name}} ?",
+        "rejected": "Refuser la candidature de {{name}} ?"
+      },
+      "body": {
+        "approved": "Une invitation est envoyée à {{email}}. La décision ne pourra plus être modifiée ici.",
+        "rejected": "La candidature passe dans « refusées ». La décision ne pourra plus être modifiée ici."
+      },
+      "reason": "Motif :",
+      "cancel": "Annuler"
+    }
   },
   "learningOps": {
     "eyebrow": "Suivi de l’apprentissage",
