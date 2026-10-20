@@ -105,9 +105,10 @@ export function useSignOut() {
     forgetTestRolesHolding({ accessToken, refreshToken })
     // Register before navigation unmounts this menu. The login mutation waits
     // for every request here to finish or time out - the logout's 8 s, and
-    // after a refusal the refresh's 10 s and the second logout's 8 s - since a
-    // logout landing after the next sign-in would end that one too. Server work
-    // may outlive it.
+    // after a refusal the refresh's 10 s and the second logout's 8 s. The
+    // backend ends one sign-in, but a token without `origin_jti` still ends the
+    // account's, and a logout of one landing after the next sign-in would end
+    // that one too. Server work may outlive the wait.
     const pending = trackPendingLogout(
       accessToken ? endOnServer(accessToken, refreshToken) : Promise.resolve(),
     )

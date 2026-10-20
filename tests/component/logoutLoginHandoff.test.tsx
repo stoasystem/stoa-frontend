@@ -112,9 +112,9 @@ it('releases the waiting login when the logout request times out after 8 seconds
 })
 
 // A logout refused for an access token that ran out is followed by a refresh
-// and a second logout (#399). That second logout ends the account's sign-ins
-// on the server just as the first would, so a login sent before it lands
-// would be ended with them: the login waits for all three.
+// and a second logout (#399). For a token without `origin_jti` the backend
+// still ends every sign-in of the account, so a login sent before that second
+// logout lands could be ended with them: the login waits for all three.
 it('waits for the refresh and the second logout after a refused logout', async () => {
   let finishSecondLogout!: () => void
   const gate = new Promise<void>((resolve) => { finishSecondLogout = resolve })
@@ -180,6 +180,38 @@ it('releases the waiting login when the refresh after a refused logout hangs, af
   expect(requests).toEqual(['logout', 'refresh'])
   await act(() => vi.advanceTimersByTimeAsync(1000))
   await waitFor(() => expect(requests).toEqual(['logout', 'refresh', 'login']))
+})
+
+it('releases the waiting login when the second logout after a refresh hangs, after 8 seconds', async () => {
+  vi.useFakeTimers({ shouldAdvanceTime: true })
+  const requests: string[] = []
+  mswServer.use(
+    http.post('https://api.test/auth/logout', async ({ request }) => {
+      const { access_token: token } = (await request.json()) as { access_token: string }
+      requests.push(`logout ${token}`)
+      if (token === 'old-token') return HttpResponse.json({ detail: 'expired' }, { status: 401 })
+      await delay('infinite')
+      return new HttpResponse(null, { status: 204 })
+    }),
+    http.post('https://api.test/auth/refresh', () => {
+      requests.push('refresh')
+      return HttpResponse.json({ accessToken: 'fresh-token' })
+    }),
+    http.post('https://api.test/auth/login', () => {
+      requests.push('login')
+      return HttpResponse.json({ detail: 'test login refused' }, { status: 503 })
+    }),
+  )
+  sessionStorage.setItem(TAB_REFRESH_KEY, 'old-refresh')
+  renderPages()
+  fireEvent.click(screen.getByText('Sign out'))
+  fireEvent.click(await screen.findByText('Sign in'))
+  await waitFor(() => expect(requests).toEqual(['logout old-token', 'refresh', 'logout fresh-token']))
+
+  await act(() => vi.advanceTimersByTimeAsync(7000))
+  expect(requests).toEqual(['logout old-token', 'refresh', 'logout fresh-token'])
+  await act(() => vi.advanceTimersByTimeAsync(1000))
+  await waitFor(() => expect(requests).toEqual(['logout old-token', 'refresh', 'logout fresh-token', 'login']))
 })
 
 it('sends login immediately when no logout is pending', async () => {

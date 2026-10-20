@@ -480,6 +480,49 @@ describe('useSignOut', () => {
       expect(refreshes).toEqual([])
     })
 
+    // Only a refusal says the access token can no longer name its sign-in. A
+    // logout that failed may well have ended it; the refresh token stays unspent.
+    it.each(['network-error', 500] as const)(
+      'does not spend the refresh token when the logout fails without refusing (%s)',
+      async (answer) => {
+        const bodies = answerLogout(answer)
+        const refreshes: unknown[] = []
+        mswServer.use(http.post('https://api.test/auth/refresh', async ({ request }) => {
+          refreshes.push(await request.json())
+          return HttpResponse.json({ accessToken: 'fresh-token' })
+        }))
+        const { result } = renderSignedInWithRefresh()
+
+        await act(() => result.current.signOut())
+
+        expect(bodies).toEqual([{ access_token: 'shared-token' }])
+        expect(refreshes).toEqual([])
+        expectSignedOutHere()
+      },
+    )
+
+    it('does not spend the refresh token when the logout times out', async () => {
+      // The XHR stand-in from the timeout test above: no request leaves, the
+      // logout reports a timeout, and any refresh would reach MSW unhandled.
+      vi.spyOn(httpClient.defaults, 'adapter', 'get').mockReturnValue((config) =>
+        Promise.reject(new AxiosError(`timeout of ${config.timeout}ms exceeded`, AxiosError.ETIMEDOUT, config)),
+      )
+      const refreshes: unknown[] = []
+      mswServer.use(http.post('https://api.test/auth/refresh', async ({ request }) => {
+        refreshes.push(await request.json())
+        return HttpResponse.json({ accessToken: 'fresh-token' })
+      }))
+      const warn = vi.spyOn(logger, 'warn')
+      const { result } = renderSignedInWithRefresh()
+
+      await act(() => result.current.signOut())
+
+      expect(refreshes).toEqual([])
+      expect(warn).toHaveBeenCalledExactlyOnceWith('Backend logout not confirmed; signed out locally', {
+        outcome: 'timeout',
+      })
+    })
+
     it('sends nothing more for a refused logout when the tab holds no refresh token', async () => {
       const warn = vi.spyOn(logger, 'warn')
       const { logouts, refreshes } = answerExpired()

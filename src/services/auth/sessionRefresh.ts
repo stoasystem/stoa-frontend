@@ -99,7 +99,8 @@ export type RefreshOutcome =
  *
  * The stored-token path below is one caller. The others hold a refresh token
  * that is not the one this tab is using: a test role in the role switcher, and
- * a dropped sign-in being ended on the server (revokeSignIn).
+ * a sign-in being ended on the server after its logout was refused - one the
+ * browser dropped, or one just signed out of (revokeSignIn, #399).
  */
 export async function exchangeRefreshToken(refreshToken: string): Promise<RefreshOutcome> {
   const abort = new AbortController()
