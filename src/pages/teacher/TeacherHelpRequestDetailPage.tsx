@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { BackButton } from '@/components/common/BackButton'
@@ -37,6 +37,7 @@ export function TeacherHelpRequestDetailPage() {
   const { t: tTeacher } = useTranslation('teacher')
   const { requestId } = useParams()
   const [resolutionNote, setResolutionNote] = useState('')
+  const requestCardRef = useRef<HTMLDivElement>(null)
   const requestQuery = useTeacherHelpRequestDetailQuery(requestId)
   const updateStatus = useUpdateTeacherHelpRequestMutation()
   const addNote = useAddTeacherHelpRequestNoteMutation()
@@ -83,7 +84,11 @@ export function TeacherHelpRequestDetailPage() {
             {requestQuery.data.practiceContext && (
               <PracticeRequestContextCard context={requestQuery.data.practiceContext} />
             )}
-            <HelpRequestDetailCard request={requestQuery.data} />
+            {/* Focus lands here after a status change: the button pressed is
+                then disabled or gone, which would drop it on the page (#332). */}
+            <div ref={requestCardRef} tabIndex={-1} className="rounded-lg">
+              <HelpRequestDetailCard request={requestQuery.data} />
+            </div>
             <TeacherAssistanceSummaryCard
               summary={assistanceQuery.data}
               isLoading={assistanceQuery.isLoading}
@@ -109,12 +114,17 @@ export function TeacherHelpRequestDetailPage() {
                 <label className="text-sm font-medium" htmlFor="resolution-note">
                   {tTeacher('detail.resolutionNote')}
                 </label>
+                {/* That it is required is said in text, not only in a placeholder
+                    that disappears as soon as the teacher types (#332). */}
+                <p id="resolution-note-hint" className="mt-1 text-xs text-muted-foreground">
+                  {tTeacher('detail.resolutionNotePlaceholder')}
+                </p>
                 <textarea
                   id="resolution-note"
                   className="mt-2 min-h-20 w-full rounded-md border bg-background px-3 py-2 text-sm"
                   value={resolutionNote}
                   onChange={(event) => setResolutionNote(event.target.value)}
-                  placeholder={tTeacher('detail.resolutionNotePlaceholder')}
+                  aria-describedby="resolution-note-hint"
                 />
               </div>
               <div className="flex flex-wrap gap-2">
@@ -123,6 +133,7 @@ export function TeacherHelpRequestDetailPage() {
                     key={status}
                     type="button"
                     variant="outline"
+                    aria-describedby={status === 'resolved' ? 'resolution-note-hint' : undefined}
                     disabled={
                       readFailed ||
                       updateStatus.isPending ||
@@ -131,11 +142,14 @@ export function TeacherHelpRequestDetailPage() {
                     }
                     onClick={() =>
                       requestId &&
-                      updateStatus.mutate({
-                        requestId,
-                        status,
-                        resolutionNote: status === 'resolved' ? resolutionNote.trim() : undefined,
-                      })
+                      updateStatus.mutate(
+                        {
+                          requestId,
+                          status,
+                          resolutionNote: status === 'resolved' ? resolutionNote.trim() : undefined,
+                        },
+                        { onSettled: () => focusIfLost(requestCardRef.current) },
+                      )
                     }
                   >
                     {tTeacher(statusActionKey[status] ?? 'markResolved')}
@@ -173,4 +187,11 @@ export function TeacherHelpRequestDetailPage() {
       </PageContainer>
     </DashboardLayout>
   )
+}
+
+// Lost: on the page itself, or still on a control that is now disabled or
+// gone (browsers differ in which).
+function focusIfLost(target: HTMLElement | null) {
+  const active = document.activeElement as (HTMLElement & { disabled?: boolean }) | null
+  if (!active || active === document.body || active.disabled || !active.isConnected) target?.focus()
 }

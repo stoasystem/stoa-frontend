@@ -74,8 +74,9 @@ describe('the reply composer still refuses HTML', () => {
 
   it('checks a long reply without stalling', async () => {
     const started = performance.now()
-    const { send } = await compose(`<div ${'a=b/ c= '.repeat(1000)}x`)
-    expect(send).toBeEnabled()
+    await compose(`<div ${'a=b/ c= '.repeat(1000)}x`)
+    // Not HTML; at 8000 characters it is over the block limit instead (#332).
+    expect(screen.queryByText(REFUSED)).not.toBeInTheDocument()
     expect(performance.now() - started).toBeLessThan(1000)
   })
 })

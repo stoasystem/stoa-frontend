@@ -205,8 +205,12 @@
     },
     "unsafe": {
       "html": "Il codice HTML non è consentito in una risposta.",
-      "privateMarkers": "Gli identificativi interni non possono essere inviati in una risposta."
-    }
+      "privateMarkers": "Gli identificativi interni non possono essere inviati in una risposta.",
+      "blockTooLong": "Questo blocco è troppo lungo: {{length}} caratteri su un massimo di {{max}}. Accorcialo o dividilo.",
+      "tooManyBlocks": "Una risposta può avere al massimo {{max}} blocchi. Unisci alcuni blocchi o rimuovine uno.",
+      "tooLong": "La risposta è troppo lunga: {{length}} caratteri su un massimo di {{max}} in totale. Accorciala."
+    },
+    "removeBlock": "Rimuovi il blocco {{number}}"
   },
   "practiceContext": {
     "source": "Fonte: {{source}}",
@@ -345,6 +349,12 @@
       "accepted": "Non è stato possibile accettare la bozza.",
       "rejected": "Non è stato possibile rifiutare la bozza.",
       "archived": "Non è stato possibile archiviare la bozza."
+    },
+    "replyRefusedBecause": {
+      "html": "La tua risposta non è stata accettata: per il server una parte sembra codice HTML. Riformula quel passaggio.",
+      "privateMarkers": "La tua risposta non è stata accettata: contiene identificativi interni o credenziali. Rimuovili.",
+      "tooManyBlocks": "La tua risposta non è stata accettata: ha troppi blocchi. Uniscine alcuni.",
+      "tooLong": "La tua risposta non è stata accettata: è troppo lunga. Accorciala o dividila."
     }
   }
 }

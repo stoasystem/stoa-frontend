@@ -20,10 +20,10 @@ export function RichTeacherReply({ content, fallback }: { content?: TeacherReply
           )
         }
         if (block.type === 'heading') {
-          return <h3 key={key} className="text-sm font-semibold text-foreground">{block.text}</h3>
+          return <h3 key={key} className="whitespace-pre-wrap text-sm font-semibold text-foreground">{block.text}</h3>
         }
         if (block.type === 'quote') {
-          return <blockquote key={key} className="border-l-2 pl-3 text-foreground">{block.text}</blockquote>
+          return <blockquote key={key} className="whitespace-pre-wrap border-l-2 pl-3 text-foreground">{block.text}</blockquote>
         }
         if (block.type === 'code') {
           return (
@@ -32,14 +32,28 @@ export function RichTeacherReply({ content, fallback }: { content?: TeacherReply
             </pre>
           )
         }
+        // A list block holds one item per line (#332).
         if (block.type === 'ordered_list') {
-          return <p key={key} className="pl-4">1. {block.text}</p>
+          return (
+            <ol key={key} className="list-decimal space-y-1 pl-6">
+              {listItems(block.text).map((item, itemIndex) => <li key={itemIndex}>{item}</li>)}
+            </ol>
+          )
         }
         if (block.type === 'unordered_list') {
-          return <p key={key} className="pl-4">- {block.text}</p>
+          return (
+            <ul key={key} className="list-disc space-y-1 pl-6">
+              {listItems(block.text).map((item, itemIndex) => <li key={itemIndex}>{item}</li>)}
+            </ul>
+          )
         }
-        return <p key={key}>{block.text}</p>
+        // The teacher's line breaks are kept, not run together (#332).
+        return <p key={key} className="whitespace-pre-wrap">{block.text}</p>
       })}
     </div>
   )
+}
+
+function listItems(text: string) {
+  return text.split('\n').map((line) => line.trim()).filter(Boolean)
 }

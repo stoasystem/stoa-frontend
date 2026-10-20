@@ -203,8 +203,12 @@
     },
     "unsafe": {
       "html": "Unsafe raw HTML is not allowed.",
-      "privateMarkers": "Private markers cannot be sent in a teacher reply."
-    }
+      "privateMarkers": "Private markers cannot be sent in a teacher reply.",
+      "blockTooLong": "This block is too long: {{length}} of at most {{max}} characters. Please shorten or split it.",
+      "tooManyBlocks": "A reply has at most {{max}} blocks. Please merge blocks or remove one.",
+      "tooLong": "The reply is too long: {{length}} of at most {{max}} characters in total. Please shorten it."
+    },
+    "removeBlock": "Remove block {{number}}"
   },
   "practiceContext": {
     "source": "Source: {{source}}",
@@ -342,6 +346,12 @@
       "accepted": "The draft could not be accepted.",
       "rejected": "The draft could not be rejected.",
       "archived": "The draft could not be archived."
+    },
+    "replyRefusedBecause": {
+      "html": "Your reply was not accepted: part of it looks like HTML code to the server. Please rephrase that part.",
+      "privateMarkers": "Your reply was not accepted: it contains internal identifiers or credentials. Please remove them.",
+      "tooManyBlocks": "Your reply was not accepted: it has too many blocks. Please merge some.",
+      "tooLong": "Your reply was not accepted: it is too long. Please shorten or split it."
     }
   }
 }

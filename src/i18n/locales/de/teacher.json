@@ -203,8 +203,12 @@
     },
     "unsafe": {
       "html": "HTML-Code ist in Antworten nicht erlaubt.",
-      "privateMarkers": "Interne Kennungen dürfen nicht in einer Antwort gesendet werden."
-    }
+      "privateMarkers": "Interne Kennungen dürfen nicht in einer Antwort gesendet werden.",
+      "blockTooLong": "Dieser Block ist zu lang: {{length}} von höchstens {{max}} Zeichen. Bitte kürzen Sie ihn oder teilen Sie ihn auf.",
+      "tooManyBlocks": "Eine Antwort hat höchstens {{max}} Blöcke. Bitte fassen Sie Blöcke zusammen oder entfernen Sie einen.",
+      "tooLong": "Die Antwort ist zu lang: {{length}} von höchstens {{max}} Zeichen insgesamt. Bitte kürzen Sie sie."
+    },
+    "removeBlock": "Block {{number}} entfernen"
   },
   "practiceContext": {
     "source": "Quelle: {{source}}",
@@ -342,6 +346,12 @@
       "accepted": "Der Entwurf konnte nicht angenommen werden.",
       "rejected": "Der Entwurf konnte nicht abgelehnt werden.",
       "archived": "Der Entwurf konnte nicht archiviert werden."
+    },
+    "replyRefusedBecause": {
+      "html": "Ihre Antwort wurde nicht angenommen: Ein Teil davon sieht für den Server wie HTML-Code aus. Bitte formulieren Sie diese Stelle um.",
+      "privateMarkers": "Ihre Antwort wurde nicht angenommen: Sie enthält interne Kennungen oder Zugangsdaten. Bitte entfernen Sie diese.",
+      "tooManyBlocks": "Ihre Antwort wurde nicht angenommen: Sie hat zu viele Blöcke. Bitte fassen Sie Blöcke zusammen.",
+      "tooLong": "Ihre Antwort wurde nicht angenommen: Sie ist zu lang. Bitte kürzen Sie sie oder teilen Sie sie auf."
     }
   }
 }

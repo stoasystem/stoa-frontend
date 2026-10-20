@@ -35,9 +35,23 @@ export function useAddTeacherHelpRequestNoteMutation() {
 
 // The teacher has to know whether to rewrite the reply or look at the request
 // again: a 409 means the request moved on, a 422 that the server refused the
-// reply's content (#271).
+// reply's content (#271), and what in it (#332).
 function replyFailureKey(error: unknown) {
   if (isHelpRequestConflict(error)) return 'teacher:toasts.replyConflict'
-  if (error instanceof ApiError && error.status === 422) return 'teacher:toasts.replyRefused'
+  if (error instanceof ApiError && error.status === 422) {
+    const reason = refusalReason(error.message)
+    return reason ? `teacher:toasts.replyRefusedBecause.${reason}` : 'teacher:toasts.replyRefused'
+  }
   return 'teacher:toasts.replyFailed'
+}
+
+// teacher_reply_service's TeacherReplyValidationError messages, as the router
+// passes them on in `detail`.
+function refusalReason(message: string) {
+  const lowered = message.toLowerCase()
+  if (lowered.includes('unsafe raw html')) return 'html'
+  if (lowered.includes('private markers') || lowered.includes('private credentials')) return 'privateMarkers'
+  if (lowered.includes('1 to 20 blocks')) return 'tooManyBlocks'
+  if (lowered.includes('exceeds')) return 'tooLong'
+  return null
 }
