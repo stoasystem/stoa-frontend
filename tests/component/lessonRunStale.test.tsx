@@ -81,3 +81,30 @@ describe('a failed check or hint stays with its exercise', () => {
     expect(result.current.hintFailed).toBe(false)
   })
 })
+
+// The stage hands `run.askHint` straight to the Hint button's onClick. A failed
+// hint is shown from the mutation's state (`hintFailed`), so the press must
+// give back nothing that rejects: the browser would report every failed hint
+// as an unhandled rejection (#369).
+describe('a failed hint leaves nothing unhandled', () => {
+  it('gives the button nothing to reject, and shows the failure', async () => {
+    vi.mocked(getPracticeHint).mockRejectedValue(new Error('network'))
+    const unhandled: unknown[] = []
+    const collect = (reason: unknown) => void unhandled.push(reason)
+    process.on('unhandledRejection', collect)
+    try {
+      const { result } = run()
+      let pressed: unknown = 'not pressed'
+      act(() => {
+        pressed = result.current.askHint()
+      })
+      expect(pressed).toBeUndefined()
+      await waitFor(() => expect(result.current.hintFailed).toBe(true))
+      // Node reports a rejection nobody handled once the microtasks have run.
+      await new Promise((resolve) => setTimeout(resolve, 0))
+      expect(unhandled).toEqual([])
+    } finally {
+      process.off('unhandledRejection', collect)
+    }
+  })
+})
