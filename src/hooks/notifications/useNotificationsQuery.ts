@@ -5,6 +5,7 @@ import {
   getNotifications,
   getUnreadNotificationCount,
   markNotificationRead,
+  NOTIFICATION_PAGE_SIZE,
 } from '@/services/notifications/notificationApi'
 import { notificationQueryKeys } from '@/services/notifications/notificationQueryKeys'
 
@@ -18,13 +19,24 @@ export function useNotificationsQuery(enabled = true) {
   })
 }
 
+/*
+ * The bell's unread count. A list short of a full page holds every
+ * notification there is, so its unread ones are counted from it, with no
+ * second request on every poll (#387). A full page can leave older unread
+ * ones out (#373): only then is the count read on its own.
+ */
 export function useUnreadNotificationCountQuery() {
-  return useQuery({
+  const items = useNotificationsQuery().data?.items
+  const fullPage = items !== undefined && items.length >= NOTIFICATION_PAGE_SIZE
+  const separate = useQuery({
     queryKey: notificationQueryKeys.unreadCount(),
     queryFn: getUnreadNotificationCount,
     staleTime: 30_000,
+    enabled: fullPage,
     retry: false,
   })
+  if (items === undefined || fullPage) return { data: separate.data }
+  return { data: items.filter((item) => item.status === 'created').length }
 }
 
 export function useAdminNotificationsQuery() {

@@ -67,10 +67,11 @@ export function NotificationCenter({
   const markRead = useMarkNotificationReadMutation()
   const archive = useArchiveNotificationMutation()
   const items = query.data?.items ?? []
-  // Read on its own, not counted among the list's items: the list is the
-  // newest 50, and older unread ones went uncounted (#373). The count stops at
-  // the backend's limit of 100, so above 99 the number reads "99+"; `count`
-  // still picks the plural form.
+  // Counted from the list while it is short of a page, read on its own once
+  // it is full: a full page is the newest 50, and older unread ones went
+  // uncounted (#373, #387). The count read on its own stops at the backend's
+  // limit of 100, so above 99 the number reads "99+"; `count` still picks the
+  // plural form.
   const unread = unreadCount.data ?? 0
   const unreadCopy = { count: unread, replace: { count: unread > 99 ? '99+' : String(unread) } }
   const RealtimeIcon = realtime.status === 'offline' ? WifiOff : Radio

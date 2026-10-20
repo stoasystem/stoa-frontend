@@ -8,8 +8,15 @@ import type {
   NotificationPreferences,
 } from '@/types/notification'
 
+// The bell's list is one page of the newest. Asked for, not left to the
+// backend's default: a list shorter than this holds every notification there
+// is, and the bell counts its unread ones from it (#387).
+export const NOTIFICATION_PAGE_SIZE = 50
+
 export async function getNotifications() {
-  const response = await httpClient.get<NotificationListResponse>('/notifications')
+  const response = await httpClient.get<NotificationListResponse>('/notifications', {
+    params: { limit: NOTIFICATION_PAGE_SIZE },
+  })
   return response.data
 }
 

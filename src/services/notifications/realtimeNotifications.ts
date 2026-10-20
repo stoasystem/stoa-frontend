@@ -70,11 +70,29 @@ export function mergeRealtimeNotification(
   event: NotificationEvent,
   user: User,
 ) {
+  const listed = queryClient
+    .getQueryData<NotificationListResponse>(notificationQueryKeys.list())
+    ?.items.some((item) => item.eventId === event.eventId)
   mergeIntoList(queryClient, notificationQueryKeys.list(), event)
+  if (!listed && event.status === 'created') countOneMoreUnread(queryClient)
 
   if (user.role === 'admin' || event.recipientRole === 'admin') {
     mergeIntoList(queryClient, notificationQueryKeys.adminList(), event)
   }
+}
+
+/*
+ * The bell's count where it is read on its own (a full list, #387): polling
+ * stops while realtime is live, so without this a new unread event showed in
+ * the list and the count stayed where it was. A count not read yet, or already
+ * due for a refetch, is left to that read. The +1 keeps the count's age, so it
+ * does not pass for a fresh read of the backend.
+ */
+function countOneMoreUnread(queryClient: QueryClient) {
+  const queryKey = notificationQueryKeys.unreadCount()
+  const state = queryClient.getQueryState<number>(queryKey)
+  if (state?.data === undefined || state.isInvalidated) return
+  queryClient.setQueryData<number>(queryKey, state.data + 1, { updatedAt: state.dataUpdatedAt })
 }
 
 function mergeIntoList(
