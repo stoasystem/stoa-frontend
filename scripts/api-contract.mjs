@@ -1,6 +1,8 @@
 // The parts of check-api-contract.mjs that read source and compare paths, kept
 // apart from the command so a test can feed them sources that must fail.
 
+import ts from 'typescript'
+
 const HTTP_METHODS = new Set(['get', 'post', 'patch', 'put', 'delete'])
 
 // Fewer calls than this means the reader stopped recognising how services are
@@ -93,6 +95,51 @@ const HTTP_CALL = new RegExp(
 const FETCH_CALL =
   /fetch\s*\(\s*`\$\{apiBaseUrl\}(?:\$\{apiPath`([^`]+)`\}|\$\{([A-Za-z_$][\w$]*)\}|((?:[^`$]|\$\{[^}]*\})+))`/y
 
+// The method each fetch( call in a file sends, keyed by where the word `fetch`
+// starts. It is read from that call's own options, parsed, because the first
+// `method:` after the URL could belong to the next call (#374).
+function fetchMethods(file, source) {
+  const kind = file.endsWith('.tsx') ? ts.ScriptKind.TSX : ts.ScriptKind.TS
+  const tree = ts.createSourceFile(file, source, ts.ScriptTarget.Latest, false, kind)
+  const methods = new Map()
+  const visit = (node) => {
+    if (ts.isCallExpression(node)) {
+      const callee = ts.isPropertyAccessExpression(node.expression) ? node.expression.name : node.expression
+      if (ts.isIdentifier(callee) && callee.text === 'fetch') {
+        methods.set(callee.getStart(tree), methodOf(node.arguments[1]))
+      }
+    }
+    ts.forEachChild(node, visit)
+  }
+  visit(tree)
+  return methods
+}
+
+// GET when there are no options or they name no method; null when the method
+// could come from somewhere this cannot see (a variable, a spread after it).
+function methodOf(options) {
+  while (
+    options &&
+    (ts.isParenthesizedExpression(options) || ts.isAsExpression(options) || ts.isSatisfiesExpression(options))
+  ) {
+    options = options.expression
+  }
+  if (!options) return 'GET'
+  if (!ts.isObjectLiteralExpression(options)) return null
+  let method = 'GET'
+  for (const property of options.properties) {
+    if (ts.isSpreadAssignment(property)) {
+      method = null
+    } else if (property.name && !ts.isComputedPropertyName(property.name) && property.name.text === 'method') {
+      method =
+        ts.isPropertyAssignment(property) && ts.isStringLiteralLike(property.initializer)
+          ? property.initializer.text.toUpperCase()
+          : null
+    }
+  }
+  return method
+}
+
 /**
  * Every request the services make, and every place that looks like one but
  * could not be read. An unread call is a failure, never a silent skip: the
@@ -120,18 +167,19 @@ export function collectCalls(sources) {
       calls.push({ method: method.toUpperCase(), path, file })
     }
 
+    let methods
     for (const start of source.matchAll(/\bfetch\s*\(/g)) {
       const at = start.index
       FETCH_CALL.lastIndex = at
       const match = FETCH_CALL.exec(source)
       const path = match && (match[1] ?? (match[2] ? constants.get(match[2]) : match[3]))
-      if (!path) {
+      methods ??= fetchMethods(file, source)
+      const method = methods.get(at)
+      if (!path || !method) {
         unparsed.push({ file, line: lineOf(source, at), text: source.slice(at, at + 60).split('\n')[0] })
         continue
       }
-      const options = source.slice(FETCH_CALL.lastIndex, FETCH_CALL.lastIndex + 400)
-      const method = /\bmethod:\s*['"](\w+)['"]/.exec(options)?.[1] ?? 'GET'
-      calls.push({ method: method.toUpperCase(), path, file })
+      calls.push({ method, path, file })
     }
   }
 
