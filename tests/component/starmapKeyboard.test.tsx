@@ -313,12 +313,12 @@ describe('the keyboard on the map (#141)', () => {
       })
     }
     expect(cases.length).toBeGreaterThan(0)
-    // The star layer: the arrow flies to it.
+    // The star layer: the arrow on the stage flies to it.
     for (const { star, direction, expected } of cases.slice(0, 6)) {
       const { container, navigate, unmount } = show(map, { layer: 'star', nebulaId: star.nebulaId, unitId: star.unitId })
-      const link = container.querySelector<HTMLElement>('article[aria-labelledby="starmap-star-title"] a')!
-      act(() => link.focus())
-      fireEvent.keyDown(link, { key: KEY[direction] })
+      const stage = container.querySelector<HTMLElement>('[data-starmap-stage]')!
+      act(() => stage.focus())
+      fireEvent.keyDown(stage, { key: KEY[direction] })
       expect(navigate).toHaveBeenLastCalledWith({ layer: 'star', nebulaId: expected.nebulaId, unitId: expected.unitId })
       unmount()
     }
@@ -366,18 +366,19 @@ describe('the keyboard on the map (#141)', () => {
     const star = [...stars].sort((a, b) => Math.hypot(a.x - disc.x, a.y - disc.y) - Math.hypot(b.x - disc.x, b.y - disc.y))[0]
     const target = (s: Star): LayerTarget => ({ layer: 'star', nebulaId: s.nebulaId, unitId: s.unitId })
     const { container, navigate } = show(map, target(star))
-    const card = container.querySelector('article[aria-labelledby="starmap-star-title"]')!
-    const link = card.querySelector('a')!
-    act(() => link.focus())
+    const stage = container.querySelector<HTMLElement>('[data-starmap-stage]')!
+    act(() => stage.focus())
     for (const direction of DIRECTIONS) {
       navigate.mockClear()
-      fireEvent.keyDown(link, { key: KEY[direction] })
+      fireEvent.keyDown(stage, { key: KEY[direction] })
       const next = stars[nearestInDirection(stars, stars.indexOf(star), direction)]
       expect(next).toBeDefined()
       expect(navigate).toHaveBeenLastCalledWith(target(next))
       expect(ahead(star, next, direction)).toBeGreaterThan(0)
     }
-    // Escape still leaves for the nebula.
+    // Escape still leaves for the nebula, from the card too.
+    const link = container.querySelector<HTMLElement>('article[aria-labelledby="starmap-star-title"] a')!
+    act(() => link.focus())
     fireEvent.keyDown(link, { key: 'Escape' })
     expect(navigate).toHaveBeenLastCalledWith({ layer: 'nebula', nebulaId: id })
   })
@@ -387,10 +388,96 @@ describe('the keyboard on the map (#141)', () => {
     const { stars } = bigNebula(map)
     const rightmost = [...stars].sort((a, b) => b.x - a.x)[0]
     const { container, navigate } = show(map, { layer: 'star', nebulaId: rightmost.nebulaId, unitId: rightmost.unitId })
-    const link = container.querySelector('article[aria-labelledby="starmap-star-title"] a')!
-    act(() => (link as HTMLElement).focus())
-    fireEvent.keyDown(link, { key: 'ArrowRight' })
+    const stage = container.querySelector<HTMLElement>('[data-starmap-stage]')!
+    act(() => stage.focus())
+    fireEvent.keyDown(stage, { key: 'ArrowRight' })
     expect(navigate).not.toHaveBeenCalled()
+  })
+
+  /** Every key the map takes for its own, dispatched on `element`: whether any was taken (its default prevented). */
+  function mapKeysOn(element: HTMLElement, advance: (ms: number) => void): boolean {
+    let taken = false
+    for (const key of [...Object.values(KEY), '+', '=', '-', '_']) {
+      const event = new KeyboardEvent('keydown', { key, bubbles: true, cancelable: true })
+      act(() => {
+        element.dispatchEvent(event)
+        advance(1000)
+      })
+      taken ||= event.defaultPrevented
+    }
+    return taken
+  }
+
+  /** The star nearest the middle of the biggest nebula: it has neighbours every way. */
+  function middleStar(map: StarMap): Star {
+    const { id, stars } = bigNebula(map)
+    const disc = nebulaDiscs(map).get(id)!
+    return [...stars].sort((a, b) => Math.hypot(a.x - disc.x, a.y - disc.y) - Math.hypot(b.x - disc.x, b.y - disc.y))[0]
+  }
+
+  it('with a star chosen, arrows and + and − on its card or any other control are theirs: nothing flies or zooms (#368)', () => {
+    const map = skyMap(1000, 'math')
+    const star = middleStar(map)
+    const { container, navigate, renderer, clock, press } = show(map, { layer: 'star', nebulaId: star.nebulaId, unitId: star.unitId })
+    const card = container.querySelector<HTMLElement>('article[aria-labelledby="starmap-star-title"]')!
+    const controls = [...container.querySelectorAll<HTMLElement>('[data-starmap-overlay] a, [data-starmap-overlay] button')]
+    expect(controls.filter((control) => card.contains(control)).length).toBeGreaterThan(1)
+    expect(controls.some((control) => !card.contains(control))).toBe(true)
+    const k0 = renderer.last().scale
+    for (const element of [card, ...controls]) {
+      act(() => element.focus())
+      // The browser's own: an arrow scrolls the card or the page, + and − do what they do there.
+      expect(mapKeysOn(element, clock.advance)).toBe(false)
+    }
+    expect(navigate).not.toHaveBeenCalled()
+    expect(renderer.last().scale).toBeCloseTo(k0, 6)
+    // On the stage they are the map's, as before.
+    const stage = container.querySelector<HTMLElement>('[data-starmap-stage]')!
+    act(() => stage.focus())
+    press(stage, '-')
+    expect(renderer.last().scale).toBeLessThan(k0)
+    fireEvent.keyDown(stage, { key: 'ArrowRight' })
+    expect(navigate).toHaveBeenLastCalledWith(expect.objectContaining({ layer: 'star', nebulaId: star.nebulaId }))
+  })
+
+  it('on a phone, arrows and + and − in the star’s sheet are the sheet’s: ↓ scrolls it, the star stays (#368)', () => {
+    vi.mocked(HTMLElement.prototype.getBoundingClientRect).mockReturnValue({
+      x: 0, y: 0, left: 0, top: 0, width: 390, height: 844, right: 390, bottom: 844, toJSON: () => ({}),
+    } as DOMRect)
+    const map = skyMap(1000, 'math')
+    const star = middleStar(map)
+    const { container, navigate, renderer, clock } = show(map, { layer: 'star', nebulaId: star.nebulaId, unitId: star.unitId })
+    const sheet = container.querySelector<HTMLElement>('[data-star-sheet]')!
+    expect(sheet).not.toBeNull()
+    const details = sheet.querySelector<HTMLElement>('[data-star-sheet-details]')!
+    const controls = [...sheet.querySelectorAll<HTMLElement>('a, button')]
+    expect(controls.length).toBeGreaterThan(1)
+    const k0 = renderer.last().scale
+    for (const element of [details, ...controls]) {
+      act(() => element.focus())
+      expect(mapKeysOn(element, clock.advance)).toBe(false)
+    }
+    expect(navigate).not.toHaveBeenCalled()
+    expect(renderer.last().scale).toBeCloseTo(k0, 6)
+    // The stage behind it still steps from star to star.
+    const stage = container.querySelector<HTMLElement>('[data-starmap-stage]')!
+    act(() => stage.focus())
+    fireEvent.keyDown(stage, { key: 'ArrowRight' })
+    expect(navigate).toHaveBeenLastCalledWith(expect.objectContaining({ layer: 'star', nebulaId: star.nebulaId }))
+  })
+
+  it('+ and − still zoom from the map’s own links, not from the controls over it (#368)', () => {
+    const map = skyMap(1000, 'math')
+    const { container, renderer, nebulaLink, press, clock } = show(map)
+    const k0 = renderer.last().scale
+    const switcher = container.querySelector<HTMLElement>('[data-starmap-overlay] a')!
+    act(() => switcher.focus())
+    expect(mapKeysOn(switcher, clock.advance)).toBe(false)
+    expect(renderer.last().scale).toBeCloseTo(k0, 6)
+    const link = nebulaLink(orderedNebulae(map)[0].topicId)
+    act(() => link.focus())
+    press(link, '+')
+    expect(renderer.last().scale / k0).toBeCloseTo(1.5, 4)
   })
 
   it('leaves dragging and zooming alone: + and − still zoom, a drag still pans', () => {

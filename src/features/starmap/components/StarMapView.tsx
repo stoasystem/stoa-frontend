@@ -136,11 +136,6 @@ export function controlBands(wide: boolean, bottomInset = 0, demo = false): { to
   return wide ? { top: 76 + noticeHeight, bottom: 164 + bottomInset } : { top: 112 + noticeHeight, bottom: 72 + bottomInset }
 }
 
-/** Whether a key goes to a field the student is typing in, not to the map. */
-function typing(target: EventTarget): boolean {
-  return target instanceof HTMLElement && (target.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(target.tagName))
-}
-
 /** Glass over the sky: words on it keep 4.5:1 over any nebula behind them. */
 const GLASS = {
   background: 'var(--sky-glass)',
@@ -490,10 +485,13 @@ export function StarMapView({ map, demo = false, target, onNavigate, land, onFir
     if (event.altKey || event.metaKey || event.ctrlKey) return
     // Keys in the help dialog are the dialog's own: Escape closes it, + and - do not zoom.
     if (event.target instanceof Element && event.target.closest('[data-starmap-help]')) return
-    if (event.key === '+' || event.key === '=') {
+    // + and - zoom from the stage and the map's own links. On the star's card
+    // or sheet, or any other control, they are that control's (#368).
+    const onMap = event.target === event.currentTarget || (event.target instanceof Element && event.target.matches('a[data-nebula-link], a[data-unit]'))
+    if (onMap && (event.key === '+' || event.key === '=')) {
       event.preventDefault()
       engineRef.current?.step('in')
-    } else if (event.key === '-' || event.key === '_') {
+    } else if (onMap && (event.key === '-' || event.key === '_')) {
       event.preventDefault()
       engineRef.current?.step('out')
     } else if (event.key === 'Escape' && target.layer !== 'map') {
@@ -506,11 +504,12 @@ export function StarMapView({ map, demo = false, target, onNavigate, land, onFir
       if (!first) return
       event.preventDefault()
       first.focus()
-    } else if (target.layer === 'star' && !event.shiftKey && !event.defaultPrevented && !typing(event.target)) {
-      // With a star chosen, an arrow goes to the nearest star of its nebula in
-      // that direction, by where the stars are (#141; #132 went by course
-      // order); with none in the cone, the nearest anywhere that way (#146).
-      // Nothing that way at all: it stays. The map flies to the next star.
+    } else if (target.layer === 'star' && event.target === event.currentTarget && !event.shiftKey && !event.defaultPrevented) {
+      // With a star chosen, an arrow on the stage goes to the nearest star of
+      // its nebula in that direction, by where the stars are (#141; #132 went
+      // by course order); with none in the cone, the nearest anywhere that way
+      // (#146). Nothing that way at all: it stays. The map flies to the next
+      // star. In the card or the sheet an arrow is theirs: it scrolls (#368).
       const direction = arrowDirection(event.key)
       if (!direction) return
       const inNebula = stars.filter((star) => star.nebulaId === target.nebulaId)

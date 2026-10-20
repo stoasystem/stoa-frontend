@@ -17,7 +17,6 @@
  * bench; a student looking at their own knowledge points is not looking at a
  * demonstration.
  */
-import { useQuery } from '@tanstack/react-query'
 import { useMemo, type ReactNode } from 'react'
 import {
   StarMapSourceContext,
@@ -30,14 +29,9 @@ import {
 import type { StarMap } from '@/features/starmap/model/starMap'
 import { nebulaLinks } from '@/features/starmap/model/links'
 import { layoutSky } from '@/features/starmap/layout/layout'
-import { getKnowledgeMap } from '@/services/practice/practiceApi'
+import { useKnowledgeMapQuery } from '@/hooks/practice/useKnowledgeMapQuery'
 import { useAuthStore } from '@/store/authStore'
-import { practiceQueryKeys } from '@/services/practice/practiceQueryKeys'
 import type { KnowledgeMapResponse } from '@/types/practice'
-
-/** How long a sky stays fresh. Learning states move when a lesson is finished,
- *  not between two glances at the map, so this is minutes rather than seconds. */
-export const KNOWLEDGE_MAP_STALE_MS = 2 * 60 * 1000
 
 /**
  * One seed for every sky, so a student's map keeps its arrangement between
@@ -177,16 +171,8 @@ function ReadModelSource({ children }: { children: ReactNode }) {
   // The whole sky, once. The galaxy in focus is a projection the route asks
   // `read` for, and the route derives it from this very source - so keying the
   // query by subject would make every switch of galaxy a fetch, and the first
-  // read a chicken-and-egg.
-  const { data, status, refetch } = useQuery({
-    queryKey: practiceQueryKeys.knowledgeMap(''),
-    queryFn: () => getKnowledgeMap(),
-    enabled: isStudent,
-    staleTime: KNOWLEDGE_MAP_STALE_MS,
-    // A sky that could not be read is not worth hammering the API for: the
-    // route offers the student a retry.
-    retry: 1,
-  })
+  // read a chicken-and-egg. The query is the chapter's too: one definition (#368).
+  const { data, status, refetch } = useKnowledgeMapQuery()
 
   const source = useMemo<StarMapSource>(
     () => ({

@@ -240,6 +240,16 @@ const PINCH_SMOOTHING_MS = 40
 /** A pinch held still this long before it is let go glides no further, ms. */
 const PINCH_HOLD_MS = 100
 
+/**
+ * A learning state as the renderer's small integer. One this front end does
+ * not know (a newer backend's) is drawn as ready, as its card offers it, not
+ * as lit: `indexOf`'s -1 clamped to 0 painted it gold (#368).
+ */
+function stateIndex(state: string): number {
+  const index = (LEARNING_STATES as readonly string[]).indexOf(state)
+  return index < 0 ? LEARNING_STATES.indexOf('ready') : index
+}
+
 /** Whether `next` only lets a choice of `previous` go: back to the galaxy, or the card closed on its own nebula. */
 function letsGo(previous: LayerTarget, next: LayerTarget): boolean {
   if (next.layer === 'map') return previous.layer !== 'map'
@@ -496,7 +506,7 @@ export class StarMapEngine {
     this.stars.forEach((star, i) => {
       scene.mapX[i] = star.x
       scene.mapY[i] = star.y
-      scene.state[i] = Math.max(0, LEARNING_STATES.indexOf(star.state))
+      scene.state[i] = stateIndex(star.state)
       scene.progress[i] = star.progress
       scene.reviewDue[i] = star.reviewDue > 0 ? 1 : 0
       scene.nebula[i] = this.nebulaIndex.get(star.nebulaId) ?? 0
