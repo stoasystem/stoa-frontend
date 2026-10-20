@@ -107,6 +107,8 @@ const STATS_KEY = JSON.stringify(teacherQueryKeys.stats())
 
 beforeEach(async () => {
   vi.clearAllMocks()
+  // The reply draft is kept per request in this tab (#331); each test starts with none.
+  sessionStorage.clear()
   await i18n.changeLanguage('de')
 })
 

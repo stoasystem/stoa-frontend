@@ -15,3 +15,12 @@ export function isHelpRequestConflict(error: unknown): boolean {
     CONFLICT_CODES.has(error.code)
   )
 }
+
+/**
+ * The server will not show this request to this teacher any more: someone
+ * else took it (403) or it is gone (404). Asking again cannot change that;
+ * any other failure (a timeout, a 500) may pass (#331).
+ */
+export function isHelpRequestOutOfReach(error: unknown): boolean {
+  return error instanceof ApiError && (error.status === 403 || error.status === 404)
+}

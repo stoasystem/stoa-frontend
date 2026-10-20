@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import { ApiError } from '@/services/api/httpClient'
+import { isHelpRequestOutOfReach } from '@/lib/teacherHelpRequestConflict'
 import { getTeacherHelpRequestDetail } from '@/services/teacher/teacherApi'
 import { teacherQueryKeys } from '@/services/teacher/teacherQueryKeys'
 
@@ -8,15 +8,6 @@ const ACTIVE_STATUSES = new Set(['in_progress'])
 
 /** Not yet being worked on — a slower poll is enough. */
 const WAITING_STATUSES = new Set(['pending', 'assigned'])
-
-/**
- * The server will not show this request to this teacher any more: someone
- * else took it (403) or it is gone (404). Asking again cannot change that;
- * any other failure (a timeout, a 500) may pass (#331).
- */
-export function isHelpRequestOutOfReach(error: unknown) {
-  return error instanceof ApiError && (error.status === 403 || error.status === 404)
-}
 
 export function useTeacherHelpRequestDetailQuery(requestId: string | undefined) {
   return useQuery({

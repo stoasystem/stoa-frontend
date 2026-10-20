@@ -18,16 +18,13 @@ import { CurriculumRolloutPanel } from '@/components/practice/CurriculumRolloutP
 import { Button } from '@/components/ui/button'
 import { useCurriculumCatalogQuery } from '@/hooks/practice/useCurriculumCatalogQuery'
 import { useAddTeacherHelpRequestNoteMutation } from '@/hooks/teacher/useAddTeacherHelpRequestNoteMutation'
-import {
-  isHelpRequestOutOfReach,
-  useTeacherHelpRequestDetailQuery,
-} from '@/hooks/teacher/useTeacherHelpRequestDetailQuery'
+import { useTeacherHelpRequestDetailQuery } from '@/hooks/teacher/useTeacherHelpRequestDetailQuery'
 import { useTeacherAssistanceSummaryQuery } from '@/hooks/teacher/useTeacherAssistanceSummaryQuery'
 import { useUpdateTeacherHelpRequestMutation } from '@/hooks/teacher/useUpdateTeacherHelpRequestMutation'
 import { DashboardLayout } from '@/layouts/DashboardLayout'
 import { trackEvent } from '@/services/analytics/analyticsClient'
 import { normalizeCurriculumSubjectId } from '@/services/practice/practiceApi'
-import { isHelpRequestConflict } from '@/lib/teacherHelpRequestConflict'
+import { isHelpRequestConflict, isHelpRequestOutOfReach } from '@/lib/teacherHelpRequestConflict'
 import { acceptsTeacherReply, teacherStatusActions } from '@/types/teacherHelp'
 
 const statusActionKey: Record<string, string> = {
