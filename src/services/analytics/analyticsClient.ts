@@ -1,4 +1,5 @@
 import { apiBaseUrl, enableAnalytics, isDevelopment } from '@/lib/env'
+import { newRandomId } from '@/lib/randomId'
 import { currentSessionToken } from '@/store/authStore'
 
 export type AnalyticsEventName =
@@ -96,7 +97,7 @@ function getSessionId() {
 
     if (existingSessionId) return existingSessionId
 
-    const nextSessionId = crypto.randomUUID()
+    const nextSessionId = newRandomId()
     sessionStorage.setItem(SESSION_ID_KEY, nextSessionId)
     return nextSessionId
   } catch {

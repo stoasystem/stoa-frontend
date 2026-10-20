@@ -1,12 +1,13 @@
 /**
- * A fresh key for a request the backend must count once: a v4 UUID, which
- * fits the backend's `[A-Za-z0-9._~-]{1,64}`.
+ * A fresh random id: a v4 UUID. It names a request the backend must count
+ * once (its idempotency keys take `[A-Za-z0-9._~-]{1,64}`), a sign-in of this
+ * browser, and a tab's analytics session.
  *
  * `crypto.randomUUID` is missing on iOS Safari 15.0–15.3 and outside a secure
- * context, and calling it there throws before the request is sent (#369).
- * `crypto.getRandomValues` is there in both, so the same UUID is built from it.
+ * context, and calling it there throws (#369, #389). `crypto.getRandomValues`
+ * is there in both, so the same UUID is built from it.
  */
-export function newIdempotencyKey(): string {
+export function newRandomId(): string {
   if (typeof crypto.randomUUID === 'function') return crypto.randomUUID()
   const bytes = crypto.getRandomValues(new Uint8Array(16))
   // RFC 9562: version 4 in the high nibble of byte 6, variant 10 in the top bits of byte 8.
