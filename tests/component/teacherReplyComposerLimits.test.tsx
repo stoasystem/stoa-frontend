@@ -11,6 +11,8 @@
  *
  * #371: a stored draft is read block by block, and a refusal is read by its
  *       code first, a block too long told apart from a reply too long.
+ * #388: the server sends no refusal code yet, so none is read; the message
+ *       decides.
  */
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { act, fireEvent, render, renderHook, screen, waitFor, within } from '@testing-library/react'
@@ -216,22 +218,23 @@ describe('T3: a reply the server refuses says why', () => {
   const refusedBecause = (reason: string) =>
     de.toasts.replyRefusedBecause[reason as keyof typeof de.toasts.replyRefusedBecause]
 
-  // #371: the server's code says what was refused, whatever its sentence says.
+  // #388: stoa-backend sends no code for a refused reply, so the codes #371
+  // guessed say nothing; the message still decides.
   it.each([
-    ['teacher_reply_unsafe_html', 'html'],
-    ['teacher_reply_private_markers', 'privateMarkers'],
-    ['teacher_reply_private_credentials', 'privateMarkers'],
-    ['teacher_reply_too_many_blocks', 'tooManyBlocks'],
-    ['teacher_reply_block_too_long', 'blockTooLong'],
-    ['teacher_reply_too_long', 'tooLong'],
-  ])('code %s', async (code, reason) => {
+    'teacher_reply_unsafe_html',
+    'teacher_reply_private_markers',
+    'teacher_reply_private_credentials',
+    'teacher_reply_too_many_blocks',
+    'teacher_reply_block_too_long',
+    'teacher_reply_too_long',
+  ])('does not read the guessed code %s', async (code) => {
     await refuse(new ApiError('reworded by the server', { status: 422, code }))
-    expect(toast.error).toHaveBeenCalledWith(refusedBecause(reason))
+    expect(toast.error).toHaveBeenCalledWith(de.toasts.replyRefused)
   })
 
-  it('reads the code before the message', async () => {
+  it('reads the message, not a code the server does not send', async () => {
     await refuse(new ApiError('teacher reply fallback exceeds 4000 characters', { status: 422, code: 'teacher_reply_block_too_long' }))
-    expect(toast.error).toHaveBeenCalledWith(de.toasts.replyRefusedBecause.blockTooLong)
+    expect(toast.error).toHaveBeenCalledWith(de.toasts.replyRefusedBecause.tooLong)
   })
 
   it('falls back to the message for a code it does not know', async () => {
