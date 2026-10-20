@@ -5,6 +5,7 @@ import type { ReactNode } from 'react'
 import { MemoryRouter } from 'react-router-dom'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { afterParentLink, afterStatusChange } from '@/hooks/admin/accountListCache'
+import { useRevokeInvitationMutation } from '@/hooks/admin/useAdminAccounts'
 import { AdminAccountsPage } from '@/pages/admin/AdminAccountsPage'
 import {
   changeAccountStatus,
@@ -12,6 +13,7 @@ import {
   listAccounts,
   reissueInvitation,
   resetAccountPassword,
+  revokeInvitation,
   type AccountListResponse,
   type AccountRow,
 } from '@/services/admin/accountsApi'
@@ -45,6 +47,7 @@ vi.mock('@/services/admin/accountsApi', async () => {
     reissueInvitation: vi.fn(),
     resetAccountPassword: vi.fn(),
     changeAccountStatus: vi.fn(),
+    revokeInvitation: vi.fn(),
   }
 })
 
@@ -53,6 +56,7 @@ const mockedInvite = vi.mocked(inviteAccount)
 const mockedReissue = vi.mocked(reissueInvitation)
 const mockedReset = vi.mocked(resetAccountPassword)
 const mockedStatus = vi.mocked(changeAccountStatus)
+const mockedRevoke = vi.mocked(revokeInvitation)
 
 function Wrapper({ children }: { children: ReactNode }) {
   const client = new QueryClient({
@@ -111,8 +115,14 @@ function rowButton(action: string, name: string) {
   return screen.getByRole('button', { name: `accounts.actionFor(${action}|${name})` })
 }
 
-async function openWithEveryPage() {
-  render(<AdminAccountsPage />, { wrapper: Wrapper })
+async function openWithEveryPage(beside?: ReactNode) {
+  render(
+    <>
+      <AdminAccountsPage />
+      {beside}
+    </>,
+    { wrapper: Wrapper },
+  )
   await screen.findByText('Anna')
   await userEvent.click(screen.getByRole('button', { name: 'accounts.loadMore' }))
   await screen.findByText('Bea')
@@ -141,6 +151,7 @@ beforeEach(() => {
   mockedReissue.mockReset()
   mockedReset.mockReset()
   mockedStatus.mockReset()
+  mockedRevoke.mockReset()
   serveThreePages()
 })
 
@@ -418,5 +429,103 @@ describe('#372: the other account views stay right', () => {
     expect(rita.linkedAccounts).toEqual([{ userId: 'nina', accountNumber: 'S26-0044', status: 'active' }])
     expect(nina.linkedAccounts).toEqual([{ userId: 'rita', accountNumber: 'E26-0001', status: 'active' }])
     expect(queryClient.getQueryState(key)?.isInvalidated).toBe(false)
+  })
+})
+
+// #385: what #381's rewrites still got wrong. An account no cached row
+// describes, a list still reading more pages, and the revoke the tests above
+// never ran.
+describe('#385: the rewrites where the cache does not know the account', () => {
+  const listKey = (filters: object) => [...adminQueryKeys.accountsAll(), 'list', filters] as const
+  type Pages = InfiniteData<AccountListResponse, string | undefined>
+
+  function client() {
+    return new QueryClient({ defaultOptions: { queries: { retry: false } } })
+  }
+
+  it('reads again every list filtered to the new status when no cached row gives the role', () => {
+    const queryClient = client()
+    const suspendedStudents = listKey({ role: 'student', status: 'suspended' })
+    const activeStudents = listKey({ role: 'student', status: 'active' })
+    queryClient.setQueryData<Pages>(suspendedStudents, {
+      pages: [answer([account('leo', { role: 'student', accountStatus: 'suspended' })])],
+      pageParams: [undefined],
+    })
+    queryClient.setQueryData<Pages>(activeStudents, { pages: [answer([])], pageParams: [undefined] })
+
+    afterStatusChange(
+      queryClient,
+      { userId: 'nina', status: 'suspended' },
+      { userId: 'nina', accountStatus: 'suspended', previousStatus: 'active' },
+    )
+
+    expect(queryClient.getQueryState(suspendedStudents)?.isInvalidated).toBe(true)
+    expect(queryClient.getQueryState(activeStudents)?.isInvalidated).toBe(false)
+  })
+
+  it('reads a parent row again rather than list a child with no number', () => {
+    const queryClient = client()
+    const parents = listKey({ role: 'parent' })
+    const teachers = listKey({ role: 'teacher' })
+    queryClient.setQueryData<Pages>(parents, {
+      pages: [answer([account('rita', { accountNumber: 'E26-0001' })], 'cursor-1'), answer([account('marco')])],
+      pageParams: [undefined, 'cursor-1'],
+    })
+    queryClient.setQueryData<Pages>(teachers, {
+      pages: [answer([account('tom', { role: 'teacher' })])],
+      pageParams: [undefined],
+    })
+
+    // No cached read holds the student, so her number is not known here.
+    afterParentLink(queryClient, { parentId: 'rita', studentId: 'nina' })
+
+    const pages = queryClient.getQueryData<Pages>(parents)!.pages
+    expect(pages[0].items[0].linkedAccounts).toEqual([])
+    expect(pages).toHaveLength(1)
+    expect(queryClient.getQueryState(parents)?.isInvalidated).toBe(true)
+    expect(queryClient.getQueryState(teachers)?.isInvalidated).toBe(false)
+  })
+
+  it('reads only the first page again when a change lands while "load more" is reading', async () => {
+    mockedList.mockImplementation(async (_, options) => {
+      const page = options?.after ?? 'first'
+      if (page === 'cursor-2') return new Promise<AccountListResponse>(() => {})
+      return answer(PAGES[page], NEXT[page])
+    })
+    render(<AdminAccountsPage />, { wrapper: Wrapper })
+    await screen.findByText('Anna')
+    await userEvent.click(screen.getByRole('button', { name: 'accounts.loadMore' }))
+    await screen.findByText('Bea')
+    await userEvent.click(screen.getByRole('button', { name: 'accounts.loadMore' }))
+    await waitFor(() => expect(mockedList).toHaveBeenCalledTimes(3))
+
+    await archive('Anna')
+
+    await waitFor(() => expect(mockedList).toHaveBeenCalledTimes(4))
+    expect(mockedList.mock.calls[3][1]?.after).toBeUndefined()
+    await waitFor(() => expect(screen.queryByText('Bea')).toBeNull())
+    await settle()
+    expect(mockedList).toHaveBeenCalledTimes(4)
+  })
+
+  it('takes the invitation off a revoked row, which then offers no resend, without a read', async () => {
+    mockedRevoke.mockResolvedValue({ invitationId: 'invite-1', status: 'revoked' })
+    function Revoke() {
+      const revoke = useRevokeInvitationMutation()
+      return (
+        <button type="button" onClick={() => revoke.mutate('invite-1')}>
+          revoke
+        </button>
+      )
+    }
+    await openWithEveryPage(<Revoke />)
+    expect(rowButton('accounts.resendInvite', 'Cleo')).toBeEnabled()
+
+    await userEvent.click(screen.getByRole('button', { name: 'revoke' }))
+
+    await waitFor(() => expect(rowButton('accounts.resendInvite', 'Cleo')).toBeDisabled())
+    expect(within(rowOf('Cleo')).getByText('accounts.status.invited')).toBeInTheDocument()
+    await settle()
+    expect(mockedList).toHaveBeenCalledTimes(3)
   })
 })

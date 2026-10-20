@@ -50,11 +50,26 @@ function inFlight(query: Query) {
 /**
  * A read in flight when a change lands may answer from before it. A refetch
  * would only join it - a first read has no answer yet for one to replace - so
- * it is stopped and started again.
+ * it is stopped and started again, from its first page.
  */
 function restart(queryClient: QueryClient, query: Query) {
   const only = { queryKey: query.queryKey, exact: true }
-  void queryClient.cancelQueries(only).then(() => queryClient.invalidateQueries({ ...only, refetchType: 'all' }))
+  void queryClient.cancelQueries(only).then(() => {
+    // Cancelling puts back every page the list had loaded, and a refetch
+    // would read each of them again.
+    keepFirstPage(queryClient, query)
+    return queryClient.invalidateQueries({ ...only, refetchType: 'all' })
+  })
+}
+
+/** A list keeps its first page only; "load more" starts over from there. */
+function keepFirstPage(queryClient: QueryClient, query: Query) {
+  const data = query.state.data as AccountRead | undefined
+  if (data === undefined || !isPages(data) || data.pages.length < 2) return
+  queryClient.setQueryData<AccountPages>(query.queryKey, {
+    pages: data.pages.slice(0, 1),
+    pageParams: data.pageParams.slice(0, 1),
+  })
 }
 
 /** One answer with `change` applied to each row, or null when no row changed. */
@@ -92,16 +107,23 @@ function rewriteRead(data: AccountRead, filters: AccountListFilters, change: Row
   return changed ? { ...data, pages } : null
 }
 
+function answersOf(query: Query) {
+  const data = query.state.data as AccountRead | undefined
+  return data === undefined ? [] : isPages(data) ? data.pages : [data]
+}
+
 function findRow(queryClient: QueryClient, userId: string) {
   for (const query of accountReads(queryClient)) {
-    const data = query.state.data as AccountRead | undefined
-    const answers = data === undefined ? [] : isPages(data) ? data.pages : [data]
-    for (const answer of answers) {
+    for (const answer of answersOf(query)) {
       const row = answer.items.find((item) => item.userId === userId)
       if (row) return row
     }
   }
   return undefined
+}
+
+function holds(query: Query, userId: string) {
+  return answersOf(query).some((answer) => answer.items.some((item) => item.userId === userId))
 }
 
 /**
@@ -117,12 +139,7 @@ export function rereadFirstPages(queryClient: QueryClient, which: (query: Query)
       continue
     }
     settled.push(query)
-    const data = query.state.data as AccountRead | undefined
-    if (data === undefined || !isPages(data) || data.pages.length < 2) continue
-    queryClient.setQueryData<AccountPages>(query.queryKey, {
-      pages: data.pages.slice(0, 1),
-      pageParams: data.pageParams.slice(0, 1),
-    })
+    keepFirstPage(queryClient, query)
   }
   void queryClient.invalidateQueries({
     queryKey: adminQueryKeys.accountsAll(),
@@ -132,14 +149,15 @@ export function rereadFirstPages(queryClient: QueryClient, which: (query: Query)
 
 /**
  * Applies `change` to every cached row. A read the change did not touch is
- * left alone, unless `missingFrom` says its filters may now admit the account
- * it does not hold; that one is read again from its first page. A read in
- * flight is started again whatever it holds.
+ * left alone, unless `stale` says it may still be wrong - its filters may now
+ * admit an account it does not hold, or it holds a row the change could not
+ * write - and that one is read again from its first page. A read in flight is
+ * started again whatever it holds.
  */
 function changeRows(
   queryClient: QueryClient,
   change: RowChange,
-  missingFrom: (filters: AccountListFilters) => boolean = () => false,
+  stale: (filters: AccountListFilters, query: Query) => boolean = () => false,
 ) {
   const reread = new Set<Query>()
   for (const query of accountReads(queryClient)) {
@@ -151,7 +169,7 @@ function changeRows(
     const filters = readFilters(query.queryKey)
     const next = data === undefined ? null : rewriteRead(data, filters, change)
     if (next) queryClient.setQueryData(query.queryKey, next)
-    else if (missingFrom(filters)) reread.add(query)
+    else if (stale(filters, query)) reread.add(query)
   }
   if (reread.size > 0) rereadFirstPages(queryClient, (query) => reread.has(query))
 }
@@ -164,6 +182,10 @@ function changeRows(
  * active drops off its parents' rows, and a parent who does has none on its
  * own. Back to active, those links return, and which ones is the server's to
  * say, so a parent or student coming back costs a first-page read.
+ *
+ * The role comes from a cached row. With none, a list filtered to any role
+ * may admit the account, so every list filtered to the new status is read
+ * again.
  */
 export function afterStatusChange(
   queryClient: QueryClient,
@@ -193,7 +215,7 @@ export function afterStatusChange(
       }
       return row
     },
-    (filters) => filters.status === status && (!filters.role || filters.role === role),
+    (filters) => filters.status === status && (!filters.role || !role || filters.role === role),
   )
 }
 
@@ -217,18 +239,23 @@ export function afterRevoke(queryClient: QueryClient, invitationId: string) {
   changeRows(queryClient, (row) => (row.invitationId === invitationId ? { ...row, invitationId: undefined } : row))
 }
 
-/** An administrator's link is active at once, and both rows list it. */
+/**
+ * An administrator's link is active at once, and both rows list it under the
+ * other account's number. That number comes from a cached row; a row whose
+ * counterpart no cached read holds gets no link without one, and the reads
+ * holding it are read again instead.
+ */
 export function afterParentLink(queryClient: QueryClient, input: { parentId: string; studentId: string }) {
-  const link = (userId: string): AccountLink => ({
-    userId,
-    accountNumber: findRow(queryClient, userId)?.accountNumber ?? '',
-    status: 'active',
-  })
-  const toParent = link(input.studentId)
-  const toStudent = link(input.parentId)
-  changeRows(queryClient, (row) => {
-    const other = row.userId === input.parentId ? toParent : row.userId === input.studentId ? toStudent : null
-    if (!other || row.linkedAccounts.some((held) => held.userId === other.userId)) return row
-    return { ...row, linkedAccounts: [...row.linkedAccounts, other] }
-  })
+  const parent = findRow(queryClient, input.parentId)
+  const student = findRow(queryClient, input.studentId)
+  changeRows(
+    queryClient,
+    (row) => {
+      const other = row.userId === input.parentId ? student : row.userId === input.studentId ? parent : undefined
+      if (!other || row.linkedAccounts.some((held) => held.userId === other.userId)) return row
+      const link: AccountLink = { userId: other.userId, accountNumber: other.accountNumber, status: 'active' }
+      return { ...row, linkedAccounts: [...row.linkedAccounts, link] }
+    },
+    (_, query) => (!student && holds(query, input.parentId)) || (!parent && holds(query, input.studentId)),
+  )
 }
