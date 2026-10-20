@@ -3,7 +3,7 @@
   "eyebrow": "Assistenza STOA",
   "description": "Ricevi aiuto con STOA, capisci il supporto dell’insegnante nel percorso di studio e contatta il team quando serve.",
   "description_informal": "Ricevi aiuto con STOA, capisci il supporto dell’insegnante nel percorso di studio e contatta il team quando serve.",
-  "viewOnboarding": "Vedi configurazione",
+  "viewOnboarding": "Guida per iniziare",
   "contact": "Contatta STOA",
   "contactSubject": "Richiesta di assistenza STOA",
   "submit": "Invia richiesta",
@@ -18,9 +18,9 @@
     "faq": {
       "title": "Domande frequenti",
       "items": [
-        "Gli studenti iniziano dalla Chat per domande sui compiti, spiegazioni e schede caricate.",
-        "I genitori usano la dashboard genitori e i report per seguire i progressi e i punti deboli.",
-        "Gli insegnanti rispondono alle richieste di aiuto degli studenti dalla dashboard insegnanti."
+        "Gli studenti imparano sulla mappa stellare e fanno le loro domande in «Fai una domanda», anche su compiti e schede.",
+        "I genitori seguono progressi, report e punti deboli dei figli nell’Area genitori.",
+        "Gli insegnanti rispondono alle richieste di aiuto degli studenti in «Richieste»."
       ]
     },
     "problems": {
@@ -28,25 +28,25 @@
       "items": [
         "Segnalaci pagine che non funzionano, dati mancanti, schermate poco chiare o qualsiasi cosa ti blocchi.",
         "Indica la pagina in cui ti trovavi, che cosa ti aspettavi e che cosa è successo invece.",
-        "Non inviare mai password, codici di accesso o trascrizioni complete della chat in un messaggio di assistenza."
+        "Non inviare mai password, codici di accesso o conversazioni complete di «Fai una domanda» in un messaggio di assistenza."
       ],
       "items_informal": [
         "Segnalaci pagine che non funzionano, dati mancanti, schermate poco chiare o qualsiasi cosa ti blocchi.",
         "Indica la pagina in cui ti trovavi, che cosa ti aspettavi e che cosa è successo invece.",
-        "Non inviare mai password, codici di accesso o trascrizioni complete della chat in un messaggio di assistenza."
+        "Non inviare mai password, codici di accesso o conversazioni complete di «Fai una domanda» in un messaggio di assistenza."
       ]
     },
     "teacherHelp": {
       "title": "Aiuto dell’insegnante o assistenza?",
       "items": [
-        "Chiedi l’aiuto di un insegnante quando una domanda di studio nata in Chat deve essere vista da una persona.",
+        "Chiedi l’aiuto di un insegnante quando una domanda di studio nata in «Fai una domanda» deve essere vista da una persona.",
         "Contatta l’assistenza quando il tuo account, l’accesso, un report o l’app stessa non funzionano.",
-        "Lo stato di una richiesta all’insegnante resta in Chat; tutto il resto riguarda l’assistenza."
+        "Lo stato di una richiesta all’insegnante resta in «Fai una domanda»; tutto il resto riguarda l’assistenza."
       ],
       "items_informal": [
-        "Chiedi l’aiuto di un insegnante quando una domanda di studio nata in Chat deve essere vista da una persona.",
+        "Chiedi l’aiuto di un insegnante quando una domanda di studio nata in «Fai una domanda» deve essere vista da una persona.",
         "Contatta l’assistenza quando il tuo account, l’accesso, un report o l’app stessa non funzionano.",
-        "Lo stato di una richiesta all’insegnante resta in Chat; tutto il resto riguarda l’assistenza."
+        "Lo stato di una richiesta all’insegnante resta in «Fai una domanda»; tutto il resto riguarda l’assistenza."
       ]
     },
     "expectations": {
@@ -95,16 +95,16 @@
         "audience": "Per gli studenti che iniziano con STOA",
         "steps": [
           {
-            "title": "Conferma classe e materie",
-            "description": "Tieni aggiornati classe e materie attive nel profilo, così STOA spiega al livello giusto."
+            "title": "Indica la tua classe",
+            "description": "Indica la tua classe nel profilo, così STOA spiega al livello giusto."
           },
           {
-            "title": "Inizia dalla Chat",
-            "description": "Apri la Chat quando hai una domanda sui compiti, un concetto poco chiaro o una scheda da caricare."
+            "title": "Impara sulla mappa stellare",
+            "description": "La mappa stellare mostra tutte le tue materie. Scegli una stella, svolgi le lezioni del suo capitolo e si accende."
           },
           {
-            "title": "Chiedi un insegnante quando ti blocchi",
-            "description": "Richiedi l’aiuto di un insegnante dalla Chat se una spiegazione resta poco chiara o vuoi una verifica umana."
+            "title": "Fai le tue domande",
+            "description": "Apri «Fai una domanda» per un compito, un concetto poco chiaro o una scheda. Se una spiegazione resta poco chiara, chiedi da lì l’aiuto di un insegnante."
           }
         ]
       },
@@ -113,12 +113,12 @@
         "audience": "Per i genitori che seguono il figlio",
         "steps": [
           {
-            "title": "Apri la dashboard del figlio",
-            "description": "La dashboard genitori mostra ogni profilo, le attività recenti e i segnali di apprendimento in un colpo d’occhio."
+            "title": "Apri l’Area genitori",
+            "description": "L’Area genitori mostra ogni profilo, le attività recenti e i segnali di apprendimento in un colpo d’occhio."
           },
           {
             "title": "Consulta i report",
-            "description": "I report mostrano progressi, punti forti, punti deboli e supporto consigliato, senza mostrare per impostazione predefinita i contenuti privati della chat."
+            "description": "I report mostrano progressi, punti forti, punti deboli e supporto consigliato, senza mostrare per impostazione predefinita le conversazioni private."
           },
           {
             "title": "Usa l’assistenza per i problemi di accesso",
@@ -132,7 +132,7 @@
         "steps": [
           {
             "title": "Tieni d’occhio l’elenco richieste",
-            "description": "La dashboard insegnanti elenca le richieste aperte, in corso e risolte che attendono una risposta umana."
+            "description": "«Richieste» elenca le richieste aperte, in corso e risolte che attendono una risposta umana."
           },
           {
             "title": "Apri una richiesta",
