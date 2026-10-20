@@ -15,10 +15,11 @@ let katexPromise: Promise<Katex> | null = null
 
 // A failed load (a dropped connection, a chunk gone after a deploy) is not
 // kept: the next formula asks again (#345), and is typeset if the browser
-// fetches the module this time. Chromium does not: it keeps a failed import
-// for the rest of the document, so there formulas stay as written until the
-// next one. Nor is a module that came back empty kept, which is what Vite
-// hands over when a `vite:preloadError` listener prevents the failure (#401).
+// fetches the module again. Chromium does not (seen with 148): it keeps a
+// failed import for the rest of the document, so there formulas stay as
+// written until the next document. Nor is a module that came back empty
+// kept, which is what Vite hands over when a `vite:preloadError` listener
+// prevents the failure (#401).
 function loadKatex(): Promise<Katex> {
   if (!katexPromise) {
     katexPromise = import('./katexLoader')

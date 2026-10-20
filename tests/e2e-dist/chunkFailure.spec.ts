@@ -136,3 +136,25 @@ test('a page whose chunk still cannot be fetched after that reload shows its err
   await expect(page.getByRole('heading', { name: 'Mathematics' })).toBeVisible()
   expect(documents()).toBe(3)
 })
+
+test('a page whose chunk hangs past the window before it fails again after the reload shows its error, not another reload', async ({
+  page,
+  backend,
+}) => {
+  test.setTimeout(120_000)
+  new StudentWorld(backend).install()
+  const documents = documentLoads(page)
+  let requests = 0
+  await page.route('**/assets/MapPages-*.js', async (route) => {
+    requests += 1
+    // The first document's request fails at once. The reloaded document's
+    // hangs past chunkReload's 30 s window, then fails the same way.
+    if (requests > 1) await new Promise((resolve) => setTimeout(resolve, 32_000))
+    return route.abort('timedout')
+  })
+
+  await signInAsStudent(page)
+  await expect(page.getByRole('alert').getByText('This page could not be shown')).toBeVisible({ timeout: 60_000 })
+  expect(requests).toBe(2)
+  expect(documents(), 'the sign-in page, then the one reload').toBe(2)
+})

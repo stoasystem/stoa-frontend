@@ -10,9 +10,11 @@
  * reload, reloading again would only loop: the page's error boundary then
  * offers "Try again" and "Reload page" instead.
  *
- * Only a page asks for the reload (`lazyPage.ts`). Every other module loaded on
- * demand is optional, and its caller copes with the failure itself: KaTeX's
- * leaves the formula as written. Reloading for it threw away what lives only in
+ * Only a page asks for the reload (`lazyPage.ts`). Every other module the
+ * running app loads on demand is optional, and its caller copes with the
+ * failure itself: KaTeX's leaves the formula as written. (The start-up imports
+ * in `main.tsx` come before this listener and have a failure screen of their
+ * own.) Reloading for it threw away what lives only in
  * memory -- the lesson's place, a quiz, an Ask draft -- and offline it landed
  * on the browser's offline page instead (#401).
  *
@@ -22,11 +24,19 @@
  */
 export const CHUNK_RELOAD_KEY = 'stoa_chunk_reload_at'
 
-/** A failure this soon after our own reload is the same one again. */
+/**
+ * A failure this soon after our own reload is the same one again, and so is
+ * any failure in a document that began this soon after it -- the document the
+ * reload made -- however long its page took to fail. Counting only from the
+ * reload, a page whose module hung past the window before it failed reloaded
+ * the tab again and again, and never showed its error (#401 audit).
+ */
 export const CHUNK_RELOAD_WINDOW_MS = 30_000
 
 type ReloadTarget = Pick<Window, 'addEventListener' | 'removeEventListener' | 'sessionStorage'> & {
   location: Pick<Location, 'reload'>
+  /** When this document began, if it can be read. */
+  performance?: Pick<Performance, 'timeOrigin'>
 }
 
 type Listening = {
@@ -79,8 +89,7 @@ export function installChunkReload(target: ReloadTarget = window, now: () => num
  * reload has started and the page should wait for it.
  *
  * An error Vite did not announce (the dev server, a test) is left to the page's
- * error boundary, and so is one that comes back within the window after our
- * own reload.
+ * error boundary, and so is one that is our own reload's failure again.
  */
 export function reloadForFailedPage(error: unknown): boolean {
   if (listening === null || typeof error !== 'object' || error === null) return false
@@ -88,7 +97,10 @@ export function reloadForFailedPage(error: unknown): boolean {
   if (!announced.has(error)) return false
   const at = now()
   const previous = lastReload(target)
-  if (previous !== null && at - previous >= 0 && at - previous < CHUNK_RELOAD_WINDOW_MS) return false
+  if (previous !== null) {
+    const soonAfter = (time: number) => time - previous >= 0 && time - previous < CHUNK_RELOAD_WINDOW_MS
+    if (soonAfter(at) || soonAfter(target.performance?.timeOrigin ?? NaN)) return false
+  }
   // Without a record of this reload the next failure could not tell it was
   // the same one, so with blocked storage nothing reloads at all.
   if (!rememberReload(target, at)) return false

@@ -405,6 +405,32 @@ describe('vite:preloadError', () => {
     expect(target.location.reload).toHaveBeenCalledTimes(2)
   })
 
+  it('does not reload again in the document its reload made, however late that page fails', () => {
+    let now = 1_000_000
+    const target = Object.assign(fakeWindow(), { performance: { timeOrigin: 0 } })
+    stop = installChunkReload(target as unknown as Window, () => now)
+    expect(reloadForFailedPage(fire(target).error)).toBe(true)
+
+    // The reloaded document began just after; its page hung past the window, then failed.
+    target.performance.timeOrigin = now + 150
+    now += CHUNK_RELOAD_WINDOW_MS + 5_000
+    expect(reloadForFailedPage(fire(target).error)).toBe(false)
+    expect(target.location.reload).toHaveBeenCalledTimes(1)
+  })
+
+  it('may reload again in a document begun long after its last reload', () => {
+    let now = 1_000_000
+    const target = Object.assign(fakeWindow(), { performance: { timeOrigin: 0 } })
+    stop = installChunkReload(target as unknown as Window, () => now)
+    expect(reloadForFailedPage(fire(target).error)).toBe(true)
+
+    // The reader opened the app afresh a minute later.
+    target.performance.timeOrigin = now + 60_000
+    now += 65_000
+    expect(reloadForFailedPage(fire(target).error)).toBe(true)
+    expect(target.location.reload).toHaveBeenCalledTimes(2)
+  })
+
   it('does not reload for a failure Vite did not announce', () => {
     const target = fakeWindow()
     stop = installChunkReload(target as unknown as Window, () => 1_000_000)
