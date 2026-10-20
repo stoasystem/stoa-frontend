@@ -33,7 +33,7 @@ import { adminQueryKeys } from '@/services/admin/adminQueryKeys'
 import type { AccountRow } from '@/services/admin/accountsApi'
 import type { AdminBillingOperationDetail } from '@/services/admin/adminApi'
 import type { AdminAccountOperations } from '@/types/adminAccountOperations'
-import type { AccountOperationsChild, AccountOperationsUsage } from '@/types/parentAccountOperations'
+import type { AccountOperationsChild, AccountOperationsProfile, AccountOperationsUsage } from '@/types/parentAccountOperations'
 import type { SubscriptionBillingEvent } from '@/types/subscriptionOperations'
 
 export function AdminAccountOperationsPage() {
@@ -103,7 +103,7 @@ export function AdminAccountOperationsPage() {
           </Button>
         </form>
 
-        <ParentLinkAssignment parentId={parentId} />
+        <ParentLinkAssignment parentId={parentId} lookedUp={query.data?.parent} />
 
         {!parentId && <EmptyLookup />}
         {parentId && query.isLoading && <LoadingPanel />}
@@ -141,11 +141,17 @@ export function AdminAccountOperationsPage() {
  * archived account as a target, and offering one would only produce a refusal
  * nobody could act on.
  *
+ * #384: the one exception is the parent the page was opened for. That read
+ * stops after MAX_ACCOUNT_PAGES pages and a filter narrows it further, so it
+ * may not carry the looked-up parent at all; taken from the lookup instead,
+ * that parent is always an option. Its status is not in the lookup - if it is
+ * not active, the route's refusal says that both accounts have to be.
+ *
  * #336: because the link takes effect at once, it is confirmed in a dialog
  * that names both accounts. The filters wait for a pause in typing rather
  * than re-reading the account list on every key.
  */
-function ParentLinkAssignment({ parentId }: { parentId: string }) {
+function ParentLinkAssignment({ parentId, lookedUp }: { parentId: string; lookedUp?: AccountOperationsProfile }) {
   const { t } = useTranslation('admin')
   const queryClient = useQueryClient()
   const [parentKeyword, setParentKeyword] = useState('')
@@ -180,13 +186,17 @@ function ParentLinkAssignment({ parentId }: { parentId: string }) {
   // search went into the confirmation as if it were a result of this one.
   // Until the read for what is typed is back, a picker is searching - its
   // rows are shown but cannot be chosen - and only an account in a current
-  // answer counts as chosen.
+  // answer, or the looked-up parent (#384), counts as chosen.
   const parentsSearching = searching(parents, parentKeyword, parentQ)
   const studentsSearching = searching(students, studentKeyword, studentQ)
   const parentRows = parents.data?.items ?? []
   const studentRows = students.data?.items ?? []
+  const lookedUpParent = lookedUp && lookedUp.userId === parentId ? lookedUp : undefined
   const selectedParent = parentChoice ?? parentId
-  const parentPick = parentsSearching ? undefined : parentRows.find((row) => row.userId === selectedParent)
+  const parentPick = parentsSearching
+    ? undefined
+    : parentRows.find((row) => row.userId === selectedParent)
+      ?? (lookedUpParent?.userId === selectedParent ? lookedUpParent : undefined)
   const studentPick = studentsSearching ? undefined : studentRows.find((row) => row.userId === studentChoice)
   const ready = Boolean(parentPick && studentPick && relationship.trim())
 
@@ -246,6 +256,7 @@ function ParentLinkAssignment({ parentId }: { parentId: string }) {
             value={selectedParent}
             onValue={setParentChoice}
             rows={parentRows}
+            pinned={lookedUpParent}
             searching={parentsSearching}
             failed={parents.isError}
             emptyLabel={t('parentLinks.noParents')}
@@ -337,6 +348,7 @@ function AccountPicker({
   value,
   onValue,
   rows,
+  pinned,
   searching,
   failed,
   emptyLabel,
@@ -352,6 +364,8 @@ function AccountPicker({
   value: string
   onValue: (value: string) => void
   rows: AccountRow[]
+  /** An account known apart from the rows (#384): listed whatever they carry. */
+  pinned?: PickerAccount
   /** The rows answer something other than what is typed (#372): shown, not choosable. */
   searching: boolean
   failed: boolean
@@ -359,14 +373,17 @@ function AccountPicker({
   loadingLabel: string
   failedLabel: string
 }) {
+  const listed: PickerAccount[] = pinned && !rows.some((row) => row.userId === pinned.userId)
+    ? [pinned, ...rows]
+    : rows
   // A value the list no longer carries would silently blank the select, so
   // while a read is under way the chosen account keeps its own option. Once
   // the answer is in, a choice it does not carry is not shown as chosen
   // (#372): the confirmation would not take it.
-  const held = rows.some((row) => row.userId === value)
+  const held = listed.some((row) => row.userId === value)
   const options = held || !value || !searching
-    ? rows
-    : [...rows, { userId: value, accountNumber: '', name: value } as AccountRow]
+    ? listed
+    : [...listed, { userId: value, name: value }]
 
   return (
     <div className="space-y-2">
@@ -418,7 +435,10 @@ function searching(
   return query.isPending || query.isPlaceholderData || keyword.trim() !== sent
 }
 
-function accountOptionLabel(row: AccountRow) {
+/** A row of a picker's answer, or the looked-up parent, which has no account number (#384). */
+type PickerAccount = Pick<AccountRow, 'userId' | 'name' | 'email'> & { accountNumber?: string }
+
+function accountOptionLabel(row: PickerAccount) {
   return [row.name || row.email || row.userId, row.accountNumber].filter(Boolean).join(' · ')
 }
 
