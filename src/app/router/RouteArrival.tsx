@@ -13,12 +13,14 @@ import { NavigationType, useLocation, useNavigationType } from 'react-router-dom
  * that is there for the whole visit.
  *
  * Left alone:
- * - the first load, with the redirects the app makes before the reader has
- *   done anything (`/` to a role's home, a guard to the sign-in page);
+ * - the first load, with the redirects the app makes before any page was
+ *   shown (`/` to a role's home, a guard to the sign-in page);
+ * - a page that stays on screen while its path changes (its <main> is the
+ *   same element): the star map across its layers (#330), Ask across its
+ *   conversations. It moves focus and speaks for itself;
  * - focus a page put somewhere itself: a field it focused, Ask's composer, a
  *   dialog. Only focus that was lost (on <body>, or on an element no longer in
- *   the document) is moved, and only after the new page's own effects ran;
- * - the star map, /map/..., which moves focus and speaks for itself (#330).
+ *   the document) is moved, and only after the new page's own effects ran.
  *
  * A page is settled once: when it reports its name (PageTitle, which renders
  * with the page), or, for a page with no name of its own (the sign-in page a
@@ -36,11 +38,6 @@ export function useReportPageName(): ReportName {
   return useContext(ReportNameContext)
 }
 
-/** The star map keeps one page mounted across its paths and handles focus there itself. */
-function managesItsOwnFocus(pathname: string) {
-  return pathname === '/map' || pathname.startsWith('/map/')
-}
-
 /** On the page itself, or on an element that was taken out of it. */
 function focusLost() {
   const active = document.activeElement
@@ -49,9 +46,11 @@ function focusLost() {
 
 /*
  * Focusable from code only (tabindex -1, never a Tab stop), and only while it
- * holds focus: the attributes go again when focus leaves, so a click on the
- * heading later does not take focus there. `data-route-focus` turns the
- * outline off (index.css), as for the other targets focused by code.
+ * holds focus: the attributes go again when focus moves on, so a click on the
+ * heading later does not take focus there. A blur that leaves it focused (the
+ * window went to the background) keeps them, or the heading would lose focus
+ * on the way back. `data-route-focus` turns the outline off (index.css), as for
+ * the other targets focused by code.
  */
 function takeFocus(target: HTMLElement) {
   const addedTabIndex = !target.hasAttribute('tabindex')
@@ -61,20 +60,27 @@ function takeFocus(target: HTMLElement) {
     if (addedTabIndex) target.removeAttribute('tabindex')
     target.removeAttribute('data-route-focus')
   }
+  const onBlur = () => {
+    // A move clears focus before the blur; a window going to the back does not.
+    if (document.activeElement === target) target.addEventListener('blur', onBlur, { once: true })
+    else release()
+  }
   // The scroll is left where it was: a back or forward move keeps the
   // position the browser gives it.
   target.focus({ preventScroll: true })
   if (document.activeElement === target) {
-    target.addEventListener('blur', release, { once: true })
+    target.addEventListener('blur', onBlur, { once: true })
     return true
   }
   release()
   return false
 }
 
-function arrivalTargets(): HTMLElement[] {
-  const main = document.querySelector('main')
-  return [main?.querySelector('h1'), document.querySelector('h1'), main].filter(
+/** The page's heading, any heading, or its <main>: inside the pages, never a portal or a dev panel. */
+function arrivalTargets(root: HTMLElement | null): HTMLElement[] {
+  if (!root) return []
+  const main = root.querySelector('main')
+  return [main?.querySelector('h1'), root.querySelector('h1'), main].filter(
     (target): target is HTMLElement => target instanceof HTMLElement,
   )
 }
@@ -82,20 +88,30 @@ function arrivalTargets(): HTMLElement[] {
 export function RouteArrival({ children }: { children: ReactNode }) {
   const { pathname } = useLocation()
   const navigationType = useNavigationType()
+  const pages = useRef<HTMLDivElement>(null)
   const shown = useRef(pathname)
   /** The path the reader went to, until its page is on screen. */
   const pending = useRef<string | null>(null)
-  /** The last name a page reported, and where it was shown. */
+  /** A name reported since the last change of path, and where. */
   const named = useRef<{ pathname: string; name: string | null } | null>(null)
-  const interacted = useRef(false)
+  /** The <main> of the page the reader was on, to tell a page that stayed from a new one. */
+  const lastMain = useRef<Element | null>(null)
+  /** A page has been on screen: a replace after this is a move, not loading. */
+  const pageShown = useRef(false)
   const spoken = useRef(0)
   const [said, setSaid] = useState<{ name: string; count: number } | null>(null)
 
+  const currentMain = () => pages.current?.querySelector('main') ?? null
+
+  // Acting on a page also ends the first load: the sign-in page a refused
+  // visitor sees has no name to report. A key on a loading screen does not.
   // A screen reader's browse mode activates a link with a click alone, no key
   // or pointer event, so a click counts too.
   useEffect(() => {
+    lastMain.current = currentMain()
     const mark = () => {
-      interacted.current = true
+      lastMain.current = currentMain()
+      if (!pageShown.current && arrivalTargets(pages.current).length > 0) pageShown.current = true
     }
     const events = ['keydown', 'pointerdown', 'click'] as const
     for (const event of events) window.addEventListener(event, mark, true)
@@ -108,9 +124,11 @@ export function RouteArrival({ children }: { children: ReactNode }) {
     const path = pending.current
     if (path === null) return
     const report = named.current?.pathname === path ? named.current : null
-    const targets = arrivalTargets()
+    const targets = arrivalTargets(pages.current)
     if (!report && targets.length === 0) return
     pending.current = null
+    pageShown.current = true
+    lastMain.current = currentMain()
     if (focusLost()) targets.some(takeFocus)
     const name = report?.name
     // A fresh node each time, so the same name twice in a row is said twice;
@@ -121,7 +139,11 @@ export function RouteArrival({ children }: { children: ReactNode }) {
   const reportName = useCallback<ReportName>(
     (path, name) => {
       named.current = { pathname: path, name }
-      if (pending.current === path) settle()
+      if (path === shown.current) pageShown.current = true
+      // The page behind a loading screen has just arrived. Its name is
+      // reported from PageTitle's effect, before the page's own effects run:
+      // settle once they have, so a focus the page sets is in place.
+      if (pending.current === path) queueMicrotask(settle)
     },
     [settle],
   )
@@ -131,18 +153,28 @@ export function RouteArrival({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (shown.current === pathname) return
     shown.current = pathname
-    // A link, a back or forward move, or anything after the reader acted; a
+    const main = currentMain()
+    const stayed = main !== null && main === lastMain.current
+    // A link, a back or forward move, or a replace once a page was shown; a
     // replace before then is the app still loading.
-    const byReader = navigationType !== NavigationType.Replace || interacted.current
-    pending.current = byReader && !managesItsOwnFocus(pathname) ? pathname : null
+    const byReader = navigationType !== NavigationType.Replace || pageShown.current
+    pending.current = byReader && !stayed ? pathname : null
     // Left alone: the region holds no name of a page the reader has left.
     if (pending.current === null) setSaid(null)
     settle()
+    lastMain.current = main
+    // The page a first load's redirects end on is shown now, if it is here.
+    if (named.current?.pathname === pathname || arrivalTargets(pages.current).length > 0) pageShown.current = true
+    // A later arrival waits for a report of its own, never this one's.
+    named.current = null
   }, [pathname, navigationType, settle])
 
   return (
     <ReportNameContext.Provider value={reportName}>
-      {children}
+      {/* No box of its own: it only marks where the pages are. */}
+      <div ref={pages} className="contents" data-route-pages="">
+        {children}
+      </div>
       {/* Outside the pages' Suspense boundary, so it is in the document before anything is said into it. */}
       <div role="status" aria-live="polite" aria-atomic="true" className="sr-only" data-route-announcer="">
         {said && <span key={said.count}>{said.name}</span>}
