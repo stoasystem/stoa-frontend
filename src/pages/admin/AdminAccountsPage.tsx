@@ -93,6 +93,9 @@ export function AdminAccountsPage() {
   // passwords and the first was dead on arrival; the ref closes the gap before
   // `isPending` reaches the next render.
   const inFlight = useRef(false)
+  // #407: a status change takes the button it was confirmed from off the row,
+  // so focus goes to the line that says what happened.
+  const noticeLine = useRef<HTMLParagraphElement>(null)
   const busy =
     resetMutation.isPending || statusMutation.isPending || reissueMutation.isPending || action !== null
 
@@ -421,6 +424,7 @@ export function AdminAccountsPage() {
           action={action}
           pending={resetMutation.isPending || statusMutation.isPending}
           error={actionError}
+          returnFocusFallback={noticeLine}
           onCancel={() => {
             setActionError(null)
             setAction(null)
@@ -429,7 +433,7 @@ export function AdminAccountsPage() {
         />
 
         {/* Always mounted: a live region that appears with its text is not announced. */}
-        <p role="status" className={notice ? 'mb-3 text-sm' : 'sr-only'}>
+        <p ref={noticeLine} tabIndex={-1} role="status" className={notice ? 'mb-3 text-sm' : 'sr-only'}>
           {notice}
         </p>
         {secret ? (

@@ -21,11 +21,21 @@ export const DialogOverlay = React.forwardRef<
 ))
 DialogOverlay.displayName = DialogPrimitive.Overlay.displayName
 
+type DialogContentProps = React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content> & {
+  /**
+   * Where focus goes on close when the control that opened the dialog is gone
+   * or disabled by then: the button of a row the action archived, say. Give it
+   * `tabIndex={-1}` if it is not focusable already.
+   */
+  returnFocusFallback?: React.RefObject<HTMLElement | null>
+}
+
 export const DialogContent = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Content>,
-  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content>
->(({ className, children, ...props }, ref) => {
+  DialogContentProps
+>(({ className, children, returnFocusFallback, onCloseAutoFocus, ...props }, ref) => {
   const { t } = useTranslation('common')
+  const opener = React.useRef<Element | null>(null)
   return (
     <DialogPortal>
       <DialogOverlay />
@@ -38,7 +48,18 @@ export const DialogContent = React.forwardRef<
           className,
         )}
         {...props}
+        onCloseAutoFocus={(event) => {
+          onCloseAutoFocus?.(event)
+          // Radix gives focus back to a DialogTrigger only. A dialog opened from
+          // state has none, so focus fell to the page and a keyboard user had
+          // to find their row again from the top (#407). Focus somewhere other
+          // than the page was put there on purpose and stays.
+          const lost = !document.activeElement || document.activeElement === document.body
+          if (event.defaultPrevented || !lost) return
+          if (refocus(opener.current) || refocus(returnFocusFallback?.current)) event.preventDefault()
+        }}
       >
+        <RememberOpener into={opener} />
         {children}
         <DialogPrimitive.Close className="absolute right-4 top-4 rounded-sm opacity-70 transition-opacity hover:opacity-100 focus-visible:opacity-100">
           <X className="h-4 w-4" />
@@ -49,6 +70,28 @@ export const DialogContent = React.forwardRef<
   )
 })
 DialogContent.displayName = DialogPrimitive.Content.displayName
+
+/**
+ * Notes what had focus when the dialog's content mounted. It reads it while
+ * rendering, before the commit moves focus into the dialog or disables the
+ * button that was pressed (a page that locks its row actions while a dialog
+ * is open), either of which leaves the page itself as the active element.
+ */
+function RememberOpener({ into }: { into: React.RefObject<Element | null> }) {
+  const [active] = React.useState(() => document.activeElement)
+  React.useEffect(() => {
+    into.current = active
+  }, [active, into])
+  return null
+}
+
+/** Focuses `element` if it is still on the page and enabled, and says whether it took. */
+function refocus(element: Element | null | undefined): boolean {
+  if (!(element instanceof HTMLElement) || element === document.body) return false
+  if (!element.isConnected || element.matches(':disabled')) return false
+  element.focus()
+  return document.activeElement === element
+}
 
 export const DialogHeader = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
   <div className={cn('flex flex-col space-y-1.5 text-center sm:text-left', className)} {...props} />

@@ -1,4 +1,4 @@
-import { type FormEvent, useMemo, useState } from 'react'
+import { type FormEvent, useMemo, useRef, useState } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import type { TFunction } from 'i18next'
 import { AlertTriangle, CheckCircle2, Link2, RefreshCw, Search, ShieldAlert, UserRound } from 'lucide-react'
@@ -172,6 +172,8 @@ function ParentLinkAssignment({ parentId, lookedUp }: { parentId: string; looked
   const [relationship, setRelationship] = useState('child')
   const [notice, setNotice] = useState<string | null>(null)
   const [failure, setFailure] = useState<string | null>(null)
+  // #407: confirming leaves the submit button disabled, so focus comes back here.
+  const heading = useRef<HTMLHeadingElement>(null)
 
   const parentQ = useDebouncedValue(parentKeyword.trim(), 300)
   const studentQ = useDebouncedValue(studentKeyword.trim(), 300)
@@ -241,7 +243,7 @@ function ParentLinkAssignment({ parentId, lookedUp }: { parentId: string; looked
   return (
     <Card className="mb-4">
       <CardHeader>
-        <CardTitle className="text-base">{t('parentLinks.title')}</CardTitle>
+        <CardTitle ref={heading} tabIndex={-1} className="text-base">{t('parentLinks.title')}</CardTitle>
         <p className="mt-2 text-sm text-muted-foreground">{t('parentLinks.description')}</p>
       </CardHeader>
       <CardContent>
@@ -301,7 +303,7 @@ function ParentLinkAssignment({ parentId, lookedUp }: { parentId: string; looked
         </form>
 
         <Dialog open={confirming} onOpenChange={setConfirming}>
-          <DialogContent>
+          <DialogContent returnFocusFallback={heading}>
             <DialogHeader>
               <DialogTitle>{t('parentLinks.confirm.title')}</DialogTitle>
               <DialogDescription>

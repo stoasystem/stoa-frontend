@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { type RefObject, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
 import {
@@ -44,12 +44,15 @@ export function CurriculumActionDialog({
   action,
   pending,
   error,
+  returnFocusFallback,
   onCancel,
   onConfirm,
 }: {
   action: CurriculumAction | null
   pending: boolean
   error: string | null
+  /** Where focus goes on close if the button the step was opened from is disabled by then (#407). */
+  returnFocusFallback?: RefObject<HTMLElement | null>
   onCancel: () => void
   onConfirm: (action: CurriculumAction, reason: string) => void
 }) {
@@ -62,6 +65,7 @@ export function CurriculumActionDialog({
           action={action}
           pending={pending}
           error={error}
+          returnFocusFallback={returnFocusFallback}
           onCancel={onCancel}
           onConfirm={onConfirm}
         />
@@ -74,12 +78,14 @@ function ActionForm({
   action,
   pending,
   error,
+  returnFocusFallback,
   onCancel,
   onConfirm,
 }: {
   action: CurriculumAction
   pending: boolean
   error: string | null
+  returnFocusFallback?: RefObject<HTMLElement | null>
   onCancel: () => void
   onConfirm: (action: CurriculumAction, reason: string) => void
 }) {
@@ -89,7 +95,7 @@ function ActionForm({
   const ready = !pending && (!withReason || reason.trim().length > 0)
 
   return (
-    <DialogContent>
+    <DialogContent returnFocusFallback={returnFocusFallback}>
       <form
         className="grid gap-4"
         onSubmit={(event) => {
