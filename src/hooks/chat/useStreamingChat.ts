@@ -522,6 +522,9 @@ export function useStreamingChat(conversationId: string | null) {
             return message
           }),
         )
+        // The answer may be on the server all the same - written while the wait
+        // was cut short - and then shows in place of the failure (#402).
+        void invalidateConversation()
         return false
       } finally {
         // Whatever ended the attempt - an answer, a failure, a stop, a session

@@ -43,6 +43,7 @@ import { mergeWithServerMessages, useStreamingChat } from '@/hooks/chat/useStrea
 import { clearPendingMessages, PENDING_MESSAGE_KEY_PREFIX } from '@/lib/pendingChatMessages'
 import { trackEvent } from '@/services/analytics/analyticsClient'
 import { commandMessageIds } from '@/services/chat/commandMessageIds'
+import { chatQueryKeys } from '@/services/chat/chatQueryKeys'
 import i18n from '@/i18n'
 
 const mockedStream = vi.mocked(streamConversationMessage)
@@ -347,6 +348,70 @@ describe('where the message stands', () => {
     })
     expect(mockedProgress.mock.calls.length).toBe(polls)
   })
+
+  it('shows the answer the server finished while the device slept (#402)', async () => {
+    mockedStream.mockResolvedValue('accepted')
+    let finished = false
+    mockedProgress.mockImplementation(async () =>
+      finished ? state({ status: 'completed', assistantMessageId: 'a-1' }) : state({ status: 'ai_running' }),
+    )
+    const { result, invalidated } = render()
+
+    act(() => {
+      void result.current.sendStreamingMessage({ content: 'Was ist 2 + 2?' })
+    })
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(3000)
+    })
+    expect(result.current.isStreaming).toBe(true)
+
+    // Asleep past the limit: the clock runs on, the timers do not.
+    finished = true
+    const polls = mockedProgress.mock.calls.length
+    vi.setSystemTime(Date.now() + 361_000)
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(5000)
+    })
+
+    await waitFor(() => expect(result.current.isStreaming).toBe(false))
+    expect(mockedProgress.mock.calls.length).toBeGreaterThan(polls)
+    expect(result.current.localMessages).toEqual([])
+    expect(invalidated()).toBe(true)
+  })
+
+  it('reads the conversation again when the wait ends without the answer (#402)', async () => {
+    // The answer may be there all the same; the conversation read back shows
+    // it in place of the failure (mergeWithServerMessages).
+    mockedStream.mockResolvedValue('accepted')
+    mockedProgress.mockResolvedValue(state({ status: 'ai_running' }))
+    const { result, invalidatedConversation } = render()
+
+    act(() => {
+      void result.current.sendStreamingMessage({ content: 'Was ist 2 + 2?' })
+    })
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(3000)
+    })
+    vi.setSystemTime(Date.now() + 361_000)
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(5000)
+    })
+
+    await waitFor(() => expect(result.current.isStreaming).toBe(false))
+    expect(result.current.localMessages.find((message) => message.role === 'student')?.status).toBe('failed')
+    expect(invalidatedConversation()).toBe(true)
+  })
+
+  it('reads the conversation again when the answer failed (#402)', async () => {
+    mockedStream.mockRejectedValueOnce(new Error('Request failed with status code 503'))
+    mockedProgress.mockResolvedValue(state({ status: 'failed', failureCategory: 'deadline_exceeded', retryable: true }))
+    const { result, invalidatedConversation } = render()
+
+    await failOnce(result)
+
+    expect(result.current.localMessages.find((message) => message.role === 'student')?.status).toBe('failed')
+    expect(invalidatedConversation()).toBe(true)
+  })
 })
 
 function state(overrides: Partial<GenerationState> = {}): GenerationState {
@@ -378,7 +443,12 @@ function render() {
     <QueryClientProvider client={client}>{children}</QueryClientProvider>
   )
   const { result } = renderHook(() => useStreamingChat('c1'), { wrapper: Wrapper })
-  return { result, invalidated: () => invalidate.mock.calls.length > 0 }
+  return {
+    result,
+    invalidated: () => invalidate.mock.calls.length > 0,
+    invalidatedConversation: () =>
+      invalidate.mock.calls.some(([filters]) => JSON.stringify(filters?.queryKey) === JSON.stringify(chatQueryKeys.conversation('c1'))),
+  }
 }
 
 async function failOnce(result: { current: ReturnType<typeof useStreamingChat> }) {
