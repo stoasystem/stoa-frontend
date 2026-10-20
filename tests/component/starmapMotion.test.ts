@@ -5,7 +5,7 @@
  * breathing, a layer change is a crossfade, and a still map asks for no
  * frames at all. A hidden or inert map holds still too.
  */
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { StarMapEngine } from '@/features/starmap/engine/starMapEngine'
 import { orderedStars } from '@/features/starmap/model/starMap'
 import { CROSSFADE_MS, motionPolicy, ZOOM_MS } from '@/features/starmap/motion/motionPolicy'
@@ -167,5 +167,41 @@ describe('a map that cannot be used holds still', () => {
     expect(engine.currentView.cx).toBeCloseTo(wide.cx, 9)
     expect(engine.currentView.cy).toBeCloseTo(wide.cy, 9)
     expect(engine.currentView.fx).toBe(0.5)
+  })
+})
+
+describe('a map at rest while the recommended star breathes (#330 M9)', () => {
+  it('does not rebuild the list of stars on screen every frame, and still updates it after a pan', () => {
+    const clock = fakeClock()
+    const renderer = recordingRenderer()
+    const lists: number[][] = []
+    const engine = new StarMapEngine({
+      renderer,
+      theme: THEME,
+      reducedMotion: false,
+      scheduler: clock,
+      now: clock.now,
+      onVisibleChange: (stars) => lists.push(stars.map((star) => star.index)),
+    })
+    engine.setViewport(1280, 776, 2)
+    engine.setData(skyMap(500), { layer: 'map' })
+    clock.advance(1000)
+    expect(lists.length).toBeGreaterThan(0)
+
+    // The list's key is the visible indices joined: count the joins while only the breath changes.
+    const join = vi.spyOn(Array.prototype, 'join')
+    const frames = renderer.frames.length
+    clock.advance(2000)
+    const breathing = renderer.frames.length - frames
+    const joins = join.mock.calls.length
+    join.mockRestore()
+    expect(breathing, 'the star breathes: frames keep coming').toBeGreaterThan(60)
+    expect(joins, `${joins} joins in ${breathing} frames`).toBeLessThan(breathing / 10)
+
+    const before = lists.length
+    throwRight(engine, clock)
+    clock.advance(3000)
+    expect(lists.length).toBeGreaterThan(before)
+    engine.destroy()
   })
 })

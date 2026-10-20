@@ -53,13 +53,19 @@ export type LightingOverlayProps = {
   map: StarMap
   /** Where a star is drawn now, from the map's engine. */
   locate: (unitId: string) => StarOnScreen | null
+  /**
+   * Calls `listener` when the map comes to rest or is covered or uncovered;
+   * returns the way to stop. A star off screen is looked for again then, not
+   * every frame (#330 M4). Without it, every frame.
+   */
+  watch?: (listener: () => void) => () => void
   /** The star may be drawn lit now: the flare's brightest moment, or the moment shown without one (#140). */
   onReveal?: (unitId: string) => void
   /** For tests: the frame clock. */
   scheduler?: FrameScheduler
 }
 
-export function LightingOverlay({ map, locate, onReveal, scheduler = animationFrameScheduler }: LightingOverlayProps) {
+export function LightingOverlay({ map, locate, watch, onReveal, scheduler = animationFrameScheduler }: LightingOverlayProps) {
   const { t } = useTranslation('starmap')
   const source = useLightingEventSource()
   const reducedMotion = usePrefersReducedMotion()
@@ -137,6 +143,7 @@ export function LightingOverlay({ map, locate, onReveal, scheduler = animationFr
     const { event, star, subjectId } = current
     let startAt: number | null = null
     let handle: number | null = null
+    let unwatch: (() => void) | null = null
     let finished = false
     let revealed = false
     let side: LabelSide | undefined
@@ -146,10 +153,12 @@ export function LightingOverlay({ map, locate, onReveal, scheduler = animationFr
       revealRef.current?.(star.unitId)
     }
 
+    // Under the phone's Ask sheet the map is `inert` (#49): there, as in a hidden tab, nobody sees a flare (#330 M3).
+    const covered = () => document.hidden || canvas.closest('[inert]') !== null
     const onScreen = (spot: StarOnScreen | null): spot is StarOnScreen => {
       const width = canvas.clientWidth
       const height = canvas.clientHeight
-      return spot !== null && !document.hidden && width > 0 && height > 0 && spot.x >= 0 && spot.x <= width && spot.y >= 0 && spot.y <= height
+      return spot !== null && !covered() && width > 0 && height > 0 && spot.x >= 0 && spot.x <= width && spot.y >= 0 && spot.y <= height
     }
 
     const end = (seen: boolean) => {
@@ -179,8 +188,14 @@ export function LightingOverlay({ map, locate, onReveal, scheduler = animationFr
       if (startAt === null) {
         if (focusRef.current !== subjectId) return end(false)
         if (!onScreen(spot)) {
-          // Not on screen yet: keep looking, draw nothing.
-          handle = scheduler.request(frame)
+          // Not on screen yet: look again when the map has moved (or every frame, with nobody to say so).
+          if (!watch) handle = scheduler.request(frame)
+          else
+            unwatch ??= watch(() => {
+              unwatch?.()
+              unwatch = null
+              if (handle === null && !finished) handle = scheduler.request(frame)
+            })
           return
         }
         setAnnouncement(t('lighting.announce', { name: star.name }))
@@ -191,6 +206,9 @@ export function LightingOverlay({ map, locate, onReveal, scheduler = animationFr
         startAt = at + SETTLE_MS
         setPlaying(true)
       }
+      // Covered mid-flare: before its brightest moment it was not seen, so it
+      // comes back; after it, it was, and nothing more is played underneath.
+      if (covered()) return end(revealed)
       const width = canvas.clientWidth
       const height = canvas.clientHeight
       const ratio = Math.min(2, window.devicePixelRatio || 1)
@@ -217,10 +235,11 @@ export function LightingOverlay({ map, locate, onReveal, scheduler = animationFr
     handle = scheduler.request(frame)
     return () => {
       if (handle !== null) scheduler.cancel(handle)
+      unwatch?.()
       // Left before it was shown: not acknowledged, so it comes back.
       if (!finished) handled.current.delete(event.unitId)
     }
-  }, [current, locate, scheduler, reducedMotion, source, ownerId, addMoment, t])
+  }, [current, locate, watch, scheduler, reducedMotion, source, ownerId, addMoment, t])
 
   // The still label (reduced motion): beside its star while the star is on screen -- it moves
   // only when the map is moved -- and gone after STILL_LABEL_MS, at once.

@@ -125,7 +125,8 @@ const OUTLINE_OFF_SITES: Record<string, { why: ('moved' | 'programmatic')[]; mar
   'features/chapter/LessonStage.tsx': {
     why: ['programmatic', 'programmatic', 'programmatic', 'programmatic'],
   },
-  'features/starmap/components/StarMapView.tsx': { why: ['programmatic'] },
+  // The help sheet, and the stage, which takes focus when a choice removes the link it was on (#330 M2).
+  'features/starmap/components/StarMapView.tsx': { why: ['programmatic', 'programmatic'] },
 }
 
 describe('no stop without an indicator (#102)', () => {

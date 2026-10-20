@@ -13,6 +13,7 @@
  * default source knows nothing, so nothing of this happens there.
  */
 import { act, render } from '@testing-library/react'
+import { useState } from 'react'
 import { I18nextProvider } from 'react-i18next'
 import { MemoryRouter, useLocation } from 'react-router-dom'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
@@ -30,6 +31,7 @@ import {
 } from '@/features/starmap/lighting/lightingEvents'
 import { presentHeld, useLightingStage } from '@/features/starmap/lighting/useLightingStage'
 import type { StarMap } from '@/features/starmap/model/starMap'
+import { emptyStarMap } from '@/features/starmap/starMapSource'
 import { resolveTarget, wholeNebulaView, type LayerTarget } from '@/features/starmap/view/layers'
 import { ZOOM } from '@/features/starmap/view/semanticZoom'
 import i18n from '@/i18n'
@@ -219,6 +221,48 @@ describe('F2: back from a lighting, the nebula seen whole', () => {
     const later = await showStage(source)
     expect(later.target()).toEqual({ layer: 'star', nebulaId: TOPIC, unitId: KP })
     expect(later.drawnState()).toBe('lit')
+  })
+
+  it('after a refresh or from a link, decides once the sky has arrived, not on the empty first render (#330 M8)', async () => {
+    // The read model's sky and its waiting points come in one response: until
+    // it lands the map is empty and nothing is known to wait.
+    let arrived = false
+    const listeners = new Set<() => void>()
+    const { source: backend } = knownSource([observed])
+    const source: LightingEventSource = {
+      ...backend,
+      known: () => (arrived ? backend.known!() : []),
+      subscribe: (listener) => {
+        listeners.add(listener)
+        return () => listeners.delete(listener)
+      },
+    }
+    const clock = fakeClock()
+    let land: (map: StarMap) => void = () => {}
+    function Arriving() {
+      const [map, setMap] = useState<StarMap>(() => emptyStarMap('math'))
+      land = setMap
+      return <RoutedStage map={map} clock={clock} />
+    }
+    const view = render(
+      <I18nextProvider i18n={i18n}>
+        <LightingEventSourceContext.Provider value={source}>
+          <MemoryRouter initialEntries={[`/map/math/${TOPIC}/${KP}`]}>
+            <Arriving />
+          </MemoryRouter>
+        </LightingEventSourceContext.Provider>
+      </I18nextProvider>,
+    )
+    await act(async () => {})
+    const out = () => view.container.querySelector('output')!
+
+    await act(async () => {
+      arrived = true
+      land(litMap())
+      for (const listener of listeners) listener()
+    })
+    expect(JSON.parse(out().getAttribute('data-target')!)).toEqual({ layer: 'nebula', nebulaId: TOPIC, whole: { star: KP } })
+    expect(out().getAttribute('data-path')).toBe(`/map/math/${TOPIC}`)
   })
 
   it('without a source that knows at once (and in production), the map and route are left as they are', async () => {
