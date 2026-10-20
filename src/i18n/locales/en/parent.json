@@ -28,6 +28,7 @@
     "summaryFallback": "Report details are being prepared.",
     "summaryUnavailable": "No summary is available for this week.",
     "emailBadge": "Email {{status}}",
+    "emailBadgeUnknown": "Email status unknown",
     "week": "Week",
     "generated": "Generated",
     "generatedPending": "Pending",
@@ -55,7 +56,8 @@
     "emailStatus": {
       "sent": "sent",
       "failed": "failed",
-      "pending": "pending"
+      "pending": "pending",
+      "notStarted": "not sent yet"
     }
   },
   "summary": {

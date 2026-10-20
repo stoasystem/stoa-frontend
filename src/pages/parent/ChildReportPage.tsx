@@ -26,6 +26,9 @@ export function ChildReportPage() {
   const report = reportState?.report
   // The same query the child page reads, so the name is usually cached already.
   const childName = useChildLearningSummaryQuery(childId).data?.student.name
+  // A pending or failed report carries placeholder zeros and empty lists, and an
+  // email that was never due; only a finished report has results to show (#338).
+  const isReady = reportState?.status === 'available'
 
   useEffect(() => {
     if (!report) return
@@ -92,9 +95,9 @@ export function ChildReportPage() {
                     <Badge variant={reportState.status === 'failed' ? 'destructive' : reportState.status === 'pending' ? 'outline' : 'secondary'}>
                       {formatReportStatus(report.reportStatus, reportState.status, t)}
                     </Badge>
-                    {report.emailStatus && (
+                    {isReady && report.emailStatus && (
                       <Badge variant={report.emailStatus === 'failed' ? 'destructive' : 'outline'}>
-                        {t('report.emailBadge', { status: formatEmailStatus(report.emailStatus, t) })}
+                        {formatEmailBadge(report.emailStatus, t)}
                       </Badge>
                     )}
                   </div>
@@ -117,53 +120,57 @@ export function ChildReportPage() {
                 </div>
               </CardContent>
             </Card>
-            <div className="grid gap-4 md:grid-cols-3">
-              <ReportMetric label={t('report.questions')} value={String(report.stats?.questionsAsked ?? report.usageCount)} description={t('report.questionsDescription')} />
-              <ReportMetric label={t('report.practice')} value={String(report.stats?.practiceLessonsCompleted ?? 0)} description={t('report.practiceDescription')} />
-              <ReportMetric label={t('report.teacherHelp')} value={String(report.stats?.teacherHelpRequests ?? report.teacherResolved)} description={t('report.teacherHelpDescription')} />
-            </div>
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">{t('report.weakTopics')}</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                {getWeakTopics(report).length === 0 && (
-                  <p className="text-sm text-muted-foreground">{t('report.noWeakTopics')}</p>
-                )}
-                {getWeakTopics(report).map((topic) => (
-                  <div key={topic.topic} className="rounded-md border p-3">
-                    <p className="text-sm font-medium text-foreground">{topic.topic}</p>
-                    {topic.note && <p className="mt-1 text-sm leading-6 text-muted-foreground">{topic.note}</p>}
-                  </div>
-                ))}
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">{t('report.recommendations')}</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                {getRecommendations(report).length === 0 && (
-                  <p className="text-sm text-muted-foreground">{t('report.noRecommendations')}</p>
-                )}
-                {getRecommendations(report).map((recommendation) => (
-                  <p key={recommendation} className="rounded-md border p-3 text-sm leading-6 text-muted-foreground">
-                    {recommendation}
-                  </p>
-                ))}
-              </CardContent>
-            </Card>
-            {((report.strengths ?? []).length > 0 || report.teacherNote || reportState.status === 'pending' || reportState.status === 'failed' || report.emailStatus === 'failed') && (
+            {isReady && (
+              <>
+                <div className="grid gap-4 md:grid-cols-3">
+                  <ReportMetric label={t('report.questions')} value={String(report.stats?.questionsAsked ?? report.usageCount)} description={t('report.questionsDescription')} />
+                  <ReportMetric label={t('report.practice')} value={String(report.stats?.practiceLessonsCompleted ?? 0)} description={t('report.practiceDescription')} />
+                  <ReportMetric label={t('report.teacherHelp')} value={String(report.stats?.teacherHelpRequests ?? report.teacherResolved)} description={t('report.teacherHelpDescription')} />
+                </div>
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-lg">{t('report.weakTopics')}</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    {getWeakTopics(report).length === 0 && (
+                      <p className="text-sm text-muted-foreground">{t('report.noWeakTopics')}</p>
+                    )}
+                    {getWeakTopics(report).map((topic) => (
+                      <div key={topic.topic} className="rounded-md border p-3">
+                        <p className="text-sm font-medium text-foreground">{topic.topic}</p>
+                        {topic.note && <p className="mt-1 text-sm leading-6 text-muted-foreground">{topic.note}</p>}
+                      </div>
+                    ))}
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-lg">{t('report.recommendations')}</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    {getRecommendations(report).length === 0 && (
+                      <p className="text-sm text-muted-foreground">{t('report.noRecommendations')}</p>
+                    )}
+                    {getRecommendations(report).map((recommendation) => (
+                      <p key={recommendation} className="rounded-md border p-3 text-sm leading-6 text-muted-foreground">
+                        {recommendation}
+                      </p>
+                    ))}
+                  </CardContent>
+                </Card>
+              </>
+            )}
+            {(!isReady || (report.strengths ?? []).length > 0 || report.teacherNote || report.emailStatus === 'failed') && (
               <Card>
                 <CardHeader>
                   <CardTitle className="text-lg">{t('report.notesTitle')}</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3 text-sm leading-6 text-muted-foreground">
-                  {(report.strengths ?? []).map((strength) => (
+                  {isReady && (report.strengths ?? []).map((strength) => (
                     <p key={strength}>{strength}</p>
                   ))}
-                  {report.teacherNote && <p>{report.teacherNote}</p>}
-                  {report.emailStatus === 'failed' && (
+                  {isReady && report.teacherNote && <p>{report.teacherNote}</p>}
+                  {isReady && report.emailStatus === 'failed' && (
                     <p>{t('report.emailFailedNote')}</p>
                   )}
                   {reportState.status === 'pending' && (
@@ -220,11 +227,16 @@ function formatReportStatus(
   return t('report.status.available')
 }
 
-function formatEmailStatus(status: string, t: TFunction) {
-  if (status === 'sent') return t('report.emailStatus.sent')
-  if (status === 'failed') return t('report.emailStatus.failed')
-  if (status === 'pending') return t('report.emailStatus.pending')
-  return status.replace(/_/g, ' ')
+function formatEmailBadge(status: string, t: TFunction) {
+  const known: Record<string, string> = {
+    sent: 'report.emailStatus.sent',
+    failed: 'report.emailStatus.failed',
+    pending: 'report.emailStatus.pending',
+    not_started: 'report.emailStatus.notStarted',
+  }
+  const key = known[status]
+  // A status the page has no words for gets a neutral label, never the raw value (#338).
+  return key ? t('report.emailBadge', { status: t(key) }) : t('report.emailBadgeUnknown')
 }
 
 function getRecommendations(report: {

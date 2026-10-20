@@ -28,6 +28,7 @@
     "summaryFallback": "I dettagli del report sono in preparazione.",
     "summaryUnavailable": "Per questa settimana non è disponibile alcun riepilogo.",
     "emailBadge": "Email {{status}}",
+    "emailBadgeUnknown": "Stato dell’email sconosciuto",
     "week": "Settimana",
     "generated": "Generato",
     "generatedPending": "In attesa",
@@ -55,7 +56,8 @@
     "emailStatus": {
       "sent": "inviata",
       "failed": "non riuscita",
-      "pending": "in attesa"
+      "pending": "in attesa",
+      "notStarted": "non ancora inviata"
     }
   },
   "summary": {

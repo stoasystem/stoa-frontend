@@ -213,3 +213,82 @@ describe('report dates', () => {
     expect(formatDate('2026-02-31')).toBe('—')
   })
 })
+
+/**
+ * #338: a report still being written, or one that failed, carries placeholder
+ * zeros and empty lists and an email status of `not_started`. The page showed
+ * them as results ("0 questions", "No weak topics were flagged.") under an
+ * English badge "E-Mail not started".
+ */
+describe('a pending or failed report shows only its status (#338)', () => {
+  it.each(['pending', 'failed'] as const)('%s: no metrics, lists or email badge', (status) => {
+    state.report = {
+      status,
+      report: reportDetail({ reportStatus: status, emailStatus: 'not_started' }),
+    } satisfies ParentChildReportState
+    renderPage()
+
+    expect(screen.getByText(deParent.report.week)).toBeInTheDocument()
+    expect(screen.getByText(deParent.report.status[status])).toBeInTheDocument()
+    expect(screen.getByText(status === 'pending' ? deParent.report.pendingNote : deParent.report.failedNote)).toBeInTheDocument()
+
+    for (const absent of [
+      deParent.report.questions,
+      deParent.report.practice,
+      deParent.report.teacherHelp,
+      deParent.report.weakTopics,
+      deParent.report.noWeakTopics,
+      deParent.report.recommendations,
+      deParent.report.noRecommendations,
+    ]) {
+      expect(screen.queryByText(absent)).not.toBeInTheDocument()
+    }
+    expect(screen.queryByText(/E-Mail/)).not.toBeInTheDocument()
+    expect(screen.queryByText(/not started/)).not.toBeInTheDocument()
+  })
+
+  it('an available report still shows its metrics and lists', () => {
+    state.report = {
+      status: 'available',
+      report: reportDetail({ summary: 'Gute Woche.', emailStatus: 'sent' }),
+    } satisfies ParentChildReportState
+    renderPage()
+
+    expect(screen.getByText(deParent.report.questions)).toBeInTheDocument()
+    expect(screen.getByText(deParent.report.noWeakTopics)).toBeInTheDocument()
+    expect(screen.getByText(deParent.report.noRecommendations)).toBeInTheDocument()
+    expect(screen.getByText('E-Mail gesendet')).toBeInTheDocument()
+  })
+})
+
+describe('the email badge never shows a raw backend status (#338)', () => {
+  it.each([
+    ['de', deParent],
+    ['en', enParent],
+    ['fr', frParent],
+    ['it', itParent],
+  ] as const)('not_started reads as translated copy, %s', async (language, copy) => {
+    await i18n.changeLanguage(language)
+    state.report = {
+      status: 'available',
+      report: reportDetail({ summary: 'x', emailStatus: 'not_started' }),
+    } satisfies ParentChildReportState
+    renderPage()
+
+    expect(
+      screen.getByText(copy.report.emailBadge.replace('{{status}}', copy.report.emailStatus.notStarted)),
+    ).toBeInTheDocument()
+    expect(screen.queryByText(/not.started/)).not.toBeInTheDocument()
+  })
+
+  it('an unknown status gets a neutral label', () => {
+    state.report = {
+      status: 'available',
+      report: reportDetail({ summary: 'x', emailStatus: 'queued_for_retry' }),
+    } satisfies ParentChildReportState
+    renderPage()
+
+    expect(screen.getByText(deParent.report.emailBadgeUnknown)).toBeInTheDocument()
+    expect(screen.queryByText(/queued/)).not.toBeInTheDocument()
+  })
+})
