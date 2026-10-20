@@ -1,6 +1,7 @@
 {
   "chapter": {
     "again": "Esercitati di nuovo",
+    "allDone": "Tutte le lezioni sono completate.",
     "backToMap": "Mappa stellare",
     "continue": "Continua: {{title}}",
     "empty": "Questo capitolo non ha ancora lezioni.",
@@ -13,11 +14,15 @@
     "listLabel": "Lezioni",
     "lit": "Questo punto di conoscenza è acceso.",
     "loading": "Caricamento del capitolo…",
+    "locked": "Questo punto di conoscenza è ancora bloccato. Accendi prima, sulla mappa stellare, i punti su cui si basa.",
     "missing": "Questo capitolo non è stato trovato.",
     "progress": "Avanzamento del capitolo",
-    "remaining_one": "Manca {{count}} lezione prima che questo punto si accenda.",
-    "remaining_many": "Mancano {{count}} lezioni prima che questo punto si accenda.",
-    "remaining_other": "Mancano {{count}} lezioni prima che questo punto si accenda.",
+    "unmet_one": "Manca {{count}} esercizio da risolvere correttamente prima che questo punto si accenda.",
+    "unmet_other": "Mancano {{count}} esercizi da risolvere correttamente prima che questo punto si accenda.",
+    "unmet_many": "Mancano {{count}} esercizi da risolvere correttamente prima che questo punto si accenda.",
+    "toGo_one": "Manca {{count}} lezione.",
+    "toGo_other": "Mancano {{count}} lezioni.",
+    "toGo_many": "Mancano {{count}} lezioni.",
     "retry": "Riprova",
     "start": "Inizia: {{title}}",
     "status": {
@@ -89,7 +94,7 @@
     "lessonOf": "Lezione {{lesson}} di {{lessons}}",
     "loading": "Caricamento della lezione…",
     "locked": {
-      "body": "Completa prima le lezioni che la precedono in questo capitolo.",
+      "body": "Questo punto di conoscenza si basa su altri che non sono ancora accesi. Accendili prima sulla mappa stellare.",
       "title": "Questa lezione è bloccata"
     },
     "missing": "Questa lezione non è stata trovata.",
@@ -108,7 +113,7 @@
       "credentialInvalid": "Il lasciapassare di questo quiz non vale per questa lezione. Rifai il quiz.",
       "expired": "Il quiz è durato troppo ed è scaduto. Avviane uno nuovo.",
       "finished": "Questo quiz è già finito. Avviane uno nuovo.",
-      "locked": "Completa prima le lezioni precedenti: questa lezione è ancora bloccata.",
+      "locked": "Questo punto di conoscenza è ancora bloccato: accendi prima, sulla mappa stellare, i punti su cui si basa.",
       "notFound": "Questo quiz non è più aperto. Avviane uno nuovo.",
       "notStarted": "Non è stato possibile avviare il quiz. Controlla la connessione e riprova.",
       "restart": "Ricomincia il quiz",

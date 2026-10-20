@@ -1,6 +1,7 @@
 {
   "chapter": {
     "again": "Noch einmal üben",
+    "allDone": "Alle Lektionen sind erledigt.",
     "backToMap": "Sternkarte",
     "continue": "Weiter: {{title}}",
     "empty": "Dieses Kapitel hat noch keine Lektionen.",
@@ -12,10 +13,13 @@
     "listLabel": "Lektionen",
     "lit": "Dieser Wissenspunkt leuchtet.",
     "loading": "Das Kapitel wird geladen…",
+    "locked": "Dieser Wissenspunkt ist noch gesperrt. Bring zuerst auf der Sternkarte die Punkte zum Leuchten, auf denen er aufbaut.",
     "missing": "Dieses Kapitel wurde nicht gefunden.",
     "progress": "Fortschritt im Kapitel",
-    "remaining_one": "Noch {{count}} Lektion, bis dieser Punkt leuchtet.",
-    "remaining_other": "Noch {{count}} Lektionen, bis dieser Punkt leuchtet.",
+    "unmet_one": "Noch {{count}} Aufgabe richtig beantworten, bis dieser Punkt leuchtet.",
+    "unmet_other": "Noch {{count}} Aufgaben richtig beantworten, bis dieser Punkt leuchtet.",
+    "toGo_one": "Noch {{count}} Lektion.",
+    "toGo_other": "Noch {{count}} Lektionen.",
     "retry": "Erneut versuchen",
     "start": "Beginnen: {{title}}",
     "status": {
@@ -85,7 +89,7 @@
     "lessonOf": "Lektion {{lesson}} von {{lessons}}",
     "loading": "Die Lektion wird geladen…",
     "locked": {
-      "body": "Schliess zuerst die Lektionen davor in diesem Kapitel ab.",
+      "body": "Dieser Wissenspunkt baut auf Punkten auf, die noch nicht leuchten. Bring sie zuerst auf der Sternkarte zum Leuchten.",
       "title": "Diese Lektion ist noch gesperrt"
     },
     "missing": "Diese Lektion wurde nicht gefunden.",
@@ -104,7 +108,7 @@
       "credentialInvalid": "Der Nachweis aus diesem Quiz gilt nicht für diese Lektion. Mach das Quiz nochmals.",
       "expired": "Das Quiz hat zu lange gedauert und ist abgelaufen. Starte ein neues.",
       "finished": "Dieses Quiz ist bereits vorbei. Starte ein neues.",
-      "locked": "Schliess zuerst die Lektionen davor ab: diese Lektion ist noch gesperrt.",
+      "locked": "Dieser Wissenspunkt ist noch gesperrt: Bring zuerst auf der Sternkarte die Punkte zum Leuchten, auf denen er aufbaut.",
       "notFound": "Dieses Quiz ist nicht mehr offen. Starte ein neues.",
       "notStarted": "Das Quiz konnte nicht gestartet werden. Prüf deine Verbindung und versuch es nochmals.",
       "restart": "Quiz neu starten",

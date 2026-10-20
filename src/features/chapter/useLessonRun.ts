@@ -82,6 +82,8 @@ export function useLessonRun(lesson: PracticeLesson | undefined, { testOut = fal
   // Per exercise: wrong answers, and whether a hint was seen (the reducer counts across the lesson).
   const [tries, setTries] = useState<{ challengeId: string; wrong: number } | null>(null)
   const [finished, setFinished] = useState(false)
+  // Finished with a quiz's credential: some exercises may never have been answered.
+  const [passedQuiz, setPassedQuiz] = useState(false)
   const finishing = useRef(false)
   const [answering, setAnswering] = useState(false)
   // A quiz answer that never reached a verdict: the quiz goes on, the student tries again.
@@ -131,6 +133,7 @@ export function useLessonRun(lesson: PracticeLesson | undefined, { testOut = fal
           quizCredential ? { lessonId: lesson.id, quizCredential } : lesson.id,
         )
         setFinished(true)
+        setPassedQuiz(quizCredential !== undefined)
         setQuiz(null)
         setQuizResult(null)
       } catch (error) {
@@ -297,6 +300,8 @@ export function useLessonRun(lesson: PracticeLesson | undefined, { testOut = fal
     hintOffered: !quiz && challenge?.hintAvailable === true,
     wrong,
     finished,
+    /** Finished by passing a quiz, a skip quiz or testing out, rather than by answering every exercise. */
+    passedQuiz,
     /** The quiz under way, as the backend sees it. */
     quiz: quizView && quiz ? { kind: quiz.view.kind, hearts: quizView.heartsLeft, total: quizView.mistakesAllowed + 1 } : null,
     /** The quiz's paper is being drawn. */

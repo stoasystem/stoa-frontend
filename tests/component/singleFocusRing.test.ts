@@ -120,6 +120,8 @@ const OUTLINE_OFF_SITES: Record<string, { why: ('moved' | 'programmatic')[]; mar
     marker: /group-focus-visible:outline-2/,
   },
   'components/common/LanguageSwitcher.tsx': { why: ['programmatic'] },
+  // A review's verdict, focused by code when a right answer takes Check's place (#342).
+  'components/practice/ReviewSession.tsx': { why: ['programmatic'] },
   // The exercise prompt, the quiz's "Not yet", the lesson-done heading and the
   // heading of a refused quiz: each is focused by code when it appears.
   'features/chapter/LessonStage.tsx': {

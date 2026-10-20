@@ -11,6 +11,10 @@
  * A lesson open to the student and not done yet also offers 「跳过这一课」
  * beside its row: the short quiz that tests out of it (`quiz.ts`). A locked
  * lesson offers none (#81).
+ *
+ * Lit is the star map's word, not the lessons' (#342): every lesson done is
+ * not a lit point when some were passed by a quiz, so the card says what the
+ * sky says, and only lessons when the sky cannot be read.
  */
 import { ChevronLeft } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
@@ -92,6 +96,18 @@ function ChapterBody({ chapter }: { chapter: Chapter }) {
   const percent = chapter.total > 0 ? Math.round((chapter.done / chapter.total) * 100) : 0
   const lessonsLabel = t('chapter.lessons', { done: chapter.done, total: chapter.total })
   const remaining = Math.max(0, chapter.total - chapter.done)
+  const star = chapter.star
+  const lit = star?.state === 'lit'
+  const standing =
+    star?.state === 'locked'
+      ? t('chapter.locked')
+      : lit
+        ? t('chapter.lit')
+        : star && star.unmetExercises > 0
+          ? t('chapter.unmet', { count: star.unmetExercises })
+          : remaining > 0
+            ? t('chapter.toGo', { count: remaining })
+            : t('chapter.allDone')
 
   return (
     <>
@@ -105,7 +121,7 @@ function ChapterBody({ chapter }: { chapter: Chapter }) {
 
       <header className="flex items-center gap-4">
         <div className="shrink-0">
-          <StarGlyph state={chapter.done > 0 ? 'in_progress' : 'ready'} size={72} progress={chapter.total ? chapter.done / chapter.total : 0} />
+          <StarGlyph state={lit ? 'lit' : star?.state === 'locked' ? 'locked' : chapter.done > 0 ? 'in_progress' : 'ready'} size={72} progress={chapter.total ? chapter.done / chapter.total : 0} />
         </div>
         <div className="flex min-w-0 flex-col gap-1">
           <h1 className="m-0 text-on-sky" style={{ font: 'var(--t-title1)', letterSpacing: 'var(--t-title1-tracking)' }}>
@@ -123,7 +139,7 @@ function ChapterBody({ chapter }: { chapter: Chapter }) {
         className="flex items-center gap-3 rounded-[var(--r-card)] border p-4"
         style={{ background: 'var(--sky-glass)', borderColor: 'var(--sky-glass-border)' }}
       >
-        <Murmi mood={remaining > 0 ? 'watching' : 'delighted'} size={56} />
+        <Murmi mood={lit || (!star && remaining === 0) ? 'delighted' : 'watching'} size={56} />
         <p
           role="progressbar"
           aria-label={t('chapter.progress')}
@@ -133,7 +149,7 @@ function ChapterBody({ chapter }: { chapter: Chapter }) {
           aria-valuenow={percent}
           className="m-0 text-[15px] font-bold text-[color:var(--lit)]"
         >
-          {remaining > 0 ? t('chapter.remaining', { count: remaining }) : t('chapter.lit')}
+          {standing}
         </p>
       </div>
 

@@ -32,13 +32,14 @@ import { getGenerationProgress, streamConversationMessage } from '@/services/cha
 import {
   completePracticeLesson,
   getCurriculumCatalog,
+  getKnowledgeMap,
   getPracticeLesson,
   getPracticeRoadmap,
   submitChallengeAnswer,
 } from '@/services/practice/practiceApi'
 import { resetAsk, useAskStore } from '@/store/askStore'
 import { type CurrentUser, useAuthStore } from '@/store/authStore'
-import type { PracticeLesson, PracticeRoadmap, RoadmapLessonStatus } from '@/types/practice'
+import type { KnowledgeMapResponse, PracticeLesson, PracticeRoadmap, RoadmapLessonStatus } from '@/types/practice'
 
 vi.mock('@/services/analytics/analyticsClient', () => ({ trackEvent: vi.fn() }))
 vi.mock('@/hooks/notifications/useNotificationsQuery', () => ({
@@ -74,6 +75,7 @@ vi.mock('@/services/learning/memoryApi', () => ({
 vi.mock('@/services/practice/practiceApi', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@/services/practice/practiceApi')>()),
   getCurriculumCatalog: vi.fn(),
+  getKnowledgeMap: vi.fn(),
   getPracticeRoadmap: vi.fn(),
   getPracticeLesson: vi.fn(),
   submitChallengeAnswer: vi.fn(),
@@ -127,6 +129,35 @@ function roadmap(): PracticeRoadmap {
         })),
       },
     ],
+  }
+}
+
+/** The knowledge point as the star map has it: lit or locked is said here, not by the lessons. */
+let star: { state: KnowledgeMapResponse['stars'][number]['state']; unmetExercises: number }
+
+function knowledgeMap(): KnowledgeMapResponse {
+  return {
+    subjectId: 'math',
+    galaxies: [{ subjectId: 'math', name: 'Maths', lit: 0, total: 1, enrolled: true }],
+    nebulae: [{ topicId: 'algebra', name: 'Algebra', order: 1, subjectId: 'math' }],
+    stars: [
+      {
+        unitId: 'u-5',
+        name: 'Linear equations',
+        nebulaId: 'algebra',
+        order: 2,
+        ...star,
+        progress: 0,
+        reviewDue: 0,
+        recommendation: null,
+        x: 0,
+        y: 0,
+        skills: [],
+        chapter: { lessonCount: 3, lessonsDone: completed.size, nextLesson: null },
+      },
+    ],
+    prerequisites: [],
+    summary: { lit: star.state === 'lit' ? 1 : 0, total: 1, streakDays: 0, score: 0 },
   }
 }
 
@@ -308,6 +339,7 @@ const originalMatchMedia = window.matchMedia
 beforeEach(async () => {
   await i18n.changeLanguage('en')
   completed = new Set(['l-1'])
+  star = { state: 'in_progress', unmetExercises: 7 }
   useAuthStore.setState({
     user: { id: 'u-1', name: 'Lina Meier', email: 'lina@example.com', role: 'student' } as CurrentUser,
     accessToken: 'token',
@@ -317,6 +349,7 @@ beforeEach(async () => {
   useAskQuoteStore.setState({ quote: null })
   vi.mocked(getCurriculumCatalog).mockResolvedValue(catalog)
   vi.mocked(getPracticeRoadmap).mockImplementation(async () => roadmap())
+  vi.mocked(getKnowledgeMap).mockImplementation(async () => knowledgeMap())
   vi.mocked(getPracticeLesson).mockResolvedValue(lesson)
   vi.mocked(submitChallengeAnswer).mockImplementation(async (challengeId, payload) => {
     const correct = payload.answer === RIGHT[challengeId]
@@ -373,8 +406,9 @@ describe('the chapter', () => {
     expect(within(rows[2]).getByText('10 min · 4 exercises')).toBeInTheDocument()
 
     expect(screen.getByText('1 of 3 lessons done')).toBeInTheDocument()
-    // Lessons, not stars: on the map one star is one knowledge point (#179).
-    expect(screen.getByText('2 lessons to go before this point lights.')).toBeInTheDocument()
+    // What the point still needs, as the star map counts it (#342): exercises
+    // answered right, not lessons.
+    expect(screen.getByText('7 more exercises to answer right before this point lights.')).toBeInTheDocument()
     const progress = screen.getByRole('progressbar', { name: 'Chapter progress' })
     expect(progress).toHaveAttribute('aria-valuenow', '33')
     // One lit button: on with the lesson in progress.
@@ -594,7 +628,9 @@ describe('a lesson the chapter does not open', () => {
     open('/chapter/u-5/l-2')
 
     expect(await screen.findByRole('heading', { level: 1, name: 'This lesson is locked' })).toBeInTheDocument()
-    expect(screen.getByText('Finish the lessons before it in this chapter first.')).toBeInTheDocument()
+    expect(
+      screen.getByText('This knowledge point builds on others that are not lit yet. Light those on the star map first.'),
+    ).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'Back to the chapter' })).toHaveAttribute('href', '/chapter/u-5')
     expect(screen.queryByRole('heading', { level: 2, name: '3x + 5 = 20' })).not.toBeInTheDocument()
     expect(screen.queryByRole('complementary', { name: 'Ask' })).not.toBeInTheDocument()
@@ -1009,5 +1045,158 @@ describe('the jump from a star', () => {
     expect(await screen.findByRole('heading', { level: 1, name: 'Linear equations' })).toBeInTheDocument()
     expect(document.querySelector('[data-jump]')).toBeNull()
     expect(document.querySelector('[data-jump-canvas]')).toBeNull()
+  })
+})
+
+describe('lit is the star map\'s word (#342)', () => {
+  it('does not call the point lit when every lesson is done but the sky says it is not', async () => {
+    completed = new Set(['l-1', 'l-2', 'l-3'])
+    star = { state: 'in_progress', unmetExercises: 2 }
+    open('/chapter/u-5')
+
+    expect(await screen.findByText('3 of 3 lessons done')).toBeInTheDocument()
+    expect(screen.getByText('2 more exercises to answer right before this point lights.')).toBeInTheDocument()
+    expect(screen.queryByText('This knowledge point is lit.')).not.toBeInTheDocument()
+    // Not the marmot's delight either: the point is not whole yet.
+    const card = screen.getByRole('progressbar', { name: 'Chapter progress' }).parentElement!
+    expect(card.querySelector('[data-murmi]')).toHaveAttribute('data-murmi', 'watching')
+  })
+
+  it('calls it lit when the sky does', async () => {
+    completed = new Set(['l-1', 'l-2', 'l-3'])
+    star = { state: 'lit', unmetExercises: 0 }
+    open('/chapter/u-5')
+
+    expect(await screen.findByText('This knowledge point is lit.')).toBeInTheDocument()
+  })
+
+  it('says only how many lessons are left when the sky cannot be read', async () => {
+    vi.mocked(getKnowledgeMap).mockRejectedValue(new ApiError('upstream', { status: 503 }))
+    open('/chapter/u-5')
+
+    expect(await screen.findByText('2 lessons to go.')).toBeInTheDocument()
+    expect(screen.queryByText(/lights|is lit/)).not.toBeInTheDocument()
+  })
+})
+
+describe('an answer moves the sky and the review (#342)', () => {
+  it('reads the star map and what is due again after an answer, and leaves the lesson as it is', async () => {
+    const client = open('/chapter/u-5/l-2')
+    await userEvent.click(await screen.findByRole('radio', { name: /x = 5/ }))
+    const invalidate = vi.spyOn(client, 'invalidateQueries')
+    await userEvent.click(screen.getByRole('button', { name: 'Check answer' }))
+    await screen.findByRole('button', { name: 'Next question' })
+
+    const keys = invalidate.mock.calls.map(([filters]) => filters?.queryKey)
+    expect(keys).toEqual(
+      expect.arrayContaining([
+        ['practice', 'knowledge-map'],
+        ['practice', 'review-due'],
+        ['practice', 'review-summary'],
+      ]),
+    )
+    expect(keys).not.toContainEqual(['practice'])
+    expect(keys).not.toContainEqual(['practice', 'lessons', 'l-2'])
+  })
+})
+
+describe('a lesson read again in the background (#342)', () => {
+  it('keeps the exercise when the sky could not be read and an answer asks for it again', async () => {
+    // Failed once; asked again, it is on the wire for as long as a slow network keeps it.
+    vi.mocked(getKnowledgeMap)
+      .mockRejectedValueOnce(new ApiError('upstream', { status: 503 }))
+      .mockImplementation(() => new Promise(() => {}))
+    open('/chapter/u-5/l-2')
+
+    await userEvent.click(await screen.findByRole('radio', { name: /x = 5/ }))
+    await userEvent.click(screen.getByRole('button', { name: 'Check answer' }))
+
+    expect(await screen.findByRole('button', { name: 'Next question' })).toBeInTheDocument()
+    await waitFor(() => expect(getKnowledgeMap).toHaveBeenCalledTimes(2))
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 0))
+    })
+    // Taken away and put back, the run would start over: the verdict is the tell.
+    expect(screen.getByRole('button', { name: 'Next question' })).toBeInTheDocument()
+    expect(screen.getByRole('radio', { name: /x = 5/ })).toBeChecked()
+  })
+
+
+  it('stays on the finished lesson when reading it again fails', async () => {
+    vi.mocked(getPracticeLesson).mockResolvedValueOnce(lesson).mockRejectedValue(new ApiError('upstream', { status: 503 }))
+    open('/chapter/u-5/l-2')
+
+    await userEvent.click(await screen.findByRole('radio', { name: /x = 5/ }))
+    await userEvent.click(screen.getByRole('button', { name: 'Check answer' }))
+    await userEvent.click(await screen.findByRole('button', { name: 'Next question' }))
+    await userEvent.type(await screen.findByRole('textbox', { name: 'Your answer' }), '3{Enter}')
+    await userEvent.click(await screen.findByRole('button', { name: 'Finish lesson' }))
+
+    expect(await screen.findByRole('heading', { name: 'Lesson complete' })).toBeInTheDocument()
+    // Finishing reads every practice query again; this one fails.
+    await waitFor(() => expect(getPracticeLesson).toHaveBeenCalledTimes(2))
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 0))
+    })
+    expect(screen.getByRole('heading', { name: 'Lesson complete' })).toBeInTheDocument()
+    expect(screen.queryByText('The lesson could not be loaded.')).not.toBeInTheDocument()
+  })
+})
+
+describe('a knowledge point that is still locked (#342)', () => {
+  it('says so on the chapter, with no lesson to go on with', async () => {
+    star = { state: 'locked', unmetExercises: 9 }
+    open('/chapter/u-5')
+
+    expect(
+      await screen.findByText('This knowledge point is still locked. Light the ones it builds on first, on the star map.'),
+    ).toBeInTheDocument()
+    const rows = within(document.querySelector<HTMLElement>('[data-chapter-lessons]')!).getAllByRole('listitem')
+    expect(rows.map((row) => row.getAttribute('data-lesson-status'))).toEqual(['completed', 'locked', 'locked'])
+    expect(screen.queryByRole('link', { name: /^(Continue|Start):/ })).not.toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: /^Skip this lesson/ })).not.toBeInTheDocument()
+  })
+
+  it('opens a deep link on the reason and the way to the star map, not on the exercise', async () => {
+    star = { state: 'locked', unmetExercises: 9 }
+    open('/chapter/u-5/l-2')
+
+    expect(await screen.findByRole('heading', { level: 1, name: 'This lesson is locked' })).toBeInTheDocument()
+    expect(
+      screen.getByText('This knowledge point builds on others that are not lit yet. Light those on the star map first.'),
+    ).toBeInTheDocument()
+    const notice = document.querySelector<HTMLElement>('[data-stage-locked]')!
+    expect(within(notice).getByRole('link', { name: 'Star map' })).toHaveAttribute('href', '/map/math/algebra/u-5')
+    expect(screen.queryByRole('heading', { level: 2, name: '3x + 5 = 20' })).not.toBeInTheDocument()
+  })
+})
+
+describe('the keyboard through an exercise (#342)', () => {
+  it('goes to the lit button with the verdict when the answer was sent with Enter', async () => {
+    open('/chapter/u-5/l-2')
+    await userEvent.click(await screen.findByRole('radio', { name: /x = 5/ }))
+    await userEvent.click(screen.getByRole('button', { name: 'Check answer' }))
+    await userEvent.click(await screen.findByRole('button', { name: 'Next question' }))
+
+    await userEvent.type(await screen.findByRole('textbox', { name: 'Your answer' }), '4{Enter}')
+    expect(await screen.findByRole('button', { name: 'Try again' })).toHaveFocus()
+  })
+
+  it('goes back to the first piece of an ordering after Try again', async () => {
+    vi.mocked(getPracticeLesson).mockResolvedValue({
+      ...lesson,
+      challenges: [
+        challenge('ch-9', { type: 'ordering', prompt: 'Smallest first', options: ['1/6', '2/6', '3/4'], correctAnswer: ['1/6', '2/6', '3/4'] }),
+      ],
+    })
+    open('/chapter/u-5/l-2')
+
+    await userEvent.click(await screen.findByRole('button', { name: '2/6' }))
+    await userEvent.click(screen.getByRole('button', { name: 'Check answer' }))
+    const again = await screen.findByRole('button', { name: 'Try again' })
+    expect(again).toHaveFocus()
+    await userEvent.keyboard('{Enter}')
+
+    expect(screen.getByRole('button', { name: '1/6' })).toHaveFocus()
   })
 })

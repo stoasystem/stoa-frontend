@@ -564,3 +564,39 @@ describe('a review list that could not be loaded', () => {
     expect(mockedDue).toHaveBeenCalledTimes(2)
   })
 })
+
+describe('the keyboard through a question (#342)', () => {
+  it('moves to Try again with a wrong verdict, and back to the first piece of an ordering after it', async () => {
+    mockedDue.mockResolvedValue({
+      items: [card({ options: ['1/6', '2/6', '3/4'], type: 'ordering' })],
+      dueCount: 1,
+      generatedAt: '',
+    })
+    mockedAnswer.mockResolvedValue({ challengeId: 'brueche-l1-c1', correct: false, feedback: 'Leider falsch.', attemptsRemaining: 1 })
+    const user = userEvent.setup()
+    renderSession()
+
+    await screen.findByText('Was ist 1/2 + 1/4?')
+    await user.click(screen.getByRole('button', { name: '2/6' }))
+    await user.click(screen.getByRole('button', { name: 'Check answer' }))
+
+    const again = await screen.findByRole('button', { name: /try again/i })
+    expect(again).toHaveFocus()
+    await user.keyboard('{Enter}')
+    expect(screen.getByRole('button', { name: '1/6' })).toHaveFocus()
+  })
+
+  it('moves to the verdict when the answer was right', async () => {
+    mockedDue.mockResolvedValue({ items: [card()], dueCount: 1, generatedAt: '' })
+    mockedAnswer.mockResolvedValue({ challengeId: 'brueche-l1-c1', correct: true, feedback: 'Richtig! Gut gemacht.', attemptsRemaining: 2 })
+    const user = userEvent.setup()
+    renderSession()
+
+    await screen.findByText('Was ist 1/2 + 1/4?')
+    await user.click(screen.getByRole('radio', { name: '3/4' }))
+    await user.click(screen.getByRole('button', { name: 'Check answer' }))
+
+    await screen.findByText('Richtig! Gut gemacht.')
+    expect(document.querySelector('[data-review-feedback]')).toHaveFocus()
+  })
+})

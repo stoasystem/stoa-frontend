@@ -1,6 +1,7 @@
 {
   "chapter": {
     "again": "Practise again",
+    "allDone": "Every lesson is done.",
     "backToMap": "Star map",
     "continue": "Continue: {{title}}",
     "empty": "This chapter has no lessons yet.",
@@ -12,10 +13,13 @@
     "listLabel": "Lessons",
     "lit": "This knowledge point is lit.",
     "loading": "Loading the chapter…",
+    "locked": "This knowledge point is still locked. Light the ones it builds on first, on the star map.",
     "missing": "This chapter could not be found.",
     "progress": "Chapter progress",
-    "remaining_one": "{{count}} lesson to go before this point lights.",
-    "remaining_other": "{{count}} lessons to go before this point lights.",
+    "unmet_one": "{{count}} more exercise to answer right before this point lights.",
+    "unmet_other": "{{count}} more exercises to answer right before this point lights.",
+    "toGo_one": "{{count}} lesson to go.",
+    "toGo_other": "{{count}} lessons to go.",
     "retry": "Try again",
     "start": "Start: {{title}}",
     "status": {
@@ -85,7 +89,7 @@
     "lessonOf": "Lesson {{lesson}} of {{lessons}}",
     "loading": "Loading the lesson…",
     "locked": {
-      "body": "Finish the lessons before it in this chapter first.",
+      "body": "This knowledge point builds on others that are not lit yet. Light those on the star map first.",
       "title": "This lesson is locked"
     },
     "missing": "This lesson could not be found.",
@@ -104,7 +108,7 @@
       "credentialInvalid": "The pass from that quiz does not work for this lesson. Take the quiz again.",
       "expired": "The quiz took too long and has expired. Start a new one.",
       "finished": "This quiz is already over. Start a new one.",
-      "locked": "Finish the lessons before this one first: this lesson is still locked.",
+      "locked": "This knowledge point is still locked: light the ones it builds on first, on the star map.",
       "notFound": "This quiz is no longer open. Start a new one.",
       "notStarted": "The quiz could not be started. Check your connection and try again.",
       "restart": "Start the quiz again",
