@@ -1,5 +1,5 @@
 import { ApiError, LOGOUT_PATH, httpClient } from '@/services/api/httpClient'
-import { LANGUAGE_STORAGE_KEY, isSupportedLanguage, type SupportedLanguage } from '@/i18n/languages'
+import { isSupportedLanguage, storedLanguage, type SupportedLanguage } from '@/i18n/languages'
 import type { AuthResponse, EmailVerificationResponse, LocalePreferenceResponse, User, UserRole } from '@/types/user'
 import { currentSessionToken } from '@/store/authStore'
 import { allowDemoFallback } from '@/lib/env'
@@ -177,7 +177,7 @@ function inferRole(email: string): UserRole {
 }
 
 function createDemoUser(email: string, role = inferRole(email), name?: string, preferredLanguage?: string): User {
-  const storedLocale = typeof window === 'undefined' ? null : localStorage.getItem(LANGUAGE_STORAGE_KEY)
+  const storedLocale = typeof window === 'undefined' ? null : storedLanguage()
   const effectiveLocale = isSupportedLanguage(preferredLanguage)
     ? preferredLanguage
     : isSupportedLanguage(storedLocale)

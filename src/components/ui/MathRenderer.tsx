@@ -13,10 +13,17 @@ type Katex = { renderToString: (tex: string, options?: Record<string, unknown>) 
 // never show a formula, so they load the first time one appears.
 let katexPromise: Promise<Katex> | null = null
 
+// A failed load (a dropped connection, a chunk gone after a deploy) is not
+// kept: the next formula asks again rather than staying plain text until a
+// reload (#345).
 function loadKatex(): Promise<Katex> {
   if (!katexPromise) {
     katexPromise = import('./katexLoader').then(
       (module) => module.default as unknown as Katex,
+      (error: unknown) => {
+        katexPromise = null
+        throw error
+      },
     )
   }
   return katexPromise
@@ -223,9 +230,15 @@ export function MathRenderer({ children, className, plain = false }: MathRendere
   useEffect(() => {
     if (!hasMath || katex) return
     let cancelled = false
-    void loadKatex().then((loaded) => {
-      if (!cancelled) setKatex(loaded)
-    })
+    loadKatex().then(
+      (loaded) => {
+        if (!cancelled) setKatex(loaded)
+      },
+      () => {
+        // The expression stays as written; the next render that needs a
+        // formula tries the load again.
+      },
+    )
     return () => {
       cancelled = true
     }

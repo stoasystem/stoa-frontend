@@ -26,11 +26,21 @@ export function captureAttributionFromUrl() {
   const hasUTM = Object.values(utm).some(Boolean)
 
   if (hasUTM) {
-    localStorage.setItem(UTM_STORAGE_KEY, JSON.stringify(utm))
+    remember(UTM_STORAGE_KEY, JSON.stringify(utm))
     trackEvent('utm_captured', utm)
   }
 
   if (referralCode) {
-    localStorage.setItem(REFERRAL_STORAGE_KEY, referralCode)
+    remember(REFERRAL_STORAGE_KEY, referralCode)
+  }
+}
+
+// Runs before the app mounts, so a browser that blocks storage must not make
+// it throw (#345). Attribution is best effort; losing it is fine.
+function remember(key: string, value: string) {
+  try {
+    localStorage.setItem(key, value)
+  } catch {
+    // Storage blocked or full.
   }
 }

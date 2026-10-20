@@ -2,7 +2,7 @@ import * as Menu from '@radix-ui/react-dropdown-menu'
 import { Check, ChevronDown, Languages } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { ICON, TOUCH_TARGET } from '@/components/base/sizes'
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { languageNameKeys, useChangeLanguage } from '@/hooks/i18n/useChangeLanguage'
 import { languageOptions, supportedLanguages, type SupportedLanguage } from '@/i18n/languages'
 import { cn } from '@/lib/utils'
@@ -76,7 +76,12 @@ export function LanguageSwitcher({ compact = false, className, variant = 'select
               'inline-flex h-8 w-14 items-center justify-between rounded-md border border-[hsl(var(--stoa-brand-border))] bg-[linear-gradient(180deg,hsl(var(--stoa-brand-card)/0.96),hsl(var(--stoa-brand-paper)/0.86))] px-2 text-xs font-semibold uppercase tracking-[0.02em] text-[hsl(var(--stoa-brand-ink))] shadow-[inset_0_1px_0_hsl(42_35%_98%/0.75),0_8px_18px_hsl(var(--stoa-brand-charcoal)/0.06)] transition-colors hover:border-[hsl(var(--stoa-brand-burgundy)/0.42)] hover:bg-[hsl(var(--stoa-brand-card))]',
               className,
             )}
-            aria-label={t('language.label')}
+            // As on the sky menu: the name carries what the button shows, "EN",
+            // so a voice command naming it works (WCAG 2.5.3, #345).
+            aria-label={t('language.current', {
+              language: t(languageNameKeys[currentLanguage.code]),
+              code: currentLanguage.shortLabel,
+            })}
           >
             <span translate="no" className="notranslate">{currentLanguage.shortLabel}</span>
             <ChevronDown className="h-3.5 w-3.5 text-[hsl(var(--stoa-brand-burgundy))]" aria-hidden="true" />
@@ -87,29 +92,29 @@ export function LanguageSwitcher({ compact = false, className, variant = 'select
           sideOffset={8}
           className="min-w-20 rounded-lg border-[hsl(var(--stoa-brand-border))] bg-[hsl(var(--stoa-brand-card))] p-1.5 shadow-[0_18px_44px_hsl(var(--stoa-brand-charcoal)/0.16)]"
         >
-          {languageOptions.map((language) => {
-            const isActive = language.code === currentLanguage.code
-
-            return (
-              <DropdownMenuItem
+          {/* A radio group, so the chosen language is read out as checked (#345). */}
+          <Menu.RadioGroup value={currentLanguage.code}>
+            {languageOptions.map((language) => (
+              <Menu.RadioItem
                 key={language.code}
+                value={language.code}
+                lang={language.code}
                 className={cn(
                   'flex h-8 cursor-pointer items-center justify-between rounded-md px-2.5 text-sm font-semibold uppercase tracking-[0.02em]',
-                  isActive
-                    ? 'bg-[hsl(var(--stoa-brand-burgundy-soft))] text-[hsl(var(--stoa-brand-ink))]'
-                    : 'text-muted-foreground hover:bg-[hsl(var(--stoa-brand-warm-grey)/0.65)] hover:text-foreground focus:bg-[hsl(var(--stoa-brand-warm-grey)/0.65)]',
+                  'text-muted-foreground hover:bg-[hsl(var(--stoa-brand-warm-grey)/0.65)] hover:text-foreground focus:bg-[hsl(var(--stoa-brand-warm-grey)/0.65)]',
+                  'data-[state=checked]:bg-[hsl(var(--stoa-brand-burgundy-soft))] data-[state=checked]:text-[hsl(var(--stoa-brand-ink))]',
                 )}
                 onSelect={() => {
                   changeLanguage(language.code)
                 }}
               >
                 <span translate="no" className="notranslate">{language.shortLabel}</span>
-                {isActive && (
-                  <span className="h-1.5 w-1.5 rounded-full bg-[hsl(var(--stoa-brand-burgundy))]" aria-hidden="true" />
-                )}
-              </DropdownMenuItem>
-            )
-          })}
+                <Menu.ItemIndicator>
+                  <span className="block h-1.5 w-1.5 rounded-full bg-[hsl(var(--stoa-brand-burgundy))]" aria-hidden="true" />
+                </Menu.ItemIndicator>
+              </Menu.RadioItem>
+            ))}
+          </Menu.RadioGroup>
         </DropdownMenuContent>
       </DropdownMenu>
     )

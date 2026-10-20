@@ -1,6 +1,6 @@
 {
   "required": "Questo campo è obbligatorio.",
-  "passwordRequirements": "La password deve contenere almeno 8 caratteri e includere lettere maiuscole e minuscole, un numero e uno di questi simboli: ! @ # $ % ^ & *.",
+  "passwordRequirements": "La password deve contenere almeno 8 caratteri e includere lettere maiuscole e minuscole e un numero.",
   "nameTooShort": "Il nome deve contenere almeno 2 caratteri.",
   "subjectRequired": "Aggiungi almeno una materia.",
   "schoolGradeRequired": "Scuola e classe sono obbligatorie.",
