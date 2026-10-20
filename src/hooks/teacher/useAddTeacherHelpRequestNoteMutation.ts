@@ -48,18 +48,12 @@ function replyFailureKey(error: unknown) {
 type RefusalReason = 'html' | 'privateMarkers' | 'tooManyBlocks' | 'blockTooLong' | 'tooLong'
 
 /*
- * The server's code for a refusal, read first (#371). It sends none for a
- * refused reply yet; until it does, and for a code not listed here, the
- * message is matched as before.
+ * The server's code for a refusal, read before its message (#371). stoa-backend
+ * sends none for a refused reply yet (the teachers router passes only
+ * `detail=str(exc)`), so nothing is listed (#388). When it adds codes, register
+ * the ones it really sends here; any other code falls back to the message.
  */
-const REFUSAL_CODES = new Map<string, RefusalReason>([
-  ['teacher_reply_unsafe_html', 'html'],
-  ['teacher_reply_private_markers', 'privateMarkers'],
-  ['teacher_reply_private_credentials', 'privateMarkers'],
-  ['teacher_reply_too_many_blocks', 'tooManyBlocks'],
-  ['teacher_reply_block_too_long', 'blockTooLong'],
-  ['teacher_reply_too_long', 'tooLong'],
-])
+const REFUSAL_CODES = new Map<string, RefusalReason>()
 
 function refusalReason(error: ApiError): RefusalReason | null {
   const coded = error.code ? REFUSAL_CODES.get(error.code) : undefined
