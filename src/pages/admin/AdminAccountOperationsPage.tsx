@@ -175,10 +175,20 @@ function ParentLinkAssignment({ parentId }: { parentId: string }) {
   const students = useAdminAccountsQuery(studentFilters)
   const assignment = useAssignParentLinkMutation()
 
+  // #372: the pickers keep the last answer on screen while the next keyword is
+  // read, and those rows stayed pickable: a parent chosen from the previous
+  // search went into the confirmation as if it were a result of this one.
+  // Until the read for what is typed is back, a picker is searching - its
+  // rows are shown but cannot be chosen - and only an account in a current
+  // answer counts as chosen.
+  const parentsSearching = searching(parents, parentKeyword, parentQ)
+  const studentsSearching = searching(students, studentKeyword, studentQ)
   const parentRows = parents.data?.items ?? []
   const studentRows = students.data?.items ?? []
   const selectedParent = parentChoice ?? parentId
-  const ready = Boolean(selectedParent && studentChoice && relationship.trim())
+  const parentPick = parentsSearching ? undefined : parentRows.find((row) => row.userId === selectedParent)
+  const studentPick = studentsSearching ? undefined : studentRows.find((row) => row.userId === studentChoice)
+  const ready = Boolean(parentPick && studentPick && relationship.trim())
 
   function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -187,29 +197,31 @@ function ParentLinkAssignment({ parentId }: { parentId: string }) {
   }
 
   function confirm() {
-    if (!ready || assignment.isPending) return
+    if (!parentPick || !studentPick || !ready || assignment.isPending) return
+    const parent = parentPick
+    const student = studentPick
     setConfirming(false)
     setNotice(null)
     setFailure(null)
     assignment.mutate(
       {
-        parentId: selectedParent,
-        studentId: studentChoice,
+        parentId: parent.userId,
+        studentId: student.userId,
         relationship: relationship.trim(),
       },
       {
         onSuccess: () => {
           setNotice(
             t('parentLinks.assigned', {
-              student: accountLabel(studentRows, studentChoice),
-              parent: accountLabel(parentRows, selectedParent),
+              student: accountOptionLabel(student),
+              parent: accountOptionLabel(parent),
             }),
           )
           setStudentChoice('')
           // The child list on this page is a different query; without this it
           // keeps showing the parent as having no children right under a line
           // saying the link was made.
-          void queryClient.invalidateQueries({ queryKey: adminQueryKeys.accountOperationsForParent(selectedParent) })
+          void queryClient.invalidateQueries({ queryKey: adminQueryKeys.accountOperationsForParent(parent.userId) })
         },
         onError: (error) => setFailure(linkRefusal(error, t)),
       },
@@ -234,7 +246,7 @@ function ParentLinkAssignment({ parentId }: { parentId: string }) {
             value={selectedParent}
             onValue={setParentChoice}
             rows={parentRows}
-            loading={parents.isLoading}
+            searching={parentsSearching}
             failed={parents.isError}
             emptyLabel={t('parentLinks.noParents')}
             loadingLabel={t('parentLinks.loading')}
@@ -250,7 +262,7 @@ function ParentLinkAssignment({ parentId }: { parentId: string }) {
             value={studentChoice}
             onValue={setStudentChoice}
             rows={studentRows}
-            loading={students.isLoading}
+            searching={studentsSearching}
             failed={students.isError}
             emptyLabel={t('parentLinks.noStudents')}
             loadingLabel={t('parentLinks.loading')}
@@ -283,8 +295,8 @@ function ParentLinkAssignment({ parentId }: { parentId: string }) {
               <DialogTitle>{t('parentLinks.confirm.title')}</DialogTitle>
               <DialogDescription>
                 {t('parentLinks.confirm.body', {
-                  student: accountLabel(studentRows, studentChoice),
-                  parent: accountLabel(parentRows, selectedParent),
+                  student: studentPick ? accountOptionLabel(studentPick) : '',
+                  parent: parentPick ? accountOptionLabel(parentPick) : '',
                   relationship: relationship.trim(),
                 })}
               </DialogDescription>
@@ -325,7 +337,7 @@ function AccountPicker({
   value,
   onValue,
   rows,
-  loading,
+  searching,
   failed,
   emptyLabel,
   loadingLabel,
@@ -340,15 +352,19 @@ function AccountPicker({
   value: string
   onValue: (value: string) => void
   rows: AccountRow[]
-  loading: boolean
+  /** The rows answer something other than what is typed (#372): shown, not choosable. */
+  searching: boolean
   failed: boolean
   emptyLabel: string
   loadingLabel: string
   failedLabel: string
 }) {
-  // A value the list no longer carries would silently blank the select, so the
-  // account the console was opened with keeps its own option until it arrives.
-  const options = rows.some((row) => row.userId === value) || !value
+  // A value the list no longer carries would silently blank the select, so
+  // while a read is under way the chosen account keeps its own option. Once
+  // the answer is in, a choice it does not carry is not shown as chosen
+  // (#372): the confirmation would not take it.
+  const held = rows.some((row) => row.userId === value)
+  const options = held || !value || !searching
     ? rows
     : [...rows, { userId: value, accountNumber: '', name: value } as AccountRow]
 
@@ -359,7 +375,9 @@ function AccountPicker({
         <select
           id={`${idPrefix}-select`}
           className="h-10 w-full rounded-md border border-border/90 bg-card/75 px-2 text-sm"
-          value={value}
+          value={held || searching ? value : ''}
+          disabled={searching}
+          aria-busy={searching}
           onChange={(event) => onValue(event.target.value)}
         >
           <option value="">{placeholder}</option>
@@ -374,26 +392,34 @@ function AccountPicker({
         {filterLabel}
         <Input id={`${idPrefix}-filter`} value={keyword} onChange={(event) => onKeyword(event.target.value)} />
       </label>
-      {loading && <p className="text-xs text-muted-foreground">{loadingLabel}</p>}
-      {failed && (
+      {searching && <p className="text-xs text-muted-foreground">{loadingLabel}</p>}
+      {failed && !searching && (
         <p className="text-xs text-destructive" role="alert">
           {failedLabel}
         </p>
       )}
-      {!loading && !failed && rows.length === 0 && (
+      {!searching && !failed && rows.length === 0 && (
         <p className="text-xs text-muted-foreground">{emptyLabel}</p>
       )}
     </div>
   )
 }
 
-function accountOptionLabel(row: AccountRow) {
-  return [row.name || row.email || row.userId, row.accountNumber].filter(Boolean).join(' · ')
+/**
+ * Whether a picker's rows answer something other than what is typed in its
+ * filter: the first read, the next keyword's read behind the last answer
+ * (#372), or a keyword still waiting out the pause before it is sent.
+ */
+function searching(
+  query: { isPending: boolean; isPlaceholderData: boolean },
+  keyword: string,
+  sent: string,
+) {
+  return query.isPending || query.isPlaceholderData || keyword.trim() !== sent
 }
 
-function accountLabel(rows: AccountRow[], userId: string) {
-  const row = rows.find((item) => item.userId === userId)
-  return row ? accountOptionLabel(row) : userId
+function accountOptionLabel(row: AccountRow) {
+  return [row.name || row.email || row.userId, row.accountNumber].filter(Boolean).join(' · ')
 }
 
 /**
