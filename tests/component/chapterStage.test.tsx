@@ -300,7 +300,8 @@ function Where() {
 
 function open(at: string | { pathname: string; state: unknown }, { width = 1280, reducedMotion = false } = {}) {
   emulate(width, { reducedMotion })
-  const client = new QueryClient({ defaultOptions: { queries: { retry: false } } })
+  // A query that keeps its own retry (the sky's, #368) retries at once.
+  const client = new QueryClient({ defaultOptions: { queries: { retry: false, retryDelay: 0 } } })
   render(
     <I18nextProvider i18n={i18n}>
       <QueryClientProvider client={client}>
@@ -1102,8 +1103,9 @@ describe('an answer moves the sky and the review (#342)', () => {
 
 describe('a lesson read again in the background (#342)', () => {
   it('keeps the exercise when the sky could not be read and an answer asks for it again', async () => {
-    // Failed once; asked again, it is on the wire for as long as a slow network keeps it.
+    // Failed (and failed its one retry, #368); asked again, it is on the wire for as long as a slow network keeps it.
     vi.mocked(getKnowledgeMap)
+      .mockRejectedValueOnce(new ApiError('upstream', { status: 503 }))
       .mockRejectedValueOnce(new ApiError('upstream', { status: 503 }))
       .mockImplementation(() => new Promise(() => {}))
     open('/chapter/u-5/l-2')
@@ -1112,7 +1114,7 @@ describe('a lesson read again in the background (#342)', () => {
     await userEvent.click(screen.getByRole('button', { name: 'Check answer' }))
 
     expect(await screen.findByRole('button', { name: 'Next question' })).toBeInTheDocument()
-    await waitFor(() => expect(getKnowledgeMap).toHaveBeenCalledTimes(2))
+    await waitFor(() => expect(getKnowledgeMap).toHaveBeenCalledTimes(3))
     await act(async () => {
       await new Promise((resolve) => setTimeout(resolve, 0))
     })
