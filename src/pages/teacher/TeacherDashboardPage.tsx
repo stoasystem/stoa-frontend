@@ -68,7 +68,15 @@ export function TeacherDashboardPage() {
             */}
             <TeacherStatsCards stats={statsQuery.data} isError={statsQuery.isError} />
             <TeacherRequestFilters value={filter} onChange={setFilter} />
-            <HelpRequestList requests={filteredRequests} />
+            <HelpRequestList
+              requests={filteredRequests}
+              // "No requests are available" under a filter read as "you have none" (#333).
+              emptyMessage={
+                filter === 'all'
+                  ? undefined
+                  : t('requests.emptyFiltered', { status: t(`common:status.teacherHelp.${filter}`) })
+              }
+            />
           </div>
         )}
         {/* Learning automation: the secondary entry inside Requests (#13 point 6). */}

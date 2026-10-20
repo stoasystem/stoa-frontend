@@ -63,7 +63,8 @@
     "reportStudentContent": "Report student content",
     "reportContext": "Send this request context to the internal moderation queue.",
     "noNotes": "No teacher notes yet.",
-    "replyPaused": "This request could not be refreshed just now. Your draft is kept; you can send it once the connection is back."
+    "replyPaused": "This request could not be refreshed just now. Your draft is kept; you can send it once the connection is back.",
+    "openAutomation": "Assign practice to {{name}} in learning automation"
   },
   "profile": {
     "eyebrow": "Teacher account",
@@ -105,6 +106,7 @@
     "filterLabel": "Filter requests",
     "all": "All",
     "empty": "No teacher support requests are available.",
+    "emptyFiltered": "No requests with the status “{{status}}”.",
     "listLabel": "Requests",
     "row": "{{subject}} · {{grade}}",
     "priority": "{{priority}} priority",

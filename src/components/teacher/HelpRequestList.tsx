@@ -35,11 +35,18 @@ const priorityLabelKeys = {
   high: 'common:status.priority.high',
 } as const
 
-export function HelpRequestList({ requests }: { requests: TeacherHelpRequestSummary[] }) {
+export function HelpRequestList({
+  requests,
+  emptyMessage,
+}: {
+  requests: TeacherHelpRequestSummary[]
+  /** What an empty list says when it is empty because of a filter (#333). */
+  emptyMessage?: string
+}) {
   const { t, i18n } = useTranslation('teacher')
 
   if (requests.length === 0) {
-    return <p className="m-0 text-[15px] text-caption">{t('requests.empty')}</p>
+    return <p className="m-0 text-[15px] text-caption">{emptyMessage ?? t('requests.empty')}</p>
   }
 
   const opened = (iso: string) =>

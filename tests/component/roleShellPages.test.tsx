@@ -168,7 +168,7 @@ describe('a teacher\'s Requests', () => {
     expect(within(filter).getAllByRole('button').map((button) => button.textContent)).toEqual([
       'All',
       'Pending',
-      'Assigned',
+      // No "Assigned": the teacher list never carries it (#333).
       'In progress',
       'Resolved',
     ])

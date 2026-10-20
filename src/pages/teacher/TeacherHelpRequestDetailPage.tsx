@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { BackButton } from '@/components/common/BackButton'
 import { Breadcrumbs } from '@/components/common/Breadcrumbs'
@@ -95,6 +95,15 @@ export function TeacherHelpRequestDetailPage() {
               isError={assistanceQuery.isError}
             />
             <AiTeacherToolsPanel request={requestQuery.data} canAct={canAct && !readFailed} />
+            {/* The console needs a student id, and this is the one place a
+                teacher has one (#333). The id goes in the link, the name does not. */}
+            {canAct && (
+              <Button asChild variant="outline">
+                <Link to={`/teacher/learning-automation?studentId=${encodeURIComponent(requestQuery.data.student.id)}`}>
+                  {tTeacher('detail.openAutomation', { name: requestQuery.data.student.name })}
+                </Link>
+              </Button>
+            )}
             <CurriculumRolloutPanel
               title={t('curriculumRollout.teacherTitle')}
               description={t('curriculumRollout.teacherDescription')}

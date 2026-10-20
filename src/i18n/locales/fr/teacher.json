@@ -63,7 +63,8 @@
     "reportStudentContent": "Signaler le message de l’élève",
     "reportContext": "Envoyer le contexte de cette demande à la modération interne.",
     "noNotes": "Aucune note d’enseignant pour l’instant.",
-    "replyPaused": "Impossible d’actualiser la demande pour le moment. Votre brouillon est conservé ; vous pourrez l’envoyer dès que la connexion sera rétablie."
+    "replyPaused": "Impossible d’actualiser la demande pour le moment. Votre brouillon est conservé ; vous pourrez l’envoyer dès que la connexion sera rétablie.",
+    "openAutomation": "Attribuer des exercices à {{name}} dans l’automatisation de l’apprentissage"
   },
   "profile": {
     "eyebrow": "Compte enseignant",
@@ -105,6 +106,7 @@
     "filterLabel": "Filtrer les demandes",
     "all": "Toutes",
     "empty": "Aucune demande d’accompagnement pour le moment.",
+    "emptyFiltered": "Aucune demande avec le statut « {{status}} ».",
     "listLabel": "Demandes",
     "row": "{{subject}} · {{grade}}",
     "priority": "Priorité : {{priority}}",

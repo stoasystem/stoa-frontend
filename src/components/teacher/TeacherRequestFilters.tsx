@@ -4,7 +4,10 @@ import type { TeacherHelpStatus } from '@/types/teacherHelp'
 
 export type TeacherRequestFilter = TeacherHelpStatus | 'all'
 
-const filterValues: readonly TeacherRequestFilter[] = ['all', 'pending', 'assigned', 'in_progress', 'resolved']
+// No "assigned": the teacher list carries the stored status, which is never
+// "assigned" (only the student's view derives it), so that filter was always
+// empty (#333).
+const filterValues: readonly TeacherRequestFilter[] = ['all', 'pending', 'in_progress', 'resolved']
 
 /* Canvas rule: filters are one segmented control, never a row of buttons. */
 export function TeacherRequestFilters({
@@ -21,7 +24,7 @@ export function TeacherRequestFilters({
   }))
 
   return (
-    // Five segments do not fit every phone in every language: the track scrolls.
+    // Four segments do not fit every phone in every language: the track scrolls.
     // The scroller clips on both axes, so it keeps room for the focus ring
     // (2 + 2 px) on every side and gives it back with a negative margin.
     <div className="-m-1 max-w-full overflow-x-auto p-1">
