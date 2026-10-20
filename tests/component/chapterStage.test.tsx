@@ -34,6 +34,7 @@ import {
   getCurriculumCatalog,
   getKnowledgeMap,
   getPracticeLesson,
+  getPracticeHint,
   getPracticeRoadmap,
   submitChallengeAnswer,
 } from '@/services/practice/practiceApi'
@@ -1201,5 +1202,32 @@ describe('the keyboard through an exercise (#342)', () => {
     await userEvent.keyboard('{Enter}')
 
     expect(screen.getByRole('button', { name: '1/6' })).toHaveFocus()
+  })
+})
+
+describe('a hint (#408)', () => {
+  it('arrives in a region that was there before it, so it is read', async () => {
+    open('/chapter/u-5/l-2')
+    await screen.findByRole('heading', { level: 2, name: '3x + 5 = 20' })
+    const region = document.querySelector<HTMLElement>('[data-stage-hint]')
+    expect(region).toHaveAttribute('role', 'status')
+    expect(region).toBeEmptyDOMElement()
+
+    await userEvent.click(screen.getByRole('button', { name: 'Hint' }))
+
+    await waitFor(() => expect(region).toHaveTextContent('Take 5 from both sides.'))
+    expect(document.querySelector('[data-stage-hint]')).toBe(region)
+  })
+
+  it('says so in the same region when none could be had', async () => {
+    vi.mocked(getPracticeHint).mockRejectedValueOnce(new ApiError('busy', { status: 503 }))
+    open('/chapter/u-5/l-2')
+    await screen.findByRole('heading', { level: 2, name: '3x + 5 = 20' })
+    const region = document.querySelector<HTMLElement>('[data-stage-hint]')
+
+    await userEvent.click(screen.getByRole('button', { name: 'Hint' }))
+
+    await waitFor(() => expect(region).toHaveTextContent('No hint right now. Try again in a moment.'))
+    expect(document.querySelector('[data-stage-hint]')).toBe(region)
   })
 })

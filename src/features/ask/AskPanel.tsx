@@ -145,6 +145,28 @@ export function AskPanel({
     openConversation.current = conversationId
   }, [conversationId])
 
+  // The list and a conversation take each other's place, and the row or the
+  // back arrow that was pressed goes with them, so the keyboard was left on
+  // the page (#408). It goes to the conversation's title, or back to the row
+  // it left (else the list, else the title) -- only when it was lost, so a
+  // question sent from the list keeps the cursor in the composer.
+  const heading = useRef<HTMLHeadingElement>(null)
+  const listArea = useRef<HTMLDivElement>(null)
+  const shown = useRef(conversationId)
+  useEffect(() => {
+    const left = shown.current
+    shown.current = conversationId
+    if (left === conversationId) return
+    if (document.activeElement && document.activeElement !== document.body) return
+    if (conversationId) {
+      heading.current?.focus()
+      return
+    }
+    const rows = Array.from(listArea.current?.querySelectorAll<HTMLElement>('[data-conversation-id]') ?? [])
+    const row = rows.find((candidate) => candidate.dataset.conversationId === left)
+    ;(row ?? listArea.current?.querySelector<HTMLElement>('[data-ask-list]') ?? heading.current)?.focus()
+  }, [conversationId])
+
   // The passage 「问这段」 put aside, waiting to go out with the next question:
   // only where it was taken from (#263).
   const chosenQuote = useAskQuoteStore((state) => state.quote)
@@ -311,7 +333,9 @@ export function AskPanel({
           />
         )}
         <div className="flex min-w-0 flex-1 flex-col">
-          <h2 className="truncate text-[15px] font-semibold leading-[1.3] text-ink">{title}</h2>
+          <h2 ref={heading} tabIndex={-1} className="truncate text-[15px] font-semibold leading-[1.3] text-ink outline-none">
+            {title}
+          </h2>
           {subtitle && <p className="truncate text-[12px] leading-[1.3] text-caption">{subtitle}</p>}
         </div>
         {!phone && availability && (
@@ -334,7 +358,7 @@ export function AskPanel({
           teachersOnline={teachersOnline}
         />
       ) : (
-        <div className="flex min-h-0 flex-1 flex-col overflow-y-auto" style={{ padding: phone ? '8px 6px' : '10px 8px' }}>
+        <div ref={listArea} className="flex min-h-0 flex-1 flex-col overflow-y-auto" style={{ padding: phone ? '8px 6px' : '10px 8px' }}>
           {conversationsQuery.isLoading ? (
             <p className="px-3 py-4 text-[13px] text-caption">{t('ask.list.loading')}</p>
           ) : conversationsQuery.isError ? (
@@ -355,11 +379,12 @@ export function AskPanel({
           ) : (
             <AskConversationList conversations={conversationsQuery.data?.items ?? []} onSelect={(id) => select(id)} />
           )}
-          {createConversation.isPending && (
-            <p role="status" className="px-3 py-2 text-[13px] text-caption">
-              {t('ask.thread.starting')}
-            </p>
-          )}
+          {/* Here before it has anything to say, so what it says is read (#408). */}
+          <div role="status" data-ask-starting>
+            {createConversation.isPending && (
+              <p className="px-3 py-2 text-[13px] text-caption">{t('ask.thread.starting')}</p>
+            )}
+          </div>
           {createConversation.isError && (
             <p role="alert" className="px-3 py-2 text-[13px] text-red">
               {toUserFacingError(createConversation.error, t('ask.thread.startFailed'))}
