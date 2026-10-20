@@ -28,6 +28,7 @@
     "summaryFallback": "Les détails du rapport sont en préparation.",
     "summaryUnavailable": "Aucun résumé n’est disponible pour cette semaine.",
     "emailBadge": "E-mail {{status}}",
+    "emailBadgeUnknown": "Statut de l’e-mail inconnu",
     "week": "Semaine",
     "generated": "Généré",
     "generatedPending": "En attente",
@@ -55,7 +56,8 @@
     "emailStatus": {
       "sent": "envoyé",
       "failed": "échoué",
-      "pending": "en attente"
+      "pending": "en attente",
+      "notStarted": "pas encore envoyé"
     }
   },
   "summary": {
