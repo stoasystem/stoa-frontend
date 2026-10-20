@@ -14,13 +14,6 @@ import { toUserFacingError } from '@/lib/userFacingText'
 import { ApiError } from '@/services/api/httpClient'
 import { useAuthStore } from '@/store/authStore'
 
-function activationMessage(error: unknown, fallback: string) {
-  if (error instanceof ApiError && error.code) {
-    return error.code
-  }
-  return toUserFacingError(error, fallback)
-}
-
 export function TeacherActivatePage() {
   const { t } = useTranslation(['auth', 'common', 'errors'])
   const [searchParams] = useSearchParams()
@@ -35,8 +28,15 @@ export function TeacherActivatePage() {
   const succeeded = claimMutation.isSuccess || consumeMutation.isSuccess
   const pending = claimMutation.isPending || consumeMutation.isPending
   const requestError = claimMutation.error || consumeMutation.error
-  const resumeRequired =
-    requestError instanceof ApiError && requestError.code === 'activation_resume_required'
+  const requestCode = requestError instanceof ApiError ? requestError.code : undefined
+  const resumeRequired = requestCode === 'activation_resume_required'
+  // A code with a sentence of its own reads that. Any other code, and a refusal
+  // with none, reads the generic sentence, or the server's English one for an
+  // English reader; the code itself never reaches the screen (#265, #367).
+  const requestFallback = requestError ? toUserFacingError(requestError, t('auth:activate.failed')) : null
+  const requestErrorText = requestCode
+    ? t(`auth:activate.errors.${requestCode}`, { defaultValue: requestFallback })
+    : requestFallback
 
   function handleClaim(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -131,12 +131,9 @@ export function TeacherActivatePage() {
           </form>
         )}
 
-        {(formError || requestError) && (
+        {(formError || requestErrorText) && (
           <p className="mt-4 rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive" role="alert">
-            {formError
-              || t(`auth:activate.errors.${requestError instanceof ApiError ? requestError.code : 'unknown'}`, {
-                defaultValue: activationMessage(requestError, t('auth:activate.failed')),
-              })}
+            {formError || requestErrorText}
           </p>
         )}
 
