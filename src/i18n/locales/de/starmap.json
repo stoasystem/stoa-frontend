@@ -9,6 +9,12 @@
     "title": "Deine Sternkarte ist unterwegs",
     "body": "Deine Fächer und Wissenspunkte erscheinen hier, sobald sie bereit sind."
   },
+  "loadingSky": "Deine Sternkarte wird geladen …",
+  "skyError": {
+    "title": "Deine Sternkarte konnte nicht geladen werden",
+    "body": "Prüf deine Verbindung und versuch es nochmals.",
+    "retry": "Erneut versuchen"
+  },
   "help": {
     "open": "So funktioniert die Sternkarte",
     "close": "Schliessen"

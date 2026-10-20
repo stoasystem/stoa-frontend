@@ -25,6 +25,15 @@ vi.mock('@/components/notifications/NotificationCenter', () => ({ NotificationCe
 // The practice stage's lesson, and a catalog without the unit (the chapter strip then says less).
 vi.mock('@/services/practice/practiceApi', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@/services/practice/practiceApi')>()),
+  // A sky with nothing in it yet; a sky still loading or not read draws no "on its way" (#329).
+  getKnowledgeMap: vi.fn(async () => ({
+    subjectId: 'math',
+    galaxies: [],
+    nebulae: [],
+    stars: [],
+    prerequisites: [],
+    summary: { lit: 0, total: 0, streakDays: 0, score: 0 },
+  })),
   getPracticeLesson: vi.fn(async (lessonId: string) => ({
     id: lessonId,
     unitId: 'u-7',
@@ -114,7 +123,7 @@ describe('a deep link refreshed in the browser', () => {
     refreshAt('/ask/c-42')
 
     // Ask opens over the home planet, on the conversation the path names (#49). The
-    // application's star map has no sky yet (#131), so the planet shows its empty state.
+    // student's sky came back empty, so the planet shows its empty state.
     expect(await screen.findByRole('heading', { name: 'Your star map is on its way' }, LANDING)).toBeInTheDocument()
     expect(window.location.pathname).toBe('/ask/c-42')
     expect(document.querySelector('[data-ask-surface]')?.getAttribute('data-ask-conversation')).toBe('c-42')

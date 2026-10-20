@@ -328,6 +328,10 @@ export function layoutSky(
   links: readonly LayoutLink[],
   seed: number,
 ): SkyLayout {
+  // A subject with no topics yet has nothing to place: left in, its empty
+  // bounds (Infinity to -Infinity) turned the whole band into NaN and every
+  // star in the sky landed on one point (#329). It takes no room on the band.
+  galaxies = galaxies.filter((galaxy) => galaxy.nebulae.length > 0)
   // Each galaxy on its own: nebulae by their relations, then drawn together
   // round their middle (harder up and down, so a galaxy lies along the
   // band) until neighbouring discs touch, never overlap -- their clouds thin

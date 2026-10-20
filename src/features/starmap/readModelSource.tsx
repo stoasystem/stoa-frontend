@@ -8,9 +8,10 @@
  * `StarMapSource.read` has to be pure and synchronous - a new source object is
  * how the view learns the states changed - so the request lives in a query
  * here and `read` only projects whatever that query has already resolved.
- * While it is loading, or if it fails, the source reads as the empty sky: the
- * route already draws that as "your star map is on its way", which is the
- * honest thing to show when we do not yet know what the student's sky holds.
+ * While it is loading, or if it fails, `read` gives the empty sky, and
+ * `status` says which of the two it is (#329): the route draws a skeleton
+ * while the sky is on the wire, an error with a retry when it could not be
+ * read, and "your star map is on its way" only for a sky that came back empty.
  *
  * `demo` stays false. The Demo notice belongs to the design preview and the
  * bench; a student looking at their own knowledge points is not looking at a
@@ -83,8 +84,49 @@ function placed(sky: KnowledgeMapResponse): KnowledgeMapResponse['stars'] {
   return sky.stars.map((star) => ({ ...star, ...(layout.stars.get(star.unitId) ?? { x: star.x, y: star.y }) }))
 }
 
+type Placement = {
+  galaxies: KnowledgeMapResponse['galaxies']
+  nebulae: KnowledgeMapResponse['nebulae']
+  prerequisites: KnowledgeMapResponse['prerequisites']
+  stars: KnowledgeMapResponse['stars']
+  subjects: KnowledgeMapResponse['galaxies']
+}
+
+/**
+ * One placement per sky (#329). `read` runs again for every galaxy in focus
+ * and every acknowledged lighting, which hands over a new response with the
+ * same arrays. Laid out afresh each time, the stars came back as new objects,
+ * and the engine, which keeps its scene only while the arrays are the same
+ * ones, rebuilt it: names blinked and a drag in progress was dropped. So the
+ * placement is kept per stars array, and reused while the galaxies, nebulae
+ * and prerequisites beside it are the ones it was made from.
+ */
+const placements = new WeakMap<KnowledgeMapResponse['stars'], Placement>()
+
+function placement(sky: KnowledgeMapResponse): Placement {
+  const known = placements.get(sky.stars)
+  if (known && known.galaxies === sky.galaxies && known.nebulae === sky.nebulae && known.prerequisites === sky.prerequisites) {
+    return known
+  }
+  // A subject with no knowledge points has no galaxy to fly to: listed in
+  // the switcher, a click on it flew to the first galaxy and the route was
+  // put back there at rest (#329).
+  const subjectOf = new Map(sky.nebulae.map((nebula) => [nebula.topicId, nebula.subjectId]))
+  const withStars = new Set(sky.stars.map((star) => subjectOf.get(star.nebulaId)))
+  const made = {
+    galaxies: sky.galaxies,
+    nebulae: sky.nebulae,
+    prerequisites: sky.prerequisites,
+    stars: placed(sky),
+    subjects: sky.galaxies.filter((galaxy) => withStars.has(galaxy.subjectId)),
+  }
+  placements.set(sky.stars, made)
+  return made
+}
+
 export function projectStarMap(response: KnowledgeMapResponse, { subjectId }: StarMapRequest): StarMap {
-  const sky = { ...response, stars: placed(response) }
+  const { stars: placedStars, subjects } = placement(response)
+  const sky = { ...response, stars: placedStars }
   const focus = subjectId || sky.subjectId
   const nebulaeOfFocus = new Set(
     sky.nebulae.filter((nebula) => nebula.subjectId === focus).map((nebula) => nebula.topicId),
@@ -94,7 +136,7 @@ export function projectStarMap(response: KnowledgeMapResponse, { subjectId }: St
   const unitIds = new Set(stars.map((star) => star.unitId))
   return {
     subject: { subjectId: focus, name: named?.name ?? '' },
-    subjects: sky.galaxies,
+    subjects,
     nebulae: sky.nebulae,
     stars: sky.stars,
     prerequisites: sky.prerequisites,
@@ -136,13 +178,13 @@ function ReadModelSource({ children }: { children: ReactNode }) {
   // `read` for, and the route derives it from this very source - so keying the
   // query by subject would make every switch of galaxy a fetch, and the first
   // read a chicken-and-egg.
-  const { data } = useQuery({
+  const { data, status, refetch } = useQuery({
     queryKey: practiceQueryKeys.knowledgeMap(''),
     queryFn: () => getKnowledgeMap(),
     enabled: isStudent,
     staleTime: KNOWLEDGE_MAP_STALE_MS,
-    // A sky that could not be read is drawn as an empty one by the route. It
-    // is not worth hammering the API for: the student can reload.
+    // A sky that could not be read is not worth hammering the API for: the
+    // route offers the student a retry.
     retry: 1,
   })
 
@@ -150,8 +192,12 @@ function ReadModelSource({ children }: { children: ReactNode }) {
     () => ({
       read: (request) => (data ? projectStarMap(data, request) : emptyStarMap(request.subjectId)),
       demo: false,
+      // A sky already drawn stays drawn when a later refetch fails. Nobody
+      // but a student asks for one, so for anybody else there is nothing to wait for.
+      status: data ? 'success' : isStudent ? status : 'success',
+      retry: () => void refetch(),
     }),
-    [data],
+    [data, status, isStudent, refetch],
   )
 
   return <StarMapSourceContext.Provider value={source}>{children}</StarMapSourceContext.Provider>

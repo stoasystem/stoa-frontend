@@ -9,6 +9,12 @@
     "title": "Ta carte du ciel arrive bientôt",
     "body": "Tes matières et tes notions apparaîtront ici dès qu’elles seront prêtes."
   },
+  "loadingSky": "Chargement de ta carte du ciel…",
+  "skyError": {
+    "title": "Ta carte du ciel n’a pas pu être chargée",
+    "body": "Vérifie ta connexion et réessaie.",
+    "retry": "Réessayer"
+  },
   "help": {
     "open": "Comment fonctionne la carte du ciel",
     "close": "Fermer"
