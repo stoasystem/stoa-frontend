@@ -26,11 +26,13 @@ const STARTUP_FAILURE_MESSAGES = {
 
 export type StartupFailureLanguage = keyof typeof STARTUP_FAILURE_MESSAGES
 
-export function startupFailureMessage(language?: string): string {
+export function startupFailureLanguage(language?: string): StartupFailureLanguage {
   const code = (language ?? browserLanguage()).slice(0, 2).toLowerCase()
-  return code in STARTUP_FAILURE_MESSAGES
-    ? STARTUP_FAILURE_MESSAGES[code as StartupFailureLanguage]
-    : STARTUP_FAILURE_MESSAGES.en
+  return code in STARTUP_FAILURE_MESSAGES ? code as StartupFailureLanguage : 'en'
+}
+
+export function startupFailureMessage(language?: string): string {
+  return STARTUP_FAILURE_MESSAGES[startupFailureLanguage(language)]
 }
 
 function browserLanguage(): string {
@@ -38,12 +40,27 @@ function browserLanguage(): string {
   return typeof candidate === 'string' ? candidate : 'en'
 }
 
+/**
+ * Two budgets, not one (#344). Proving the release is two small same-origin
+ * documents, and ten seconds is long for them. Loading the application is the
+ * first-screen code, which on a slow connection can take longer than that while
+ * nothing is wrong - so it has its own, longer budget instead of eating into the
+ * first one.
+ *
+ * Running out of either only puts the failure text up. It does not stop the
+ * start: if the load finishes after all, the application mounts over the text.
+ * A step that fails outright still stops it.
+ */
 const DEFAULT_STARTUP_TIMEOUT_MS = 10_000
 const MAX_STARTUP_TIMEOUT_MS = 30_000
+const DEFAULT_APPLICATION_TIMEOUT_MS = 30_000
+const MAX_APPLICATION_TIMEOUT_MS = 120_000
 
 export interface StartupFailureTarget {
   textContent: string | null
   setAttribute(name: string, value: string): void
+  removeAttribute?(name: string): void
+  readonly ownerDocument?: { readonly documentElement: { lang: string } } | null
 }
 
 export type ApplicationStarter = () => void | Promise<void>
@@ -52,7 +69,12 @@ export interface WebStartupOptions {
   readonly webOrigin: string
   readonly loadApplication: () => Promise<ApplicationStarter>
   readonly renderFailure: () => void
+  /** Takes the failure text down again when a slow start finishes after all. */
+  readonly clearFailure?: () => void
+  /** Budget for proving the release: the descriptor and the config it names. */
   readonly timeoutMs?: number
+  /** Budget for loading the application code once the release is proven. */
+  readonly applicationTimeoutMs?: number
 }
 
 type StartupState = 'idle' | 'starting' | 'started' | 'failed'
@@ -67,36 +89,87 @@ function ensureStarting(): void {
   if (startupState !== 'starting') throw new StartupAttemptStopped()
 }
 
+function showFailure(): void {
+  if (failureRendered) return
+  failureRendered = true
+  activeFailureRenderer?.()
+}
+
 function failStartup(): false {
   startupState = 'failed'
-  if (!failureRendered) {
-    failureRendered = true
-    activeFailureRenderer?.()
-  }
+  showFailure()
   return false
 }
 
-function startupTimeout(value: number | undefined): number {
-  if (value === undefined) return DEFAULT_STARTUP_TIMEOUT_MS
-  if (!Number.isFinite(value) || value <= 0) return DEFAULT_STARTUP_TIMEOUT_MS
-  return Math.min(value, MAX_STARTUP_TIMEOUT_MS)
+function budget(value: number | undefined, fallback: number, max: number): number {
+  if (value === undefined) return fallback
+  if (!Number.isFinite(value) || value <= 0) return fallback
+  return Math.min(value, max)
+}
+
+/** Puts the failure text up if `work` has not settled within `ms`; never stops it. */
+async function withinBudget<T>(work: () => Promise<T>, ms: number): Promise<T> {
+  const timer = setTimeout(() => {
+    if (startupState === 'starting') showFailure()
+  }, ms)
+  try {
+    return await work()
+  } finally {
+    clearTimeout(timer)
+  }
+}
+
+/**
+ * A config that is well formed but belongs to another release than the
+ * descriptor names. With the digest-named config a publish writes now this
+ * cannot happen; with the fixed name an older publish wrote, it did for every
+ * visitor between two uploads (#344). Asking for the descriptor once more gets
+ * the pair that is being served now. Read by code, not by class: this file
+ * imports the loader and nothing else from the config module.
+ */
+function isReleaseMismatch(error: unknown): boolean {
+  const code = (error as { code?: unknown } | null)?.code
+  return code === 'runtime_config_digest_mismatch' || code === 'runtime_config_release_mismatch'
+}
+
+async function proveRelease(webOrigin: string): Promise<void> {
+  const attempt = async () => {
+    const descriptor = await loadServedRelease({ webOrigin })
+    ensureStarting()
+
+    const runtimeOptions = toRuntimeConfigLoadOptions(descriptor, {
+      expectedWebOrigin: webOrigin,
+    })
+    ensureStarting()
+
+    await initializeRuntimeConfig(runtimeOptions)
+    ensureStarting()
+  }
+  try {
+    await attempt()
+  } catch (error) {
+    if (!isReleaseMismatch(error)) throw error
+    ensureStarting()
+    await attempt()
+  }
 }
 
 async function runStartup(options: WebStartupOptions): Promise<void> {
-  const descriptor = await loadServedRelease({ webOrigin: options.webOrigin })
+  await withinBudget(
+    () => proveRelease(options.webOrigin),
+    budget(options.timeoutMs, DEFAULT_STARTUP_TIMEOUT_MS, MAX_STARTUP_TIMEOUT_MS),
+  )
+
+  const startApplication = await withinBudget(
+    () => options.loadApplication(),
+    budget(options.applicationTimeoutMs, DEFAULT_APPLICATION_TIMEOUT_MS, MAX_APPLICATION_TIMEOUT_MS),
+  )
   ensureStarting()
 
-  const runtimeOptions = toRuntimeConfigLoadOptions(descriptor, {
-    expectedWebOrigin: options.webOrigin,
-  })
-  ensureStarting()
-
-  await initializeRuntimeConfig(runtimeOptions)
-  ensureStarting()
-
-  const startApplication = await options.loadApplication()
-  ensureStarting()
-
+  if (failureRendered) {
+    failureRendered = false
+    options.clearFailure?.()
+  }
   await startApplication()
   ensureStarting()
 }
@@ -111,36 +184,14 @@ export function startWebApplication(options: WebStartupOptions): Promise<boolean
   activeFailureRenderer = options.renderFailure
   failureRendered = false
 
-  const operation = runStartup(options)
-  return new Promise((resolve) => {
-    let settled = false
-    const timer = setTimeout(() => {
-      if (settled) return
-      settled = true
-      failStartup()
-      resolve(false)
-    }, startupTimeout(options.timeoutMs))
-
-    void operation.then(
-      () => {
-        if (settled) return
-        settled = true
-        clearTimeout(timer)
-        if (startupState !== 'starting') {
-          resolve(false)
-          return
-        }
-        startupState = 'started'
-        resolve(true)
-      },
-      () => {
-        if (settled) return
-        settled = true
-        clearTimeout(timer)
-        resolve(failStartup())
-      },
-    )
-  })
+  return runStartup(options).then(
+    () => {
+      if (startupState !== 'starting') return false
+      startupState = 'started'
+      return true
+    },
+    () => failStartup(),
+  )
 }
 
 export function renderStartupFailure(
@@ -148,7 +199,23 @@ export function renderStartupFailure(
   language?: string,
 ): void {
   if (target === null) return
-  target.textContent = startupFailureMessage(language)
+  const chosen = startupFailureLanguage(language)
+  target.textContent = STARTUP_FAILURE_MESSAGES[chosen]
   target.setAttribute('role', 'alert')
   target.setAttribute('aria-live', 'assertive')
+  // index.html says `en`; a screen reader reading the German sentence as
+  // English is as lost as the family was with the Chinese one (#344).
+  const root = target.ownerDocument?.documentElement
+  if (root) root.lang = chosen
+}
+
+/**
+ * Takes the failure text down when a start that ran out of time finishes after
+ * all. The page language is set again by the application's own start.
+ */
+export function clearStartupFailure(target: StartupFailureTarget | null): void {
+  if (target === null) return
+  target.textContent = ''
+  target.removeAttribute?.('role')
+  target.removeAttribute?.('aria-live')
 }

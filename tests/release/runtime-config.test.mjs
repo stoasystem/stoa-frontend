@@ -321,6 +321,74 @@ test('loader rejects cross-origin paths, redirects, wrong media, and documents o
   }), { name: 'RuntimeConfigError' })
 })
 
+// #344: the descriptor now names the config by its digest. The loader fetches
+// that name, and only when the name's digest is the one it was told to expect.
+test('loader fetches a digest-named config only under the digest it expects', async () => {
+  const runtime = await loadRuntimeConfigModule()
+  const config = validConfig()
+  const body = JSON.stringify(config)
+  const digest = await runtime.digestRuntimeConfig(config)
+  const base = {
+    webOrigin: 'https://staging.stoaedu.ch',
+    expectedDigest: digest,
+    expectedRelease: { ...config.release },
+    expectedEnvironment: 'staging',
+  }
+  const calls = []
+  const loaded = await runtime.loadRuntimeConfig({
+    ...base,
+    configUrl: `/runtime-config.${digest}.json`,
+    fetchImpl: async (url) => {
+      calls.push(url)
+      return responseFor(body, { url })
+    },
+  })
+  assert.equal(loaded.release.releaseId, sha('1'))
+  assert.deepEqual(calls, [`https://staging.stoaedu.ch/runtime-config.${digest}.json`])
+
+  for (const configUrl of [
+    `/runtime-config.${sha('e')}.json`,
+    `/runtime-config.${digest.toUpperCase()}.json`,
+    `/runtime-config/${digest}.json`,
+    `/other.${digest}.json`,
+  ]) {
+    await assert.rejects(runtime.loadRuntimeConfig({
+      ...base,
+      configUrl,
+      fetchImpl: async (url) => responseFor(body, { url }),
+    }), { name: 'RuntimeConfigError' }, configUrl)
+  }
+})
+
+// A config for another release than the descriptor names is told apart from a
+// broken one, because startup asks for the descriptor once more on it (#344).
+test('a config for another release fails as a release mismatch', async () => {
+  const runtime = await loadRuntimeConfigModule()
+  const config = validConfig()
+  const digest = await runtime.digestRuntimeConfig(config)
+  await assert.rejects(runtime.validateRuntimeConfig(config, {
+    expectedDigest: digest,
+    expectedRelease: { ...config.release, releaseId: sha('f') },
+    expectedEnvironment: 'staging',
+    expectedWebOrigin: 'https://staging.stoaedu.ch',
+  }), (error) => error.code === 'runtime_config_release_mismatch')
+  await assert.rejects(runtime.validateRuntimeConfig(config, {
+    expectedDigest: digest,
+    expectedRelease: { ...config.release },
+    expectedEnvironment: 'staging-pilot',
+    expectedWebOrigin: 'https://staging.stoaedu.ch',
+  }), (error) => error.code === 'runtime_config_release_mismatch')
+  // Broken is still broken, not a mismatch.
+  const broken = validConfig()
+  broken.extra = true
+  await assert.rejects(runtime.validateRuntimeConfig(broken, {
+    expectedDigest: digest,
+    expectedRelease: { ...config.release },
+    expectedEnvironment: 'staging',
+    expectedWebOrigin: 'https://staging.stoaedu.ch',
+  }), (error) => error.code === 'runtime_config_invalid')
+})
+
 test('registry publishes only validated state and clears failed initialization', async () => {
   const runtime = await loadRuntimeConfigModule()
   const config = validConfig()

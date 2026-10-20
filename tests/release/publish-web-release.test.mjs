@@ -4,7 +4,7 @@ import { mkdir, readFile, writeFile } from 'node:fs/promises'
 import os from 'node:os'
 import path from 'node:path'
 import test from 'node:test'
-import { fileURLToPath } from 'node:url'
+import { fileURLToPath, URL } from 'node:url'
 import ts from 'typescript'
 import {
   buildReleaseIdentities,
@@ -15,6 +15,7 @@ import {
   hashFileTree,
   PRODUCTION_DEFAULTS,
   publishWebRelease,
+  runtimeConfigKeyFor,
   sha256Hex,
 } from '../../scripts/publish-web-release.mjs'
 
@@ -121,13 +122,19 @@ test('publish uploads hashed assets, then the pointer documents, and refuses an 
   const putKeys = calls
     .filter((argv) => argv.includes('put-object'))
     .map((argv) => argv[argv.indexOf('--key') + 1])
+  // #344: the digest-named config before anything that could lead to it, the
+  // descriptor - the only object overwritten in place - last.
+  assert.equal(result.runtimeConfigKey, runtimeConfigKeyFor(result.runtimeConfigSha256))
   assert.deepEqual(putKeys, [
     'assets/app.js',
+    result.runtimeConfigKey,
     'index.html',
-    'runtime-config.json',
     'served-release.json',
   ])
   assert.equal(result.webEntryVersionId.startsWith('version-indexhtml'), true)
+  const configPut = calls.find((argv) => argv.includes(result.runtimeConfigKey))
+  assert.equal(configPut[configPut.indexOf('--cache-control') + 1], 'public,max-age=31536000,immutable')
+  assert.equal(configPut[configPut.indexOf('--content-type') + 1], 'application/json')
   assert.equal(calls.some((argv) => argv.includes('create-invalidation')), true)
 
   const unversioned = async (argv) => {
@@ -164,7 +171,171 @@ test('tree hash is path-stable and ignores templates', () => {
     webEntrySha256: sha('6'),
     webEntryVersionId: 'web-version_E5f6g7h8',
   })
-  assert.equal(JSON.parse(canonicalize(served)).runtimeConfig.key, 'runtime-config.json')
+  const parsed = JSON.parse(canonicalize(served))
+  assert.equal(parsed.runtimeConfig.key, `runtime-config.${sha('5')}.json`)
+  assert.equal(parsed.runtimeConfig.url, `https://app.stoaedu.ch/runtime-config.${sha('5')}.json`)
+  assert.throws(() => runtimeConfigKeyFor('latest'), { code: 'RELEASE_HASH_INVALID' })
+})
+
+// ---- What a visitor can see while a publish runs (#344) --------------------
+// A bucket in memory: every put lands at once, as S3 does per object. After
+// each one, a visitor starts the app the way src/bootstrap.ts does - the
+// descriptor, then the config it names, checked by the client's own code.
+
+async function loadServedModule() {
+  const source = await readFile(path.join(repoRoot, 'src/lib/servedRelease.ts'), 'utf8')
+  const compiled = ts.transpileModule(source, {
+    compilerOptions: { module: ts.ModuleKind.ES2022, target: ts.ScriptTarget.ES2020 },
+    fileName: 'servedRelease.ts',
+  })
+  return import(`data:text/javascript;base64,${Buffer.from(compiled.outputText).toString('base64')}`)
+}
+
+function memoryBucket() {
+  const objects = new Map()
+  let versions = 0
+  return {
+    objects,
+    async put(key, bodyPath) {
+      versions += 1
+      objects.set(key, await readFile(bodyPath, 'utf8'))
+      return `memory-version-${String(versions).padStart(8, '0')}`
+    },
+  }
+}
+
+async function visitorStarts(bucket, webOrigin) {
+  const served = await loadServedModule()
+  const runtime = await loadRuntimeModule()
+  const fetchImpl = async (url) => {
+    const key = new URL(url).pathname.slice(1)
+    const body = bucket.objects.get(key)
+    if (body === undefined) {
+      return { ok: false, status: 404, redirected: false, url, headers: { get: () => null }, text: async () => '' }
+    }
+    return {
+      ok: true,
+      status: 200,
+      redirected: false,
+      url,
+      headers: { get: (name) => (name.toLowerCase() === 'content-type' ? 'application/json' : null) },
+      text: async () => body,
+    }
+  }
+  const descriptor = await served.loadServedRelease({ webOrigin, fetchImpl })
+  const options = served.toRuntimeConfigLoadOptions(descriptor, { expectedWebOrigin: webOrigin })
+  return runtime.loadRuntimeConfig({ ...options, fetchImpl })
+}
+
+// Publishes `distDir` into `bucket`; `onPut` runs after each upload lands, and
+// the upload of `failOn` fails the way an AWS CLI error does.
+function publishInto(bucket, { distDir, backend, failOn }) {
+  const runner = async (argv) => {
+    if (argv.includes('get-bucket-versioning')) return JSON.stringify({ Status: 'Enabled' })
+    if (argv.includes('create-invalidation')) return 'I0'
+    if (!argv.includes('put-object')) throw new Error(argv.join(' '))
+    const key = argv[argv.indexOf('--key') + 1]
+    if (failOn?.(key)) throw new Error(`upload of ${key} failed`)
+    return bucket.put(key, argv[argv.indexOf('--body') + 1])
+  }
+  return {
+    run: (onPut) => publishWebRelease({
+      distDir,
+      backendArtifactSha256: sha(backend),
+      environment: 'staging',
+      webOrigin: 'https://staging.stoaedu.ch',
+      apiOrigin: 'https://api.staging.stoaedu.ch',
+      runner: async (argv) => {
+        const out = await runner(argv)
+        if (argv.includes('put-object')) await onPut(argv[argv.indexOf('--key') + 1])
+        return out
+      },
+    }),
+  }
+}
+
+async function freshDist(label, script) {
+  const distDir = await mkdir(path.join(os.tmpdir(), `stoa-publish-${label}-${Date.now()}-${Math.random().toString(16).slice(2)}`), { recursive: true })
+  await mkdir(path.join(distDir, 'assets'), { recursive: true })
+  await writeFile(path.join(distDir, 'index.html'), `<html>${label}</html>`)
+  await writeFile(path.join(distDir, `assets/${label}.js`), script)
+  return distDir
+}
+
+// What this proves is the descriptor and config a visitor is handed. The code
+// index.html loads is not modelled: from its upload until the descriptor lands
+// it is the new release's, against the previous config (see the publisher).
+test('a visitor arriving between any two uploads gets one release\'s descriptor and config', async () => {
+  const webOrigin = 'https://staging.stoaedu.ch'
+  const bucket = memoryBucket()
+  const first = publishInto(bucket, { distDir: await freshDist('a', 'console.log(1)'), backend: '4' })
+  const released = await first.run(async () => {})
+  assert.equal((await visitorStarts(bucket, webOrigin)).release.releaseId, released.release.releaseId)
+
+  const second = publishInto(bucket, { distDir: await freshDist('b', 'console.log(2)'), backend: '7' })
+  const seen = []
+  const next = await second.run(async (key) => {
+    const config = await visitorStarts(bucket, webOrigin)
+    seen.push([key, config.release.releaseId])
+  })
+  assert.notEqual(next.release.releaseId, released.release.releaseId)
+  // Every visitor before the descriptor lands gets the first release, whole;
+  // the one after it gets the second.
+  assert.deepEqual(seen, [
+    ['assets/b.js', released.release.releaseId],
+    [next.runtimeConfigKey, released.release.releaseId],
+    ['index.html', released.release.releaseId],
+    ['served-release.json', next.release.releaseId],
+  ])
+})
+
+test('a publish that fails before its descriptor lands leaves the served descriptor and config whole', async () => {
+  const webOrigin = 'https://staging.stoaedu.ch'
+  for (const [label, failOn] of [
+    ['asset', (key) => key.startsWith('assets/')],
+    ['config', (key) => key.startsWith('runtime-config.')],
+    ['index.html', (key) => key === 'index.html'],
+    ['descriptor', (key) => key === 'served-release.json'],
+  ]) {
+    const bucket = memoryBucket()
+    const first = publishInto(bucket, { distDir: await freshDist('a', 'console.log(1)'), backend: '4' })
+    const released = await first.run(async () => {})
+    const second = publishInto(bucket, { distDir: await freshDist('b', 'console.log(2)'), backend: '7', failOn })
+    await assert.rejects(second.run(async () => {}), /upload of/, label)
+    const config = await visitorStarts(bucket, webOrigin)
+    assert.equal(config.release.releaseId, released.release.releaseId, label)
+  }
+})
+
+// The deploy that switches over finds what every earlier publish left: the
+// config at the fixed name `runtime-config.json`, and a descriptor naming it.
+test('the first publish after the switch-over never pairs the legacy config with the new descriptor', async () => {
+  const webOrigin = 'https://staging.stoaedu.ch'
+  const bucket = memoryBucket()
+  const first = publishInto(bucket, { distDir: await freshDist('a', 'console.log(1)'), backend: '4' })
+  const released = await first.run(async () => {})
+  // Rewrite the first release into the legacy layout.
+  bucket.objects.set('runtime-config.json', bucket.objects.get(released.runtimeConfigKey))
+  bucket.objects.delete(released.runtimeConfigKey)
+  const legacy = JSON.parse(bucket.objects.get('served-release.json'))
+  legacy.runtimeConfig.key = 'runtime-config.json'
+  legacy.runtimeConfig.url = `${webOrigin}/runtime-config.json`
+  bucket.objects.set('served-release.json', `${canonicalize(legacy)}\n`)
+  assert.equal((await visitorStarts(bucket, webOrigin)).release.releaseId, released.release.releaseId)
+
+  const second = publishInto(bucket, { distDir: await freshDist('b', 'console.log(2)'), backend: '7' })
+  const seen = []
+  const next = await second.run(async (key) => {
+    seen.push([key, (await visitorStarts(bucket, webOrigin)).release.releaseId])
+  })
+  assert.deepEqual(seen.map(([, id]) => id), [
+    released.release.releaseId,
+    released.release.releaseId,
+    released.release.releaseId,
+    next.release.releaseId,
+  ])
+  // The legacy object is left as it was: nothing the new descriptor names.
+  assert.equal(JSON.parse(bucket.objects.get('runtime-config.json')).release.releaseId, released.release.releaseId)
 })
 
 // ---- Production deploy workflow --------------------------------------------

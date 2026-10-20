@@ -4,6 +4,7 @@ export type RuntimeConfigErrorCode =
   | 'runtime_config_digest_mismatch'
   | 'runtime_config_fetch_failed'
   | 'runtime_config_invalid'
+  | 'runtime_config_release_mismatch'
   | 'runtime_config_uninitialized'
 
 export interface RuntimeConfig {
@@ -275,7 +276,9 @@ export async function validateRuntimeConfig(
   requireExactKeys(config, TOP_LEVEL_KEYS)
   if (config.schema !== 'stoa.web.runtime-config.v1') fail()
   const environment = parseEnvironment(config.environment)
-  if (environment !== options.expectedEnvironment) fail()
+  // A well-formed config for another release is told apart from a broken one:
+  // startup asks for the descriptor again once on this, not on anything else.
+  if (environment !== options.expectedEnvironment) fail('runtime_config_release_mismatch')
 
   const release = requireRecord(config.release)
   requireExactKeys(release, RELEASE_KEYS)
@@ -284,7 +287,7 @@ export async function validateRuntimeConfig(
   for (const key of RELEASE_KEYS) {
     const actual = requireSha256(release[key])
     const expected = requireSha256(expectedRelease[key])
-    if (actual !== expected) fail()
+    if (actual !== expected) fail('runtime_config_release_mismatch')
   }
 
   const web = requireRecord(config.web)
@@ -432,7 +435,14 @@ function strictParseJson(text: string): unknown {
   return new StrictJsonParser(text).parse()
 }
 
-function requestUrl(configUrl: string, webOrigin: string): URL {
+/**
+ * The two names a descriptor may give the config (#344): one named by its own
+ * digest, which every publish now writes, and the fixed name every publish
+ * before that wrote. See servedRelease.ts.
+ */
+const CONFIG_PATH_PATTERN = /^\/runtime-config(?:\.([0-9a-f]{64}))?\.json$/
+
+function requestUrl(configUrl: string, webOrigin: string, expectedDigest: string): URL {
   let origin: URL
   let request: URL
   try {
@@ -442,15 +452,21 @@ function requestUrl(configUrl: string, webOrigin: string): URL {
     fail()
   }
   if (origin.origin !== webOrigin || origin.pathname !== '/' || origin.search || origin.hash ||
-      request.origin !== origin.origin || request.pathname !== '/runtime-config.json' ||
+      request.origin !== origin.origin ||
       request.search || request.hash || request.username || request.password) fail()
+  const named = CONFIG_PATH_PATTERN.exec(request.pathname)
+  if (named === null || (named[1] !== undefined && named[1] !== expectedDigest)) fail()
   return request
 }
 
 export async function loadRuntimeConfig(
   options: RuntimeConfigLoadOptions,
 ): Promise<Readonly<RuntimeConfig>> {
-  const request = requestUrl(options.configUrl ?? '/runtime-config.json', options.webOrigin)
+  const request = requestUrl(
+    options.configUrl ?? '/runtime-config.json',
+    options.webOrigin,
+    options.expectedDigest,
+  )
   const fetchImpl = options.fetchImpl ?? fetch
   let response: Response
   try {

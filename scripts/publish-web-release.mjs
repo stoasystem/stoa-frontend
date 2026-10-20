@@ -1,10 +1,18 @@
 #!/usr/bin/env node
 /**
- * Build runtime-config.json and served-release.json from a Vite dist, upload
+ * Build the runtime config and served-release.json from a Vite dist, upload
  * them with real S3 VersionIds, then invalidate CloudFront.
  *
  * The Web client refuses to start unless both documents are valid JSON with
  * matching SHA-256 digests and S3 version identities.
+ *
+ * served-release.json is the one object a release changes in place, and it is
+ * written last (#344). The runtime config goes up first under a key named by its
+ * own digest, `runtime-config.<sha256>.json`, so no object a live descriptor
+ * names is ever overwritten. Before, `runtime-config.json` was overwritten
+ * before the descriptor: a visitor in between got the new config against the
+ * old digest and the "cannot start" page, and a publish that failed on the last
+ * upload left the site like that until the next one.
  */
 import { createHash } from 'node:crypto'
 import { readdir, readFile, stat, writeFile } from 'node:fs/promises'
@@ -21,6 +29,7 @@ const MUTABLE_IDENTITIES = new Set([
   'head', 'latest', 'main', 'master', 'develop', 'development',
   'staging', 'staging-pilot', 'production', 'null',
 ])
+const RUNTIME_CONFIG_KEY_PATTERN = /^runtime-config\.[0-9a-f]{64}\.json$/
 const SKIP_NAMES = new Set([
   'runtime-config.json',
   'served-release.json',
@@ -104,7 +113,7 @@ export async function listDistFiles(distDir) {
         continue
       }
       if (!entry.isFile()) continue
-      if (SKIP_NAMES.has(entry.name)) continue
+      if (SKIP_NAMES.has(entry.name) || RUNTIME_CONFIG_KEY_PATTERN.test(entry.name)) continue
       files.push(full)
     }
   }
@@ -151,6 +160,11 @@ export function buildRuntimeConfig({ release, environment, webOrigin, apiOrigin,
   }
 }
 
+export function runtimeConfigKeyFor(runtimeConfigSha256) {
+  if (!SHA256_PATTERN.test(runtimeConfigSha256)) fail('RELEASE_HASH_INVALID')
+  return `runtime-config.${runtimeConfigSha256}.json`
+}
+
 export function buildServedRelease({
   release,
   environment,
@@ -162,14 +176,15 @@ export function buildServedRelease({
 }) {
   assertVersionId(runtimeVersionId)
   assertVersionId(webEntryVersionId)
+  const runtimeConfigKey = runtimeConfigKeyFor(runtimeConfigSha256)
   return {
     schema: 'stoa.web.served-release.v1',
     environment,
     release,
     runtimeConfig: {
-      key: 'runtime-config.json',
+      key: runtimeConfigKey,
       versionId: runtimeVersionId,
-      url: `${webOrigin}/runtime-config.json`,
+      url: `${webOrigin}/${runtimeConfigKey}`,
       sha256: runtimeConfigSha256,
     },
     webEntry: {
@@ -200,6 +215,8 @@ export function contentTypeFor(relativePath) {
 }
 
 export function cacheControlFor(relativePath) {
+  // Named by its own digest, so its bytes never change under that name.
+  if (RUNTIME_CONFIG_KEY_PATTERN.test(relativePath)) return 'public,max-age=31536000,immutable'
   if (relativePath === 'index.html' || relativePath.endsWith('.json')) return 'no-store'
   if (relativePath.startsWith('assets/')) return 'public,max-age=31536000,immutable'
   return 'public,max-age=300'
@@ -288,10 +305,22 @@ export async function publishWebRelease({
     release, environment, webOrigin, apiOrigin, features,
   })
   const runtimeConfigSha256 = digestCanonical(runtimeConfig)
-  const runtimeConfigPath = path.join(distDir, 'runtime-config.json')
+  const runtimeConfigKey = runtimeConfigKeyFor(runtimeConfigSha256)
+  const runtimeConfigPath = path.join(distDir, runtimeConfigKey)
   await writeFile(runtimeConfigPath, `${canonicalize(runtimeConfig)}\n`, 'utf8')
 
   await requireVersioning(bucket, runner)
+
+  // Order is the contract (#344): everything the new descriptor names goes up
+  // first, and the descriptor last. Hashed assets and the digest-named config
+  // land under names nothing live points at, so a failure before index.html
+  // changes nothing a visitor sees. index.html cannot follow the descriptor,
+  // which carries its VersionId: from its upload until the descriptor lands -
+  // or, if the descriptor upload fails, until the next publish - new code
+  // starts against the previous descriptor and config. That pair is still one
+  // release's descriptor and config, digest-checked; it only fails if the new
+  // code no longer accepts the previous config's shape (a config key added or
+  // removed), so such a change must ship in a release that accepts both.
 
   for (const entry of hashed) {
     if (entry.path === 'index.html') continue
@@ -305,6 +334,14 @@ export async function publishWebRelease({
     })
   }
 
+  const runtimeVersionId = await putObject({
+    bucket,
+    key: runtimeConfigKey,
+    body: runtimeConfigPath,
+    contentType: contentTypeFor(runtimeConfigKey),
+    cacheControl: cacheControlFor(runtimeConfigKey),
+    runner,
+  })
   const webEntrySha256 = hashed.find((entry) => entry.path === 'index.html').sha256
   const webEntryVersionId = await putObject({
     bucket,
@@ -312,14 +349,6 @@ export async function publishWebRelease({
     body: indexPath,
     contentType: contentTypeFor('index.html'),
     cacheControl: cacheControlFor('index.html'),
-    runner,
-  })
-  const runtimeVersionId = await putObject({
-    bucket,
-    key: 'runtime-config.json',
-    body: runtimeConfigPath,
-    contentType: 'application/json',
-    cacheControl: 'no-store',
     runner,
   })
 
@@ -346,12 +375,12 @@ export async function publishWebRelease({
   await runner([
     'aws', 'cloudfront', 'create-invalidation',
     '--distribution-id', distributionId,
-    '--paths', '/index.html', '/served-release.json', '/runtime-config.json', '/*',
+    '--paths', '/index.html', '/served-release.json', '/*',
     '--query', 'Invalidation.Id',
     '--output', 'text',
   ])
 
-  return { release, runtimeConfigSha256, runtimeVersionId, webEntryVersionId }
+  return { release, runtimeConfigSha256, runtimeConfigKey, runtimeVersionId, webEntryVersionId }
 }
 
 function parseArgs(argv) {

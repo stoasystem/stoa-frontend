@@ -36,7 +36,7 @@ export interface ServedReleaseLoadOptions {
 }
 
 export interface RuntimeConfigLoadExpectations {
-  readonly configUrl: '/runtime-config.json'
+  readonly configUrl: string
   readonly webOrigin: string
   readonly expectedDigest: string
   readonly expectedRelease: ServedReleaseIdentity
@@ -45,6 +45,16 @@ export interface RuntimeConfigLoadExpectations {
 
 const MAX_DESCRIPTOR_BYTES = 16 * 1024
 const SHA256_PATTERN = /^[0-9a-f]{64}$/
+/**
+ * The runtime config's object name (#344). A publish puts it under a name made
+ * of its own digest, so the descriptor is the only object a release overwrites
+ * and a visitor can never pair one release's descriptor with another's config.
+ * `runtime-config.json` is the name every publish before that used; it is
+ * accepted so the deploy that switches over does not refuse the descriptor still
+ * being served while it runs, and so an older commit can still be redeployed.
+ */
+const LEGACY_RUNTIME_CONFIG_KEY = 'runtime-config.json'
+const DIGEST_RUNTIME_CONFIG_KEY = /^runtime-config\.([0-9a-f]{64})\.json$/
 const VERSION_ID_PATTERN = /^[A-Za-z0-9._~+/-]{8,1024}$/
 const MUTABLE_IDENTITIES = new Set([
   'head',
@@ -190,15 +200,28 @@ function requireEnvironmentOrigin(origin: URL, environment: ServedReleaseEnviron
       (environment === 'production' && (localHost || stagingHost || pilotHost))) fail()
 }
 
+type ServedObjectKind = 'runtime-config' | 'index.html'
+
+function requireObjectKey(key: string, kind: ServedObjectKind, sha256: string): void {
+  if (kind === 'index.html') {
+    if (key !== 'index.html') fail()
+    return
+  }
+  if (key === LEGACY_RUNTIME_CONFIG_KEY) return
+  const named = DIGEST_RUNTIME_CONFIG_KEY.exec(key)
+  if (named === null || named[1] !== sha256) fail()
+}
+
 function parseServedObject(
   value: unknown,
-  expectedKey: 'runtime-config.json' | 'index.html',
+  kind: ServedObjectKind,
   origin: URL,
 ): ServedObjectIdentity {
   const object = requireRecord(value)
   requireExactKeys(object, OBJECT_KEYS)
   const key = requireString(object.key)
-  if (key !== expectedKey) fail()
+  const sha256 = requireSha256(object.sha256)
+  requireObjectKey(key, kind, sha256)
   const versionId = requireVersionId(object.versionId)
   const url = requireString(object.url)
   let parsed: URL
@@ -207,15 +230,15 @@ function parseServedObject(
   } catch {
     fail()
   }
-  const expectedUrl = new URL(`/${expectedKey}`, origin).href
+  const expectedUrl = new URL(`/${key}`, origin).href
   if (parsed.protocol !== 'https:' || parsed.origin !== origin.origin || parsed.href !== expectedUrl ||
-      parsed.pathname !== `/${expectedKey}` || parsed.username || parsed.password ||
+      parsed.pathname !== `/${key}` || parsed.username || parsed.password ||
       parsed.search || parsed.hash) fail()
   return {
     key,
     versionId,
     url,
-    sha256: requireSha256(object.sha256),
+    sha256,
   }
 }
 
@@ -280,7 +303,7 @@ export function validateServedRelease(
     schema: 'stoa.web.served-release.v1',
     environment,
     release,
-    runtimeConfig: parseServedObject(source.runtimeConfig, 'runtime-config.json', origin),
+    runtimeConfig: parseServedObject(source.runtimeConfig, 'runtime-config', origin),
     webEntry: parseServedObject(source.webEntry, 'index.html', origin),
   }
   return deepFreeze(descriptor)
@@ -444,7 +467,7 @@ export function toRuntimeConfigLoadOptions(
 ): Readonly<RuntimeConfigLoadExpectations> {
   const validated = validateServedRelease(descriptor, options)
   return deepFreeze({
-    configUrl: '/runtime-config.json',
+    configUrl: `/${validated.runtimeConfig.key}`,
     webOrigin: options.expectedWebOrigin,
     expectedDigest: validated.runtimeConfig.sha256,
     expectedRelease: { ...validated.release },

@@ -1,4 +1,4 @@
-import { renderStartupFailure, startWebApplication } from './bootstrap'
+import { clearStartupFailure, renderStartupFailure, startWebApplication } from './bootstrap'
 
 const rootElement = document.getElementById('root')
 
@@ -29,6 +29,7 @@ void (import.meta.env.DEV
   : startWebApplication({
       webOrigin: window.location.origin,
       renderFailure: () => renderStartupFailure(rootElement),
+      clearFailure: () => clearStartupFailure(rootElement),
       loadApplication,
     }))
 
@@ -36,7 +37,7 @@ async function loadApplication() {
   {
     if (rootElement === null) throw new Error('startup root unavailable')
 
-    await Promise.all([
+    const [, { default: i18n }] = await Promise.all([
       import('./index.css'),
       import('@/i18n'),
     ])
@@ -47,6 +48,9 @@ async function loadApplication() {
     ])
 
     return () => {
+      // The failure text may have set the page language after i18next did, if
+      // the application loaded late (#344); the language the app shows wins.
+      document.documentElement.lang = i18n.language
       ReactDOM.createRoot(rootElement).render(
         React.createElement(
           React.StrictMode,

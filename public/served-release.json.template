@@ -8,9 +8,9 @@
     "backendArtifactSha256": "4444444444444444444444444444444444444444444444444444444444444444"
   },
   "runtimeConfig": {
-    "key": "runtime-config.json",
+    "key": "runtime-config.5555555555555555555555555555555555555555555555555555555555555555.json",
     "versionId": "runtime-version_A1b2c3d4",
-    "url": "https://staging.stoaedu.ch/runtime-config.json",
+    "url": "https://staging.stoaedu.ch/runtime-config.5555555555555555555555555555555555555555555555555555555555555555.json",
     "sha256": "5555555555555555555555555555555555555555555555555555555555555555"
   },
   "webEntry": {
