@@ -356,7 +356,8 @@
       "html": "Votre réponse n’a pas été acceptée : une partie ressemble à du code HTML pour le serveur. Veuillez reformuler ce passage.",
       "privateMarkers": "Votre réponse n’a pas été acceptée : elle contient des identifiants internes ou des données d’accès. Veuillez les retirer.",
       "tooManyBlocks": "Votre réponse n’a pas été acceptée : elle compte trop de blocs. Veuillez en regrouper.",
-      "tooLong": "Votre réponse n’a pas été acceptée : elle est trop longue. Veuillez la raccourcir ou la diviser."
+      "blockTooLong": "Votre réponse n’a pas été acceptée : l’un de ses blocs est trop long. Veuillez raccourcir ou diviser ce bloc.",
+      "tooLong": "Votre réponse n’a pas été acceptée : elle est trop longue au total. Veuillez la raccourcir ou la diviser."
     }
   }
 }

@@ -353,7 +353,8 @@
       "html": "Your reply was not accepted: part of it looks like HTML code to the server. Please rephrase that part.",
       "privateMarkers": "Your reply was not accepted: it contains internal identifiers or credentials. Please remove them.",
       "tooManyBlocks": "Your reply was not accepted: it has too many blocks. Please merge some.",
-      "tooLong": "Your reply was not accepted: it is too long. Please shorten or split it."
+      "blockTooLong": "Your reply was not accepted: one of its blocks is too long. Please shorten or split that block.",
+      "tooLong": "Your reply was not accepted: it is too long in total. Please shorten or split it."
     }
   }
 }

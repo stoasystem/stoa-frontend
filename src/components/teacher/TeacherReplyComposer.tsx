@@ -32,10 +32,25 @@ function readDraft(draftKey: string | undefined): ComposerDraft {
     const stored = JSON.parse(sessionStorage.getItem(draftStorageKey(draftKey)) ?? 'null') as Partial<ComposerDraft> | null
     if (!stored || typeof stored.value !== 'string' || !Array.isArray(stored.blocks)) return emptyDraft
     const mode = modeOptions.some((option) => option.mode === stored.mode) ? (stored.mode as ComposerMode) : 'paragraph'
-    return { mode, value: stored.value, blocks: stored.blocks }
+    return { mode, value: stored.value, blocks: stored.blocks.flatMap(storedBlock) }
   } catch {
     return emptyDraft
   }
+}
+
+const textBlockTypes = new Set<string>(['paragraph', 'heading', 'ordered_list', 'unordered_list', 'quote', 'code'])
+
+/*
+ * A stored block as the composer would have queued it, or nothing. Storage
+ * from an older version, or one edited by hand, may hold a block without its
+ * text; rendered, that threw and took the whole request page down (#371).
+ */
+function storedBlock(value: unknown): TeacherReplyBlock[] {
+  if (typeof value !== 'object' || value === null) return []
+  const { type, text, latex } = value as Record<string, unknown>
+  if (type === 'formula') return typeof latex === 'string' && latex.trim() ? [{ type, latex }] : []
+  if (typeof type !== 'string' || !textBlockTypes.has(type) || typeof text !== 'string' || !text.trim()) return []
+  return [{ type: type as Exclude<TeacherReplyBlock['type'], 'formula'>, text }]
 }
 
 function writeDraft(draftKey: string | undefined, draft: ComposerDraft) {

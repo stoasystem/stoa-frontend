@@ -356,7 +356,8 @@
       "html": "La tua risposta non è stata accettata: per il server una parte sembra codice HTML. Riformula quel passaggio.",
       "privateMarkers": "La tua risposta non è stata accettata: contiene identificativi interni o credenziali. Rimuovili.",
       "tooManyBlocks": "La tua risposta non è stata accettata: ha troppi blocchi. Uniscine alcuni.",
-      "tooLong": "La tua risposta non è stata accettata: è troppo lunga. Accorciala o dividila."
+      "blockTooLong": "La tua risposta non è stata accettata: uno dei suoi blocchi è troppo lungo. Accorcia o dividi quel blocco.",
+      "tooLong": "La tua risposta non è stata accettata: nel complesso è troppo lunga. Accorciala o dividila."
     }
   }
 }

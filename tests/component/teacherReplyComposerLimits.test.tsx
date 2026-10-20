@@ -8,6 +8,9 @@
  * T8 - line breaks survive into the timeline; a list block is one item a line.
  * T9 - focus is not dropped after an action, the resolution note says it is
  *      required in text, and the difficulty buttons are a named group.
+ *
+ * #371: a stored draft is read block by block, and a refusal is read by its
+ *       code first, a block too long told apart from a reply too long.
  */
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { act, fireEvent, render, renderHook, screen, waitFor, within } from '@testing-library/react'
@@ -71,6 +74,26 @@ function renderComposer({ draft, isSubmitting = false }: { draft?: TeacherReplyB
 
 const paragraph = (text: string): TeacherReplyBlock => ({ type: 'paragraph', text })
 const message = (key: string, values?: Record<string, number>) => i18n.t(`teacher:${key}`, values)
+
+function detail(status: TeacherHelpStatus) {
+  return {
+    requestId: 'r1', conversationId: 'c1', student: { id: 's1', name: 'Lea', grade: '8' },
+    subject: 'mathematics', status, messages: [], notes: [],
+  } as never
+}
+
+function renderDetail() {
+  const client = new QueryClient({ defaultOptions: { queries: { retry: false } } })
+  render(
+    <I18nextProvider i18n={i18n}>
+      <QueryClientProvider client={client}>
+        <MemoryRouter initialEntries={['/teacher/requests/r1']}>
+          <Routes><Route path="/teacher/requests/:requestId" element={<TeacherHelpRequestDetailPage />} /></Routes>
+        </MemoryRouter>
+      </QueryClientProvider>
+    </I18nextProvider>,
+  )
+}
 
 beforeEach(async () => {
   vi.clearAllMocks()
@@ -167,15 +190,13 @@ describe('T3: a reply the server refuses says why', () => {
     ['teacher reply contains private markers', 'privateMarkers'],
     ['teacher reply contains private credentials', 'privateMarkers'],
     ['rich_content blocks must contain 1 to 20 blocks', 'tooManyBlocks'],
-    ['text exceeds 2000 characters', 'tooLong'],
-    ['latex exceeds 500 characters', 'tooLong'],
+    ['text exceeds 2000 characters', 'blockTooLong'],
+    ['latex exceeds 500 characters', 'blockTooLong'],
     ['teacher reply fallback exceeds 4000 characters', 'tooLong'],
-  ])('"%s"', async (detail, reason) => {
-    vi.mocked(teacherApi.addTeacherHelpRequestNote).mockRejectedValue(new ApiError(detail, { status: 422, detail }))
-    const { result } = renderHook(() => useAddTeacherHelpRequestNoteMutation(), { wrapper })
-    act(() => result.current.mutate({ requestId: 'r1', content: 'x' } as never))
-    await waitFor(() => expect(toast.error).toHaveBeenCalled())
-    expect(toast.error).toHaveBeenCalledWith(de.toasts.replyRefusedBecause[reason as keyof typeof de.toasts.replyRefusedBecause])
+    ['content exceeds 4000 characters', 'tooLong'],
+  ])('"%s"', async (sentence, reason) => {
+    await refuse(new ApiError(sentence, { status: 422, detail: sentence }))
+    expect(toast.error).toHaveBeenCalledWith(refusedBecause(reason))
   })
 
   it('keeps the general message for a refusal it does not know', async () => {
@@ -183,6 +204,88 @@ describe('T3: a reply the server refuses says why', () => {
     const { result } = renderHook(() => useAddTeacherHelpRequestNoteMutation(), { wrapper })
     act(() => result.current.mutate({ requestId: 'r1', content: 'x' } as never))
     await waitFor(() => expect(toast.error).toHaveBeenCalledWith(de.toasts.replyRefused))
+  })
+
+  async function refuse(error: ApiError) {
+    vi.mocked(teacherApi.addTeacherHelpRequestNote).mockRejectedValue(error)
+    const { result } = renderHook(() => useAddTeacherHelpRequestNoteMutation(), { wrapper })
+    act(() => result.current.mutate({ requestId: 'r1', content: 'x' } as never))
+    await waitFor(() => expect(toast.error).toHaveBeenCalled())
+  }
+
+  const refusedBecause = (reason: string) =>
+    de.toasts.replyRefusedBecause[reason as keyof typeof de.toasts.replyRefusedBecause]
+
+  // #371: the server's code says what was refused, whatever its sentence says.
+  it.each([
+    ['teacher_reply_unsafe_html', 'html'],
+    ['teacher_reply_private_markers', 'privateMarkers'],
+    ['teacher_reply_private_credentials', 'privateMarkers'],
+    ['teacher_reply_too_many_blocks', 'tooManyBlocks'],
+    ['teacher_reply_block_too_long', 'blockTooLong'],
+    ['teacher_reply_too_long', 'tooLong'],
+  ])('code %s', async (code, reason) => {
+    await refuse(new ApiError('reworded by the server', { status: 422, code }))
+    expect(toast.error).toHaveBeenCalledWith(refusedBecause(reason))
+  })
+
+  it('reads the code before the message', async () => {
+    await refuse(new ApiError('teacher reply fallback exceeds 4000 characters', { status: 422, code: 'teacher_reply_block_too_long' }))
+    expect(toast.error).toHaveBeenCalledWith(de.toasts.replyRefusedBecause.blockTooLong)
+  })
+
+  it('falls back to the message for a code it does not know', async () => {
+    await refuse(new ApiError('text exceeds 2000 characters', { status: 422, code: 'something_new' }))
+    expect(toast.error).toHaveBeenCalledWith(de.toasts.replyRefusedBecause.blockTooLong)
+  })
+
+  it('keeps the general message for an unknown code with an unknown message', async () => {
+    await refuse(new ApiError('something else', { status: 422, code: 'constructor' }))
+    expect(toast.error).toHaveBeenCalledWith(de.toasts.replyRefused)
+  })
+})
+
+describe('#371: a stored draft is read block by block', () => {
+  function storeDraft(blocks: unknown[]) {
+    sessionStorage.setItem('stoa.teacherReplyDraft.r1', JSON.stringify({ mode: 'paragraph', value: '', blocks }))
+  }
+
+  it('drops the blocks it cannot render and keeps the rest', () => {
+    storeDraft([
+      { type: 'paragraph' },
+      { type: 'formula', text: 'x = 1' },
+      { type: 'paragraph', text: 42 },
+      { type: 'video', text: 'unbekannt' },
+      { text: 'ohne Typ' },
+      { type: 'paragraph', text: '   ' },
+      null,
+      'Erster Schritt',
+      paragraph('bleibt'),
+      { type: 'formula', latex: '2x = 4' },
+      { type: 'quote', text: 'Zitat', extra: true },
+    ])
+    const composer = renderComposer()
+
+    const queued = screen.getByRole('list', { name: message('reply.queued', { count: 3 }) })
+    expect(within(queued).getByText('bleibt')).toBeInTheDocument()
+    expect(within(queued).getByText('2x = 4')).toBeInTheDocument()
+    expect(within(queued).getByText('Zitat')).toBeInTheDocument()
+    expect(composer.send()).toBeEnabled()
+    expect(JSON.parse(sessionStorage.getItem('stoa.teacherReplyDraft.r1') ?? '{}').blocks).toEqual([
+      paragraph('bleibt'),
+      { type: 'formula', latex: '2x = 4' },
+      { type: 'quote', text: 'Zitat' },
+    ])
+  })
+
+  it('keeps the request page up for a draft with a block missing its text', async () => {
+    storeDraft([{ type: 'paragraph' }, { type: 'formula' }])
+    vi.mocked(teacherApi.getTeacherHelpRequestDetail).mockResolvedValue(detail('in_progress'))
+    renderDetail()
+
+    expect(await screen.findByLabelText(REPLY)).toHaveValue('')
+    expect(screen.queryByText(message('reply.queued', { count: 2 }))).toBeNull()
+    expect(sessionStorage.getItem('stoa.teacherReplyDraft.r1')).toBeNull()
   })
 })
 
@@ -276,26 +379,6 @@ describe('T9: focus and labels', () => {
     expect(composer.reply()).toHaveFocus()
   })
 
-  function detail(status: TeacherHelpStatus) {
-    return {
-      requestId: 'r1', conversationId: 'c1', student: { id: 's1', name: 'Lea', grade: '8' },
-      subject: 'mathematics', status, messages: [], notes: [],
-    } as never
-  }
-
-  function renderDetail() {
-    const client = new QueryClient({ defaultOptions: { queries: { retry: false } } })
-    render(
-      <I18nextProvider i18n={i18n}>
-        <QueryClientProvider client={client}>
-          <MemoryRouter initialEntries={['/teacher/requests/r1']}>
-            <Routes><Route path="/teacher/requests/:requestId" element={<TeacherHelpRequestDetailPage />} /></Routes>
-          </MemoryRouter>
-        </QueryClientProvider>
-      </I18nextProvider>,
-    )
-  }
-
   it('says in text that the resolution note is required', async () => {
     vi.mocked(teacherApi.getTeacherHelpRequestDetail).mockResolvedValue(detail('in_progress'))
     renderDetail()
@@ -342,9 +425,11 @@ describe('the new copy', () => {
       }
       expect(bundle.reply.unsafe.tooManyBlocks, language).toContain('{{max}}')
       expect(bundle.reply.removeBlock, language).toContain('{{number}}')
-      for (const reason of ['html', 'privateMarkers', 'tooManyBlocks', 'tooLong'] as const) {
+      for (const reason of ['html', 'privateMarkers', 'tooManyBlocks', 'blockTooLong', 'tooLong'] as const) {
         expect(bundle.toasts.replyRefusedBecause[reason], `${language} ${reason}`).toBeTruthy()
       }
+      // #371: a block too long and a reply too long are not the same toast.
+      expect(bundle.toasts.replyRefusedBecause.blockTooLong, language).not.toBe(bundle.toasts.replyRefusedBecause.tooLong)
     }
   })
 

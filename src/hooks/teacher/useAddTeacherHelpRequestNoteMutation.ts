@@ -39,19 +39,43 @@ export function useAddTeacherHelpRequestNoteMutation() {
 function replyFailureKey(error: unknown) {
   if (isHelpRequestConflict(error)) return 'teacher:toasts.replyConflict'
   if (error instanceof ApiError && error.status === 422) {
-    const reason = refusalReason(error.message)
+    const reason = refusalReason(error)
     return reason ? `teacher:toasts.replyRefusedBecause.${reason}` : 'teacher:toasts.replyRefused'
   }
   return 'teacher:toasts.replyFailed'
 }
 
+type RefusalReason = 'html' | 'privateMarkers' | 'tooManyBlocks' | 'blockTooLong' | 'tooLong'
+
+/*
+ * The server's code for a refusal, read first (#371). It sends none for a
+ * refused reply yet; until it does, and for a code not listed here, the
+ * message is matched as before.
+ */
+const REFUSAL_CODES = new Map<string, RefusalReason>([
+  ['teacher_reply_unsafe_html', 'html'],
+  ['teacher_reply_private_markers', 'privateMarkers'],
+  ['teacher_reply_private_credentials', 'privateMarkers'],
+  ['teacher_reply_too_many_blocks', 'tooManyBlocks'],
+  ['teacher_reply_block_too_long', 'blockTooLong'],
+  ['teacher_reply_too_long', 'tooLong'],
+])
+
+function refusalReason(error: ApiError): RefusalReason | null {
+  const coded = error.code ? REFUSAL_CODES.get(error.code) : undefined
+  return coded ?? refusalReasonFromMessage(error.message)
+}
+
 // teacher_reply_service's TeacherReplyValidationError messages, as the router
-// passes them on in `detail`.
-function refusalReason(message: string) {
+// passes them on in `detail`. A block's own limit names its field ("text
+// exceeds 2000 characters", "latex exceeds 500 characters"); the whole reply's
+// is "teacher reply fallback exceeds 4000 characters" (#371).
+function refusalReasonFromMessage(message: string): RefusalReason | null {
   const lowered = message.toLowerCase()
   if (lowered.includes('unsafe raw html')) return 'html'
   if (lowered.includes('private markers') || lowered.includes('private credentials')) return 'privateMarkers'
   if (lowered.includes('1 to 20 blocks')) return 'tooManyBlocks'
+  if (/\b(?:text|latex) exceeds\b/.test(lowered)) return 'blockTooLong'
   if (lowered.includes('exceeds')) return 'tooLong'
   return null
 }
