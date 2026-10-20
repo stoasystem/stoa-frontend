@@ -409,7 +409,8 @@ describe('vite:preloadError', () => {
     const target = fakeWindow()
     stop = installChunkReload(target as unknown as Window, () => 1_000_000)
 
-    expect(reloadForFailedPage(new Error('the page threw while its module ran'))).toBe(false)
+    // The dev server has no preload helper, so nothing is announced there.
+    expect(reloadForFailedPage(new Error('the dev server could not load the page'))).toBe(false)
     expect(reloadForFailedPage('not an error')).toBe(false)
     expect(reloadForFailedPage(undefined)).toBe(false)
     expect(target.location.reload).not.toHaveBeenCalled()

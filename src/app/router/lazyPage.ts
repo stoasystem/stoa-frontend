@@ -69,8 +69,8 @@ export function lazyPage<Name extends string>(
         .then(
           (module) => ({ default: module[pageName] }),
           (error: unknown) =>
-            // A module that could not be fetched may be one an older release
-            // named, so the tab reloads (chunkReload.ts) and the page stays
+            // A module that failed to load may be one an older release named,
+            // so the tab reloads (chunkReload.ts) and the page stays
             // loading until it does, rather than fail and report that. A
             // reload that never comes -- the reader chose to stay on a "Leave
             // site?" prompt -- is a failure after all, so the page offers

@@ -1,12 +1,14 @@
 /*
- * Reloading once when a page's module cannot be fetched (#272).
+ * Reloading once when a page's module fails to load (#272).
  *
- * Vite announces a failed dynamic import with `vite:preloadError`, then rejects
- * the import with the same error. A reload fetches the page afresh, which
- * recovers both a moment's network loss and a page that is still running an
- * older release. If the same failure comes back right after a reload,
- * reloading again would only loop: the page's error boundary then offers
- * "Try again" instead.
+ * In a build, Vite announces every failed dynamic import with
+ * `vite:preloadError` -- a module that could not be fetched, its stylesheet,
+ * or a module that threw as it ran -- then rejects the import with the same
+ * error. The dev server has no such announcement. A reload fetches the page
+ * afresh, which recovers both a moment's network loss and a page that is still
+ * running an older release. If the same failure comes back right after a
+ * reload, reloading again would only loop: the page's error boundary then
+ * offers "Try again" and "Reload page" instead.
  *
  * Only a page asks for the reload (`lazyPage.ts`). Every other module loaded on
  * demand is optional, and its caller copes with the failure itself: KaTeX's
@@ -30,7 +32,7 @@ type ReloadTarget = Pick<Window, 'addEventListener' | 'removeEventListener' | 's
 type Listening = {
   target: ReloadTarget
   now: () => number
-  /** The errors Vite announced, so a page can tell a failed fetch from any other. */
+  /** The errors Vite announced: what makes a page's failure one a reload may cure. */
   announced: WeakSet<object>
 }
 
@@ -76,8 +78,9 @@ export function installChunkReload(target: ReloadTarget = window, now: () => num
  * Reloads the tab for a page whose module failed to load; `true` when the
  * reload has started and the page should wait for it.
  *
- * An error Vite did not announce is left to the page's error boundary, and so
- * is one that comes back within the window after our own reload.
+ * An error Vite did not announce (the dev server, a test) is left to the page's
+ * error boundary, and so is one that comes back within the window after our
+ * own reload.
  */
 export function reloadForFailedPage(error: unknown): boolean {
   if (listening === null || typeof error !== 'object' || error === null) return false

@@ -71,6 +71,32 @@ test('formulas whose KaTeX chunk cannot be fetched stay as written, and the tab 
   expect(documents(), 'documents loaded since the first formula').toBe(0)
   expect(await page.evaluate(() => (globalThis as { stoaE2eDocument?: string }).stoaE2eDocument)).toBe('before the formulas')
 })
+// Vite fetches a lazy module's stylesheet first and never again once it has
+// failed, so a stylesheet of KaTeX's own could fail while its code later
+// loaded: every formula then showed twice, typeset and as raw text.
+test('KaTeX and its stylesheet come in one file, and a formula is typeset with it', async ({ page, backend }) => {
+  const world = new StudentWorld(backend)
+  world.install()
+  await signInAsStudent(page)
+
+  const katexFiles: string[] = []
+  page.on('request', (request) => {
+    const { pathname } = new URL(request.url())
+    if (/^\/assets\/katex/i.test(pathname) && !/\.(woff2?|ttf)$/.test(pathname)) katexFiles.push(pathname)
+  })
+
+  const question = 'What is $x^2$?'
+  await page.getByRole('textbox', { name: 'Your question' }).fill(question)
+  const panel = page.getByRole('complementary', { name: 'Ask' })
+  await panel.getByRole('textbox', { name: 'Your question' }).press('Enter')
+  const formula = panel.getByRole('log', { name: 'Messages' }).locator('.katex').first()
+  await expect(formula).toBeVisible()
+
+  expect(katexFiles).toEqual([expect.stringMatching(/^\/assets\/katexLoader-[\w-]+\.js$/)])
+  // Styled: the MathML copy kept for screen readers is not shown beside the typeset formula.
+  await expect(formula.locator('.katex-mathml')).toHaveCSS('position', 'absolute')
+})
+
 test('a page whose chunk cannot be fetched reloads the tab once, and then shows', async ({ page, backend }) => {
   new StudentWorld(backend).install()
   const documents = documentLoads(page)

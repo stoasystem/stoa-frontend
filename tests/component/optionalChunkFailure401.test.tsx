@@ -7,7 +7,7 @@
  * reload took the failure over, the import came back empty, which was kept as
  * KaTeX: if the reload did not happen, every formula after it stayed plain
  * text, past #345's retry. A formula is meant to stay as written instead, and
- * the next one to try again.
+ * the next one to ask for KaTeX again.
  */
 import { act, render, screen, waitFor } from '@testing-library/react'
 import { Suspense } from 'react'
@@ -55,8 +55,9 @@ describe('a KaTeX chunk that fails to load', () => {
     })
     const { MathRenderer } = await import('@/components/ui/MathRenderer')
     // The chunk can be fetched again. Registered anew because Vitest keeps a
-    // mocked module that loaded, even an empty one, where a browser whose
-    // import failed keeps nothing and fetches it again when asked.
+    // mocked module that loaded, even an empty one. This stands for a browser
+    // that fetches a failed import again; Chromium does not, and keeps the
+    // failure for the document (tests/e2e-dist/chunkFailure.spec.ts).
     const recover = () =>
       vi.doMock('@/components/ui/katexLoader', async () => {
         counter.attempts += 1
@@ -91,7 +92,9 @@ describe('a KaTeX chunk that fails to load', () => {
   })
 
   it('counts a module that came back empty as a failure, and asks again for the next formula', async () => {
-    // What Vite hands over when a listener prevented the failure.
+    // A listener that prevents the failure makes Vite resolve the import to
+    // `undefined`. A mock cannot resolve to nothing, so an empty module
+    // stands in; MathRenderer refuses both alike.
     const { MathRenderer, counter, recover } = await mathRendererWhoseLoad(async () => ({ default: undefined }))
 
     const first = render(<MathRenderer>{'area is $x^2$'}</MathRenderer>)
