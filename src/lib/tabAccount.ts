@@ -577,7 +577,13 @@ export function initializeTab(): void {
     // server too; a newer one was ended by whoever replaced or signed it out.
     const dropped = legacy ? { accessToken: token, refreshToken: storedRefreshToken() } : null
     replaceRefreshToken(null)
-    signOutTab({ reason: 'signed-out-elsewhere' })
+    // The page the tab opened on is where it was, for the same account to
+    // come back to (#343), as when it notices the change while open.
+    const { pathname, search, hash } = window.location
+    signOutTab({
+      reason: 'signed-out-elsewhere',
+      ...(pathname !== '/login' ? { returnTo: `${pathname}${search ?? ''}${hash ?? ''}` } : {}),
+    })
     if (dropped) dropOnServer([dropped])
     return
   }
