@@ -1,6 +1,7 @@
-import { FormEvent, useEffect, useMemo, useState } from 'react'
-import { Code2, List, Pilcrow, Send, Sigma } from 'lucide-react'
+import { FormEvent, useEffect, useMemo, useRef, useState } from 'react'
+import { Code2, List, Pilcrow, Send, Sigma, X } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
+import { RichTeacherReply } from '@/components/teacher/RichTeacherReply'
 import { Button } from '@/components/ui/button'
 import type { TeacherReplyBlock, TeacherReplyRichContent } from '@/types/teacher'
 
@@ -65,24 +66,41 @@ export function TeacherReplyComposer({
   const [mode, setMode] = useState<ComposerMode>(initialDraft.mode)
   const [value, setValue] = useState(initialDraft.value)
   const [blocks, setBlocks] = useState<TeacherReplyBlock[]>(initialDraft.blocks)
+  const textareaRef = useRef<HTMLTextAreaElement>(null)
+  const wasSubmitting = useRef(isSubmitting)
 
   useEffect(() => {
     writeDraft(draftKey, { mode, value, blocks })
   }, [draftKey, mode, value, blocks])
 
+  // The send button is disabled while the reply is on its way, which drops
+  // keyboard focus on the page; give it back to the reply once it lands (#332).
+  useEffect(() => {
+    const active = document.activeElement as (HTMLElement & { disabled?: boolean }) | null
+    const lost = !active || active === document.body || active.disabled || !active.isConnected
+    if (wasSubmitting.current && !isSubmitting && lost) textareaRef.current?.focus()
+    wasSubmitting.current = isSubmitting
+  }, [isSubmitting])
+
   const previewBlocks = useMemo(() => {
     const trimmed = value.trim()
     return trimmed ? [...blocks, blockFromInput(mode, trimmed)] : blocks
   }, [blocks, mode, value])
-  const unsafeReason = useMemo(() => unsafeReplyReason(previewBlocks), [previewBlocks])
+  const problem = useMemo(() => replyProblem(previewBlocks), [previewBlocks])
   const locked = isSubmitting || disabled
-  const canSubmit = previewBlocks.length > 0 && !locked && !unsafeReason
+  const canSubmit = previewBlocks.length > 0 && !locked && !problem
 
   function addBlock() {
     const trimmed = value.trim()
-    if (!trimmed || unsafeReplyReason([blockFromInput(mode, trimmed)])) return
+    if (!trimmed || replyProblem([...blocks, blockFromInput(mode, trimmed)])) return
     setBlocks((current) => [...current, blockFromInput(mode, trimmed)])
     setValue('')
+    textareaRef.current?.focus()
+  }
+
+  function removeBlock(index: number) {
+    setBlocks((current) => current.filter((_, at) => at !== index))
+    textareaRef.current?.focus()
   }
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -93,6 +111,7 @@ export function TeacherReplyComposer({
       setBlocks([])
       setValue('')
       setMode('paragraph')
+      textareaRef.current?.focus()
     })
   }
 
@@ -120,29 +139,62 @@ export function TeacherReplyComposer({
           )
         })}
       </div>
+      {blocks.length > 0 && (
+        <div className="space-y-2 rounded-md border bg-secondary/40 p-3">
+          <p id="teacher-reply-queued" className="text-xs text-muted-foreground">
+            {t('reply.queued', { count: blocks.length })}
+          </p>
+          {/* What is queued is what will be sent: shown as the student sees it,
+              and each block can be taken out again (#332). */}
+          <ol aria-labelledby="teacher-reply-queued" className="space-y-2">
+            {blocks.map((block, index) => (
+              <li key={index} className="flex items-start justify-between gap-2 rounded-md bg-background p-2">
+                <div className="min-w-0 flex-1">
+                  <RichTeacherReply content={{ version: 1, blocks: [block] }} fallback="" />
+                </div>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  aria-label={t('reply.removeBlock', { number: index + 1 })}
+                  disabled={locked}
+                  onClick={() => removeBlock(index)}
+                >
+                  <X className="h-4 w-4" aria-hidden="true" />
+                </Button>
+              </li>
+            ))}
+          </ol>
+        </div>
+      )}
       <label className="block text-sm font-medium" htmlFor="teacher-rich-reply">
         {t('reply.label')}
       </label>
+      {/* Read-only, not disabled, while sending: a disabled field drops the
+          keyboard focus (#332). Disabled only while the page cannot act (#331). */}
       <textarea
+        ref={textareaRef}
         id="teacher-rich-reply"
         className="min-h-28 w-full resize-y rounded-md border bg-background px-3 py-2 text-sm leading-6 placeholder:text-muted-foreground"
         placeholder={mode === 'formula' ? '2x + 4 = 10' : t('reply.placeholder')}
         value={value}
         onChange={(event) => setValue(event.target.value)}
-        disabled={locked}
+        readOnly={isSubmitting}
+        disabled={disabled}
+        aria-invalid={problem ? true : undefined}
+        aria-describedby={problem ? 'teacher-reply-problem' : undefined}
       />
-      {blocks.length > 0 && (
-        <div className="rounded-md border bg-secondary/40 p-3 text-xs text-muted-foreground">
-          {t('reply.queued', { count: blocks.length })}
-        </div>
+      {problem && (
+        <p id="teacher-reply-problem" className="text-sm text-destructive">
+          {t(`reply.unsafe.${problem.key}`, problem.values)}
+        </p>
       )}
-      {unsafeReason && <p className="text-sm text-destructive">{t(`reply.unsafe.${unsafeReason}`)}</p>}
       <div className="flex flex-wrap gap-2">
         <Button
           type="button"
           variant="outline"
           onClick={addBlock}
-          disabled={locked || !value.trim() || Boolean(unsafeReason)}
+          disabled={locked || !value.trim() || Boolean(problem)}
         >
           {t('reply.addBlock')}
         </Button>
@@ -157,7 +209,44 @@ export function TeacherReplyComposer({
 
 function blockFromInput(mode: ComposerMode, value: string): TeacherReplyBlock {
   if (mode === 'formula') return { type: 'formula', latex: value }
+  // One item per line; bullets or numbers the teacher typed are the list's own (#332).
+  if (mode === 'unordered_list' || mode === 'ordered_list') {
+    const items = value
+      .split('\n')
+      .map((line) => line.trim().replace(/^(?:[-*•]|\d+[.)])\s+/, ''))
+      .filter(Boolean)
+    return { type: mode, text: items.join('\n') }
+  }
   return { type: mode, text: value }
+}
+
+/*
+ * What stoa-backend's teacher_reply_service refuses with a 422 (#332): at most
+ * 20 blocks, 2000 characters in a text block, 500 in a formula, 4000 in all
+ * (the blocks joined by line breaks). Python counts code points, so do we.
+ */
+const REPLY_LIMITS = { blocks: 20, textBlock: 2000, formula: 500, total: 4000 } as const
+
+type ReplyProblem = {
+  key: 'html' | 'privateMarkers' | 'blockTooLong' | 'tooManyBlocks' | 'tooLong'
+  values?: Record<string, number>
+}
+
+const characters = (text: string) => [...text].length
+
+/** Why a reply may not be sent, as the key of its message; null when it may. */
+function replyProblem(blocks: TeacherReplyBlock[]): ReplyProblem | null {
+  const unsafe = unsafeReplyReason(blocks)
+  if (unsafe) return { key: unsafe }
+  for (const block of blocks) {
+    const max = block.type === 'formula' ? REPLY_LIMITS.formula : REPLY_LIMITS.textBlock
+    const length = characters(block.type === 'formula' ? block.latex : block.text)
+    if (length > max) return { key: 'blockTooLong', values: { length, max } }
+  }
+  if (blocks.length > REPLY_LIMITS.blocks) return { key: 'tooManyBlocks', values: { max: REPLY_LIMITS.blocks } }
+  const length = characters(plainTextFallback({ version: 1, blocks }))
+  if (length > REPLY_LIMITS.total) return { key: 'tooLong', values: { length, max: REPLY_LIMITS.total } }
+  return null
 }
 
 function plainTextFallback(content: TeacherReplyRichContent) {
@@ -167,26 +256,32 @@ function plainTextFallback(content: TeacherReplyRichContent) {
     .trim()
 }
 
-/** Why a reply may not be sent, as the key of its message; null when it may. */
 function unsafeReplyReason(blocks: TeacherReplyBlock[]): 'html' | 'privateMarkers' | null {
-  const serialized = blocks
+  const text = blocks
     .map((block) => (block.type === 'formula' ? block.latex : block.text))
     .join('\n')
-    .toLowerCase()
+  const serialized = text.toLowerCase()
   if (!serialized) return null
   if (looksLikeUnsafeHtml(serialized)) return 'html'
+  // The backend's markers (_SECRET_MARKERS) and its AWS access key pattern (#332).
   const privateMarkers = [
-    'private/',
     'weekly-reports/',
-    'presigned_url',
-    'presignedurl',
+    'private/',
+    's3://',
+    'https://s3',
+    'amazonaws.com',
     'x-amz-signature',
+    'presignedurl',
+    'presigned_url',
     'access_token',
     'id_token',
     'refresh_token',
     'aws_secret_access_key',
+    'secretaccesskey',
+    'password=',
+    'cookie=',
   ]
-  return privateMarkers.some((marker) => serialized.includes(marker))
+  return privateMarkers.some((marker) => serialized.includes(marker)) || AWS_ACCESS_KEY.test(text)
     ? 'privateMarkers'
     : null
 }
@@ -198,6 +293,8 @@ function unsafeReplyReason(blocks: TeacherReplyBlock[]): 'html' | 'privateMarker
  * "<a href=...>" and "<script>" are markup. Replies are rendered as text nodes,
  * so this guards against pasted markup; it is not the escaping itself.
  */
+const AWS_ACCESS_KEY = /\b(?:AKIA|ASIA)[A-Z0-9]{16}\b/
+
 const UNSAFE_TAG =
   /<\/?(script|iframe|frame|frameset|embed|object|applet|style|link|meta|base|html|body|img|svg|math|video|audio|form|input|button|a)(?:[\s/][^<>]*)?>/
 

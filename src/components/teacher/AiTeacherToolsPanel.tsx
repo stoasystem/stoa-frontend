@@ -169,8 +169,11 @@ export function AiTeacherToolsPanel({ request, canAct }: Props) {
             </div>
             <div className="grid gap-3 sm:grid-cols-[1fr_96px]">
               <div className="space-y-2">
-                <Label htmlFor="exercise-difficulty">{t('aiTools.exercise.difficulty')}</Label>
-                <div id="exercise-difficulty" className="flex flex-wrap gap-2">
+                {/* A label names a field; these buttons are a group, named by it (#332). */}
+                <p id="exercise-difficulty-label" className="text-sm font-medium leading-none">
+                  {t('aiTools.exercise.difficulty')}
+                </p>
+                <div role="group" aria-labelledby="exercise-difficulty-label" className="flex flex-wrap gap-2">
                   {difficulties.map((option) => (
                     <button
                       key={option}

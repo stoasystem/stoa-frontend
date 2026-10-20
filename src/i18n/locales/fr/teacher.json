@@ -205,8 +205,12 @@
     },
     "unsafe": {
       "html": "Le code HTML n’est pas autorisé dans une réponse.",
-      "privateMarkers": "Des identifiants internes ne peuvent pas être envoyés dans une réponse."
-    }
+      "privateMarkers": "Des identifiants internes ne peuvent pas être envoyés dans une réponse.",
+      "blockTooLong": "Ce bloc est trop long : {{length}} caractères sur {{max}} au maximum. Veuillez le raccourcir ou le diviser.",
+      "tooManyBlocks": "Une réponse compte au maximum {{max}} blocs. Veuillez regrouper des blocs ou en supprimer un.",
+      "tooLong": "La réponse est trop longue : {{length}} caractères sur {{max}} au maximum au total. Veuillez la raccourcir."
+    },
+    "removeBlock": "Supprimer le bloc {{number}}"
   },
   "practiceContext": {
     "source": "Source : {{source}}",
@@ -345,6 +349,12 @@
       "accepted": "Le brouillon n’a pas pu être accepté.",
       "rejected": "Le brouillon n’a pas pu être refusé.",
       "archived": "Le brouillon n’a pas pu être archivé."
+    },
+    "replyRefusedBecause": {
+      "html": "Votre réponse n’a pas été acceptée : une partie ressemble à du code HTML pour le serveur. Veuillez reformuler ce passage.",
+      "privateMarkers": "Votre réponse n’a pas été acceptée : elle contient des identifiants internes ou des données d’accès. Veuillez les retirer.",
+      "tooManyBlocks": "Votre réponse n’a pas été acceptée : elle compte trop de blocs. Veuillez en regrouper.",
+      "tooLong": "Votre réponse n’a pas été acceptée : elle est trop longue. Veuillez la raccourcir ou la diviser."
     }
   }
 }
