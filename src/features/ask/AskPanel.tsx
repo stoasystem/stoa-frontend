@@ -52,13 +52,14 @@ import { teacherHelpErrorKey } from '@/lib/teacherHelpErrors'
 import { toUserFacingError } from '@/lib/userFacingText'
 import { cn } from '@/lib/utils'
 import { trackEvent } from '@/services/analytics/analyticsClient'
+import { ApiError } from '@/services/api/httpClient'
 import { chatQueryKeys } from '@/services/chat/chatQueryKeys'
 import { createTeacherHelpRequest } from '@/services/teacherHelp/teacherHelpApi'
 import { sendDetached } from '@/services/chat/detachedSend'
 import { useAuthStore } from '@/store/authStore'
 import { litMomentsFor, useLitMoments, type LitMoment } from '@/store/litMomentsStore'
 import { learningSubjectOptions } from '@/types/learningProfile'
-import { QUOTE_MAX_LENGTH, type ChatMessage } from '@/types/chat'
+import { QUOTE_MAX_LENGTH, type ChatMessage, type PracticeContextRef } from '@/types/chat'
 
 export type AskLayout = 'panel' | 'sheet'
 
@@ -112,12 +113,18 @@ export function AskPanel({
         idempotencyKey: `initial-${created.id}`,
         content: payload.initialMessage,
         askedAt: askedAtRef.current ?? new Date().toISOString(),
+        // The same fields the server took it with, or sending it again under
+        // the same key is refused as a different message (#327 K3).
+        ...(payload.practiceContext ? { practiceContext: payload.practiceContext } : {}),
       })
     },
   })
   // Two sends in one tick would start two conversations.
   const creatingRef = useRef(false)
   const askedAtRef = useRef<string | null>(null)
+  // The conversation a refused first question left behind (#327 K4): asking
+  // again goes into it, not into another empty one.
+  const refusedRef = useRef<RefusedConversation | null>(null)
   const ask = useAskConversation(conversationId)
   const { sendStreamingMessage, isStreaming, conversation } = ask
   const phone = layout === 'sheet'
@@ -162,47 +169,77 @@ export function AskPanel({
     if (creatingRef.current || createConversation.isPending) return
     const attachmentIds = attachments.readyIds
     const carried = attachmentIds.length > 0
-    creatingRef.current = true
-    askedAtRef.current = new Date().toISOString()
+    const grade = conversationGrade(profile?.grade)
+    const askedAt = new Date().toISOString()
+    askedAtRef.current = askedAt
     // Sent is sent: the question leaves the composer now, so closing Ask while
     // the conversation is being made cannot leave it there to be sent twice.
     // It comes back only if the conversation could not be made.
     setDraft('')
-    // `POST /conversations` takes neither a quote nor a file, so a question
-    // carrying either starts the conversation empty and is sent into it as a
-    // message of its own -- into that conversation only, and whether or not
-    // Ask is still open by then (#263).
-    const held = quote || carried
     const readyAttachments = attachments.readyAttachments
     const practiceContext = practice?.context
+    // Sent into a conversation as a message of its own -- into that
+    // conversation only, and whether or not Ask is still open by then (#263).
+    const sendInto = (id: string, idempotencyKey: string) => {
+      sendDetached(id, {
+        idempotencyKey,
+        content,
+        askedAt,
+        ...(attachmentIds.length > 0 ? { attachmentIds, attachments: readyAttachments } : {}),
+        ...(practiceContext ? { practiceContext } : {}),
+        ...(quote ? { quote: quoteField(quote) } : {}),
+      })
+      // Gone with the question -- unless another was chosen meanwhile.
+      if (quote && useAskQuoteStore.getState().quote === quote) clearQuote()
+      clearSent()
+    }
+    // Opened only in the panel that asked, and only if the student is still
+    // on the list: a closed Ask stays closed, and a conversation the student
+    // opened meanwhile stays open.
+    const open = (id: string) => {
+      if (mounted.current && openConversation.current === null) select(id)
+    }
+
+    const refused = refusedRef.current
+    if (refused && refused.subject === subject && refused.grade === grade) {
+      refusedRef.current = null
+      createConversation.reset()
+      // The key the server named for the refused question when it is asked
+      // again as it was; a question changed meanwhile is a message of its own.
+      const same =
+        refused.content === content &&
+        !quote &&
+        !carried &&
+        sameContext(refused.practiceContext, practiceContext)
+      sendInto(refused.id, same ? `initial-${refused.id}` : `again-${refused.id}-${Date.now()}`)
+      open(refused.id)
+      return
+    }
+
+    creatingRef.current = true
+    // `POST /conversations` takes neither a quote nor a file, so a question
+    // carrying either starts the conversation empty and is sent into it as a
+    // message of its own (#263).
+    const held = quote || carried
     createConversation
       .mutateAsync({
         subject,
-        grade: conversationGrade(profile?.grade),
+        grade,
         ...(held ? {} : { initialMessage: content }),
         ...practiceField,
       })
       .then(
         (created) => {
-          if (held) {
-            sendDetached(created.id, {
-              idempotencyKey: `held-${created.id}`,
-              content,
-              askedAt: askedAtRef.current ?? new Date().toISOString(),
-              ...(attachmentIds.length > 0 ? { attachmentIds, attachments: readyAttachments } : {}),
-              ...(practiceContext ? { practiceContext } : {}),
-              ...(quote ? { quote: quoteField(quote) } : {}),
-            })
-            // Gone with the question -- unless another was chosen meanwhile.
-            if (quote && useAskQuoteStore.getState().quote === quote) clearQuote()
-            clearSent()
-          }
-          // Opened only in the panel that asked, and only if the student is
-          // still on the list: a closed Ask stays closed, and a conversation
-          // the student opened meanwhile stays open.
-          if (mounted.current && openConversation.current === null) select(created.id)
+          if (held) sendInto(created.id, `held-${created.id}`)
+          open(created.id)
         },
-        () => {
+        (error: unknown) => {
+          // The conversation was made and only its first question refused:
+          // the refusal names it (#327 K4).
+          const made = refusedConversationId(error)
+          if (made && !held) {
+            refusedRef.current = { id: made, subject, grade, content, practiceContext }
+          }
           // Unless the student has started another question meanwhile.
           if (!controller.readDraft()) setDraft(content)
         },
@@ -599,4 +636,31 @@ function latestAnswerId(messages: readonly ChatMessage[]) {
     }
   }
   return null
+}
+
+type RefusedConversation = {
+  id: string
+  subject: string
+  grade: string
+  content: string
+  practiceContext?: PracticeContextRef
+}
+
+/**
+ * The conversation `POST /conversations` made before refusing its first
+ * question: the backend names it in the refusal's detail, so the question can
+ * be asked again in it (stoa-backend `_naming_the_conversation`).
+ */
+function refusedConversationId(error: unknown): string | null {
+  if (!(error instanceof ApiError)) return null
+  const detail = error.detail
+  if (typeof detail !== 'object' || detail === null) return null
+  const id = (detail as { conversationId?: unknown }).conversationId
+  return typeof id === 'string' && id ? id : null
+}
+
+function sameContext(a?: PracticeContextRef, b?: PracticeContextRef) {
+  return (
+    a?.unitId === b?.unitId && a?.lessonId === b?.lessonId && a?.challengeId === b?.challengeId
+  )
 }
