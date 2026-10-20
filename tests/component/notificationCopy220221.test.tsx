@@ -20,6 +20,7 @@ const adminEvents = vi.hoisted(() => ({ items: [] as unknown[] }))
 vi.mock('@/hooks/notifications/useNotificationsQuery', () => ({
   useAdminNotificationsQuery: () => ({ data: adminEvents, isLoading: false, isError: false }),
   useNotificationsQuery: () => ({ data: { items: [] }, isLoading: false, isError: false }),
+  useUnreadNotificationCountQuery: () => ({ data: 0 }),
   useMarkNotificationReadMutation: () => ({ mutate: vi.fn() }),
   useArchiveNotificationMutation: () => ({ mutate: vi.fn() }),
 }))

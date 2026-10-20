@@ -33,6 +33,7 @@ const state = vi.hoisted(() => ({
 
 vi.mock('@/hooks/notifications/useNotificationsQuery', () => ({
   useNotificationsQuery: () => ({ data: { items: [] }, isLoading: false, isError: false }),
+  useUnreadNotificationCountQuery: () => ({ data: 0 }),
   useAdminNotificationsQuery: () => ({ data: { items: [] }, isLoading: false, isError: false }),
   useMarkNotificationReadMutation: () => ({ mutate: vi.fn(), isPending: false }),
   useArchiveNotificationMutation: () => ({ mutate: vi.fn(), isPending: false }),

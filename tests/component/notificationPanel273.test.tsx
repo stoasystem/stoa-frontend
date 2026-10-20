@@ -25,6 +25,7 @@ vi.mock('react-i18next', () => ({
 }))
 vi.mock('@/hooks/notifications/useNotificationsQuery', () => ({
   useNotificationsQuery: () => ({ data: { items: [] }, isLoading: false, isError: false }),
+  useUnreadNotificationCountQuery: () => ({ data: 0 }),
   useMarkNotificationReadMutation: () => ({ mutate: vi.fn(), isPending: false }),
   useArchiveNotificationMutation: () => ({ mutate: vi.fn(), isPending: false }),
 }))

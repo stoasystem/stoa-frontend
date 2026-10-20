@@ -13,6 +13,22 @@ export async function getNotifications() {
   return response.data
 }
 
+// The most `limit` the backend takes; past it the bell reads "99+".
+export const UNREAD_COUNT_LIMIT = 100
+
+/*
+ * The bell's unread count, read on its own (#373). `GET /notifications` holds
+ * the newest 50, so counting `created` among them missed older unread ones.
+ * The backend's `count` is the number of items it returned, so this one is
+ * exact up to the limit.
+ */
+export async function getUnreadNotificationCount() {
+  const response = await httpClient.get<NotificationListResponse>('/notifications', {
+    params: { status: 'created', limit: UNREAD_COUNT_LIMIT },
+  })
+  return response.data.count
+}
+
 export async function getAdminNotifications() {
   const response = await httpClient.get<NotificationListResponse>('/admin/notifications')
   return response.data
