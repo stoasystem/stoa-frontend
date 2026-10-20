@@ -312,10 +312,15 @@ export async function publishWebRelease({
   await requireVersioning(bucket, runner)
 
   // Order is the contract (#344): everything the new descriptor names goes up
-  // first under names nothing live points at (hashed assets, the digest-named
-  // config) or that work with either descriptor (index.html: its code loads
-  // whichever release the descriptor names). Then the descriptor, last. A
-  // failure anywhere before it leaves the previous release whole.
+  // first, and the descriptor last. Hashed assets and the digest-named config
+  // land under names nothing live points at, so a failure before index.html
+  // changes nothing a visitor sees. index.html cannot follow the descriptor,
+  // which carries its VersionId: from its upload until the descriptor lands -
+  // or, if the descriptor upload fails, until the next publish - new code
+  // starts against the previous descriptor and config. That pair is still one
+  // release's descriptor and config, digest-checked; it only fails if the new
+  // code no longer accepts the previous config's shape (a config key added or
+  // removed), so such a change must ship in a release that accepts both.
 
   for (const entry of hashed) {
     if (entry.path === 'index.html') continue

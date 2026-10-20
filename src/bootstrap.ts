@@ -211,7 +211,7 @@ export function renderStartupFailure(
 
 /**
  * Takes the failure text down when a start that ran out of time finishes after
- * all. The language is left to i18next, which has set it by then.
+ * all. The page language is set again by the application's own start.
  */
 export function clearStartupFailure(target: StartupFailureTarget | null): void {
   if (target === null) return

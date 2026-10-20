@@ -235,7 +235,7 @@ function publishInto(bucket, { distDir, backend, failOn }) {
     if (argv.includes('create-invalidation')) return 'I0'
     if (!argv.includes('put-object')) throw new Error(argv.join(' '))
     const key = argv[argv.indexOf('--key') + 1]
-    if (key === failOn) throw new Error(`upload of ${key} failed`)
+    if (failOn?.(key)) throw new Error(`upload of ${key} failed`)
     return bucket.put(key, argv[argv.indexOf('--body') + 1])
   }
   return {
@@ -262,7 +262,10 @@ async function freshDist(label, script) {
   return distDir
 }
 
-test('a visitor arriving between any two uploads of a publish starts one whole release', async () => {
+// What this proves is the descriptor and config a visitor is handed. The code
+// index.html loads is not modelled: from its upload until the descriptor lands
+// it is the new release's, against the previous config (see the publisher).
+test('a visitor arriving between any two uploads gets one release\'s descriptor and config', async () => {
   const webOrigin = 'https://staging.stoaedu.ch'
   const bucket = memoryBucket()
   const first = publishInto(bucket, { distDir: await freshDist('a', 'console.log(1)'), backend: '4' })
@@ -286,17 +289,53 @@ test('a visitor arriving between any two uploads of a publish starts one whole r
   ])
 })
 
-test('a publish that fails before its descriptor lands leaves the served release working', async () => {
+test('a publish that fails before its descriptor lands leaves the served descriptor and config whole', async () => {
   const webOrigin = 'https://staging.stoaedu.ch'
-  for (const failOn of ['index.html', 'served-release.json']) {
+  for (const [label, failOn] of [
+    ['asset', (key) => key.startsWith('assets/')],
+    ['config', (key) => key.startsWith('runtime-config.')],
+    ['index.html', (key) => key === 'index.html'],
+    ['descriptor', (key) => key === 'served-release.json'],
+  ]) {
     const bucket = memoryBucket()
     const first = publishInto(bucket, { distDir: await freshDist('a', 'console.log(1)'), backend: '4' })
     const released = await first.run(async () => {})
     const second = publishInto(bucket, { distDir: await freshDist('b', 'console.log(2)'), backend: '7', failOn })
-    await assert.rejects(second.run(async () => {}), /upload of/, failOn)
+    await assert.rejects(second.run(async () => {}), /upload of/, label)
     const config = await visitorStarts(bucket, webOrigin)
-    assert.equal(config.release.releaseId, released.release.releaseId, failOn)
+    assert.equal(config.release.releaseId, released.release.releaseId, label)
   }
+})
+
+// The deploy that switches over finds what every earlier publish left: the
+// config at the fixed name `runtime-config.json`, and a descriptor naming it.
+test('the first publish after the switch-over never pairs the legacy config with the new descriptor', async () => {
+  const webOrigin = 'https://staging.stoaedu.ch'
+  const bucket = memoryBucket()
+  const first = publishInto(bucket, { distDir: await freshDist('a', 'console.log(1)'), backend: '4' })
+  const released = await first.run(async () => {})
+  // Rewrite the first release into the legacy layout.
+  bucket.objects.set('runtime-config.json', bucket.objects.get(released.runtimeConfigKey))
+  bucket.objects.delete(released.runtimeConfigKey)
+  const legacy = JSON.parse(bucket.objects.get('served-release.json'))
+  legacy.runtimeConfig.key = 'runtime-config.json'
+  legacy.runtimeConfig.url = `${webOrigin}/runtime-config.json`
+  bucket.objects.set('served-release.json', `${canonicalize(legacy)}\n`)
+  assert.equal((await visitorStarts(bucket, webOrigin)).release.releaseId, released.release.releaseId)
+
+  const second = publishInto(bucket, { distDir: await freshDist('b', 'console.log(2)'), backend: '7' })
+  const seen = []
+  const next = await second.run(async (key) => {
+    seen.push([key, (await visitorStarts(bucket, webOrigin)).release.releaseId])
+  })
+  assert.deepEqual(seen.map(([, id]) => id), [
+    released.release.releaseId,
+    released.release.releaseId,
+    released.release.releaseId,
+    next.release.releaseId,
+  ])
+  // The legacy object is left as it was: nothing the new descriptor names.
+  assert.equal(JSON.parse(bucket.objects.get('runtime-config.json')).release.releaseId, released.release.releaseId)
 })
 
 // ---- Production deploy workflow --------------------------------------------
