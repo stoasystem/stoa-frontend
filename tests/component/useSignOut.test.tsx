@@ -15,6 +15,7 @@ import { httpClient } from '@/services/api/httpClient'
 import { getConversations } from '@/services/chat/chatApi'
 import { chatQueryKeys } from '@/services/chat/chatQueryKeys'
 import { LOGOUT_TIMEOUT_MS } from '@/services/auth/authApi'
+import { TAB_REFRESH_KEY } from '@/services/auth/sessionRefresh'
 import { logger } from '@/services/logging/logger'
 import { type CurrentUser, TOKEN_KEY, useAuthStore } from '@/store/authStore'
 import { mswServer } from '../mswServer'
@@ -346,5 +347,221 @@ describe('useSignOut', () => {
     expect(JSON.parse(localStorage.getItem('stoa_test_roles') ?? '[]')).toEqual([
       expect.objectContaining({ email: 'pa@test.stoaedu.ch', accessToken: 'parent-token' }),
     ])
+  })
+
+  // stoasystem/stoa-frontend#399: a page left idle for over an hour holds an
+  // access token that has run out. The backend refuses to sign it out and
+  // records nothing, while the refresh token beside it stays good for 30 days.
+  describe('with an access token that has run out', () => {
+    type RefreshAnswer = 'renewed' | 'rotated' | 'network-error' | 401
+
+    // The logout refuses the token the tab held and accepts a fresh one as told;
+    // the refresh answers as told. Every body each endpoint was sent, in order.
+    function answerExpired({
+      refused = 401,
+      refresh = 'renewed',
+      freshLogout = 204,
+      refreshGate,
+    }: {
+      refused?: 401 | 403
+      refresh?: RefreshAnswer
+      freshLogout?: 204 | 401 | 500
+      refreshGate?: Promise<void>
+    } = {}) {
+      const logouts: unknown[] = []
+      const refreshes: unknown[] = []
+      mswServer.use(
+        http.post('https://api.test/auth/logout', async ({ request }) => {
+          const body = (await request.json()) as { access_token: string }
+          logouts.push(body)
+          if (body.access_token === 'shared-token') {
+            return HttpResponse.json({ detail: { code: 'token_expired', message: 'expired' } }, { status: refused })
+          }
+          return new HttpResponse(null, { status: freshLogout })
+        }),
+        http.post('https://api.test/auth/refresh', async ({ request }) => {
+          refreshes.push(await request.json())
+          await refreshGate
+          if (refresh === 'network-error') return HttpResponse.error()
+          if (refresh === 401) return HttpResponse.json({ detail: 'refused' }, { status: 401 })
+          return HttpResponse.json({
+            accessToken: 'fresh-token',
+            ...(refresh === 'rotated' ? { refreshToken: 'rotated-refresh' } : {}),
+          })
+        }),
+      )
+      return { logouts, refreshes }
+    }
+
+    function renderSignedInWithRefresh() {
+      sessionStorage.setItem(TAB_REFRESH_KEY, 'refresh-a')
+      return renderSignedIn()
+    }
+
+    // Every value this browser keeps, to show no credential stayed behind.
+    function everythingStored(): string {
+      const values: string[] = []
+      for (const storage of [sessionStorage, localStorage]) {
+        for (let index = 0; index < storage.length; index += 1) {
+          values.push(storage.getItem(storage.key(index) ?? '') ?? '')
+        }
+      }
+      return values.join('\n')
+    }
+
+    it.each([401, 403] as const)(
+      'spends the refresh token once and signs the fresh token out when the logout is refused (%s)',
+      async (refused) => {
+        const info = vi.spyOn(logger, 'info')
+        const warn = vi.spyOn(logger, 'warn')
+        const { logouts, refreshes } = answerExpired({ refused })
+        const { result, clearAuth } = renderSignedInWithRefresh()
+
+        await act(() => result.current.signOut())
+
+        expect(logouts).toEqual([{ access_token: 'shared-token' }, { access_token: 'fresh-token' }])
+        expect(refreshes).toEqual([{ refresh_token: 'refresh-a' }])
+        expect(info).toHaveBeenCalledWith('Backend logout confirmed', { outcome: 'ok', afterRefresh: true })
+        expect(warn).not.toHaveBeenCalled()
+        expect(clearAuth).toHaveBeenCalledOnce()
+        expectSignedOutHere()
+        expectLeftForLogin(result)
+      },
+    )
+
+    it('keeps the fresh tokens out of this tab, the browser and the log', async () => {
+      const logged = [vi.spyOn(logger, 'info'), vi.spyOn(logger, 'warn'), vi.spyOn(logger, 'error')]
+      const { logouts } = answerExpired({ refresh: 'rotated' })
+      const { result } = renderSignedInWithRefresh()
+
+      await act(() => result.current.signOut())
+
+      expect(logouts).toHaveLength(2)
+      expect(everythingStored()).not.toMatch(/fresh-token|rotated-refresh|refresh-a|shared-token/)
+      expect(sessionStorage.getItem(TAB_REFRESH_KEY)).toBeNull()
+      expect(useAuthStore.getState().accessToken).toBeNull()
+      expect(JSON.stringify(logged.map((spy) => spy.mock.calls))).not.toMatch(/fresh-token|rotated-refresh|refresh-a/)
+    })
+
+    it('has cleared this tab and left for /login while the refresh is still out', async () => {
+      const late = gate()
+      const { logouts, refreshes } = answerExpired({ refreshGate: late.opened })
+      const { result } = renderSignedInWithRefresh()
+      let pending!: Promise<void>
+      act(() => { pending = result.current.signOut() })
+
+      try {
+        expectSignedOutHere()
+        expect(sessionStorage.getItem(TAB_REFRESH_KEY)).toBeNull()
+        expect(result.current.pathname).toBe('/login')
+        await waitFor(() => expect(refreshes).toHaveLength(1))
+        expect(logouts).toEqual([{ access_token: 'shared-token' }])
+        expect(result.current.isSigningOut).toBe(true)
+      } finally {
+        await act(async () => { late.open(); await pending })
+      }
+      expect(logouts).toEqual([{ access_token: 'shared-token' }, { access_token: 'fresh-token' }])
+      expect(result.current.isSigningOut).toBe(false)
+      expectSignedOutHere()
+    })
+
+    it('logs a token that is still good out once, never spending the refresh token', async () => {
+      const bodies = answerLogout('ok')
+      const refreshes: unknown[] = []
+      mswServer.use(http.post('https://api.test/auth/refresh', async ({ request }) => {
+        refreshes.push(await request.json())
+        return HttpResponse.json({ accessToken: 'fresh-token' })
+      }))
+      const { result } = renderSignedInWithRefresh()
+
+      await act(() => result.current.signOut())
+
+      expect(bodies).toEqual([{ access_token: 'shared-token' }])
+      expect(refreshes).toEqual([])
+    })
+
+    // Only a refusal says the access token can no longer name its sign-in. A
+    // logout that failed may well have ended it; the refresh token stays unspent.
+    it.each(['network-error', 500] as const)(
+      'does not spend the refresh token when the logout fails without refusing (%s)',
+      async (answer) => {
+        const bodies = answerLogout(answer)
+        const refreshes: unknown[] = []
+        mswServer.use(http.post('https://api.test/auth/refresh', async ({ request }) => {
+          refreshes.push(await request.json())
+          return HttpResponse.json({ accessToken: 'fresh-token' })
+        }))
+        const { result } = renderSignedInWithRefresh()
+
+        await act(() => result.current.signOut())
+
+        expect(bodies).toEqual([{ access_token: 'shared-token' }])
+        expect(refreshes).toEqual([])
+        expectSignedOutHere()
+      },
+    )
+
+    it('does not spend the refresh token when the logout times out', async () => {
+      // The XHR stand-in from the timeout test above: no request leaves, the
+      // logout reports a timeout, and any refresh would reach MSW unhandled.
+      vi.spyOn(httpClient.defaults, 'adapter', 'get').mockReturnValue((config) =>
+        Promise.reject(new AxiosError(`timeout of ${config.timeout}ms exceeded`, AxiosError.ETIMEDOUT, config)),
+      )
+      const refreshes: unknown[] = []
+      mswServer.use(http.post('https://api.test/auth/refresh', async ({ request }) => {
+        refreshes.push(await request.json())
+        return HttpResponse.json({ accessToken: 'fresh-token' })
+      }))
+      const warn = vi.spyOn(logger, 'warn')
+      const { result } = renderSignedInWithRefresh()
+
+      await act(() => result.current.signOut())
+
+      expect(refreshes).toEqual([])
+      expect(warn).toHaveBeenCalledExactlyOnceWith('Backend logout not confirmed; signed out locally', {
+        outcome: 'timeout',
+      })
+    })
+
+    it('sends nothing more for a refused logout when the tab holds no refresh token', async () => {
+      const warn = vi.spyOn(logger, 'warn')
+      const { logouts, refreshes } = answerExpired()
+      const { result } = renderSignedIn()
+
+      await act(() => result.current.signOut())
+
+      expect(logouts).toEqual([{ access_token: 'shared-token' }])
+      expect(refreshes).toEqual([])
+      expect(warn).toHaveBeenCalledExactlyOnceWith('Backend logout not confirmed; signed out locally', {
+        outcome: 'http',
+        status: 401,
+      })
+    })
+
+    it.each([
+      ['the refresh is refused', { refresh: 401 }, 1, 'refresh-refused'],
+      ['the refresh cannot be reached', { refresh: 'network-error' }, 1, 'refresh-unreachable'],
+      ['the fresh token\'s logout fails', { freshLogout: 500 }, 2, 'logout-failed'],
+      ['the fresh token\'s logout is refused', { freshLogout: 401 }, 2, 'logout-refused'],
+    ] as const)('ends quietly, signed out here, when %s', async (_, answers, logoutsSent, afterRefresh) => {
+      const warn = vi.spyOn(logger, 'warn')
+      const error = vi.spyOn(logger, 'error')
+      const { logouts, refreshes } = answerExpired(answers)
+      const { result } = renderSignedInWithRefresh()
+
+      await act(() => result.current.signOut())
+
+      expect(refreshes).toEqual([{ refresh_token: 'refresh-a' }])
+      expect(logouts).toHaveLength(logoutsSent)
+      expect(warn).toHaveBeenCalledExactlyOnceWith('Backend logout not confirmed; signed out locally', {
+        outcome: 'http',
+        status: 401,
+        afterRefresh,
+      })
+      expect(error).not.toHaveBeenCalled()
+      expect(result.current.isSigningOut).toBe(false)
+      expectSignedOutHere()
+      expectLeftForLogin(result)
+    })
   })
 })

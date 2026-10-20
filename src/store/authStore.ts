@@ -20,7 +20,9 @@ export type { UserRole }
 export const TOKEN_KEY = TAB_TOKEN_KEY
 
 // This tab's logout can outlive the account menu. Keep only its completion,
-// never a credential, so the next login waits for the existing 8 s request.
+// never a credential, so the next login waits for its requests - the logout,
+// and after a refusal the refresh and the second logout (#399) - each bounded
+// by its own timeout.
 let pendingLogout: Promise<void> = Promise.resolve()
 
 export function trackPendingLogout(request: Promise<unknown>): Promise<void> {

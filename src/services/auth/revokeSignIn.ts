@@ -10,6 +10,9 @@
  * and that is signed out instead. Nothing is stored, retried or logged: the
  * browser has already let go of these credentials, whatever the server says.
  *
+ * Signing out takes the same second step when its own logout is refused
+ * (#399): the token a page left idle for an hour has run out too.
+ *
  * Plain `fetch`, not the shared client: that client answers a 401 by renewing
  * or ending this tab's own session, and these credentials are not this tab's.
  */
@@ -19,6 +22,11 @@ import { exchangeRefreshToken } from '@/services/auth/sessionRefresh'
 const LOGOUT_TIMEOUT_MS = 8000
 
 export type DroppedSignIn = { accessToken: string; refreshToken?: string | null }
+
+/** The backend would not sign this access token out: it has run out, or was revoked. */
+export function logoutRefused(status: number): boolean {
+  return status === 401 || status === 403
+}
 
 async function postLogout(accessToken: string): Promise<'ok' | 'refused' | 'failed'> {
   const abort = new AbortController()
@@ -31,7 +39,7 @@ async function postLogout(accessToken: string): Promise<'ok' | 'refused' | 'fail
       signal: abort.signal,
     })
     if (response.ok) return 'ok'
-    return response.status === 401 || response.status === 403 ? 'refused' : 'failed'
+    return logoutRefused(response.status) ? 'refused' : 'failed'
   } catch {
     return 'failed'
   } finally {
@@ -39,12 +47,31 @@ async function postLogout(accessToken: string): Promise<'ok' | 'refused' | 'fail
   }
 }
 
+/** What came of the second step: the refresh, or else the fresh token's logout. */
+export type RefreshedLogout =
+  | 'ok'
+  | 'refresh-refused'
+  | 'refresh-unreachable'
+  | 'logout-refused'
+  | 'logout-failed'
+
+/**
+ * End on the server the sign-in a refused logout could not: spend its refresh
+ * token once for a fresh access token, and sign that out. The fresh token is
+ * held here and nowhere else - never stored, never logged. Never throws.
+ */
+export async function logoutWithRefreshToken(refreshToken: string): Promise<RefreshedLogout> {
+  const renewed = await exchangeRefreshToken(refreshToken)
+  if (renewed.status !== 'renewed') return `refresh-${renewed.status}`
+  const outcome = await postLogout(renewed.accessToken)
+  return outcome === 'ok' ? 'ok' : `logout-${outcome}`
+}
+
 export async function revokeSignIn(signIn: DroppedSignIn): Promise<void> {
   try {
     const outcome = await postLogout(signIn.accessToken)
     if (outcome !== 'refused' || !signIn.refreshToken) return
-    const renewed = await exchangeRefreshToken(signIn.refreshToken)
-    if (renewed.status === 'renewed') await postLogout(renewed.accessToken)
+    await logoutWithRefreshToken(signIn.refreshToken)
   } catch {
     // Best effort: the browser no longer holds these credentials either way.
   }
