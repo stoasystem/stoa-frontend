@@ -29,6 +29,7 @@ import { quizRefused, quizTrouble, type QuizTrouble } from '@/features/chapter/q
 import { useCompleteLessonMutation } from '@/hooks/practice/useCompleteLessonMutation'
 import { usePracticeHintMutation } from '@/hooks/practice/usePracticeHintMutation'
 import { useSubmitChallengeAnswerMutation } from '@/hooks/practice/useSubmitChallengeAnswerMutation'
+import { newIdempotencyKey } from '@/lib/idempotencyKey'
 import { answerLessonQuiz, startLessonQuiz } from '@/services/practice/practiceApi'
 import type {
   LessonQuizAnswer,
@@ -210,7 +211,7 @@ export function useLessonRun(lesson: PracticeLesson | undefined, { testOut = fal
   const askHint = useCallback(async () => {
     if (!challenge || quiz || !challenge.hintAvailable || hintMutation.isPending) return
     const { challengeId } = challenge
-    if (hintPress.current?.challengeId !== challengeId) hintPress.current = { challengeId, key: crypto.randomUUID() }
+    if (hintPress.current?.challengeId !== challengeId) hintPress.current = { challengeId, key: newIdempotencyKey() }
     const response = await hintMutation.mutateAsync({ challengeId, idempotencyKey: hintPress.current.key })
     hintPress.current = null
     setHint({ challengeId, hint: response })

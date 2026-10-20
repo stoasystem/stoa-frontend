@@ -1106,4 +1106,31 @@ describe('Hint (#325)', () => {
     expect(next.challengeId).toBe('l-2-e2')
     expect(next.idempotencyKey).not.toBe(first.idempotencyKey)
   })
+
+  // iOS Safari 15.0–15.3 and a page outside https have no crypto.randomUUID:
+  // the press threw before anything was sent, and Hint never answered (#369).
+  describe('on a browser without crypto.randomUUID (#369)', () => {
+    beforeEach(() => {
+      const real = globalThis.crypto
+      vi.stubGlobal('crypto', { getRandomValues: real.getRandomValues.bind(real), subtle: real.subtle })
+    })
+    afterEach(() => vi.unstubAllGlobals())
+
+    it('sends the press with a key the backend takes, and a resend keeps it', async () => {
+      expect(crypto.randomUUID).toBeUndefined()
+      let fail = true
+      rules.hint = () => (fail ? 'fail' : 'Add it to itself.')
+      open('/chapter/u-5/l-2')
+      await onScreen()
+      await user.click(hintButton())
+      expect(await screen.findByText('No hint right now. Try again in a moment.')).toBeInTheDocument()
+
+      fail = false
+      await user.click(hintButton())
+      expect(await screen.findByText('Add it to itself.')).toBeInTheDocument()
+      const [first, again] = seen.hints as { challengeId: string; idempotencyKey: string }[]
+      expect(first).toEqual({ challengeId: 'l-2-e1', idempotencyKey: expect.stringMatching(/^[A-Za-z0-9._~-]{1,64}$/) })
+      expect(again.idempotencyKey).toBe(first.idempotencyKey)
+    })
+  })
 })
