@@ -82,19 +82,79 @@ export type AccountStatusResponse = {
 }
 
 /** Requests behind one call to `listAccounts`, so a heavy table cannot hang it. */
-const MAX_ACCOUNT_PAGES = 20
+export const MAX_ACCOUNT_PAGES = 20
 
-async function accountPage(filters: AccountListFilters, cursor?: string) {
+const ZURICH = 'Europe/Zurich'
+
+/** Milliseconds Zurich is ahead of UTC at `instant` (+1 h in winter, +2 h in summer). */
+function zurichOffset(instant: number) {
+  const parts = new Intl.DateTimeFormat('en-US', {
+    timeZone: ZURICH,
+    hourCycle: 'h23',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+  }).formatToParts(new Date(instant))
+  const part = (type: string) => Number(parts.find((item) => item.type === type)?.value)
+  const wall = Date.UTC(part('year'), part('month') - 1, part('day'), part('hour'), part('minute'), part('second'))
+  return wall - Math.floor(instant / 1000) * 1000
+}
+
+/** The UTC instant at which the Zurich calendar day `YYYY-MM-DD` begins, or null for anything else. */
+function zurichMidnight(day: string, plusDays = 0) {
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(day)
+  if (!match) return null
+  const wall = Date.UTC(Number(match[1]), Number(match[2]) - 1, Number(match[3]) + plusDays)
+  // Twice: the offset at the guess can differ from the offset at the answer
+  // on the two nights a year the clocks change.
+  const first = wall - zurichOffset(wall)
+  return wall - zurichOffset(first)
+}
+
+/** `2026-10-19T22:00:00` — no suffix, so every stored timestamp of that second or later sorts at or after it. */
+function utcStamp(instant: number) {
+  return new Date(instant).toISOString().slice(0, 19)
+}
+
+/**
+ * The `created_from` / `created_to` the server compares as strings (#335).
+ *
+ * The picker hands over a day, `2026-10-20`, and the server compares it with
+ * stored timestamps such as `2026-10-20T09:15:00.123456+00:00`. As a "to"
+ * bound the bare day sorts before every timestamp of that day, so "created
+ * up to 20 October" left out everything created on the 20th. Both ends are
+ * now the edges of the Zurich day, the day the administrator means, in UTC:
+ * from its first second, to its last microsecond.
+ */
+export function createdRangeParams(createdFrom?: string, createdTo?: string) {
+  const start = createdFrom ? zurichMidnight(createdFrom) : null
+  const end = createdTo ? zurichMidnight(createdTo, 1) : null
+  return {
+    created_from: start === null ? createdFrom || undefined : utcStamp(start),
+    created_to: end === null ? createdTo || undefined : `${utcStamp(end - 1000)}.999999+00:00`,
+  }
+}
+
+type ListOptions = {
+  signal?: AbortSignal
+  /** Carry on from this continuation key, with a fresh budget ("load more"). */
+  after?: string
+}
+
+async function accountPage(filters: AccountListFilters, cursor: string | undefined, signal?: AbortSignal) {
   const response = await httpClient.get<AccountListResponse>('/admin/users', {
     params: {
       role: filters.role || undefined,
       status: filters.status || undefined,
       q: filters.q || undefined,
-      created_from: filters.createdFrom || undefined,
-      created_to: filters.createdTo || undefined,
+      ...createdRangeParams(filters.createdFrom, filters.createdTo),
       cursor: cursor || filters.cursor || undefined,
       limit: filters.limit || undefined,
     },
+    signal,
   })
   return response.data
 }
@@ -109,9 +169,14 @@ async function accountPage(filters: AccountListFilters, cursor?: string) {
  * numbers were wrong and some accounts were simply absent - on a table where
  * audit rows outnumber profiles, the administrator's own account was on page
  * two and nowhere on screen.
+ *
+ * The walk still stops after `MAX_ACCOUNT_PAGES` requests. When it does, the
+ * key it stopped at comes back as `nextCursor`, and the caller has to say the
+ * list is incomplete (#335); `after` carries on from there.
  */
-export async function listAccounts(filters: AccountListFilters = {}) {
-  const first = await accountPage(filters)
+export async function listAccounts(filters: AccountListFilters = {}, options: ListOptions = {}) {
+  const { signal, after } = options
+  const first = await accountPage(filters, after, signal)
   // An explicit cursor asks for one page and means it.
   if (filters.cursor || !first.nextCursor) return first
 
@@ -120,7 +185,7 @@ export async function listAccounts(filters: AccountListFilters = {}) {
   let cursor: string | null = first.nextCursor
 
   for (let page = 1; page < MAX_ACCOUNT_PAGES && cursor; page += 1) {
-    const next: AccountListResponse = await accountPage(filters, cursor)
+    const next: AccountListResponse = await accountPage(filters, cursor, signal)
     items.push(...next.items)
     for (const [role, count] of Object.entries(next.groups)) {
       groups[role] = (groups[role] ?? 0) + count

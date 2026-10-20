@@ -70,6 +70,9 @@
     },
     "reasonRequired": "Indiquez d'abord un motif : chaque modification de compte est consignée.",
     "loading": "Chargement des comptes…",
+    "incomplete": "La liste s’est arrêtée après {{shown}} comptes et n’est pas complète. Affinez les filtres ou chargez-en davantage.",
+    "loadMore": "Charger la suite",
+    "loadingMore": "Chargement de la suite…",
     "actionFor": "{{action}} : {{account}}",
     "confirm": {
       "title": {

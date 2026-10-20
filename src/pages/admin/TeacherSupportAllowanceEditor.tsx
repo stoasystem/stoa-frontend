@@ -43,7 +43,9 @@ export function TeacherSupportAllowanceEditor({
   }, [current])
 
   function save() {
-    const parsed = Number(draft)
+    // #335: `Number('')` is 0, so an emptied box saved "no teacher support"
+    // without anybody typing zero. Empty is not a number.
+    const parsed = draft.trim() === '' ? Number.NaN : Number(draft)
     if (!Number.isInteger(parsed) || parsed < 0 || (current && parsed > current.maximum)) {
       setNotice(t('accounts.teacherSupport.outOfRange', { maximum: current?.maximum ?? 0 }))
       return

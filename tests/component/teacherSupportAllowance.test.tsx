@@ -134,6 +134,21 @@ describe('the weekly teacher-support figure an administrator edits', () => {
     expect(mockedSet).not.toHaveBeenCalled()
   })
 
+  it('refuses an emptied box instead of saving it as zero (#335)', async () => {
+    // `Number('')` is 0: a cleared field used to take teacher support away.
+    mockedRead.mockResolvedValue(allowance())
+    await open()
+
+    const field = await screen.findByLabelText('accounts.teacherSupport.weeklyCases')
+    await waitFor(() => expect(field).toHaveValue('7'))
+    await userEvent.clear(field)
+    await userEvent.type(field, '  ')
+    await userEvent.click(screen.getByRole('button', { name: 'accounts.teacherSupport.save' }))
+
+    expect(screen.getByText('accounts.teacherSupport.outOfRange')).toBeInTheDocument()
+    expect(mockedSet).not.toHaveBeenCalled()
+  })
+
   it('will not save without the reason the audit log records', async () => {
     mockedRead.mockResolvedValue(allowance())
     await open('')

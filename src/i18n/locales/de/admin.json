@@ -70,6 +70,9 @@
     },
     "reasonRequired": "Geben Sie zuerst einen Grund an: jede Kontoänderung wird festgehalten.",
     "loading": "Konten werden geladen…",
+    "incomplete": "Die Liste wurde nach {{shown}} Konten angehalten und ist unvollständig. Grenzen Sie die Filter ein oder laden Sie weitere.",
+    "loadMore": "Weitere laden",
+    "loadingMore": "Weitere Konten werden geladen…",
     "actionFor": "{{action}}: {{account}}",
     "confirm": {
       "title": {
