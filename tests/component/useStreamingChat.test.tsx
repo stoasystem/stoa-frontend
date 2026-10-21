@@ -304,12 +304,16 @@ describe('where the message stands', () => {
       .mockResolvedValue(state({ status: 'completed', assistantMessageId: 'a-1' }))
     const { result, invalidated } = render()
 
-    await waitFor(() => expect(result.current.isStreaming).toBe(true))
-    // The server's ids, so the page shows its copy of the question, not a second one.
-    expect(result.current.localMessages.map((message) => message.id)).toEqual([
-      'student:c1:student-earlier',
-      'assistant:c1:student-earlier',
-    ])
+    // The bubbles, not the flag: they land a render after it, once their ids are
+    // hashed, and a busy worker can read in between (#440). The server's ids,
+    // so the page shows its copy of the question, not a second one.
+    await waitFor(() =>
+      expect(result.current.localMessages.map((message) => message.id)).toEqual([
+        'student:c1:student-earlier',
+        'assistant:c1:student-earlier',
+      ]),
+    )
+    expect(result.current.isStreaming).toBe(true)
     await act(async () => {
       await vi.advanceTimersByTimeAsync(5000)
     })
@@ -536,7 +540,14 @@ describe('a message that is replaced before it ends', () => {
     act(() => {
       result.current.retryMessage!(failed.id)
     })
-    await waitFor(() => expect(result.current.isStreaming).toBe(true))
+    // The retry's own bubble: until its ids are hashed only the failed attempt
+    // is there, and its two bubbles pass the checks below on their own (#440).
+    await waitFor(() =>
+      expect(
+        result.current.localMessages.some((message) => message.role === 'student' && message.status === 'sending'),
+      ).toBe(true),
+    )
+    expect(result.current.isStreaming).toBe(true)
 
     const ids = result.current.localMessages.map((message) => message.id)
     expect(new Set(ids).size).toBe(ids.length)
