@@ -12,7 +12,8 @@
  *
  * Only a page asks for the reload (`lazyPage.ts`). Every other module the
  * running app loads on demand is optional, and its caller copes with the
- * failure itself: KaTeX's leaves the formula as written. (The start-up imports
+ * failure itself: KaTeX's leaves the formula as written, a language's copy
+ * reads in English (#414). (The start-up imports
  * in `main.tsx` come before this listener and have a failure screen of their
  * own.) Reloading for it threw away what lives only in
  * memory -- the lesson's place, a quiz, an Ask draft -- and offline it landed

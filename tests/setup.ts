@@ -34,6 +34,20 @@ vi.mock('@/lib/env', () => ({
   showCheckoutPreview: false,
 }))
 
+// Every language in full, as when all four shipped inside the app: a test
+// switches with a bare changeLanguage and reads the next line in the new
+// language. The app itself ships English and loads the rest when a tab is
+// read in it (#414); i18nLoading414.test.tsx takes this away to test that.
+vi.mock('@/i18n/resources', async (importOriginal) => {
+  const files = import.meta.glob<Record<string, unknown>>('../src/i18n/locales/*/*.json', { import: 'default' })
+  const bundledResources: Record<string, Record<string, Record<string, unknown>>> = {}
+  for (const [file, load] of Object.entries(files)) {
+    const [, language, namespace] = /\/locales\/([^/]+)\/([^/]+)\.json$/.exec(file) ?? []
+    ;(bundledResources[language] ??= {})[namespace] = await load()
+  }
+  return { ...(await importOriginal<typeof import('@/i18n/resources')>()), bundledResources }
+})
+
 afterEach(() => {
   cleanup()
 })

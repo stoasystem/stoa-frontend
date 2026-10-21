@@ -2,7 +2,7 @@ import { useMutation } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import { queryClient, SignedOutMutationError } from '@/app/query/queryClient'
-import { activeLanguage, type SupportedLanguage } from '@/i18n/languages'
+import { activeLanguage, languageShown, type SupportedLanguage } from '@/i18n/languages'
 import { addressContext } from '@/lib/addressForm'
 import { updateLocalePreference } from '@/services/auth/authApi'
 import { useAuthStore } from '@/store/authStore'
@@ -39,8 +39,11 @@ export function useUpdateLocalePreferenceMutation() {
     },
     // The screen already shows the new language, but the next page load takes
     // the stored one from /auth/me and would switch back without a word.
-    onError: (error, language) => {
+    onError: async (error, language) => {
       if (error instanceof SignedOutMutationError) return
+      // The write can fail before the language it is for has loaded (#414):
+      // until then the screen shows the one before, and so would the toast.
+      await languageShown()
       // A later choice is queued behind this one and reports for itself.
       if (language !== activeLanguage()) return
       const context = addressContext(useAuthStore.getState().user?.role)

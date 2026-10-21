@@ -17,7 +17,7 @@
 import { readdirSync, readFileSync } from 'node:fs'
 import path from 'node:path'
 import { describe, expect, it } from 'vitest'
-import i18n, { resources } from '@/i18n'
+import i18n from '@/i18n'
 import { namespaces } from '@/i18n/namespaces'
 
 const LOCALES_DIR = path.resolve(__dirname, '../../src/i18n/locales')
@@ -59,8 +59,8 @@ function pluralProblems(lang: string, keys: string[]): string[] {
 }
 
 const NAMESPACES = readdirSync(path.join(LOCALES_DIR, 'en')).filter((name) => name.endsWith('.json'))
-const keysOf = (lang: string, file: string) =>
-  leafKeys(JSON.parse(readFileSync(path.join(LOCALES_DIR, lang, file), 'utf8')))
+const copyOf = (lang: string, file: string): Record<string, unknown> => JSON.parse(readFileSync(path.join(LOCALES_DIR, lang, file), 'utf8'))
+const keysOf = (lang: string, file: string) => leafKeys(copyOf(lang, file))
 
 describe('the rule itself', () => {
   it('reads the forms each language needs from Intl.PluralRules', () => {
@@ -104,6 +104,8 @@ describe('every plural key in the bundles', () => {
     ['fr', 1_000_000],
     ['it', 1_000_000],
   ] as const)('%s: a count of %d reads its own sentence for every plural key', (lang, count) => {
+    // Read off the files: the app ships English alone and loads the rest (#414).
+    const resources = { [lang]: Object.fromEntries(NAMESPACES.map((file) => [file.replace(/\.json$/, ''), copyOf(lang, file)])) }
     const own = i18n.createInstance()
     void own.init({ resources, lng: lang, fallbackLng: false, ns: namespaces, initAsync: false })
     const unresolved = NAMESPACES.flatMap((file) => {
