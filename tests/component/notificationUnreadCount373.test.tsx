@@ -42,8 +42,8 @@ let store: NotificationEvent[] = []
 const requests: string[] = []
 
 function fakeBackend() {
-  vi.spyOn(httpClient, 'get').mockImplementation(async (url: string, config?: { params?: Record<string, unknown> }) => {
-    const { status, limit = 50 } = config?.params ?? {}
+  vi.spyOn(httpClient, 'get').mockImplementation(async (url: string, config?: { params?: unknown }) => {
+    const { status, limit = 50 } = (config?.params ?? {}) as Record<string, unknown>
     requests.push(`GET ${url}${status ? ` status=${status} limit=${limit}` : ''}`)
     if (url !== '/notifications') throw new Error(`unexpected GET ${url}`)
     if (Number(limit) > 100) throw new Error('limit above 100')

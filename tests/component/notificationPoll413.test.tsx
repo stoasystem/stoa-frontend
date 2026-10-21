@@ -102,8 +102,8 @@ const requests: string[] = []
 let listed = 0
 
 function fakeBackend() {
-  vi.spyOn(httpClient, 'get').mockImplementation(async (url: string, config?: { params?: Record<string, unknown> }) => {
-    const params = config?.params ?? {}
+  vi.spyOn(httpClient, 'get').mockImplementation(async (url: string, config?: { params?: unknown }) => {
+    const params = (config?.params ?? {}) as Record<string, unknown>
     requests.push([`GET ${url}`, ...Object.entries(params).map(([key, value]) => `${key}=${value}`)].join(' '))
     const items = Array.from({ length: listed }, (_, index) => event(index + 1))
     return { data: { items, count: items.length } }

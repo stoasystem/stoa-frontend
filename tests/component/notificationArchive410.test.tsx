@@ -45,9 +45,9 @@ let store: NotificationEvent[] = []
 let hold: Promise<void> = Promise.resolve()
 
 function fakeBackend() {
-  vi.spyOn(httpClient, 'get').mockImplementation(async (url: string, config?: { params?: Record<string, unknown> }) => {
+  vi.spyOn(httpClient, 'get').mockImplementation(async (url: string, config?: { params?: unknown }) => {
     if (url !== '/notifications') throw new Error(`unexpected GET ${url}`)
-    const { status } = config?.params ?? {}
+    const { status } = (config?.params ?? {}) as Record<string, unknown>
     const items = store
       .filter((item) => (status === undefined ? item.status !== 'archived' : item.status === status))
       .sort((a, b) => b.createdAt.localeCompare(a.createdAt))

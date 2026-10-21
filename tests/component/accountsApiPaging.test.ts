@@ -110,7 +110,7 @@ describe('#335: what each request carries', () => {
 
     await listAccounts({}, { after: 'cursor-21' })
 
-    expect(mockedGet.mock.calls[0][1]?.params?.cursor).toBe('cursor-21')
+    expect((mockedGet.mock.calls[0][1]?.params as Record<string, unknown> | undefined)?.cursor).toBe('cursor-21')
   })
 
   it('sends the "created to" day as the end of that Zurich day', async () => {
