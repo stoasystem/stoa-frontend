@@ -7,7 +7,8 @@
  * - The page's error boundary sits in the app shell, inside the route
  *   guards: the top bar stays, a guard's redirect still happens, and moving to
  *   another address clears the error.
- * - `vite:preloadError` reloads the tab once, never twice in a row.
+ * - A page whose module Vite could not fetch reloads the tab once, never
+ *   twice in a row.
  * - The shared date helpers show a dash for a value that is not a date.
  */
 import { act, fireEvent, render, screen, within } from '@testing-library/react'
@@ -15,7 +16,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { Suspense, type ReactNode } from 'react'
 import { MemoryRouter, Route, Routes, useNavigate } from 'react-router-dom'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { CHUNK_RELOAD_KEY, CHUNK_RELOAD_WINDOW_MS, installChunkReload } from '@/app/chunkReload'
+import { CHUNK_RELOAD_KEY, CHUNK_RELOAD_WINDOW_MS, installChunkReload, reloadForFailedPage } from '@/app/chunkReload'
 import { buildRoutes } from '@/app/router/AppRoutes'
 import { lazyPage, RELOAD_GRACE_MS, type PageComponent } from '@/app/router/lazyPage'
 import type { PageRoute } from '@/app/router/routeManifest'
@@ -31,10 +32,9 @@ import {
   formatTimeOfDay,
 } from '@/lib/formatDateTime'
 import { useAuthStore, type CurrentUser } from '@/store/authStore'
+import { chunkError, failLikeVite, listeningWindow } from './vitePreloadError'
 
 vi.mock('@/services/monitoring', () => ({ reportFrontendError: vi.fn() }))
-
-const chunkError = () => new TypeError('Failed to fetch dynamically imported module: /assets/Page-abc123.js')
 
 /** Lets the pending import settle and React render what came of it. */
 async function settle() {
@@ -131,10 +131,16 @@ describe('a page whose module failed to load', () => {
   })
 })
 
-describe('a page whose import Vite gave up on for a reload', () => {
+describe('a page whose module failed to load, while the tab reloads for it', () => {
+  let stop: () => void = () => {}
+  beforeEach(() => sessionStorage.removeItem(CHUNK_RELOAD_KEY))
+  afterEach(() => stop())
+
   it('stays loading until the reload instead of failing and reporting it', async () => {
     vi.mocked(reportFrontendError).mockClear()
-    const Page = lazyPage('Page', () => Promise.resolve(undefined as unknown as Record<'Page', PageComponent>))
+    const { target, reload } = listeningWindow()
+    stop = installChunkReload(target, () => 1_000_000)
+    const Page = lazyPage('Page', () => failLikeVite(chunkError()) as Promise<never>)
     render(
       <AppErrorBoundary>
         <Suspense fallback={<p>loading</p>}>
@@ -143,6 +149,7 @@ describe('a page whose import Vite gave up on for a reload', () => {
       </AppErrorBoundary>,
     )
     await settle()
+    expect(reload).toHaveBeenCalledTimes(1)
     expect(screen.getByText('loading')).toBeInTheDocument()
     expect(screen.queryByRole('alert')).toBeNull()
     expect(reportFrontendError).not.toHaveBeenCalled()
@@ -150,14 +157,20 @@ describe('a page whose import Vite gave up on for a reload', () => {
 })
 
 describe('a reload for a failed import that never comes (#283–#311 review)', () => {
+  let stop: () => void = () => {}
+  beforeEach(() => sessionStorage.removeItem(CHUNK_RELOAD_KEY))
+  afterEach(() => stop())
+
   it('stops loading after the grace period and offers "Try again"', async () => {
+    const { target, reload } = listeningWindow()
+    stop = installChunkReload(target, () => 1_000_000)
     vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] })
     let calls = 0
     const load = vi.fn(() => {
       calls += 1
-      // Vite handed back nothing for the reload the reader then cancelled.
+      // The tab started a reload for this failure, which the reader then cancelled.
       return calls === 1
-        ? Promise.resolve(undefined as unknown as Record<'Page', PageComponent>)
+        ? (failLikeVite(chunkError()) as Promise<never>)
         : Promise.resolve({ Page: () => <p>page loaded</p> })
     })
     const Page = lazyPage('Page', load)
@@ -172,6 +185,7 @@ describe('a reload for a failed import that never comes (#283–#311 review)', (
       await act(async () => {
         await vi.advanceTimersByTimeAsync(RELOAD_GRACE_MS - 1)
       })
+      expect(reload).toHaveBeenCalledTimes(1)
       expect(screen.getByText('loading')).toBeInTheDocument()
       await act(async () => {
         await vi.advanceTimersByTimeAsync(1)
@@ -182,6 +196,7 @@ describe('a reload for a failed import that never comes (#283–#311 review)', (
     fireEvent.click(await screen.findByRole('button', { name: 'Try again' }))
     expect(await screen.findByText('page loaded')).toBeInTheDocument()
     expect(load).toHaveBeenCalledTimes(2)
+    expect(reload).toHaveBeenCalledTimes(1)
   })
 })
 
@@ -351,32 +366,109 @@ describe('vite:preloadError', () => {
     return target
   }
 
-  function fire(target: EventTarget) {
-    const event = new Event('vite:preloadError', { cancelable: true })
+  /** Vite's announcement of a failed import; the import then rejects with `error`. */
+  function fire(target: EventTarget, error: Error = chunkError()) {
+    const event = Object.assign(new Event('vite:preloadError', { cancelable: true }), { payload: error })
     target.dispatchEvent(event)
-    return event
+    return { event, error }
   }
 
+  let stop: () => void = () => {}
   beforeEach(() => sessionStorage.removeItem(CHUNK_RELOAD_KEY))
+  afterEach(() => stop())
 
-  it('reloads once, and lets the next failure through instead of reloading again', () => {
+  it('is never prevented, so the import fails to whoever asked for it, and nothing reloads by itself', () => {
+    const target = fakeWindow()
+    stop = installChunkReload(target as unknown as Window, () => 1_000_000)
+
+    expect(fire(target).event.defaultPrevented).toBe(false)
+    expect(target.location.reload).not.toHaveBeenCalled()
+    expect(sessionStorage.getItem(CHUNK_RELOAD_KEY)).toBeNull()
+  })
+
+  it('reloads once for a page, and lets the next failure through instead of reloading again', () => {
     let now = 1_000_000
     const target = fakeWindow()
-    const stop = installChunkReload(target as unknown as Window, () => now)
+    stop = installChunkReload(target as unknown as Window, () => now)
 
-    expect(fire(target).defaultPrevented).toBe(true)
+    expect(reloadForFailedPage(fire(target).error)).toBe(true)
     expect(target.location.reload).toHaveBeenCalledTimes(1)
 
     // The page after that reload fails the same way.
     now += 2_000
-    expect(fire(target).defaultPrevented).toBe(false)
+    expect(reloadForFailedPage(fire(target).error)).toBe(false)
     expect(target.location.reload).toHaveBeenCalledTimes(1)
 
     // A failure long after is a new one.
     now += CHUNK_RELOAD_WINDOW_MS
-    expect(fire(target).defaultPrevented).toBe(true)
+    expect(reloadForFailedPage(fire(target).error)).toBe(true)
     expect(target.location.reload).toHaveBeenCalledTimes(2)
+  })
+
+  /** A window whose document began at `began`, on the same clock as `now`. */
+  function windowBegunAt(clock: { now: number; began: number }) {
+    return Object.assign(fakeWindow(), { performance: { now: () => clock.now - clock.began } })
+  }
+
+  it('does not reload again in the document its reload made, even when its page fails after the window', () => {
+    const clock = { now: 1_000_000, began: 0 }
+    const target = windowBegunAt(clock)
+    stop = installChunkReload(target as unknown as Window, () => clock.now)
+    expect(reloadForFailedPage(fire(target).error)).toBe(true)
+
+    // The reloaded document began just after; its page hung past the window, then failed.
+    clock.began = clock.now + 150
+    clock.now += CHUNK_RELOAD_WINDOW_MS + 5_000
+    expect(reloadForFailedPage(fire(target).error)).toBe(false)
+    expect(target.location.reload).toHaveBeenCalledTimes(1)
+  })
+
+  it('counts a document that seems to have begun a moment before the reload as the one it made', () => {
+    const clock = { now: 1_000_000, began: 0 }
+    const target = windowBegunAt(clock)
+    stop = installChunkReload(target as unknown as Window, () => clock.now)
+    expect(reloadForFailedPage(fire(target).error)).toBe(true)
+
+    // Worked out from two clocks, the start can come out a little early.
+    clock.began = clock.now - 5
+    clock.now += CHUNK_RELOAD_WINDOW_MS + 5_000
+    expect(reloadForFailedPage(fire(target).error)).toBe(false)
+    expect(target.location.reload).toHaveBeenCalledTimes(1)
+  })
+
+  it('may reload again in a document begun long after its last reload', () => {
+    const clock = { now: 1_000_000, began: 0 }
+    const target = windowBegunAt(clock)
+    stop = installChunkReload(target as unknown as Window, () => clock.now)
+    expect(reloadForFailedPage(fire(target).error)).toBe(true)
+
+    // The reader opened the app afresh a minute later.
+    clock.began = clock.now + 60_000
+    clock.now += 65_000
+    expect(reloadForFailedPage(fire(target).error)).toBe(true)
+    expect(target.location.reload).toHaveBeenCalledTimes(2)
+  })
+
+  it('does not reload for a failure Vite did not announce', () => {
+    const target = fakeWindow()
+    stop = installChunkReload(target as unknown as Window, () => 1_000_000)
+
+    // The dev server has no preload helper, so nothing is announced there.
+    expect(reloadForFailedPage(new Error('the dev server could not load the page'))).toBe(false)
+    expect(reloadForFailedPage('not an error')).toBe(false)
+    expect(reloadForFailedPage(undefined)).toBe(false)
+    expect(target.location.reload).not.toHaveBeenCalled()
+  })
+
+  it('does not reload once it has stopped listening', () => {
+    const target = fakeWindow()
+    stop = installChunkReload(target as unknown as Window, () => 1_000_000)
+    const { error } = fire(target)
     stop()
+
+    expect(reloadForFailedPage(error)).toBe(false)
+    expect(reloadForFailedPage(fire(target).error)).toBe(false)
+    expect(target.location.reload).not.toHaveBeenCalled()
   })
 
   it('does not reload when it cannot remember having reloaded', () => {
@@ -389,9 +481,9 @@ describe('vite:preloadError', () => {
       },
     } as unknown as Storage
     const target = fakeWindow(blocked)
-    installChunkReload(target as unknown as Window, () => 5)
+    stop = installChunkReload(target as unknown as Window, () => 5)
 
-    expect(fire(target).defaultPrevented).toBe(false)
+    expect(reloadForFailedPage(fire(target).error)).toBe(false)
     expect(target.location.reload).not.toHaveBeenCalled()
   })
 })
