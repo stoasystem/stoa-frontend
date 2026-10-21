@@ -10,6 +10,7 @@ import {
   LOGIN_PATH,
   roleHomePaths,
 } from '@/app/router/routeManifest'
+import { pathFromState } from '@/lib/fromState'
 import type { UserRole } from '@/types/user'
 
 // The one screen an account under a forced password change can still use.
@@ -87,27 +88,18 @@ function resolveDestination(path: unknown, role: UserRole): string | null {
     return null
   }
   if (url.origin !== window.location.origin) return null
+  // Checked again once parsed: a dot segment can walk `/x/..//` to `//`,
+  // which the router's `/` would match.
+  if (!isSafePath(url.pathname)) return null
   if (!canUseNextPathForRole(url.pathname, role)) return null
   return `${url.pathname}${url.search}${url.hash}`
 }
 
-type FromState = { from?: { pathname?: unknown; search?: unknown; hash?: unknown } } | null | undefined
-
-/**
- * The path a `state.from` names, query and hash included, unchecked; undefined
- * when there is none. ProtectedRoute leaves one for the sign-in and for the
- * forced password change: the page it sent the visitor away from.
- */
-export function pathFromState(state: unknown): string | undefined {
-  const from = (state as FromState)?.from
-  if (typeof from?.pathname !== 'string') return undefined
-  const search = typeof from.search === 'string' ? from.search : ''
-  const hash = typeof from.hash === 'string' ? from.hash : ''
-  return `${from.pathname}${search}${hash}`
-}
+// The page a redirect's `state.from` names, unchecked; resolveDestination checks it.
+export { pathFromState }
 
 /** What a redirect to the forced password change carries: where the visitor was headed (#412). */
-export type ForcedChangeState = { from: Partial<Path> }
+export type ForcedChangeState = { from: Path }
 
 /** Where to send a signed-in account, with the state the redirect carries. */
 export type RouteTarget = { to: string; state?: ForcedChangeState }
@@ -127,7 +119,8 @@ function homeOf(role: UserRole): string {
  */
 function sendTo(user: { mustChangePassword?: boolean }, destination: string): RouteTarget {
   if (!user.mustChangePassword) return { to: destination }
-  return { to: CHANGE_PASSWORD_PATH, state: { from: parsePath(destination) } }
+  const { pathname = '/', search = '', hash = '' } = parsePath(destination)
+  return { to: CHANGE_PASSWORD_PATH, state: { from: { pathname, search, hash } } }
 }
 
 /**
@@ -148,7 +141,7 @@ export function getPostLoginTarget(
   return sendTo(user, destination)
 }
 
-/** getPostLoginTarget's path alone, for a full page load, which carries no state. */
+/** getPostLoginTarget's path alone. */
 export function getPostLoginPath(
   user: { role: UserRole; mustChangePassword?: boolean },
   location: { search: string; state?: unknown },

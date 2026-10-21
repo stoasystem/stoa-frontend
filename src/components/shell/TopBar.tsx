@@ -24,6 +24,7 @@ import { AccountMenu } from '@/components/shell/AccountMenu'
  */
 export function TopBar({
   homePath,
+  homeState,
   wide,
   segments,
   activeIndex,
@@ -31,8 +32,9 @@ export function TopBar({
   covered = false,
   sky = false,
 }: {
-  /** Where the logo leads; null: nowhere, the logo is only the logo. */
-  homePath: string | null
+  homePath: string
+  /** The state the logo's link carries (a forced password change keeps its page in it). */
+  homeState?: unknown
   wide: boolean
   /** A teacher's or parent's pages; below the bar on a phone. */
   segments?: readonly SegmentedNavItem[]
@@ -81,22 +83,17 @@ export function TopBar({
           paddingRight: wide ? TOP_BAR.paddingX : Math.max(0, TOP_BAR_PHONE.paddingRight - avatarOverhang),
         }}
       >
-        {homePath === null ? (
-          <span className="flex items-center justify-self-start" style={{ height: bar.height }}>
-            <StoaLogo height={bar.logo} variant={sky ? 'light' : 'dark'} />
-          </span>
-        ) : (
-          <Link
-            to={homePath}
-            aria-label={t('navigation.logoHome')}
-            data-logo-link
-            className="flex items-center justify-self-start"
-            // The logo is narrower than 44 at 26 high, so its target is widened.
-            style={{ height: bar.height, minWidth: touch ? TOUCH_TARGET : undefined }}
-          >
-            <StoaLogo height={bar.logo} variant={sky ? 'light' : 'dark'} />
-          </Link>
-        )}
+        <Link
+          to={homePath}
+          state={homeState}
+          aria-label={t('navigation.logoHome')}
+          data-logo-link
+          className="flex items-center justify-self-start"
+          // The logo is narrower than 44 at 26 high, so its target is widened.
+          style={{ height: bar.height, minWidth: touch ? TOUCH_TARGET : undefined }}
+        >
+          <StoaLogo height={bar.logo} variant={sky ? 'light' : 'dark'} />
+        </Link>
         <div className="justify-self-center">{wide && segmented}</div>
         <div className="flex items-center justify-self-end" style={{ gap: touch ? 0 : bar.gap }}>
           {bell && <NotificationCenter hitSize={touch ? TOUCH_TARGET : undefined} onSky={sky} />}

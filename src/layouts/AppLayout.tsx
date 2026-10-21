@@ -20,7 +20,7 @@ import {
 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { useLocation } from 'react-router-dom'
-import type { AppNavIcon } from '@/app/router/routeManifest'
+import { CHANGE_PASSWORD_PATH, type AppNavIcon } from '@/app/router/routeManifest'
 import { InternalDebugPanel } from '@/components/internal/InternalDebugPanel'
 import { activeNavIndex, shellNavigationFor } from '@/components/shell/shellNavigation'
 import { SourceList } from '@/components/shell/SourceList'
@@ -85,10 +85,12 @@ export function AppLayout({
   const roomForSourceList = useMediaQuery(SOURCE_LIST_QUERY)
   // Under a forced password change every page but the change sends the
   // account back to it (ProtectedRoute), and the backend refuses everything
-  // else: the shell offers no page, the logo leads nowhere and the bell, which
-  // could only be refused, is left out (#412). The account menu does the same.
+  // else (#412). The shell offers no page and no bell, which could only be
+  // refused. The logo, the way home, leads to the change, which is this
+  // account's home for now, with the state the page has: the page the change
+  // carries stays carried through a look at Help and back.
   const forcedChange = Boolean(user?.mustChangePassword)
-  const homePath = forcedChange ? null : user ? getDefaultRouteForRole(user.role) : '/'
+  const homePath = forcedChange ? CHANGE_PASSWORD_PATH : user ? getDefaultRouteForRole(user.role) : '/'
   const navigation = user && !forcedChange ? shellNavigationFor(user.role) : ({ kind: 'none' } as const)
   const items: readonly AppNavItem[] = navigation.kind === 'none' ? [] : navigation.items
   const activeIndex = activeNavIndex(items, location.pathname, user?.role, location.search)
@@ -120,6 +122,7 @@ export function AppLayout({
           covered={covered}
           sky={surface === 'sky'}
           homePath={homePath}
+          homeState={forcedChange ? location.state : undefined}
           wide={wide}
           bell={Boolean(user) && !forcedChange}
           segments={

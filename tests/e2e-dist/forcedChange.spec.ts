@@ -5,19 +5,15 @@ import { ACCESS_TOKEN, STUDENT, StudentWorld } from './support/student'
 // #412: an account an administrator has reset goes to the password change
 // first, and the change then leads on to the page it asked for. The page
 // travels in the history entry's state, which only a real browser keeps
-// across a reload. While the reset stands the shell offers nothing that would
-// only bounce back to the change or be refused: the backend answers 403 to
-// everything but GET /auth/me and the change itself.
+// across a reload. While the reset stands the app asks for nothing the backend
+// refuses (it answers 403 to everything but GET /auth/me and the change
+// itself), and the shell offers no page that would only bounce back.
 
-const ALLOWED_WHILE_RESET = new Set([
+const ANSWERED_WHILE_RESET = new Set([
   'post /auth/login',
   'get /auth/me',
   'post /auth/password-change/request',
   'post /auth/password-change/confirm',
-  // Not the shell's: the sky provider around every route (AppRouter) reads a
-  // student's sky whether or not a reset stands, and the 403 goes unseen.
-  // Left for its own ticket; #412 is the shell and the way back.
-  'get /practice/knowledge-map',
 ])
 
 /** The student world, with the student's password reset until the change is confirmed. */
@@ -51,6 +47,13 @@ function resetStudent(backend: MockBackend) {
     reset = false
     return { status: 200, body: { status: 'changed' } }
   })
+  // As the backend does (deps.py): while the reset stands, every other route
+  // that takes the account is refused. Sign-in and sign-out do not take it.
+  backend.refuse((method, template) =>
+    reset && !ANSWERED_WHILE_RESET.has(`${method} ${template}`) && template !== '/auth/logout'
+      ? { status: 403, body: { detail: { code: 'action_not_allowed', message: 'This action is not allowed.', correlationId: 'e2e-correlation' } } }
+      : null,
+  )
 }
 
 test('a reset student who opened /ask: the change first, kept across a reload, then Continue opens /ask', async ({ page, backend }) => {
@@ -64,13 +67,13 @@ test('a reset student who opened /ask: the change first, kept across a reload, t
   await expect(page).toHaveURL('/settings/password')
   await expect(page.getByRole('heading', { name: 'Change your password' })).toBeVisible()
 
-  // The shell: the avatar menu holds Help and Sign out, there is no bell and
-  // the logo leads nowhere.
+  // The shell: the avatar menu holds Language, Help and Log out, there is no
+  // bell, and the logo leads to the change.
   await page.getByRole('button', { name: 'Account' }).first().click()
-  await expect(page.getByRole('menuitem')).toHaveText(['Help and support', 'Log out'])
+  await expect(page.getByRole('menuitem')).toHaveText([/^Language/, 'Help and support', 'Log out'])
   await page.keyboard.press('Escape')
   await expect(page.getByRole('button', { name: 'Notifications' })).toHaveCount(0)
-  await expect(page.getByRole('link', { name: 'STOA home' })).toHaveCount(0)
+  await expect(page.getByRole('link', { name: 'STOA home' })).toHaveAttribute('href', '/settings/password')
 
   // A reload keeps the page the change was asked from.
   await page.reload()
@@ -82,11 +85,18 @@ test('a reset student who opened /ask: the change first, kept across a reload, t
   await page.getByLabel('New password', { exact: true }).fill('New!Pass1234')
   await page.getByLabel('Confirm new password').fill('New!Pass1234')
   await page.getByRole('button', { name: 'Set new password' }).click()
+  const next = page.getByRole('link', { name: 'Continue' })
+  await expect(next).toBeVisible()
 
   const asked = backend.calls.map((call) => `${call.method} ${call.template}`)
-  expect(asked.filter((call) => !ALLOWED_WHILE_RESET.has(call)), 'asked while the reset stood').toEqual([])
+  const through = asked.indexOf('post /auth/password-change/confirm')
+  expect(through, 'the change went through').toBeGreaterThan(-1)
+  expect(asked.slice(0, through).filter((call) => !ANSWERED_WHILE_RESET.has(call)), 'asked while the reset stood').toEqual([])
 
-  await page.getByRole('link', { name: 'Continue' }).click()
+  await next.click()
   await expect(page).toHaveURL('/ask')
   await expect(page.getByRole('textbox', { name: 'Your question' }).first()).toBeVisible()
+  // The sky is read once the change is through, and the map beside Ask shows it.
+  await expect(page.getByRole('heading', { name: 'Mathematics' })).toBeVisible()
+  await expect(page.getByText(/star map didn.t load/)).toHaveCount(0)
 })

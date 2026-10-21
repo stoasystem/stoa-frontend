@@ -27,6 +27,7 @@ export class MockBackend {
   readonly calls: Call[] = []
   private readonly handlers = new Map<string, Handler>()
   private readonly contract: Contract
+  private gate: ((method: string, template: string) => Reply | null) | null = null
 
   constructor(contract: Contract) {
     this.contract = contract
@@ -47,6 +48,17 @@ export class MockBackend {
       await until()
       return answer(request)
     })
+    return this
+  }
+
+  /**
+   * Answer whatever `gate` refuses with its refusal instead of the handler: a
+   * backend that refuses a whole class of calls, as it refuses every route
+   * but a few while an administrator's reset stands (#412). Null lets the
+   * call through to its handler.
+   */
+  refuse(gate: (method: string, template: string) => Reply | null) {
+    this.gate = gate
     return this
   }
 
@@ -86,7 +98,8 @@ export class MockBackend {
       this.note(where, 'request', this.contract.checkRequest(op, backendRequest.body))
       this.note(where, 'query', this.contract.checkQuery(op, url.searchParams))
 
-      const handler = this.handlers.get(`${op.method} ${op.template}`)
+      const refusal = this.gate?.(op.method, op.template) ?? null
+      const handler = refusal ? () => refusal : this.handlers.get(`${op.method} ${op.template}`)
       if (!handler) {
         this.problems.push(`${where}: no mock answers ${op.method.toUpperCase()} ${op.template}`)
         await route.fulfill({ status: 503, headers: cors, json: { detail: 'not mocked' } })

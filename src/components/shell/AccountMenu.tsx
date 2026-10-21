@@ -2,7 +2,7 @@ import * as Menu from '@radix-ui/react-dropdown-menu'
 import { Check, ChevronRight, CircleHelp, ClipboardList, CreditCard, Globe, KeyRound, LogOut, UserRound, type LucideIcon } from 'lucide-react'
 import { createContext, useContext, useRef, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import { navAreaForRole } from '@/app/router/routeManifest'
 import { Avatar, type AvatarSize } from '@/components/base/Avatar'
 import { ACCOUNT_MENU, ICON, TOUCH_TARGET } from '@/components/base/sizes'
@@ -49,7 +49,17 @@ function useItemStyle() {
   return { height: useContext(ItemHeight), borderRadius: ACCOUNT_MENU.itemRadius }
 }
 
-function LinkItem({ to, icon, children }: { to: string | null; icon: LucideIcon; children: ReactNode }) {
+function LinkItem({
+  to,
+  state,
+  icon,
+  children,
+}: {
+  to: string | null
+  state?: unknown
+  icon: LucideIcon
+  children: ReactNode
+}) {
   const itemStyle = useItemStyle()
   const chosePage = useContext(ChosePage)
   if (!to) {
@@ -61,7 +71,7 @@ function LinkItem({ to, icon, children }: { to: string | null; icon: LucideIcon;
   }
   return (
     <Menu.Item asChild className={ITEM} style={itemStyle} onSelect={chosePage}>
-      <Link to={to}>
+      <Link to={to} state={state}>
         <ItemBody icon={icon}>{children}</ItemBody>
       </Link>
     </Menu.Item>
@@ -83,6 +93,7 @@ export function AccountMenu({
 }) {
   const { t } = useTranslation('common')
   const user = useAuthStore((state) => state.user)
+  const location = useLocation()
   const { signOut, isSigningOut } = useSignOut()
   const { current, changeLanguage } = useChangeLanguage()
   const openedPage = useRef(false)
@@ -91,10 +102,10 @@ export function AccountMenu({
 
   const targets = accountMenuFor(navAreaForRole(user.role))
   // Under a forced password change (an administrator reset) the change is the
-  // one page the account can use: every other sends it back there, and the
-  // backend refuses the language preference as well. What still works is
-  // Help, a public page, and Sign out (#412).
-  const forcedChange = user.mustChangePassword === true
+  // one page the account can use: every other sends it back there (#412). So
+  // the menu leaves out the pages and keeps Language (the screen switches;
+  // useChangeLanguage stores nothing then), Help, a public page, and Sign out.
+  const forcedChange = Boolean(user.mustChangePassword)
   const itemHeight = touch ? TOUCH_TARGET : ACCOUNT_MENU.item
   const itemStyle = { height: itemHeight, borderRadius: ACCOUNT_MENU.itemRadius }
   // Beside the menu there is no room on a phone: at 375 a submenu flipped to
@@ -153,51 +164,52 @@ export function AccountMenu({
           </div>
 
           {!forcedChange && (
-            <>
-              <LinkItem to={targets.profile} icon={UserRound}>
-                {t('navigation.profile')}
-              </LinkItem>
-
-              <Menu.Sub>
-                <Menu.SubTrigger className={ITEM} style={itemStyle}>
-                  <ItemBody icon={Globe}>{t('language.label')}</ItemBody>
-                  <span className="text-[13px] text-caption">{t(languageNameKeys[current])}</span>
-                  <ChevronRight aria-hidden="true" size={14} strokeWidth={2} className="shrink-0 text-tertiary" />
-                </Menu.SubTrigger>
-                <Menu.Portal>
-                  <Menu.SubContent
-                    sideOffset={subPlacement.sideOffset}
-                    collisionPadding={8}
-                    className={PANEL}
-                    style={{ minWidth: 180, width: subPlacement.width, borderRadius: 12 }}
-                  >
-                    <Menu.RadioGroup value={current}>
-                      {supportedLanguages.map((code) => (
-                        <Menu.RadioItem
-                          key={code}
-                          value={code}
-                          lang={code}
-                          onSelect={() => changeLanguage(code)}
-                          className={ITEM}
-                          style={itemStyle}
-                        >
-                          <span className="flex-1">{t(languageNameKeys[code])}</span>
-                          <Menu.ItemIndicator>
-                            <Check aria-hidden="true" size={16} strokeWidth={ICON.stroke} className="text-accent" />
-                          </Menu.ItemIndicator>
-                        </Menu.RadioItem>
-                      ))}
-                    </Menu.RadioGroup>
-                  </Menu.SubContent>
-                </Menu.Portal>
-              </Menu.Sub>
-
-              <LinkItem to={targets.password} icon={KeyRound}>
-                {t('actions.changePassword')}
-              </LinkItem>
-            </>
+            <LinkItem to={targets.profile} icon={UserRound}>
+              {t('navigation.profile')}
+            </LinkItem>
           )}
-          <LinkItem to={targets.help} icon={CircleHelp}>
+
+          <Menu.Sub>
+            <Menu.SubTrigger className={ITEM} style={itemStyle}>
+              <ItemBody icon={Globe}>{t('language.label')}</ItemBody>
+              <span className="text-[13px] text-caption">{t(languageNameKeys[current])}</span>
+              <ChevronRight aria-hidden="true" size={14} strokeWidth={2} className="shrink-0 text-tertiary" />
+            </Menu.SubTrigger>
+            <Menu.Portal>
+              <Menu.SubContent
+                sideOffset={subPlacement.sideOffset}
+                collisionPadding={8}
+                className={PANEL}
+                style={{ minWidth: 180, width: subPlacement.width, borderRadius: 12 }}
+              >
+                <Menu.RadioGroup value={current}>
+                  {supportedLanguages.map((code) => (
+                    <Menu.RadioItem
+                      key={code}
+                      value={code}
+                      lang={code}
+                      onSelect={() => changeLanguage(code)}
+                      className={ITEM}
+                      style={itemStyle}
+                    >
+                      <span className="flex-1">{t(languageNameKeys[code])}</span>
+                      <Menu.ItemIndicator>
+                        <Check aria-hidden="true" size={16} strokeWidth={ICON.stroke} className="text-accent" />
+                      </Menu.ItemIndicator>
+                    </Menu.RadioItem>
+                  ))}
+                </Menu.RadioGroup>
+              </Menu.SubContent>
+            </Menu.Portal>
+          </Menu.Sub>
+
+          {!forcedChange && (
+            <LinkItem to={targets.password} icon={KeyRound}>
+              {t('actions.changePassword')}
+            </LinkItem>
+          )}
+          {/* Help keeps what the change carries, for the logo to bring it back. */}
+          <LinkItem to={targets.help} state={forcedChange ? location.state : undefined} icon={CircleHelp}>
             {t('accountMenu.help')}
           </LinkItem>
           {!forcedChange &&

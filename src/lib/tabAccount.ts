@@ -22,6 +22,7 @@
  * remembers who it was and the page it was on, so the sign-in page can say
  * whose session ended and take them back there.
  */
+import { pathFromState } from '@/lib/fromState'
 import { LOGIN_SUBMITTED_AT_KEY } from '@/lib/loginTimingKey'
 import { newRandomId } from '@/lib/randomId'
 import { signInOf } from '@/lib/signIn'
@@ -154,6 +155,28 @@ export function readTabSignOut(): TabSignOut | null {
   const account = reason === 'signed-out' ? undefined : asAccount(parsed?.account)
   const returnTo = typeof parsed?.returnTo === 'string' ? parsed.returnTo : undefined
   return { reason, ...(account ? { account } : {}), ...(returnTo ? { returnTo } : {}) }
+}
+
+// routeManifest's CHANGE_PASSWORD_PATH; this module stays clear of the router
+// (a test holds the two equal).
+export const FORCED_CHANGE_PAGE = '/settings/password'
+
+/**
+ * Where this tab is, for the same account to come back to once its session
+ * has ended (#217, #343): the page with its query and hash, nothing on the
+ * sign-in itself. On the forced password change it is the page the change
+ * carries (#412): the change is never gone back to, so the page it was going
+ * to would be lost, and a reset that still stands sends the account by the
+ * change again on the way there.
+ */
+export function returnToHere(): { returnTo?: string } {
+  const { pathname, search, hash } = window.location
+  if (pathname === '/login') return {}
+  if (pathname === FORCED_CHANGE_PAGE) {
+    const carried = pathFromState((window.history.state as { usr?: unknown } | null)?.usr)
+    return carried ? { returnTo: carried } : {}
+  }
+  return { returnTo: `${pathname}${search ?? ''}${hash ?? ''}` }
 }
 
 /** This tab had an account and its sign-in ended: it joins no other by itself. */
@@ -572,11 +595,7 @@ export function initializeTab(): void {
     replaceRefreshToken(null)
     // The page the tab opened on is where it was, for the same account to
     // come back to (#343), as when it notices the change while open.
-    const { pathname, search, hash } = window.location
-    signOutTab({
-      reason: 'signed-out-elsewhere',
-      ...(pathname !== '/login' ? { returnTo: `${pathname}${search ?? ''}${hash ?? ''}` } : {}),
-    })
+    signOutTab({ reason: 'signed-out-elsewhere', ...returnToHere() })
     if (dropped) dropOnServer([dropped])
     return
   }

@@ -15,6 +15,10 @@ export const languageNameKeys: Record<SupportedLanguage, string> = {
  * Switch the app's language, and for a signed-in account record the choice
  * for next time. The screen changes at once; the writes go out one after
  * another, the last choice is the one stored, and a failed one says so.
+ *
+ * While an administrator's reset stands the choice is not recorded: the
+ * backend refuses everything but the password change, and the switch is what
+ * lets a reader whose stored language is not theirs read that change (#412).
  */
 export function useChangeLanguage() {
   const { i18n } = useTranslation('common')
@@ -25,7 +29,7 @@ export function useChangeLanguage() {
   function changeLanguage(language: SupportedLanguage) {
     if (language === i18n.language) return
     void i18n.changeLanguage(language)
-    if (user) updateLocale.mutate(language)
+    if (user && !user.mustChangePassword) updateLocale.mutate(language)
   }
 
   return { current, changeLanguage }

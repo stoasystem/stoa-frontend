@@ -4,7 +4,7 @@ import { toast } from 'sonner'
 import i18n from '@/i18n'
 import { resolveUserLanguage } from '@/i18n/languages'
 import type { AddressContext } from '@/lib/addressForm'
-import { getPostLoginPath } from '@/lib/authRoutes'
+import { getPostLoginTarget } from '@/lib/authRoutes'
 import { isSameAccount, readTabAccount } from '@/lib/tabAccount'
 import { markLoginAuthenticated } from '@/lib/loginTiming'
 import { getConversations } from '@/services/chat/chatApi'
@@ -57,10 +57,19 @@ export function useLoginMutation({ context }: { context?: AddressContext } = {})
       // takes its cached answers with it.
       if (replacing) {
         // A `?next=` or the page sign-in was asked from still counts, checked
-        // for the new account as always. A full load carries no state, so a
-        // reset account lands on the password change without it.
+        // for the new account as always.
         const from = (window.history.state as { usr?: unknown } | null)?.usr
-        window.location.assign(getPostLoginPath(data.user, { search: window.location.search, state: from }))
+        const target = getPostLoginTarget(data.user, { search: window.location.search, state: from })
+        if (target.state) {
+          // A reset account goes by the password change, carrying where it
+          // was going (#412). A load of a new address starts with no state, so
+          // the state goes into this entry, in the router's own shape, and
+          // the entry is loaded again: as full a load as the other.
+          window.history.replaceState({ usr: target.state, key: 'default', idx: 0 }, '', target.to)
+          window.location.reload()
+          return
+        }
+        window.location.assign(target.to)
         return
       }
 
