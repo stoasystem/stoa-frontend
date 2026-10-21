@@ -46,6 +46,11 @@ jobs:
       - name: Install locked dependencies
         run: npm ci --ignore-scripts --no-audit --no-fund --include=dev --package-lock=true
 
+      # As deploy-production does (#419): a high or critical advisory in a
+      # production dependency fails the PR before it can reach main.
+      - name: Production dependency audit
+        run: npm audit --omit=dev --audit-level=high
+
       - name: Lint
         run: npm run lint
 
