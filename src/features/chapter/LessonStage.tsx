@@ -379,7 +379,6 @@ function Exercise({
   side: boolean
   arrived: MutableRefObject<boolean>
 }) {
-  const { t } = useTranslation('chapter')
   const prompt = useRef<HTMLHeadingElement>(null)
   const mode = run.quiz ? 'quiz' : 'lesson'
 
@@ -478,12 +477,7 @@ function Exercise({
               />
             </form>
 
-            {run.hint && <Nudge>{run.hint.hint ?? t('stage.noHint')}</Nudge>}
-            {run.hintFailed && !run.hint && (
-              <p role="alert" className={cn('m-0 text-[13px]', bodyOnSky)}>
-                {t('stage.hintFailed')}
-              </p>
-            )}
+            <Hint run={run} />
 
             <Feedback run={run} />
 
@@ -512,6 +506,25 @@ function Nudge({ children }: { children: ReactNode }) {
       >
         {children}
       </div>
+    </div>
+  )
+}
+
+/**
+ * What Hint brought, in a region that is there before it, so the hint is read
+ * when it arrives (#408). Empty, it is lifted out of the column so it adds no
+ * gap there; it stays in the accessibility tree all the same.
+ */
+function Hint({ run }: { run: LessonRun }) {
+  const { t } = useTranslation('chapter')
+  return (
+    <div role="status" aria-live="polite" data-stage-hint className="empty:absolute">
+      {run.hint && <Nudge>{run.hint.hint ?? t('stage.noHint')}</Nudge>}
+      {run.hintFailed && !run.hint && (
+        <p role="alert" className={cn('m-0 text-[13px]', bodyOnSky)}>
+          {t('stage.hintFailed')}
+        </p>
+      )}
     </div>
   )
 }

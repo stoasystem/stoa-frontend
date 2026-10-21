@@ -122,6 +122,11 @@ const OUTLINE_OFF_SITES: Record<string, { why: ('moved' | 'programmatic')[]; mar
   'components/common/LanguageSwitcher.tsx': { why: ['programmatic'] },
   // A review's verdict, focused by code when a right answer takes Check's place (#342).
   'components/practice/ReviewSession.tsx': { why: ['programmatic'] },
+  // Ask's title, focused by code when a conversation opens, or when the way
+  // back finds no row and no list (#408).
+  'features/ask/AskPanel.tsx': { why: ['programmatic'] },
+  // Ask's list, focused by code on the way back from a conversation not in it (#408).
+  'features/ask/AskConversationList.tsx': { why: ['programmatic'] },
   // The exercise prompt, the quiz's "Not yet", the lesson-done heading and the
   // heading of a refused quiz: each is focused by code when it appears.
   'features/chapter/LessonStage.tsx': {

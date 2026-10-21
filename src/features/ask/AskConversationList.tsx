@@ -26,7 +26,8 @@ export function AskConversationList({
   const { t } = useTranslation('chat')
 
   return (
-    <nav aria-label={t('ask.list.label')}>
+    // Focusable from code, for the way back from a conversation that is no longer in it (#408).
+    <nav data-ask-list tabIndex={-1} aria-label={t('ask.list.label')} className="outline-none">
       <ul className="flex flex-col gap-0.5">
         {conversations.map((conversation) => {
           const title = conversationDisplayTitle(conversation, t) || t('ask.list.untitled')

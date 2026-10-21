@@ -600,3 +600,49 @@ describe('the keyboard through a question (#342)', () => {
     expect(document.querySelector('[data-review-feedback]')).toHaveFocus()
   })
 })
+
+describe('the verdict is read out (#408)', () => {
+  it('arrives in a region that was there before it, while the keyboard goes on to Try again', async () => {
+    mockedDue.mockResolvedValue({ items: [card()], dueCount: 1, generatedAt: '' })
+    mockedAnswer.mockResolvedValue({ challengeId: 'brueche-l1-c1', correct: false, feedback: 'Leider falsch.', attemptsRemaining: 1 })
+    const user = userEvent.setup()
+    renderSession()
+
+    await screen.findByText('Was ist 1/2 + 1/4?')
+    const region = screen.getByRole('status')
+    expect(region).toBeEmptyDOMElement()
+    await user.click(screen.getByRole('radio', { name: '2/6' }))
+    await user.click(screen.getByRole('button', { name: 'Check answer' }))
+
+    expect(await screen.findByRole('button', { name: /try again/i })).toHaveFocus()
+    expect(screen.getByRole('status')).toBe(region)
+    expect(region).toHaveTextContent('Leider falsch.')
+    expect(region).toHaveAttribute('data-review-feedback', 'wrong')
+    // Try again is said by the focus; it is not read a second time with the verdict.
+    expect(region).not.toHaveTextContent(/try again/i)
+  })
+
+  it('stays when Try again empties it, ready for the next verdict', async () => {
+    mockedDue.mockResolvedValue({ items: [card()], dueCount: 1, generatedAt: '' })
+    mockedAnswer
+      .mockResolvedValueOnce({ challengeId: 'brueche-l1-c1', correct: false, feedback: 'Leider falsch.', attemptsRemaining: 1 })
+      .mockResolvedValueOnce({ challengeId: 'brueche-l1-c1', correct: true, feedback: 'Richtig! Gut gemacht.', attemptsRemaining: 0 })
+    const user = userEvent.setup()
+    renderSession()
+
+    await screen.findByText('Was ist 1/2 + 1/4?')
+    const region = screen.getByRole('status')
+    await user.click(screen.getByRole('radio', { name: '2/6' }))
+    await user.click(screen.getByRole('button', { name: 'Check answer' }))
+    await user.click(await screen.findByRole('button', { name: /try again/i }))
+
+    expect(screen.getByRole('status')).toBe(region)
+    expect(region).toBeEmptyDOMElement()
+    expect(region).not.toHaveAttribute('data-review-feedback')
+    await user.click(screen.getByRole('radio', { name: '3/4' }))
+    await user.click(screen.getByRole('button', { name: 'Check answer' }))
+
+    await waitFor(() => expect(region).toHaveTextContent('Richtig! Gut gemacht.'))
+    expect(region).toHaveFocus()
+  })
+})

@@ -187,26 +187,32 @@ function ReviewQuestion({ card, onAnswer }: { card: ReviewCard; onAnswer: () => 
             />
           </div>
 
-          {result ? (
+          <div className="flex flex-col">
+            {/* Here before the verdict, so the verdict is read when it arrives
+                -- also while the focus goes on to Try again (#408). */}
             <div
               ref={verdictArea}
               tabIndex={-1}
               role="status"
               aria-live="polite"
-              data-review-feedback={result.correct ? 'correct' : 'wrong'}
-              className="flex flex-col gap-3 outline-none"
+              data-review-feedback={result ? (result.correct ? 'correct' : 'wrong') : undefined}
+              className="outline-none"
             >
               {/* The explanation states the answer, so the card holds it back
                   until the student has found it; the feedback points the way. */}
-              <FeedbackCard correct={result.correct} feedback={result.feedback} explanation={result.explanation}>
-                {result.correct && <p className={cn('m-0 text-[13px]', bodyOnSky)}>{t('review.comesBackLater')}</p>}
-              </FeedbackCard>
-              {!result.correct && (
+              {result && (
+                <FeedbackCard correct={result.correct} feedback={result.feedback} explanation={result.explanation}>
+                  {result.correct && <p className={cn('m-0 text-[13px]', bodyOnSky)}>{t('review.comesBackLater')}</p>}
+                </FeedbackCard>
+              )}
+            </div>
+            {result ? (
+              !result.correct && (
                 <Button
                   ref={tryAgain}
                   lift
                   variant="onSky"
-                  className="self-start"
+                  className="mt-3 self-start"
                   onClick={() => {
                     retried.current = true
                     setResult(null)
@@ -216,19 +222,19 @@ function ReviewQuestion({ card, onAnswer }: { card: ReviewCard; onAnswer: () => 
                   <RotateCcw size={16} aria-hidden="true" />
                   {tStage('stage.tryAgain')}
                 </Button>
-              )}
-            </div>
-          ) : (
-            <Button
-              lift
-              variant="onSky"
-              className="self-start"
-              disabled={!isFilled(answerValue) || answer.isPending}
-              onClick={() => isFilled(answerValue) && answer.mutate(answerValue)}
-            >
-              {answer.isPending ? tStage('stage.checking') : tStage('stage.check')}
-            </Button>
-          )}
+              )
+            ) : (
+              <Button
+                lift
+                variant="onSky"
+                className="self-start"
+                disabled={!isFilled(answerValue) || answer.isPending}
+                onClick={() => isFilled(answerValue) && answer.mutate(answerValue)}
+              >
+                {answer.isPending ? tStage('stage.checking') : tStage('stage.check')}
+              </Button>
+            )}
+          </div>
         </>
       )}
 
