@@ -1,5 +1,5 @@
 import '@testing-library/jest-dom/vitest'
-import { cleanup } from '@testing-library/react'
+import { cleanup, configure } from '@testing-library/react'
 import { afterEach, vi } from 'vitest'
 
 // src/lib/env.ts reads runtime config at import time, so anything importing
@@ -51,6 +51,16 @@ vi.mock('@/i18n/resources', async (importOriginal) => {
 afterEach(() => {
   cleanup()
 })
+
+// findBy* and waitFor give up after 3 s, not Testing Library's 1 s (#440). A
+// mocked request answers at once; the first paint of a whole page on a busy CI
+// worker does not. teacherMisc333's T5 finds its link in about 0.1 s here, and
+// in a gate run was still on the page's skeleton after 1 s. With the timeout
+// cut to 0.3 s, a full run here misses only the account pickers, which wait out
+// a 300 ms typing pause, and one review page: every other wait takes under a
+// tenth of this. Three times the default, as testTimeout is (#133), so a wait
+// that never ends still fails as "Unable to find …", inside a test's 15 s.
+configure({ asyncUtilTimeout: 3000 })
 
 // Node 25+ has its own global localStorage and sessionStorage, which Vitest
 // leaves in place of jsdom's. Without --localstorage-file they are undefined;

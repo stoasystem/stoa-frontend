@@ -149,7 +149,8 @@ describe('a deep link refreshed in the browser', () => {
       </I18nextProvider>,
     )
 
-    await vi.waitFor(() => expect(window.location.pathname).toBe('/login'))
+    // vi.waitFor keeps Vitest's 1 s whatever tests/setup.ts sets (#440).
+    await vi.waitFor(() => expect(window.location.pathname).toBe('/login'), LANDING)
   })
 
   it('reopens a star on the star map, at that star (#47, #72)', async () => {
