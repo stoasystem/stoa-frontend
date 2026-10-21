@@ -47,6 +47,10 @@ signed in across a reload; asks a question, gets the answer, and a reload in
 the middle of the next answer picks it up again without sending the question
 twice; signs out, which clears the session here and calls `POST /auth/logout`.
 
+`firstScreen.spec.ts`: after a student's reload, the star map's code is asked
+for, once, while `/auth/me` is still being answered rather than after it, and
+the map follows the account without the page skeleton in between (#415).
+
 `accountMenu.spec.ts`: at 375 px, the account menu's language and switch-account
 lists open on the screen and can be tapped where they are drawn (#162: they
 opened at x = -152).

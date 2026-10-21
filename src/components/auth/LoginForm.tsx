@@ -12,7 +12,7 @@ import { cn } from '@/lib/utils'
 import { useLoginMutation } from '@/hooks/auth/useLoginMutation'
 import { markLoginSubmitted } from '@/lib/loginTiming'
 import { toUserFacingError } from '@/lib/userFacingText'
-import { createLoginSchema } from '@/lib/validation'
+import { loginErrors } from '@/lib/validation'
 import { ApiError } from '@/services/api/httpClient'
 import { isEmailVerificationRequiredError } from '@/services/auth/authApi'
 
@@ -33,7 +33,6 @@ export function LoginForm({
   const [password, setPassword] = useState('')
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({})
   const loginMutation = useLoginMutation({ context })
-  const loginSchema = createLoginSchema(t, context)
   const verificationBlocked = loginMutation.isError && isEmailVerificationRequiredError(loginMutation.error)
 
   return (
@@ -46,18 +45,14 @@ export function LoginForm({
       onSubmit={(event) => {
         event.preventDefault()
         if (loginMutation.isPending) return
-        const result = loginSchema.safeParse({ email, password })
-        if (!result.success) {
-          const fieldErrors = result.error.flatten().fieldErrors
-          setErrors({
-            email: fieldErrors.email?.[0],
-            password: fieldErrors.password?.[0],
-          })
+        const found = loginErrors({ email, password }, t, context)
+        if (found.email || found.password) {
+          setErrors(found)
           return
         }
         setErrors({})
         markLoginSubmitted()
-        loginMutation.mutate(result.data)
+        loginMutation.mutate({ email, password })
       }}
     >
       <div className="space-y-2">
