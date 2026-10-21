@@ -67,6 +67,12 @@ export type RouteNav = {
    * be a registered page open to the same roles.
    */
   covers?: readonly string[]
+  /**
+   * Pages opened from this entry's page with `?from=<this>` light it, though
+   * their address is another entry's (#411): a child's weekly report opened
+   * from Reports lives under Overview's /parent.
+   */
+  from?: string
 }
 
 export type RouteMeta = {
@@ -356,7 +362,7 @@ export const pageRoutes: readonly PageRoute[] = [
     path: '/parent/reports',
     access: PARENT,
     page: ParentReportsPage,
-    nav: [{ area: 'parent', label: 'Reports', labelKey: 'navigation.reports', priority: 'primary', icon: 'reports', mobile: true, description: 'Open weekly and monthly child reports.' }],
+    nav: [{ area: 'parent', label: 'Reports', labelKey: 'navigation.reports', priority: 'primary', icon: 'reports', mobile: true, from: 'reports', description: 'Open weekly and monthly child reports.' }],
     meta: { module: 'Parent', status: 'core', purpose: 'Parent report hub for weekly and monthly child reports.' },
   },
   { path: '/parent/children/:childId', access: PARENT, page: ChildSummaryPage, titleKey: 'routes.childSummary.title', meta: { module: 'Parent', status: 'core', purpose: 'Child summary detail.' } },
@@ -469,6 +475,16 @@ export function askPathFor(conversationId: unknown): string {
   // Anything but a string (a number, an object from a malformed payload) is no id.
   const id = typeof conversationId === 'string' ? conversationId.trim() : ''
   return CONVERSATION_ID.test(id) ? `${ASK_PATH}/${id}` : ASK_PATH
+}
+
+/**
+ * The moderation queue with one case open (#411): `/admin/moderation?case=<id>`,
+ * which AdminModerationPage reads, or the queue alone when there is no id. A
+ * case id (`mod-<hex>`) has a conversation id's shape.
+ */
+export function moderationPathFor(caseId: unknown): string {
+  const id = typeof caseId === 'string' ? caseId.trim() : ''
+  return CONVERSATION_ID.test(id) ? `/admin/moderation?case=${encodeURIComponent(id)}` : '/admin/moderation'
 }
 
 /*

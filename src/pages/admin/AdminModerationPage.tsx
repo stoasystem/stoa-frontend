@@ -1,6 +1,7 @@
 import { useEffect, useId, useMemo, useState } from 'react'
 import type { TFunction } from 'i18next'
 import { useTranslation } from 'react-i18next'
+import { useSearchParams } from 'react-router-dom'
 import { Check, CheckCircle2, Clock, Flag, MessageSquare, UserCheck } from 'lucide-react'
 import { PageContainer } from '@/components/common/PageContainer'
 import { PageHeader } from '@/components/common/PageHeader'
@@ -30,13 +31,15 @@ const severityOptions: (ModerationSeverity | '')[] = ['', 'low', 'medium', 'high
 const reasonOptions: (ModerationReason | '')[] = ['', 'incorrect_answer', 'unsafe_content', 'abuse', 'privacy', 'other']
 const actionStatuses: ModerationCaseStatus[] = ['in_review', 'actioned', 'dismissed', 'closed']
 const QUEUE_LIMIT = 50
+const CASE_PARAM = 'case'
 
 export function AdminModerationPage() {
   const { t } = useTranslation('admin')
   const [status, setStatus] = useState<ModerationCaseStatus | ''>('')
   const [severity, setSeverity] = useState<ModerationSeverity | ''>('')
   const [reason, setReason] = useState<ModerationReason | ''>('')
-  const [selectedCaseId, setSelectedCaseId] = useState<string | null>(null)
+  const [searchParams, setSearchParams] = useSearchParams()
+  const [firstCaseId, setFirstCaseId] = useState<string | null>(null)
 
   const filters = useMemo(() => ({ status, severity, reason, limit: QUEUE_LIMIT }), [reason, severity, status])
   const casesQuery = useAdminModerationCasesQuery(filters)
@@ -46,9 +49,24 @@ export function AdminModerationPage() {
   const mayHaveMore = cases.length >= QUEUE_LIMIT
 
   useEffect(() => {
-    if (selectedCaseId || cases.length === 0) return
-    setSelectedCaseId(cases[0].case_id)
-  }, [cases, selectedCaseId])
+    if (firstCaseId || cases.length === 0) return
+    setFirstCaseId(cases[0].case_id)
+  }, [cases, firstCaseId])
+
+  // The open case is the address's (`?case=`): a notification names the case
+  // it is about, and opening it shows that case, not the first in the queue
+  // (#411). Its detail is its own request, so a case beyond the 50 here shows
+  // too. Without one, the first case in the queue.
+  const selectedCaseId = searchParams.get(CASE_PARAM)?.trim() || firstCaseId
+  const selectCase = (caseId: string) =>
+    setSearchParams(
+      (params) => {
+        const next = new URLSearchParams(params)
+        next.set(CASE_PARAM, caseId)
+        return next
+      },
+      { replace: true },
+    )
 
   const detailQuery = useAdminModerationCaseQuery(selectedCaseId)
   const selectedCase = detailQuery.data ?? cases.find((item) => item.case_id === selectedCaseId) ?? null
@@ -114,7 +132,7 @@ export function AdminModerationPage() {
                     key={item.case_id}
                     item={item}
                     selected={item.case_id === selectedCaseId}
-                    onSelect={() => setSelectedCaseId(item.case_id)}
+                    onSelect={() => selectCase(item.case_id)}
                   />
                 ))}
                 {casesQuery.isSuccess && mayHaveMore && (
@@ -134,6 +152,14 @@ export function AdminModerationPage() {
                 writes={writes}
                 feedback={feedback?.caseId === selectedCase.case_id ? feedback : null}
               />
+            ) : selectedCaseId && detailQuery.isError ? (
+              // A notification's case that is gone, or a mistyped address:
+              // not "select a case" with none marked in the queue.
+              <Card>
+                <CardContent role="alert" className="p-6 text-sm text-destructive">
+                  {t('moderation.caseLoadFailed')}
+                </CardContent>
+              </Card>
             ) : (
               <Card>
                 <CardContent className="p-6 text-sm text-muted-foreground">

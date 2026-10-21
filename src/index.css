@@ -210,6 +210,15 @@ pre {
 }
 
 /*
+ * Where a move to another page puts focus (#406): the page's heading, or its
+ * <main>. Focused by code only, never by Tab (RouteArrival.tsx), so a ring
+ * would mark a stop that is not one, round the whole page for <main>.
+ */
+[data-route-focus]:focus {
+  outline: none;
+}
+
+/*
  * Lit points breathe: the one ambient rhythm (Motion and states: 2.8-4.2 s,
  * ease-in-out, scale 1 -> 1.14, opacity .82 -> 1). Reduced motion: the stars
  * hold still. First used by the sign-in page's nebula (#53).

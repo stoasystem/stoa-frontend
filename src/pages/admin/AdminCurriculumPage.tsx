@@ -15,6 +15,7 @@ import { formatDateTime } from '@/lib/formatDateTime'
 import type { CurriculumAction, CurriculumReviewStep } from '@/pages/admin/CurriculumActionDialog'
 import { CurriculumActionDialog } from '@/pages/admin/CurriculumActionDialog'
 import { curriculumErrorMessage } from '@/pages/admin/curriculumErrorMessage'
+import { isApiPathValue } from '@/services/api/apiPath'
 import {
   useApplyCurriculumMigrationMutation,
   useApproveCurriculumVersionMutation,
@@ -113,7 +114,10 @@ export function AdminCurriculumPage() {
   const validationQuery = useCurriculumValidationQuery(selectedPublicId, selectedVersionId, validationEnabled)
   const auditQuery = useCurriculumAuditQuery(selectedPublicId, auditEnabled)
   const diffQuery = useCurriculumDiffQuery(selectedPublicId, fromVersionId, toVersionId, diffEnabled)
-  const evidenceQuery = useCurriculumMigrationEvidenceQuery(evidenceId, evidenceEnabled)
+  // #418: a migration id of `..` or `.` would send the read a level up the
+  // API, so it is not read; the panel says it is not valid.
+  const evidenceIdInvalid = Boolean(evidenceId) && !isApiPathValue(evidenceId)
+  const evidenceQuery = useCurriculumMigrationEvidenceQuery(evidenceId, evidenceEnabled && !evidenceIdInvalid)
 
   const patchMutation = usePatchCurriculumDraftMutation()
   const submitReviewMutation = useSubmitCurriculumReviewMutation()
@@ -403,6 +407,7 @@ export function AdminCurriculumPage() {
               onSubmit={loadEvidence}
               evidence={evidenceQuery.data}
               error={evidenceQuery.error}
+              invalidId={evidenceEnabled && evidenceIdInvalid}
               isLoading={evidenceQuery.isFetching}
             />
           </TabsContent>
@@ -748,6 +753,7 @@ function EvidencePanel(props: {
   onSubmit: (event: FormEvent<HTMLFormElement>) => void
   evidence?: CurriculumMigrationEvidenceResponse
   error: unknown
+  invalidId: boolean
   isLoading: boolean
 }) {
   const { t } = useTranslation('admin')
@@ -763,6 +769,7 @@ function EvidencePanel(props: {
           </label>
           <Button type="submit" disabled={props.isLoading}>{t('curriculum.evidence.load')}</Button>
         </form>
+        {props.invalidId && <p role="alert" className="text-sm text-destructive">{t('curriculum.evidence.invalidId')}</p>}
         <ApiErrorPanel error={props.error} />
         {props.evidence?.permissionDenied && <RestrictedPanel message={t('curriculum.evidence.missingCapability')} />}
         {props.evidence && <CompactJson value={props.evidence} />}

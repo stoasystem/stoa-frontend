@@ -89,7 +89,7 @@ export function useChapter(unitId: string | undefined): ChapterQuery {
   // The parts each query is read for, not the query objects: those are new
   // on every render, which would rebuild the chapter every time.
   const { isLoading: catalogLoading, isError: catalogFailed, refetch: refetchCatalog } = catalogQuery
-  const { isLoading: roadmapLoading, isError: roadmapFailed, refetch: refetchRoadmap } = roadmapQuery
+  const { isLoading: roadmapLoading, refetch: refetchRoadmap } = roadmapQuery
   const skyQuery = useKnowledgeMapQuery()
   // Waited for on the first read only: a sky that failed once goes back to
   // pending on every refetch (an answer asks for one), and the stage would
@@ -102,10 +102,13 @@ export function useChapter(unitId: string | undefined): ChapterQuery {
   return useMemo<ChapterQuery>(() => {
     if (!unitId) return { status: 'missing' }
     if (catalogLoading) return { status: 'loading' }
-    if (catalogFailed) return { status: 'error', retry: () => void refetchCatalog() }
+    // A chapter already read stays when a read in the background fails
+    // (finishing a lesson reads every practice query again): only a catalog
+    // or roadmap that never arrived is an error (#417).
+    if (catalogFailed && !catalog) return { status: 'error', retry: () => void refetchCatalog() }
     if (!unit) return { status: 'missing' }
     if (roadmapLoading || skyLoading) return { status: 'loading' }
-    if (roadmapFailed || !roadmap) return { status: 'error', retry: () => void refetchRoadmap() }
+    if (!roadmap) return { status: 'error', retry: () => void refetchRoadmap() }
     const roadmapUnit = roadmap.units.find((candidate) => candidate.id === unitId)
     if (!roadmapUnit) return { status: 'missing' }
 
@@ -139,7 +142,7 @@ export function useChapter(unitId: string | undefined): ChapterQuery {
         star: starState ? { state: starState, unmetExercises } : null,
       },
     }
-  }, [unitId, unit, catalog, catalogLoading, catalogFailed, refetchCatalog, roadmap, roadmapLoading, roadmapFailed, refetchRoadmap, skyLoading, starState, unmetExercises])
+  }, [unitId, unit, catalog, catalogLoading, catalogFailed, refetchCatalog, roadmap, roadmapLoading, refetchRoadmap, skyLoading, starState, unmetExercises])
 }
 
 /** `/chapter/:unitId` and `/chapter/:unitId/:lessonId`, each segment encoded once. */
