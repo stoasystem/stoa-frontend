@@ -10,6 +10,7 @@ import {
 } from '@/services/notifications/realtimeNotifications'
 import { notificationQueryKeys } from '@/services/notifications/notificationQueryKeys'
 import { useAuthStore } from '@/store/authStore'
+import { useNotificationPollStore } from '@/store/notificationPollStore'
 
 export type RealtimeNotificationStatus =
   | 'disabled'
@@ -20,7 +21,6 @@ export type RealtimeNotificationStatus =
   | 'offline'
 
 const HEARTBEAT_MS = 25_000
-const FALLBACK_POLL_MS = 30_000
 const MAX_RECONNECT_MS = 30_000
 
 export function useRealtimeNotifications() {
@@ -166,16 +166,14 @@ export function useRealtimeNotifications() {
     }
   }, [accessToken, queryClient, user])
 
+  // Not live, the notification queries poll on their own, and only in a tab
+  // that is shown (#413): a timer here refetched them in hidden tabs too.
+  const poll = Boolean(accessToken && user) && status !== 'live'
   useEffect(() => {
-    if (!accessToken || !user || status === 'live') return undefined
-
-    const interval = window.setInterval(() => {
-      void queryClient.invalidateQueries({ queryKey: notificationQueryKeys.list() })
-      void queryClient.invalidateQueries({ queryKey: notificationQueryKeys.adminList() })
-    }, FALLBACK_POLL_MS)
-
-    return () => window.clearInterval(interval)
-  }, [accessToken, queryClient, status, user])
+    if (!poll) return undefined
+    useNotificationPollStore.setState({ polling: true })
+    return () => useNotificationPollStore.setState({ polling: false })
+  }, [poll])
 
   return {
     status,
