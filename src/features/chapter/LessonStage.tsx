@@ -757,13 +757,18 @@ function LessonDone({
   useEffect(() => heading.current?.focus(), [])
   const next = chapter ? lessonAfter(chapter, lesson.id) : null
   const chapterTitle = chapter?.title ?? lesson.topic
-  const allDone = chapter ? chapter.total > 0 && chapter.done >= chapter.total : false
+  // This lesson is done now, whether or not the chapter was read since: when
+  // that read fails, the chapter on hand is the one from before (#417).
+  const done = chapter
+    ? chapter.done + (chapter.lessons.some((item) => item.id === lesson.id && item.status !== 'completed') ? 1 : 0)
+    : 0
+  const allDone = chapter ? chapter.total > 0 && done >= chapter.total : false
 
   return (
     <div className="relative flex min-h-0 flex-1 items-center justify-center overflow-y-auto p-6">
       <section aria-labelledby="stage-done-title" data-stage-done className="flex max-w-[520px] flex-col items-center gap-4 text-center">
         {chapter && (
-          <StarGlyph state="in_progress" size={96} progress={chapter.total ? chapter.done / chapter.total : 0} />
+          <StarGlyph state="in_progress" size={96} progress={chapter.total ? done / chapter.total : 0} />
         )}
         {/* Finishing is the fourth of the marmot's moments, and the chapter
           * page already draws exactly this pair a level up: at the telescope
@@ -784,7 +789,7 @@ function LessonDone({
           <p data-stage-done-progress className={cn('m-0 text-[17px]', bodyOnSky)}>
             {allDone
               ? t('stage.done.allDone', { chapter: chapterTitle })
-              : t('stage.done.progress', { done: chapter.done, total: chapter.total, chapter: chapterTitle })}
+              : t('stage.done.progress', { done, total: chapter.total, chapter: chapterTitle })}
           </p>
         )}
         {testedOut && (
