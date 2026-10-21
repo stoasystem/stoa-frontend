@@ -269,11 +269,12 @@ describe('a parent\'s Overview and Reports', () => {
     renderAs('parent', '/parent/reports', <ParentReportsPage />)
 
     // The monthly report has no route yet (#78 review), so it has no row.
-    // The progress page is reached from here (#256).
+    // The progress page is reached from here (#256). Each row says it was
+    // opened from Reports (#411).
     expect(rowLinks()).toEqual([
-      '/parent/children/ch-1',
-      '/parent/children/ch-1/report',
-      '/parent/children/ch-1/progress',
+      '/parent/children/ch-1?from=reports',
+      '/parent/children/ch-1/report?from=reports',
+      '/parent/children/ch-1/progress?from=reports',
     ])
     expect(screen.queryByText('Monthly trends')).toBeNull()
   })

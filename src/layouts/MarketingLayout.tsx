@@ -7,9 +7,17 @@ import { AppFooter } from '@/components/common/AppFooter'
 import { LanguageSwitcher } from '@/components/common/LanguageSwitcher'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
+import { useAuthStore } from '@/store/authStore'
 
+/*
+ * "Start learning" is a visitor's way in: to the sign-in page, which sends
+ * each role on to its own home (a student to the star map), not to Ask on
+ * the way past (#411). A signed-in reader is in already and is not offered
+ * it, as on /support (#46).
+ */
 export function MarketingHeader() {
   const { t } = useTranslation('common')
+  const signedIn = useAuthStore((state) => state.isAuthenticated && state.user !== null)
 
   return (
     <header className="sticky top-0 z-30 border-b border-[hsl(var(--border)/0.9)] bg-[hsl(35_25%_91%/0.96)] shadow-[0_1px_0_hsl(42_35%_98%/0.65)] backdrop-blur">
@@ -19,9 +27,11 @@ export function MarketingHeader() {
         </Link>
         <nav className="stoa-type-nav flex min-w-0 flex-1 flex-wrap items-center justify-end gap-x-4 gap-y-2 text-sm text-muted-foreground">
           <LanguageSwitcher compact />
-          <Button asChild size="sm" className="premium-button-lift premium-primary-button h-auto min-h-9 rounded-md px-4 py-2 whitespace-normal text-center">
-            <Link to="/login?next=/chat">{t('navigation.startLearning')}</Link>
-          </Button>
+          {!signedIn && (
+            <Button asChild size="sm" className="premium-button-lift premium-primary-button h-auto min-h-9 rounded-md px-4 py-2 whitespace-normal text-center">
+              <Link to="/login">{t('navigation.startLearning')}</Link>
+            </Button>
+          )}
         </nav>
       </div>
     </header>

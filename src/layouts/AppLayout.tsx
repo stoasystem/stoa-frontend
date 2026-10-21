@@ -86,7 +86,7 @@ export function AppLayout({
   const homePath = user ? getDefaultRouteForRole(user.role) : '/'
   const navigation = user ? shellNavigationFor(user.role) : ({ kind: 'none' } as const)
   const items: readonly AppNavItem[] = navigation.kind === 'none' ? [] : navigation.items
-  const activeIndex = activeNavIndex(items, location.pathname, user?.role)
+  const activeIndex = activeNavIndex(items, location.pathname, user?.role, location.search)
   const [covered, setCovered] = useState(false)
   const label = (item: AppNavItem) => t(item.labelKey ?? item.label, { defaultValue: item.label })
 
