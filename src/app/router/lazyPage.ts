@@ -11,10 +11,11 @@ export type LazyPage = PageComponent & {
   readonly pageName: string
   /**
    * Starts loading the page's module before the page is rendered (#415). A
-   * page that mounts once its module is in renders at once. A failure is not
-   * kept: it is left to the render's own load, which reports it and reloads
-   * the tab when that may cure it (chunkReload.ts). A page that is never
-   * rendered has nothing to report.
+   * page that mounts once its module is in renders at once. The page's render
+   * takes over this load, failure included: the preload reports nothing and
+   * reloads nothing itself, and the render reports a failure and reloads the
+   * tab when that may cure it (chunkReload.ts), as for a load of its own. A
+   * page that is never rendered has nothing to report.
    */
   readonly preload: () => void
 }
@@ -68,14 +69,22 @@ export function lazyPage<Name extends string>(
   // moment even then, and the router's Suspense would show its skeleton for
   // React's minimum of 300 ms, about what a preload saves (#415).
   let loaded: PageComponent | undefined
+  // The current attempt's load, one for a preload and the render together.
+  // Vite asks for a page's stylesheet only the first time it loads the page in
+  // a document: a render that loaded again after a preload had failed on the
+  // stylesheet showed the page without it, and nothing reported the failure
+  // (#441 audit). Shared, the render meets that failure, and it waits for a
+  // stylesheet still on its way.
+  let loading: Promise<Record<Name, PageComponent>> | undefined
   const loadPage = () =>
-    load().then((module) => {
+    (loading ??= load().then((module) => {
       loaded = module[pageName]
       return module
-    })
+    }))
   const failed = (error: unknown): never => {
     const reset = () => {
       failedLoads.delete(reset)
+      loading = undefined
       current = attempt()
     }
     failedLoads.add(reset)

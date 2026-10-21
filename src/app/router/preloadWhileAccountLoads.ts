@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 import { matchRoutes, useLocation } from 'react-router-dom'
+import { justReloadedForFailedPage } from '@/app/chunkReload'
 import type { LazyPage } from '@/app/router/lazyPage'
 import { isAdmitted } from '@/app/router/routeAccess'
 import { legacyRedirects, pageRoutes, type PageRoute } from '@/app/router/routeManifest'
@@ -17,7 +18,9 @@ import { normalizeUserRole, useAuthStore } from '@/store/authStore'
  * not remember whose it was (`readTabAccount`).
  *
  * Nothing here decides what is shown. The guards still wait for the account,
- * and a tab that turns out to be someone else's has fetched code it never runs.
+ * and a tab that turns out to be someone else's has fetched and evaluated code
+ * it never renders. Right after a reload for a page that failed to load, the
+ * page waits for its render as before (`justReloadedForFailedPage`).
  */
 
 const STUDENT = { role: 'student' } as const
@@ -43,6 +46,7 @@ export function usePreloadWhileAccountLoads() {
   const accountLoading = useAuthStore((state) => Boolean(state.accessToken) && state.user === null)
 
   useEffect(() => {
-    if (accountLoading) pageToPreload(pathname, readTabAccount()?.role)?.preload()
+    if (!accountLoading || justReloadedForFailedPage()) return
+    pageToPreload(pathname, readTabAccount()?.role)?.preload()
   }, [accountLoading, pathname])
 }
