@@ -1,5 +1,6 @@
 import axios from 'axios'
 import { apiBaseUrl } from '@/lib/env'
+import { returnToHere } from '@/lib/tabAccount'
 import { activeLanguage } from '@/i18n/languages'
 import { currentSessionToken, useAuthStore } from '@/store/authStore'
 import { isSameSession, renewSession, storedRefreshToken } from '@/services/auth/sessionRefresh'
@@ -168,11 +169,7 @@ export const SESSION_UNREACHABLE = 'session_unreachable'
  * tab's own storage, what is held in memory here and by the page load.
  */
 function endSession(): never | Promise<never> {
-  const { pathname, search, hash } = window.location
-  useAuthStore.getState().clearAuth({
-    reason: 'expired',
-    ...(pathname !== '/login' ? { returnTo: `${pathname}${search ?? ''}${hash ?? ''}` } : {}),
-  })
+  useAuthStore.getState().clearAuth({ reason: 'expired', ...returnToHere() })
   queryClient.clear()
   if (window.location.pathname !== '/login') {
     window.location.assign('/login')

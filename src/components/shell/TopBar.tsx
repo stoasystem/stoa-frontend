@@ -24,19 +24,23 @@ import { AccountMenu } from '@/components/shell/AccountMenu'
  */
 export function TopBar({
   homePath,
+  homeState,
   wide,
   segments,
   activeIndex,
-  signedIn,
+  bell,
   covered = false,
   sky = false,
 }: {
   homePath: string
+  /** The state the logo's link carries (a forced password change keeps its page in it). */
+  homeState?: unknown
   wide: boolean
   /** A teacher's or parent's pages; below the bar on a phone. */
   segments?: readonly SegmentedNavItem[]
   activeIndex: number
-  signedIn: boolean
+  /** The notification bell, for a signed-in account. */
+  bell: boolean
   /** Under a modal (the phone Ask sheet): dimmed with the page, and inert. */
   covered?: boolean
   /** Over a sky page: the bar is the sky as well. */
@@ -81,6 +85,7 @@ export function TopBar({
       >
         <Link
           to={homePath}
+          state={homeState}
           aria-label={t('navigation.logoHome')}
           data-logo-link
           className="flex items-center justify-self-start"
@@ -91,7 +96,7 @@ export function TopBar({
         </Link>
         <div className="justify-self-center">{wide && segmented}</div>
         <div className="flex items-center justify-self-end" style={{ gap: touch ? 0 : bar.gap }}>
-          {signedIn && <NotificationCenter hitSize={touch ? TOUCH_TARGET : undefined} onSky={sky} />}
+          {bell && <NotificationCenter hitSize={touch ? TOUCH_TARGET : undefined} onSky={sky} />}
           <AccountMenu avatarSize={bar.avatar} touch={touch} onSky={sky} />
         </div>
       </div>

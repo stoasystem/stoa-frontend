@@ -9,7 +9,7 @@
  * for a tab that missed the event (asleep, or frozen by the browser).
  */
 import { queryClient } from '@/app/query/queryClient'
-import { isBrowserSignInEvent, tabOnBrowserSignIn } from '@/lib/tabAccount'
+import { isBrowserSignInEvent, returnToHere, tabOnBrowserSignIn } from '@/lib/tabAccount'
 import { useAuthStore } from '@/store/authStore'
 
 /**
@@ -18,11 +18,7 @@ import { useAuthStore } from '@/store/authStore'
  */
 export function signOutIfReplacedElsewhere(): boolean {
   if (tabOnBrowserSignIn()) return false
-  const { pathname, search, hash } = window.location
-  useAuthStore.getState().clearAuth({
-    reason: 'signed-out-elsewhere',
-    ...(pathname !== '/login' ? { returnTo: `${pathname}${search ?? ''}${hash ?? ''}` } : {}),
-  })
+  useAuthStore.getState().clearAuth({ reason: 'signed-out-elsewhere', ...returnToHere() })
   queryClient.clear()
   // A full load, even on the sign-in page: it then says what happened.
   window.location.assign('/login')

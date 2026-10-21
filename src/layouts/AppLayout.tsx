@@ -20,7 +20,7 @@ import {
 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { useLocation } from 'react-router-dom'
-import type { AppNavIcon } from '@/app/router/routeManifest'
+import { CHANGE_PASSWORD_PATH, type AppNavIcon } from '@/app/router/routeManifest'
 import { InternalDebugPanel } from '@/components/internal/InternalDebugPanel'
 import { activeNavIndex, shellNavigationFor } from '@/components/shell/shellNavigation'
 import { SourceList } from '@/components/shell/SourceList'
@@ -83,8 +83,15 @@ export function AppLayout({
   const user = useAuthStore((state) => state.user)
   const wide = useMediaQuery(WIDE_QUERY)
   const roomForSourceList = useMediaQuery(SOURCE_LIST_QUERY)
-  const homePath = user ? getDefaultRouteForRole(user.role) : '/'
-  const navigation = user ? shellNavigationFor(user.role) : ({ kind: 'none' } as const)
+  // Under a forced password change every page but the change sends the
+  // account back to it (ProtectedRoute), and the backend refuses everything
+  // else (#412). The shell offers no page and no bell, which could only be
+  // refused. The logo, the way home, leads to the change, which is this
+  // account's home for now, with the state the page has: the page the change
+  // carries stays carried through a look at Help and back.
+  const forcedChange = Boolean(user?.mustChangePassword)
+  const homePath = forcedChange ? CHANGE_PASSWORD_PATH : user ? getDefaultRouteForRole(user.role) : '/'
+  const navigation = user && !forcedChange ? shellNavigationFor(user.role) : ({ kind: 'none' } as const)
   const items: readonly AppNavItem[] = navigation.kind === 'none' ? [] : navigation.items
   const activeIndex = activeNavIndex(items, location.pathname, user?.role, location.search)
   const [covered, setCovered] = useState(false)
@@ -115,8 +122,9 @@ export function AppLayout({
           covered={covered}
           sky={surface === 'sky'}
           homePath={homePath}
+          homeState={forcedChange ? location.state : undefined}
           wide={wide}
-          signedIn={Boolean(user)}
+          bell={Boolean(user) && !forcedChange}
           segments={
             navigation.kind === 'segmented'
               ? navigation.items.map((item) => ({ to: item.path, label: label(item) }))

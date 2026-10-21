@@ -77,6 +77,11 @@ function LegacyRedirectElement({ redirect }: { redirect: LegacyRedirect }) {
  * screen it can use -- not even the moment the change goes through, which
  * clears the flag while the page is still saying so (#46). Once the page has
  * been shown for a forced change, it stays until the visitor leaves it.
+ *
+ * Whose page it is cannot be told before the account is read, so a session
+ * whose account is not in yet waits, as RoleRoute does (#412). Deciding on
+ * the missing account showed a reloading student the other roles' page first,
+ * and kept it there for good when /auth/me failed with anything but a 401.
  */
 function RoleScopedRedirect({
   redirect,
@@ -86,6 +91,7 @@ function RoleScopedRedirect({
   children: ReactNode
 }) {
   const user = useAuthStore((state) => state.user)
+  const accessToken = useAuthStore((state) => state.accessToken)
   const location = useLocation()
   const { to, state } = useRedirectTarget(redirect)
   const applies = Boolean(user && redirect.onlyFor?.includes(user.role))
@@ -99,6 +105,7 @@ function RoleScopedRedirect({
   if (forcedNow && userId !== null && forcedFor !== userId) setForcedFor(userId)
   const wasForced = forcedFor !== null && forcedFor === userId
 
+  if (!user && accessToken) return <AccountLoadStatus />
   if (applies && !forcedNow && !wasForced) return <Navigate replace to={to} state={state} />
   return children
 }

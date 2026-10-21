@@ -141,6 +141,10 @@ export type LegacyRedirect = {
 /** The one screen an account under a forced password change can still use. */
 export const CHANGE_PASSWORD_PATH = '/settings/password'
 
+/** The anchor on /me that holds the password change, and /me opened there. */
+export const PASSWORD_SECTION_ID = 'password'
+export const ME_PASSWORD_PATH = `/me#${PASSWORD_SECTION_ID}`
+
 /** Where a guard sends a role a route is not for (RoleRoute, and a role with no home). */
 export const FORBIDDEN_PATH = '/forbidden'
 
@@ -593,7 +597,8 @@ export const legacyRedirects: readonly LegacyRedirect[] = [
   // /chat, so outside links to it may still exist.
   { from: '/assistant', to: toAskOrHome, access: EVERY_ROLE, carryContext: true, consumes: [CONVERSATION_QUERY], decision: '#104' },
   { from: '/profile', to: '/me', access: STUDENT, decision: '#13 §2' },
-  // Students change their password on /me (#46); everyone else keeps the page
-  // here, and so does any account under a forced change (RoleScopedRedirect).
-  { from: CHANGE_PASSWORD_PATH, to: '/me', access: SIGNED_IN, onlyFor: ['student'], decision: '#13 §2' },
+  // Students change their password on /me (#46), in its password section
+  // (#412); everyone else keeps the page here, and so does any account under
+  // a forced change (RoleScopedRedirect).
+  { from: CHANGE_PASSWORD_PATH, to: ME_PASSWORD_PATH, access: SIGNED_IN, onlyFor: ['student'], decision: '#13 §2' },
 ]

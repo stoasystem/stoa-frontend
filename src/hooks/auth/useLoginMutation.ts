@@ -4,7 +4,7 @@ import { toast } from 'sonner'
 import i18n from '@/i18n'
 import { resolveUserLanguage } from '@/i18n/languages'
 import type { AddressContext } from '@/lib/addressForm'
-import { getPostLoginPath } from '@/lib/authRoutes'
+import { getPostLoginTarget } from '@/lib/authRoutes'
 import { isSameAccount, readTabAccount } from '@/lib/tabAccount'
 import { markLoginAuthenticated } from '@/lib/loginTiming'
 import { getConversations } from '@/services/chat/chatApi'
@@ -41,9 +41,10 @@ export function useLoginMutation({ context }: { context?: AddressContext } = {})
       // new one (tab-account audit F2).
       const replacing = currentSessionToken() !== null && !isSameAccount(data.user, readTabAccount())
       // Signing in is all this does. The login screen (EntryPage) sees the
-      // session and picks the destination: the password change for a reset
-      // account, else a permitted `?next=` or `from`, else the role's home.
-      // It becomes the browser's one sign-in; nothing else is kept (#320).
+      // session and picks the destination: a permitted `?next=` or `from`,
+      // else the role's home, by way of the password change for a reset
+      // account (#412). It becomes the browser's one sign-in; nothing else is
+      // kept (#320).
       setAuth(data.user, data.accessToken, data.refreshToken)
       markLoginAuthenticated(data.user.role)
       trackEvent('user_login', { role: data.user.role, userId: data.user.id })
@@ -58,7 +59,17 @@ export function useLoginMutation({ context }: { context?: AddressContext } = {})
         // A `?next=` or the page sign-in was asked from still counts, checked
         // for the new account as always.
         const from = (window.history.state as { usr?: unknown } | null)?.usr
-        window.location.assign(getPostLoginPath(data.user, { search: window.location.search, state: from }))
+        const target = getPostLoginTarget(data.user, { search: window.location.search, state: from })
+        if (target.state) {
+          // A reset account goes by the password change, carrying where it
+          // was going (#412). A load of a new address starts with no state, so
+          // the state goes into this entry, in the router's own shape, and
+          // the entry is loaded again: as full a load as the other.
+          window.history.replaceState({ usr: target.state, key: 'default', idx: 0 }, '', target.to)
+          window.location.reload()
+          return
+        }
+        window.location.assign(target.to)
         return
       }
 

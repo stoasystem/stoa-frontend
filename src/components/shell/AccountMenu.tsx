@@ -2,7 +2,7 @@ import * as Menu from '@radix-ui/react-dropdown-menu'
 import { Check, ChevronRight, CircleHelp, ClipboardList, CreditCard, Globe, KeyRound, LogOut, UserRound, type LucideIcon } from 'lucide-react'
 import { createContext, useContext, useRef, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import { navAreaForRole } from '@/app/router/routeManifest'
 import { Avatar, type AvatarSize } from '@/components/base/Avatar'
 import { ACCOUNT_MENU, ICON, TOUCH_TARGET } from '@/components/base/sizes'
@@ -49,7 +49,17 @@ function useItemStyle() {
   return { height: useContext(ItemHeight), borderRadius: ACCOUNT_MENU.itemRadius }
 }
 
-function LinkItem({ to, icon, children }: { to: string | null; icon: LucideIcon; children: ReactNode }) {
+function LinkItem({
+  to,
+  state,
+  icon,
+  children,
+}: {
+  to: string | null
+  state?: unknown
+  icon: LucideIcon
+  children: ReactNode
+}) {
   const itemStyle = useItemStyle()
   const chosePage = useContext(ChosePage)
   if (!to) {
@@ -61,7 +71,7 @@ function LinkItem({ to, icon, children }: { to: string | null; icon: LucideIcon;
   }
   return (
     <Menu.Item asChild className={ITEM} style={itemStyle} onSelect={chosePage}>
-      <Link to={to}>
+      <Link to={to} state={state}>
         <ItemBody icon={icon}>{children}</ItemBody>
       </Link>
     </Menu.Item>
@@ -83,6 +93,7 @@ export function AccountMenu({
 }) {
   const { t } = useTranslation('common')
   const user = useAuthStore((state) => state.user)
+  const location = useLocation()
   const { signOut, isSigningOut } = useSignOut()
   const { current, changeLanguage } = useChangeLanguage()
   const openedPage = useRef(false)
@@ -90,6 +101,11 @@ export function AccountMenu({
   if (!user) return null
 
   const targets = accountMenuFor(navAreaForRole(user.role))
+  // Under a forced password change (an administrator reset) the change is the
+  // one page the account can use: every other sends it back there (#412). So
+  // the menu leaves out the pages and keeps Language (the screen switches;
+  // useChangeLanguage stores nothing then), Help, a public page, and Sign out.
+  const forcedChange = Boolean(user.mustChangePassword)
   const itemHeight = touch ? TOUCH_TARGET : ACCOUNT_MENU.item
   const itemStyle = { height: itemHeight, borderRadius: ACCOUNT_MENU.itemRadius }
   // Beside the menu there is no room on a phone: at 375 a submenu flipped to
@@ -147,9 +163,11 @@ export function AccountMenu({
             </div>
           </div>
 
-          <LinkItem to={targets.profile} icon={UserRound}>
-            {t('navigation.profile')}
-          </LinkItem>
+          {!forcedChange && (
+            <LinkItem to={targets.profile} icon={UserRound}>
+              {t('navigation.profile')}
+            </LinkItem>
+          )}
 
           <Menu.Sub>
             <Menu.SubTrigger className={ITEM} style={itemStyle}>
@@ -185,17 +203,21 @@ export function AccountMenu({
             </Menu.Portal>
           </Menu.Sub>
 
-          <LinkItem to={targets.password} icon={KeyRound}>
-            {t('actions.changePassword')}
-          </LinkItem>
-          <LinkItem to={targets.help} icon={CircleHelp}>
+          {!forcedChange && (
+            <LinkItem to={targets.password} icon={KeyRound}>
+              {t('actions.changePassword')}
+            </LinkItem>
+          )}
+          {/* Help keeps what the change carries, for the logo to bring it back. */}
+          <LinkItem to={targets.help} state={forcedChange ? location.state : undefined} icon={CircleHelp}>
             {t('accountMenu.help')}
           </LinkItem>
-          {targets.extras.map((extra) => (
-            <LinkItem key={extra.key} to={extra.to} icon={extraIcons[extra.key] ?? CircleHelp}>
-              {t(extra.labelKey)}
-            </LinkItem>
-          ))}
+          {!forcedChange &&
+            targets.extras.map((extra) => (
+              <LinkItem key={extra.key} to={extra.to} icon={extraIcons[extra.key] ?? CircleHelp}>
+                {t(extra.labelKey)}
+              </LinkItem>
+            ))}
 
           <Menu.Separator className="mx-0 my-1.5 h-px bg-hairline" />
           <Menu.Item

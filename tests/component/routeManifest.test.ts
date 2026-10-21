@@ -36,7 +36,8 @@ const pagePatterns = pageRoutes.map((route) => route.path).filter((p) => p !== '
 
 /** The page a concrete address lands on, by react-router's own ranking. */
 function landsOnPage(address: string): boolean {
-  const pathname = address.split('?')[0]
+  // The router sees neither the query nor a `#section` (/me#password, #412).
+  const pathname = address.split(/[?#]/)[0]
   return pagePatterns.some((pattern) => matchPath(pattern, pathname))
 }
 
