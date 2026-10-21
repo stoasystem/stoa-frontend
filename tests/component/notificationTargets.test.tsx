@@ -52,8 +52,11 @@ function event(overrides: Partial<NotificationEvent>): NotificationEvent {
 }
 
 let pathname = ''
+let search = ''
 function LocationProbe() {
-  pathname = useLocation().pathname
+  const location = useLocation()
+  pathname = location.pathname
+  search = location.search
   return null
 }
 
@@ -117,13 +120,14 @@ describe('a notification in the bell', () => {
     expect(pathname).toBe('/assignments')
   })
 
-  it('opens moderation for an administrator', async () => {
+  it('opens moderation for an administrator, at the case it names (#411)', async () => {
     renderBell('admin', [event({ targetType: 'moderation_case', targetId: 'm-1', title: 'Case updated' })])
     await openBell()
 
-    await userEvent.click(screen.getByRole('button', { name: /Case updated/ }))
+    await userEvent.click(screen.getByRole('button', { name: /^Case updated/ }))
 
     expect(pathname).toBe('/admin/moderation')
+    expect(search).toBe('?case=m-1')
   })
 
   it('is only marked read when there is no page for it, and stays open', async () => {
@@ -170,8 +174,10 @@ const ALL_ROLES: UserRole[] = [
   'school_viewer',
 ]
 
+// A target may carry a query (`?case=`, #411); the route is its path's.
 function routeFor(path: string) {
-  return pageRoutes.find((route) => route.path !== '*' && matchPath({ path: route.path, end: true }, path))
+  const [pathname] = path.split('?')
+  return pageRoutes.find((route) => route.path !== '*' && matchPath({ path: route.path, end: true }, pathname))
 }
 
 describe('every notification target', () => {

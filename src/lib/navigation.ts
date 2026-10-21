@@ -22,6 +22,8 @@ export type AppNavItem = {
   description?: string
   /** The other pages of the entry's section, which light it too. */
   covers?: readonly string[]
+  /** `?from=` this lights the entry on a page it opened (#411). */
+  from?: string
 }
 
 /*
@@ -42,6 +44,7 @@ export const navItems: readonly AppNavItem[] = pageRoutes
       mobile: nav.mobile,
       description: nav.description,
       covers: nav.covers,
+      from: nav.from,
     })),
   )
   .sort((a, b) => Number(a.priority === 'secondary') - Number(b.priority === 'secondary'))

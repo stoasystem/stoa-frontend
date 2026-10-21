@@ -272,6 +272,7 @@
     "notePlaceholder": "Ajouter une note de modération interne",
     "addNote": "Ajouter la note",
     "selectCase": "Sélectionnez un cas de modération pour voir son contexte et les actions possibles.",
+    "caseLoadFailed": "Impossible de charger ce cas.",
     "noPreview": "Aucun aperçu du contexte",
     "question": "Question",
     "aiAnswer": "Réponse de l’IA",
