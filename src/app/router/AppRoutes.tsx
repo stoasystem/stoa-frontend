@@ -11,6 +11,7 @@ import { useTranslation } from 'react-i18next'
 import { Navigate, Outlet, Route, Routes, useLocation, useParams } from 'react-router-dom'
 import { AccountLoadStatus } from '@/app/router/AccountLoadStatus'
 import { DemoSurfaceRoute } from '@/app/router/DemoSurfaceRoute'
+import { usePreloadWhileAccountLoads } from '@/app/router/preloadWhileAccountLoads'
 import { ProtectedRoute } from '@/app/router/ProtectedRoute'
 import { RoleRoute } from '@/app/router/RoleRoute'
 import { useReportPageName } from '@/app/router/RouteArrival'
@@ -264,5 +265,6 @@ export function buildRoutes(
 const routes = buildRoutes()
 
 export function AppRoutes() {
+  usePreloadWhileAccountLoads()
   return <Routes>{routes}</Routes>
 }

@@ -166,7 +166,7 @@ function Page({ pageName }: { pageName: string }) {
 }
 
 export function lazyPage(pageName: string) {
-  return Object.assign(() => <Page pageName={pageName} />, { pageName })
+  return Object.assign(() => <Page pageName={pageName} />, { pageName, preload() {} })
 }
 
 /* Stub pages never fail to load, so there is nothing to try again. */
