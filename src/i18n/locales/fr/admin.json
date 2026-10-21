@@ -473,6 +473,7 @@
       "submit": "Examiner",
       "empty": "Saisissez l’ID d’un parent pour examiner les opérations de compte, ou ouvrez cette vue depuis un enregistrement de facturation du fournisseur dans la file des abonnements.",
       "notFound": "Le compte parent est introuvable.",
+      "invalidParentId": "Cet ID de parent n’est pas valide. Vérifiez-le et réessayez.",
       "unavailable": "Les opérations de compte sont indisponibles. Réessayez plus tard."
     },
     "support": {
@@ -589,7 +590,8 @@
         "denied": "L’accès aux preuves de facturation est refusé. La capacité de support facturation est requise.",
         "inProgress": "Une revérification de la facturation est déjà en cours. Patientez un instant puis réessayez ce même paiement.",
         "providerUnavailable": "Le fournisseur de facturation est temporairement indisponible. Conservez cette référence de paiement et réessayez plus tard.",
-        "notFound": "Aucun paiement correspondant n’a été trouvé pour ce parent."
+        "notFound": "Aucun paiement correspondant n’a été trouvé pour ce parent.",
+        "invalidRef": "Cette référence de paiement n’est pas valide. Vérifiez-la et réessayez."
       }
     },
     "values": {
@@ -780,6 +782,7 @@
       "title": "Preuves de migration",
       "idLabel": "ID de migration",
       "load": "Charger les preuves",
+      "invalidId": "Cet ID de migration n’est pas valide. Vérifiez-le et réessayez.",
       "missingCapability": "Capacité d’opérateur de migration ou d’éditeur manquante."
     },
     "selectItem": "Sélectionnez un élément du programme dans la liste de travail.",

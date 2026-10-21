@@ -473,6 +473,7 @@
       "submit": "Esamina",
       "empty": "Inserisci l’ID di un genitore per esaminare le operazioni dell’account, oppure apri questa vista da un record di fatturazione del provider nella coda degli abbonamenti.",
       "notFound": "Account genitore non trovato.",
+      "invalidParentId": "Questo ID genitore non è valido. Controllalo e riprova.",
       "unavailable": "Le operazioni account non sono disponibili. Riprova più tardi."
     },
     "support": {
@@ -589,7 +590,8 @@
         "denied": "Accesso alle evidenze di fatturazione negato. È necessaria la capacità di supporto fatturazione.",
         "inProgress": "Un nuovo controllo della fatturazione è già in corso. Attendi un attimo e riprova con lo stesso checkout.",
         "providerUnavailable": "Il provider di fatturazione non è momentaneamente disponibile. Conserva questo riferimento del checkout e riprova più tardi.",
-        "notFound": "Nessun checkout corrispondente trovato per questo genitore."
+        "notFound": "Nessun checkout corrispondente trovato per questo genitore.",
+        "invalidRef": "Questo riferimento checkout non è valido. Controllalo e riprova."
       }
     },
     "values": {
@@ -780,6 +782,7 @@
       "title": "Evidenze di migrazione",
       "idLabel": "ID migrazione",
       "load": "Carica le evidenze",
+      "invalidId": "Questo ID migrazione non è valido. Controllalo e riprova.",
       "missingCapability": "Manca la capacità di operatore di migrazione o di pubblicazione."
     },
     "selectItem": "Seleziona un elemento del programma dalla lista di lavoro.",

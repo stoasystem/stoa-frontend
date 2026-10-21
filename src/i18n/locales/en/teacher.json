@@ -268,6 +268,7 @@
     "preview": "Preview candidates",
     "previewFailed": "Preview failed",
     "needStudentId": "Enter a student id before previewing automation.",
+    "invalidStudentId": "This student id is not valid. Check it and try again.",
     "summary": {
       "selected": "Selected",
       "refused": "Refused",
