@@ -31,11 +31,10 @@ export function useUpdateModerationCaseMutation() {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (input: ModerationCaseUpdateInput) => updateModerationCase(input),
-    onSuccess: (caseItem) => {
+    // The case's detail is under this key too. Invalidated once more on its
+    // own, its refetch was cancelled and the case read a second time (#416).
+    onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: adminQueryKeys.moderationCases() })
-      void queryClient.invalidateQueries({
-        queryKey: [...adminQueryKeys.moderationCases(), 'detail', caseItem.case_id],
-      })
     },
   })
 }
@@ -44,11 +43,10 @@ export function useAddModerationCaseNoteMutation() {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (input: ModerationCaseNoteInput) => addModerationCaseNote(input),
-    onSuccess: (caseItem) => {
+    // The case's detail is under this key too. Invalidated once more on its
+    // own, its refetch was cancelled and the case read a second time (#416).
+    onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: adminQueryKeys.moderationCases() })
-      void queryClient.invalidateQueries({
-        queryKey: [...adminQueryKeys.moderationCases(), 'detail', caseItem.case_id],
-      })
     },
   })
 }

@@ -1,4 +1,4 @@
-import { useCallback } from 'react'
+import { useCallback, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { askPathFor, roleHomePaths } from '@/app/router/routeManifest'
 import type { AskEntry } from '@/features/ask/askLayout'
@@ -88,16 +88,23 @@ export function useAskController(route?: AskRoute): AskController {
     if (direct) navigate(roleHomePaths.student)
   }, [direct, navigate, storeClose])
 
-  return {
-    entry: direct ? 'direct' : 'planet',
-    open: direct ? true : planetOpen,
-    conversationId: direct ? directId : planetConversationId,
-    draft,
-    readDraft,
-    setDraft,
-    openWithDraft,
-    reopen,
-    select,
-    close,
-  }
+  // The same object until something in it changes, so what is built on it --
+  // the stage's controller, the hosts' callbacks -- changes only then (#416).
+  const open = direct ? true : planetOpen
+  const conversationId = direct ? directId : planetConversationId
+  return useMemo<AskController>(
+    () => ({
+      entry: direct ? 'direct' : 'planet',
+      open,
+      conversationId,
+      draft,
+      readDraft,
+      setDraft,
+      openWithDraft,
+      reopen,
+      select,
+      close,
+    }),
+    [close, conversationId, direct, draft, open, openWithDraft, readDraft, reopen, select, setDraft],
+  )
 }

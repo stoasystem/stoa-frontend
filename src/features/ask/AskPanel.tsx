@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { ChevronLeft, X } from 'lucide-react'
-import { useEffect, useLayoutEffect, useRef, useState, type HTMLAttributes } from 'react'
+import { useEffect, useLayoutEffect, useMemo, useRef, useState, type HTMLAttributes } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 import { Button, Composer, IconButton, PresenceDot } from '@/components/base'
@@ -528,6 +528,21 @@ function AskThread({
   const entries = threadEntries(messages, moments)
   const lastAnswerId = latestAnswerId(messages)
   const offerHelp = !helpActive && !isStreaming && !requestHelp.isPending
+  // The same element from one render to the next, so the answer it sits under
+  // is not drawn again at every key typed in the composer (#416).
+  const { mutate: request, isPending: requesting } = requestHelp
+  const helpAction = useMemo(
+    () =>
+      offerHelp || requesting ? (
+        <TeacherHelpAction
+          onRequest={() => request()}
+          requesting={requesting}
+          teachersOnline={teachersOnline}
+          error={helpError}
+        />
+      ) : undefined,
+    [helpError, offerHelp, request, requesting, teachersOnline],
+  )
 
   // Keep the latest message in view as the thread grows -- unless the student
   // has scrolled up to read something earlier.
@@ -583,16 +598,7 @@ function AskThread({
             message={entry.message}
             teacherName={help?.teacherName}
             onRetry={retryMessage}
-            after={
-              entry.message.id === lastAnswerId && (offerHelp || requestHelp.isPending) ? (
-                <TeacherHelpAction
-                  onRequest={() => requestHelp.mutate()}
-                  requesting={requestHelp.isPending}
-                  teachersOnline={teachersOnline}
-                  error={helpError}
-                />
-              ) : undefined
-            }
+            after={entry.message.id === lastAnswerId ? helpAction : undefined}
           />
         ))}
       </div>

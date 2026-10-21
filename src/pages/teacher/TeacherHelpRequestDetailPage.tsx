@@ -47,9 +47,12 @@ export function TeacherHelpRequestDetailPage() {
   const updateStatus = useUpdateTeacherHelpRequestMutation()
   const addNote = useAddTeacherHelpRequestNoteMutation()
   const assistanceQuery = useTeacherAssistanceSummaryQuery(requestQuery.data?.requestId)
+  // Read once the request has said its subject: read before, it was the whole
+  // catalog with its previews, and then again for the subject (#416).
   const curriculumQuery = useCurriculumCatalogQuery({
     subjectId: normalizeCurriculumSubjectId(requestQuery.data?.subject),
     includePreview: true,
+    enabled: requestQuery.data !== undefined,
   })
 
   useEffect(() => {
