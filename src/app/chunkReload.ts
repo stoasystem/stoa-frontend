@@ -105,20 +105,39 @@ export function reloadForFailedPage(error: unknown): boolean {
   const { target, now, announced } = listening
   if (!announced.has(error)) return false
   const at = now()
-  const previous = lastReload(target)
-  if (previous !== null) {
-    // When this document began, on the same clock as the reload's record.
-    // Not `performance.timeOrigin`: Firefox's source works that out from a
-    // clock fixed once per process, which can fall behind `Date.now()` -- by
-    // hours, once the computer has slept.
-    const began = at - (target.performance?.now() ?? NaN)
-    const sinceReload = at - previous
-    if (sinceReload >= 0 && sinceReload < CHUNK_RELOAD_WINDOW_MS) return false
-    if (began - previous >= -CLOCK_SLACK_MS && began - previous < CHUNK_RELOAD_WINDOW_MS) return false
-  }
+  if (withinOurReload(target, at)) return false
   // Without a record of this reload the next failure could not tell it was
   // the same one, so with blocked storage nothing reloads at all.
   if (!rememberReload(target, at)) return false
   target.location.reload()
   return true
+}
+
+/**
+ * Whether `at` falls in our last reload's window: moments after it, or in the
+ * document it made (CHUNK_RELOAD_WINDOW_MS).
+ */
+function withinOurReload(target: ReloadTarget, at: number): boolean {
+  const previous = lastReload(target)
+  if (previous === null) return false
+  // When this document began, on the same clock as the reload's record.
+  // Not `performance.timeOrigin`: Firefox's source works that out from a
+  // clock fixed once per process, which can fall behind `Date.now()` -- by
+  // hours, once the computer has slept.
+  const began = at - (target.performance?.now() ?? NaN)
+  const sinceReload = at - previous
+  if (sinceReload >= 0 && sinceReload < CHUNK_RELOAD_WINDOW_MS) return true
+  return began - previous >= -CLOCK_SLACK_MS && began - previous < CHUNK_RELOAD_WINDOW_MS
+}
+
+/**
+ * Whether this tab reloaded for a failed page moments ago, or is the document
+ * that reload made. A page is then not loaded ahead of time (#441 audit): the
+ * network that failed may not be back yet, and a browser keeps a module that
+ * failed for the rest of the document, so an early load could spend the
+ * page's one chance. Its own load, when it renders, comes as late as before.
+ */
+export function justReloadedForFailedPage(): boolean {
+  if (listening !== null) return withinOurReload(listening.target, listening.now())
+  return typeof window !== 'undefined' && withinOurReload(window, Date.now())
 }
