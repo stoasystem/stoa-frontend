@@ -220,9 +220,10 @@ test('every release test runs in both gates', async () => {
 // A high or critical advisory in a production dependency stops both gates
 // (#419): the PR before it merges, the push to main before the publish job.
 // The command exactly as written, so `|| true`, a lower bar (`critical`) or a
-// broader one (dev packages, which never reach a browser) is a visible change
-// here too. gatingRuns already leaves out a step that `if:` or
-// `continue-on-error:` can skip or let through.
+// broader scope (dev packages: build and test tools, which the shipped code
+// does not import, as dependencyAdvisories419 checks) is a visible change here
+// too. gatingRuns already leaves out a step that `if:` or `continue-on-error:`
+// can skip or let through.
 const PRODUCTION_AUDIT = 'npm audit --omit=dev --audit-level=high'
 
 test('both gates fail on a high advisory in a production dependency', async () => {

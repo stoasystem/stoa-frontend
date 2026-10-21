@@ -55,9 +55,14 @@ API 契约那步是从 `stoasystem/stoa-backend` 的 **main 分支**实时拉取
 接口变更时，先推后端再推前端，否则这道门会拦下来。
 
 依赖审计那步是 `npm audit --omit=dev --audit-level=high`（#419，PR 门禁也跑）：生产依赖一出
-高危公告，部署就停，哪怕代码没动。npm 没有忽略清单。处理办法是升级到修复版本，传递依赖用
+高危公告，部署就停，哪怕代码没动；registry 挂了也停。中危不拦，升级依赖时自己读一遍
+`npm audit --omit=dev`。npm 没有忽略清单。处理办法是升级到修复版本，传递依赖用
 `package.json` 的 `overrides` 顶上去；只有没有修复版本、又确认打不到浏览器时，才单开 PR 改
 门禁命令，同时改 `tests/release/verify-release.test.mjs` 里钉着的那一行。
+
+审计只看 `dependencies`，所以分组就是审计范围：`src` 里 import 的包放 `dependencies`，构建工具
+（vite、tailwind、插件）放 `devDependencies`。`tests/component/dependencyAdvisories419.test.tsx`
+钉着这两条。
 
 方案 A 的集成分支 `redesign/planet` 已于 2026-10 合回 `main` 并删除，app-planet 预览站和它的
 预览工作流也一并停用；前端修复现在直接 PR 到 `main`。方案 B 的 `redesign/cute` 暂缓，
