@@ -1,5 +1,5 @@
 import { Navigate, Outlet, useLocation } from 'react-router-dom'
-import { CHANGE_PASSWORD_PATH } from '@/lib/authRoutes'
+import { CHANGE_PASSWORD_PATH, type ForcedChangeState } from '@/lib/authRoutes'
 import { useAuthStore } from '@/store/authStore'
 
 export function ProtectedRoute() {
@@ -13,9 +13,11 @@ export function ProtectedRoute() {
 
   // An account an administrator has reset can sign in and reach nothing else:
   // the backend answers 403 everywhere but the password change. Sending it there
-  // is the only screen it can use, and the only way out of the reset.
+  // is the only screen it can use, and the only way out of the reset. The page
+  // it asked for goes along, for the change to lead back to once done (#412).
   if (mustChangePassword && location.pathname !== CHANGE_PASSWORD_PATH) {
-    return <Navigate to={CHANGE_PASSWORD_PATH} replace />
+    const from = { pathname: location.pathname, search: location.search, hash: location.hash }
+    return <Navigate to={CHANGE_PASSWORD_PATH} replace state={{ from } satisfies ForcedChangeState} />
   }
 
   return <Outlet />

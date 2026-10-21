@@ -83,8 +83,13 @@ export function AppLayout({
   const user = useAuthStore((state) => state.user)
   const wide = useMediaQuery(WIDE_QUERY)
   const roomForSourceList = useMediaQuery(SOURCE_LIST_QUERY)
-  const homePath = user ? getDefaultRouteForRole(user.role) : '/'
-  const navigation = user ? shellNavigationFor(user.role) : ({ kind: 'none' } as const)
+  // Under a forced password change every page but the change sends the
+  // account back to it (ProtectedRoute), and the backend refuses everything
+  // else: the shell offers no page, the logo leads nowhere and the bell, which
+  // could only be refused, is left out (#412). The account menu does the same.
+  const forcedChange = Boolean(user?.mustChangePassword)
+  const homePath = forcedChange ? null : user ? getDefaultRouteForRole(user.role) : '/'
+  const navigation = user && !forcedChange ? shellNavigationFor(user.role) : ({ kind: 'none' } as const)
   const items: readonly AppNavItem[] = navigation.kind === 'none' ? [] : navigation.items
   const activeIndex = activeNavIndex(items, location.pathname, user?.role, location.search)
   const [covered, setCovered] = useState(false)
@@ -116,7 +121,7 @@ export function AppLayout({
           sky={surface === 'sky'}
           homePath={homePath}
           wide={wide}
-          signedIn={Boolean(user)}
+          bell={Boolean(user) && !forcedChange}
           segments={
             navigation.kind === 'segmented'
               ? navigation.items.map((item) => ({ to: item.path, label: label(item) }))

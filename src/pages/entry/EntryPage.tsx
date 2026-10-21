@@ -25,7 +25,7 @@ import { useCallback, useEffect, useState, useSyncExternalStore } from 'react'
 import { Navigate, useLocation } from 'react-router-dom'
 import { AccountLoadStatus } from '@/app/router/AccountLoadStatus'
 import { LoginPage } from '@/pages/login/LoginPage'
-import { getDefaultRouteForRole, getPostLoginPath, getReturnPath } from '@/lib/authRoutes'
+import { getPostLoginTarget, getReturnTarget } from '@/lib/authRoutes'
 import {
   browserSignInSnapshot,
   isSameAccount,
@@ -65,16 +65,15 @@ export function EntryPage() {
   }, [joinNow, join])
 
   if (isAuthenticated && user?.role) {
+    // A reset account goes to the password change first, carrying where it
+    // was going (#412).
     if (ended && ended.reason !== 'signed-out') {
       const back = !choseOther && isSameAccount(user, ended.account)
-      const to = back
-        ? getReturnPath(user, ended.returnTo)
-        : user.mustChangePassword
-          ? getReturnPath(user, undefined)
-          : getDefaultRouteForRole(user.role)
-      return <Navigate replace to={to} />
+      const target = getReturnTarget(user, back ? ended.returnTo : undefined)
+      return <Navigate replace to={target.to} state={target.state} />
     }
-    return <Navigate replace to={getPostLoginPath(user, location)} />
+    const target = getPostLoginTarget(user, location)
+    return <Navigate replace to={target.to} state={target.state} />
   }
 
   // Signed in, the account still being read (or its read failed): the

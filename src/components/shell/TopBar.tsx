@@ -27,16 +27,18 @@ export function TopBar({
   wide,
   segments,
   activeIndex,
-  signedIn,
+  bell,
   covered = false,
   sky = false,
 }: {
-  homePath: string
+  /** Where the logo leads; null: nowhere, the logo is only the logo. */
+  homePath: string | null
   wide: boolean
   /** A teacher's or parent's pages; below the bar on a phone. */
   segments?: readonly SegmentedNavItem[]
   activeIndex: number
-  signedIn: boolean
+  /** The notification bell, for a signed-in account. */
+  bell: boolean
   /** Under a modal (the phone Ask sheet): dimmed with the page, and inert. */
   covered?: boolean
   /** Over a sky page: the bar is the sky as well. */
@@ -79,19 +81,25 @@ export function TopBar({
           paddingRight: wide ? TOP_BAR.paddingX : Math.max(0, TOP_BAR_PHONE.paddingRight - avatarOverhang),
         }}
       >
-        <Link
-          to={homePath}
-          aria-label={t('navigation.logoHome')}
-          data-logo-link
-          className="flex items-center justify-self-start"
-          // The logo is narrower than 44 at 26 high, so its target is widened.
-          style={{ height: bar.height, minWidth: touch ? TOUCH_TARGET : undefined }}
-        >
-          <StoaLogo height={bar.logo} variant={sky ? 'light' : 'dark'} />
-        </Link>
+        {homePath === null ? (
+          <span className="flex items-center justify-self-start" style={{ height: bar.height }}>
+            <StoaLogo height={bar.logo} variant={sky ? 'light' : 'dark'} />
+          </span>
+        ) : (
+          <Link
+            to={homePath}
+            aria-label={t('navigation.logoHome')}
+            data-logo-link
+            className="flex items-center justify-self-start"
+            // The logo is narrower than 44 at 26 high, so its target is widened.
+            style={{ height: bar.height, minWidth: touch ? TOUCH_TARGET : undefined }}
+          >
+            <StoaLogo height={bar.logo} variant={sky ? 'light' : 'dark'} />
+          </Link>
+        )}
         <div className="justify-self-center">{wide && segmented}</div>
         <div className="flex items-center justify-self-end" style={{ gap: touch ? 0 : bar.gap }}>
-          {signedIn && <NotificationCenter hitSize={touch ? TOUCH_TARGET : undefined} onSky={sky} />}
+          {bell && <NotificationCenter hitSize={touch ? TOUCH_TARGET : undefined} onSky={sky} />}
           <AccountMenu avatarSize={bar.avatar} touch={touch} onSky={sky} />
         </div>
       </div>

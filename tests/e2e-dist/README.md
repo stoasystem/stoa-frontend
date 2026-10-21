@@ -51,6 +51,11 @@ twice; signs out, which clears the session here and calls `POST /auth/logout`.
 for, once, while `/auth/me` is still being answered rather than after it, and
 the map follows the account without the page skeleton in between (#415).
 
+`forcedChange.spec.ts`: a student whose password an administrator reset opens
+`/ask`, signs in, is sent to the password change with only Help and Log out in
+the shell, reloads it, changes the password, and "Continue" opens `/ask`; the
+backend is asked for nothing it would refuse during the reset but the sky (#412).
+
 `accountMenu.spec.ts`: at 375 px, the account menu's language and switch-account
 lists open on the screen and can be tapped where they are drawn (#162: they
 opened at x = -152).

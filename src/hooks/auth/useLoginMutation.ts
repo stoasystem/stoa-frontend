@@ -41,9 +41,10 @@ export function useLoginMutation({ context }: { context?: AddressContext } = {})
       // new one (tab-account audit F2).
       const replacing = currentSessionToken() !== null && !isSameAccount(data.user, readTabAccount())
       // Signing in is all this does. The login screen (EntryPage) sees the
-      // session and picks the destination: the password change for a reset
-      // account, else a permitted `?next=` or `from`, else the role's home.
-      // It becomes the browser's one sign-in; nothing else is kept (#320).
+      // session and picks the destination: a permitted `?next=` or `from`,
+      // else the role's home, by way of the password change for a reset
+      // account (#412). It becomes the browser's one sign-in; nothing else is
+      // kept (#320).
       setAuth(data.user, data.accessToken, data.refreshToken)
       markLoginAuthenticated(data.user.role)
       trackEvent('user_login', { role: data.user.role, userId: data.user.id })
@@ -56,7 +57,8 @@ export function useLoginMutation({ context }: { context?: AddressContext } = {})
       // takes its cached answers with it.
       if (replacing) {
         // A `?next=` or the page sign-in was asked from still counts, checked
-        // for the new account as always.
+        // for the new account as always. A full load carries no state, so a
+        // reset account lands on the password change without it.
         const from = (window.history.state as { usr?: unknown } | null)?.usr
         window.location.assign(getPostLoginPath(data.user, { search: window.location.search, state: from }))
         return

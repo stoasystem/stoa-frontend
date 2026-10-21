@@ -90,6 +90,11 @@ export function AccountMenu({
   if (!user) return null
 
   const targets = accountMenuFor(navAreaForRole(user.role))
+  // Under a forced password change (an administrator reset) the change is the
+  // one page the account can use: every other sends it back there, and the
+  // backend refuses the language preference as well. What still works is
+  // Help, a public page, and Sign out (#412).
+  const forcedChange = user.mustChangePassword === true
   const itemHeight = touch ? TOUCH_TARGET : ACCOUNT_MENU.item
   const itemStyle = { height: itemHeight, borderRadius: ACCOUNT_MENU.itemRadius }
   // Beside the menu there is no room on a phone: at 375 a submenu flipped to
@@ -147,55 +152,60 @@ export function AccountMenu({
             </div>
           </div>
 
-          <LinkItem to={targets.profile} icon={UserRound}>
-            {t('navigation.profile')}
-          </LinkItem>
+          {!forcedChange && (
+            <>
+              <LinkItem to={targets.profile} icon={UserRound}>
+                {t('navigation.profile')}
+              </LinkItem>
 
-          <Menu.Sub>
-            <Menu.SubTrigger className={ITEM} style={itemStyle}>
-              <ItemBody icon={Globe}>{t('language.label')}</ItemBody>
-              <span className="text-[13px] text-caption">{t(languageNameKeys[current])}</span>
-              <ChevronRight aria-hidden="true" size={14} strokeWidth={2} className="shrink-0 text-tertiary" />
-            </Menu.SubTrigger>
-            <Menu.Portal>
-              <Menu.SubContent
-                sideOffset={subPlacement.sideOffset}
-                collisionPadding={8}
-                className={PANEL}
-                style={{ minWidth: 180, width: subPlacement.width, borderRadius: 12 }}
-              >
-                <Menu.RadioGroup value={current}>
-                  {supportedLanguages.map((code) => (
-                    <Menu.RadioItem
-                      key={code}
-                      value={code}
-                      lang={code}
-                      onSelect={() => changeLanguage(code)}
-                      className={ITEM}
-                      style={itemStyle}
-                    >
-                      <span className="flex-1">{t(languageNameKeys[code])}</span>
-                      <Menu.ItemIndicator>
-                        <Check aria-hidden="true" size={16} strokeWidth={ICON.stroke} className="text-accent" />
-                      </Menu.ItemIndicator>
-                    </Menu.RadioItem>
-                  ))}
-                </Menu.RadioGroup>
-              </Menu.SubContent>
-            </Menu.Portal>
-          </Menu.Sub>
+              <Menu.Sub>
+                <Menu.SubTrigger className={ITEM} style={itemStyle}>
+                  <ItemBody icon={Globe}>{t('language.label')}</ItemBody>
+                  <span className="text-[13px] text-caption">{t(languageNameKeys[current])}</span>
+                  <ChevronRight aria-hidden="true" size={14} strokeWidth={2} className="shrink-0 text-tertiary" />
+                </Menu.SubTrigger>
+                <Menu.Portal>
+                  <Menu.SubContent
+                    sideOffset={subPlacement.sideOffset}
+                    collisionPadding={8}
+                    className={PANEL}
+                    style={{ minWidth: 180, width: subPlacement.width, borderRadius: 12 }}
+                  >
+                    <Menu.RadioGroup value={current}>
+                      {supportedLanguages.map((code) => (
+                        <Menu.RadioItem
+                          key={code}
+                          value={code}
+                          lang={code}
+                          onSelect={() => changeLanguage(code)}
+                          className={ITEM}
+                          style={itemStyle}
+                        >
+                          <span className="flex-1">{t(languageNameKeys[code])}</span>
+                          <Menu.ItemIndicator>
+                            <Check aria-hidden="true" size={16} strokeWidth={ICON.stroke} className="text-accent" />
+                          </Menu.ItemIndicator>
+                        </Menu.RadioItem>
+                      ))}
+                    </Menu.RadioGroup>
+                  </Menu.SubContent>
+                </Menu.Portal>
+              </Menu.Sub>
 
-          <LinkItem to={targets.password} icon={KeyRound}>
-            {t('actions.changePassword')}
-          </LinkItem>
+              <LinkItem to={targets.password} icon={KeyRound}>
+                {t('actions.changePassword')}
+              </LinkItem>
+            </>
+          )}
           <LinkItem to={targets.help} icon={CircleHelp}>
             {t('accountMenu.help')}
           </LinkItem>
-          {targets.extras.map((extra) => (
-            <LinkItem key={extra.key} to={extra.to} icon={extraIcons[extra.key] ?? CircleHelp}>
-              {t(extra.labelKey)}
-            </LinkItem>
-          ))}
+          {!forcedChange &&
+            targets.extras.map((extra) => (
+              <LinkItem key={extra.key} to={extra.to} icon={extraIcons[extra.key] ?? CircleHelp}>
+                {t(extra.labelKey)}
+              </LinkItem>
+            ))}
 
           <Menu.Separator className="mx-0 my-1.5 h-px bg-hairline" />
           <Menu.Item

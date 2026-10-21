@@ -6,16 +6,22 @@
  * "Assignments" (#400) and the parent's "Billing and payments". Every link
  * must be a route the manifest registers, and an entry whose route is not
  * registered is left out: billing is withdrawn (card 007), so the parent's
- * extra stays hidden until its routes come back.
+ * extra stays hidden until its routes come back. An account under a forced
+ * password change gets only Help and Sign out (AccountMenu, #412).
  */
 import { matchPath } from 'react-router-dom'
-import { CHANGE_PASSWORD_PATH, pageRoutes, type AppNavArea } from '@/app/router/routeManifest'
+import {
+  CHANGE_PASSWORD_PATH,
+  ME_PASSWORD_PATH,
+  PASSWORD_SECTION_ID,
+  pageRoutes,
+  type AppNavArea,
+} from '@/app/router/routeManifest'
 
 export const HELP_PATH = '/support'
 
 /** The anchor on /me that holds the password change. */
-export const PASSWORD_SECTION_ID = 'password'
-const ME_PASSWORD = `/me#${PASSWORD_SECTION_ID}`
+export { PASSWORD_SECTION_ID }
 
 /*
  * Profile per role. The student's is /me. A teacher has /teacher/profile; a
@@ -38,11 +44,11 @@ const PROFILE_PATHS: Record<AppNavArea, string | null> = {
  * under a forced change, which only ever happens there.
  */
 const PASSWORD_PATHS: Record<AppNavArea, string> = {
-  student: ME_PASSWORD,
+  student: ME_PASSWORD_PATH,
   teacher: CHANGE_PASSWORD_PATH,
   parent: CHANGE_PASSWORD_PATH,
-  admin: ME_PASSWORD,
-  organization: ME_PASSWORD,
+  admin: ME_PASSWORD_PATH,
+  organization: ME_PASSWORD_PATH,
 }
 
 export type AccountMenuExtra = { key: string; labelKey: string; to: string }

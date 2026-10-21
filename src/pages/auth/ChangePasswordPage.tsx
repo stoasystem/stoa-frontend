@@ -1,10 +1,11 @@
 import { useRef } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/base/Button'
 import { PasswordChangeFields, passwordChangeStatusKey } from '@/features/account/PasswordChangeFields'
 import { usePasswordChange } from '@/features/account/usePasswordChange'
 import { DashboardLayout } from '@/layouts/DashboardLayout'
+import { getReturnPath, pathFromState } from '@/lib/authRoutes'
 import { getHomePathForUserRole } from '@/lib/navigation'
 import { useAuthStore } from '@/store/authStore'
 
@@ -16,6 +17,7 @@ import { useAuthStore } from '@/store/authStore'
 export function ChangePasswordPage() {
   const { t } = useTranslation(['auth', 'common', 'errors'])
   const user = useAuthStore((state) => state.user)
+  const location = useLocation()
   const heading = useRef<HTMLHeadingElement>(null)
   const flow = usePasswordChange({ outcomeRef: heading })
   const { step, mustChangePassword } = flow
@@ -23,6 +25,10 @@ export function ChangePasswordPage() {
   // signed in, and Cognito's change_password does not revoke their tokens.
   // Both exits therefore lead back into the app, never to the login screen.
   const homePath = user ? getHomePathForUserRole(user.role) : '/'
+  // Once through, on to the page a forced change interrupted, which the
+  // redirect here carried (#412), checked as a sign-in's `next` is; else home.
+  // The flag is cleared by then, so this is never the change itself.
+  const continuePath = user ? getReturnPath(user, pathFromState(location.state)) : '/'
 
   return (
     <DashboardLayout>
@@ -50,7 +56,7 @@ export function ChangePasswordPage() {
         {step === 'done' ? (
           <div>
             <Button asChild>
-              <Link to={homePath}>{t('common:actions.continue')}</Link>
+              <Link to={continuePath}>{t('common:actions.continue')}</Link>
             </Button>
           </div>
         ) : (

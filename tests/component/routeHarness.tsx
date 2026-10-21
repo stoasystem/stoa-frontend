@@ -49,15 +49,15 @@ export function signInAs(viewer: Viewer | 'pending', options: { mustChangePasswo
   })
 }
 
-type Probe = { pathname: string; search: string; state: unknown }
+type Probe = { pathname: string; search: string; hash: string; state: unknown }
 
 function LocationProbe({ onChange }: { onChange: (probe: Probe) => void }) {
   const location = useLocation()
-  onChange({ pathname: location.pathname, search: location.search, state: location.state })
+  onChange({ pathname: location.pathname, search: location.search, hash: location.hash, state: location.state })
   return null
 }
 
-export type Outcome = { pathname: string; search: string; state: unknown; page: string | null; text: string }
+export type Outcome = { pathname: string; search: string; hash: string; state: unknown; page: string | null; text: string }
 
 /** Open `entry` as `viewer`, the way typing it into the address bar would. */
 export function openAs(
@@ -66,7 +66,7 @@ export function openAs(
   options: { mustChangePassword?: boolean } = {},
 ): Outcome {
   signInAs(viewer, options)
-  let probe: Probe = { pathname: '', search: '', state: null }
+  let probe: Probe = { pathname: '', search: '', hash: '', state: null }
   // The app's own provider: the guard reads the account's state while it waits (#250).
   const view = render(
     <QueryClientProvider client={new QueryClient()}>

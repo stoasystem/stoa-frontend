@@ -1,4 +1,4 @@
-import { matchPath } from 'react-router-dom'
+import { matchPath, parsePath, type Path } from 'react-router-dom'
 import { isAdmitted } from '@/app/router/routeAccess'
 import {
   CHANGE_PASSWORD_PATH,
@@ -28,7 +28,7 @@ export function canAccessRoute(role: UserRole, allowedRoles: UserRole[]) {
  * Manifest entries a sign-in never returns to, by their pattern:
  * - `*`, the public catch-all: it matches every path, so it would admit them all;
  * - the password change: an account under a forced change is sent there first
- *   anyway (getPostLoginPath), and any other account has no reason to be;
+ *   anyway (getPostLoginTarget), and any other account has no reason to be;
  * - the sign-in itself and the two refusal pages: nothing to go back to.
  */
 const NOT_A_DESTINATION: ReadonlySet<string> = new Set([
@@ -94,43 +94,89 @@ function resolveDestination(path: unknown, role: UserRole): string | null {
 type FromState = { from?: { pathname?: unknown; search?: unknown; hash?: unknown } } | null | undefined
 
 /**
- * The one place that decides where a signed-in visitor on the login screen goes:
- * the password change for a reset account, else a `?next=` link or the page
- * ProtectedRoute sent them away from (`state.from`), if the role may use it,
- * else the role's home.
+ * The path a `state.from` names, query and hash included, unchecked; undefined
+ * when there is none. ProtectedRoute leaves one for the sign-in and for the
+ * forced password change: the page it sent the visitor away from.
  */
+export function pathFromState(state: unknown): string | undefined {
+  const from = (state as FromState)?.from
+  if (typeof from?.pathname !== 'string') return undefined
+  const search = typeof from.search === 'string' ? from.search : ''
+  const hash = typeof from.hash === 'string' ? from.hash : ''
+  return `${from.pathname}${search}${hash}`
+}
+
+/** What a redirect to the forced password change carries: where the visitor was headed (#412). */
+export type ForcedChangeState = { from: Partial<Path> }
+
+/** Where to send a signed-in account, with the state the redirect carries. */
+export type RouteTarget = { to: string; state?: ForcedChangeState }
+
+function homeOf(role: UserRole): string {
+  // A role the manifest has no home for is refused outright; left undefined,
+  // the redirect would resolve to wherever an empty path happens to point.
+  return (getDefaultRouteForRole(role) as string | undefined) ?? FORBIDDEN_PATH
+}
+
+/*
+ * An account under a forced change goes to the change first, whatever it was
+ * headed for, and takes that destination along in `state.from`: the change
+ * page's "Continue" leads there once the change is through (#412). Before,
+ * a teacher reset by an administrator who opened a request's link landed on
+ * their home after the change, and the request was gone.
+ */
+function sendTo(user: { mustChangePassword?: boolean }, destination: string): RouteTarget {
+  if (!user.mustChangePassword) return { to: destination }
+  return { to: CHANGE_PASSWORD_PATH, state: { from: parsePath(destination) } }
+}
+
+/**
+ * The one place that decides where a signed-in visitor on the login screen goes:
+ * a `?next=` link or the page ProtectedRoute sent them away from (`state.from`),
+ * if the role may use it, else the role's home; for a reset account, the
+ * password change first, on the way there.
+ */
+export function getPostLoginTarget(
+  user: { role: UserRole; mustChangePassword?: boolean },
+  location: { search: string; state?: unknown },
+): RouteTarget {
+  const queryNext = new URLSearchParams(location.search).get('next')
+  const destination =
+    resolveDestination(queryNext, user.role) ??
+    resolveDestination(pathFromState(location.state), user.role) ??
+    homeOf(user.role)
+  return sendTo(user, destination)
+}
+
+/** getPostLoginTarget's path alone, for a full page load, which carries no state. */
 export function getPostLoginPath(
   user: { role: UserRole; mustChangePassword?: boolean },
   location: { search: string; state?: unknown },
 ) {
-  if (user.mustChangePassword) return CHANGE_PASSWORD_PATH
-
-  const queryNext = new URLSearchParams(location.search).get('next')
-  const next = resolveDestination(queryNext, user.role)
-  if (next) return next
-
-  const from = (location.state as FromState)?.from
-  if (typeof from?.pathname === 'string') {
-    const search = typeof from.search === 'string' ? from.search : ''
-    const hash = typeof from.hash === 'string' ? from.hash : ''
-    const back = resolveDestination(`${from.pathname}${search}${hash}`, user.role)
-    if (back) return back
-  }
-
-  // A role the manifest has no home for is refused outright; left undefined,
-  // the redirect would resolve to wherever an empty path happens to point.
-  return (getDefaultRouteForRole(user.role) as string | undefined) ?? FORBIDDEN_PATH
+  return getPostLoginTarget(user, location).to
 }
 
 /**
  * Where an account that signed in again after its tab's session ended goes:
  * back to the page the tab was on, if that account may see it, else home
- * (#217). Only for the same account, which the caller decides.
+ * (#217). Only for the same account, which the caller decides. A reset
+ * account goes by the password change, as from the login screen.
+ */
+export function getReturnTarget(
+  user: { role: UserRole; mustChangePassword?: boolean },
+  returnTo: string | undefined,
+): RouteTarget {
+  return sendTo(user, resolveDestination(returnTo, user.role) ?? homeOf(user.role))
+}
+
+/**
+ * getReturnTarget's path alone. The password change's "Continue" leads
+ * through it, so the page a forced change interrupted is checked exactly as a
+ * sign-in's `next` is (#412).
  */
 export function getReturnPath(
   user: { role: UserRole; mustChangePassword?: boolean },
   returnTo: string | undefined,
 ) {
-  if (user.mustChangePassword) return CHANGE_PASSWORD_PATH
-  return resolveDestination(returnTo, user.role) ?? getDefaultRouteForRole(user.role)
+  return getReturnTarget(user, returnTo).to
 }
