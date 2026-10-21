@@ -30,6 +30,13 @@ jobs:
       - name: Install locked dependencies
         run: npm ci --ignore-scripts --no-audit --no-fund --include=dev --package-lock=true
 
+      # A high or critical advisory in a production dependency stops the
+      # deploy (#419). It reads the lock and asks the npm registry, so a new
+      # advisory blocks the next push to main until the package is upgraded.
+      # There is no ignore list; AGENTS.md ("push 即部署") says what to do then.
+      - name: Production dependency audit
+        run: npm audit --omit=dev --audit-level=high
+
       - name: Lint
         run: npm run lint
 

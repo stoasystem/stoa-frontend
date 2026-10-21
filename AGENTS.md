@@ -48,11 +48,16 @@ npm run check:untranslated   # 未翻译文案的棘轮，基线在 scripts/untr
 ## push 即部署
 
 `main` 分支 push 会触发 `.github/workflows/deploy-production.yml`，先过一道门
-（lint → typecheck → API 契约 → 翻译守卫 → 单测 → release 契约 → publisher 测试），
+（依赖审计 → lint → typecheck → API 契约 → 翻译守卫 → 单测 → release 契约 → publisher 测试），
 过了才 build 并发布到 S3 + CloudFront。**没有预发环境，提交前想清楚。**
 
 API 契约那步是从 `stoasystem/stoa-backend` 的 **main 分支**实时拉取路由清单。所以涉及
 接口变更时，先推后端再推前端，否则这道门会拦下来。
+
+依赖审计那步是 `npm audit --omit=dev --audit-level=high`（#419，PR 门禁也跑）：生产依赖一出
+高危公告，部署就停，哪怕代码没动。npm 没有忽略清单。处理办法是升级到修复版本，传递依赖用
+`package.json` 的 `overrides` 顶上去；只有没有修复版本、又确认打不到浏览器时，才单开 PR 改
+门禁命令，同时改 `tests/release/verify-release.test.mjs` 里钉着的那一行。
 
 方案 A 的集成分支 `redesign/planet` 已于 2026-10 合回 `main` 并删除，app-planet 预览站和它的
 预览工作流也一并停用；前端修复现在直接 PR 到 `main`。方案 B 的 `redesign/cute` 暂缓，
