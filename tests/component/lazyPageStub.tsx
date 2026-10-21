@@ -6,7 +6,8 @@ export function lazyPage(pageName: string) {
     (props: { title?: string }) => (
       <p data-testid="page">{props.title ? `${pageName} title="${props.title}"` : pageName}</p>
     ),
-    { pageName },
+    // Nothing to load ahead of time.
+    { pageName, preload() {} },
   )
 }
 

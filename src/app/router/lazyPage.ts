@@ -9,6 +9,14 @@ export type PageComponent = ComponentType<any>
 export type LazyPage = PageComponent & {
   /** The named export the page is loaded from, e.g. `TeacherDashboardPage`. */
   readonly pageName: string
+  /**
+   * Starts loading the page's module before the page is rendered (#415). A
+   * page that mounts once its module is in renders at once. A failure is not
+   * kept: it is left to the render's own load, which reports it and reloads
+   * the tab when that may cure it (chunkReload.ts). A page that is never
+   * rendered has nothing to report.
+   */
+  readonly preload: () => void
 }
 
 /*
@@ -55,6 +63,16 @@ export function lazyPage<Name extends string>(
   pageName: Name,
   load: () => Promise<Record<Name, PageComponent>>,
 ): LazyPage {
+  // The page itself, once a load has brought its module in. A page mounted
+  // after that renders it at once: through React.lazy it would suspend for a
+  // moment even then, and the router's Suspense would show its skeleton for
+  // React's minimum of 300 ms, about what a preload saves (#415).
+  let loaded: PageComponent | undefined
+  const loadPage = () =>
+    load().then((module) => {
+      loaded = module[pageName]
+      return module
+    })
   const failed = (error: unknown): never => {
     const reset = () => {
       failedLoads.delete(reset)
@@ -65,7 +83,7 @@ export function lazyPage<Name extends string>(
   }
   const attempt = () =>
     lazy(() =>
-      load()
+      loadPage()
         .then(
           (module) => ({ default: module[pageName] }),
           (error: unknown) =>
@@ -80,7 +98,15 @@ export function lazyPage<Name extends string>(
         .catch(failed),
     )
   let current = attempt()
-  const Page: PageComponent = (props) => createElement(current, props)
+  // `loaded` is set before React.lazy hears that the module is in, so the lazy
+  // only ever suspends: by the time there is a page to show, it is shown
+  // directly, and nothing on the screen is swapped for another component.
+  const Page: PageComponent = (props) => createElement(loaded ?? current, props)
   Page.displayName = pageName
-  return Object.assign(Page, { pageName })
+  const preload = () => {
+    void loadPage().catch(() => {
+      // Not this page's failure yet: see LazyPage.preload.
+    })
+  }
+  return Object.assign(Page, { pageName, preload })
 }
