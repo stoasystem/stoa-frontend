@@ -13,13 +13,14 @@
  * reload; the second the router, with stub pages that record a preload.
  */
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { act, cleanup, render, screen } from '@testing-library/react'
+import { act, cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { Suspense } from 'react'
 import { MemoryRouter } from 'react-router-dom'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import i18n from '@/i18n'
 import { CHUNK_RELOAD_KEY, installChunkReload } from '@/app/chunkReload'
 import { AppRoutes } from '@/app/router/AppRoutes'
+import { AppErrorBoundary } from '@/components/common/AppErrorBoundary'
 import { rememberTabAccount, type TabAccount } from '@/lib/tabAccount'
 import { type CurrentUser, useAuthStore } from '@/store/authStore'
 import { chunkError, failLikeVite, listeningWindow } from './vitePreloadError'
@@ -27,11 +28,14 @@ import { chunkError, failLikeVite, listeningWindow } from './vitePreloadError'
 const preloaded = vi.hoisted(() => [] as string[])
 
 // The router's pages are stubs that record a preload. The first part uses
-// the real lazyPage, through `importActual`.
-vi.mock('@/app/router/lazyPage', async () => {
+// the real lazyPage, through `importActual`, and the error boundary's "Try
+// again" the real retry.
+vi.mock('@/app/router/lazyPage', async (importOriginal) => {
   const stub = await import('./lazyPageStub')
+  const actual = await importOriginal<typeof import('@/app/router/lazyPage')>()
   return {
     ...stub,
+    retryFailedPageLoads: actual.retryFailedPageLoads,
     lazyPage: (pageName: string) => Object.assign(stub.lazyPage(pageName), { preload: () => preloaded.push(pageName) }),
   }
 })
@@ -99,44 +103,58 @@ describe("a page's preload", () => {
     expect(screen.queryByText('loading')).not.toBeInTheDocument()
   })
 
+  it('is the load the render takes: one load, and the page waits for it', async () => {
+    let arrive: (module: { Shown: typeof Shown }) => void = () => {}
+    const load = vi.fn(() => new Promise<{ Shown: typeof Shown }>((resolve) => (arrive = resolve)))
+    const Page = realLazyPage('Shown', load)
+
+    Page.preload()
+    render(
+      <Suspense fallback={<p>loading</p>}>
+        <Page />
+      </Suspense>,
+    )
+    await settle()
+    // A stylesheet still on its way keeps the page waiting the same way: Vite
+    // holds the module's promise until its stylesheets are in.
+    expect(screen.getByText('loading')).toBeInTheDocument()
+
+    arrive({ Shown })
+    await settle()
+    expect(screen.getByText('the page')).toBeInTheDocument()
+    expect(load).toHaveBeenCalledTimes(1)
+  })
+
   describe('that fails', () => {
     let stop = () => {}
     afterEach(() => stop())
 
-    it('reloads nothing, and the page loads afresh when it renders', async () => {
+    it('reloads nothing by itself', async () => {
+      const { target, reload } = listeningWindow()
+      stop = installChunkReload(target)
+      const Page = realLazyPage('Shown', () => failLikeVite(chunkError('Shown-1')) as never)
+
+      Page.preload()
+      await settle()
+      expect(reload).not.toHaveBeenCalled()
+      expect(sessionStorage.getItem(CHUNK_RELOAD_KEY)).toBeNull()
+    })
+
+    // Vite asks for a page's stylesheet only on its first load in a document,
+    // and Chromium keeps a module that failed: a second load would not meet
+    // the failure again, and could show the page without its stylesheet
+    // (#441 audit). So the render takes the failed load over.
+    it('hands its failure to the render, which reloads the tab once (#401) without loading again', async () => {
       const { target, reload } = listeningWindow()
       stop = installChunkReload(target)
       const load = vi
         .fn<() => Promise<{ Shown: typeof Shown }>>()
-        .mockImplementationOnce(() => failLikeVite(chunkError('Shown-1')) as never)
+        .mockImplementationOnce(() => failLikeVite(chunkError('Shown-2')) as never)
         .mockResolvedValue({ Shown })
       const Page = realLazyPage('Shown', load)
 
       Page.preload()
       await settle()
-      expect(reload).not.toHaveBeenCalled()
-
-      render(
-        <Suspense fallback={<p>loading</p>}>
-          <Page />
-        </Suspense>,
-      )
-      await settle()
-      expect(load).toHaveBeenCalledTimes(2)
-      expect(screen.getByText('the page')).toBeInTheDocument()
-      expect(reload).not.toHaveBeenCalled()
-    })
-
-    it('leaves the reload to the render, which still reloads once when its load fails too (#401)', async () => {
-      const { target, reload } = listeningWindow()
-      stop = installChunkReload(target)
-      const load = vi.fn(() => failLikeVite(chunkError('Shown-2')) as never)
-      const Page = realLazyPage('Shown', load)
-
-      Page.preload()
-      await settle()
-      expect(reload).not.toHaveBeenCalled()
-
       render(
         <Suspense fallback={<p>loading</p>}>
           <Page />
@@ -144,8 +162,34 @@ describe("a page's preload", () => {
       )
       await settle()
       expect(reload).toHaveBeenCalledTimes(1)
-      expect(sessionStorage.getItem(CHUNK_RELOAD_KEY)).not.toBeNull()
+      expect(load).toHaveBeenCalledTimes(1)
       expect(screen.getByText('loading')).toBeInTheDocument()
+    })
+
+    it('right after a reload, leaves the page to its error, and "Try again" loads afresh', async () => {
+      const { target, reload } = listeningWindow()
+      stop = installChunkReload(target)
+      sessionStorage.setItem(CHUNK_RELOAD_KEY, String(Date.now()))
+      vi.spyOn(console, 'error').mockImplementation(() => {})
+      const load = vi
+        .fn<() => Promise<{ Shown: typeof Shown }>>()
+        .mockImplementationOnce(() => failLikeVite(chunkError('Shown-3')) as never)
+        .mockResolvedValue({ Shown })
+      const Page = realLazyPage('Shown', load)
+
+      Page.preload()
+      await settle()
+      render(
+        <AppErrorBoundary>
+          <Suspense fallback={<p>loading</p>}>
+            <Page />
+          </Suspense>
+        </AppErrorBoundary>,
+      )
+      fireEvent.click(await screen.findByRole('button', { name: 'Try again' }))
+      expect(await screen.findByText('the page')).toBeInTheDocument()
+      expect(load).toHaveBeenCalledTimes(2)
+      expect(reload).not.toHaveBeenCalled()
     })
   })
 })
@@ -236,6 +280,22 @@ describe('the router while the account is read', () => {
     )
     expect(screen.getByTestId('page')).toHaveTextContent('MapHomePage')
     expect(preloaded).toEqual([])
+  })
+
+  // The reload for a page that failed to load: its document leaves the page's
+  // load to the render, as late as before, so a network that is not back yet
+  // does not spend it (#441 audit).
+  it('loads nothing ahead right after this tab reloaded for a failed page', () => {
+    sessionStorage.setItem(CHUNK_RELOAD_KEY, String(Date.now()))
+    reloadAt('/', STUDENT)
+    expect(preloaded).toEqual([])
+    expect(stillLoading()).toBeInTheDocument()
+  })
+
+  it('loads ahead again once that reload is long past', () => {
+    sessionStorage.setItem(CHUNK_RELOAD_KEY, String(Date.now() - 10 * 60_000))
+    reloadAt('/', STUDENT)
+    expect(preloaded).toEqual(['MapHomePage'])
   })
 
   it('decides nothing: the account that arrives gets its own page', () => {

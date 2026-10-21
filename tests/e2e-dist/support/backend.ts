@@ -38,13 +38,13 @@ export class MockBackend {
     return this
   }
 
-  /** Answer `method template` as it is answered now, but only once `until` settles: a slow backend. */
-  holdUntil(method: string, template: string, until: Promise<unknown>) {
+  /** Answer `method template` as it is answered now, but each request only once `until()` settles: a slow backend. */
+  holdUntil(method: string, template: string, until: () => Promise<unknown>) {
     const key = `${method.toLowerCase()} ${template}`
     const answer = this.handlers.get(key)
     if (!answer) throw new Error(`no mock answers ${method.toUpperCase()} ${template} to hold`)
     this.handlers.set(key, async (request) => {
-      await until
+      await until()
       return answer(request)
     })
     return this
