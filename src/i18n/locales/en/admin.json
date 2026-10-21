@@ -270,6 +270,7 @@
     "notePlaceholder": "Add an internal moderation note",
     "addNote": "Add note",
     "selectCase": "Select a moderation case to inspect its context and actions.",
+    "caseLoadFailed": "This case could not be loaded.",
     "noPreview": "No context preview",
     "question": "Question",
     "aiAnswer": "AI answer",

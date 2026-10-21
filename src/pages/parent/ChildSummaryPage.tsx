@@ -10,6 +10,7 @@ import { LearningProfileSignals } from '@/components/learning/LearningProfileSig
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { useChildLearningProfileQuery } from '@/hooks/parent/useChildLearningProfileQuery'
 import { useChildLearningSummaryQuery } from '@/hooks/parent/useChildLearningSummaryQuery'
+import { useReportsTrail } from '@/hooks/parent/useReportsTrail'
 import { DashboardLayout } from '@/layouts/DashboardLayout'
 import { getSubjectLabel, getTopicLabel } from '@/lib/displayLabels'
 import type { LearningProfile } from '@/types/learningProfile'
@@ -43,6 +44,8 @@ export function ChildSummaryPage() {
   const learningProfileQuery = useChildLearningProfileQuery(childId)
   const summary = summaryQuery.data
   const weakTopics = summary ? weakTopicLabels(learningProfileQuery.data, summary, tParent) : []
+  // Opened from Reports, it leads back there (#411).
+  const trail = useReportsTrail()
 
   return (
     <DashboardLayout>
@@ -50,11 +53,11 @@ export function ChildSummaryPage() {
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <Breadcrumbs
             items={[
-              { label: tParent('summary.breadcrumbRoot'), to: '/parent' },
+              trail.root({ label: tParent('summary.breadcrumbRoot'), to: '/parent' }),
               { label: summary?.student.name ?? tParent('childSummary') },
             ]}
           />
-          <PageActions secondary={<BackButton label={tParent('summary.backLabel')} to="/parent" />} />
+          <PageActions secondary={<BackButton {...trail.back({ label: tParent('summary.backLabel'), to: '/parent' })} />} />
         </div>
         {/* The page keeps a heading while the child loads or fails to (#339). */}
         {!summary && <h1 className="text-2xl font-semibold">{tParent('childSummary')}</h1>}

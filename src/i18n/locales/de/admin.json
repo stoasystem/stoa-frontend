@@ -270,6 +270,7 @@
     "notePlaceholder": "Interne Moderationsnotiz hinzufügen",
     "addNote": "Notiz hinzufügen",
     "selectCase": "Wählen Sie einen Moderationsfall, um Kontext und Aktionen zu sehen.",
+    "caseLoadFailed": "Dieser Fall konnte nicht geladen werden.",
     "noPreview": "Keine Kontextvorschau",
     "question": "Frage",
     "aiAnswer": "KI-Antwort",

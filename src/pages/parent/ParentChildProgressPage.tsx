@@ -12,6 +12,7 @@ import { PageHeader } from '@/components/common/PageHeader'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { useParentChildProgressQuery } from '@/hooks/learning/useLearningOperationsQueries'
 import { useChildLearningSummaryQuery } from '@/hooks/parent/useChildLearningSummaryQuery'
+import { useReportsTrail } from '@/hooks/parent/useReportsTrail'
 import { DashboardLayout } from '@/layouts/DashboardLayout'
 import { getRecommendationRationale, getSubjectLabel, getTopicLabel } from '@/lib/displayLabels'
 import type { LearningAssignment } from '@/types/learningOperations'
@@ -73,6 +74,9 @@ export function ParentChildProgressPage() {
   const progress = progressQuery.data
   // The same query the child page reads, so the name is usually cached already.
   const childName = useChildLearningSummaryQuery(childId).data?.student.name
+  // Opened from Reports, it is Reports' and leads back there, not to the
+  // child's summary (#411).
+  const trail = useReportsTrail()
 
   return (
     <DashboardLayout>
@@ -80,13 +84,13 @@ export function ParentChildProgressPage() {
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <Breadcrumbs
             items={[
-              { label: t('dashboardTitle'), to: '/parent' },
-              { label: childName || t('child'), to: childId ? `/parent/children/${childId}` : undefined },
+              trail.root({ label: t('dashboardTitle'), to: '/parent' }),
+              { label: childName || t('child'), to: childId ? trail.keep(`/parent/children/${childId}`) : undefined },
               { label: t('progress.title') },
             ]}
           />
           <PageActions
-            secondary={childId && <BackButton label={t('childSummary')} to={`/parent/children/${childId}`} />}
+            secondary={childId && <BackButton {...trail.back({ label: t('childSummary'), to: `/parent/children/${childId}` })} />}
           />
         </div>
         <PageHeader

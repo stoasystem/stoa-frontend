@@ -106,7 +106,8 @@ describe('#256.1: the child progress page', () => {
     wrap('/parent/reports', <ParentReportsPage />)
 
     const link = screen.getByRole('link', { name: new RegExp(enParent.reports.progressLink) })
-    expect(link).toHaveAttribute('href', '/parent/children/child-1/progress')
+    // Marked as opened from Reports (#411).
+    expect(link).toHaveAttribute('href', '/parent/children/child-1/progress?from=reports')
   })
 
   for (const [language, [parent, practice]] of Object.entries(LANGUAGES)) {

@@ -14,6 +14,7 @@ import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { useChildLearningSummaryQuery } from '@/hooks/parent/useChildLearningSummaryQuery'
 import { useChildReportQuery } from '@/hooks/parent/useChildReportQuery'
+import { useReportsTrail } from '@/hooks/parent/useReportsTrail'
 import { DashboardLayout } from '@/layouts/DashboardLayout'
 import { formatDate, formatDateTime } from '@/lib/formatDateTime'
 import { trackEvent } from '@/services/analytics/analyticsClient'
@@ -29,6 +30,9 @@ export function ChildReportPage() {
   // A pending or failed report carries placeholder zeros and empty lists, and an
   // email that was never due; only a finished report has results to show (#338).
   const isReady = reportState?.status === 'available'
+  // Opened from Reports, it is Reports' and leads back there, not to the
+  // child's summary (#411).
+  const trail = useReportsTrail()
 
   useEffect(() => {
     if (!report) return
@@ -47,8 +51,8 @@ export function ChildReportPage() {
           <div className="space-y-3">
             <Breadcrumbs
               items={[
-                { label: t('dashboardTitle'), to: '/parent' },
-                { label: childName || t('child'), to: childId ? `/parent/children/${childId}` : undefined },
+                trail.root({ label: t('dashboardTitle'), to: '/parent' }),
+                { label: childName || t('child'), to: childId ? trail.keep(`/parent/children/${childId}`) : undefined },
                 { label: t('weeklyReport') },
               ]}
             />
@@ -64,7 +68,7 @@ export function ChildReportPage() {
             * primary={<Button asChild><Link to={`/parent/children/${childId}/monthly-report`}>{t('monthlyReport')}</Link></Button>}
           */}
           <PageActions
-            secondary={childId && <BackButton label={t('childSummary')} to={`/parent/children/${childId}`} />}
+            secondary={childId && <BackButton {...trail.back({ label: t('childSummary'), to: `/parent/children/${childId}` })} />}
           />
         </div>
         {reportQuery.isLoading && <PageSkeleton rows={4} />}

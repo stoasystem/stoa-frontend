@@ -50,13 +50,20 @@ const isOn = (pathname: string, path: string) =>
  * covers, that the address is on, so /admin/users lights Users and not System,
  * and /admin/account-operations lights Users too. -1 when none, and on a page
  * the avatar menu leads to (a teacher's /teacher/profile lights no segment).
+ * A page opened from an item's page with that item's `?from=` stays its
+ * (#411): a child's report opened from Reports lights Reports, not Overview.
  */
 export function activeNavIndex(
   items: readonly AppNavItem[],
   pathname: string,
   role?: UserRole,
+  search = '',
 ): number {
   if (role && accountMenuPaths(navAreaForRole(role)).has(pathname)) return -1
+  const from = new URLSearchParams(search).get('from')
+  const opener = from ? items.findIndex((item) => item.from === from) : -1
+  // An item's own page is that item's, whatever its address says.
+  if (opener >= 0 && !items.some((item) => item.path === pathname)) return opener
   let best = -1
   let bestLength = -1
   items.forEach((item, index) => {
