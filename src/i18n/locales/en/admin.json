@@ -461,6 +461,7 @@
       "submit": "Inspect",
       "empty": "Enter a parent ID to inspect account operations, or open this view from a provider billing record in the subscription queue.",
       "notFound": "Parent account was not found.",
+      "invalidParentId": "This parent ID is not valid. Check it and try again.",
       "unavailable": "Admin account operations are unavailable. Please try again later."
     },
     "support": {
@@ -575,7 +576,8 @@
         "denied": "Billing evidence access is denied. The billing support capability is required.",
         "inProgress": "Billing recheck is already in progress. Wait briefly and retry this same checkout.",
         "providerUnavailable": "Billing provider is temporarily unavailable. Keep this checkout reference and retry later.",
-        "notFound": "Billing checkout was not found for this parent."
+        "notFound": "Billing checkout was not found for this parent.",
+        "invalidRef": "This checkout reference is not valid. Check it and try again."
       }
     },
     "values": {
@@ -766,6 +768,7 @@
       "title": "Migration evidence",
       "idLabel": "Migration ID",
       "load": "Load evidence",
+      "invalidId": "This migration ID is not valid. Check it and try again.",
       "missingCapability": "Missing migration operator or publisher capability."
     },
     "selectItem": "Select a curriculum item from the worklist.",

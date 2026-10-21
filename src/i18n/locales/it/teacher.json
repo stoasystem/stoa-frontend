@@ -270,6 +270,7 @@
     "preview": "Vedi le proposte",
     "previewFailed": "Anteprima non riuscita",
     "needStudentId": "Inserisci prima l'ID di uno studente.",
+    "invalidStudentId": "Questo ID studente non è valido. Controllalo e riprova.",
     "summary": {
       "selected": "Selezionate",
       "refused": "Rifiutate",

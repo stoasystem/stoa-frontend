@@ -20,6 +20,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
+import { isApiPathValue } from '@/services/api/apiPath'
 import { ApiError } from '@/services/api/httpClient'
 import { useAdminAccountsQuery, useAssignParentLinkMutation } from '@/hooks/admin/useAdminAccounts'
 import { useAdminParentAccountOperationsQuery } from '@/hooks/admin/useAdminAccountOperationsQuery'
@@ -42,11 +43,16 @@ export function AdminAccountOperationsPage() {
   const parentId = searchParams.get('parentId')?.trim() ?? ''
   const day = searchParams.get('day')?.trim() ?? ''
   const checkoutRef = searchParams.get('checkoutRef')?.trim() ?? ''
+  // #418: `..` or `.` from the address would send the read a level up the API,
+  // so such an id is not looked up at all; the page says it is not valid.
+  const parentIdInvalid = Boolean(parentId) && !isApiPathValue(parentId)
+  const checkoutRefInvalid = Boolean(checkoutRef) && !isApiPathValue(checkoutRef)
+  const lookupParentId = parentIdInvalid ? '' : parentId
   const [draftParentId, setDraftParentId] = useState(parentId)
   const [draftDay, setDraftDay] = useState(day)
   const [draftCheckoutRef, setDraftCheckoutRef] = useState(checkoutRef)
-  const query = useAdminParentAccountOperationsQuery(parentId, day || undefined)
-  const billingOperation = useAdminBillingOperation(parentId, checkoutRef)
+  const query = useAdminParentAccountOperationsQuery(lookupParentId, day || undefined)
+  const billingOperation = useAdminBillingOperation(lookupParentId, checkoutRefInvalid ? '' : checkoutRef)
 
   function submitLookup(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -103,13 +109,15 @@ export function AdminAccountOperationsPage() {
           </Button>
         </form>
 
-        <ParentLinkAssignment parentId={parentId} lookedUp={query.data?.parent} />
+        <ParentLinkAssignment parentId={lookupParentId} lookedUp={query.data?.parent} />
 
         {!parentId && <EmptyLookup />}
-        {parentId && query.isLoading && <LoadingPanel />}
-        {parentId && query.isError && <ErrorPanel error={query.error} />}
+        {parentIdInvalid && <InvalidLookup message={t('accountOperations.lookup.invalidParentId')} />}
+        {lookupParentId && query.isLoading && <LoadingPanel />}
+        {lookupParentId && query.isError && <ErrorPanel error={query.error} />}
         {query.data && <AdminAccountOperationsDetail data={query.data} />}
 
+        {checkoutRefInvalid && <InvalidLookup message={t('accountOperations.recovery.errors.invalidRef')} />}
         {parentId && checkoutRef && billingOperation.query.isLoading && <BillingRecoveryLoading />}
         {parentId && checkoutRef && billingOperation.query.isError && (
           <BillingRecoveryError error={billingOperation.query.error} operation="read" />
@@ -978,6 +986,16 @@ function LoadingPanel() {
         <div className="h-4 w-40 rounded bg-muted" />
         <div className="h-4 w-full max-w-xl rounded bg-muted" />
         <div className="h-4 w-2/3 rounded bg-muted" />
+      </CardContent>
+    </Card>
+  )
+}
+
+function InvalidLookup({ message }: { message: string }) {
+  return (
+    <Card>
+      <CardContent className="p-5 text-sm text-destructive" role="alert">
+        {message}
       </CardContent>
     </Card>
   )

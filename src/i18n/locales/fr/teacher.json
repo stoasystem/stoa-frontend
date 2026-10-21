@@ -270,6 +270,7 @@
     "preview": "Prévisualiser les propositions",
     "previewFailed": "La prévisualisation a échoué",
     "needStudentId": "Saisissez d'abord l'identifiant d'un élève.",
+    "invalidStudentId": "Cet identifiant d'élève n'est pas valide. Vérifiez-le et réessayez.",
     "summary": {
       "selected": "Retenues",
       "refused": "Refusées",
