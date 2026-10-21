@@ -3,6 +3,7 @@ import { Suspense } from 'react'
 import { PageSkeleton } from '@/components/common/PageSkeleton'
 import { AppRoutes } from '@/app/router/AppRoutes'
 import { AuthBootstrap } from '@/app/router/AuthBootstrap'
+import { RouteArrival } from '@/app/router/RouteArrival'
 import { RoleSwitcher } from '@/components/dev/RoleSwitcher'
 import { KnowledgeMapSourceProvider } from '@/features/starmap/readModelSource'
 import { LightingEventsProvider } from '@/features/starmap/lighting/readModelLighting'
@@ -23,10 +24,13 @@ export function AppRouter() {
           * for the first time is celebrated once. The design preview builds its
           * own tree and supplies the demo source there. */}
         <LightingEventsProvider>
-          {/* Every page is loaded on demand, so one boundary covers them all. */}
-          <Suspense fallback={<PageSkeleton rows={4} />}>
-            <AppRoutes />
-          </Suspense>
+          {/* #406: focus and a spoken name for each page the reader moves to. */}
+          <RouteArrival>
+            {/* Every page is loaded on demand, so one boundary covers them all. */}
+            <Suspense fallback={<PageSkeleton rows={4} />}>
+              <AppRoutes />
+            </Suspense>
+          </RouteArrival>
         </LightingEventsProvider>
       </KnowledgeMapSourceProvider>
     </BrowserRouter>

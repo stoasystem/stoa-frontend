@@ -13,6 +13,7 @@ import { AccountLoadStatus } from '@/app/router/AccountLoadStatus'
 import { DemoSurfaceRoute } from '@/app/router/DemoSurfaceRoute'
 import { ProtectedRoute } from '@/app/router/ProtectedRoute'
 import { RoleRoute } from '@/app/router/RoleRoute'
+import { useReportPageName } from '@/app/router/RouteArrival'
 import { isAdmitted, unknownAccess } from '@/app/router/routeAccess'
 import {
   CHANGE_PASSWORD_PATH,
@@ -127,17 +128,22 @@ function RefusedPageSwitch({ access, refused }: { access: RouteAccess; refused: 
  * Every route carries a `titleKey` (#103), and until this existed only two
  * pages ever reached `document.title`: a reader arriving anywhere else was
  * told the name of the site and nothing about where they were. A screen
- * reader announces this on arrival, so it is the first thing said.
+ * reader announces this on arrival, so it is the first thing said. The same
+ * name is said after a move from another page (RouteArrival, #406).
  */
 function PageTitle({ titleKey }: { titleKey: string }) {
   const { t, i18n } = useTranslation()
   // /me is "Ihr Konto" to an administrator (#277).
   const context = useAddressContext()
+  const { pathname } = useLocation()
+  const reportName = useReportPageName()
 
   useEffect(() => {
     const name = t(titleKey, { context })
-    document.title = name && name !== titleKey ? `${name} · STOA` : 'STOA'
-  }, [t, titleKey, context, i18n.resolvedLanguage])
+    const named = name && name !== titleKey ? name : null
+    document.title = named ? `${named} · STOA` : 'STOA'
+    reportName(pathname, named)
+  }, [t, titleKey, context, i18n.resolvedLanguage, pathname, reportName])
 
   return null
 }

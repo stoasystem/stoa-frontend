@@ -6,6 +6,7 @@ import { PageActions } from '@/components/common/PageActions'
 import { ChildLearningHistoryList } from '@/components/parent/ChildLearningHistoryList'
 import { useChildLearningHistoryQuery } from '@/hooks/parent/useChildLearningHistoryQuery'
 import { useChildLearningSummaryQuery } from '@/hooks/parent/useChildLearningSummaryQuery'
+import { useReportsTrail } from '@/hooks/parent/useReportsTrail'
 import { DashboardLayout } from '@/layouts/DashboardLayout'
 
 export function ChildLearningHistoryPage() {
@@ -14,6 +15,9 @@ export function ChildLearningHistoryPage() {
   const historyQuery = useChildLearningHistoryQuery(childId)
   // The same query the child page reads, so the name is usually cached already.
   const childName = useChildLearningSummaryQuery(childId).data?.student.name
+  // Reached from the child's summary only, so Back stays the summary, on the
+  // trail it was opened on (Reports', #411).
+  const { root, keep } = useReportsTrail()
 
   return (
     <DashboardLayout>
@@ -21,13 +25,13 @@ export function ChildLearningHistoryPage() {
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <Breadcrumbs
             items={[
-              { label: t('dashboardTitle'), to: '/parent' },
-              { label: childName || t('child'), to: childId ? `/parent/children/${childId}` : undefined },
+              root({ label: t('dashboardTitle'), to: '/parent' }),
+              { label: childName || t('child'), to: childId ? keep(`/parent/children/${childId}`) : undefined },
               { label: t('summary.learningHistoryLink') },
             ]}
           />
           <PageActions
-            secondary={childId && <BackButton label={t('childSummary')} to={`/parent/children/${childId}`} />}
+            secondary={childId && <BackButton label={t('childSummary')} to={keep(`/parent/children/${childId}`)} />}
           />
         </div>
         <div>

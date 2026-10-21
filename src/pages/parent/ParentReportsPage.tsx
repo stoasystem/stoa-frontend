@@ -7,6 +7,7 @@ import { PageHeader } from '@/components/common/PageHeader'
 import { PageSkeleton } from '@/components/common/PageSkeleton'
 import { NoLinkedChildrenNotice } from '@/components/parent/NoLinkedChildrenNotice'
 import { useParentChildrenQuery } from '@/hooks/parent/useParentChildrenQuery'
+import { fromReports } from '@/hooks/parent/useReportsTrail'
 import { getSubjectLabel } from '@/lib/displayLabels'
 import { DashboardLayout } from '@/layouts/DashboardLayout'
 import type { ParentChild } from '@/types/parent'
@@ -14,7 +15,9 @@ import type { ParentChild } from '@/types/parent'
 /*
  * Parent board, Reports (#52): the figures under the title, then one grouped
  * list per child whose rows open that child's summary and weekly report. The
- * monthly report has no route yet, so it has no row.
+ * monthly report has no route yet, so it has no row. Each row says it was
+ * opened from here (`?from=reports`, #411), so the page it opens keeps
+ * Reports lit and leads back here.
  */
 export function ParentReportsPage() {
   const { t } = useTranslation('parent')
@@ -72,20 +75,20 @@ function ChildReports({ child }: { child: ParentChild }) {
   return (
     <Group title={t('reports.childReports', { name: child.name })}>
       <Row
-        to={`/parent/children/${child.id}`}
+        to={fromReports(`/parent/children/${child.id}`)}
         leading={{ kind: 'icon', icon: UserRound, tone: 'accent' }}
         title={t('reports.summary')}
         subtitle={about}
       />
       <Row
-        to={`/parent/children/${child.id}/report`}
+        to={fromReports(`/parent/children/${child.id}/report`)}
         leading={{ kind: 'icon', icon: FileText }}
         title={t('weeklyReport')}
         subtitle={t('reports.weeklyLinkDescription')}
       />
       {/* The progress page had no way in (#256). */}
       <Row
-        to={`/parent/children/${child.id}/progress`}
+        to={fromReports(`/parent/children/${child.id}/progress`)}
         leading={{ kind: 'icon', icon: ListChecks }}
         title={t('reports.progressLink')}
         subtitle={t('reports.progressLinkDescription')}

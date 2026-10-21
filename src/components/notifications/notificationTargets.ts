@@ -13,7 +13,7 @@
  * Every path here must be a page the manifest opens to that role; the test
  * holds each one against the manifest's access.
  */
-import { ASK_PATH, askPathFor, navAreaForRole, type AppNavArea } from '@/app/router/routeManifest'
+import { ASK_PATH, askPathFor, moderationPathFor, navAreaForRole, type AppNavArea } from '@/app/router/routeManifest'
 import type { NotificationEvent } from '@/types/notification'
 import type { UserRole } from '@/types/user'
 
@@ -38,7 +38,8 @@ export const NOTIFICATION_TARGETS: Record<AppNavArea, Readonly<Record<string, Re
     report: () => '/parent/reports',
   },
   admin: {
-    moderation_case: () => '/admin/moderation',
+    // That case, opened, though it is beyond the 50 the queue lists (#411).
+    moderation_case: (id) => moderationPathFor(id),
     account: () => '/admin/users',
     system_status: () => '/admin/system',
   },

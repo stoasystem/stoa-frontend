@@ -7,16 +7,20 @@
  * were not when the page took whatever was due first across the whole sky.
  */
 import { useTranslation } from 'react-i18next'
-import { useParams } from 'react-router-dom'
+import { useLocation, useParams } from 'react-router-dom'
 import { PageContainer } from '@/components/common/PageContainer'
 import { PageHeader } from '@/components/common/PageHeader'
 import { ReviewSession } from '@/components/practice/ReviewSession'
 import { BackButton } from '@/components/common/BackButton'
+import { reviewReturnPath } from '@/features/starmap/view/reviewReturn'
 import { AppLayout } from '@/layouts/AppLayout'
 
 export function ReviewPage() {
   const { t } = useTranslation('practice')
   const { unitId } = useParams<{ unitId: string }>()
+  // Back to the star the review was opened from (#411); the sky when the
+  // page was reached some other way.
+  const back = reviewReturnPath(useLocation().state) ?? '/'
 
   // Inside the app shell like every other student page: it stood alone, with
   // no bar, no bell and no account menu (app.stoaedu.ch, 2026-10-10).
@@ -30,7 +34,7 @@ export function ReviewPage() {
     <AppLayout surface="sky">
       <div data-surface="sky" data-review-surface>
         <PageContainer className="space-y-6">
-          <BackButton label={t('review.backToMap')} to="/" />
+          <BackButton label={t('review.backToMap')} to={back} />
           <PageHeader eyebrow={t('review.eyebrow')} title={t('review.title')} description={t('review.description')} />
           <ReviewSession unitId={unitId} />
         </PageContainer>
