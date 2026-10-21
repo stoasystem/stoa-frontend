@@ -153,9 +153,9 @@ describe('a notification in the bell', () => {
     await openBell()
 
     const row = document.querySelector('[data-notification="e-5"]') as HTMLElement
-    await userEvent.click(within(row).getByRole('button', { name: 'notifications.archive' }))
+    await userEvent.click(within(row).getByRole('button', { name: 'notifications.archiveItem' }))
 
-    expect(archive).toHaveBeenCalledWith('e-5')
+    expect(archive.mock.calls[0][0]).toBe('e-5')
     expect(pathname).toBe('/somewhere')
   })
 })

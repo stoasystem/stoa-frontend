@@ -316,7 +316,7 @@ describe('the page after a write', () => {
     expect(await screen.findByText('Not ready to publish')).toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: 'Load audit' }))
     expect(await screen.findByText(/create_draft/)).toBeInTheDocument()
-    await user.type(screen.getByPlaceholderText('from version'), 'v2')
+    await user.type(screen.getByLabelText('From version'), 'v2')
     await user.click(screen.getByRole('button', { name: 'Compare' }))
     await waitFor(() => expect(diff).toHaveBeenCalledWith('lesson-1', 'v2', 'v4'))
 

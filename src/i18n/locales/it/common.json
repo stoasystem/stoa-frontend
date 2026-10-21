@@ -155,7 +155,7 @@
   },
   "nextStep": "Prossimo passo consigliato",
   "notifications": {
-    "archive": "Archivia",
+    "archiveItem": "Archivia «{{title}}»",
     "connection": {
       "checking": "Controllo aggiornamenti",
       "connecting": "Connessione in corso",

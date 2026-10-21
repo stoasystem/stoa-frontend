@@ -90,11 +90,11 @@ describe('the note and the assignee belong to the selected case', () => {
     renderPage()
     await caseHeading('case-a')
 
-    fireEvent.change(screen.getByPlaceholderText('Resolution note'), { target: { value: 'spam from A' } })
+    fireEvent.change(screen.getByLabelText('Resolution note'), { target: { value: 'spam from A' } })
     fireEvent.click(caseButton('case-b'))
     await caseHeading('case-b')
 
-    expect(screen.getByPlaceholderText('Resolution note')).toHaveValue('')
+    expect(screen.getByLabelText('Resolution note')).toHaveValue('')
     fireEvent.click(screen.getByRole('button', { name: 'Dismissed' }))
 
     await waitFor(() => expect(api.updateModerationCase).toHaveBeenCalledTimes(1))
@@ -110,10 +110,10 @@ describe('the note and the assignee belong to the selected case', () => {
     renderPage()
     await caseHeading('case-a')
 
-    fireEvent.change(screen.getByPlaceholderText('Resolution note'), { target: { value: 'checked, fine' } })
+    fireEvent.change(screen.getByLabelText('Resolution note'), { target: { value: 'checked, fine' } })
     fireEvent.click(screen.getByRole('button', { name: 'Dismissed' }))
 
-    await waitFor(() => expect(screen.getByPlaceholderText('Resolution note')).toHaveValue(''))
+    await waitFor(() => expect(screen.getByLabelText('Resolution note')).toHaveValue(''))
     expect(api.updateModerationCase.mock.calls[0][0]).toMatchObject({ resolution_note: 'checked, fine' })
   })
 
@@ -159,11 +159,11 @@ describe('actions say how they went', () => {
     renderPage()
     await caseHeading('case-a')
 
-    fireEvent.change(screen.getByPlaceholderText('Resolution note'), { target: { value: 'keep me' } })
+    fireEvent.change(screen.getByLabelText('Resolution note'), { target: { value: 'keep me' } })
     fireEvent.click(screen.getByRole('button', { name: 'Actioned' }))
 
     expect(await screen.findByRole('alert')).toHaveTextContent('Could not update the case. Please try again.')
-    expect(screen.getByPlaceholderText('Resolution note')).toHaveValue('keep me')
+    expect(screen.getByLabelText('Resolution note')).toHaveValue('keep me')
   })
 
   it('confirms a status change and an assignment', async () => {
@@ -172,7 +172,7 @@ describe('actions say how they went', () => {
     await caseHeading('case-a')
 
     fireEvent.click(screen.getByRole('button', { name: 'Closed' }))
-    expect(await screen.findByRole('status')).toHaveTextContent('Case set to "Closed".')
+    await waitFor(() => expect(screen.getByRole('status')).toHaveTextContent('Case set to "Closed".'))
 
     fireEvent.change(screen.getByLabelText('Admin'), { target: { value: 'admin-ana' } })
     fireEvent.click(screen.getByRole('button', { name: 'Assign case' }))
@@ -192,7 +192,7 @@ describe('actions say how they went', () => {
     expect(note).toHaveValue('looked at it')
 
     fireEvent.click(screen.getByRole('button', { name: 'Add note' }))
-    expect(await screen.findByRole('status')).toHaveTextContent('Note added.')
+    await waitFor(() => expect(screen.getByRole('status')).toHaveTextContent('Note added.'))
     expect(note).toHaveValue('')
   })
 
@@ -347,6 +347,55 @@ describe('the case says what it is and what changed (#337)', () => {
     expect(assign).toBeDisabled()
     fireEvent.change(screen.getByLabelText('Admin'), { target: { value: 'admin-bo' } })
     expect(assign).toBeEnabled()
+  })
+})
+
+describe('#410: without a placeholder, without colour alone', () => {
+  it('confirms a write in a status line already on the page', async () => {
+    listOf([moderationCase('case-a')])
+    renderPage()
+    await caseHeading('case-a')
+
+    // A live region put on the page together with its words is not read out.
+    const line = screen.getByRole('status')
+    expect(line).toBeEmptyDOMElement()
+    fireEvent.click(screen.getByRole('button', { name: 'Closed' }))
+    await waitFor(() => expect(line).toHaveTextContent('Case set to "Closed".'))
+    expect(screen.getByRole('status')).toBe(line)
+  })
+
+  it('names both notes by text on screen', async () => {
+    listOf([moderationCase('case-a')])
+    renderPage()
+    await caseHeading('case-a')
+
+    const resolution = screen.getByLabelText('Resolution note')
+    expect(resolution).not.toHaveAttribute('placeholder')
+    fireEvent.change(resolution, { target: { value: 'typed' } })
+    expect(screen.getByRole('textbox', { name: 'Resolution note' })).toBe(resolution)
+    // The internal note is named by its heading, and keeps its hint.
+    expect(screen.getByRole('textbox', { name: 'Internal note' })).toBe(
+      screen.getByPlaceholderText('Add an internal moderation note'),
+    )
+  })
+
+  it('marks the open case with aria-current and a tick, and moves both with it', async () => {
+    listOf([moderationCase('case-a'), moderationCase('case-b')])
+    renderPage()
+    await caseHeading('case-a')
+    const mark = (id: string) => caseButton(id).querySelector('[data-selected-mark]')
+
+    expect(caseButton('case-a')).toHaveAttribute('aria-current', 'true')
+    expect(mark('case-a')).not.toBeNull()
+    expect(caseButton('case-b')).not.toHaveAttribute('aria-current')
+    expect(mark('case-b')).toBeNull()
+
+    fireEvent.click(caseButton('case-b'))
+    await caseHeading('case-b')
+    expect(caseButton('case-b')).toHaveAttribute('aria-current', 'true')
+    expect(mark('case-b')).not.toBeNull()
+    expect(caseButton('case-a')).not.toHaveAttribute('aria-current')
+    expect(mark('case-a')).toBeNull()
   })
 })
 

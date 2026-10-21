@@ -155,7 +155,7 @@
   },
   "nextStep": "Prochaine étape recommandée",
   "notifications": {
-    "archive": "Archiver",
+    "archiveItem": "Archiver « {{title}} »",
     "connection": {
       "checking": "Recherche de nouveautés",
       "connecting": "Connexion",

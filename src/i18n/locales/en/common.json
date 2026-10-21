@@ -155,7 +155,7 @@
   },
   "nextStep": "Recommended next step",
   "notifications": {
-    "archive": "Archive",
+    "archiveItem": "Archive “{{title}}”",
     "connection": {
       "checking": "Checking for updates",
       "connecting": "Connecting",

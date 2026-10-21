@@ -736,8 +736,8 @@
       "validation": "Convalida",
       "runValidation": "Avvia la convalida",
       "diff": "Confronto",
-      "fromVersion": "dalla versione",
-      "toVersion": "alla versione",
+      "fromVersion": "Dalla versione",
+      "toVersion": "Alla versione",
       "compare": "Confronta",
       "title": "Revisione e audit",
       "submit": "Invia",
@@ -777,7 +777,7 @@
     },
     "evidence": {
       "title": "Evidenze di migrazione",
-      "idPlaceholder": "ID migrazione",
+      "idLabel": "ID migrazione",
       "load": "Carica le evidenze",
       "missingCapability": "Manca la capacità di operatore di migrazione o di pubblicazione."
     },

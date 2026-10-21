@@ -40,7 +40,7 @@ export function TeacherDashboardPage() {
           description={t('dashboardDescription')}
         />
         {requestsQuery.isLoading && <TeacherDashboardSkeleton showHeader={false} />}
-        {requestsQuery.isError && <p className="text-sm text-red">{t('loadRequestsFailed')}</p>}
+        {requestsQuery.isError && <p role="alert" className="text-sm text-red">{t('loadRequestsFailed')}</p>}
         {requestsQuery.data && (
           <div className="flex flex-col gap-[22px]">
             {/* Card 020: the classroom queue is withdrawn until it has a backend.

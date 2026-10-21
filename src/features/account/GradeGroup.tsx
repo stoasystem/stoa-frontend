@@ -86,11 +86,11 @@ export function GradeGroup() {
               <Button type="submit" disabled={!profile.data || unchanged || save.isPending}>
                 {save.isPending ? t('actions.saving') : t('me.grade.save')}
               </Button>
-              {save.isSuccess && (
-                <p className="m-0 text-[13px] leading-[1.35] text-caption" role="status">
-                  {t('me.grade.saved')}
-                </p>
-              )}
+              {/* Always mounted, only its text changes: a live region added
+                  together with its words is not announced (#410). */}
+              <p className="m-0 text-[13px] leading-[1.35] text-caption" role="status">
+                {save.isSuccess ? t('me.grade.saved') : null}
+              </p>
             </div>
             {save.isError && (
               <p className="m-0 text-[13px] leading-[1.35] text-red" role="alert">

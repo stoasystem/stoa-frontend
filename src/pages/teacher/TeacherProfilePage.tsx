@@ -37,7 +37,7 @@ export function TeacherProfilePage() {
         />
         {profileQuery.isLoading && <PageSkeleton rows={4} />}
         {profileQuery.isError && (
-          <p className="text-sm text-destructive">{t('profile.loadFailed')}</p>
+          <p role="alert" className="text-sm text-destructive">{t('profile.loadFailed')}</p>
         )}
         {profile && (
           <section className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_22rem]">
