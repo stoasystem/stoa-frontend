@@ -156,5 +156,8 @@ export function useSetTeacherSupportAllowanceMutation() {
 }
 
 export function useClaimInvitationMutation() {
-  return useMutation({ mutationFn: claimInvitation })
+  // The variables carry the invitation token and the new password, which a
+  // mutation keeps in the query client's cache until it is collected, five
+  // minutes by default; gcTime 0 drops them once the page no longer shows them (#409).
+  return useMutation({ mutationFn: claimInvitation, gcTime: 0 })
 }

@@ -1,4 +1,4 @@
-import { type FormEvent, useState } from 'react'
+import { type FormEvent, useEffect, useRef, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
@@ -14,6 +14,11 @@ import { toUserFacingError } from '@/lib/userFacingText'
 import { ApiError } from '@/services/api/httpClient'
 import { useAuthStore } from '@/store/authStore'
 
+type ActivationField = 'password' | 'confirm'
+
+const ERROR_ID = 'teacher-activate-error'
+const RULES_ID = 'teacher-password-rules'
+
 export function TeacherActivatePage() {
   const { t } = useTranslation(['auth', 'common', 'errors'])
   const [searchParams] = useSearchParams()
@@ -21,9 +26,10 @@ export function TeacherActivatePage() {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
-  const [formError, setFormError] = useState<string | null>(null)
+  const [formError, setFormError] = useState<{ message: string; field?: ActivationField } | null>(null)
   const claimMutation = useClaimTeacherInvitationMutation()
   const consumeMutation = useConsumeTeacherInvitationMutation()
+  const success = useRef<HTMLParagraphElement>(null)
 
   const succeeded = claimMutation.isSuccess || consumeMutation.isSuccess
   const pending = claimMutation.isPending || consumeMutation.isPending
@@ -37,19 +43,36 @@ export function TeacherActivatePage() {
   const requestErrorText = requestCode
     ? t(`auth:activate.errors.${requestCode}`, { defaultValue: requestFallback })
     : requestFallback
+  // A rejected password is the one refusal about a field; the others are
+  // about the invitation as a whole.
+  const invalidField = formError ? formError.field : requestCode === 'password_rejected' ? 'password' : undefined
+
+  // The form or the finish button goes once activation succeeds, and focus
+  // would go down with it to the page; it moves to the sentence saying so,
+  // with the sign-in link next after it (#409, WCAG 2.4.3).
+  useEffect(() => {
+    if (succeeded) success.current?.focus()
+  }, [succeeded])
+
+  /** What a field reads with its label: the error, if it is about this field, then its own help. */
+  function fieldProps(field: ActivationField, ...help: string[]) {
+    const invalid = invalidField === field
+    const describedBy = [invalid ? ERROR_ID : '', ...help].filter(Boolean).join(' ')
+    return { 'aria-invalid': invalid || undefined, 'aria-describedby': describedBy || undefined }
+  }
 
   function handleClaim(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     if (!token) {
-      setFormError(t('auth:activate.missingToken'))
+      setFormError({ message: t('auth:activate.missingToken') })
       return
     }
     if (!isCompliantPassword(password) || password.length < 12) {
-      setFormError(t('errors:passwordRequirements'))
+      setFormError({ message: t('errors:passwordRequirements'), field: 'password' })
       return
     }
     if (password !== confirmPassword) {
-      setFormError(t('auth:activate.passwordMismatch'))
+      setFormError({ message: t('auth:activate.passwordMismatch'), field: 'confirm' })
       return
     }
     setFormError(null)
@@ -58,7 +81,7 @@ export function TeacherActivatePage() {
 
   function handleConsume() {
     if (!token) {
-      setFormError(t('auth:activate.missingToken'))
+      setFormError({ message: t('auth:activate.missingToken') })
       return
     }
     setFormError(null)
@@ -84,7 +107,9 @@ export function TeacherActivatePage() {
 
         {succeeded && (
           <div className="mt-6 space-y-4">
-            <p className="text-sm text-muted-foreground">{t('auth:activate.success')}</p>
+            <p ref={success} tabIndex={-1} className="text-sm text-muted-foreground">
+              {t('auth:activate.success')}
+            </p>
             <Button asChild className="rounded-full">
               <Link to="/login">{t('auth:activate.signIn')}</Link>
             </Button>
@@ -111,8 +136,11 @@ export function TeacherActivatePage() {
                 value={password}
                 onChange={(event) => setPassword(event.target.value)}
                 required
+                {...fieldProps('password', RULES_ID)}
               />
-              <p className="text-sm text-muted-foreground">{t('errors:passwordRequirements')}</p>
+              <p id={RULES_ID} className="text-sm text-muted-foreground">
+                {t('errors:passwordRequirements')}
+              </p>
             </div>
             <div className="space-y-2">
               <Label htmlFor="teacher-password-confirm">{t('auth:activate.confirmPassword')}</Label>
@@ -123,6 +151,7 @@ export function TeacherActivatePage() {
                 value={confirmPassword}
                 onChange={(event) => setConfirmPassword(event.target.value)}
                 required
+                {...fieldProps('confirm')}
               />
             </div>
             <Button type="submit" disabled={pending}>
@@ -132,14 +161,21 @@ export function TeacherActivatePage() {
         )}
 
         {(formError || requestErrorText) && (
-          <p className="mt-4 rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive" role="alert">
-            {formError || requestErrorText}
+          <p id={ERROR_ID} className="mt-4 rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive" role="alert">
+            {formError?.message || requestErrorText}
           </p>
         )}
 
         {resumeRequired && (
           <p className="mt-3 text-sm text-muted-foreground">
-            <Link className="underline" to={`/login?next=${encodeURIComponent(`/teacher-activate?token=${token}`)}`}>
+            {/* The token is encoded for its own query, then the whole path once
+                more as `next`: unencoded, a token with `#` or `&` ended there
+                once the sign-in decoded `next` (#409). A token of URL-safe
+                characters, as invitations carry, reads exactly as before. */}
+            <Link
+              className="underline"
+              to={`/login?next=${encodeURIComponent(`/teacher-activate?token=${encodeURIComponent(token)}`)}`}
+            >
               {t('auth:activate.resumeSignIn')}
             </Link>
           </p>
