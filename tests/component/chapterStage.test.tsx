@@ -1147,6 +1147,128 @@ describe('a lesson read again in the background (#342)', () => {
   })
 })
 
+describe('a chapter read again in the background (#417)', () => {
+  const upstream = () => new ApiError('upstream', { status: 503 })
+
+  async function finishLesson() {
+    await userEvent.click(await screen.findByRole('radio', { name: /x = 5/ }))
+    await userEvent.click(screen.getByRole('button', { name: 'Check answer' }))
+    await userEvent.click(await screen.findByRole('button', { name: 'Next question' }))
+    await userEvent.type(await screen.findByRole('textbox', { name: 'Your answer' }), '3{Enter}')
+    await userEvent.click(await screen.findByRole('button', { name: 'Finish lesson' }))
+    expect(await screen.findByRole('heading', { name: 'Lesson complete' })).toBeInTheDocument()
+  }
+
+  async function settle() {
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 0))
+    })
+  }
+
+  /** How full the completion screen's star ring is drawn. */
+  function ringFilled() {
+    const ring = document.querySelector('[data-stage-done] circle[stroke-dasharray]')
+    if (!ring) return null
+    const [drawn, whole] = ring.getAttribute('stroke-dasharray')!.split(' ').map(Number)
+    return drawn / whole
+  }
+
+  it('keeps the progress, the ring and the next lesson when the roadmap cannot be read again', async () => {
+    vi.mocked(getPracticeRoadmap).mockImplementationOnce(async () => roadmap()).mockRejectedValue(upstream())
+    open('/chapter/u-5/l-2')
+
+    await finishLesson()
+    // Finishing reads every practice query again; the roadmap fails.
+    await waitFor(() => expect(getPracticeRoadmap).toHaveBeenCalledTimes(2))
+    await settle()
+
+    // The chapter on hand is from before the lesson was finished: it is counted all the same.
+    expect(screen.getByText('2 of 3 lessons in Linear equations done')).toBeInTheDocument()
+    expect(ringFilled()).toBeCloseTo(2 / 3)
+    expect(screen.getByRole('link', { name: 'Next lesson: Equations with brackets' })).toHaveAttribute('href', '/chapter/u-5/l-3')
+  })
+
+  it('keeps them when the catalog cannot be read again', async () => {
+    vi.mocked(getCurriculumCatalog).mockResolvedValueOnce(catalog).mockRejectedValue(upstream())
+    open('/chapter/u-5/l-2')
+
+    await finishLesson()
+    await waitFor(() => expect(getCurriculumCatalog).toHaveBeenCalledTimes(2))
+    await settle()
+
+    expect(screen.getByText('2 of 3 lessons in Linear equations done')).toBeInTheDocument()
+    expect(ringFilled()).toBeCloseTo(2 / 3)
+    expect(screen.getByRole('link', { name: 'Next lesson: Equations with brackets' })).toHaveAttribute('href', '/chapter/u-5/l-3')
+  })
+
+  it('still leads the last lesson to the star map when the roadmap cannot be read again', async () => {
+    completed.add('l-3')
+    vi.mocked(getPracticeRoadmap).mockImplementationOnce(async () => roadmap()).mockRejectedValue(upstream())
+    open('/chapter/u-5/l-2')
+
+    await finishLesson()
+    await waitFor(() => expect(getPracticeRoadmap).toHaveBeenCalledTimes(2))
+    await settle()
+
+    expect(screen.getByText('Every lesson in Linear equations is done.')).toBeInTheDocument()
+    expect(ringFilled()).toBeCloseTo(1)
+    expect(screen.getByRole('link', { name: 'See it on the star map' })).toHaveAttribute('href', '/map/math/algebra/u-5')
+  })
+
+  it('keeps the chapter on its page when the roadmap still cannot be read', async () => {
+    vi.mocked(getPracticeRoadmap).mockImplementationOnce(async () => roadmap()).mockRejectedValue(upstream())
+    open('/chapter/u-5/l-2')
+
+    await finishLesson()
+    await userEvent.click(screen.getByRole('link', { name: 'Back to the chapter' }))
+
+    expect(await screen.findByRole('heading', { level: 1, name: 'Linear equations' })).toBeInTheDocument()
+    // Opened, the chapter asks again, and fails again.
+    await waitFor(() => expect(getPracticeRoadmap).toHaveBeenCalledTimes(3))
+    await settle()
+    expect(screen.getByRole('heading', { level: 1, name: 'Linear equations' })).toBeInTheDocument()
+    expect(within(document.querySelector<HTMLElement>('[data-chapter-lessons]')!).getAllByRole('listitem')).toHaveLength(3)
+    expect(screen.queryByText('The chapter could not be loaded.')).not.toBeInTheDocument()
+  })
+
+  it('keeps the chapter on its page when the catalog cannot be read again', async () => {
+    const client = open('/chapter/u-5')
+    expect(await screen.findByRole('heading', { level: 1, name: 'Linear equations' })).toBeInTheDocument()
+
+    vi.mocked(getCurriculumCatalog).mockRejectedValue(upstream())
+    await act(() => client.invalidateQueries({ queryKey: ['practice'] }))
+    await settle()
+
+    expect(getCurriculumCatalog).toHaveBeenCalledTimes(2)
+    expect(screen.getByRole('heading', { level: 1, name: 'Linear equations' })).toBeInTheDocument()
+    expect(screen.getByText('1 of 3 lessons done')).toBeInTheDocument()
+    expect(screen.queryByText('The chapter could not be loaded.')).not.toBeInTheDocument()
+  })
+
+  it('still says the chapter could not be loaded when the catalog never arrived', async () => {
+    vi.mocked(getCurriculumCatalog).mockRejectedValueOnce(upstream())
+    open('/chapter/u-5')
+
+    expect(await screen.findByRole('alert')).toHaveTextContent('The chapter could not be loaded.')
+    expect(getPracticeRoadmap).not.toHaveBeenCalled()
+
+    // Try again reads the catalog again, and the chapter opens.
+    await userEvent.click(screen.getByRole('button', { name: 'Try again' }))
+    expect(await screen.findByRole('heading', { level: 1, name: 'Linear equations' })).toBeInTheDocument()
+  })
+
+  it('still says the chapter could not be loaded when the roadmap never arrived', async () => {
+    vi.mocked(getPracticeRoadmap).mockRejectedValueOnce(upstream())
+    open('/chapter/u-5')
+
+    expect(await screen.findByRole('alert')).toHaveTextContent('The chapter could not be loaded.')
+
+    await userEvent.click(screen.getByRole('button', { name: 'Try again' }))
+    expect(await screen.findByRole('heading', { level: 1, name: 'Linear equations' })).toBeInTheDocument()
+    expect(getPracticeRoadmap).toHaveBeenCalledTimes(2)
+  })
+})
+
 describe('a knowledge point that is still locked (#342)', () => {
   it('says so on the chapter, with no lesson to go on with', async () => {
     star = { state: 'locked', unmetExercises: 9 }
