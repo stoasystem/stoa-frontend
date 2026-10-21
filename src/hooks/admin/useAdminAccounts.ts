@@ -1,4 +1,5 @@
 import {
+  type InfiniteData,
   keepPreviousData,
   type QueryClient,
   useInfiniteQuery,
@@ -45,6 +46,28 @@ export function useAdminAccountsQuery(filters: AccountListFilters) {
 }
 
 /**
+ * The loaded pages as one list. A function of the pages alone, kept out of
+ * the hook: an inline `select` is a new function at every render, which
+ * TanStack runs again, so each key typed on the page walked every loaded page
+ * and compared the result with the last one, deep (#416).
+ */
+function mergePages(data: InfiniteData<AccountListResponse>): AccountListResponse {
+  const groups: Record<string, number> = {}
+  for (const page of data.pages) {
+    for (const [role, count] of Object.entries(page.groups)) {
+      groups[role] = (groups[role] ?? 0) + count
+    }
+  }
+  const items = data.pages.flatMap((page) => page.items)
+  return {
+    items,
+    count: items.length,
+    groups,
+    nextCursor: data.pages[data.pages.length - 1]?.nextCursor ?? null,
+  }
+}
+
+/**
  * The accounts page's list (#335): one query per filter, and the next one
  * keeps the previous answer on screen while it is read instead of flashing
  * "loading"; a superseded read is aborted rather than left to finish.
@@ -61,21 +84,7 @@ export function useAdminAccountListQuery(filters: AccountListFilters) {
     initialPageParam: undefined as string | undefined,
     getNextPageParam: (last: AccountListResponse) => last.nextCursor ?? undefined,
     placeholderData: keepPreviousData,
-    select: (data): AccountListResponse => {
-      const groups: Record<string, number> = {}
-      for (const page of data.pages) {
-        for (const [role, count] of Object.entries(page.groups)) {
-          groups[role] = (groups[role] ?? 0) + count
-        }
-      }
-      const items = data.pages.flatMap((page) => page.items)
-      return {
-        items,
-        count: items.length,
-        groups,
-        nextCursor: data.pages[data.pages.length - 1]?.nextCursor ?? null,
-      }
-    },
+    select: mergePages,
     retry: false,
   })
 }

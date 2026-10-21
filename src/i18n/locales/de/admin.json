@@ -270,6 +270,7 @@
     "notePlaceholder": "Interne Moderationsnotiz hinzufügen",
     "addNote": "Notiz hinzufügen",
     "selectCase": "Wählen Sie einen Moderationsfall, um Kontext und Aktionen zu sehen.",
+    "caseLoadFailed": "Dieser Fall konnte nicht geladen werden.",
     "noPreview": "Keine Kontextvorschau",
     "question": "Frage",
     "aiAnswer": "KI-Antwort",
@@ -461,6 +462,7 @@
       "submit": "Prüfen",
       "empty": "Geben Sie eine Eltern-ID ein, um den Kontobetrieb zu prüfen, oder öffnen Sie diese Ansicht über einen Abrechnungseintrag des Anbieters in der Abo-Warteschlange.",
       "notFound": "Das Elternkonto wurde nicht gefunden.",
+      "invalidParentId": "Diese Eltern-ID ist ungültig. Prüfen Sie sie und versuchen Sie es erneut.",
       "unavailable": "Der Kontobetrieb ist nicht verfügbar. Bitte versuchen Sie es später erneut."
     },
     "support": {
@@ -575,7 +577,8 @@
         "denied": "Der Zugriff auf Abrechnungsnachweise ist verweigert. Dafür ist die Berechtigung für Abrechnungssupport nötig.",
         "inProgress": "Die erneute Abrechnungsprüfung läuft bereits. Warten Sie kurz und versuchen Sie es mit demselben Checkout erneut.",
         "providerUnavailable": "Der Abrechnungsanbieter ist vorübergehend nicht erreichbar. Bewahren Sie diese Checkout-Referenz auf und versuchen Sie es später erneut.",
-        "notFound": "Für dieses Elternkonto wurde kein solcher Checkout gefunden."
+        "notFound": "Für dieses Elternkonto wurde kein solcher Checkout gefunden.",
+        "invalidRef": "Diese Checkout-Referenz ist ungültig. Prüfen Sie sie und versuchen Sie es erneut."
       }
     },
     "values": {
@@ -766,6 +769,7 @@
       "title": "Migrationsnachweise",
       "idLabel": "Migrations-ID",
       "load": "Nachweise laden",
+      "invalidId": "Diese Migrations-ID ist ungültig. Prüfen Sie sie und versuchen Sie es erneut.",
       "missingCapability": "Es fehlt die Berechtigung für Migrationen oder zum Veröffentlichen."
     },
     "selectItem": "Wählen Sie einen Lehrplaneintrag aus der Arbeitsliste.",

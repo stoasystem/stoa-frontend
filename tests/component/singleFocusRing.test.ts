@@ -104,8 +104,9 @@ describe('kept border colours (#102)', () => {
  * `marker`; `programmatic` is focused by code, never by Tab.
  */
 const OUTLINE_OFF_SITES: Record<string, { why: ('moved' | 'programmatic')[]; marker?: RegExp }> = {
+  // The search field and composer; and where a move to another page puts focus (#406).
   'index.css': {
-    why: ['moved'],
+    why: ['moved', 'programmatic'],
     marker: /\[data-search-field\]:focus-within,[\s\S]*?outline: var\(--focus-ring-width\)/,
   },
   'features/starmap/starmap.css': {

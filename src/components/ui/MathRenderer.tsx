@@ -5,7 +5,7 @@
  * Falls back to plain text when KaTeX is unavailable or the expression
  * is malformed, so the chat experience is never broken by a bad formula.
  */
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 
 type Katex = { renderToString: (tex: string, options?: Record<string, unknown>) => string }
 
@@ -267,7 +267,7 @@ function renderPlainSegments(segments: MathSegment[], katex: Katex): React.React
 }
 
 export function MathRenderer({ children, className, plain = false }: MathRendererProps) {
-  const segments = children ? parseSegments(children) : []
+  const segments = useMemo(() => (children ? parseSegments(children) : []), [children])
   const hasMath = segments.some((segment) => segment.type !== 'text')
   const [katex, setKatex] = useState<Katex | null>(null)
 
@@ -288,14 +288,19 @@ export function MathRenderer({ children, className, plain = false }: MathRendere
     }
   }, [hasMath, katex])
 
+  // Typesetting is the costly part, and the text is drawn again whenever what
+  // is around it is: in Ask, at every key typed and every frame of the sheet
+  // dragged (#416). So it is done again only when the text or KaTeX changes.
+  const nodes = useMemo(() => {
+    if (!children) return null
+    // Until it loads, and if it never does, the expression is shown as written.
+    if (!hasMath || !katex) return plain ? children : renderInlineMarkdown(children, 'md')
+    return plain ? renderPlainSegments(segments, katex) : renderSegments(segments, katex)
+  }, [children, hasMath, katex, plain, segments])
+
   if (!children) return null
 
-  // Until it loads, and if it never does, the expression is shown as written.
-  if (!hasMath || !katex) {
-    // Plain text with no formula is the text itself, with no wrapper of its own.
-    if (plain) return className ? <span className={className}>{children}</span> : <>{children}</>
-    return <span className={className}>{renderInlineMarkdown(children, 'md')}</span>
-  }
-
-  return <span className={className}>{plain ? renderPlainSegments(segments, katex) : renderSegments(segments, katex)}</span>
+  // Plain text with no formula is the text itself, with no wrapper of its own.
+  if (plain && (!hasMath || !katex) && !className) return <>{children}</>
+  return <span className={className}>{nodes}</span>
 }

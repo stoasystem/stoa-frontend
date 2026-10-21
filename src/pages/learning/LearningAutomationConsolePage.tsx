@@ -17,6 +17,7 @@ import {
   useStudentAssignmentsQuery,
 } from '@/hooks/learning/useLearningOperationsQueries'
 import { DashboardLayout } from '@/layouts/DashboardLayout'
+import { isApiPathValue } from '@/services/api/apiPath'
 import { ApiError } from '@/services/api/httpClient'
 import type { AutomationCandidate, AutomationPolicy } from '@/types/learningOperations'
 
@@ -125,7 +126,10 @@ export function LearningAutomationConsolePage() {
   const trimmedStudentId = studentId.trim()
   const trimmedSubject = subject.trim()
 
-  const assignmentsQuery = useStudentAssignmentsQuery(shownStudentId)
+  // #418: `..` or `.`, from the link or the field, would send the request a
+  // level up the API, so it is not read; the history card says it is not valid.
+  const shownStudentIdInvalid = Boolean(shownStudentId) && !isApiPathValue(shownStudentId)
+  const assignmentsQuery = useStudentAssignmentsQuery(shownStudentIdInvalid ? '' : shownStudentId)
   // An id that names no student, or one this account may not see, is an
   // answer, not a failure.
   const historyNotFound = assignmentsQuery.error instanceof ApiError && assignmentsQuery.error.status === 404
@@ -167,6 +171,11 @@ export function LearningAutomationConsolePage() {
     event.preventDefault()
     if (!trimmedStudentId) {
       toast.error(t('automationConsole.needStudentId'))
+      return
+    }
+    if (!isApiPathValue(trimmedStudentId)) {
+      setShownStudentId(trimmedStudentId)
+      toast.error(t('automationConsole.invalidStudentId'))
       return
     }
     // A batch still running keeps its preview, or its result would land unseen
@@ -419,6 +428,11 @@ export function LearningAutomationConsolePage() {
                     someone else, none of it is shown, so it cannot pass for theirs. */}
                 {!historyStale && (
                   <>
+                    {shownStudentIdInvalid && (
+                      <p className="rounded-md border border-dashed p-4 text-sm text-destructive">
+                        {t('automationConsole.invalidStudentId')}
+                      </p>
+                    )}
                     {assignmentsQuery.isLoading && <LoadingState message={t('automationConsole.historyLoading')} />}
                     {historyNotFound && (
                       <p className="rounded-md border border-dashed p-4 text-sm text-muted-foreground">

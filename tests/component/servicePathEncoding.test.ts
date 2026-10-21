@@ -9,7 +9,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { httpClient } from '@/services/api/httpClient'
 import { apiBaseUrl } from '@/lib/env'
-import { apiPath } from '@/services/api/apiPath'
+import { ApiPathValueError, apiPath, isApiPathValue } from '@/services/api/apiPath'
 import * as accountsApi from '@/services/admin/accountsApi'
 import * as adminApi from '@/services/admin/adminApi'
 import * as adminBillingApi from '@/services/admin/adminBillingApi'
@@ -238,7 +238,30 @@ describe.each(Object.entries(cases))('%s', (_file, fileCases) => {
       for (const request of requests) expect(request).not.toMatch(/[?#]/)
     },
   )
+
+  // #418: encoding leaves `..` as `..`, which the URL parser resolves to the
+  // level above, and an empty id drops its segment. Neither is sent: the call
+  // fails before the request that would carry it, and makes only the requests
+  // that do not (an upload's intent).
+  it.each(fileCases.map((testCase) => [testCase.name, testCase] as const))(
+    '%s sends no request for an id of .., . or nothing',
+    async (_name, testCase) => {
+      const withoutId = testCase.requests('\u0000').filter((request) => !request.includes('\u0000'))
+      for (const id of REFUSED) {
+        seen.length = 0
+        currentId = id
+        await expect(testCase.call(id), JSON.stringify(id)).rejects.toBeInstanceOf(ApiPathValueError)
+        expect(seen, JSON.stringify(id)).toEqual(withoutId)
+      }
+    },
+  )
 })
+
+const REFUSED = ['..', '.', '']
+
+// What the URL parser does with a path: dot segments, spelt `..`, `.%2e`,
+// `%2E%2e` or `.`, are resolved away. This is the request a browser sends.
+const resolved = (path: string) => new URL(`https://api.example${path}`).pathname
 
 describe('apiPath', () => {
   it('encodes each value once and leaves the literal text alone', () => {
@@ -250,4 +273,29 @@ describe('apiPath', () => {
   it('gives the bare text when nothing is inserted', () => {
     expect(apiPath`/a/b`).toBe('/a/b')
   })
+
+  it('needs to: the URL parser takes a dot segment, encoded or not, a level up', () => {
+    for (const segment of ['..', '.%2e', '%2E%2e', '.', '%2e']) {
+      expect(resolved(`/a/${segment}/b`), segment).not.toBe(`/a/${segment}/b`)
+    }
+  })
+
+  it.each(REFUSED)('refuses %j, which would not stay one segment (#418)', (value) => {
+    expect(isApiPathValue(value)).toBe(false)
+    expect(() => apiPath`/a/${value}/b`).toThrow(ApiPathValueError)
+    // Wherever the value stands, and whatever stands beside it.
+    expect(() => apiPath`/a/${'ok'}/${value}`).toThrow(ApiPathValueError)
+  })
+
+  // A value spelt like an encoded dot is encoded once more, so it reaches the
+  // API as its own text and the parser leaves the path as built.
+  it.each(['%2e%2e', '%2E%2E', '.%2e', '%2e', '...', '.hidden', 'a..b', ' .. ', 'id-1', 0])(
+    'keeps %j as one segment the URL parser leaves alone',
+    (value) => {
+      expect(isApiPathValue(value)).toBe(true)
+      const path = apiPath`/a/${value}/b`
+      expect(path).toBe(`/a/${encodeURIComponent(String(value))}/b`)
+      expect(resolved(path)).toBe(path)
+    },
+  )
 })

@@ -14,6 +14,7 @@ import type { JumpState } from '@/features/chapter/jump'
 import { Button } from '@/components/base'
 import { StarGlyph } from '@/features/starmap/components/StarGlyph'
 import { pathForTarget } from '@/features/starmap/view/layers'
+import type { ReviewReturnState } from '@/features/starmap/view/reviewReturn'
 import { subjectOfNebula, type Nebula, type Star, type StarMap } from '@/features/starmap/model/starMap'
 import { cn } from '@/lib/utils'
 
@@ -101,6 +102,10 @@ export function StarCardDetails({ map, demo = false, star }: { map: StarMap; dem
           .filter((candidate): candidate is Star => Boolean(candidate) && candidate!.state !== 'lit')
       : []
   const allLessonsDone = lessonCount > 0 && lessonsDone >= lessonCount
+  // The review's way back is to this star, not to the whole sky (#411).
+  const reviewFrom: ReviewReturnState = {
+    star: here(pathForTarget(subjectOfNebula(map, star.nebulaId), { layer: 'star', nebulaId: star.nebulaId, unitId: star.unitId })),
+  }
 
   return (
     <>
@@ -186,7 +191,7 @@ export function StarCardDetails({ map, demo = false, star }: { map: StarMap; dem
 
       {star.reviewDue > 0 && (
         <Button asChild lift variant="onSky" size="regular">
-          <Link to={`/review/${encodeURIComponent(star.unitId)}`}>
+          <Link to={`/review/${encodeURIComponent(star.unitId)}`} state={reviewFrom}>
             {t('star.review', { count: star.reviewDue })}
           </Link>
         </Button>

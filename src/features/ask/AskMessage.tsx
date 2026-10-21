@@ -1,5 +1,5 @@
 import { FileText, Image as ImageGlyph } from 'lucide-react'
-import type { ReactNode } from 'react'
+import { memo, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Avatar, Button } from '@/components/base'
 import { ICON } from '@/components/base/sizes'
@@ -15,8 +15,12 @@ import type { ChatAttachment, ChatMessage } from '@/types/chat'
  *
  * A teacher's reply (#12 point 2) is told apart by more than colour: it carries
  * the teacher's name and initials above it, on the green of "in progress".
+ *
+ * Drawn again only when what it is given changes: the thread around it is
+ * drawn again at every key typed in the composer and every frame of the phone
+ * sheet dragged, and a message's formulas are costly to draw (#416).
  */
-export function AskMessage({
+export const AskMessage = memo(function AskMessage({
   message,
   teacherName,
   onRetry,
@@ -129,7 +133,7 @@ export function AskMessage({
       {after}
     </div>
   )
-}
+})
 
 /**
  * The files a message carries (#125). The server names each one and no more;
