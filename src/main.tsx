@@ -37,7 +37,7 @@ async function loadApplication() {
   {
     if (rootElement === null) throw new Error('startup root unavailable')
 
-    const [, { default: i18n }] = await Promise.all([
+    const [, { default: i18n, i18nReady }] = await Promise.all([
       import('./index.css'),
       import('@/i18n'),
     ])
@@ -45,6 +45,9 @@ async function loadApplication() {
       import('react'),
       import('react-dom/client'),
       import('./App'),
+      // The language the app starts in, and English under it, are in before
+      // the first render, which would otherwise show raw keys (#414).
+      i18nReady,
     ])
 
     return () => {

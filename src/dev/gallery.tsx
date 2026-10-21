@@ -26,7 +26,8 @@ const role = (params.get('role') ?? 'student') as UserRole
 
 async function start() {
   await takePageOffline()
-  await Promise.all([import('../index.css'), import('@/i18n')])
+  const [, { i18nReady }] = await Promise.all([import('../index.css'), import('@/i18n')])
+  await i18nReady
   const base = await import('@/components/base')
   const { AppLayout } = await import('@/layouts/AppLayout')
   const { useAuthStore } = await import('@/store/authStore')

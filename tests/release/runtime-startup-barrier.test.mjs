@@ -123,7 +123,10 @@ test('main statically imports only the barrier and dynamically loads the applica
   assert.match(source, /clearFailure: \(\) => clearStartupFailure\(rootElement\)/)
   // #344: a late start may follow failure text that set the page language
   // after i18next did; the application's own start sets it back.
-  assert.match(source, /const \[, \{ default: i18n \}\] = await Promise\.all\(\[\s*import\(['"]\.\/index\.css['"]\),\s*import\(['"]@\/i18n['"]\)/)
+  assert.match(source, /const \[, \{ default: i18n, i18nReady \}\] = await Promise\.all\(\[\s*import\(['"]\.\/index\.css['"]\),\s*import\(['"]@\/i18n['"]\)/)
+  // #414: only English ships with the app; the language it starts in loads
+  // before the first render, alongside the application code.
+  assert.match(source, /import\(['"]\.\/App['"]\),(?:\s*\/\/[^\n]*)*\s*i18nReady,\s*\]\)/)
   assert.match(source, /return \(\) => \{[^}]*document\.documentElement\.lang = i18n\.language\s*ReactDOM\.createRoot/)
   assert.doesNotMatch(source, /VITE_/)
   const metaEnvReads = source.match(/import\.meta\.env\.[A-Z0-9_]+/g) ?? []

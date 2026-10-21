@@ -55,6 +55,23 @@ export function storedLanguage(): string | null {
  */
 let shownLanguage: SupportedLanguage | null = null
 
+/*
+ * A switch the screen has not caught up with yet. A language loads before it
+ * is shown (#414), so for a moment a tab is asked for one language and still
+ * shows the one before.
+ */
+let pendingSwitch: { shown: Promise<void>; settle: () => void } | null = null
+
+/** A switch has started. Only i18n/index.ts calls this. */
+export function noteLanguageSwitch() {
+  if (pendingSwitch) return
+  let settle = () => {}
+  const shown = new Promise<void>((resolve) => {
+    settle = resolve
+  })
+  pendingSwitch = { shown, settle }
+}
+
 /**
  * Record the language this tab now shows. Only i18n/index.ts calls this. A
  * code i18n has no copy for is shown in English, its fallback language.
@@ -62,6 +79,17 @@ let shownLanguage: SupportedLanguage | null = null
 export function setShownLanguage(language: string) {
   const code = language.slice(0, 2).toLowerCase()
   shownLanguage = isSupportedLanguage(code) ? code : 'en'
+  pendingSwitch?.settle()
+  pendingSwitch = null
+}
+
+/**
+ * Settles once this tab shows the language it was last asked for: at once
+ * when no switch is under way. Whatever compares a choice with the screen
+ * waits for this first, or it reads the language that is going away.
+ */
+export function languageShown(): Promise<void> {
+  return pendingSwitch?.shown ?? Promise.resolve()
 }
 
 /** The language the app is being read in right now, in this tab. */

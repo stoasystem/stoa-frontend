@@ -1,130 +1,35 @@
-import i18n from 'i18next'
+import i18n, { type BackendModule } from 'i18next'
 import { initReactI18next } from 'react-i18next'
-import { getInitialLanguage, LANGUAGE_STORAGE_KEY, setShownLanguage, type SupportedLanguage } from '@/i18n/languages'
-import { namespaces } from '@/i18n/namespaces'
-import enCommon from '@/i18n/locales/en/common.json'
-import enAuth from '@/i18n/locales/en/auth.json'
-import enChat from '@/i18n/locales/en/chat.json'
-import enParent from '@/i18n/locales/en/parent.json'
-import enPractice from '@/i18n/locales/en/practice.json'
-import enUploads from '@/i18n/locales/en/uploads.json'
-import enTeacherArea from '@/i18n/locales/en/teacher.json'
-import enBilling from '@/i18n/locales/en/billing.json'
-import enSupport from '@/i18n/locales/en/support.json'
-import enLegal from '@/i18n/locales/en/legal.json'
-import enAdmin from '@/i18n/locales/en/admin.json'
-import enErrors from '@/i18n/locales/en/errors.json'
-import enStarmap from '@/i18n/locales/en/starmap.json'
-import enChapter from '@/i18n/locales/en/chapter.json'
-import deCommon from '@/i18n/locales/de/common.json'
-import deAuth from '@/i18n/locales/de/auth.json'
-import deChat from '@/i18n/locales/de/chat.json'
-import deParent from '@/i18n/locales/de/parent.json'
-import dePractice from '@/i18n/locales/de/practice.json'
-import deUploads from '@/i18n/locales/de/uploads.json'
-import deTeacherArea from '@/i18n/locales/de/teacher.json'
-import deBilling from '@/i18n/locales/de/billing.json'
-import deSupport from '@/i18n/locales/de/support.json'
-import deLegal from '@/i18n/locales/de/legal.json'
-import deAdmin from '@/i18n/locales/de/admin.json'
-import deErrors from '@/i18n/locales/de/errors.json'
-import deStarmap from '@/i18n/locales/de/starmap.json'
-import deChapter from '@/i18n/locales/de/chapter.json'
-import frCommon from '@/i18n/locales/fr/common.json'
-import frAuth from '@/i18n/locales/fr/auth.json'
-import frChat from '@/i18n/locales/fr/chat.json'
-import frParent from '@/i18n/locales/fr/parent.json'
-import frPractice from '@/i18n/locales/fr/practice.json'
-import frUploads from '@/i18n/locales/fr/uploads.json'
-import frTeacherArea from '@/i18n/locales/fr/teacher.json'
-import frBilling from '@/i18n/locales/fr/billing.json'
-import frSupport from '@/i18n/locales/fr/support.json'
-import frLegal from '@/i18n/locales/fr/legal.json'
-import frAdmin from '@/i18n/locales/fr/admin.json'
-import frErrors from '@/i18n/locales/fr/errors.json'
-import frStarmap from '@/i18n/locales/fr/starmap.json'
-import frChapter from '@/i18n/locales/fr/chapter.json'
-import itCommon from '@/i18n/locales/it/common.json'
-import itAuth from '@/i18n/locales/it/auth.json'
-import itChat from '@/i18n/locales/it/chat.json'
-import itParent from '@/i18n/locales/it/parent.json'
-import itPractice from '@/i18n/locales/it/practice.json'
-import itUploads from '@/i18n/locales/it/uploads.json'
-import itTeacherArea from '@/i18n/locales/it/teacher.json'
-import itBilling from '@/i18n/locales/it/billing.json'
-import itSupport from '@/i18n/locales/it/support.json'
-import itLegal from '@/i18n/locales/it/legal.json'
-import itAdmin from '@/i18n/locales/it/admin.json'
-import itErrors from '@/i18n/locales/it/errors.json'
-import itStarmap from '@/i18n/locales/it/starmap.json'
-import itChapter from '@/i18n/locales/it/chapter.json'
+import {
+  getInitialLanguage,
+  LANGUAGE_STORAGE_KEY,
+  noteLanguageSwitch,
+  setShownLanguage,
+  type SupportedLanguage,
+} from '@/i18n/languages'
+import { startupNamespaces } from '@/i18n/namespaces'
+import { bundledResources, loadNamespace } from '@/i18n/resources'
 
-export const resources = {
-  en: {
-    common: enCommon,
-    auth: enAuth,
-    chat: enChat,
-    parent: enParent,
-    practice: enPractice,
-    uploads: enUploads,
-    teacher: enTeacherArea,
-    billing: enBilling,
-    support: enSupport,
-    legal: enLegal,
-    admin: enAdmin,
-    errors: enErrors,
-    starmap: enStarmap,
-    chapter: enChapter,
+/**
+ * Fetches the copy the app does not ship (#414). i18next asks for it before
+ * it shows a language: at start-up for the language read from storage or the
+ * browser, on a switch for the new one, and for `admin` when a screen first
+ * asks for it (react-i18next suspends that screen until then).
+ *
+ * A failed download is not retried: the browser keeps a failed module for
+ * the page, so only a reload fetches it again. That text reads in English
+ * until then, and the next page load asks again.
+ */
+const onDemandCopy: BackendModule = {
+  type: 'backend',
+  init() {},
+  read(language, namespace, callback) {
+    loadNamespace(language, namespace).then(
+      (copy) => callback(null, copy),
+      (error: Error) => callback(error, false),
+    )
   },
-  de: {
-    common: deCommon,
-    auth: deAuth,
-    chat: deChat,
-    parent: deParent,
-    practice: dePractice,
-    uploads: deUploads,
-    teacher: deTeacherArea,
-    billing: deBilling,
-    support: deSupport,
-    legal: deLegal,
-    admin: deAdmin,
-    errors: deErrors,
-    starmap: deStarmap,
-    chapter: deChapter,
-  },
-  fr: {
-    common: frCommon,
-    auth: frAuth,
-    chat: frChat,
-    parent: frParent,
-    practice: frPractice,
-    uploads: frUploads,
-    teacher: frTeacherArea,
-    billing: frBilling,
-    support: frSupport,
-    legal: frLegal,
-    admin: frAdmin,
-    errors: frErrors,
-    starmap: frStarmap,
-    chapter: frChapter,
-  },
-  it: {
-    common: itCommon,
-    auth: itAuth,
-    chat: itChat,
-    parent: itParent,
-    practice: itPractice,
-    uploads: itUploads,
-    teacher: itTeacherArea,
-    billing: itBilling,
-    support: itSupport,
-    legal: itLegal,
-    admin: itAdmin,
-    errors: itErrors,
-    starmap: itStarmap,
-    chapter: itChapter,
-  },
-} as const
+}
 
 function syncDocumentLanguage(language: string) {
   if (typeof document !== 'undefined') {
@@ -132,28 +37,57 @@ function syncDocumentLanguage(language: string) {
   }
 }
 
-void i18n
+/** Set once the language the app starts in is in. */
+let started = false
+
+/**
+ * Settles once the language the app starts in, and English under it, are
+ * in; main.tsx renders nothing before. Never rejects: a language that fails
+ * to load starts in English.
+ */
+export const i18nReady = i18n
+  .use(onDemandCopy)
   .use(initReactI18next)
-  .init({
-    resources,
-    lng: getInitialLanguage(),
-    fallbackLng: 'en',
-    ns: namespaces,
-    defaultNS: 'common',
-    fallbackNS: 'common',
-    interpolation: {
-      escapeValue: false,
+  .init(
+    {
+      resources: bundledResources,
+      // English ships with the app; the rest comes from `onDemandCopy`.
+      partialBundledLanguages: true,
+      lng: getInitialLanguage(),
+      fallbackLng: 'en',
+      // A copy: i18next adds `admin` to this list once a screen loads it, so
+      // a switch then loads it in the new language too.
+      ns: [...startupNamespaces],
+      defaultNS: 'common',
+      fallbackNS: 'common',
+      interpolation: {
+        escapeValue: false,
+      },
     },
-  })
+    // Called right after the `languageChanged` the start-up language brings.
+    () => {
+      started = true
+    },
+  )
 
 syncDocumentLanguage(i18n.language)
 setShownLanguage(i18n.language)
 
+// Emitted as a switch starts, before the language loads. A call with no
+// language changes nothing and is never followed by `languageChanged`.
+i18n.on('languageChanging', (language?: string) => {
+  if (language) noteLanguageSwitch()
+})
+
+// i18next emits this once the new language is in, never before (#414).
 i18n.on('languageChanged', (language) => {
   syncDocumentLanguage(language)
   // Before anything else hears of the switch: AppProviders refetches every
   // query on it, and those requests must already go out in the new language.
   setShownLanguage(language)
+  // The start-up language arriving: read from storage or the browser, not
+  // chosen, so not written back.
+  if (!started) return
   // The choice for the next page load, in any tab. Other tabs open now keep
   // the language they show (#403).
   if (typeof window !== 'undefined') {

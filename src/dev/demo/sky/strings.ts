@@ -35,6 +35,24 @@ export const DEMO_SKY_STRINGS: Record<SupportedLanguage, { notice: string; empty
 /** Adds the demo words to the app's `starmap` namespace. Idempotent. */
 export function addDemoSkyStrings(): void {
   for (const [language, demo] of Object.entries(DEMO_SKY_STRINGS)) {
-    i18n.addResourceBundle(language, 'starmap', { demo }, true, true)
+    whenStarmapIsIn(language, () => i18n.addResourceBundle(language, 'starmap', { demo }, true, true))
   }
+}
+
+/*
+ * A language's copy loads when a tab is first read in it (#414). Words added
+ * before would stand in for its whole `starmap` namespace, and i18next would
+ * never load the rest.
+ */
+function whenStarmapIsIn(language: string, add: () => void) {
+  if (i18n.hasResourceBundle(language, 'starmap')) {
+    add()
+    return
+  }
+  const onAdded = (lng: string, ns: string) => {
+    if (lng !== language || ns !== 'starmap') return
+    i18n.store.off('added', onAdded)
+    add()
+  }
+  i18n.store.on('added', onAdded)
 }

@@ -45,7 +45,8 @@ for (const key of ['relations', 'longNames']) {
 
 async function start() {
   await takePageOffline()
-  await Promise.all([import('../index.css'), import('@/i18n')])
+  const [, { i18nReady }] = await Promise.all([import('../index.css'), import('@/i18n')])
+  await i18nReady
   const { useAuthStore } = await import('@/store/authStore')
   const pages = await import('@/pages/map/MapPages')
 

@@ -46,11 +46,13 @@ async function start() {
   await installInterception()
   const { LANGUAGE_STORAGE_KEY, isSupportedLanguage } = await import('@/i18n/languages')
   if (language && isSupportedLanguage(language)) localStorage.setItem(LANGUAGE_STORAGE_KEY, language)
-  const [, { default: i18n }, { demo, setDemoLanguage, resetDemoServer, finishDemoKnowledgePoint, makeReviewDue }] = await Promise.all([
+  const [, { default: i18n, i18nReady }, { demo, setDemoLanguage, resetDemoServer, finishDemoKnowledgePoint, makeReviewDue }] = await Promise.all([
     import('../../index.css'),
     import('@/i18n'),
     import('@/dev/preview/demoSource'),
   ])
+  // The page's language loads before it is read (#414).
+  await i18nReady
   // The demo account reads in the page's language, so `/auth/me` does not switch it back.
   const reading = i18n.resolvedLanguage ?? i18n.language
   setDemoLanguage(isSupportedLanguage(reading) ? reading : 'en')
