@@ -362,9 +362,21 @@ export function AskPanel({
         />
       ) : (
         <div ref={listArea} className="flex min-h-0 flex-1 flex-col overflow-y-auto" style={{ padding: phone ? '8px 6px' : '10px 8px' }}>
+          {/* A list on screen stays when a read behind it fails: the reads that
+              follow a conversation (#405, #452), a language switch (#457). */}
+          {conversationsQuery.isError && conversationsQuery.data && (
+            <div className="flex flex-col items-start gap-2 px-3 py-2">
+              <p role="alert" className="text-[13px] text-caption">
+                {t('ask.list.refreshFailed')}
+              </p>
+              <Button variant="plain" size="small" onClick={() => void conversationsQuery.refetch()}>
+                {t('ask.list.retry')}
+              </Button>
+            </div>
+          )}
           {conversationsQuery.isLoading ? (
             <p className="px-3 py-4 text-[13px] text-caption">{t('ask.list.loading')}</p>
-          ) : conversationsQuery.isError ? (
+          ) : conversationsQuery.isError && !conversationsQuery.data ? (
             <div className="flex flex-col items-start gap-2 px-3 py-4">
               <p role="alert" className="text-[13px] text-caption">
                 {t('ask.list.failed')}

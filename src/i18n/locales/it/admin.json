@@ -38,6 +38,7 @@
     "statusChanged": "Stato cambiato in {{status}}.",
     "statusFailed": "Non è stato possibile cambiare lo stato.",
     "loadFailed": "Non è stato possibile caricare l'elenco degli account.",
+    "refreshFailed": "Non è stato possibile aggiornare l'elenco degli account. Resta visibile l'ultimo stato caricato.",
     "empty": "Nessun account in questo gruppo.",
     "columnNumber": "Numero",
     "columnName": "Nome",
@@ -74,6 +75,7 @@
     "incomplete": "L’elenco si è fermato dopo {{shown}} account e non è completo. Restringi i filtri o caricane altri.",
     "loadMore": "Carica altri",
     "loadingMore": "Caricamento di altri account…",
+    "loadMoreFailed": "Non è stato possibile caricare gli account successivi. Riprova.",
     "actionFor": "{{action}}: {{account}}",
     "confirm": {
       "title": {
@@ -144,6 +146,7 @@
       "saved_other": "Salvato: {{count}} casi a settimana.",
       "loading": "Lettura del numero attuale…",
       "loadFailed": "Non è stato possibile leggere il numero attuale.",
+      "refreshFailed": "Non è stato possibile rileggere il numero attuale. Resta visibile quello letto in precedenza.",
       "saveFailed": "Non è stato possibile salvare il numero.",
       "outOfRange": "Inserisci un numero intero tra 0 e {{maximum}}.",
       "zeroWarning": "Zero disattiva completamente il supporto dell'insegnante per questo studente: gli verrà detto di contattare un amministratore, non che la settimana è esaurita."
@@ -229,7 +232,8 @@
     "atRisk": "A rischio",
     "breached": "Superati",
     "loading": "Caricamento dei tempi di risposta…",
-    "unavailable": "I tempi di risposta non sono disponibili al momento. Le cifre non vengono mostrate per evitare valori errati."
+    "unavailable": "I tempi di risposta non sono disponibili al momento. Le cifre non vengono mostrate per evitare valori errati.",
+    "refreshFailed": "Non è stato possibile aggiornare i tempi di risposta. Restano visibili le ultime cifre caricate."
   },
   "placeholder": {
     "eyebrow": "Amministrazione",
@@ -352,6 +356,7 @@
     "resentNotDelivered": "Invito creato, ma l’e-mail non è stata recapitata.",
     "resendFailed": "Impossibile inviare di nuovo l’invito.",
     "statementFailed": "Non è stato possibile caricare la lettera di motivazione.",
+    "statementRefreshFailed": "Non è stato possibile aggiornare la lettera di motivazione. Resta visibile l’ultimo stato caricato.",
     "noStatement": "Non è stata inviata alcuna lettera di motivazione.",
     "reasonLabel": "Motivazione della decisione",
     "confirm": {

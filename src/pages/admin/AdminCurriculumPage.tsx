@@ -361,7 +361,7 @@ export function AdminCurriculumPage() {
           <TabsContent value="worklist">
             <WorklistPanel
               isLoading={worklistQuery.isLoading}
-              failed={worklistQuery.isError || Boolean(worklistQuery.data?.permissionDenied)}
+              failed={(worklistQuery.isError && !worklistQuery.data) || Boolean(worklistQuery.data?.permissionDenied)}
               items={worklist}
               selectedVersionId={selectedVersionId}
               onSelect={selectVersion}
@@ -506,7 +506,11 @@ function WorklistPanel({
   onSelect,
 }: {
   isLoading: boolean
-  /** The page already says why there is no list; an empty one would contradict it. */
+  /**
+   * The page already says why there is no list; an empty one would contradict it.
+   * A list on hand is not failed: when Refresh, or the read after a change,
+   * fails, the page's alert says so above it and the list stays (#457).
+   */
   failed: boolean
   items: CurriculumVersion[]
   selectedVersionId?: string

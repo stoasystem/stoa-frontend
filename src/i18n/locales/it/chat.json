@@ -64,6 +64,7 @@
       "label": "Conversazioni",
       "loading": "Caricamento delle tue conversazioni…",
       "failed": "Non è stato possibile caricare le tue conversazioni.",
+      "refreshFailed": "Non è stato possibile aggiornare le tue conversazioni. Resta visibile l’ultimo stato caricato.",
       "retry": "Riprova",
       "untitled": "Nuova conversazione"
     },

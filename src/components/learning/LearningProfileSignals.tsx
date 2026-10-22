@@ -37,12 +37,18 @@ export function LearningProfileSignals({
           {tPractice('profile.loadingSignals')}
         </div>
       )}
-      {isError && (
-        <div className="rounded-lg border border-destructive/25 bg-destructive/5 p-5 text-sm text-destructive">
+      {/* Signals on screen stay when they cannot be read again (#457). */}
+      {isError && !profile && (
+        <div role="alert" className="rounded-lg border border-destructive/25 bg-destructive/5 p-5 text-sm text-destructive">
           {tPractice('profile.signalsUnavailable')}
         </div>
       )}
-      {!isLoading && !isError && profile && (
+      {isError && profile && (
+        <p role="alert" className="text-sm text-destructive">
+          {tPractice('profile.signalsRefreshFailed')}
+        </p>
+      )}
+      {!isLoading && profile && (
         <div className="space-y-4">
           <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
             {profile.subjects.map((subject) => {

@@ -106,10 +106,13 @@ function AccountRow() {
   type AccountState = 'loading' | 'failed' | 'blocked' | 'attention' | 'ready'
   let kind: AccountState
   let subtitle: string
+  // A state on hand stays when it cannot be read again -- a language switch,
+  // a reconnect -- and the row says that beside it (#457).
+  const refreshFailed = query.isError && Boolean(state)
   if (query.isLoading) {
     kind = 'loading'
     subtitle = t('overview.accountLoading')
-  } else if (query.isError || !state) {
+  } else if (!state) {
     kind = 'failed'
     subtitle = t('accountOps.loadFailed')
   } else if (state.state === 'blocked') {
@@ -135,10 +138,21 @@ function AccountRow() {
       leading={{ kind: 'icon', icon: UsersRound }}
       title={t('overview.account')}
       subtitle={
-        <span role={kind === 'failed' ? 'alert' : 'status'} data-account-state={kind}>
-          {subtitle}
-        </span>
+        <>
+          <span role={kind === 'failed' ? 'alert' : 'status'} data-account-state={kind}>
+            {subtitle}
+          </span>
+          {refreshFailed && (
+            <>
+              {' '}
+              <span role="alert" className="text-red">
+                {t('overview.accountRefreshFailed')}
+              </span>
+            </>
+          )}
+        </>
       }
+      subtitleLines={refreshFailed ? 2 : 1}
       trailing={pill}
     />
   )

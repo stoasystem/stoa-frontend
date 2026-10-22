@@ -60,8 +60,11 @@ export function AdminTeacherApplicationsPage() {
   // Only a pending application can be decided; the other tabs are a record.
   const decidable = reviewState === 'pending_review'
   const applicantName = selected ? detail?.fullName || selected.fullName || selected.applicationId : ''
+  // A statement on hand stays when it cannot be read again; the line under it
+  // says so (#457).
+  const statementFailed = detailQuery.isError && !detail
   let statement: string
-  if (detailQuery.isError) statement = toUserFacingError(detailQuery.error, t('teacherApplications.statementFailed'))
+  if (statementFailed) statement = toUserFacingError(detailQuery.error, t('teacherApplications.statementFailed'))
   else if (detailQuery.isPending) statement = t('teacherApplications.loadingStatement')
   else statement = detail?.statement?.trim() || t('teacherApplications.noStatement')
 
@@ -212,7 +215,10 @@ export function AdminTeacherApplicationsPage() {
                   <p><span className="font-medium">{t('teacherApplications.name')}</span> {applicantName}</p>
                   <p><span className="font-medium">{t('teacherApplications.email')}</span> {selected.verifiedEmail}</p>
                   <p><span className="font-medium">{t('teacherApplications.subjects')}</span> {subjectList(detail?.subjects || selected.subjects || [])}</p>
-                  <p className={`whitespace-pre-wrap ${detailQuery.isError ? 'text-destructive' : 'text-muted-foreground'}`}>{statement}</p>
+                  <p className={`whitespace-pre-wrap ${statementFailed ? 'text-destructive' : 'text-muted-foreground'}`}>{statement}</p>
+                  {detailQuery.isError && detail && (
+                    <p role="alert" className="text-destructive">{t('teacherApplications.statementRefreshFailed')}</p>
+                  )}
                   {decidable && (
                     <Textarea
                       value={reason}

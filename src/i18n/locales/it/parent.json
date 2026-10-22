@@ -249,6 +249,7 @@
     "more": "Altro",
     "account": "Account e famiglia",
     "accountLoading": "Verifica dell’account…",
+    "accountRefreshFailed": "Al momento non è stato possibile aggiornarlo.",
     "accountReady_one": "Pronto · {{count}} figlio collegato",
     "accountReady_many": "Pronto · {{count}} figli collegati",
     "accountReady_other": "Pronto · {{count}} figli collegati",
