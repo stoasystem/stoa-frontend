@@ -51,6 +51,14 @@ twice; signs out, which clears the session here and calls `POST /auth/logout`.
 for, once, while `/auth/me` is still being answered rather than after it, and
 the map follows the account without the page skeleton in between (#415).
 
+`chunkFailure.spec.ts`: a page or KaTeX file that cannot be fetched, with
+Vite's real preload helper and Chromium's module map. A page reloads the tab
+once and, failing again, offers only "Reload page"; KaTeX never reloads it and
+is asked for again under a new address; a page that fails after the reader went
+back reloads nothing, and offline it waits for the connection; a stylesheet
+that failed is put back before the next page that loads is shown, and failing
+again holds back no page that never failed on it (#272, #401, #447).
+
 `forcedChange.spec.ts`: a student whose password an administrator reset opens
 `/ask`, signs in, is sent to the password change with only Help and Log out in
 the shell, reloads it, changes the password, and "Continue" opens `/ask`; the
@@ -59,6 +67,14 @@ backend is asked for nothing it would refuse during the reset but the sky (#412)
 `accountMenu.spec.ts`: at 375 px, the account menu's language and switch-account
 lists open on the screen and can be tapped where they are drawn (#162: they
 opened at x = -152).
+
+`pageChange.spec.ts`: a page opened from the foot of a long one starts at its
+top, with its heading focused under the sticky bar, and Back from it (a long
+page too) gives the first one back where it was read; the star map, a
+full-height page, opens with its bar and heading on the screen (a check: the
+browser already puts such a page at the top, on a desktop); the sign-in page
+at `/` names itself in the tab and is announced on arriving from another page
+(#448).
 
 `controls.spec.ts` holds two controls. One is a negative control marked
 `test.fail()`: it fails while the app renders, and passes -- turning the suite
