@@ -188,24 +188,28 @@ function ReviewQuestion({ card, onAnswer }: { card: ReviewCard; onAnswer: () => 
           </div>
 
           <div className="flex flex-col">
-            {/* Here before the verdict, so the verdict is read when it arrives
-                -- also while the focus goes on to Try again (#408). */}
+            {/* Here before the verdict, so a wrong one is read when it arrives,
+                while the focus goes on to Try again (#408). */}
             <div
-              ref={verdictArea}
-              tabIndex={-1}
               role="status"
               aria-live="polite"
-              data-review-feedback={result ? (result.correct ? 'correct' : 'wrong') : undefined}
-              className="outline-none"
+              data-review-feedback={result && !result.correct ? 'wrong' : undefined}
             >
               {/* The explanation states the answer, so the card holds it back
                   until the student has found it; the feedback points the way. */}
-              {result && (
-                <FeedbackCard correct={result.correct} feedback={result.feedback} explanation={result.explanation}>
-                  {result.correct && <p className={cn('m-0 text-[13px]', bodyOnSky)}>{t('review.comesBackLater')}</p>}
-                </FeedbackCard>
+              {result && !result.correct && (
+                <FeedbackCard correct={false} feedback={result.feedback} />
               )}
             </div>
+            {/* A right one takes the focus, which reads it, so it stays out of
+                the region: in it, it was read a second time (#453). */}
+            {result?.correct && (
+              <div ref={verdictArea} tabIndex={-1} data-review-feedback="correct" className="outline-none">
+                <FeedbackCard correct feedback={result.feedback} explanation={result.explanation}>
+                  <p className={cn('m-0 text-[13px]', bodyOnSky)}>{t('review.comesBackLater')}</p>
+                </FeedbackCard>
+              </div>
+            )}
             {result ? (
               !result.correct && (
                 <Button

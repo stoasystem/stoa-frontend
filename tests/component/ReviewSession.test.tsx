@@ -626,7 +626,7 @@ describe('the verdict is read out (#408)', () => {
     mockedDue.mockResolvedValue({ items: [card()], dueCount: 1, generatedAt: '' })
     mockedAnswer
       .mockResolvedValueOnce({ challengeId: 'brueche-l1-c1', correct: false, feedback: 'Leider falsch.', attemptsRemaining: 1 })
-      .mockResolvedValueOnce({ challengeId: 'brueche-l1-c1', correct: true, feedback: 'Richtig! Gut gemacht.', attemptsRemaining: 0 })
+      .mockResolvedValueOnce({ challengeId: 'brueche-l1-c1', correct: false, feedback: 'Noch einmal falsch.', attemptsRemaining: 0 })
     const user = userEvent.setup()
     renderSession()
 
@@ -639,10 +639,62 @@ describe('the verdict is read out (#408)', () => {
     expect(screen.getByRole('status')).toBe(region)
     expect(region).toBeEmptyDOMElement()
     expect(region).not.toHaveAttribute('data-review-feedback')
+    await user.click(screen.getByRole('radio', { name: '1/6' }))
+    await user.click(screen.getByRole('button', { name: 'Check answer' }))
+
+    await waitFor(() => expect(region).toHaveTextContent('Noch einmal falsch.'))
+    expect(screen.getByRole('button', { name: /try again/i })).toHaveFocus()
+  })
+})
+
+// The focus reads what it lands on, and the region reads what arrives in it:
+// a right verdict in the region that also took the focus was said twice.
+describe('a right verdict is read once (#453)', () => {
+  it('takes the focus outside the region, which stays empty', async () => {
+    mockedDue.mockResolvedValue({ items: [card()], dueCount: 1, generatedAt: '' })
+    mockedAnswer.mockResolvedValue({ challengeId: 'brueche-l1-c1', correct: true, feedback: 'Richtig! Gut gemacht.', attemptsRemaining: 2 })
+    const user = userEvent.setup()
+    renderSession()
+
+    await screen.findByText('Was ist 1/2 + 1/4?')
+    const region = screen.getByRole('status')
     await user.click(screen.getByRole('radio', { name: '3/4' }))
     await user.click(screen.getByRole('button', { name: 'Check answer' }))
 
-    await waitFor(() => expect(region).toHaveTextContent('Richtig! Gut gemacht.'))
-    expect(region).toHaveFocus()
+    const verdict = (await screen.findByText('Richtig! Gut gemacht.')).closest<HTMLElement>('[data-review-feedback]')
+    expect(verdict).toHaveFocus()
+    expect(verdict).toHaveAttribute('data-review-feedback', 'correct')
+    expect(verdict).toHaveTextContent('This one will come back later')
+    // Not a region of its own, and not inside one.
+    expect(verdict?.closest('[aria-live], [role="status"], [role="alert"]')).toBeNull()
+    expect(screen.getByRole('status')).toBe(region)
+    expect(region).toBeEmptyDOMElement()
+    expect(region).not.toHaveAttribute('data-review-feedback')
+  })
+
+  it('is not read by the region after a wrong one was', async () => {
+    mockedDue.mockResolvedValue({ items: [card()], dueCount: 1, generatedAt: '' })
+    mockedAnswer
+      .mockResolvedValueOnce({ challengeId: 'brueche-l1-c1', correct: false, feedback: 'Leider falsch.', attemptsRemaining: 1 })
+      .mockResolvedValueOnce({ challengeId: 'brueche-l1-c1', correct: true, feedback: 'Richtig! Gut gemacht.', attemptsRemaining: 0 })
+    const user = userEvent.setup()
+    renderSession()
+
+    await screen.findByText('Was ist 1/2 + 1/4?')
+    const region = screen.getByRole('status')
+    await user.click(screen.getByRole('radio', { name: '2/6' }))
+    await user.click(screen.getByRole('button', { name: 'Check answer' }))
+    // A wrong one is still the region's to say, with the focus on Try again.
+    expect(await screen.findByRole('button', { name: /try again/i })).toHaveFocus()
+    expect(region).toHaveTextContent('Leider falsch.')
+    expect(document.querySelector('[data-review-feedback="correct"]')).toBeNull()
+    await user.click(screen.getByRole('button', { name: /try again/i }))
+    await user.click(screen.getByRole('radio', { name: '3/4' }))
+    await user.click(screen.getByRole('button', { name: 'Check answer' }))
+
+    const verdict = (await screen.findByText('Richtig! Gut gemacht.')).closest('[data-review-feedback]')
+    expect(verdict).toHaveFocus()
+    expect(screen.getByRole('status')).toBe(region)
+    expect(region).toBeEmptyDOMElement()
   })
 })
