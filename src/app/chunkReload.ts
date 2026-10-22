@@ -48,6 +48,18 @@ export const CHUNK_RELOAD_WINDOW_MS = 30_000
  */
 const CLOCK_SLACK_MS = 1_000
 
+/**
+ * How long a failed page waits for the browser to come back online before it
+ * shows its error. `navigator.onLine` can read false while the network works
+ * (some VPN adapters and Linux setups), and then no `online` event ever comes
+ * (#447 audit). The tab still reloads if the connection comes back later while
+ * the reader is at the page's address.
+ */
+export const OFFLINE_WAIT_MS = 10_000
+
+/** How long a page waits for a stylesheet being put back before it is shown without it. */
+export const STYLESHEET_WAIT_MS = 5_000
+
 /** What Vite's preload helper rejects with when a page's stylesheet fails. */
 const STYLESHEET_FAILURE = /^Unable to preload CSS for (\S+)$/
 
@@ -67,8 +79,10 @@ type Listening = {
    * announced, and a stylesheet of ours that failed again. What a reload may cure.
    */
   loadFailures: WeakSet<object>
+  /** The stylesheet each of those failures is about, when it is one. */
+  stylesheetFailures: WeakMap<object, string>
   /** Stylesheets Vite could not load, by address, with the load that is bringing each back. */
-  deadStylesheets: Map<string, Promise<void> | null>
+  deadStylesheets: Map<string, Promise<StylesheetFailure | null> | null>
 }
 
 let listening: Listening | null = null
@@ -94,7 +108,13 @@ function rememberReload(target: ReloadTarget, at: number): boolean {
 
 /** Starts listening; returns a function that stops. */
 export function installChunkReload(target: ReloadTarget = window, now: () => number = Date.now) {
-  const current: Listening = { target, now, loadFailures: new WeakSet(), deadStylesheets: new Map() }
+  const current: Listening = {
+    target,
+    now,
+    loadFailures: new WeakSet(),
+    stylesheetFailures: new WeakMap(),
+    deadStylesheets: new Map(),
+  }
   const onPreloadError = (event: Event) => {
     // Never prevented: Vite then rejects the import as usual, and whoever
     // asked for the module decides what its failure means.
@@ -102,9 +122,9 @@ export function installChunkReload(target: ReloadTarget = window, now: () => num
     if (typeof payload !== 'object' || payload === null) return
     current.loadFailures.add(payload)
     const stylesheet = payload instanceof Error ? STYLESHEET_FAILURE.exec(payload.message)?.[1] : undefined
-    if (stylesheet !== undefined && !current.deadStylesheets.has(stylesheet)) {
-      current.deadStylesheets.set(stylesheet, null)
-    }
+    if (stylesheet === undefined) return
+    current.stylesheetFailures.set(payload, stylesheet)
+    if (!current.deadStylesheets.has(stylesheet)) current.deadStylesheets.set(stylesheet, null)
   }
   listening = current
   target.addEventListener('vite:preloadError', onPreloadError)
@@ -120,6 +140,15 @@ export function installChunkReload(target: ReloadTarget = window, now: () => num
  */
 export function isLoadFailure(error: unknown): boolean {
   return listening !== null && typeof error === 'object' && error !== null && listening.loadFailures.has(error)
+}
+
+/**
+ * The stylesheet a load failure is about, if it is one: Vite's, or one that
+ * failed again as it was put back (`restoreFailedStylesheets`).
+ */
+export function stylesheetIn(error: unknown): string | null {
+  if (listening === null || typeof error !== 'object' || error === null) return null
+  return listening.stylesheetFailures.get(error) ?? null
 }
 
 /** What became of a page whose module failed to load. */
@@ -138,7 +167,9 @@ export type FailedPageOutcome =
  * for. A page that failed after the reader went somewhere else reloads
  * nothing: the reload would throw away the page they are on now (#447). While
  * the browser is offline the page waits for it to come back, and is judged
- * then: reloaded offline, the tab only showed the browser's offline page.
+ * then: reloaded offline, the tab only showed the browser's offline page. It
+ * waits OFFLINE_WAIT_MS at most, then shows its error; the tab still reloads
+ * if the connection comes back while the reader is at that address.
  *
  * An error Vite did not announce (the dev server, a test) is left to the page's
  * error boundary, and so is one that is our own reload's failure again.
@@ -146,24 +177,55 @@ export type FailedPageOutcome =
 export async function reloadForFailedPage(error: unknown, askedAt?: string): Promise<FailedPageOutcome> {
   const current = listening
   if (current === null || !isLoadFailure(error)) return 'failed'
-  const { target, now } = current
   for (;;) {
-    if (withinOurReload(target, now())) return 'failed'
-    if (askedAt !== undefined && target.location.pathname !== askedAt) return 'left'
-    if (target.navigator?.onLine !== false) break
-    await nextOnline(target)
+    const verdict = judge(current, askedAt)
+    if (verdict !== 'offline') return verdict === 'reload' ? reloadNow(current) : verdict
+    const cameBack = await onlineWithin(current.target, OFFLINE_WAIT_MS)
     if (listening !== current) return 'failed'
+    if (!cameBack) {
+      void nextOnline(current.target).then(() => {
+        if (listening === current && judge(current, askedAt) === 'reload') reloadNow(current)
+      })
+      return 'failed'
+    }
   }
-  const at = now()
+}
+
+/** What the reload rules say for a failed page, now. */
+function judge(current: Listening, askedAt: string | undefined): 'failed' | 'left' | 'offline' | 'reload' {
+  const { target, now } = current
+  // First, so the document our reload made never reloads, offline or not.
+  if (withinOurReload(target, now())) return 'failed'
+  if (askedAt !== undefined && target.location.pathname !== askedAt) return 'left'
+  if (target.navigator?.onLine === false) return 'offline'
+  return 'reload'
+}
+
+function reloadNow(current: Listening): 'reloading' | 'failed' {
   // Without a record of this reload the next failure could not tell it was
   // the same one, so with blocked storage nothing reloads at all.
-  if (!rememberReload(target, at)) return 'failed'
-  target.location.reload()
+  if (!rememberReload(current.target, current.now())) return 'failed'
+  current.target.location.reload()
   return 'reloading'
 }
 
 function nextOnline(target: ReloadTarget): Promise<void> {
   return new Promise((resolve) => target.addEventListener('online', () => resolve(), { once: true }))
+}
+
+/** Whether the browser says it is online again within `ms`. */
+function onlineWithin(target: ReloadTarget, ms: number): Promise<boolean> {
+  return new Promise((resolve) => {
+    const onOnline = () => {
+      window.clearTimeout(timer)
+      resolve(true)
+    }
+    const timer = window.setTimeout(() => {
+      target.removeEventListener('online', onOnline)
+      resolve(false)
+    }, ms)
+    target.addEventListener('online', onOnline, { once: true })
+  })
 }
 
 /**
@@ -195,9 +257,13 @@ export function justReloadedForFailedPage(): boolean {
   return typeof window !== 'undefined' && withinOurReload(window, Date.now())
 }
 
+/** A stylesheet that failed again as it was put back, with the load failure that says so. */
+export type StylesheetFailure = { href: string; error: Error }
+
 /**
- * Brings back the stylesheets Vite could not load in this document; resolves
- * once each is in, and rejects, with a load failure, if one fails again.
+ * Puts back the stylesheets Vite could not load in this document. Resolves --
+ * never rejects -- with those that failed again, once each has come or failed,
+ * or after STYLESHEET_WAIT_MS.
  *
  * Vite asks for a stylesheet only the first time a page needs it in a
  * document. After a failure the next page that shares it -- the map, a
@@ -206,19 +272,26 @@ export function justReloadedForFailedPage(): boolean {
  * before a page is shown, each dead `<link>` is replaced by a new one for the
  * same address, and the page waits for it. Every page waits, not only those
  * that need the stylesheet: which page needs which is known only to the build.
+ * For the same reason a stylesheet that fails again fails only a page whose
+ * own load failed on it (`lazyPage.ts`): any other page is shown without it,
+ * and one that stalls holds a page up only so long (#447 audit).
  */
-export function restoreFailedStylesheets(): Promise<void> {
+export function restoreFailedStylesheets(): Promise<StylesheetFailure[]> {
   const current = listening
-  if (current === null || current.deadStylesheets.size === 0) return Promise.resolve()
-  return Promise.all([...current.deadStylesheets.keys()].map((href) => restoreStylesheet(current, href))).then(
-    () => undefined,
+  if (current === null || current.deadStylesheets.size === 0) return Promise.resolve([])
+  const outcomes = [...current.deadStylesheets.keys()].map((href) =>
+    Promise.race([
+      restoreStylesheet(current, href),
+      new Promise<null>((resolve) => window.setTimeout(() => resolve(null), STYLESHEET_WAIT_MS)),
+    ]),
   )
+  return Promise.all(outcomes).then((all) => all.filter((outcome): outcome is StylesheetFailure => outcome !== null))
 }
 
-function restoreStylesheet(current: Listening, href: string): Promise<void> {
+function restoreStylesheet(current: Listening, href: string): Promise<StylesheetFailure | null> {
   const pending = current.deadStylesheets.get(href)
   if (pending) return pending
-  const restored = new Promise<void>((resolve, reject) => {
+  const restored = new Promise<StylesheetFailure | null>((resolve) => {
     const fresh = document.createElement('link')
     fresh.rel = 'stylesheet'
     // As Vite's own <link>, so the request is the same.
@@ -226,14 +299,15 @@ function restoreStylesheet(current: Listening, href: string): Promise<void> {
     fresh.href = href
     fresh.addEventListener('load', () => {
       current.deadStylesheets.delete(href)
-      resolve()
+      resolve(null)
     })
     fresh.addEventListener('error', () => {
       // Dead again; the next page asks again.
       current.deadStylesheets.set(href, null)
       const error = new Error(`Unable to load the stylesheet ${href} again`)
       current.loadFailures.add(error)
-      reject(error)
+      current.stylesheetFailures.set(error, href)
+      resolve({ href, error })
     })
     const dead = [...document.querySelectorAll<HTMLLinkElement>('link[rel="stylesheet"]')].find(
       (link) => link.getAttribute('href') === href,

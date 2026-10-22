@@ -1,5 +1,5 @@
 import { createElement, lazy, type ComponentType } from 'react'
-import { reloadForFailedPage, restoreFailedStylesheets } from '@/app/chunkReload'
+import { reloadForFailedPage, restoreFailedStylesheets, stylesheetIn } from '@/app/chunkReload'
 
 /* The props a page receives from the route manifest: whatever its entry lists
  * under `props`, plus the entry's `titleKey` when it has one. */
@@ -47,8 +47,9 @@ function reloadThatNeverCame(error: unknown): Promise<never> {
  * this. A page never retries by itself while it is shown: React renders a
  * failed component once more before it gives up, and a page that started a
  * new load there would fetch again and again for as long as the network
- * stayed down. (A page that failed after the reader left it is not shown, and
- * starts afresh at once.)
+ * stayed down. (A page that failed after the reader left its address starts
+ * afresh at once. If it is shown again meanwhile, at another address of its
+ * own -- `/map/:subjectId` -- that new load is judged there.)
  */
 export function retryFailedPageLoads() {
   for (const reset of [...failedLoads]) reset()
@@ -80,13 +81,23 @@ export function lazyPage<Name extends string>(
   // The address the current load was asked for at: a page that fails after
   // the reader went elsewhere does not reload the page they are on (#447).
   let askedAt: string | undefined
+  // The stylesheets this page's own loads failed on. One that fails again as
+  // it is put back fails this page too; any other page is shown without it,
+  // as it may well not use it (#447 audit).
+  const ownStylesheets = new Set<string>()
   const loadPage = () => {
     if (!loading) {
       askedAt = window.location.pathname
       loading = load()
         // A stylesheet that failed for another page may be this page's too,
         // and Vite will not ask for it again (chunkReload.ts).
-        .then((module) => restoreFailedStylesheets().then(() => module))
+        .then((module) =>
+          restoreFailedStylesheets().then((failures) => {
+            const own = failures.find((failure) => ownStylesheets.has(failure.href))
+            if (own) throw own.error
+            return module
+          }),
+        )
         .then((module) => {
           loaded = module[pageName]
           return module
@@ -100,8 +111,8 @@ export function lazyPage<Name extends string>(
       loading = undefined
       current = attempt()
     }
-    // Not shown, so nothing renders it again and again: the next time it is
-    // shown, it loads afresh.
+    // The reader left its address, so nothing renders it again and again;
+    // shown again, it loads afresh and is judged where it is shown then.
     if (left) reset()
     else failedLoads.add(reset)
     throw error
@@ -116,12 +127,15 @@ export function lazyPage<Name extends string>(
         // network first. A reload that never comes -- the reader chose to stay
         // on a "Leave site?" prompt -- is a failure after all, so the page
         // shows its error instead of loading for good.
-        (error: unknown) =>
-          reloadForFailedPage(error, askedAt).then((outcome) =>
+        (error: unknown) => {
+          const stylesheet = stylesheetIn(error)
+          if (stylesheet !== null) ownStylesheets.add(stylesheet)
+          return reloadForFailedPage(error, askedAt).then((outcome) =>
             outcome === 'reloading'
               ? reloadThatNeverCame(error).catch((late: unknown) => failed(late))
               : failed(error, outcome === 'left'),
-          ),
+          )
+        },
       ),
     )
   let current = attempt()

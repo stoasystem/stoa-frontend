@@ -7,8 +7,10 @@
  * - KaTeX's file is asked for again under a new address, so the next formula
  *   is typeset.
  * - A stylesheet Vite could not load is put back before the next page is shown.
+ *   Failing again, it fails only a page whose own load failed on it.
  * - A page that fails after the reader went elsewhere reloads nothing, and
- *   loads afresh when it is shown again; offline, it waits for the connection.
+ *   loads afresh when it is shown again; offline, it waits for the connection,
+ *   for a while.
  *
  * Chromium's side of it (a failed import kept for the document, Vite's
  * stylesheet `seen` map) is in tests/e2e-dist/chunkFailure.spec.ts.
@@ -18,7 +20,14 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { Suspense, type ReactNode } from 'react'
 import { MemoryRouter } from 'react-router-dom'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { CHUNK_RELOAD_KEY, installChunkReload, reloadForFailedPage, restoreFailedStylesheets } from '@/app/chunkReload'
+import {
+  CHUNK_RELOAD_KEY,
+  installChunkReload,
+  OFFLINE_WAIT_MS,
+  reloadForFailedPage,
+  restoreFailedStylesheets,
+  STYLESHEET_WAIT_MS,
+} from '@/app/chunkReload'
 import { lazyPage, RELOAD_GRACE_MS, type PageComponent } from '@/app/router/lazyPage'
 import { PageErrorBoundary } from '@/components/common/AppErrorBoundary'
 import i18n from '@/i18n'
@@ -200,6 +209,22 @@ describe("KaTeX's file after a failed load", () => {
     expect(katexLoads()).toEqual([expect.stringMatching(/\/tests\/component\/fixtures\/katexLoader-447\.ts$/)])
   })
 
+  it('is the only file asked for again: another file of ours named in the message is not', async () => {
+    const { MathRenderer, counter } = await mathRendererWhoseImportFails(
+      `Failed to fetch dynamically imported module: ${window.location.origin}/assets/index-abc123.js`,
+    )
+
+    const first = render(<MathRenderer>{'area is $x^2$'}</MathRenderer>)
+    await waitFor(() => expect(counter.plain).toBe(1))
+    await settle()
+    first.unmount()
+    render(<MathRenderer>{'then $y^3$'}</MathRenderer>)
+    // The same address again: a shared file asked for under a new one would
+    // run a second copy of it.
+    await waitFor(() => expect(counter.plain).toBe(2))
+    expect(katexLoads()).toEqual([])
+  })
+
   it('is never asked for at an address on another site, whatever the message says', async () => {
     const { MathRenderer, counter } = await mathRendererWhoseImportFails(
       'Failed to fetch dynamically imported module: https://elsewhere.example/assets/katexLoader-abc123.js',
@@ -219,61 +244,126 @@ describe("KaTeX's file after a failed load", () => {
 describe('a stylesheet Vite could not load', () => {
   const STYLESHEET = '/assets/Shared-abc123.css'
 
+  function stylesheetLink(href: string) {
+    const link = document.createElement('link')
+    link.rel = 'stylesheet'
+    link.href = href
+    document.head.append(link)
+    return link
+  }
+
   /** As Vite leaves it: its <link> in the head, and the failure announced for the page that needed it. */
   function stylesheetFailed() {
-    const dead = document.createElement('link')
-    dead.rel = 'stylesheet'
-    dead.href = STYLESHEET
-    document.head.append(dead)
+    const dead = stylesheetLink(STYLESHEET)
     void failLikeVite(new Error(`Unable to preload CSS for ${STYLESHEET}`)).catch(() => {})
     return dead
   }
 
-  const linksTo = (href: string) =>
-    [...document.head.querySelectorAll<HTMLLinkElement>('link[rel="stylesheet"]')].filter(
-      (link) => link.getAttribute('href') === href,
-    )
+  const stylesheets = () => [...document.head.querySelectorAll<HTMLLinkElement>('link[rel="stylesheet"]')]
+  const linksTo = (href: string) => stylesheets().filter((link) => link.getAttribute('href') === href)
 
-  it('is put back before the next page is shown, and the page waits for it', async () => {
+  function showPage(page: ReactNode) {
+    return render(<Suspense fallback={<p>loading</p>}>{page}</Suspense>)
+  }
+
+  it('is put back before the next page is shown, in its place, and the page waits for it', async () => {
     const dead = stylesheetFailed()
-    render(
-      <Suspense fallback={<p>loading</p>}>
-        {createPage(loads())}
-      </Suspense>,
-    )
+    const later = stylesheetLink('/assets/Later-def456.css')
+    showPage(createPage(loads()))
     await settle()
     expect(screen.getByText('loading')).toBeInTheDocument()
-    // A new <link> in the dead one's place.
+    // A new <link> in the dead one's place, asked for as Vite asks.
     expect(dead.isConnected).toBe(false)
     const [fresh] = linksTo(STYLESHEET)
-    expect(linksTo(STYLESHEET)).toHaveLength(1)
+    expect(stylesheets()).toEqual([fresh, later])
+    expect(fresh.getAttribute('crossorigin')).toBe('')
 
     fireEvent.load(fresh)
     expect(await screen.findByText('page loaded')).toBeInTheDocument()
 
     // Back, so the next page does not wait.
-    await expect(restoreFailedStylesheets()).resolves.toBeUndefined()
-    expect(linksTo(STYLESHEET)).toEqual([fresh])
+    await expect(restoreFailedStylesheets()).resolves.toEqual([])
+    expect(stylesheets()).toEqual([fresh, later])
   })
 
-  it('that fails again fails the page as a load failure, which reloads the tab', async () => {
+  it('that fails again holds back no page that never failed on it, and the next page asks again', async () => {
     stylesheetFailed()
-    render(
-      <Suspense fallback={<p>loading</p>}>
-        {createPage(loads())}
-      </Suspense>,
-    )
+    showPage(createPage(loads()))
     await settle()
+    const [first] = linksTo(STYLESHEET)
+    fireEvent.error(first)
+    // Shown without it: a page that never failed on it may well not use it.
+    expect(await screen.findByText('page loaded')).toBeInTheDocument()
+    expect(reload).not.toHaveBeenCalled()
+
+    showPage(createPage(loads()))
+    await settle()
+    const [second] = linksTo(STYLESHEET)
+    expect(second).not.toBe(first)
+    expect(linksTo(STYLESHEET)).toHaveLength(1)
+    expect(screen.getAllByText('page loaded')).toHaveLength(1)
+    fireEvent.load(second)
+    await waitFor(() => expect(screen.getAllByText('page loaded')).toHaveLength(2))
+  })
+
+  it('that fails again fails the page whose own load failed on it, which reloads the tab', async () => {
+    window.history.pushState({}, '', '/lesson')
+    let failFirst = () => {}
+    let calls = 0
+    const load = vi.fn(() => {
+      calls += 1
+      if (calls > 1) return loads()()
+      return new Promise<never>((_, reject) => {
+        failFirst = () => {
+          stylesheetLink(STYLESHEET)
+          void failLikeVite(new Error(`Unable to preload CSS for ${STYLESHEET}`)).catch(reject)
+        }
+      })
+    })
+    const Page = lazyPage('Page', load)
+    const before = showPage(<Page />)
+    await settle()
+    // Its stylesheet fails after the reader went on, so nothing reloads then.
+    window.history.pushState({}, '', '/elsewhere')
+    before.unmount()
+    failFirst()
+    await settle()
+    expect(reload).not.toHaveBeenCalled()
+
+    window.history.pushState({}, '', '/lesson')
+    showPage(<Page />)
+    await settle()
+    expect(load).toHaveBeenCalledTimes(2)
     fireEvent.error(linksTo(STYLESHEET)[0])
     await settle()
     expect(reload).toHaveBeenCalledTimes(1)
     expect(screen.getByText('loading')).toBeInTheDocument()
   })
 
+  it(`that stalls holds a page up for ${STYLESHEET_WAIT_MS} ms at most`, async () => {
+    stylesheetFailed()
+    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] })
+    try {
+      showPage(createPage(loads()))
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(STYLESHEET_WAIT_MS - 1)
+      })
+      expect(screen.getByText('loading')).toBeInTheDocument()
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(1)
+      })
+    } finally {
+      vi.useRealTimers()
+    }
+    expect(await screen.findByText('page loaded')).toBeInTheDocument()
+    // Still on its way: it styles the page if it comes.
+    expect(linksTo(STYLESHEET)).toHaveLength(1)
+  })
+
   it('is the only kind that is put back: a module that failed holds no page up', async () => {
     void failLikeVite(chunkError()).catch(() => {})
-    await expect(restoreFailedStylesheets()).resolves.toBeUndefined()
-    expect(document.head.querySelectorAll('link[rel="stylesheet"]')).toHaveLength(0)
+    await expect(restoreFailedStylesheets()).resolves.toEqual([])
+    expect(stylesheets()).toHaveLength(0)
   })
 })
 
@@ -333,6 +423,50 @@ describe('a page that fails, and where the reader is', () => {
     await settle()
 
     // As the router does: another address, another page.
+    window.history.pushState({}, '', '/elsewhere')
+    view.unmount()
+    act(() => backOnline())
+    await settle()
+    expect(reload).not.toHaveBeenCalled()
+  })
+
+  /** Offline for good, or so the browser says: the page waits OFFLINE_WAIT_MS, then shows its error. */
+  async function waitedOffline(load: () => Promise<Record<string, PageComponent>>) {
+    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] })
+    try {
+      const view = render(asPage(createPage(load)))
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(OFFLINE_WAIT_MS - 1)
+      })
+      expect(screen.getByText('loading')).toBeInTheDocument()
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(1)
+      })
+      return view
+    } finally {
+      vi.useRealTimers()
+    }
+  }
+
+  it('offline for longer than it waits, shows its error, and reloads when the connection comes back while the reader is there', async () => {
+    window.history.pushState({}, '', '/lesson')
+    const backOnline = goOffline()
+    await waitedOffline(() => failLikeVite(chunkError()) as Promise<never>)
+    const alert = await screen.findByRole('alert')
+    expect(within(alert).getByRole('button', { name: 'Reload page' })).toBeInTheDocument()
+    expect(reload).not.toHaveBeenCalled()
+
+    act(() => backOnline())
+    await settle()
+    expect(reload).toHaveBeenCalledTimes(1)
+  })
+
+  it('offline for longer than it waits, reloads nothing when the connection comes back after the reader left', async () => {
+    window.history.pushState({}, '', '/lesson')
+    const backOnline = goOffline()
+    const view = await waitedOffline(() => failLikeVite(chunkError()) as Promise<never>)
+    await screen.findByRole('alert')
+
     window.history.pushState({}, '', '/elsewhere')
     view.unmount()
     act(() => backOnline())

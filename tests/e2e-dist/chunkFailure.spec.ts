@@ -39,8 +39,12 @@ async function refuse(page: Page, chunk: string, blocked: () => boolean) {
   return refused
 }
 
-/** Holds the first request for a file until `release()`, then fails it, as a connection that timed out. */
-async function holdThenFail(page: Page, file: string | ((url: URL) => boolean)) {
+/**
+ * Holds the first request for a file until `release()`, then fails it, as a
+ * connection that timed out. Later requests are served, or with `refuseLater`
+ * refused too.
+ */
+async function holdThenFail(page: Page, file: string | ((url: URL) => boolean), { refuseLater = false } = {}) {
   let release = () => {}
   const released = new Promise<void>((resolve) => (release = resolve))
   let asked = () => {}
@@ -48,7 +52,7 @@ async function holdThenFail(page: Page, file: string | ((url: URL) => boolean)) 
   let requests = 0
   await page.route(file, async (route) => {
     requests += 1
-    if (requests > 1) return route.fallback()
+    if (requests > 1) return refuseLater ? route.abort('internetdisconnected') : route.fallback()
     asked()
     await released
     return route.abort('timedout')
@@ -357,4 +361,58 @@ test('a stylesheet that failed in the document the reload made is put back for t
   // Placed by the stylesheet; unstyled, a star's link sits in the flow.
   await expect(page.locator('.starmap-link').first()).toHaveCSS('position', 'absolute')
   expect(documents()).toBe(2)
+})
+
+// Which page needs which stylesheet only the build knows, so every page waits
+// for one being put back; failing again, it fails only a page whose own load
+// failed on it (#447 audit). Privacy never needed the map's.
+test('a stylesheet that fails again holds back no page that never failed on it', async ({ page, backend }) => {
+  await onHelp(page, backend)
+  const documents = documentLoads(page)
+  const mark = await markDocument(page)
+  const stylesheet = await holdThenFail(page, '**/assets/PlanetScreen-*.css', { refuseLater: true })
+
+  await page.getByRole('link', { name: 'STOA home' }).click()
+  await stylesheet.askedFor
+  await page.goBack()
+  await expect(page).toHaveURL('/support')
+  const failed = page.waitForEvent('requestfailed', (request) => /\/assets\/PlanetScreen-/.test(request.url()))
+  stylesheet.release()
+  await failed
+
+  // No link leads to Privacy from Help, so the address is changed as a link would.
+  await page.evaluate("history.pushState({}, '', '/privacy'); dispatchEvent(new PopStateEvent('popstate'))")
+  await expect(page.getByRole('heading', { name: 'Privacy Policy' })).toBeVisible()
+  expect(stylesheet.requests(), 'the stylesheet, asked for again before Privacy').toBe(2)
+  // Long enough for a reload to have started, had one been coming.
+  await page.waitForTimeout(2_000)
+  expect(documents()).toBe(0)
+  expect(await mark()).toBe('kept')
+  await expect(page.getByRole('alert')).toHaveCount(0)
+})
+
+// `navigator.onLine` can read false while the network works (some VPN
+// adapters and Linux setups); no `online` event then ever comes (#447 audit).
+test("a browser that wrongly says it is offline shows the page's error after a while, and the reload brings the page", async ({
+  page,
+  backend,
+}) => {
+  new StudentWorld(backend).install()
+  await signInAsStudent(page)
+  await page.addInitScript("Object.defineProperty(Navigator.prototype, 'onLine', { get: () => false })")
+  await page.goto('/support')
+  await expect(page.getByRole('link', { name: 'STOA home' })).toBeVisible()
+  await page.waitForLoadState('networkidle')
+  const documents = documentLoads(page)
+  let failures = 1
+  await refuse(page, 'MapPages', () => failures-- > 0)
+
+  await page.getByRole('link', { name: 'STOA home' }).click()
+  const alert = page.getByRole('alert')
+  await expect(alert.getByText('This page could not be shown')).toBeVisible({ timeout: 20_000 })
+  expect(documents(), 'documents loaded while the page waited').toBe(0)
+
+  await alert.getByRole('button', { name: 'Reload page' }).click()
+  await expect(page.getByRole('heading', MAP_HEADING)).toBeVisible()
+  expect(documents()).toBe(1)
 })
