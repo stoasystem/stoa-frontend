@@ -3,16 +3,19 @@
  * bar and its navigation as in the app, with a heading that names the export it
  * would have loaded and a few links of its own. Some pages differ the way real
  * ones do: one has no heading, one puts focus on its own field, one is still
- * loading when it is chosen, and the map and Ask keep one page across their
- * paths. Kept apart from the test, which imports the router that imports this.
+ * loading when it is chosen, the account page scrolls to its password section,
+ * the sign-in page sends a signed-in account home, and the map and Ask keep
+ * one page across their paths. Kept apart from the test, which imports the
+ * router that imports this.
  *
  * The layouts import the route manifest, which imports this module while it
  * is being mocked: a static import here would wait on itself. They are loaded
  * apart instead, and the test waits for `shellReady` before it renders. */
 import { lazy, useEffect, useRef, type ComponentType, type ReactNode } from 'react'
-import { Link, useNavigate, useParams } from 'react-router-dom'
+import { Link, Navigate, useLocation, useNavigate, useParams } from 'react-router-dom'
 import { PageHeader } from '@/components/common/PageHeader'
 import type { AppSurface } from '@/layouts/AppLayout'
+import { useAuthStore } from '@/store/authStore'
 
 type Shell = {
   AppLayout: (props: { children: ReactNode; surface?: AppSurface; bleed?: boolean }) => ReactNode
@@ -76,6 +79,7 @@ function PageLinks() {
       <Link to="/teacher">Teacher home</Link>
       <Link to="/map/s1">Star map</Link>
       <Link to="/me">My account</Link>
+      <Link to="/me#password">Change password</Link>
       <button type="button" onClick={() => navigate(-1)}>
         Back
       </button>
@@ -93,6 +97,34 @@ function FocusedField() {
     if (document.activeElement === document.body) field.current?.focus()
   }, [])
   return <input ref={field} aria-label="The page's own field" />
+}
+
+/** Scrolls to its password section and focuses its heading when the address names it, as MePage does. */
+function PasswordSection() {
+  const { hash } = useLocation()
+  const heading = useRef<HTMLHeadingElement>(null)
+  useEffect(() => {
+    if (hash !== '#password') return
+    window.scrollTo(0, 640)
+    heading.current?.focus({ preventScroll: true })
+  }, [hash])
+  return (
+    <h2 ref={heading} tabIndex={-1}>
+      Password
+    </h2>
+  )
+}
+
+/** Sends a signed-in account on to its home at once, as EntryPage does. */
+function EntryStub() {
+  const user = useAuthStore((state) => (state.isAuthenticated ? state.user : null))
+  if (user) return <Navigate replace to={user.role === 'student' ? '/' : `/${user.role}`} />
+  return (
+    <DashboardLayout>
+      <PageHeader title="EntryPage" />
+      <PageLinks />
+    </DashboardLayout>
+  )
 }
 
 /** One page for every map path, as in the app; choosing the nebula takes its link away. */
@@ -150,6 +182,16 @@ function Page({ pageName }: { pageName: string }) {
       )
     case 'LearningAutomationConsolePage':
       return <SlowPage pageName={pageName} />
+    case 'MePage':
+      return (
+        <DashboardLayout>
+          <PageHeader title={pageName} />
+          <PageLinks />
+          <PasswordSection />
+        </DashboardLayout>
+      )
+    case 'EntryPage':
+      return <EntryStub />
     case 'MapHomePage':
     case 'MapPage':
       return <MapStub pageName={pageName} />

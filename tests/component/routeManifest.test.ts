@@ -136,6 +136,7 @@ describe('askPathFor', () => {
 describe('the translation keys the manifest names', () => {
   const keys = [
     ...pageRoutes.flatMap((route) => (route.titleKey ? [route.titleKey] : [])),
+    ...pageRoutes.flatMap((route) => (route.refusedTitleKey ? [route.refusedTitleKey] : [])),
     ...navItems.flatMap((item) => (item.labelKey ? [item.labelKey] : [])),
   ]
 
@@ -146,6 +147,12 @@ describe('the translation keys the manifest names', () => {
   it.each(LOCALES)('exist in %s', (locale) => {
     const missing = keys.filter((key) => typeof lookup(common[locale], key) !== 'string')
     expect(missing).toEqual([])
+  })
+
+  it('name the page a route shows to those it refuses (#448)', () => {
+    // `/` showed its sign-in page with no title of its own.
+    const unnamed = pageRoutes.filter((route) => route.refusedPage && !route.refusedTitleKey).map((route) => route.path)
+    expect(unnamed).toEqual([])
   })
 
   it('give every new student page a title', () => {

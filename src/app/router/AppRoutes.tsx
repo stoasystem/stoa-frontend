@@ -120,14 +120,35 @@ function RoleScopedRedirect({
  * the sign-in page until /auth/me answered, and the refused page's one-time
  * reads of the tab (the account choice, how the last session ended) were
  * made for a visitor who was not there.
+ *
+ * The refused page is named only to a visitor who is not signed in, the one
+ * it shows the sign-in page to (#448). A signed-in visitor it is not for is
+ * sent straight on to their own home: a name reported on the way would put
+ * "Sign in" in the title bar for a moment, and end the first load before any
+ * page was shown, so the redirect would be announced as the reader's move
+ * (#406).
  */
-function RefusedPageSwitch({ access, refused }: { access: RouteAccess; refused: ReactNode }) {
+function RefusedPageSwitch({
+  access,
+  refused,
+  refusedTitleKey,
+}: {
+  access: RouteAccess
+  refused: ReactNode
+  refusedTitleKey?: string
+}) {
   const user = useAuthStore((state) => state.user)
   const accessToken = useAuthStore((state) => state.accessToken)
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
 
   if (access.kind === 'roles' && !user && accessToken) return <AccountLoadStatus />
-  return isAdmitted(access, user, isAuthenticated) ? <Outlet /> : refused
+  if (isAdmitted(access, user, isAuthenticated)) return <Outlet />
+  return (
+    <>
+      {refusedTitleKey && !isAuthenticated && <PageTitle titleKey={refusedTitleKey} />}
+      {refused}
+    </>
+  )
 }
 
 /**
@@ -234,6 +255,7 @@ export function buildRoutes(
                   <Refused />
                 </PageErrorBoundary>
               }
+              refusedTitleKey={route.refusedTitleKey}
             />
           }
           key={`refused:${route.path}`}
