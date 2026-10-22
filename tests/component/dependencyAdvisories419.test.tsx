@@ -7,6 +7,11 @@
  * in the lock. This pins the floors the ticket set, offline: axios 1.20.0, and
  * react-router with react-router-dom on one version, 7.18.2 or later.
  *
+ * #454: react-router-dom is written down exactly, 7.18.4, not as a range. A
+ * range let a regenerated lock move the router on unseen, and 7.18.3 changed
+ * what `navigate()` does with a target off the site (navigationTargets454).
+ * react-router-dom names its react-router exactly, so the pair moves together.
+ *
  * `--omit=dev` audits `dependencies` and what they pull in. Vite bundles
  * whatever src imports, wherever package.json lists it, so a browser package
  * moved to `devDependencies` would drop out of the audit unseen. Every package
@@ -17,11 +22,13 @@
  * Then the router's backslash fix (GHSA-wrjc-x8rr-h8h6, in 7.18.0). To a
  * browser `/\evil.example` is `//evil.example`, another host. Before the fix
  * `navigate()` kept the backslash, `pushState` refused the other origin, and
- * the router fell back to `location.assign`: off the site. Now `navigate()`
- * and `<Navigate>` collapse the slashes into a path here. `<Link>` instead
- * treats such a `to` as an external URL and leaves the site on a click, so a
- * `to` built from input still goes through `URL` first (`resolveDestination`
- * in authRoutes); every `to` in src today is a literal or starts with one.
+ * the router fell back to `location.assign`: off the site. 7.18.0 to 7.18.2
+ * collapsed the slashes into a path here; from 7.18.3 `navigate()` and
+ * `<Navigate>` read the target as the browser would and refuse it (#454).
+ * `<Link>` instead treats such a `to` as an external URL and leaves the site
+ * on a click, so a `to` built from input still goes through `URL` first
+ * (`resolveDestination` in authRoutes). Every `to` in src today is a literal,
+ * starts with one, or comes through such a check (navigationTargets454).
  */
 import { readdirSync, readFileSync } from 'node:fs'
 import path from 'node:path'
@@ -34,11 +41,14 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 const ROOT = path.resolve(__dirname, '../..')
 const LOCK = path.join(ROOT, 'package-lock.json')
 
-type LockEntry = { version?: string }
+type LockEntry = { version?: string; resolved?: string; dependencies?: Record<string, string> }
+type Lock = { packages: Record<string, LockEntry> }
+
+const readLock = () => JSON.parse(readFileSync(LOCK, 'utf8')) as Lock
 
 /** Every copy of `name` the lock installs, nested ones included. */
 function lockedVersions(name: string): string[] {
-  const lock = JSON.parse(readFileSync(LOCK, 'utf8')) as { packages: Record<string, LockEntry> }
+  const lock = readLock()
   return Object.entries(lock.packages)
     .filter(([key]) => key === `node_modules/${name}` || key.endsWith(`/node_modules/${name}`))
     .map(([, entry]) => entry.version ?? '')
@@ -75,6 +85,40 @@ describe('#419: the lock carries the versions the audit cleared', () => {
     expect(dom).toHaveLength(1)
     expect(dom).toEqual(router)
     expect(atLeast(router[0], '7.18.2')).toBe(true)
+  })
+})
+
+/** A version written down exactly: no range, no tag, nothing a new lock could resolve differently. */
+const isExact = (spec: string) => /^\d+\.\d+\.\d+$/.test(spec)
+
+describe('#454: the router is written down exactly, not only in the lock', () => {
+  const manifest = JSON.parse(readFileSync(path.join(ROOT, 'package.json'), 'utf8')) as {
+    dependencies: Record<string, string>
+  }
+
+  it('tells an exact version from a range', () => {
+    // Negative control: each of these lets a regenerated lock take another release.
+    for (const range of ['^7.18.4', '~7.18.4', '>=7.18.4', '7.18.x', '7.18', '7.18.4 - 7.18.9', '7.18.4 || 7.18.5', '*', 'latest', '']) {
+      expect(isExact(range), range).toBe(false)
+    }
+    expect(isExact('7.18.4')).toBe(true)
+  })
+
+  // The lock, which `npm ci` installs exactly; a local node_modules that drifted is not read here.
+  it('pins react-router-dom, and react-router with it, to the version the lock installs', () => {
+    const spec = manifest.dependencies['react-router-dom']
+    expect(isExact(spec), `react-router-dom is "${spec}" in package.json`).toBe(true)
+    expect(atLeast(spec, '7.18.4')).toBe(true)
+    const lock = readLock()
+    expect(lock.packages[''].dependencies?.['react-router-dom']).toBe(spec)
+    expect(lockedVersions('react-router-dom')).toEqual([spec])
+    // react-router-dom names its react-router exactly, so the pair cannot part.
+    expect(lock.packages['node_modules/react-router-dom'].dependencies?.['react-router']).toBe(spec)
+    expect(lockedVersions('react-router')).toEqual([spec])
+    // From the registry, as published: not a tarball or a fork that only carries the number.
+    for (const name of ['react-router', 'react-router-dom']) {
+      expect(lock.packages[`node_modules/${name}`].resolved).toBe(`https://registry.npmjs.org/${name}/-/${name}-${spec}.tgz`)
+    }
   })
 })
 
@@ -173,19 +217,23 @@ describe('#419: the production audit counts every package the browser runs', () 
   })
 })
 
-function NavigateOnMount({ to }: { to: string }) {
+function NavigateOnMount({ to, onRefusal }: { to: string; onRefusal: (error: unknown) => void }) {
   const navigate = useNavigate()
   // Once: outside a data router `navigate` is a new function after each move.
   const sent = useRef(false)
   useEffect(() => {
     if (sent.current) return
     sent.current = true
-    navigate(to)
-  }, [navigate, to])
+    try {
+      navigate(to)
+    } catch (error) {
+      onRefusal(error)
+    }
+  }, [navigate, to, onRefusal])
   return null
 }
 
-describe('#419: navigate() keeps a backslash path on this site', () => {
+describe('#419: navigate() never hands the browser a backslash path', () => {
   afterEach(() => {
     vi.restoreAllMocks()
     window.history.replaceState(null, '', '/')
@@ -194,24 +242,27 @@ describe('#419: navigate() keeps a backslash path on this site', () => {
   // A slash and a backslash, a backslash and a slash, two backslashes: each
   // reads as `//evil.example` to the browser.
   it.each(['/\\evil.example/path', '\\/evil.example/path', '\\\\evil.example/path'])(
-    'treats %s as a path here',
+    'refuses %s and stays here',
     async (to) => {
       window.history.replaceState(null, '', '/start')
       const pushState = vi.spyOn(window.history, 'pushState')
+      let refusal: unknown = null
 
       await act(async () => {
         render(
           <BrowserRouter>
-            <NavigateOnMount to={to} />
+            <NavigateOnMount to={to} onRefusal={(error) => (refusal = error)} />
           </BrowserRouter>,
         )
       })
 
-      // What the router handed the browser: jsdom cannot leave the page, so
-      // the address alone would not show an attempt to.
-      const pushed = pushState.mock.calls.map(([, , url]) => new URL(String(url), window.location.href).href)
-      expect(pushed).toEqual([`${window.location.origin}/evil.example/path`])
-      expect(window.location.pathname).toBe('/evil.example/path')
+      // 7.18.2 handed the browser `<origin>/evil.example/path`; 7.18.3 and
+      // later refuse the target outright (#454). jsdom cannot leave the page,
+      // so the address alone would not show an attempt to: read what the
+      // router asked the browser for, which is nothing.
+      expect(refusal).toEqual(new Error('External navigation is not allowed'))
+      expect(pushState).not.toHaveBeenCalled()
+      expect(window.location.pathname).toBe('/start')
     },
   )
 })

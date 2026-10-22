@@ -87,7 +87,11 @@ async function advance(ms: number) {
 
 beforeEach(() => {
   vi.useFakeTimers()
-  listMock.mockResolvedValue({ items: [] })
+  // The list as the conversations are first read: a first read the list is
+  // behind on reads it again of its own (#452, askListFirstRead452).
+  listMock.mockResolvedValue({
+    items: ['c1', 'c2'].map((id) => ({ id, title: 'Linear equations', subject: 'math', grade: '8', updatedAt: '2026-10-20T10:00:00.000Z' })),
+  })
   progressMock.mockResolvedValue({ conversationId: 'c1', steps: [], updatedAt: '2026-10-20T10:00:00.000Z' })
 })
 

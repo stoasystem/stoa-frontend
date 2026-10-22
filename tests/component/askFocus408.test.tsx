@@ -16,7 +16,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { AskHost } from '@/features/ask/AskHost'
 import i18n from '@/i18n'
 import { ApiError } from '@/services/api/httpClient'
-import { createConversation, getConversations } from '@/services/chat/chatApi'
+import { createConversation, getConversation, getConversations } from '@/services/chat/chatApi'
 import { getGenerationProgress } from '@/services/chat/chatStreamApi'
 import { resetAsk, useAskStore } from '@/store/askStore'
 import { type CurrentUser, useAuthStore } from '@/store/authStore'
@@ -164,6 +164,23 @@ describe.each([
 
     expect(surface()).toHaveAttribute('data-ask-conversation', '')
     expect(row('c2')).toHaveFocus()
+  })
+})
+
+describe('the title the keyboard lands on, before the conversation is read (#452)', () => {
+  it('names the conversation as the list does, not “Ask”', async () => {
+    let read: (value: ReturnType<typeof created>) => void = () => {}
+    vi.mocked(getConversation).mockImplementationOnce(() => new Promise((resolve) => (read = resolve)))
+    show()
+    await panel().findByRole('button', { name: /Fractions/ })
+
+    await press(row('c2'))
+
+    expect(panel().getByRole('heading', { level: 2, name: 'Fractions' })).toHaveFocus()
+    expect(panel().getByText('Mathematics')).toBeInTheDocument()
+
+    await act(async () => read({ ...summary('c2', 'Fractions'), messages: [] }))
+    expect(panel().getByRole('heading', { level: 2, name: 'Fractions' })).toHaveFocus()
   })
 })
 

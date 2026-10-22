@@ -7,7 +7,7 @@ import {
   useTeacherHelpStatusQuery,
 } from '@/hooks/chat/useTeacherHelpStatusQuery'
 import { chatQueryKeys } from '@/services/chat/chatQueryKeys'
-import type { Conversation } from '@/types/chat'
+import type { Conversation, ConversationListResponse } from '@/types/chat'
 import type { TeacherHelpRequest } from '@/types/teacherHelp'
 
 /**
@@ -30,27 +30,42 @@ function lastMessageOf(conversation: Conversation | undefined): string | null | 
  * The list of conversations is read again when the open conversation's last
  * message or its help status changes, as read here: a teacher's reply that a
  * poll brought, an answer, help taken or ended (#405). Nothing else reads it
- * again while Ask stays open, so its preview, time and order went stale. The
- * first reading of a conversation is not a change.
+ * again while Ask stays open, so its preview, time and order went stale.
+ *
+ * The first reading of a conversation is not a change, but it can show the
+ * list is behind: a teacher who replied while the list sat unread (#452). So
+ * the list is read again when it has the conversation at another `updatedAt`,
+ * or not at all. A list still on its first read is not asked for twice:
+ * TanStack joins the read in flight.
  */
 function useListFollows(
   conversationId: string | null,
-  lastMessage: string | null | undefined,
+  conversation: Conversation | undefined,
   help: TeacherHelpRequest | null | undefined,
 ) {
   const queryClient = useQueryClient()
+  const lastMessage = lastMessageOf(conversation)
+  const updatedAt = conversation?.updatedAt
   const helpStatus = help === undefined ? undefined : (help?.status ?? null)
-  const seen = useRef({ conversationId, lastMessage, helpStatus })
+  const seen = useRef({ conversationId, lastMessage, updatedAt, helpStatus })
   useEffect(() => {
     const before = seen.current
-    seen.current = { conversationId, lastMessage, helpStatus }
+    seen.current = { conversationId, lastMessage, updatedAt, helpStatus }
     if (!conversationId || before.conversationId !== conversationId) return
     const changed = (now: string | null | undefined, then: string | null | undefined) =>
       now !== undefined && then !== undefined && now !== then
-    if (changed(lastMessage, before.lastMessage) || changed(helpStatus, before.helpStatus)) {
+    const listBehind = () =>
+      queryClient
+        .getQueryData<ConversationListResponse>(chatQueryKeys.conversations())
+        ?.items.find((item) => item.id === conversationId)?.updatedAt !== updatedAt
+    if (
+      changed(lastMessage, before.lastMessage) ||
+      changed(helpStatus, before.helpStatus) ||
+      (before.updatedAt === undefined && updatedAt !== undefined && listBehind())
+    ) {
       void queryClient.invalidateQueries({ queryKey: chatQueryKeys.conversations(), exact: true })
     }
-  }, [conversationId, helpStatus, lastMessage, queryClient])
+  }, [conversationId, helpStatus, lastMessage, queryClient, updatedAt])
 }
 
 /**
@@ -83,7 +98,7 @@ export function useAskConversation(conversationId: string | null) {
     lastStatus.current = status
     if (previous !== null && conversationId) void refetch()
   }, [conversationId, refetch, status])
-  useListFollows(conversationId, lastMessageOf(conversationQuery.data), helpQuery.data)
+  useListFollows(conversationId, conversationQuery.data, helpQuery.data)
   const streaming = useStreamingChat(conversationId)
   const serverMessages = conversationQuery.data?.messages
   const messages = useMemo(

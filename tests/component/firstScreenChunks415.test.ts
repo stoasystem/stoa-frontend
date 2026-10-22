@@ -1,18 +1,23 @@
 /*
- * The first screen carries no library that only a later page needs (#415).
+ * The first screen carries no library that only a later page needs (#415,
+ * #456).
  *
  * vite.config.ts names a chunk for each group of packages it keeps together
  * on purpose (React, the router and state, i18n, the UI kit, HTTP) and puts
  * every other installed package in one more, `vendor`. The first screen needs
- * `vendor` (TanStack Query's core is there), so whatever else lands in it
- * loads for every visitor as well: zod did, about 16 kB gzip that only the
- * sign-in form used, in a signed-in student's first screen too.
+ * every one of them, so whatever else lands in one loads for every visitor as
+ * well: zod did in `vendor`, about 16 kB gzip that only the sign-in form used,
+ * in a signed-in student's first screen too (#415); Radix's dialog, tabs and
+ * label in the UI kit's, and zustand's `persist` in the router and state's,
+ * about 3 kB gzip that only later pages use (#456).
  *
  * This builds the application with a report of what the first screen imports
- * (fixtures/firstScreen.vite.config.ts) and holds that no first-screen chunk
- * other than the named groups carries a package module the first screen never
- * imports. What goes into a named group is decided in vite.config.ts, so the
- * groups are left out here.
+ * (fixtures/firstScreen.vite.config.mjs) and holds that no first-screen chunk,
+ * named group or not, carries a package module the first screen never imports.
+ *
+ * What a package's index re-exports counts as imported wherever the index is
+ * (the fixture says why), so this does not see a later page's lucide-react
+ * icons in the UI kit's chunk.
  */
 import { execFileSync } from 'node:child_process'
 import { mkdtempSync, readFileSync, rmSync } from 'node:fs'
@@ -31,7 +36,6 @@ type FirstScreenChunk = {
 }
 
 const ROOT = path.resolve(__dirname, '../..')
-const NAMED_GROUPS = ['vendor-react', 'vendor-router-state', 'vendor-i18n', 'vendor-aws', 'vendor-ui', 'vendor-http']
 
 describe('the first screen of a production build', () => {
   const scratch = mkdtempSync(path.join(os.tmpdir(), 'stoa-first-screen-'))
@@ -70,9 +74,9 @@ describe('the first screen of a production build', () => {
     expect(chunk('katexLoader')?.notImported.some((module) => module.startsWith('katex/'))).toBe(true)
   })
 
-  it('carries no package module it never imports outside the named groups', () => {
+  it('carries no package module it never imports, in a named group or not', () => {
     const carried = report
-      .filter((candidate) => candidate.firstScreen && !NAMED_GROUPS.includes(candidate.name))
+      .filter((candidate) => candidate.firstScreen)
       .filter((candidate) => candidate.notImported.length > 0)
       .map(({ name, notImported }) => ({ chunk: name, notImported }))
     expect(carried).toEqual([])
