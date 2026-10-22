@@ -161,6 +161,7 @@
       "label": "File allegati",
       "remove": "Rimuovi {{name}}",
       "uploading": "Aggiunta in corso…",
+      "uploadingFile": "Aggiunta di {{name}} in corso…",
       "errors": {
         "tooMany": "Puoi inviare al massimo {{count}} file con una domanda.",
         "tooLarge": "Questo file è troppo grande. Le foto possono arrivare a {{imageLimit}}, gli altri file a {{fileLimit}}.",

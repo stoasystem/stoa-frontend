@@ -847,6 +847,7 @@
       },
       "liveVersion": "Attualmente online: {{version}}. Verrà sostituita. Se nel frattempo qualcuno ha pubblicato un’altra versione, la pubblicazione verrà rifiutata.",
       "noLiveVersion": "Nessuna versione di questa lezione è ancora online. Se nel frattempo qualcuno ne ha pubblicata una, la pubblicazione verrà rifiutata.",
+      "liveVersionReading": "Verifica della versione attualmente online…",
       "applySummary": "{{creates}} nuove, {{updates}} aggiornate, {{skips}} saltate.",
       "reason": "Motivo per il registro di audit",
       "cancel": "Annulla",

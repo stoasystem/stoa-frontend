@@ -255,7 +255,10 @@ export function AdminTeacherApplicationsPage() {
                   </div>
                 </>
               )}
-              <p ref={messageLine} tabIndex={-1} role="status" className="text-muted-foreground empty:hidden">
+              {/* In the accessibility tree while empty: a live region that
+                  appears with its text is not announced, and `empty:hidden`
+                  took this one out until then (#450). */}
+              <p ref={messageLine} tabIndex={-1} role="status" className={message ? 'text-muted-foreground' : 'sr-only'}>
                 {message}
               </p>
             </CardContent>

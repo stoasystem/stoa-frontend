@@ -161,6 +161,7 @@
       "label": "Fichiers joints",
       "remove": "Retirer {{name}}",
       "uploading": "Ajout en cours…",
+      "uploadingFile": "Ajout de {{name}} en cours…",
       "errors": {
         "tooMany": "Tu peux envoyer au maximum {{count}} fichiers avec une question.",
         "tooLarge": "Ce fichier est trop lourd. Les photos peuvent aller jusqu’à {{imageLimit}}, les autres fichiers jusqu’à {{fileLimit}}.",

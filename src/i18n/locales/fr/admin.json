@@ -847,6 +847,7 @@
       },
       "liveVersion": "Version en ligne : {{version}}. Elle sera remplacée. Si quelqu’un a publié une autre version entre-temps, la publication sera refusée.",
       "noLiveVersion": "Aucune version de cette leçon n’est encore en ligne. Si quelqu’un en a publié une entre-temps, la publication sera refusée.",
+      "liveVersionReading": "Vérification de la version actuellement en ligne…",
       "applySummary": "{{creates}} nouvelles, {{updates}} mises à jour, {{skips}} ignorées.",
       "reason": "Motif pour le journal d’audit",
       "cancel": "Annuler",

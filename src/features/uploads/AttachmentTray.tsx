@@ -34,8 +34,31 @@ export function AttachmentTray({
   onRemove: (localId: string) => void
 }) {
   const { t } = useTranslation('chat')
-  if (drafts.length === 0 && !overflow) return null
+  const uploading = drafts.filter((draft) => draft.state === 'uploading')
 
+  return (
+    <>
+      {/* Mounted before the first file is chosen: a live region that appears
+          together with its text is not announced, and each row's "Adding…"
+          did just that (#450). */}
+      <p role="status" className="sr-only">
+        {uploading.map((draft) => t('ask.attachments.uploadingFile', { name: draft.filename })).join(' ')}
+      </p>
+      {(drafts.length > 0 || overflow) && <Tray drafts={drafts} overflow={overflow} onRemove={onRemove} />}
+    </>
+  )
+}
+
+function Tray({
+  drafts,
+  overflow,
+  onRemove,
+}: {
+  drafts: readonly AttachmentDraft[]
+  overflow: boolean
+  onRemove: (localId: string) => void
+}) {
+  const { t } = useTranslation('chat')
   return (
     <div data-ask-attachments className="mb-1.5 flex flex-col gap-1">
       {drafts.length > 0 && (
@@ -56,7 +79,7 @@ export function AttachmentTray({
               <span className="flex min-w-0 flex-1 flex-col">
                 <span className="truncate text-[13px] text-ink">{draft.filename}</span>
                 {draft.state === 'uploading' && (
-                  <span role="status" className="text-[12px] text-caption">
+                  <span className="text-[12px] text-caption">
                     {t('ask.attachments.uploading')}
                   </span>
                 )}
