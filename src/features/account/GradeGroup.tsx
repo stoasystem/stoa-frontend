@@ -8,6 +8,7 @@ import { TextField } from '@/components/base/TextField'
 import { useStudentProfileQuery } from '@/hooks/student/useStudentProfileQuery'
 import { updateStudentProfile } from '@/services/student/studentApi'
 import { studentQueryKeys } from '@/services/student/studentQueryKeys'
+import type { StudentProfile } from '@/types/student'
 
 /** Where Ask's blank-grade hint lands (#154). */
 export const GRADE_SECTION_ID = 'me-grade'
@@ -30,7 +31,10 @@ export function GradeGroup() {
 
   const save = useMutation({
     mutationFn: (grade: string) => updateStudentProfile({ grade }),
-    onSuccess: async () => {
+    onSuccess: async (_profile, grade) => {
+      // The saved grade first: if the read after it fails, the field would
+      // otherwise go back to the one from before, beside "Saved" (#457).
+      queryClient.setQueryData<StudentProfile>(studentQueryKeys.profile(), (held) => held && { ...held, grade })
       await queryClient.invalidateQueries({ queryKey: studentQueryKeys.profile() })
       setValue(null)
     },
@@ -65,7 +69,9 @@ export function GradeGroup() {
         className="flex flex-col gap-4 border border-[color:var(--card-border)] bg-surface"
         style={{ borderRadius: ROW.groupRadius, padding: ROW.paddingX }}
       >
-        {profile.isError ? (
+        {/* Only a profile never read takes the form's place: one on hand
+            stays when it cannot be read again (#457). */}
+        {profile.isError && !profile.data ? (
           <p className="m-0 text-[15px] leading-[1.45] text-caption">{t('me.grade.unavailable')}</p>
         ) : (
           <form className="grid max-w-md gap-4" onSubmit={submit} noValidate>
@@ -95,6 +101,11 @@ export function GradeGroup() {
             {save.isError && (
               <p className="m-0 text-[13px] leading-[1.35] text-red" role="alert">
                 {t('me.grade.saveFailed')}
+              </p>
+            )}
+            {profile.isError && (
+              <p className="m-0 text-[13px] leading-[1.35] text-red" role="alert">
+                {t('me.grade.refreshFailed')}
               </p>
             )}
           </form>

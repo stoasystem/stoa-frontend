@@ -38,6 +38,7 @@
     "statusChanged": "Status changed to {{status}}.",
     "statusFailed": "The status could not be changed.",
     "loadFailed": "The account list could not be loaded.",
+    "refreshFailed": "The account list could not be refreshed. Showing what was loaded before.",
     "empty": "No accounts in this group.",
     "columnNumber": "Number",
     "columnName": "Name",
@@ -74,6 +75,7 @@
     "incomplete": "The list stopped after {{shown}} accounts and is not complete. Narrow the filters or load more.",
     "loadMore": "Load more",
     "loadingMore": "Loading more accounts…",
+    "loadMoreFailed": "The next accounts could not be loaded. Please try again.",
     "actionFor": "{{action}}: {{account}}",
     "confirm": {
       "title": {
@@ -143,6 +145,7 @@
       "saved_other": "Saved: {{count}} cases a week.",
       "loading": "Reading the current figure…",
       "loadFailed": "The current figure could not be read.",
+      "refreshFailed": "The current figure could not be read again. Showing the one read before.",
       "saveFailed": "The figure could not be saved.",
       "outOfRange": "Enter a whole number between 0 and {{maximum}}.",
       "zeroWarning": "Zero turns teacher support off for this student entirely — they will be told to contact an administrator, not that they have used this week up."
@@ -228,7 +231,8 @@
     "atRisk": "At risk",
     "breached": "Breached",
     "loading": "Loading response times…",
-    "unavailable": "Response times are unavailable right now. The figures are not shown so that no false values appear."
+    "unavailable": "Response times are unavailable right now. The figures are not shown so that no false values appear.",
+    "refreshFailed": "Response times could not be refreshed. Showing the figures loaded before."
   },
   "placeholder": {
     "eyebrow": "Admin operations",
@@ -350,6 +354,7 @@
     "resentNotDelivered": "Invitation created, but email was not delivered.",
     "resendFailed": "Could not resend the invitation.",
     "statementFailed": "The statement could not be loaded.",
+    "statementRefreshFailed": "The statement could not be refreshed. Showing what was loaded before.",
     "noStatement": "No statement was submitted.",
     "reasonLabel": "Reason for the decision",
     "confirm": {

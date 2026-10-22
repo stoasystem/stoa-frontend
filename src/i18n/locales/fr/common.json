@@ -69,7 +69,8 @@
       "save": "Enregistrer",
       "saveFailed": "Ton année scolaire n’a pas été enregistrée. Réessaie.",
       "saved": "Enregistré.",
-      "unavailable": "Ton année scolaire ne peut pas être chargée pour le moment."
+      "unavailable": "Ton année scolaire ne peut pas être chargée pour le moment.",
+      "refreshFailed": "Ton année scolaire n’a pas pu être actualisée pour le moment."
     },
     "language": {
       "heading": "Langue"

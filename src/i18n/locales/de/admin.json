@@ -38,6 +38,7 @@
     "statusChanged": "Status auf {{status}} geändert.",
     "statusFailed": "Der Status konnte nicht geändert werden.",
     "loadFailed": "Die Kontoliste konnte nicht geladen werden.",
+    "refreshFailed": "Die Kontoliste konnte nicht aktualisiert werden. Angezeigt wird der zuletzt geladene Stand.",
     "empty": "Keine Konten in dieser Gruppe.",
     "columnNumber": "Nummer",
     "columnName": "Name",
@@ -74,6 +75,7 @@
     "incomplete": "Die Liste wurde nach {{shown}} Konten angehalten und ist unvollständig. Grenzen Sie die Filter ein oder laden Sie weitere.",
     "loadMore": "Weitere laden",
     "loadingMore": "Weitere Konten werden geladen…",
+    "loadMoreFailed": "Die nächsten Konten konnten nicht geladen werden. Bitte versuchen Sie es erneut.",
     "actionFor": "{{action}}: {{account}}",
     "confirm": {
       "title": {
@@ -143,6 +145,7 @@
       "saved_other": "Gespeichert: {{count}} Fälle pro Woche.",
       "loading": "Aktueller Wert wird gelesen…",
       "loadFailed": "Der aktuelle Wert konnte nicht gelesen werden.",
+      "refreshFailed": "Der aktuelle Wert konnte nicht erneut gelesen werden. Angezeigt wird der zuvor gelesene.",
       "saveFailed": "Der Wert konnte nicht gespeichert werden.",
       "outOfRange": "Geben Sie eine ganze Zahl zwischen 0 und {{maximum}} ein.",
       "zeroWarning": "Null schaltet die Lehrerunterstützung für diese Person vollständig ab — ihr wird gesagt, sie solle sich an die Administration wenden, nicht, dass die Woche aufgebraucht sei."
@@ -228,7 +231,8 @@
     "atRisk": "Gefährdet",
     "breached": "Überschritten",
     "loading": "Antwortzeiten werden geladen …",
-    "unavailable": "Die Antwortzeiten sind gerade nicht verfügbar. Es werden keine Zahlen angezeigt, damit keine falschen Werte erscheinen."
+    "unavailable": "Die Antwortzeiten sind gerade nicht verfügbar. Es werden keine Zahlen angezeigt, damit keine falschen Werte erscheinen.",
+    "refreshFailed": "Die Antwortzeiten konnten nicht aktualisiert werden. Angezeigt werden die zuletzt geladenen Zahlen."
   },
   "placeholder": {
     "eyebrow": "Verwaltung",
@@ -350,6 +354,7 @@
     "resentNotDelivered": "Einladung erstellt, aber die E-Mail wurde nicht zugestellt.",
     "resendFailed": "Die Einladung konnte nicht erneut gesendet werden.",
     "statementFailed": "Das Motivationsschreiben konnte nicht geladen werden.",
+    "statementRefreshFailed": "Das Motivationsschreiben konnte nicht aktualisiert werden. Angezeigt wird der zuletzt geladene Stand.",
     "noStatement": "Es wurde kein Motivationsschreiben eingereicht.",
     "reasonLabel": "Begründung der Entscheidung",
     "confirm": {

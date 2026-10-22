@@ -76,7 +76,9 @@ export function TeacherSupportAllowanceEditor({
     )
   }
 
-  if (allowanceQuery.isError) {
+  // Saving reads the figure again. When that read fails, the editor stays,
+  // with the figure read before and what the save said (#457).
+  if (allowanceQuery.isError && !current) {
     return (
       <p role="alert" className="text-sm text-destructive">
         {toUserFacingError(allowanceQuery.error, t('accounts.teacherSupport.loadFailed'))}
@@ -115,6 +117,11 @@ export function TeacherSupportAllowanceEditor({
       </Button>
       {draft === '0' ? (
         <p className="w-full text-sm text-destructive">{t('accounts.teacherSupport.zeroWarning')}</p>
+      ) : null}
+      {allowanceQuery.isError ? (
+        <p role="alert" className="w-full text-sm text-destructive">
+          {t('accounts.teacherSupport.refreshFailed')}
+        </p>
       ) : null}
       <p role="status" className={notice ? 'w-full text-sm' : 'sr-only'}>
         {notice}

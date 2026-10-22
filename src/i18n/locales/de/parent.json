@@ -248,6 +248,7 @@
     "more": "Mehr",
     "account": "Konto und Familie",
     "accountLoading": "Konto wird geprüft…",
+    "accountRefreshFailed": "Konnte gerade nicht aktualisiert werden.",
     "accountReady_one": "Bereit · {{count}} verknüpftes Kind",
     "accountReady_other": "Bereit · {{count}} verknüpfte Kinder",
     "accountAttention_one": "Braucht Aufmerksamkeit: {{issue}}",

@@ -79,7 +79,10 @@ export function ReviewSession({ unitId }: { unitId?: string } = {}) {
     return <p className="text-sm text-muted-foreground">{t('review.loading')}</p>
   }
 
-  if (dueQuery.isError) {
+  // Only a list that never arrived is an error. One on screen stays when a
+  // read behind it fails -- a language switch reads everything again, so does
+  // a reconnect -- and with it the answers typed and the feedback (#457).
+  if (dueQuery.isError && !dueQuery.data) {
     return (
       <div className="flex flex-col items-start gap-3">
         <p className="m-0 text-sm text-destructive">{t('review.loadFailed')}</p>
@@ -96,12 +99,21 @@ export function ReviewSession({ unitId }: { unitId?: string } = {}) {
     )
   }
 
+  // No Try again here: a list read again drops the questions already
+  // answered, and their feedback with them.
+  const refreshFailed = dueQuery.isError ? (
+    <p role="alert" className="m-0 text-sm text-destructive">{t('review.refreshFailed')}</p>
+  ) : null
+
   if (cards.length === 0) {
     return (
-      <EmptyState
-        title={t('review.emptyTitle')}
-        description={t('review.emptyBody')}
-      />
+      <div className="space-y-4">
+        <EmptyState
+          title={t('review.emptyTitle')}
+          description={t('review.emptyBody')}
+        />
+        {refreshFailed}
+      </div>
     )
   }
 
@@ -110,6 +122,7 @@ export function ReviewSession({ unitId }: { unitId?: string } = {}) {
       <p className="text-sm text-muted-foreground">
         {t('review.due', { count: cards.length })}
       </p>
+      {refreshFailed}
       {cards.map((card) => (
         <ReviewQuestion key={card.challengeId} card={card} onAnswer={onAnswer} />
       ))}

@@ -105,6 +105,10 @@ export function AdminAccountsPage() {
   // #335: the read stops after a budget of requests. A list cut there used to
   // look complete; now it says so and offers to read on.
   const incomplete = Boolean(accountsQuery.data?.nextCursor)
+  // #457: only a list never read is replaced by the failure. With
+  // `retry: false` a "load more" that failed, or a read again after a change,
+  // put the whole query in error, and the accounts on hand went with it.
+  const listFailed = accountsQuery.isError && !accountsQuery.data
   const rows = accountsQuery.data?.items ?? []
   const groups = accountsQuery.data?.groups ?? {}
   const grouped = ROLES.map((item) => ({ role: item, rows: rows.filter((row) => row.role === item) }))
@@ -475,12 +479,17 @@ export function AdminAccountsPage() {
           * an administrator who lacked the capability to list accounts was told,
           * in effect, that the platform had none. The groups only render once
           * the list has actually been read. */}
-        {accountsQuery.isError ? (
+        {listFailed ? (
           <p
             role="alert"
             className="mb-3 rounded-md border border-destructive/40 bg-destructive/5 p-3 text-sm text-destructive"
           >
             {refusal(accountsQuery.error, t('accounts.loadFailed'))}
+          </p>
+        ) : null}
+        {accountsQuery.isRefetchError ? (
+          <p role="alert" className="mb-3 text-sm text-destructive">
+            {t('accounts.refreshFailed')}
           </p>
         ) : null}
 
@@ -490,7 +499,7 @@ export function AdminAccountsPage() {
           </p>
         ) : null}
 
-        {incomplete && !accountsQuery.isError ? (
+        {incomplete ? (
           <div className="mb-3 flex flex-wrap items-center gap-3 rounded-md border p-3 text-sm">
             <p>{t('accounts.incomplete', { shown: rows.length })}</p>
             <Button
@@ -502,10 +511,15 @@ export function AdminAccountsPage() {
             >
               {accountsQuery.isFetchingNextPage ? t('accounts.loadingMore') : t('accounts.loadMore')}
             </Button>
+            {accountsQuery.isFetchNextPageError ? (
+              <p role="alert" className="text-destructive">
+                {t('accounts.loadMoreFailed')}
+              </p>
+            ) : null}
           </div>
         ) : null}
 
-        {accountsQuery.isError || loading ? null : grouped.map((group) => (
+        {listFailed || loading ? null : grouped.map((group) => (
           <Card key={group.role} className="mb-4">
             <CardHeader>
               <CardTitle>
