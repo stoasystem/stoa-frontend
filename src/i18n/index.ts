@@ -17,8 +17,9 @@ import { bundledResources, loadNamespace } from '@/i18n/resources'
  * asks for it (react-i18next suspends that screen until then).
  *
  * A failed download is not retried: the browser keeps a failed module for
- * the page, so only a reload fetches it again. That text reads in English
- * until then, and the next page load asks again.
+ * the page, so only a reload fetches it again. Until then that text reads in
+ * English, or shows its keys where the English copy is on demand too and
+ * failed as well (`admin`); the next page load asks again.
  */
 const onDemandCopy: BackendModule = {
   type: 'backend',

@@ -4,9 +4,15 @@ import { expect, test } from './support/fixtures'
 import { WEB_ORIGIN } from './support/origins'
 import { signInAsStudent } from './support/signIn'
 import { StudentWorld } from './support/student'
+import { ADMIN, signInAt, StaffWorld, TEACHER } from './support/staff'
 
 // The star map's own chunk; Vite asks for the chunks it imports beside it.
 const MAP_CODE = /^\/assets\/MapPages-[\w-]+\.js$/
+// The teacher's home, their request queue.
+const TEACHER_HOME_CODE = /^\/assets\/TeacherDashboardPage-[\w-]+\.js$/
+// An administrator's page that asks the backend for nothing, and their copy.
+const ADMIN_PAGE_CODE = /^\/assets\/OperationsPlaceholder-[\w-]+\.js$/
+const ADMIN_COPY = /^\/assets\/admin-[\w-]+\.js$/
 // Longer than a Lambda cold start (1-3 s): if the map's code waits for the
 // account, it is asked for only after this.
 const HOLD_MS = 5_000
@@ -38,6 +44,44 @@ async function onTheMap(page: Page, backend: MockBackend) {
   await page.waitForLoadState('networkidle')
 }
 
+/**
+ * From now on /auth/me answers like a cold start that outlasts the download:
+ * once `code` has been asked for, every file then on its way is in and the
+ * page has run it (it is idle), or after HOLD_MS, whichever comes first. So
+ * the order it records is not a race.
+ */
+function accountAfterCode(page: Page, backend: MockBackend, code: RegExp) {
+  const seen: string[] = []
+  let codeAskedFor = false
+  let downloading = 0
+  let release = () => {}
+  const codeIn = new Promise<void>((resolve) => (release = resolve))
+  const fromSite = (request: Request) => new URL(request.url()).origin === WEB_ORIGIN
+  page.on('request', (request) => {
+    if (!fromSite(request)) return
+    downloading += 1
+    if (!code.test(new URL(request.url()).pathname)) return
+    seen.push('code asked for')
+    codeAskedFor = true
+  })
+  const finished = (request: Request) => {
+    if (!fromSite(request)) return
+    downloading -= 1
+    if (!codeAskedFor || downloading > 0) return
+    void page
+      .evaluate('new Promise((resolve) => requestIdleCallback(() => resolve(null), { timeout: 5000 }))')
+      .then(release, release)
+  }
+  page.on('requestfinished', finished)
+  page.on('requestfailed', finished)
+  page.on('response', (response) => {
+    if (new URL(response.url()).pathname === '/auth/me') seen.push('/auth/me answered')
+  })
+  const held = Promise.race([codeIn, pause(HOLD_MS)])
+  backend.holdUntil('GET', '/auth/me', () => held)
+  return seen
+}
+
 /** Counts the documents the tab loads from now on: a reload is one. */
 function documentLoads(page: Page) {
   let loads = 0
@@ -52,50 +96,66 @@ test("a student's reload loads the star map's code while /auth/me is answered, a
   backend,
 }) => {
   await onTheMap(page, backend)
-
-  // From here /auth/me answers like a cold start that outlasts the download:
-  // once the map's code has been asked for, every file then on its way is in
-  // and the page has run it (it is idle), or after HOLD_MS, whichever comes
-  // first. So the order below is not a race.
-  const seen: string[] = []
-  let mapAskedFor = false
-  let downloading = 0
-  let release = () => {}
-  const codeIn = new Promise<void>((resolve) => (release = resolve))
-  const fromSite = (request: Request) => new URL(request.url()).origin === WEB_ORIGIN
-  page.on('request', (request) => {
-    if (!fromSite(request)) return
-    downloading += 1
-    if (!MAP_CODE.test(new URL(request.url()).pathname)) return
-    seen.push('map code asked for')
-    mapAskedFor = true
-  })
-  const finished = (request: Request) => {
-    if (!fromSite(request)) return
-    downloading -= 1
-    if (!mapAskedFor || downloading > 0) return
-    void page
-      .evaluate('new Promise((resolve) => requestIdleCallback(() => resolve(null), { timeout: 5000 }))')
-      .then(release, release)
-  }
-  page.on('requestfinished', finished)
-  page.on('requestfailed', finished)
-  page.on('response', (response) => {
-    if (new URL(response.url()).pathname === '/auth/me') seen.push('/auth/me answered')
-  })
-  const held = Promise.race([codeIn, pause(HOLD_MS)])
-  backend.holdUntil('GET', '/auth/me', () => held)
+  const seen = accountAfterCode(page, backend, MAP_CODE)
   await page.addInitScript({ content: WATCH_SKELETON })
 
   await page.reload()
   await expect(page.getByRole('heading', { name: 'Mathematics' })).toBeVisible()
 
-  expect(seen[0], 'what came first after the reload').toBe('map code asked for')
+  expect(seen[0], 'what came first after the reload').toBe('code asked for')
   expect(seen).toContain('/auth/me answered')
   // The preload and the page share one download.
-  expect(seen.filter((event) => event === 'map code asked for')).toHaveLength(1)
+  expect(seen.filter((event) => event === 'code asked for')).toHaveLength(1)
   // With its code in, the map follows the account at once: no skeleton,
   // which React would have held for at least 300 ms.
+  expect(await page.evaluate('window.__skeletonShown === true'), 'the page skeleton was drawn').toBe(false)
+})
+
+test("a teacher's reload loads their home's code while /auth/me is answered, and shows it at once (#456)", async ({
+  page,
+  backend,
+}) => {
+  new StaffWorld(backend, TEACHER).install()
+  await signInAt(page, TEACHER, '/teacher')
+  const home = page.getByRole('heading', { name: 'Teacher support requests' })
+  await expect(home).toBeVisible()
+  await page.waitForLoadState('networkidle')
+  const seen = accountAfterCode(page, backend, TEACHER_HOME_CODE)
+  await page.addInitScript({ content: WATCH_SKELETON })
+
+  await page.reload()
+  await expect(home).toBeVisible()
+
+  expect(seen[0], 'what came first after the reload').toBe('code asked for')
+  expect(seen).toContain('/auth/me answered')
+  expect(seen.filter((event) => event === 'code asked for')).toHaveLength(1)
+  expect(await page.evaluate('window.__skeletonShown === true'), 'the page skeleton was drawn').toBe(false)
+})
+
+// An administrator's page also reads copy that loads on demand (#414). It
+// comes with the page's code, or the page would wait for it behind the
+// skeleton once the account is in (#456 audit).
+test("an administrator's reload loads the page's code and the administrators' copy while /auth/me is answered", async ({
+  page,
+  backend,
+}) => {
+  new StaffWorld(backend, ADMIN).install()
+  await signInAt(page, ADMIN, '/admin/system')
+  const heading = page.getByRole('heading', { name: 'System status', exact: true })
+  await expect(heading).toBeVisible()
+  await page.waitForLoadState('networkidle')
+  const seen = accountAfterCode(page, backend, ADMIN_PAGE_CODE)
+  page.on('request', (request) => {
+    if (ADMIN_COPY.test(new URL(request.url()).pathname)) seen.push('copy asked for')
+  })
+  await page.addInitScript({ content: WATCH_SKELETON })
+
+  await page.reload()
+  await expect(heading).toBeVisible()
+
+  expect(seen[0], 'what came first after the reload').toBe('code asked for')
+  expect(seen.indexOf('copy asked for'), 'the copy asked for before /auth/me answered').toBeGreaterThan(0)
+  expect(seen.indexOf('copy asked for')).toBeLessThan(seen.indexOf('/auth/me answered'))
   expect(await page.evaluate('window.__skeletonShown === true'), 'the page skeleton was drawn').toBe(false)
 })
 
@@ -176,6 +236,49 @@ test("after a reload for the map's failed code, the next document waits for the 
   await expect(page.getByRole('heading', { name: 'Mathematics' })).toBeVisible({ timeout: 20_000 })
 
   expect(refused).toEqual(['document 1'])
+  expect(documents(), 'the reload, then the one reload for the failed code').toBe(2)
+  await expect(page.getByRole('alert')).toHaveCount(0)
+})
+
+// The same for a teacher, whose home is loaded ahead too (#456): a failure of
+// the code loaded ahead reloads the tab once (#401, #447), and the next
+// document waits for the account (#441 audit).
+test("after a reload for a teacher's failed home, the next document waits for the account before asking again", async ({
+  page,
+  backend,
+}) => {
+  new StaffWorld(backend, TEACHER).install()
+  await signInAt(page, TEACHER, '/teacher')
+  const home = page.getByRole('heading', { name: 'Teacher support requests' })
+  await expect(home).toBeVisible()
+  await page.waitForLoadState('networkidle')
+  const documents = documentLoads(page)
+  let documentsSeen = 0
+  let secondBegan = 0
+  let accountIn = false
+  page.on('request', (request) => {
+    if (!request.isNavigationRequest() || request.frame() !== page.mainFrame()) return
+    documentsSeen += 1
+    accountIn = false
+    if (documentsSeen === 2) secondBegan = Date.now()
+  })
+  page.on('response', (response) => {
+    if (new URL(response.url()).pathname === '/auth/me') accountIn = true
+  })
+  const refused: string[] = []
+  await page.route('**/assets/TeacherDashboardPage-*.js', async (route) => {
+    const down = documentsSeen === 1 || (documentsSeen === 2 && Date.now() - secondBegan < 800)
+    if (!down) return route.fallback()
+    refused.push(`document ${documentsSeen}, ${accountIn ? 'after' : 'before'} the account`)
+    return route.abort('internetdisconnected')
+  })
+  backend.holdUntil('GET', '/auth/me', () => pause(1_500))
+
+  await page.reload()
+  await expect(home).toBeVisible({ timeout: 20_000 })
+
+  // Refused while loaded ahead, before the account was in.
+  expect(refused).toEqual(['document 1, before the account'])
   expect(documents(), 'the reload, then the one reload for the failed code').toBe(2)
   await expect(page.getByRole('alert')).toHaveCount(0)
 })

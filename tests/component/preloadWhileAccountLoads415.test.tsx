@@ -1,13 +1,14 @@
 /**
- * A student's page starts loading while the tab's account is read (#415).
+ * A page starts loading while the tab's account is read (#415, #456).
  *
  * After a reload, a role route waits for /auth/me before it renders its page
  * (#250, #274), and the page's code was asked for only then: the star map's
  * 77 kB gzip after a reply that takes 1-3 s on a cold start. Now the page
- * this address shows a student is preloaded while the account loads, when
- * the tab remembers a student or nobody. The preload decides nothing: the
- * screen still waits for the account, and whoever it turns out to be gets
- * their own page.
+ * this address shows the role the tab remembers is preloaded while the
+ * account loads: a student's, a teacher's, a parent's or an administrator's,
+ * and a student's when the tab remembers nobody. The preload decides
+ * nothing: the screen still waits for the account, and whoever it turns out
+ * to be gets their own page.
  *
  * The first part is `lazyPage`'s preload itself, against the real chunk
  * reload; the second the router, with stub pages that record a preload.
@@ -22,7 +23,7 @@ import { CHUNK_RELOAD_KEY, installChunkReload } from '@/app/chunkReload'
 import { AppRoutes } from '@/app/router/AppRoutes'
 import { AppErrorBoundary } from '@/components/common/AppErrorBoundary'
 import { rememberTabAccount, type TabAccount } from '@/lib/tabAccount'
-import { type CurrentUser, useAuthStore } from '@/store/authStore'
+import { type CurrentUser, normalizeUserRole, useAuthStore } from '@/store/authStore'
 import { chunkError, failLikeVite, listeningWindow } from './vitePreloadError'
 
 const preloaded = vi.hoisted(() => [] as string[])
@@ -197,6 +198,9 @@ describe("a page's preload", () => {
 describe('the router while the account is read', () => {
   const STUDENT: TabAccount = { id: 'u-1', email: 'mia@example.test', role: 'student' }
   const TEACHER: TabAccount = { id: 'u-2', email: 'tom@example.test', role: 'teacher' }
+  /** A tab that remembers an account with `role`, or `nobody`. */
+  const remembering = (role: string): TabAccount | undefined =>
+    role === 'nobody' ? undefined : { id: `u-${role}`, email: `${role}@example.test`, role }
 
   /** A reload at `path`: a stored token, and an account that has not come back yet. */
   function reloadAt(path: string, remembered?: TabAccount) {
@@ -241,20 +245,82 @@ describe('the router while the account is read', () => {
     expect(stillLoading()).toBeInTheDocument()
   })
 
-  it('loads nothing for a tab that remembers someone else', () => {
-    reloadAt('/', TEACHER)
+  // Teachers and administrators waited for /auth/me, then for at least 300 ms
+  // of skeleton, before their page's code was even asked for (#456).
+  it.each([
+    ['/teacher', 'teacher', 'TeacherDashboardPage'],
+    ['/teacher/requests/r-1', 'teacher', 'TeacherHelpRequestDetailPage'],
+    // The tab keeps the role as the account came; a Cognito group name is the same teacher.
+    ['/teacher/availability', 'Teachers', 'TeacherAvailabilityPage'],
+    ['/admin', 'admin', 'AdminDashboardPage'],
+    ['/admin/users', 'admin', 'AdminAccountsPage'],
+    ['/admin/curriculum', 'admin', 'AdminCurriculumPage'],
+    ['/organization', 'admin', 'OrganizationHomePage'],
+    ['/me', 'admin', 'MePage'],
+    ['/parent', 'parent', 'ParentDashboardPage'],
+    ['/parent/children/c-1/report', 'parent', 'ChildReportPage'],
+    ['/organization/learning-operations', 'school_viewer', 'LearningOperationsDashboardPage'],
+  ])('loads the page %s shows a remembered %s, and still waits for the account', (path, role, page) => {
+    reloadAt(path, remembering(role))
+
+    expect(preloaded).toEqual([page])
+    expect(stillLoading()).toBeInTheDocument()
+    expect(screen.queryByTestId('page')).not.toBeInTheDocument()
+
+    accountArrives(normalizeUserRole(role))
+    expect(screen.getByTestId('page')).toHaveTextContent(page)
+  })
+
+  // Their pages read the administrators' copy, which loads on demand (#414):
+  // loaded only once the page asked for it, it held the page skeleton up
+  // after the account had come (#456 audit).
+  it.each([
+    ['/admin/system', 'admin'],
+    ['/admin/users', 'admin'],
+    ['/organization/learning-operations', 'school_viewer'],
+  ])("loads the administrators' copy with the page %s shows a remembered %s", (path, role) => {
+    const loadNamespaces = vi.spyOn(i18n, 'loadNamespaces')
+    reloadAt(path, remembering(role))
+    expect(loadNamespaces).toHaveBeenCalledWith(['admin'])
+  })
+
+  it.each([
+    ['/teacher', 'teacher'],
+    ['/organization', 'admin'],
+    ['/me', 'admin'],
+    ['/', 'student'],
+    // A page the tab's role is turned away from.
+    ['/admin/users', 'teacher'],
+  ])('loads no copy ahead with the page %s shows a remembered %s', (path, role) => {
+    const loadNamespaces = vi.spyOn(i18n, 'loadNamespaces')
+    reloadAt(path, remembering(role))
+    expect(loadNamespaces).not.toHaveBeenCalled()
+  })
+
+  it.each([
+    // The star map: a teacher at / is sent on to their own home.
+    ['/', 'teacher'],
+    ['/teacher', 'student'],
+    // Remembering nobody counts as a student.
+    ['/teacher', 'nobody'],
+    ['/admin/users', 'teacher'],
+    ['/parent', 'admin'],
+    // A teacher's profile is /teacher/profile; /me turns a teacher away.
+    ['/me', 'teacher'],
+  ])('loads nothing at %s for a tab remembering %s, whom it turns away', (path, role) => {
+    reloadAt(path, remembering(role))
     expect(preloaded).toEqual([])
     expect(stillLoading()).toBeInTheDocument()
   })
 
-  it("loads nothing where a student's page is not what waits", () => {
-    // A teacher's page: a student would be turned away.
-    reloadAt('/teacher', STUDENT)
-    expect(stillLoading()).toBeInTheDocument()
-    cleanup()
+  it('loads nothing where no page waits for the account', () => {
     // A public page renders, and loads, at once.
-    reloadAt('/privacy', STUDENT)
+    reloadAt('/privacy', remembering('teacher'))
     expect(screen.getByTestId('page')).toHaveTextContent('PrivacyPage')
+    expect(preloaded).toEqual([])
+    cleanup()
+    // A demo surface sends everyone to the 404 while demo surfaces are off.
+    reloadAt('/students/s-1/learning-profile', remembering('admin'))
     expect(preloaded).toEqual([])
   })
 
@@ -285,17 +351,24 @@ describe('the router while the account is read', () => {
   // The reload for a page that failed to load: its document leaves the page's
   // load to the render, as late as before, so a network that is not back yet
   // does not spend it (#441 audit).
-  it('loads nothing ahead right after this tab reloaded for a failed page', () => {
+  it.each([
+    ['/', 'student'],
+    ['/teacher', 'teacher'],
+    ['/admin/users', 'admin'],
+  ])('loads nothing ahead at %s right after this tab reloaded for a failed page', (path, role) => {
     sessionStorage.setItem(CHUNK_RELOAD_KEY, String(Date.now()))
-    reloadAt('/', STUDENT)
+    reloadAt(path, remembering(role))
     expect(preloaded).toEqual([])
     expect(stillLoading()).toBeInTheDocument()
   })
 
-  it('loads ahead again once that reload is long past', () => {
+  it.each([
+    ['/', 'student', 'MapHomePage'],
+    ['/teacher', 'teacher', 'TeacherDashboardPage'],
+  ])('loads ahead at %s again once that reload is long past', (path, role, page) => {
     sessionStorage.setItem(CHUNK_RELOAD_KEY, String(Date.now() - 10 * 60_000))
-    reloadAt('/', STUDENT)
-    expect(preloaded).toEqual(['MapHomePage'])
+    reloadAt(path, remembering(role))
+    expect(preloaded).toEqual([page])
   })
 
   it('decides nothing: the account that arrives gets its own page', () => {
@@ -304,5 +377,13 @@ describe('the router while the account is read', () => {
 
     accountArrives('teacher')
     expect(screen.getByTestId('page')).toHaveTextContent('EntryPage')
+    cleanup()
+
+    // A tab that remembers a teacher, signed in as a student by now.
+    reloadAt('/teacher', TEACHER)
+    expect(preloaded).toEqual(['MapHomePage', 'TeacherDashboardPage'])
+
+    accountArrives('student')
+    expect(screen.getByTestId('page')).toHaveTextContent('ForbiddenPage')
   })
 })
