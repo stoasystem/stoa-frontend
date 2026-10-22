@@ -25,6 +25,7 @@
     "resetPassword": "Reset password",
     "reasonPrompt": "Reason for this change (recorded in the audit log)",
     "readOnceHint": "Readable once, copy it now:",
+    "hideSecret": "Hide",
     "inviteSent": "Invitation sent. Account number {{accountNumber}}.",
     "inviteResent": "Invitation resent.",
     "inviteNotDelivered": "Account {{accountNumber}} was created, but the email was not delivered. Pass the link on yourself or resend it.",

@@ -25,6 +25,7 @@
     "resetPassword": "Réinitialiser le mot de passe",
     "reasonPrompt": "Motif de cette modification (consigné dans le journal d'audit)",
     "readOnceHint": "Lisible une seule fois, copiez-le maintenant :",
+    "hideSecret": "Masquer",
     "inviteSent": "Invitation envoyée. Numéro de compte {{accountNumber}}.",
     "inviteResent": "Invitation renvoyée.",
     "inviteNotDelivered": "Le compte {{accountNumber}} a été créé, mais l'e-mail n'a pas été remis. Transmettez le lien vous-même ou renvoyez-le.",

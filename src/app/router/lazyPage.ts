@@ -1,5 +1,5 @@
 import { createElement, lazy, type ComponentType } from 'react'
-import { reloadForFailedPage } from '@/app/chunkReload'
+import { reloadForFailedPage, restoreFailedStylesheets, stylesheetIn } from '@/app/chunkReload'
 
 /* The props a page receives from the route manifest: whatever its entry lists
  * under `props`, plus the entry's `titleKey` when it has one. */
@@ -32,12 +32,11 @@ const failedLoads = new Set<() => void>()
 /** How long a page waits for the reload `chunkReload.ts` started before it counts as failed. */
 export const RELOAD_GRACE_MS = 10_000
 
-function reloadThatNeverCame(pageName: string): Promise<never> {
+// The failure itself, once the wait is over: the error boundary tells a load
+// failure by it, and offers a reload rather than "Try again".
+function reloadThatNeverCame(error: unknown): Promise<never> {
   return new Promise((_, reject) => {
-    window.setTimeout(
-      () => reject(new Error(`${pageName}: the page did not reload after its module failed to load`)),
-      RELOAD_GRACE_MS,
-    )
+    window.setTimeout(() => reject(error), RELOAD_GRACE_MS)
   })
 }
 
@@ -45,9 +44,12 @@ function reloadThatNeverCame(pageName: string): Promise<never> {
  * Lets every page whose module failed to load try again on its next render.
  *
  * Only an error boundary's "Try again" (or its reset on navigation) calls
- * this. A page never retries by itself: React renders a failed component once
- * more before it gives up, and a page that started a new load there would
- * fetch again and again for as long as the network stayed down.
+ * this. A page never retries by itself while it is shown: React renders a
+ * failed component once more before it gives up, and a page that started a
+ * new load there would fetch again and again for as long as the network
+ * stayed down. (A page that failed after the reader left its address starts
+ * afresh at once. If it is shown again meanwhile, at another address of its
+ * own -- `/map/:subjectId` -- that new load is judged there.)
  */
 export function retryFailedPageLoads() {
   for (const reset of [...failedLoads]) reset()
@@ -76,35 +78,65 @@ export function lazyPage<Name extends string>(
   // (#441 audit). Shared, the render meets that failure, and it waits for a
   // stylesheet still on its way.
   let loading: Promise<Record<Name, PageComponent>> | undefined
-  const loadPage = () =>
-    (loading ??= load().then((module) => {
-      loaded = module[pageName]
-      return module
-    }))
-  const failed = (error: unknown): never => {
+  // The address the current load was asked for at: a page that fails after
+  // the reader went elsewhere does not reload the page they are on (#447).
+  let askedAt: string | undefined
+  // The stylesheets this page's own loads failed on. One that fails again as
+  // it is put back fails this page too; any other page is shown without it,
+  // as it may well not use it (#447 audit).
+  const ownStylesheets = new Set<string>()
+  const loadPage = () => {
+    if (!loading) {
+      askedAt = window.location.pathname
+      loading = load()
+        // A stylesheet that failed for another page may be this page's too,
+        // and Vite will not ask for it again (chunkReload.ts).
+        .then((module) =>
+          restoreFailedStylesheets().then((failures) => {
+            const own = failures.find((failure) => ownStylesheets.has(failure.href))
+            if (own) throw own.error
+            return module
+          }),
+        )
+        .then((module) => {
+          loaded = module[pageName]
+          return module
+        })
+    }
+    return loading
+  }
+  const failed = (error: unknown, left = false): never => {
     const reset = () => {
       failedLoads.delete(reset)
       loading = undefined
       current = attempt()
     }
-    failedLoads.add(reset)
+    // The reader left its address, so nothing renders it again and again;
+    // shown again, it loads afresh and is judged where it is shown then.
+    if (left) reset()
+    else failedLoads.add(reset)
     throw error
   }
   const attempt = () =>
     lazy(() =>
-      loadPage()
-        .then(
-          (module) => ({ default: module[pageName] }),
-          (error: unknown) =>
-            // A module that failed to load may be one an older release named,
-            // so the tab reloads (chunkReload.ts) and the page stays
-            // loading until it does, rather than fail and report that. A
-            // reload that never comes -- the reader chose to stay on a "Leave
-            // site?" prompt -- is a failure after all, so the page offers
-            // "Try again" instead of loading for good.
-            reloadForFailedPage(error) ? reloadThatNeverCame(pageName) : Promise.reject(error),
-        )
-        .catch(failed),
+      loadPage().then(
+        (module) => ({ default: module[pageName] }),
+        // A module that failed to load may be one an older release named, so
+        // the tab reloads (chunkReload.ts) and the page stays loading until it
+        // does, rather than fail and report that; offline, it waits for the
+        // network first. A reload that never comes -- the reader chose to stay
+        // on a "Leave site?" prompt -- is a failure after all, so the page
+        // shows its error instead of loading for good.
+        (error: unknown) => {
+          const stylesheet = stylesheetIn(error)
+          if (stylesheet !== null) ownStylesheets.add(stylesheet)
+          return reloadForFailedPage(error, askedAt).then((outcome) =>
+            outcome === 'reloading'
+              ? reloadThatNeverCame(error).catch((late: unknown) => failed(late))
+              : failed(error, outcome === 'left'),
+          )
+        },
+      ),
     )
   let current = attempt()
   // `loaded` is set before React.lazy hears that the module is in, so the lazy

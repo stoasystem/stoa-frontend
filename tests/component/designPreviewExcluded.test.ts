@@ -119,6 +119,13 @@ function urlAsset(node: ts.NewExpression, where: string): string | null {
   throw new Error(`${where} has a new URL(…, import.meta.url) this walk cannot follow`)
 }
 
+/*
+ * The one import() whose address is read at run time: after a failed load,
+ * MathRenderer asks for KaTeX's file again under a new address (#447). It is
+ * the file its `import('./katexLoader')` names, so the walk follows that.
+ */
+const RUNTIME_IMPORT = { file: path.join('src', 'components', 'ui', 'MathRenderer.tsx'), sameAs: './katexLoader' }
+
 /**
  * Every file a module brings into the build: static imports, re-exports,
  * import() with a literal, import.meta.glob matches and new URL(…,
@@ -134,6 +141,7 @@ function dependenciesOf(file: string): string[] {
     const resolved = resolveSpecifier(specifier, file)
     if (resolved) found.push(resolved)
   }
+  let runtimeImports = 0
   const visit = (node: ts.Node) => {
     if ((ts.isImportDeclaration(node) || ts.isExportDeclaration(node)) && node.moduleSpecifier && ts.isStringLiteral(node.moduleSpecifier)) {
       add(node.moduleSpecifier.text)
@@ -141,6 +149,7 @@ function dependenciesOf(file: string): string[] {
     if (ts.isCallExpression(node) && node.expression.kind === ts.SyntaxKind.ImportKeyword) {
       const [argument] = node.arguments
       if (argument && ts.isStringLiteralLike(argument)) add(argument.text)
+      else if (where === RUNTIME_IMPORT.file && (runtimeImports += 1) === 1) add(RUNTIME_IMPORT.sameAs)
       else throw new Error(`${where} has an import() this walk cannot follow`)
     }
     if (ts.isCallExpression(node)) {

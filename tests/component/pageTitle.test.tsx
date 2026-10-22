@@ -15,7 +15,7 @@ vi.mock('@/pages/entry/EntryPage', () => ({ EntryPage: () => <p>entry</p> }))
 
 afterEach(() => {
   document.title = ''
-  useAuthStore.setState({ user: null, isAuthenticated: false } as never)
+  useAuthStore.setState({ user: null, accessToken: null, isAuthenticated: false } as never)
 })
 
 function at(path: string) {
@@ -44,6 +44,31 @@ describe('what the browser tab says', () => {
     await i18n.changeLanguage('fr')
 
     await waitFor(() => expect(document.title).toContain(i18n.t('common:routes.login.title')))
+  })
+
+  it('names the sign-in page a signed-out visitor sees at / (#448)', async () => {
+    // It said the generic title of index.html on a first load, and the last
+    // page's name after a move: "Privacy · STOA" over the sign-in form.
+    await i18n.changeLanguage('de')
+    document.title = `${i18n.t('common:routes.privacy.title')} · STOA`
+
+    at('/')
+
+    await waitFor(() => expect(document.title).toBe(`${i18n.t('common:routes.login.title')} · STOA`))
+  })
+
+  it('leaves the title alone for a signed-in visitor / is not for, who is sent on to their own home (#448)', async () => {
+    await i18n.changeLanguage('de')
+    useAuthStore.setState({
+      user: { id: 'u-teacher', name: 'Ada', email: 'ada@example.com', role: 'teacher' },
+      accessToken: 'token',
+      isAuthenticated: true,
+    } as never)
+
+    const { findByText } = at('/')
+
+    await findByText('entry')
+    expect(document.title).toBe('')
   })
 
   it('never shows a bare key when a translation is missing', async () => {

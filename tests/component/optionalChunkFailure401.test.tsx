@@ -55,9 +55,10 @@ describe('a KaTeX chunk that fails to load', () => {
     })
     const { MathRenderer } = await import('@/components/ui/MathRenderer')
     // The chunk can be fetched again. Registered anew because Vitest keeps a
-    // mocked module that loaded, even an empty one. This stands for a browser
-    // that fetches a failed import again; Chromium does not, and keeps the
-    // failure for the document (tests/e2e-dist/chunkFailure.spec.ts).
+    // mocked module that loaded, even an empty one. The failures here name no
+    // file, as Safari's do, so the next formula asks for the same address
+    // again. Where the failure names the file (Chromium, which keeps a failed
+    // import for the document), it asks under a new one (chunkRecovery447.test.tsx).
     const recover = () =>
       vi.doMock('@/components/ui/katexLoader', async () => {
         counter.attempts += 1
@@ -70,7 +71,7 @@ describe('a KaTeX chunk that fails to load', () => {
     const { target, reload } = listeningWindow()
     stop = installChunkReload(target, () => 1_000_000)
     const { MathRenderer, counter, recover } = await mathRendererWhoseLoad(async () => {
-      await failLikeVite(chunkError('katexLoader-abc123'))
+      await failLikeVite(new TypeError('Importing a module script failed.'))
       // Reached only if a listener took the failure over.
       return { default: undefined }
     })

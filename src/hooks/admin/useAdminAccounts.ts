@@ -92,6 +92,12 @@ export function useAdminAccountListQuery(filters: AccountListFilters) {
 /**
  * A command on accounts, and what its success does to the account reads in
  * the cache (#372): see `accountListCache`.
+ *
+ * An invitation's activation code and an assigned account's first password
+ * come back in the response, which a mutation keeps in the query client's
+ * cache until it is collected, five minutes after nothing shows it by
+ * default. gcTime 0 drops it as soon as the page resets the mutation or is
+ * gone (#449).
  */
 function useAccountMutation<TInput, TResult>(
   mutationFn: (input: TInput) => Promise<TResult>,
@@ -101,6 +107,7 @@ function useAccountMutation<TInput, TResult>(
   return useMutation({
     mutationFn,
     onSuccess: (result, input) => settle(queryClient, input, result),
+    gcTime: 0,
   })
 }
 
@@ -125,9 +132,12 @@ export function useRevokeInvitationMutation() {
   return useAccountMutation(revokeInvitation, afterRevoke)
 }
 
-/** A temporary password changes nothing an account list shows, so no read is touched. */
+/**
+ * A temporary password changes nothing an account list shows, so no read is
+ * touched. It is a secret, though, and goes from the cache as the others do (#449).
+ */
 export function useResetAccountPasswordMutation() {
-  return useMutation({ mutationFn: resetAccountPassword })
+  return useMutation({ mutationFn: resetAccountPassword, gcTime: 0 })
 }
 
 export function useChangeAccountStatusMutation() {
