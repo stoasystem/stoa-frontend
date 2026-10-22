@@ -58,8 +58,10 @@ export function usePreloadWhileAccountLoads() {
     if (!route) return
     route.page.preload()
     // i18next's own instance, which @/i18n sets up before the first render.
-    // Never rejects: copy that fails to load reads in English, as it would
-    // have when the page asked for it.
+    // It never rejects: copy that fails to load is missing just as when the
+    // page asked for it (src/i18n/index.ts). Once asked for, the namespace
+    // stays on i18next's list for the page's life, so a tab that turns out to
+    // be someone else's also fetches it with each later switch of language.
     if (route.copy) void i18n.loadNamespaces([...route.copy])
   }, [accountLoading, pathname])
 }

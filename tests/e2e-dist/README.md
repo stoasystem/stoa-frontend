@@ -51,9 +51,9 @@ twice; signs out, which clears the session here and calls `POST /auth/logout`.
 for, once, while `/auth/me` is still being answered rather than after it, and
 the map follows the account without the page skeleton in between (#415); a
 teacher's home does the same, and an administrator's page brings the
-administrators' copy along (#456). The map's or the teacher's code refused
-while loaded ahead reloads the tab once, and the document that reload opens
-waits for the account before asking again.
+administrators' copy along (#456). A page's code refused after a reload (the
+teacher's while loaded ahead, before the account) reloads the tab once, and
+the document that reload opens waits for the account before asking again.
 
 `chunkFailure.spec.ts`: a page or KaTeX file that cannot be fetched, with
 Vite's real preload helper and Chromium's module map. A page reloads the tab

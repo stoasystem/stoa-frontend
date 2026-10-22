@@ -20,9 +20,10 @@ const DEV_ONLY_DIRS = ['src/dev/', 'src/mocks/']
  *
  * The dialog goes too, though the star map, a student's home, opens one. Out
  * of the UI kit's chunk it saves every first screen 1.4 kB gzip, before
- * anything is asked of the backend, and costs a student on the star map (and
- * an administrator on Users or Curriculum) 1.8 kB and a request, which mostly
- * load while the account is read (#456 audit).
+ * anything is asked of the backend. Each page that opens one (the star map,
+ * Ask, a teacher's request, and the administrators' Users, Teacher
+ * applications, Account operations and Curriculum) pays 1.8 kB and a request,
+ * after a reload while the account is read (#456 audits).
  *
  * tests/component/firstScreenChunks415.test.ts fails a build whose first
  * screen carries a package module it never imports. What a package's index

@@ -240,9 +240,9 @@ test("after a reload for the map's failed code, the next document waits for the 
   await expect(page.getByRole('alert')).toHaveCount(0)
 })
 
-// The same for a teacher, whose home is loaded ahead too (#456): the render
-// takes the failed preload over and reloads at the address it was asked for
-// (#447), and the next document waits for the account (#441 audit).
+// The same for a teacher, whose home is loaded ahead too (#456): a failure of
+// the code loaded ahead reloads the tab once (#401, #447), and the next
+// document waits for the account (#441 audit).
 test("after a reload for a teacher's failed home, the next document waits for the account before asking again", async ({
   page,
   backend,
@@ -277,7 +277,7 @@ test("after a reload for a teacher's failed home, the next document waits for th
   await page.reload()
   await expect(home).toBeVisible({ timeout: 20_000 })
 
-  // Refused while loaded ahead: the render took the preload's failure over.
+  // Refused while loaded ahead, before the account was in.
   expect(refused).toEqual(['document 1, before the account'])
   expect(documents(), 'the reload, then the one reload for the failed code').toBe(2)
   await expect(page.getByRole('alert')).toHaveCount(0)

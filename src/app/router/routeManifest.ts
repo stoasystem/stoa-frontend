@@ -209,7 +209,8 @@ const EVERY_ROLE = only(
   } satisfies Record<UserRole, true>) as UserRole[]),
 )
 
-// The administrators' copy: the admin pages and the learning operations read it.
+// The administrators' copy: the admin pages, the learning operations and the
+// learning profile read it.
 const ADMIN_COPY = ['admin'] as const
 
 // ---------------------------------------------------------------------------

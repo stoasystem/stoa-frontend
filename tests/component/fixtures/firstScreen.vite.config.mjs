@@ -9,7 +9,10 @@
  * those import statically. Its chunks are the ones that load before the first
  * render: the entry, the chunks that hold those start-up imports, and the
  * chunks these import statically (#456 audit: a chunk merely holding a module
- * the first screen imports may still load later). For every chunk the report
+ * the first screen imports may still load later). Among them is the
+ * stylesheet's empty stub, which Vite drops from the output after this runs;
+ * not among them is the de, fr or it copy i18n loads before the first render,
+ * which imports nothing. For every chunk the report
  * lists the installed packages' modules in it that the first screen never
  * imports: in a first-screen chunk, that is code every visitor downloads for
  * a page they may never open.
