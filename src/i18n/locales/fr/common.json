@@ -35,6 +35,7 @@
     "body": "Réessaie ou recharge la page.",
     "body_formal": "Réessayez ou rechargez la page.",
     "pageBody": "Réessayer ou recharger la page. La barre du haut permet toujours d’aller ailleurs.",
+    "pageLoadBody": "La page n’a pas pu se charger entièrement. Recharger la page pour réessayer. La barre du haut permet toujours d’aller ailleurs.",
     "pageTitle": "Cette page n’a pas pu s’afficher",
     "reload": "Recharger la page",
     "title": "Une erreur est survenue"
