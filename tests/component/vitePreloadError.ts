@@ -21,7 +21,10 @@ export function failLikeVite(error: Error, target: EventTarget = window): Promis
 
 /**
  * The window as `installChunkReload` sees it, hearing what is dispatched on
- * the real one, with a reload that only counts. jsdom cannot navigate.
+ * the real one, with a reload that only counts. jsdom cannot navigate. Its
+ * address and whether it is online are the real window's, so a test moves the
+ * reader with `history.pushState` and takes them offline with
+ * `goOffline` (below).
  */
 export function listeningWindow() {
   const reload = vi.fn()
@@ -29,7 +32,22 @@ export function listeningWindow() {
     addEventListener: window.addEventListener.bind(window),
     removeEventListener: window.removeEventListener.bind(window),
     sessionStorage: window.sessionStorage,
-    location: { reload },
+    navigator: window.navigator,
+    location: {
+      reload,
+      get pathname() {
+        return window.location.pathname
+      },
+    },
   } as unknown as Window
   return { target, reload }
+}
+
+/** Takes jsdom's window offline; returns a function that brings it back, with the browser's `online` event. */
+export function goOffline() {
+  const onLine = vi.spyOn(window.navigator, 'onLine', 'get').mockReturnValue(false)
+  return () => {
+    onLine.mockReturnValue(true)
+    window.dispatchEvent(new Event('online'))
+  }
 }
