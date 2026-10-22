@@ -160,6 +160,7 @@
       "label": "Attached files",
       "remove": "Remove {{name}}",
       "uploading": "Adding…",
+      "uploadingFile": "Adding {{name}}…",
       "errors": {
         "tooMany": "You can send up to {{count}} files with one question.",
         "tooLarge": "This file is too big. Photos may be up to {{imageLimit}}, other files up to {{fileLimit}}.",

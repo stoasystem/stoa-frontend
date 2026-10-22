@@ -44,6 +44,7 @@ export function CurriculumActionDialog({
   action,
   pending,
   error,
+  liveVersionReading = false,
   returnFocusFallback,
   onCancel,
   onConfirm,
@@ -51,6 +52,8 @@ export function CurriculumActionDialog({
   action: CurriculumAction | null
   pending: boolean
   error: string | null
+  /** A publish was refused as stale and the live version is being read again (#450). */
+  liveVersionReading?: boolean
   /** Where focus goes on close if the button the step was opened from is disabled by then (#407). */
   returnFocusFallback?: RefObject<HTMLElement | null>
   onCancel: () => void
@@ -65,6 +68,7 @@ export function CurriculumActionDialog({
           action={action}
           pending={pending}
           error={error}
+          liveVersionReading={liveVersionReading}
           returnFocusFallback={returnFocusFallback}
           onCancel={onCancel}
           onConfirm={onConfirm}
@@ -78,6 +82,7 @@ function ActionForm({
   action,
   pending,
   error,
+  liveVersionReading,
   returnFocusFallback,
   onCancel,
   onConfirm,
@@ -85,6 +90,7 @@ function ActionForm({
   action: CurriculumAction
   pending: boolean
   error: string | null
+  liveVersionReading: boolean
   returnFocusFallback?: RefObject<HTMLElement | null>
   onCancel: () => void
   onConfirm: (action: CurriculumAction, reason: string) => void
@@ -92,7 +98,7 @@ function ActionForm({
   const { t } = useTranslation('admin')
   const [reason, setReason] = useState('')
   const withReason = needsReason(action.kind)
-  const ready = !pending && (!withReason || reason.trim().length > 0)
+  const ready = !pending && !liveVersionReading && (!withReason || reason.trim().length > 0)
 
   return (
     <DialogContent returnFocusFallback={returnFocusFallback}>
@@ -115,10 +121,14 @@ function ActionForm({
           </DialogDescription>
         </DialogHeader>
         {action.kind === 'publish' ? (
-          <p className="text-sm text-foreground">
-            {action.liveVersionId
-              ? t('curriculum.confirm.liveVersion', { version: action.liveVersionId })
-              : t('curriculum.confirm.noLiveVersion')}
+          // A live region: after a stale refusal the version here changes
+          // while the dialog is open, and the admin is told so (#450).
+          <p role="status" className="text-sm text-foreground">
+            {liveVersionReading
+              ? t('curriculum.confirm.liveVersionReading')
+              : action.liveVersionId
+                ? t('curriculum.confirm.liveVersion', { version: action.liveVersionId })
+                : t('curriculum.confirm.noLiveVersion')}
           </p>
         ) : null}
         {action.kind === 'apply' ? (

@@ -160,6 +160,7 @@
       "label": "Angehängte Dateien",
       "remove": "{{name}} entfernen",
       "uploading": "Wird hinzugefügt…",
+      "uploadingFile": "{{name}} wird hinzugefügt…",
       "errors": {
         "tooMany": "Du kannst zu einer Frage höchstens {{count}} Dateien senden.",
         "tooLarge": "Diese Datei ist zu gross. Fotos dürfen bis {{imageLimit}} gross sein, andere Dateien bis {{fileLimit}}.",

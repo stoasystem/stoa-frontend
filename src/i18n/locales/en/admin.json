@@ -833,6 +833,7 @@
       },
       "liveVersion": "Currently live: {{version}}. It will be replaced. If someone has published a different version in the meantime, the publish will be refused.",
       "noLiveVersion": "No version of this lesson is live yet. If someone has published one in the meantime, the publish will be refused.",
+      "liveVersionReading": "Checking which version is live now…",
       "applySummary": "{{creates}} new, {{updates}} updated, {{skips}} skipped.",
       "reason": "Reason for the audit log",
       "cancel": "Cancel",

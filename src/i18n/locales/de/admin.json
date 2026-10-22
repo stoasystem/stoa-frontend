@@ -833,6 +833,7 @@
       },
       "liveVersion": "Derzeit live: {{version}}. Sie wird ersetzt. Hat inzwischen jemand eine andere Version veröffentlicht, wird die Veröffentlichung abgelehnt.",
       "noLiveVersion": "Von dieser Lektion ist noch keine Version live. Hat inzwischen jemand eine veröffentlicht, wird die Veröffentlichung abgelehnt.",
+      "liveVersionReading": "Es wird geprüft, welche Version jetzt live ist…",
       "applySummary": "{{creates}} neu, {{updates}} aktualisiert, {{skips}} übersprungen.",
       "reason": "Begründung für das Audit-Protokoll",
       "cancel": "Abbrechen",
