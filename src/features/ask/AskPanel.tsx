@@ -301,11 +301,14 @@ export function AskPanel({
     })
   }
 
-  const conversationTitle = conversation ? conversationDisplayTitle(conversation, t) : ''
+  // Named as the list names it until it is read itself, so the title the
+  // keyboard lands on says which conversation opened, not "Ask" (#452).
+  const named = conversation ?? conversationsQuery.data?.items.find((item) => item.id === conversationId)
+  const conversationTitle = named ? conversationDisplayTitle(named, t) : ''
   const title = conversationId ? conversationTitle || t('ask.title') : t('ask.title')
   const subtitle = conversationId
-    ? conversation
-      ? subjectDisplayLabel(conversation.subject, t)
+    ? named
+      ? subjectDisplayLabel(named.subject, t)
       : ''
     : practice
       ? t('ask.practice.subtitle')

@@ -17,12 +17,17 @@ const POLL_MS = 30_000
  * in a tab that is shown. Each query polls itself, so a hidden tab no longer
  * asks for a list nobody sees. Two views of one query still send one request:
  * every update of a query restarts all its views' intervals together.
+ *
+ * A tab shown again reads at once what is older than a poll (#452), instead of
+ * at the next poll: the app reads nothing on focus, so the bell was up to 30 s
+ * behind. TanStack takes "focus" from `visibilitychange`.
  */
 function useFallbackPoll() {
   const polling = useNotificationPollStore((state) => state.polling)
   return {
     refetchInterval: polling ? POLL_MS : false,
     refetchIntervalInBackground: false,
+    refetchOnWindowFocus: polling,
   } as const
 }
 
