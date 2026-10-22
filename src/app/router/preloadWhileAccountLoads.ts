@@ -1,9 +1,9 @@
+import i18n from 'i18next'
 import { useEffect } from 'react'
 import { matchRoutes, useLocation } from 'react-router-dom'
 import { justReloadedForFailedPage } from '@/app/chunkReload'
 import { isAdmitted } from '@/app/router/routeAccess'
 import { legacyRedirects, pageRoutes, type PageRoute } from '@/app/router/routeManifest'
-import i18n from '@/i18n'
 import { showDemoSurfaces } from '@/lib/env'
 import { readTabAccount } from '@/lib/tabAccount'
 import { normalizeUserRole, useAuthStore } from '@/store/authStore'
@@ -57,6 +57,7 @@ export function usePreloadWhileAccountLoads() {
     const route = routeToPreload(pathname, readTabAccount()?.role)
     if (!route) return
     route.page.preload()
+    // i18next's own instance, which @/i18n sets up before the first render.
     // Never rejects: copy that fails to load reads in English, as it would
     // have when the page asked for it.
     if (route.copy) void i18n.loadNamespaces([...route.copy])

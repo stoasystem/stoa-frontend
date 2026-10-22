@@ -19,9 +19,9 @@ const DEV_ONLY_DIRS = ['src/dev/', 'src/mocks/']
  * chunk whatever this says: Rollup takes it along.
  *
  * The dialog goes too, though the star map, a student's home, opens one. Out
- * of the UI kit's chunk it saves every first screen 1.5 kB gzip, before
+ * of the UI kit's chunk it saves every first screen 1.4 kB gzip, before
  * anything is asked of the backend, and costs a student on the star map (and
- * an administrator on Users or Curriculum) 1.7 kB and a request, which mostly
+ * an administrator on Users or Curriculum) 1.8 kB and a request, which mostly
  * load while the account is read (#456 audit).
  *
  * tests/component/firstScreenChunks415.test.ts fails a build whose first
