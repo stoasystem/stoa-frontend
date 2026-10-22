@@ -307,8 +307,9 @@ export function AdminCurriculumPage() {
     // `cancelRefetch: false` joins the read the refusal has already started.
     void worklistQuery.refetch({ cancelRefetch: false }).then((read) => {
       setLiveVersionReading(false)
-      // A failed read leaves the version as it was; a retry is refused, and read, again.
-      if (!read.isSuccess) return
+      // A failed read leaves the version as it was; a retry is refused, and read,
+      // again. So does a refused one: its empty list would say nothing is live.
+      if (!read.isSuccess || read.data.permissionDenied) return
       const liveVersionId = liveVersionOf(read.data.items, publicLessonId)
       setAction((current) =>
         current?.kind === 'publish' && current.versionId === versionId ? { ...current, liveVersionId } : current,

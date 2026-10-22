@@ -221,6 +221,26 @@ describe('#450: a publish refused as stale, in the dialog still open', () => {
     expect(publish).toHaveBeenCalledTimes(1)
   })
 
+  it.each([
+    { read: 'fails', answer: () => Promise.reject(new ApiError('down', { status: 503 })) },
+    { read: 'is refused', answer: async () => ({ items: [], count: 0, permissionDenied: true }) },
+  ])('when the read again $read, keeps the version it showed and lets Publish go', async ({ answer }) => {
+    publish.mockImplementationOnce(async () => {
+      worklist.mockImplementationOnce(answer)
+      throw STALE_POINTER()
+    })
+    const user = userEvent.setup()
+    renderPage(<AdminCurriculumPage />)
+    await openVersion(user, 'v3')
+    const dialog = await openPublishDialog(user)
+
+    await user.click(confirmButton(dialog))
+    await within(dialog).findByText(copy.errors.code.stale_pointer)
+    await waitFor(() => expect(confirmButton(dialog)).toBeEnabled())
+    // Not "nothing is live": the read said nothing about it.
+    expect(within(dialog).getByRole('status')).toHaveTextContent(/^Currently live: v2\./)
+  })
+
   it('never swaps in a version the dialog did not show: a read with no refusal leaves it as shown', async () => {
     const user = userEvent.setup()
     const client = renderPage(<AdminCurriculumPage />)
