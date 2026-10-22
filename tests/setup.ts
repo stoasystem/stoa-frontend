@@ -85,6 +85,11 @@ globalThis.ResizeObserver ??= class {
   disconnect() {}
 }
 
+// jsdom lays nothing out and scrolls nothing: its window.scrollTo only
+// reports "Not implemented" to the console. RouteArrival puts a new page at
+// its top (#448); routeArrival406.test.tsx spies on this to see it.
+window.scrollTo = (() => {}) as typeof window.scrollTo
+
 if (!window.matchMedia) {
   window.matchMedia = vi.fn().mockImplementation((query: string) => ({
     matches: false,
