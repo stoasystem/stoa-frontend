@@ -123,10 +123,9 @@ function RoleScopedRedirect({
  *
  * The refused page is named only to a visitor who is not signed in, the one
  * it shows the sign-in page to (#448). A signed-in visitor it is not for is
- * sent straight on to their own home: a name reported on the way would put
- * "Sign in" in the title bar for a moment, and end the first load before any
- * page was shown, so the redirect would be announced as the reader's move
- * (#406).
+ * sent straight on to their own home, and is not shown "Sign in" in the title
+ * bar on the way. RouteArrival does not count that page as shown either: the
+ * redirect stays the first load (#406).
  */
 function RefusedPageSwitch({
   access,

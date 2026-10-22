@@ -11,12 +11,12 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { act, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { Suspense, type ReactNode } from 'react'
+import { Suspense, useEffect, type ReactNode } from 'react'
 import { MemoryRouter, Route, Routes, useNavigate, type NavigateFunction } from 'react-router-dom'
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 import { AppRouter } from '@/app/router/AppRouter'
 import { AppRoutes } from '@/app/router/AppRoutes'
-import { RouteArrival } from '@/app/router/RouteArrival'
+import { RouteArrival, useReportPageName } from '@/app/router/RouteArrival'
 import i18n from '@/i18n'
 import { type CurrentUser, useAuthStore } from '@/store/authStore'
 import type { UserRole } from '@/types/user'
@@ -447,6 +447,42 @@ describe('the first load (#406)', () => {
 
     const title = await waitFor(() => heading('The next page'))
     await waitFor(() => expect(document.activeElement).toBe(title))
+    // It has no name to say either.
+    expect(announced()).toEqual([])
+  })
+
+  it('does not end with a name alone: a page that sends the visitor on as it opens was never shown (#448 audit)', async () => {
+    // The sign-in page opened by a signed-in account names itself and draws
+    // nothing but a redirect. In the browser the router's move comes in a
+    // later task, after the report has settled.
+    function NamedRedirect() {
+      const reportName = useReportPageName()
+      const navigate = useNavigate()
+      useEffect(() => {
+        reportName('/', 'Anmelden')
+        const later = setTimeout(() => navigate('/next', { replace: true }), 0)
+        return () => clearTimeout(later)
+      }, [reportName, navigate])
+      return null
+    }
+    render(
+      <MemoryRouter initialEntries={['/']}>
+        <RouteArrival>
+          <Routes>
+            <Route element={<NamedRedirect />} path="/" />
+            <Route element={<main><h1>The next page</h1></main>} path="/next" />
+          </Routes>
+        </RouteArrival>
+      </MemoryRouter>,
+    )
+
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 10))
+    })
+
+    const title = heading('The next page')
+    expect(document.activeElement).toBe(document.body)
+    expect(title).not.toHaveAttribute('tabindex')
   })
 })
 
@@ -699,6 +735,58 @@ describe('a new page starts at its top (#448)', () => {
     await waitFor(() => expect(heading('TeacherDashboardPage')).toBeInTheDocument())
 
     expect(watch.scrolls()).toEqual([])
+  })
+
+  it('waits for a page that is still loading: scrolls once it is shown, then focuses it', async () => {
+    const user = userEvent.setup()
+    signInAs('teacher')
+    openAt('/teacher')
+    const release = holdSlowPage()
+
+    await user.click(screen.getByRole('link', { name: 'Learning automation' }))
+    expect(heading('TeacherDashboardPage')).toBeInTheDocument()
+    expect(watch.scrolls()).toEqual([])
+
+    await act(async () => release())
+
+    await waitFor(() => expect(document.activeElement).toBe(heading('LearningAutomationConsolePage')))
+    expect(watch.scrolls()).toEqual([TO_TOP])
+    expect(watch.log.slice(watch.log.indexOf(TO_TOP))).toEqual([TO_TOP, 'focus LearningAutomationConsolePage'])
+  })
+
+  it('scrolls once as a guard’s loading screen comes in, and not again for the page behind it', async () => {
+    const user = userEvent.setup()
+    signInAs('pending')
+    openAt('/support')
+
+    await user.click(screen.getByRole('link', { name: 'Teacher home' }))
+    await waitFor(() => expect(screen.getByText(name('status.loadingAccount'))).toBeInTheDocument())
+    expect(watch.scrolls()).toEqual([TO_TOP])
+
+    act(() => useAuthStore.setState({ user: account('teacher') }))
+    await waitFor(() => expect(document.activeElement).toBe(heading('TeacherDashboardPage')))
+    expect(watch.scrolls()).toEqual([TO_TOP])
+  })
+
+  it('leaves the map alone when it moves itself across its layers after coming in behind a loading screen (#448 audit)', async () => {
+    // A reload on a star: the account is read before the map is drawn, and
+    // the map then moves to the star's nebula itself, as useLightingStage
+    // does for a star waiting to be lit. No key or pointer on the way.
+    signInAs('pending')
+    openAt('/map/s1')
+    act(() => useAuthStore.setState({ user: account('student') }))
+    const title = await waitFor(() => heading('MapPage'))
+    await waitFor(() => expect(document.title).toContain('STOA'))
+    const main = screen.getByRole('main')
+
+    act(() => go('/map/s1/t1', { replace: true }))
+    await waitFor(() => expect(screen.queryByRole('link', { name: 'A nebula' })).not.toBeInTheDocument())
+    await act(async () => {})
+
+    expect(screen.getByRole('main')).toBe(main)
+    expect(watch.scrolls()).toEqual([])
+    expect(document.activeElement).not.toBe(title)
+    expect(announced()).toEqual([])
   })
 
   it('lets a page that scrolls itself on arrival have the last word (the account page’s #password)', async () => {

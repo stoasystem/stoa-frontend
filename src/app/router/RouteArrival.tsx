@@ -143,22 +143,41 @@ export function RouteArrival({ children }: { children: ReactNode }) {
     setSaid(name ? { name, count: ++spoken.current } : null)
   }, [])
 
+  /*
+   * The first load ends with a page on screen, checked once the commit that
+   * named the page or led to it has run its effects: a page that sends the
+   * visitor on as it opens (the sign-in page, to a signed-in account's home)
+   * or is replaced in the same flush (a tab joining the browser's sign-in at
+   * `/`) was never shown, and the move it makes is still the first load.
+   */
+  const shownOnceSettled = useCallback((path: string) => {
+    queueMicrotask(() => {
+      if (shown.current !== path || arrivalTargets(pages.current).length === 0) return
+      pageShown.current = true
+      // It may have come in after the last change of path, behind a loading
+      // screen: a move it then makes in place is its own.
+      lastMain.current = currentMain()
+    })
+  }, [])
+
   const reportName = useCallback<ReportName>(
     (path, name) => {
       named.current = { pathname: path, name }
-      if (path === shown.current) pageShown.current = true
+      if (path === shown.current) shownOnceSettled(path)
       // The page behind a loading screen has just arrived. Its name is
       // reported from PageTitle's effect, before the page's own effects run:
       // settle once they have, so a focus the page sets is in place.
       if (pending.current === path) queueMicrotask(settle)
     },
-    [settle],
+    [settle, shownOnceSettled],
   )
 
   // Decided as the new page is put in the document, before it is painted and
-  // before its own effects run: it starts at its top, and a place it scrolls
-  // to or a field it focuses itself (the account page's #password) still has
-  // the last word.
+  // before its passive effects run: it starts at its top, and a place it
+  // scrolls to or a field it focuses itself in one (the account page's
+  // #password) still has the last word. Its layout effects, refs and
+  // autoFocus have run already; a page that sets its own place on arrival
+  // does it in a passive effect.
   useLayoutEffect(() => {
     if (shown.current === pathname) return
     const main = currentMain()
@@ -184,10 +203,10 @@ export function RouteArrival({ children }: { children: ReactNode }) {
     settle()
     lastMain.current = main
     // The page a first load's redirects end on is shown now, if it is here.
-    if (named.current?.pathname === pathname || arrivalTargets(pages.current).length > 0) pageShown.current = true
+    shownOnceSettled(pathname)
     // A later arrival waits for a report of its own, never this one's.
     named.current = null
-  }, [pathname, navigationType, settle])
+  }, [pathname, navigationType, settle, shownOnceSettled])
 
   return (
     <ReportNameContext.Provider value={reportName}>

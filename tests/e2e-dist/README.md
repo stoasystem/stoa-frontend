@@ -61,10 +61,12 @@ lists open on the screen and can be tapped where they are drawn (#162: they
 opened at x = -152).
 
 `pageChange.spec.ts`: a page opened from the foot of a long one starts at its
-top, with its heading focused under the sticky bar, and Back gives the long
-one back where it was read; the star map, a full-height page, opens with its
-bar and heading on the screen; the sign-in page at `/` names itself in the tab
-and is announced on arriving from another page (#448).
+top, with its heading focused under the sticky bar, and Back from it (a long
+page too) gives the first one back where it was read; the star map, a
+full-height page, opens with its bar and heading on the screen (a check: the
+browser already puts such a page at the top, on a desktop); the sign-in page
+at `/` names itself in the tab and is announced on arriving from another page
+(#448).
 
 `controls.spec.ts` holds two controls. One is a negative control marked
 `test.fail()`: it fails while the app renders, and passes -- turning the suite
