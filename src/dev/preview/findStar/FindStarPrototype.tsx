@@ -20,7 +20,9 @@
  *      target star (#472's `target_unit_id`), a card in the thread offers to
  *      show the way on the map.
  *
- * `?recognizer=local|backend` picks the stub (`recognize.ts`). Assumes a
+ * `?recognizer=local|backend` picks the stub (`recognize.ts`). `?flight=<ms>`
+ * slows the camera's flights (the product's is 600 ms; here 2000 by default,
+ * so the way can be followed on a recording). Assumes a
  * desktop viewport; the bar covers the map's corner on a phone.
  */
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
@@ -33,6 +35,7 @@ import { placeBesideStar, type Rect } from '@/features/starmap/lighting/labelPla
 import { FindStarSeamContext, type FindStarSeam } from '@/features/starmap/findStarPrototypeSeam'
 import { subjectOfNebula, type Star, type StarMap } from '@/features/starmap/model/starMap'
 import { pathForTarget, type LayerTarget } from '@/features/starmap/view/layers'
+import { ZOOM } from '@/features/starmap/view/semanticZoom'
 import { useAskStore } from '@/store/askStore'
 import { useAuthStore } from '@/store/authStore'
 
@@ -57,6 +60,9 @@ function writeParam(name: string, value: string) {
   url.searchParams.set(name, value)
   window.history.replaceState(null, '', url)
 }
+
+// Every flight on this page, the prototype's included: slower, to be followed by eye.
+;(ZOOM as { flightMs: number }).flightMs = Number(new URLSearchParams(window.location.search).get('flight')) || 2000
 
 type Found = { way: Way; text: string; show: 'bubble' | 'strip' | 'path' }
 
