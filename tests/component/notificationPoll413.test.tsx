@@ -7,6 +7,10 @@
  * long as it stayed open, and every tab more polled once more. The queries
  * now poll themselves: every 30 s while realtime is not live, only in a tab
  * that is shown, and not at all while the socket is live.
+ *
+ * A tab shown again reads at once what is older than a poll (#452), so the
+ * bell is not left up to 30 s behind; while the socket is live it reads
+ * nothing on that account either.
  */
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { act, cleanup, render } from '@testing-library/react'
@@ -118,8 +122,8 @@ const sent = () => ({
 
 // The bell in the top bar and the admin dashboard's operational card: every
 // notification query there is, on one page. The client takes the app's
-// `refetchOnWindowFocus: false`, so a tab shown again is not refetched on
-// that account alone.
+// `refetchOnWindowFocus: false`: whatever a tab shown again reads, the
+// notification queries read of their own.
 function renderAdminPage(length: number) {
   listed = length
   useAuthStore.setState({ user: admin, accessToken: 'token', isAuthenticated: true })
@@ -192,7 +196,7 @@ describe('with realtime off, as in production', () => {
     expect(sent()).toEqual({ list: 2, count: 2, admin: 2 })
   })
 
-  it('a hidden tab sends no poll, and one shown again polls again', async () => {
+  it('a hidden tab sends no poll, and one shown again reads at once, then polls again', async () => {
     renderAdminPage(50)
     await settle()
     expect(sent()).toEqual({ list: 1, count: 1, admin: 1 })
@@ -201,9 +205,24 @@ describe('with realtime off, as in production', () => {
     await wait(120_000)
     expect(sent()).toEqual({ list: 1, count: 1, admin: 1 })
 
+    // Not at the next poll, up to 30 s on (#452).
     show('visible')
-    await wait(30_000)
+    await settle()
     expect(sent()).toEqual({ list: 2, count: 2, admin: 2 })
+
+    await wait(30_000)
+    expect(sent()).toEqual({ list: 3, count: 3, admin: 3 })
+  })
+
+  it('a tab shown again before a poll was due reads nothing more', async () => {
+    renderAdminPage(50)
+    await settle()
+
+    show('hidden')
+    await wait(10_000)
+    show('visible')
+    await settle()
+    expect(sent()).toEqual({ list: 1, count: 1, admin: 1 })
   })
 })
 
@@ -230,6 +249,18 @@ describe('with realtime on', () => {
     await wait(30_000)
     expect(FakeSocket.all.length).toBeGreaterThan(1)
     expect(sent()).toEqual({ list: 3, count: 0, admin: 3 })
+  })
+
+  it('a tab shown again while live reads nothing: the socket brought it all', async () => {
+    renderAdminPage(5)
+    await settle()
+    act(() => FakeSocket.all[0].open())
+
+    show('hidden')
+    await wait(120_000)
+    show('visible')
+    await settle()
+    expect(sent()).toEqual({ list: 1, count: 0, admin: 1 })
   })
 
   it('a connection still opening polls, as one that is not there', async () => {
