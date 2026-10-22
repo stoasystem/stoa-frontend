@@ -147,6 +147,10 @@ export function AdminAccountsPage() {
             : t('accounts.inviteNotDelivered', { accountNumber: result.accountNumber }),
         )
         if (!result.invitationDelivered) setSecret(result.activationToken)
+        // #449: the page holds what it shows now. The mutation's answer, code
+        // and all, would otherwise stay in the query client's cache for as
+        // long as the page is open; reset, it is collected at once.
+        inviteMutation.reset()
       },
       onError: (error) =>
         setNotice(
@@ -185,6 +189,7 @@ export function AdminAccountsPage() {
         clearDraft()
         setNotice(t('accounts.assigned', { accountNumber: result.accountNumber }))
         setSecret(result.initialPassword)
+        assignMutation.reset()
       },
       // The dialog stays open on a refusal, and it sits over the page, so the
       // answer has to be rendered inside it. Put on the page behind, a real
@@ -218,6 +223,10 @@ export function AdminAccountsPage() {
               ? t('accounts.inviteResent')
               : t('accounts.inviteNotDelivered', { accountNumber: result.accountNumber }),
           )
+          // #449: "pass it on yourself" needs something to pass on. The new
+          // code is shown as an invitation's is; the old one is dead.
+          if (!result.invitationDelivered) setSecret(result.activationToken)
+          reissueMutation.reset()
         },
         onError: (error) => setNotice(refusal(error, t('accounts.reissueFailed'))),
       },
@@ -253,6 +262,7 @@ export function AdminAccountsPage() {
             setAction(null)
             setNotice(t('accounts.passwordReset'))
             setSecret(result.temporaryPassword)
+            resetMutation.reset()
           },
         },
       )
@@ -268,6 +278,19 @@ export function AdminAccountsPage() {
         },
       },
     )
+  }
+
+  /**
+   * #449: a one-time secret stayed on screen until the next action. It now
+   * goes when the administrator says so. Not on a timer: the code or password
+   * cannot be read a second time, and one that vanished while being copied
+   * or read out over the phone would have to be issued again.
+   */
+  function hideSecret() {
+    // The button goes with the line it sits on; focus goes to the line that
+    // says what happened, which stays.
+    noticeLine.current?.focus()
+    setSecret(null)
   }
 
   function openAction(chosen: AccountAction) {
@@ -437,9 +460,14 @@ export function AdminAccountsPage() {
           {notice}
         </p>
         {secret ? (
-          <p className="mb-3 break-all rounded-md border p-2 font-mono text-sm">
-            {t('accounts.readOnceHint')} {secret}
-          </p>
+          <div className="mb-3 flex flex-wrap items-center gap-3 rounded-md border p-2">
+            <p className="min-w-0 flex-1 break-all font-mono text-sm">
+              {t('accounts.readOnceHint')} {secret}
+            </p>
+            <Button type="button" size="sm" variant="outline" onClick={hideSecret}>
+              {t('accounts.hideSecret')}
+            </Button>
+          </div>
         ) : null}
         {/* A list that could not be read is not a list of nothing.
           * The refusal used to print as one grey line above four cards each
