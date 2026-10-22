@@ -98,6 +98,12 @@ export type PageRoute = {
    * one's own home) for everybody else.
    */
   refusedPage?: LazyPage
+  /**
+   * The refused page's name, in the `common` namespace, for the visitor it
+   * shows the sign-in page to (#448). A signed-in visitor is only sent on to
+   * their own home, which names itself.
+   */
+  refusedTitleKey?: string
   nav?: readonly RouteNav[]
   meta: RouteMeta
 }
@@ -294,6 +300,7 @@ export const pageRoutes: readonly PageRoute[] = [
     access: STUDENT,
     page: MapHomePage,
     refusedPage: EntryPage,
+    refusedTitleKey: 'routes.login.title',
     titleKey: 'studentRoutes.home.title',
     meta: { module: 'Star map', status: 'demo', purpose: 'Student: the default subject star map. Everyone else: sign-in, or the way to their own home.' },
   },

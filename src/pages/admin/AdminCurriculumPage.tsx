@@ -14,7 +14,7 @@ import { DashboardLayout } from '@/layouts/DashboardLayout'
 import { formatDateTime } from '@/lib/formatDateTime'
 import type { CurriculumAction, CurriculumReviewStep } from '@/pages/admin/CurriculumActionDialog'
 import { CurriculumActionDialog } from '@/pages/admin/CurriculumActionDialog'
-import { curriculumErrorMessage } from '@/pages/admin/curriculumErrorMessage'
+import { curriculumErrorCode, curriculumErrorMessage } from '@/pages/admin/curriculumErrorMessage'
 import { isApiPathValue } from '@/services/api/apiPath'
 import {
   useApplyCurriculumMigrationMutation,
@@ -95,9 +95,14 @@ export function AdminCurriculumPage() {
   // editor's text, which may have changed since (#258).
   const [dryRunManifest, setDryRunManifest] = useState<Record<string, unknown> | null>(null)
   const [evidenceId, setEvidenceId] = useState('')
-  const [evidenceEnabled, setEvidenceEnabled] = useState(false)
+  // #450: the id the evidence is read for, trimmed, set by Load and by an
+  // apply. The read used to follow the field, so after the first load every
+  // keystroke sent a request with the raw, untrimmed id.
+  const [evidenceReadId, setEvidenceReadId] = useState('')
   const [action, setAction] = useState<CurriculumAction | null>(null)
   const [actionError, setActionError] = useState<string | null>(null)
+  // #450: a publish refused as stale holds Confirm until the worklist is read again.
+  const [liveVersionReading, setLiveVersionReading] = useState(false)
   const [notice, setNotice] = useState<string | null>(null)
   // #258: one write at a time. A double click sent two publishes; the ref
   // closes the gap before `isPending` reaches the next render.
@@ -116,8 +121,8 @@ export function AdminCurriculumPage() {
   const diffQuery = useCurriculumDiffQuery(selectedPublicId, fromVersionId, toVersionId, diffEnabled)
   // #418: a migration id of `..` or `.` would send the read a level up the
   // API, so it is not read; the panel says it is not valid.
-  const evidenceIdInvalid = Boolean(evidenceId) && !isApiPathValue(evidenceId)
-  const evidenceQuery = useCurriculumMigrationEvidenceQuery(evidenceId, evidenceEnabled && !evidenceIdInvalid)
+  const evidenceIdInvalid = Boolean(evidenceReadId) && !isApiPathValue(evidenceReadId)
+  const evidenceQuery = useCurriculumMigrationEvidenceQuery(evidenceReadId, !evidenceIdInvalid)
 
   const patchMutation = usePatchCurriculumDraftMutation()
   const submitReviewMutation = useSubmitCurriculumReviewMutation()
@@ -189,6 +194,8 @@ export function AdminCurriculumPage() {
     dryRunMutation.mutate(manifest, {
       onSuccess: (data) => {
         setDryRunManifest(manifest)
+        // Filled in, not read: the backend keeps evidence only for an
+        // applied migration, and answers migration_not_found until then.
         setEvidenceId(data.migrationId)
       },
     })
@@ -250,7 +257,15 @@ export function AdminCurriculumPage() {
       }
       applyMutation.mutate(
         { migrationId: chosen.migrationId, manifest: dryRunManifest, confirmationToken: dryRun.confirmationToken },
-        { ...settle, onSuccess: () => done() },
+        {
+          ...settle,
+          onSuccess: () => {
+            done()
+            // Its evidence exists from now on (#450).
+            setEvidenceId(chosen.migrationId)
+            setEvidenceReadId(chosen.migrationId)
+          },
+        },
       )
       return
     }
@@ -270,20 +285,52 @@ export function AdminCurriculumPage() {
       // refuses it (409 stale_pointer) if someone else published since.
       publishMutation.mutate({ ...target, expectedPublishedVersionId: chosen.liveVersionId, reason }, {
         ...settle,
+        onError: (error: unknown) => {
+          settle.onError(error)
+          if (curriculumErrorCode(error) === 'stale_pointer') showLiveVersionNow(chosen.publicLessonId, chosen.versionId)
+        },
         onSuccess: () => done(t('curriculum.notice.published', { version: chosen.versionId })),
       })
     }
+  }
+
+  /**
+   * After a stale_pointer refusal the open dialog held the live version the
+   * backend had just refused, so Publish in it was refused again; only
+   * cancelling and reopening read the new one (#450). The refusal re-reads the
+   * worklist (#404). Confirm waits for that read, and the dialog then shows the
+   * version live now, so the admin sees it before publishing over it: it is
+   * never swapped in at confirm time.
+   */
+  function showLiveVersionNow(publicLessonId: string, versionId: string) {
+    setLiveVersionReading(true)
+    // `cancelRefetch: false` joins the read the refusal has already started.
+    void worklistQuery.refetch({ cancelRefetch: false }).then((read) => {
+      setLiveVersionReading(false)
+      // A failed read leaves the version as it was; a retry is refused, and read,
+      // again. So does a refused one: its empty list would say nothing is live.
+      if (!read.isSuccess || read.data.permissionDenied) return
+      const liveVersionId = liveVersionOf(read.data.items, publicLessonId)
+      setAction((current) =>
+        current?.kind === 'publish' && current.versionId === versionId ? { ...current, liveVersionId } : current,
+      )
+    })
   }
 
   function cancelAction() {
     if (inFlight.current) return
     setAction(null)
     setActionError(null)
+    setLiveVersionReading(false)
   }
 
   function loadEvidence(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    setEvidenceEnabled(Boolean(evidenceId.trim()))
+    const id = evidenceId.trim()
+    // The same id again is read again, as the review panel's buttons do; an
+    // invalid one never is.
+    if (id === evidenceReadId && isApiPathValue(id)) void evidenceQuery.refetch()
+    setEvidenceReadId(id)
   }
 
   return (
@@ -407,7 +454,7 @@ export function AdminCurriculumPage() {
               onSubmit={loadEvidence}
               evidence={evidenceQuery.data}
               error={evidenceQuery.error}
-              invalidId={evidenceEnabled && evidenceIdInvalid}
+              invalidId={evidenceIdInvalid}
               isLoading={evidenceQuery.isFetching}
             />
           </TabsContent>
@@ -421,6 +468,7 @@ export function AdminCurriculumPage() {
             applyMutation.isPending
           }
           error={actionError}
+          liveVersionReading={liveVersionReading}
           returnFocusFallback={action?.kind === 'apply' ? applyHeading : reviewNotice}
           onCancel={cancelAction}
           onConfirm={confirmAction}
@@ -673,7 +721,10 @@ function ReviewPanel(props: {
             <Button type="button" variant="outline" onClick={props.onRequestChanges} disabled={props.busy}>{t('curriculum.review.requestChanges')}</Button>
             <Button type="button" onClick={props.onPublish} disabled={props.publishBusy}>{t('curriculum.review.publish')}</Button>
           </div>
-          <p ref={props.noticeRef} tabIndex={-1} role="status" className="text-sm text-foreground empty:hidden">
+          {/* In the accessibility tree while empty: a live region that appears
+              with its text is not announced, and `empty:hidden` took this one
+              out until then (#450). */}
+          <p ref={props.noticeRef} tabIndex={-1} role="status" className={props.notice ? 'text-sm text-foreground' : 'sr-only'}>
             {props.notice}
           </p>
           <Button type="button" variant="outline" onClick={props.onLoadAudit} disabled={props.auditLoading}>{t('curriculum.review.loadAudit')}</Button>

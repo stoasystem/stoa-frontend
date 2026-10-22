@@ -1,5 +1,6 @@
 /**
- * Moving to another page puts focus on it and says its name (#406).
+ * Moving to another page puts focus on it and says its name (#406), and
+ * opens it at its top (#448).
  *
  * Every page draws its own layout, so a move replaced the top bar too: the
  * link just pressed was gone, focus fell to <body> and a screen reader said
@@ -10,12 +11,12 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { act, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { Suspense, type ReactNode } from 'react'
-import { MemoryRouter, useNavigate, type NavigateFunction } from 'react-router-dom'
+import { Suspense, useEffect, type ReactNode } from 'react'
+import { MemoryRouter, Route, Routes, useNavigate, type NavigateFunction } from 'react-router-dom'
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 import { AppRouter } from '@/app/router/AppRouter'
 import { AppRoutes } from '@/app/router/AppRoutes'
-import { RouteArrival } from '@/app/router/RouteArrival'
+import { RouteArrival, useReportPageName } from '@/app/router/RouteArrival'
 import i18n from '@/i18n'
 import { type CurrentUser, useAuthStore } from '@/store/authStore'
 import type { UserRole } from '@/types/user'
@@ -416,18 +417,72 @@ describe('the first load (#406)', () => {
   })
 
   it('ends with a click alone on a page with no name, as a screen reader’s browse mode sends', async () => {
-    // A refused visitor's sign-in page at `/` reports no name of its own.
-    signInAs('anonymous')
-    openAt('/')
-    await waitFor(() => expect(heading('EntryPage')).toBeInTheDocument())
+    // Every page of the manifest reports a name since #448 named the sign-in
+    // page a refused visitor sees at `/`; one that does not is drawn here.
+    function Unnamed() {
+      const navigate = useNavigate()
+      return (
+        <main>
+          <h1>No name of its own</h1>
+          <button type="button" onClick={() => navigate('/next', { replace: true })}>
+            Replace
+          </button>
+        </main>
+      )
+    }
+    render(
+      <MemoryRouter initialEntries={['/']}>
+        <RouteArrival>
+          <Routes>
+            <Route element={<Unnamed />} path="/" />
+            <Route element={<main><h1>The next page</h1></main>} path="/next" />
+          </Routes>
+        </RouteArrival>
+      </MemoryRouter>,
+    )
 
     act(() => {
-      screen.getByRole('button', { name: 'Replace with support' }).click()
+      screen.getByRole('button', { name: 'Replace' }).click()
     })
 
-    const title = await waitFor(() => heading('SupportPage'))
+    const title = await waitFor(() => heading('The next page'))
     await waitFor(() => expect(document.activeElement).toBe(title))
-    expect(announced()).toEqual([name('routes.support.title')])
+    // It has no name to say either.
+    expect(announced()).toEqual([])
+  })
+
+  it('does not end with a name alone: a page that sends the visitor on as it opens was never shown (#448 audit)', async () => {
+    // The sign-in page opened by a signed-in account names itself and draws
+    // nothing but a redirect. In the browser the router's move comes in a
+    // later task, after the report has settled.
+    function NamedRedirect() {
+      const reportName = useReportPageName()
+      const navigate = useNavigate()
+      useEffect(() => {
+        reportName('/', 'Anmelden')
+        const later = setTimeout(() => navigate('/next', { replace: true }), 0)
+        return () => clearTimeout(later)
+      }, [reportName, navigate])
+      return null
+    }
+    render(
+      <MemoryRouter initialEntries={['/']}>
+        <RouteArrival>
+          <Routes>
+            <Route element={<NamedRedirect />} path="/" />
+            <Route element={<main><h1>The next page</h1></main>} path="/next" />
+          </Routes>
+        </RouteArrival>
+      </MemoryRouter>,
+    )
+
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 10))
+    })
+
+    const title = heading('The next page')
+    expect(document.activeElement).toBe(document.body)
+    expect(title).not.toHaveAttribute('tabindex')
   })
 })
 
@@ -468,11 +523,14 @@ describe('a move that goes through a guard or a redirect (#406)', () => {
     await waitFor(() => expect(document.activeElement).toBe(signIn))
     expect(announced()).toEqual([name('routes.login.title')])
 
-    // `/` shows the same page to anyone it is not for, with no name of its
-    // own: focus still goes there, and the region keeps nothing from before.
+    // `/` shows the same page to anyone it is not for, under the same name
+    // (#448): said again, in a fresh node.
+    const first = announcer().firstElementChild
     await user.click(screen.getByRole('link', { name: name('navigation.logoHome') }))
     await waitFor(() => expect(document.activeElement).toBe(heading('EntryPage')))
-    expect(announced()).toEqual([])
+    await waitFor(() => expect(announcer().firstElementChild).not.toBe(first))
+    expect(announced()).toEqual([name('routes.login.title')])
+    expect(document.title).toBe(`${name('routes.login.title')} · STOA`)
   })
 
   it('stays on the forced password change, and says it each time the guard sends it back', async () => {
@@ -569,5 +627,245 @@ describe('the app’s router (#406)', () => {
 
     await waitFor(() => expect(document.activeElement).toBe(screen.getByRole('main')))
     expect(announced()).toEqual([name('navigation.availability')])
+  })
+})
+
+/** The calls to window.scrollTo and the moves of focus, in the order they came. */
+function watchScrollAndFocus() {
+  const log: string[] = []
+  vi.spyOn(window, 'scrollTo').mockImplementation((...args: unknown[]) => {
+    log.push(`scroll ${JSON.stringify(args)}`)
+  })
+  const focused = (event: FocusEvent) => log.push(`focus ${(event.target as HTMLElement).textContent}`)
+  document.addEventListener('focusin', focused)
+  return {
+    log,
+    scrolls: () => log.filter((entry) => entry.startsWith('scroll ')),
+    stop: () => document.removeEventListener('focusin', focused),
+  }
+}
+
+const TO_TOP = `scroll ${JSON.stringify([{ top: 0, left: 0, behavior: 'instant' }])}`
+
+describe('a new page starts at its top (#448)', () => {
+  let watch: ReturnType<typeof watchScrollAndFocus>
+
+  beforeEach(() => {
+    watch = watchScrollAndFocus()
+  })
+
+  afterEach(() => {
+    watch.stop()
+    vi.restoreAllMocks()
+  })
+
+  it('scrolls to the top on a link to another page, before its heading takes focus', async () => {
+    const user = userEvent.setup()
+    signInAs('teacher')
+    openAt('/teacher/availability')
+
+    await user.click(screen.getByRole('link', { name: name('navigation.requests') }))
+
+    await waitFor(() => expect(document.activeElement).toBe(heading('TeacherDashboardPage')))
+    expect(watch.scrolls()).toEqual([TO_TOP])
+    expect(watch.log.slice(watch.log.indexOf(TO_TOP))).toEqual([TO_TOP, 'focus TeacherDashboardPage'])
+  })
+
+  it('scrolls to the top on a replace the reader makes, and on the page a redirect leads to', async () => {
+    const user = userEvent.setup()
+    signInAs('teacher')
+    openAt('/teacher')
+
+    await user.click(screen.getByRole('button', { name: 'Replace with support' }))
+    await waitFor(() => expect(document.activeElement).toBe(heading('SupportPage')))
+    expect(watch.scrolls()).toEqual([TO_TOP])
+
+    watch.log.length = 0
+    await user.click(screen.getByRole('link', { name: 'Old availability address' }))
+    await waitFor(() => expect(document.activeElement).toBe(screen.getByRole('main')))
+    // Once for the old address, once for the page it leads to.
+    expect(watch.scrolls()).toEqual([TO_TOP, TO_TOP])
+  })
+
+  it('leaves a step back to the browser', async () => {
+    const user = userEvent.setup()
+    signInAs('teacher')
+    openAt('/teacher')
+    await user.click(screen.getByRole('link', { name: name('navigation.availability') }))
+    await waitFor(() => expect(document.activeElement).toBe(screen.getByRole('main')))
+    watch.log.length = 0
+
+    await user.click(screen.getByRole('button', { name: 'Back' }))
+
+    // Focus still moves (#406); the scroll is the browser's to give back.
+    await waitFor(() => expect(document.activeElement).toBe(heading('TeacherDashboardPage')))
+    expect(watch.scrolls()).toEqual([])
+  })
+
+  it('leaves a page that stays on screen where it is: the map’s layers, Ask’s conversations', async () => {
+    const user = userEvent.setup()
+    signInAs('student')
+    const map = openAt('/map/s1')
+    await user.click(screen.getByRole('link', { name: 'A nebula' }))
+    await waitFor(() => expect(screen.queryByRole('link', { name: 'A nebula' })).not.toBeInTheDocument())
+    expect(watch.scrolls()).toEqual([])
+    map.unmount()
+
+    openAt('/ask')
+    await user.click(screen.getByRole('button', { name: 'Conversation one' }))
+    await waitFor(() => expect(screen.getByRole('heading', { level: 2, name: 'Conversation c1' })).toBeInTheDocument())
+    await user.click(screen.getByRole('button', { name: 'Back to the list' }))
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Conversation one' })).toBeInTheDocument())
+    expect(watch.scrolls()).toEqual([])
+  })
+
+  it('leaves the first load and its redirects alone', async () => {
+    signInAs('anonymous')
+    const guard = openAt('/teacher')
+    await waitFor(() => expect(heading('EntryPage')).toBeInTheDocument())
+    guard.unmount()
+
+    signInAs('teacher')
+    const legacy = openAt('/tutor/availability')
+    await waitFor(() => expect(screen.getByText('A page without a heading.')).toBeInTheDocument())
+    legacy.unmount()
+
+    // `/` sends a signed-in teacher home.
+    openAt('/')
+    await waitFor(() => expect(heading('TeacherDashboardPage')).toBeInTheDocument())
+
+    expect(watch.scrolls()).toEqual([])
+  })
+
+  it('waits for a page that is still loading: scrolls once it is shown, then focuses it', async () => {
+    const user = userEvent.setup()
+    signInAs('teacher')
+    openAt('/teacher')
+    const release = holdSlowPage()
+
+    await user.click(screen.getByRole('link', { name: 'Learning automation' }))
+    expect(heading('TeacherDashboardPage')).toBeInTheDocument()
+    expect(watch.scrolls()).toEqual([])
+
+    await act(async () => release())
+
+    await waitFor(() => expect(document.activeElement).toBe(heading('LearningAutomationConsolePage')))
+    expect(watch.scrolls()).toEqual([TO_TOP])
+    expect(watch.log.slice(watch.log.indexOf(TO_TOP))).toEqual([TO_TOP, 'focus LearningAutomationConsolePage'])
+  })
+
+  it('scrolls once as a guard’s loading screen comes in, and not again for the page behind it', async () => {
+    const user = userEvent.setup()
+    signInAs('pending')
+    openAt('/support')
+
+    await user.click(screen.getByRole('link', { name: 'Teacher home' }))
+    await waitFor(() => expect(screen.getByText(name('status.loadingAccount'))).toBeInTheDocument())
+    expect(watch.scrolls()).toEqual([TO_TOP])
+
+    act(() => useAuthStore.setState({ user: account('teacher') }))
+    await waitFor(() => expect(document.activeElement).toBe(heading('TeacherDashboardPage')))
+    expect(watch.scrolls()).toEqual([TO_TOP])
+  })
+
+  it('leaves the map alone when it moves itself across its layers after coming in behind a loading screen (#448 audit)', async () => {
+    // A reload on a star: the account is read before the map is drawn, and
+    // the map then moves to the star's nebula itself, as useLightingStage
+    // does for a star waiting to be lit. No key or pointer on the way.
+    signInAs('pending')
+    openAt('/map/s1')
+    act(() => useAuthStore.setState({ user: account('student') }))
+    const title = await waitFor(() => heading('MapPage'))
+    await waitFor(() => expect(document.title).toContain('STOA'))
+    const main = screen.getByRole('main')
+
+    act(() => go('/map/s1/t1', { replace: true }))
+    await waitFor(() => expect(screen.queryByRole('link', { name: 'A nebula' })).not.toBeInTheDocument())
+    await act(async () => {})
+
+    expect(screen.getByRole('main')).toBe(main)
+    expect(watch.scrolls()).toEqual([])
+    expect(document.activeElement).not.toBe(title)
+    expect(announced()).toEqual([])
+  })
+
+  it('lets a page that scrolls itself on arrival have the last word (the account page’s #password)', async () => {
+    const user = userEvent.setup()
+    signInAs('student')
+    openAt('/assignments')
+
+    await user.click(screen.getByRole('link', { name: 'Change password' }))
+
+    const section = await waitFor(() => screen.getByRole('heading', { level: 2, name: 'Password' }))
+    await waitFor(() => expect(document.activeElement).toBe(section))
+    expect(watch.scrolls()).toEqual([TO_TOP, `scroll ${JSON.stringify([0, 640])}`])
+    expect(heading('MePage')).not.toHaveAttribute('tabindex')
+  })
+
+  it('scrolls to the top in the app’s own router', async () => {
+    const user = userEvent.setup()
+    signInAs('teacher')
+    window.history.replaceState(null, '', '/teacher')
+    render(
+      <QueryClientProvider client={new QueryClient()}>
+        <AppRouter />
+      </QueryClientProvider>,
+    )
+    await waitFor(() => expect(heading('TeacherDashboardPage')).toBeInTheDocument())
+    expect(watch.scrolls()).toEqual([])
+
+    await user.click(screen.getByRole('link', { name: name('navigation.availability') }))
+
+    await waitFor(() => expect(document.activeElement).toBe(screen.getByRole('main')))
+    expect(watch.scrolls()).toEqual([TO_TOP])
+  })
+})
+
+describe('the sign-in page a refused visitor sees at / (#448)', () => {
+  it('is named in the title bar on the first load, and nothing is said', async () => {
+    signInAs('anonymous')
+    openAt('/')
+
+    await waitFor(() => expect(document.title).toBe(`${name('routes.login.title')} · STOA`))
+    expect(heading('EntryPage')).toBeInTheDocument()
+    expect(document.activeElement).toBe(document.body)
+    expect(announced()).toEqual([])
+  })
+
+  it('is said after a move from another page, with focus on its heading', async () => {
+    const user = userEvent.setup()
+    signInAs('anonymous')
+    openAt('/support')
+    await waitFor(() => expect(document.title).toBe(`${name('routes.support.title')} · STOA`))
+
+    await user.click(screen.getByRole('link', { name: name('navigation.logoHome') }))
+
+    await waitFor(() => expect(document.activeElement).toBe(heading('EntryPage')))
+    expect(announced()).toEqual([name('routes.login.title')])
+    expect(document.title).toBe(`${name('routes.login.title')} · STOA`)
+  })
+
+  it('ends the first load, as any page on screen does: a move the app makes from it is a move', async () => {
+    signInAs('anonymous')
+    openAt('/')
+    await waitFor(() => expect(document.title).toBe(`${name('routes.login.title')} · STOA`))
+
+    // No key, pointer or click here: its name alone says a page was shown.
+    act(() => go('/support', { replace: true }))
+
+    const title = await waitFor(() => heading('SupportPage'))
+    await waitFor(() => expect(document.activeElement).toBe(title))
+    expect(announced()).toEqual([name('routes.support.title')])
+  })
+
+  it('is not named to a signed-in visitor it sends home: that redirect is still the first load', async () => {
+    signInAs('teacher')
+    openAt('/')
+
+    const title = await waitFor(() => heading('TeacherDashboardPage'))
+    await waitFor(() => expect(document.title).toBe(`${name('navigation.requests')} · STOA`))
+    expect(document.activeElement).toBe(document.body)
+    expect(title).not.toHaveAttribute('tabindex')
+    expect(announced()).toEqual([])
   })
 })

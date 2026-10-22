@@ -14,21 +14,54 @@ type Katex = { renderToString: (tex: string, options?: Record<string, unknown>) 
 let katexPromise: Promise<Katex> | null = null
 
 // A failed load (a dropped connection, a chunk gone after a deploy) is not
-// kept: the next formula asks again (#345), and is typeset if the browser
-// fetches the module again. Chromium does not (seen with 148): it keeps a
-// failed import for the rest of the document, so there formulas stay as
-// written until the next document. Nor is a module that came back empty
-// kept, which is what Vite hands over when a `vite:preloadError` listener
+// kept: the next formula asks again (#345). Nor is a module that came back
+// empty, which is what Vite hands over when a `vite:preloadError` listener
 // prevents the failure (#401).
+//
+// Asking for the same address again is not enough: Chromium keeps a failed
+// import for the rest of the document and answers it again without asking
+// the network (seen with 148), so formulas stayed as written for good. The
+// next formula therefore asks for KaTeX's file under a new address,
+// `?retry=1`, then `?retry=2` (#447). That is safe for this file alone: it
+// imports nothing, while a page's file would meet its own imports' failures again.
+let katexRetry: { file: string; count: number } | null = null
+
+/**
+ * KaTeX's file, as a failed import names it: Chromium and Firefox put the
+ * address in the message, of the error or of one it wraps (`cause`). A
+ * browser that does not (Safari) asks for the same address again, as before.
+ */
+function katexFileIn(error: unknown): string | null {
+  for (const failure of [error, error instanceof Error ? (error as { cause?: unknown }).cause : undefined]) {
+    if (!(failure instanceof Error)) continue
+    for (const word of failure.message.split(/\s+/)) {
+      let url: URL
+      try {
+        url = new URL(word, window.location.href)
+      } catch {
+        continue
+      }
+      // Only our own file: the address is read from a message, after all.
+      if (url.origin === window.location.origin && /\/katexLoader[\w-]*\.[jt]s$/.test(url.pathname)) return url.pathname
+    }
+  }
+  return null
+}
+
 function loadKatex(): Promise<Katex> {
   if (!katexPromise) {
-    katexPromise = import('./katexLoader')
+    const pending: Promise<{ default?: unknown } | undefined> = katexRetry
+      ? import(/* @vite-ignore */ `${katexRetry.file}?retry=${(katexRetry.count += 1)}`)
+      : import('./katexLoader')
+    katexPromise = pending
       .then((module) => {
         if (!module?.default) throw new Error('KaTeX did not load')
-        return module.default as unknown as Katex
+        return module.default as Katex
       })
       .catch((error: unknown) => {
         katexPromise = null
+        const file = katexRetry ? null : katexFileIn(error)
+        if (file) katexRetry = { file, count: 0 }
         throw error
       })
   }

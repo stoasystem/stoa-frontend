@@ -148,6 +148,19 @@ export function rereadFirstPages(queryClient: QueryClient, which: (query: Query)
 }
 
 /**
+ * Applies `change` to the rows of every read not in flight, and nothing more:
+ * which reads go to the server again is the caller's to say. A read in flight
+ * is left to it too: its answer, or cancelling it, would replace the rows.
+ */
+function writeRows(queryClient: QueryClient, change: RowChange) {
+  for (const query of accountReads(queryClient, (query) => !inFlight(query))) {
+    const data = query.state.data as AccountRead | undefined
+    const next = data === undefined ? null : rewriteRead(data, readFilters(query.queryKey), change)
+    if (next) queryClient.setQueryData(query.queryKey, next)
+  }
+}
+
+/**
  * Applies `change` to every cached row. A read the change did not touch is
  * left alone, unless `stale` says it may still be wrong - its filters may now
  * admit an account it does not hold, or it holds a row the change could not
@@ -181,7 +194,11 @@ function changeRows(
  * the children linked while both accounts are active. A student who leaves
  * active drops off its parents' rows, and a parent who does has none on its
  * own. Back to active, those links return, and which ones is the server's to
- * say, so a parent or student coming back costs a first-page read.
+ * say, so a parent or student coming back costs a first-page read. Its own
+ * row says "active" before that read is sent (#449): the row's buttons follow
+ * its status, and the "Reactivate" its dialog was opened from has to be gone
+ * by the time the dialog closes, or focus goes back to it and then, when the
+ * read lands, to nowhere.
  *
  * The role comes from a cached row. With none, a list filtered to any role
  * may admit the account, so every list filtered to the new status is read
@@ -195,6 +212,9 @@ export function afterStatusChange(
   const status = result?.accountStatus ?? input.status
   const role = findRow(queryClient, input.userId)?.role
   if (status === 'active' && role !== 'teacher' && role !== 'admin') {
+    writeRows(queryClient, (row) =>
+      row.userId === input.userId ? { ...row, accountStatus: status, invitationId: undefined } : row,
+    )
     rereadFirstPages(queryClient)
     return
   }

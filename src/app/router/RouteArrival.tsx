@@ -1,9 +1,9 @@
-import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from 'react'
+import { createContext, useCallback, useContext, useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react'
 import { NavigationType, useLocation, useNavigationType } from 'react-router-dom'
 
 /**
  * Where focus goes, and what a screen reader is told, when the page changes
- * (#406).
+ * (#406), and where the new page is scrolled to (#448).
  *
  * Every page draws its own layout, so going from one page to the next
  * replaces the top bar and its navigation too: the link just pressed is gone,
@@ -11,6 +11,11 @@ import { NavigationType, useLocation, useNavigationType } from 'react-router-dom
  * After a change of path this puts focus on the new page's heading, or on its
  * <main> where it has none, and says the page's name in a polite live region
  * that is there for the whole visit.
+ *
+ * The document scrolls, not the page, so a page opened from one read halfway
+ * down kept that offset, and its heading took focus off screen. A page the
+ * reader opens with a link or a replace starts at its top; a back or forward
+ * move keeps the position the browser gives it.
  *
  * Left alone:
  * - the first load, with the redirects the app makes before any page was
@@ -23,10 +28,10 @@ import { NavigationType, useLocation, useNavigationType } from 'react-router-dom
  *   the document) is moved, and only after the new page's own effects ran.
  *
  * A page is settled once: when it reports its name (PageTitle, which renders
- * with the page), or, for a page with no name of its own (the sign-in page a
- * refused visitor sees at `/`), when it has a heading or <main>. A guard's
- * loading screen has neither, so its page is settled when it arrives; a
- * redirect is never settled, the page it leads to is.
+ * with the page), or, for a page with no name of its own, when it has a
+ * heading or <main>. A guard's loading screen has neither, so its page is
+ * settled when it arrives; a redirect is never settled, the page it leads to
+ * is.
  */
 
 type ReportName = (pathname: string, name: string | null) => void
@@ -65,8 +70,8 @@ function takeFocus(target: HTMLElement) {
     if (document.activeElement === target) target.addEventListener('blur', onBlur, { once: true })
     else release()
   }
-  // The scroll is left where it was: a back or forward move keeps the
-  // position the browser gives it.
+  // Never scrolled to: a new page was put at its top before its own effects
+  // ran, and a back or forward move keeps the position the browser gives it.
   target.focus({ preventScroll: true })
   if (document.activeElement === target) {
     target.addEventListener('blur', onBlur, { once: true })
@@ -98,13 +103,15 @@ export function RouteArrival({ children }: { children: ReactNode }) {
   const lastMain = useRef<Element | null>(null)
   /** A page has been on screen: a replace after this is a move, not loading. */
   const pageShown = useRef(false)
+  /** Whether the change of path to `pathname` is the reader's move to another page. */
+  const arrival = useRef<{ pathname: string; moved: boolean } | null>(null)
   const spoken = useRef(0)
   const [said, setSaid] = useState<{ name: string; count: number } | null>(null)
 
   const currentMain = () => pages.current?.querySelector('main') ?? null
 
-  // Acting on a page also ends the first load: the sign-in page a refused
-  // visitor sees has no name to report. A key on a loading screen does not.
+  // Acting on a page also ends the first load, for a page with no name to
+  // report. A key on a loading screen does not.
   // A screen reader's browse mode activates a link with a click alone, no key
   // or pointer event, so a click counts too.
   useEffect(() => {
@@ -136,17 +143,53 @@ export function RouteArrival({ children }: { children: ReactNode }) {
     setSaid(name ? { name, count: ++spoken.current } : null)
   }, [])
 
+  /*
+   * The first load ends with a page on screen, checked once the commit that
+   * named the page or led to it has run its effects: a page that sends the
+   * visitor on as it opens (the sign-in page, to a signed-in account's home)
+   * or is replaced in the same flush (a tab joining the browser's sign-in at
+   * `/`) was never shown, and the move it makes is still the first load.
+   */
+  const shownOnceSettled = useCallback((path: string) => {
+    queueMicrotask(() => {
+      if (shown.current !== path || arrivalTargets(pages.current).length === 0) return
+      pageShown.current = true
+      // It may have come in after the last change of path, behind a loading
+      // screen: a move it then makes in place is its own.
+      lastMain.current = currentMain()
+    })
+  }, [])
+
   const reportName = useCallback<ReportName>(
     (path, name) => {
       named.current = { pathname: path, name }
-      if (path === shown.current) pageShown.current = true
+      if (path === shown.current) shownOnceSettled(path)
       // The page behind a loading screen has just arrived. Its name is
       // reported from PageTitle's effect, before the page's own effects run:
       // settle once they have, so a focus the page sets is in place.
       if (pending.current === path) queueMicrotask(settle)
     },
-    [settle],
+    [settle, shownOnceSettled],
   )
+
+  // Decided as the new page is put in the document, before it is painted and
+  // before its passive effects run: it starts at its top, and a place it
+  // scrolls to or a field it focuses itself in one (the account page's
+  // #password) still has the last word. Its layout effects, refs and
+  // autoFocus have run already; a page that sets its own place on arrival
+  // does it in a passive effect.
+  useLayoutEffect(() => {
+    if (shown.current === pathname) return
+    const main = currentMain()
+    const stayed = main !== null && main === lastMain.current
+    // A link, a back or forward move, or a replace once a page was shown; a
+    // replace before then is the app still loading.
+    const byReader = navigationType !== NavigationType.Replace || pageShown.current
+    arrival.current = { pathname, moved: byReader && !stayed }
+    if (arrival.current.moved && navigationType !== NavigationType.Pop) {
+      window.scrollTo({ top: 0, left: 0, behavior: 'instant' })
+    }
+  }, [pathname, navigationType])
 
   // Runs after the new page's own effects (they are its children's), so a
   // focus the page set is already in place, and its name already reported.
@@ -154,20 +197,16 @@ export function RouteArrival({ children }: { children: ReactNode }) {
     if (shown.current === pathname) return
     shown.current = pathname
     const main = currentMain()
-    const stayed = main !== null && main === lastMain.current
-    // A link, a back or forward move, or a replace once a page was shown; a
-    // replace before then is the app still loading.
-    const byReader = navigationType !== NavigationType.Replace || pageShown.current
-    pending.current = byReader && !stayed ? pathname : null
+    pending.current = arrival.current?.pathname === pathname && arrival.current.moved ? pathname : null
     // Left alone: the region holds no name of a page the reader has left.
     if (pending.current === null) setSaid(null)
     settle()
     lastMain.current = main
     // The page a first load's redirects end on is shown now, if it is here.
-    if (named.current?.pathname === pathname || arrivalTargets(pages.current).length > 0) pageShown.current = true
+    shownOnceSettled(pathname)
     // A later arrival waits for a report of its own, never this one's.
     named.current = null
-  }, [pathname, navigationType, settle])
+  }, [pathname, navigationType, settle, shownOnceSettled])
 
   return (
     <ReportNameContext.Provider value={reportName}>

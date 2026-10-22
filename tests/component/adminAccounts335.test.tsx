@@ -148,11 +148,32 @@ describe('A6: the keyword waits for a pause and the list stays up', () => {
     render(<AdminAccountsPage />, { wrapper: Wrapper })
     await screen.findByText('Anna')
 
+    // #449: every change to the page while the next list is read, not the
+    // page at one moment. Checked once, as the request went out, a flash
+    // that came a render later passed.
+    const flashes: string[] = []
+    const note = (records: MutationRecord[]) => {
+      for (const record of records) {
+        for (const node of record.addedNodes) {
+          if (node.textContent?.includes('accounts.loading')) flashes.push('"loading" shown')
+        }
+        for (const node of record.removedNodes) {
+          if (node.textContent?.includes('Anna')) flashes.push('the list taken down')
+        }
+      }
+    }
+    const watch = new MutationObserver(note)
+    watch.observe(document.body, { childList: true, subtree: true })
+
     typeQuickly(screen.getByLabelText('accounts.keywordLabel'), 'lea')
     await waitFor(() => expect(mockedList).toHaveBeenCalledTimes(2))
+    // The request stays open over many renders before it is answered.
+    await new Promise((resolve) => setTimeout(resolve, 100))
 
+    note(watch.takeRecords())
+    watch.disconnect()
+    expect(flashes).toEqual([])
     expect(screen.getByText('Anna')).toBeInTheDocument()
-    expect(screen.queryByText('accounts.loading')).toBeNull()
 
     answer(list(['Lea']))
     expect(await screen.findByText('Lea')).toBeInTheDocument()
