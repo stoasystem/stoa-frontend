@@ -7,6 +7,42 @@ import path from 'node:path'
 // and network replacement, the benches) and the vitest-only MSW handlers.
 const DEV_ONLY_DIRS = ['src/dev/', 'src/mocks/']
 
+/*
+ * Installed modules that only pages loaded on demand import, by their path
+ * below the outermost node_modules/ (#456). The named group of their package
+ * would put them on every first screen; left unnamed, they travel with the
+ * pages that need them. Radix's dialog and tabs take the slot, context and
+ * primitive nested under them along. The top-level primitive is react-label's
+ * (the menu on the first screen has copies of its own; react-avatar and
+ * react-separator would take it too, but nothing uses them). `persist` serves
+ * the star map's store. A module that a named chunk imports stays in that
+ * chunk whatever this says: Rollup takes it along.
+ *
+ * The dialog goes too, though the star map, a student's home, opens one. Out
+ * of the UI kit's chunk it saves every first screen 1.4 kB gzip, before
+ * anything is asked of the backend. Each page that opens one (the star map,
+ * Ask, a teacher's request, and the administrators' Users, Teacher
+ * applications, Account operations and Curriculum) pays 1.8 kB and a request,
+ * after a reload while the account is read (#456 audits).
+ *
+ * tests/component/firstScreenChunks415.test.ts fails a build whose first
+ * screen carries a package module it never imports. What a package's index
+ * re-exports counts as imported there, so it does not see lucide-react's icons.
+ */
+const LATER_PAGES_ONLY = [
+  '@radix-ui/react-dialog/',
+  '@radix-ui/react-label/',
+  '@radix-ui/react-primitive/',
+  '@radix-ui/react-tabs/',
+  'zustand/esm/middleware',
+]
+
+/** A slash-separated module id's path below the outermost node_modules/. */
+function installedPath(normalizedId: string) {
+  const at = normalizedId.indexOf('/node_modules/')
+  return at === -1 ? normalizedId : normalizedId.slice(at + '/node_modules/'.length)
+}
+
 /** The project-relative, slash-separated path of a module id, query dropped. */
 function projectPath(id: string) {
   const file = id.replace(/^\0/, '').split('?')[0]
@@ -57,6 +93,8 @@ export default defineConfig({
           // dependency. KaTeX is loaded on demand, so it is left unnamed and
           // travels with the screen that needs it.
           if (normalizedId.includes('/katex/')) return undefined
+          const installed = installedPath(normalizedId)
+          if (LATER_PAGES_ONLY.some((prefix) => installed.startsWith(prefix))) return undefined
 
           if (
             normalizedId.includes('/react/') ||
