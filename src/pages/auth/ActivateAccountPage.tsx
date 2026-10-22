@@ -35,6 +35,7 @@ export function ActivateAccountPage() {
   const [formError, setFormError] = useState<{ message: string; field?: ActivationField } | null>(null)
   const claimMutation = useClaimInvitationMutation()
   const success = useRef<HTMLParagraphElement>(null)
+  const dateOfBirthField = useRef<HTMLInputElement>(null)
 
   // The form goes once the claim succeeds, and focus would go down with it to
   // the page; it moves to the sentence saying so, with the sign-in link next
@@ -66,6 +67,12 @@ export function ActivateAccountPage() {
     }
     if (password !== confirmPassword) {
       setFormError({ message: t('admin:activation.passwordMismatch'), field: 'confirm' })
+      return
+    }
+    // A date typed only in part reads as '' and would go as "no date"; only
+    // the field's validity tells the two apart (#451).
+    if (dateOfBirthField.current?.validity.badInput) {
+      setFormError({ message: t('admin:activation.dateOfBirthIncomplete'), field: 'dateOfBirth' })
       return
     }
     setFormError(null)
@@ -101,7 +108,15 @@ export function ActivateAccountPage() {
         ) : null}
 
         {!claimMutation.isSuccess && token ? (
-          <form className="mt-6 grid max-w-md gap-4" onSubmit={submit}>
+          <form
+            className="mt-6 grid max-w-md gap-4"
+            // The browser's own prompts follow its language, not the one
+            // chosen here, and stopped the submit before the page's own
+            // checks ran; those answer instead (#451). `required` stays on
+            // the fields for assistive technology.
+            noValidate
+            onSubmit={submit}
+          >
             <div className="space-y-2">
               <Label htmlFor="activation-password">{t('auth:register.password')}</Label>
               <Input
@@ -132,6 +147,7 @@ export function ActivateAccountPage() {
             <div className="space-y-2">
               <Label htmlFor="activation-date-of-birth">{t('admin:activation.dateOfBirth')}</Label>
               <Input
+                ref={dateOfBirthField}
                 id="activation-date-of-birth"
                 type="date"
                 autoComplete="bday"

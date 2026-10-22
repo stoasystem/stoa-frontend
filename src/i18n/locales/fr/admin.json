@@ -187,6 +187,7 @@
     "signIn": "Se connecter",
     "missingToken": "Ce lien d'invitation ne contient pas de jeton. Ouvrez le lien depuis votre e-mail.",
     "passwordMismatch": "Les deux mots de passe ne correspondent pas.",
+    "dateOfBirthIncomplete": "Cette date de naissance est incomplète. Indiquez le jour, le mois et l'année, ou videz le champ.",
     "failed": "Nous n'avons pas pu activer cette invitation. Veuillez réessayer.",
     "errors": {
       "invitation_invalid": "Cette invitation n'est pas valide.",

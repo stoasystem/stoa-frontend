@@ -187,6 +187,7 @@
     "signIn": "Accedi",
     "missingToken": "In questo link di invito manca il token. Apri il link dalla tua e-mail.",
     "passwordMismatch": "Le due password non coincidono.",
+    "dateOfBirthIncomplete": "Questa data di nascita è incompleta. Indica giorno, mese e anno, oppure svuota il campo.",
     "failed": "Non è stato possibile attivare questo invito. Riprova.",
     "errors": {
       "invitation_invalid": "Questo invito non è valido.",
