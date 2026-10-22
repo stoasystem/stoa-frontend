@@ -25,6 +25,7 @@
     "resetPassword": "Reimposta la password",
     "reasonPrompt": "Motivo di questa modifica (registrato nel log di audit)",
     "readOnceHint": "Leggibile una sola volta, copialo adesso:",
+    "hideSecret": "Nascondi",
     "inviteSent": "Invito inviato. Numero account {{accountNumber}}.",
     "inviteResent": "Invito inviato di nuovo.",
     "inviteNotDelivered": "L'account {{accountNumber}} è stato creato, ma l'e-mail non è stata recapitata. Trasmetti tu il link oppure invialo di nuovo.",
