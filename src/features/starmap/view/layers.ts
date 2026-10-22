@@ -21,7 +21,8 @@ import { SHEET, ZOOM } from '@/features/starmap/view/semanticZoom'
 import type { NebulaDisc } from '@/features/starmap/view/geometry'
 
 export type LayerTarget =
-  | { layer: 'map' }
+  /** `fly`: pull back to the galaxy even from a choice let go (the first reveal), not stay. */
+  | { layer: 'map'; fly?: true }
   /** `whole`: the nebula seen whole, `star` kept in view: back on the map from a lighting (#140). */
   | { layer: 'nebula'; nebulaId: string; whole?: { star: string } }
   | { layer: 'star'; nebulaId: string; unitId: string }

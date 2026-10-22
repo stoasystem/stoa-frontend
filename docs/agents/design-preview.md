@@ -24,6 +24,7 @@ npm run dev -- --host 127.0.0.1 --port 5173
 - `lang`：`de` / `en` / `fr` / `it`；不给时按浏览器语言。界面文字和演示内容（章节、对话、通知、星名）同一种语言；在 /me 或账号菜单改语言后，后续请求也按新语言作答。
 - `signedIn=0`：以未登录访客打开（`login` 默认如此）。
 - `longNames=1`：星云用四语里最长的名字（经预览自己的星图覆盖，`withLongNebulaNames`）；全景只画悬停的那团星云名，放大后（#134 按星云屏上大小淡入）才看得到。
+- `newcomer=1`：新生的天空（`src/dev/demo/sky/newcomer.ts`）：零点亮、零进行中，只有没有前置的星可以开始；数学推荐演示知识点，其他在修学科按 #9 第 8 点。用来看首次落点（方案 A，`docs/research/user-onboarding-design.md`）。天空停在这个状态，页面里完成课时不会改变它。`map-newcomer` 界面自带这个参数。
 - `fresh=1`：清掉演示后端在本标签页里记住的状态（已完成课时、点亮与确认、Ask 里新建的对话和发出的消息，见下文「演示后端的状态」），回到 #116 的开场状态。
 
 页面里一旦移动过，地址栏就始终写回 `path`；登出后写回 `signedIn=0`，在页面里改过语言后写回 `lang`。所以刷新总是回到离开时的那一页、那个登录状态和语言。
@@ -39,6 +40,7 @@ npm run dev -- --host 127.0.0.1 --port 5173
 | `ask` / `ask-conversation` | `/ask`、`/ask/demo-ask-sine` | 可看；桌面为侧栏，手机为全屏 sheet；`demo-ask-sine` 带一位进行中的老师；能发消息（答复为固定文字）、请老师 |
 | `me` | `/me` | 可看 |
 | `account-menu` | `/me` 并自动打开头像菜单 | 可看，能退出（回到登录页） |
+| `map-newcomer` | `/` → `/map/math/trigonometry` | 可看：新生首次落点。没有点亮、没有进行中，打开 `/` 时不看全景，落到推荐星（演示知识点）所在星云的整团视野，Murmi 气泡在星旁边（窄于 560 px 时停靠在底部控件上方）；「Start this star」进章节，「Look around first」或 Esc 收起气泡、镜头不动；截图等气泡出现（`[data-first-landing] [data-shown]`）后再拍 |
 | `lighting` | `/map/math/trigonometry/demo-sine-cosine` | 可看：打开前把演示知识点的课时全部记为完成、点亮尚未确认；打开这颗星的地址，落在它所在星云的整团视野（地址换成星云的，#140），在这颗星上播放一次点亮动画（#51）；截图等动画结束（`data-lighting="done"`）后再拍 |
 
 ## 拦截：怎么做到零后端请求

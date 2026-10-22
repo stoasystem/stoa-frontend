@@ -19,6 +19,10 @@ import { useLocation, useNavigate, useParams, useSearchParams } from 'react-rout
 import { StarMapView } from '@/features/starmap/components/StarMapView'
 import { LightingOverlay } from '@/features/starmap/lighting/LightingOverlay'
 import { useLightingStage } from '@/features/starmap/lighting/useLightingStage'
+import { FirstLandingBubble } from '@/features/starmap/onboarding/FirstLandingBubble'
+import { FirstSubjectQuestion } from '@/features/starmap/onboarding/FirstSubjectQuestion'
+import { useFirstLanding } from '@/features/starmap/onboarding/useFirstLanding'
+import { useFirstReveal } from '@/features/starmap/onboarding/useFirstReveal'
 import { DEFAULT_SUBJECT_ID, DEMO_STAR_COUNT, fixtureSizeFrom, foveationFrom, useStarMap } from '@/features/starmap/useStarMap'
 import { pathForTarget, resolveTarget, type LayerTarget } from '@/features/starmap/view/layers'
 import { markLoginFirstScreenReady } from '@/lib/loginTiming'
@@ -50,6 +54,10 @@ export function StarMapRoute({ relations = false, longNames = false }: { relatio
   // A point waiting for its lighting moment is drawn in progress until it, and its star's route
   // (or a tap on it) opens on its nebula (#140, #145).
   const stage = useLightingStage(map, routeTarget)
+  // A student who has not started anything is asked which subject school is on (plan B), lands on
+  // its recommended star with Murmi beside it, and after the first lighting sees the galaxy (plan A).
+  const first = useFirstLanding(map, stage.target, ownerId)
+  const firstReveal = useFirstReveal(map, first.target, stage.reveal)
 
   // Sign-in timing, handed over from ChatPage / LearnPage (#45): a student
   // lands on the map now, so its first drawn frame ends the wait. The mark is
@@ -77,8 +85,17 @@ export function StarMapRoute({ relations = false, longNames = false }: { relatio
   if (map.subjects.length === 0) return <EmptyStarMap onShown={onFirstFrame} />
 
   return (
-    <StarMapView demo={demo} map={stage.map} target={stage.target} onNavigate={onNavigate} land={stage.land} onFirstFrame={onFirstFrame} onCentreGalaxy={onCentreGalaxy} foveate={search.has('foveation') ? foveationFrom(search) : false}
-      overlay={(locate, watch) => <LightingOverlay map={map} locate={locate} watch={watch} onReveal={stage.reveal} />} />
+    <StarMapView demo={demo} map={stage.map} target={firstReveal.target ?? first.target} onNavigate={onNavigate} land={stage.land} onFirstFrame={onFirstFrame} onCentreGalaxy={onCentreGalaxy} foveate={search.has('foveation') ? foveationFrom(search) : false}
+      overlay={(locate, watch) => (
+        <>
+          <LightingOverlay map={map} locate={locate} watch={watch} onReveal={firstReveal.onReveal} />
+          {first.asking && <FirstSubjectQuestion subjects={first.asking} onChoose={first.choose} />}
+          {first.star && <FirstLandingBubble star={first.star} locate={locate} watch={watch} onDismiss={first.dismiss} />}
+          {firstReveal.star && firstReveal.next && (
+            <FirstLandingBubble key={firstReveal.star.unitId} star={firstReveal.star} next={firstReveal.next} locate={locate} watch={watch} onDismiss={firstReveal.dismiss} />
+          )}
+        </>
+      )} />
   )
 }
 

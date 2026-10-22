@@ -93,3 +93,34 @@
   outline: var(--focus-ring-width, 2px) solid var(--focus-ring);
   outline-offset: var(--focus-ring-offset, 2px);
 }
+
+/* The first landing's Murmi (plan A): it arrives once the map is at rest beside the star. */
+@keyframes starmap-first-landing-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes starmap-first-landing-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.starmap-first-landing[data-shown] {
+  animation: starmap-first-landing-in var(--motion-panel) var(--ease-standard) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .starmap-first-landing[data-shown] {
+    animation: starmap-first-landing-fade var(--motion-reduced) linear both;
+  }
+}

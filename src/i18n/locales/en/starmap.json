@@ -15,6 +15,23 @@
     "body": "Check your connection and try again.",
     "retry": "Try again"
   },
+  "firstLanding": {
+    "title": "Start here: {{name}}",
+    "body": "Every star is one thing to learn. Finish its lessons and it lights up.",
+    "start": "Start this star",
+    "later": "Look around first"
+  },
+  "firstQuestion": {
+    "title": "Which subject are you working on at school right now?",
+    "body": "Murmi will take you to a good first star there.",
+    "unsure": "Not sure"
+  },
+  "firstReveal": {
+    "title": "Your first star is lit!",
+    "body": "Every star you light opens the ones that build on it. Next up: {{name}}.",
+    "show": "Show me the next star",
+    "later": "Got it"
+  },
   "help": {
     "open": "How the star map works",
     "close": "Close"
