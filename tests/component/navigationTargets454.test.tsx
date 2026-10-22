@@ -49,7 +49,29 @@ const ROLES: readonly UserRole[] = [
   'school_viewer',
 ]
 
+// A role the manifest has no home for: one the backend added first, and
+// Object's own keys, which a bare lookup in roleHomePaths would answer.
+const UNKNOWN_ROLES = ['guest', 'constructor', 'toString', '__proto__'] as unknown as readonly UserRole[]
+
+/*
+ * Another host in front of a page some role may open. A destination check
+ * that reads only the parsed path (`canUseNextPathForRole`) lets each of these
+ * through, so only the origin check stands between them and the redirect.
+ * Behind `/x/%2e%2e`, the parser's `..`, the host is a path here again.
+ */
+const OTHER_HOSTS = [
+  '//evil.example',
+  '/\\evil.example',
+  '\\\\evil.example',
+  '/\t/evil.example',
+  'https://evil.example',
+  `${window.location.protocol}//${window.location.host}@evil.example`,
+  '/x/%2e%2e//evil.example',
+]
+const PAGES = ['/', '/ask', '/map/math', '/me', '/parent', '/teacher', '/admin', '/organization']
+
 const HOSTILE_STRINGS: readonly string[] = [
+  ...OTHER_HOSTS.flatMap((host) => PAGES.map((page) => `${host}${page}`)),
   // Another host, in each spelling a browser reads as one.
   '//evil.example/x',
   '///evil.example/x',
@@ -158,9 +180,9 @@ function builtTargets(): Built[] {
     }
   }
 
-  // The sign-in's destination, the return after a session ended, and the
-  // forced change's "Continue" to where it was headed.
-  for (const role of ROLES) {
+  // The sign-in's destination, the return after a session ended, the forced
+  // change's "Continue" to where it was headed, and each role's home.
+  for (const role of [...ROLES, ...UNKNOWN_ROLES]) {
     for (const mustChangePassword of [false, true]) {
       const user = { role, mustChangePassword }
       for (const id of HOSTILE) {
@@ -274,6 +296,7 @@ describe('#454: every in-app target builder keeps hostile ids on this site', () 
     const built = builtTargets()
     expect(built.length).toBeGreaterThan(1000)
     // notificationTargetPath and reviewReturnPath answer null for "no target".
+    // Undefined is no answer: from 7.18.3 a link or navigate() to it throws.
     const leaving = built.filter(({ to }) => to !== null && !staysHere(to)).map(describeBuilt)
     expect(leaving).toEqual([])
   })
@@ -336,10 +359,12 @@ describe('#454: the real redirects and links keep hostile ids on this site', () 
     ] as const
   })
 
-  it('lands every old address on a page here', () => {
+  it('lands every old address on a page', () => {
+    // A page rendered, so no <Navigate> on the way threw. Where it landed is
+    // the router's own location, already a path here, so it proves nothing more.
     const lost = oldAddresses.flatMap(([role, address]) => {
       const landed = openAs(role, address)
-      return landed.page !== null && staysHere(createPath(landed)) ? [] : [`${role} ${address} -> ${createPath(landed)} (${landed.page ?? landed.text})`]
+      return landed.page !== null ? [] : [`${role} ${address} -> ${createPath(landed)} (${landed.text})`]
     })
     expect(lost).toEqual([])
   })

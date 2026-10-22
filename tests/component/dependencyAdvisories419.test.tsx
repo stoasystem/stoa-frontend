@@ -27,8 +27,8 @@
  * `<Navigate>` read the target as the browser would and refuse it (#454).
  * `<Link>` instead treats such a `to` as an external URL and leaves the site
  * on a click, so a `to` built from input still goes through `URL` first
- * (`resolveDestination` in authRoutes); every `to` in src today is a literal
- * or starts with one.
+ * (`resolveDestination` in authRoutes). Every `to` in src today is a literal,
+ * starts with one, or comes through such a check (navigationTargets454).
  */
 import { readdirSync, readFileSync } from 'node:fs'
 import path from 'node:path'
@@ -41,7 +41,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 const ROOT = path.resolve(__dirname, '../..')
 const LOCK = path.join(ROOT, 'package-lock.json')
 
-type LockEntry = { version?: string; dependencies?: Record<string, string> }
+type LockEntry = { version?: string; resolved?: string; dependencies?: Record<string, string> }
 type Lock = { packages: Record<string, LockEntry> }
 
 const readLock = () => JSON.parse(readFileSync(LOCK, 'utf8')) as Lock
@@ -104,6 +104,7 @@ describe('#454: the router is written down exactly, not only in the lock', () =>
     expect(isExact('7.18.4')).toBe(true)
   })
 
+  // The lock, which `npm ci` installs exactly; a local node_modules that drifted is not read here.
   it('pins react-router-dom, and react-router with it, to the version the lock installs', () => {
     const spec = manifest.dependencies['react-router-dom']
     expect(isExact(spec), `react-router-dom is "${spec}" in package.json`).toBe(true)
@@ -114,6 +115,10 @@ describe('#454: the router is written down exactly, not only in the lock', () =>
     // react-router-dom names its react-router exactly, so the pair cannot part.
     expect(lock.packages['node_modules/react-router-dom'].dependencies?.['react-router']).toBe(spec)
     expect(lockedVersions('react-router')).toEqual([spec])
+    // From the registry, as published: not a tarball or a fork that only carries the number.
+    for (const name of ['react-router', 'react-router-dom']) {
+      expect(lock.packages[`node_modules/${name}`].resolved).toBe(`https://registry.npmjs.org/${name}/-/${name}-${spec}.tgz`)
+    }
   })
 })
 

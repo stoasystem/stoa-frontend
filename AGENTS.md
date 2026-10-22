@@ -66,11 +66,13 @@ API 契约那步是从 `stoasystem/stoa-backend` 的 **main 分支**实时拉取
 
 `react-router-dom` 在 `package.json` 里写死版本（#454，现在是 7.18.4），不写范围：7.18.3 起 `navigate()`
 和 `<Navigate>` 遇到站外目标会抛错，重新生成 lock 不能悄悄换掉路由。`dependencyAdvisories419` 钉着它是精确
-版本、与 lock 一致。升级时只改这一个数，读路由 CHANGELOG 里讲跳转的条目，再跑
-`tests/component/navigationTargets454.test.tsx`（用恶意 id 驱动每个构造跳转目标的函数）。
+版本、与 lock 一致。升级用 `npm install react-router-dom@<版本> --save-exact`（只改 `package.json` 会和 lock
+对不上），读路由 CHANGELOG 里讲跳转的条目，再跑 `tests/component/navigationTargets454.test.tsx`（用恶意 id
+驱动每个构造跳转目标的函数）。
 
-完整的 `npm audit`（含开发依赖）不进门禁：开发工具的公告打不到浏览器，不该拦部署。升级依赖时顺手跑一遍，
-有公告就单开 PR，升到 npm 给的兼容修复版本。
+完整的 `npm audit`（含开发依赖）不进门禁：测试和 lint 工具的拒绝服务类公告打不到浏览器，不该拦部署。升级依赖时
+顺手跑一遍，有公告就单开 PR，升到 npm 给的兼容修复版本。构建链（vite 及其插件、tailwind、esbuild）不在此列：
+它们决定 `dist/` 的内容，还在带 `id-token: write` 的发布 job 里跑，那里的代码执行或恶意包公告要马上处理。
 
 方案 A 的集成分支 `redesign/planet` 已于 2026-10 合回 `main` 并删除，app-planet 预览站和它的
 预览工作流也一并停用；前端修复现在直接 PR 到 `main`。方案 B 的 `redesign/cute` 暂缓，
