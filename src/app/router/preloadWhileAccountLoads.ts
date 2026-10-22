@@ -4,6 +4,7 @@ import { justReloadedForFailedPage } from '@/app/chunkReload'
 import type { LazyPage } from '@/app/router/lazyPage'
 import { isAdmitted } from '@/app/router/routeAccess'
 import { legacyRedirects, pageRoutes, type PageRoute } from '@/app/router/routeManifest'
+import { showDemoSurfaces } from '@/lib/env'
 import { readTabAccount } from '@/lib/tabAccount'
 import { normalizeUserRole, useAuthStore } from '@/store/authStore'
 
@@ -14,16 +15,15 @@ import { normalizeUserRole, useAuthStore } from '@/store/authStore'
  * after a reload or in a new tab its page's code was not even asked for until
  * then: the star map's, about 77 kB gzip, only once a reply that takes 1-3 s
  * on a cold start had come. Now, while the account is read, the page this
- * address shows a student starts loading, when the tab was a student's or does
- * not remember whose it was (`readTabAccount`).
+ * address shows the role the tab remembers starts loading (`readTabAccount`):
+ * a teacher's, a parent's or an administrator's as well as a student's (#456),
+ * and a student's when the tab does not remember whose it was.
  *
  * Nothing here decides what is shown. The guards still wait for the account,
  * and a tab that turns out to be someone else's has fetched and evaluated code
  * it never renders. Right after a reload for a page that failed to load, the
  * page waits for its render as before (`justReloadedForFailedPage`).
  */
-
-const STUDENT = { role: 'student' } as const
 
 // Every path the router has, so an address matches here what it matches there.
 const routes: { path: string; page?: PageRoute }[] = [
@@ -33,11 +33,16 @@ const routes: { path: string; page?: PageRoute }[] = [
 
 /** The page to load while the account is read, given the role the tab remembers, if any. */
 export function pageToPreload(pathname: string, rememberedRole: string | undefined): LazyPage | null {
-  if (rememberedRole && normalizeUserRole(rememberedRole) !== 'student') return null
   const matches = matchRoutes(routes, pathname) ?? []
   const matched = matches[matches.length - 1]?.route.page
   // Only a role route waits for the account; every other page loads at once.
-  if (!matched || matched.access.kind !== 'roles' || !isAdmitted(matched.access, STUDENT, true)) return null
+  if (!matched || matched.access.kind !== 'roles') return null
+  // A demo surface sends everyone to the 404 while demo surfaces are off.
+  if (matched.demoSurface && !showDemoSurfaces) return null
+  // Nobody remembered, or a role this app does not know, is a student, as
+  // normalizeUserRole has it for the account itself.
+  const role = normalizeUserRole(rememberedRole)
+  if (!isAdmitted(matched.access, { role }, true)) return null
   return matched.page
 }
 

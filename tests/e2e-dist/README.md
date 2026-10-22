@@ -49,7 +49,10 @@ twice; signs out, which clears the session here and calls `POST /auth/logout`.
 
 `firstScreen.spec.ts`: after a student's reload, the star map's code is asked
 for, once, while `/auth/me` is still being answered rather than after it, and
-the map follows the account without the page skeleton in between (#415).
+the map follows the account without the page skeleton in between (#415); a
+teacher's home does the same (#456). Code that fails while loaded ahead reloads
+the tab once, and the document that reload opens waits for the account before
+asking again, for both.
 
 `chunkFailure.spec.ts`: a page or KaTeX file that cannot be fetched, with
 Vite's real preload helper and Chromium's module map. A page reloads the tab

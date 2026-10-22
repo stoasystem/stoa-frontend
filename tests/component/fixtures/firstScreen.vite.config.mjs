@@ -22,9 +22,11 @@ import config from '../../../vite.config.ts'
 const ROOT = path.resolve(import.meta.dirname, '../../..')
 const ENTRY = path.join(ROOT, 'src/main.tsx')
 
+// Below the outermost node_modules/, so a copy nested under a package is named
+// with it: `@radix-ui/react-tabs/node_modules/@radix-ui/react-slot/...`.
 function installedPath(id) {
   const file = id.split('\\').join('/').split('?')[0]
-  const at = file.lastIndexOf('/node_modules/')
+  const at = file.indexOf('/node_modules/')
   return at === -1 ? null : file.slice(at + '/node_modules/'.length)
 }
 

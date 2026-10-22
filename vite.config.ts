@@ -7,6 +7,34 @@ import path from 'node:path'
 // and network replacement, the benches) and the vitest-only MSW handlers.
 const DEV_ONLY_DIRS = ['src/dev/', 'src/mocks/']
 
+/*
+ * Installed modules that only pages loaded on demand import, by their path
+ * below the outermost node_modules/ (#456). The named group of their package
+ * would put them on every first screen; left unnamed, they travel with the
+ * pages that need them. Radix's tabs take the slot, context and primitive
+ * nested under them along; the top-level primitive is react-label's (the menu
+ * on the first screen has copies of its own). `persist` serves the star map's
+ * store. tests/component/firstScreenChunks415.test.ts fails a build whose
+ * first screen carries a package module it never imports.
+ *
+ * Radix's dialog stays with the UI kit on purpose. The star map, a student's
+ * home, opens one, and its code loads with the first screen while the account
+ * is read (#415). In a chunk of its own it cost each student a request and
+ * about 1 kB gzip more than it saved everyone else.
+ */
+const LATER_PAGES_ONLY = [
+  '@radix-ui/react-label/',
+  '@radix-ui/react-primitive/',
+  '@radix-ui/react-tabs/',
+  'zustand/esm/middleware',
+]
+
+/** A slash-separated module id's path below the outermost node_modules/. */
+function installedPath(normalizedId: string) {
+  const at = normalizedId.indexOf('/node_modules/')
+  return at === -1 ? normalizedId : normalizedId.slice(at + '/node_modules/'.length)
+}
+
 /** The project-relative, slash-separated path of a module id, query dropped. */
 function projectPath(id: string) {
   const file = id.replace(/^\0/, '').split('?')[0]
@@ -57,6 +85,8 @@ export default defineConfig({
           // dependency. KaTeX is loaded on demand, so it is left unnamed and
           // travels with the screen that needs it.
           if (normalizedId.includes('/katex/')) return undefined
+          const installed = installedPath(normalizedId)
+          if (LATER_PAGES_ONLY.some((prefix) => installed.startsWith(prefix))) return undefined
 
           if (
             normalizedId.includes('/react/') ||
