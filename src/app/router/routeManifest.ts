@@ -526,8 +526,12 @@ const CONVERSATION_QUERY = 'conversationId'
 const toAsk = ({ params, search }: LegacyRedirectInput) =>
   askPathFor(params.conversationId ?? search.get(CONVERSATION_QUERY))
 
-/** A role's home (roleHomePaths); `/forbidden` for a role the manifest has no home for. */
-function homePathFor(role: UserRole): string {
+/**
+ * A role's home (roleHomePaths); `/forbidden` for a role the manifest has no
+ * home for. Always a path: from react-router 7.18.3 a link or a navigation to
+ * undefined throws (#454).
+ */
+export function homePathFor(role: UserRole): string {
   const area = navAreaForRole(role)
   // Own properties only: `constructor` or `toString` is not a role with a home.
   return Object.prototype.hasOwnProperty.call(roleHomePaths, area) ? roleHomePaths[area] : FORBIDDEN_PATH
