@@ -126,7 +126,15 @@ export function TeacherActivatePage() {
         )}
 
         {!succeeded && token && !isAuthenticated && (
-          <form className="mt-6 grid max-w-md gap-4" onSubmit={handleClaim}>
+          <form
+            className="mt-6 grid max-w-md gap-4"
+            // The browser's own prompts follow its language, not the one
+            // chosen here, and stopped the submit before the page's own
+            // checks ran; those answer instead (#451). `required` stays on
+            // the fields for assistive technology.
+            noValidate
+            onSubmit={handleClaim}
+          >
             <div className="space-y-2">
               <Label htmlFor="teacher-password">{t('auth:register.password')}</Label>
               <Input

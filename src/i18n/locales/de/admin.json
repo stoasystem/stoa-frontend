@@ -185,6 +185,7 @@
     "signIn": "Anmelden",
     "missingToken": "In diesem Einladungslink fehlt der Token. Öffnen Sie den Link aus Ihrer E-Mail.",
     "passwordMismatch": "Die beiden Passwörter stimmen nicht überein.",
+    "dateOfBirthIncomplete": "Dieses Geburtsdatum ist unvollständig. Geben Sie Tag, Monat und Jahr an oder leeren Sie das Feld.",
     "failed": "Diese Einladung konnte nicht freigeschaltet werden. Bitte versuchen Sie es erneut.",
     "errors": {
       "invitation_invalid": "Diese Einladung ist nicht gültig.",

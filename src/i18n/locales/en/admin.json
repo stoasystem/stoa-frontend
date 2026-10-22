@@ -185,6 +185,7 @@
     "signIn": "Sign in",
     "missingToken": "This invitation link is missing a token. Open the link from your email.",
     "passwordMismatch": "The two passwords do not match.",
+    "dateOfBirthIncomplete": "That date of birth is incomplete. Enter the day, month and year, or clear the field.",
     "failed": "We could not activate this invitation. Please try again.",
     "errors": {
       "invitation_invalid": "This invitation is not valid.",
