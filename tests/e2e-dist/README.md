@@ -51,6 +51,13 @@ twice; signs out, which clears the session here and calls `POST /auth/logout`.
 for, once, while `/auth/me` is still being answered rather than after it, and
 the map follows the account without the page skeleton in between (#415).
 
+`chunkFailure.spec.ts`: a page or KaTeX file that cannot be fetched, with
+Vite's real preload helper and Chromium's module map. A page reloads the tab
+once and, failing again, offers only "Reload page"; KaTeX never reloads it and
+is asked for again under a new address; a page that fails after the reader went
+back reloads nothing, and offline it waits for the connection; a stylesheet
+that failed is put back for the next page that needs it (#272, #401, #447).
+
 `forcedChange.spec.ts`: a student whose password an administrator reset opens
 `/ask`, signs in, is sent to the password change with only Help and Log out in
 the shell, reloads it, changes the password, and "Continue" opens `/ask`; the

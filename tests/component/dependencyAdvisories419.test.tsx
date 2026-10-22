@@ -88,6 +88,13 @@ function packageOf(specifier: string): string | null {
   return first.startsWith('@') ? `${first}/${second}` : first
 }
 
+/*
+ * The one import() whose address is read at run time: after a failed load,
+ * MathRenderer asks for KaTeX's file again under a new address (#447). It is
+ * our own file, the one its `import('./katexLoader')` names: no package.
+ */
+const RUNTIME_IMPORT_IN = 'src/components/ui/MathRenderer.tsx'
+
 /** The packages a module's code imports: type-only imports left out, they are erased. */
 function packagesImportedBy(file: string, source: string): string[] {
   const kind = file.endsWith('x') ? ts.ScriptKind.TSX : ts.ScriptKind.TS
@@ -97,6 +104,7 @@ function packagesImportedBy(file: string, source: string): string[] {
     const name = packageOf(specifier)
     if (name) found.push(name)
   }
+  let runtimeImports = 0
   const visit = (node: ts.Node) => {
     if (ts.isImportDeclaration(node) && ts.isStringLiteral(node.moduleSpecifier) && !node.importClause?.isTypeOnly) {
       add(node.moduleSpecifier.text)
@@ -107,7 +115,9 @@ function packagesImportedBy(file: string, source: string): string[] {
     if (ts.isCallExpression(node) && node.expression.kind === ts.SyntaxKind.ImportKeyword) {
       const [argument] = node.arguments
       if (argument && ts.isStringLiteralLike(argument)) add(argument.text)
-      else throw new Error(`${file} has an import() this check cannot read`)
+      else if (file !== RUNTIME_IMPORT_IN || (runtimeImports += 1) > 1) {
+        throw new Error(`${file} has an import() this check cannot read`)
+      }
     }
     ts.forEachChild(node, visit)
   }
