@@ -11,18 +11,25 @@ const DEV_ONLY_DIRS = ['src/dev/', 'src/mocks/']
  * Installed modules that only pages loaded on demand import, by their path
  * below the outermost node_modules/ (#456). The named group of their package
  * would put them on every first screen; left unnamed, they travel with the
- * pages that need them. Radix's tabs take the slot, context and primitive
- * nested under them along; the top-level primitive is react-label's (the menu
- * on the first screen has copies of its own). `persist` serves the star map's
- * store. tests/component/firstScreenChunks415.test.ts fails a build whose
- * first screen carries a package module it never imports.
+ * pages that need them. Radix's dialog and tabs take the slot, context and
+ * primitive nested under them along. The top-level primitive is react-label's
+ * (the menu on the first screen has copies of its own; react-avatar and
+ * react-separator would take it too, but nothing uses them). `persist` serves
+ * the star map's store. A module that a named chunk imports stays in that
+ * chunk whatever this says: Rollup takes it along.
  *
- * Radix's dialog stays with the UI kit on purpose. The star map, a student's
- * home, opens one, and its code loads with the first screen while the account
- * is read (#415). In a chunk of its own it cost each student a request and
- * about 1 kB gzip more than it saved everyone else.
+ * The dialog goes too, though the star map, a student's home, opens one. Out
+ * of the UI kit's chunk it saves every first screen 1.5 kB gzip, before
+ * anything is asked of the backend, and costs a student on the star map (and
+ * an administrator on Users or Curriculum) 1.7 kB and a request, which mostly
+ * load while the account is read (#456 audit).
+ *
+ * tests/component/firstScreenChunks415.test.ts fails a build whose first
+ * screen carries a package module it never imports. What a package's index
+ * re-exports counts as imported there, so it does not see lucide-react's icons.
  */
 const LATER_PAGES_ONLY = [
+  '@radix-ui/react-dialog/',
   '@radix-ui/react-label/',
   '@radix-ui/react-primitive/',
   '@radix-ui/react-tabs/',

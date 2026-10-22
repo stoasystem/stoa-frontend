@@ -7,14 +7,17 @@
  * every other installed package in one more, `vendor`. The first screen needs
  * every one of them, so whatever else lands in one loads for every visitor as
  * well: zod did in `vendor`, about 16 kB gzip that only the sign-in form used,
- * in a signed-in student's first screen too (#415); Radix's tabs and label in
- * the UI kit's, and zustand's `persist` in the router and state's, about
- * 1.7 kB gzip that only later pages use (#456).
+ * in a signed-in student's first screen too (#415); Radix's dialog, tabs and
+ * label in the UI kit's, and zustand's `persist` in the router and state's,
+ * about 3 kB gzip that only later pages use (#456).
  *
  * This builds the application with a report of what the first screen imports
  * (fixtures/firstScreen.vite.config.mjs) and holds that no first-screen chunk,
- * named group or not, carries a package module the first screen never imports,
- * but for the one vite.config.ts keeps there on purpose.
+ * named group or not, carries a package module the first screen never imports.
+ *
+ * What a package's index re-exports counts as imported wherever the index is
+ * (the fixture says why), so this does not see a later page's lucide-react
+ * icons in the UI kit's chunk.
  */
 import { execFileSync } from 'node:child_process'
 import { mkdtempSync, readFileSync, rmSync } from 'node:fs'
@@ -33,10 +36,6 @@ type FirstScreenChunk = {
 }
 
 const ROOT = path.resolve(__dirname, '../..')
-// Radix's dialog, with what is nested under it: the star map, a student's
-// home, opens one, and loads with the first screen while the account is read
-// (#415). Moved out, it cost each student more than it saved anyone (#456).
-const CARRIED_ON_PURPOSE = '@radix-ui/react-dialog/'
 
 describe('the first screen of a production build', () => {
   const scratch = mkdtempSync(path.join(os.tmpdir(), 'stoa-first-screen-'))
@@ -78,29 +77,8 @@ describe('the first screen of a production build', () => {
   it('carries no package module it never imports, in a named group or not', () => {
     const carried = report
       .filter((candidate) => candidate.firstScreen)
-      .map(({ name, notImported }) => ({
-        chunk: name,
-        notImported: notImported.filter((module) => !module.startsWith(CARRIED_ON_PURPOSE)),
-      }))
       .filter((candidate) => candidate.notImported.length > 0)
+      .map(({ name, notImported }) => ({ chunk: name, notImported }))
     expect(carried).toEqual([])
-  })
-
-  it("keeps the star map's dialog with the UI kit", () => {
-    expect(chunk('vendor-ui')?.notImported).toContain('@radix-ui/react-dialog/dist/index.mjs')
-  })
-
-  // What the named groups used to carry, now with the pages that use it.
-  it.each([
-    '@radix-ui/react-tabs/dist/index.mjs',
-    '@radix-ui/react-label/dist/index.mjs',
-    // The top-level copy, react-label's; the menu's are nested under it.
-    '@radix-ui/react-primitive/dist/index.mjs',
-    'zustand/esm/middleware.mjs',
-  ])('loads %s with a later page', (module) => {
-    const holders = report.filter((candidate) => candidate.notImported.includes(module))
-    expect(holders.map(({ name, firstScreen }) => ({ name, firstScreen }))).toEqual([
-      { name: expect.not.stringMatching(/^vendor/), firstScreen: false },
-    ])
   })
 })

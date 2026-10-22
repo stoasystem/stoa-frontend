@@ -271,6 +271,32 @@ describe('the router while the account is read', () => {
     expect(screen.getByTestId('page')).toHaveTextContent(page)
   })
 
+  // Their pages read the administrators' copy, which loads on demand (#414):
+  // loaded only once the page asked for it, it held the page skeleton up
+  // after the account had come (#456 audit).
+  it.each([
+    ['/admin/system', 'admin'],
+    ['/admin/users', 'admin'],
+    ['/organization/learning-operations', 'school_viewer'],
+  ])("loads the administrators' copy with the page %s shows a remembered %s", (path, role) => {
+    const loadNamespaces = vi.spyOn(i18n, 'loadNamespaces')
+    reloadAt(path, remembering(role))
+    expect(loadNamespaces).toHaveBeenCalledWith(['admin'])
+  })
+
+  it.each([
+    ['/teacher', 'teacher'],
+    ['/organization', 'admin'],
+    ['/me', 'admin'],
+    ['/', 'student'],
+    // A page the tab's role is turned away from.
+    ['/admin/users', 'teacher'],
+  ])('loads no copy ahead with the page %s shows a remembered %s', (path, role) => {
+    const loadNamespaces = vi.spyOn(i18n, 'loadNamespaces')
+    reloadAt(path, remembering(role))
+    expect(loadNamespaces).not.toHaveBeenCalled()
+  })
+
   it.each([
     // The star map: a teacher at / is sent on to their own home.
     ['/', 'teacher'],

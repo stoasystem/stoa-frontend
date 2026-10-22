@@ -13,6 +13,7 @@
  * authorisation stays the authority on every request.
  */
 import { lazyPage, type LazyPage } from '@/app/router/lazyPage'
+import type { OnDemandNamespace } from '@/i18n/namespaces'
 import type { UserRole } from '@/types/user'
 
 // ---------------------------------------------------------------------------
@@ -92,6 +93,12 @@ export type PageRoute = {
   titleKey?: string
   /** Rendered only where demo surfaces are switched on. */
   demoSurface?: boolean
+  /**
+   * The copy the page reads that loads on demand (#414). While the account
+   * is read it loads with the page's code, so the page does not then wait
+   * for it behind the page skeleton (#456).
+   */
+  copy?: readonly OnDemandNamespace[]
   /**
    * Shown instead of refusing a visitor the guard would turn away. Only `/`
    * uses it: it is the student's star map, and the sign-in page (or the way to
@@ -202,6 +209,9 @@ const EVERY_ROLE = only(
   } satisfies Record<UserRole, true>) as UserRole[]),
 )
 
+// The administrators' copy: the admin pages and the learning operations read it.
+const ADMIN_COPY = ['admin'] as const
+
 // ---------------------------------------------------------------------------
 // Pages
 // ---------------------------------------------------------------------------
@@ -282,7 +292,7 @@ const VirtualCheckoutPage = lazyPage('VirtualCheckoutPage', () => import('@/page
   // The admin source list's fifth item (#13 point 6, #52), between Moderation and System; add its
   // `navigation.admin.billing` key to the four `common` bundles when it comes back.
   { path: '/admin/subscriptions', access: ADMIN, page: AdminSubscriptionRequestsPage, nav: [{ area: 'admin', label: 'Subscriptions and billing', labelKey: 'navigation.admin.billing', priority: 'primary', icon: 'billing', covers: ['/admin/billing-interest', '/admin/billing/checkout-recovery'] }], meta: { module: 'Admin', status: 'core', purpose: 'Manual subscription request queue.' } },
-  { path: '/admin/billing-interest', access: ADMIN, page: AdminOperationsPlaceholderPage, props: { title: 'Billing interest' }, meta: { module: 'Admin', status: 'placeholder', purpose: 'Future billing interest admin placeholder.' } },
+  { path: '/admin/billing-interest', access: ADMIN, page: AdminOperationsPlaceholderPage, copy: ADMIN_COPY, props: { title: 'Billing interest' }, meta: { module: 'Admin', status: 'placeholder', purpose: 'Future billing interest admin placeholder.' } },
   { path: '/admin/billing/checkout-recovery', access: ADMIN, page: AdminBillingCheckoutPage, meta: { module: 'Admin', status: 'core', purpose: 'Checkout recovery.' } },
  */
 
@@ -393,10 +403,10 @@ export const pageRoutes: readonly PageRoute[] = [
     titleKey: 'organizationHome.title',
     meta: { module: 'Organization', status: 'core', purpose: 'Organisation home: learning operations and learning automation.' },
   },
-  { path: '/organization/learning-operations', access: ORGANIZATION, page: LearningOperationsDashboardPage, titleKey: 'routes.learningOperations.title', meta: { module: 'Learning Operations', status: 'core', purpose: 'Organisation learning operations.' } },
-  { path: '/organization/students/:studentId/learning-profile', access: ORGANIZATION, page: StudentLearningProfilePage, demoSurface: true, titleKey: 'routes.learningProfile.title', meta: { module: 'Learning Intelligence', status: 'demo', purpose: 'Organisation-scoped learning profile.' } },
+  { path: '/organization/learning-operations', access: ORGANIZATION, page: LearningOperationsDashboardPage, copy: ADMIN_COPY, titleKey: 'routes.learningOperations.title', meta: { module: 'Learning Operations', status: 'core', purpose: 'Organisation learning operations.' } },
+  { path: '/organization/students/:studentId/learning-profile', access: ORGANIZATION, page: StudentLearningProfilePage, copy: ADMIN_COPY, demoSurface: true, titleKey: 'routes.learningProfile.title', meta: { module: 'Learning Intelligence', status: 'demo', purpose: 'Organisation-scoped learning profile.' } },
   { path: '/organization/learning-automation', access: ORGANIZATION, page: LearningAutomationConsolePage, titleKey: 'routes.learningAutomation.title', meta: { module: 'Learning Operations', status: 'core', purpose: 'Organisation learning automation.' } },
-  { path: '/students/:studentId/learning-profile', access: ORGANIZATION, page: StudentLearningProfilePage, demoSurface: true, titleKey: 'routes.learningProfile.title', meta: { module: 'Learning Intelligence', status: 'demo', purpose: 'Advanced learning profile direct route.' } },
+  { path: '/students/:studentId/learning-profile', access: ORGANIZATION, page: StudentLearningProfilePage, copy: ADMIN_COPY, demoSurface: true, titleKey: 'routes.learningProfile.title', meta: { module: 'Learning Intelligence', status: 'demo', purpose: 'Advanced learning profile direct route.' } },
 
   // ---- teacher -----------------------------------------------------------
   {
@@ -430,6 +440,7 @@ export const pageRoutes: readonly PageRoute[] = [
     path: '/admin/users',
     access: ADMIN,
     page: AdminAccountsPage,
+    copy: ADMIN_COPY,
     nav: [{ area: 'admin', label: 'Users', labelKey: 'navigation.admin.users', priority: 'primary', icon: 'students', covers: ['/admin/account-operations'], description: 'Invite, assign, reset, suspend and archive accounts.' }],
     meta: { module: 'Admin', status: 'core', purpose: 'Account console: invite, assign, reset password, suspend and archive.' },
   },
@@ -437,6 +448,7 @@ export const pageRoutes: readonly PageRoute[] = [
     path: '/admin/teacher-applications',
     access: ADMIN,
     page: AdminTeacherApplicationsPage,
+    copy: ADMIN_COPY,
     nav: [{ area: 'admin', label: 'Teacher applications', labelKey: 'navigation.admin.teacherApplications', priority: 'primary', icon: 'teachers', description: 'Review teacher applications and send activation invitations.' }],
     meta: { module: 'Admin', status: 'core', purpose: 'Teacher application review and invitation.' },
   },
@@ -444,6 +456,7 @@ export const pageRoutes: readonly PageRoute[] = [
     path: '/admin/curriculum',
     access: ADMIN,
     page: AdminCurriculumPage,
+    copy: ADMIN_COPY,
     nav: [{ area: 'admin', label: 'Curriculum', labelKey: 'navigation.admin.curriculum', priority: 'primary', icon: 'curriculum', description: 'Curriculum authoring, review, migration, and evidence console.' }],
     meta: { module: 'Admin', status: 'core', purpose: 'Curriculum editor, review, migration, and evidence console.' },
   },
@@ -451,6 +464,7 @@ export const pageRoutes: readonly PageRoute[] = [
     path: '/admin/moderation',
     access: ADMIN,
     page: AdminModerationPage,
+    copy: ADMIN_COPY,
     nav: [{ area: 'admin', label: 'Moderation', labelKey: 'navigation.admin.moderation', priority: 'primary', icon: 'moderation', mobile: true, description: 'Reported learning content and internal moderation actions.' }],
     meta: { module: 'Admin', status: 'core', purpose: 'Reported learning content and moderation.' },
   },
@@ -459,14 +473,15 @@ export const pageRoutes: readonly PageRoute[] = [
     path: '/admin',
     access: ADMIN,
     page: AdminDashboardPage,
+    copy: ADMIN_COPY,
     nav: [{ area: 'admin', label: 'System', labelKey: 'navigation.admin.system', priority: 'primary', icon: 'settings', mobile: true, covers: ['/admin/system', '/admin/learning-operations', '/admin/learning-automation'], description: 'Operations overview, system status, learning operations and learning automation.' }],
     meta: { module: 'Admin', status: 'core', purpose: 'Admin operations overview.' },
   },
-  { path: '/admin/learning-operations', access: ADMIN, page: LearningOperationsDashboardPage, titleKey: 'routes.learningOperations.title', meta: { module: 'Admin', status: 'core', purpose: 'Platform learning operations.' } },
+  { path: '/admin/learning-operations', access: ADMIN, page: LearningOperationsDashboardPage, copy: ADMIN_COPY, titleKey: 'routes.learningOperations.title', meta: { module: 'Admin', status: 'core', purpose: 'Platform learning operations.' } },
   { path: '/admin/learning-automation', access: ADMIN, page: LearningAutomationConsolePage, titleKey: 'routes.learningAutomation.title', meta: { module: 'Admin', status: 'core', purpose: 'Platform learning automation.' } },
-  { path: '/admin/account-operations', access: ADMIN, page: AdminAccountOperationsPage, titleKey: 'routes.accountOperations.title', meta: { module: 'Admin', status: 'core', purpose: 'Account operations queue.' } },
+  { path: '/admin/account-operations', access: ADMIN, page: AdminAccountOperationsPage, copy: ADMIN_COPY, titleKey: 'routes.accountOperations.title', meta: { module: 'Admin', status: 'core', purpose: 'Account operations queue.' } },
   // untranslated-ok: OperationsPlaceholder shows routes.systemStatus.title for this path; the English is its fallback.
-  { path: '/admin/system', access: ADMIN, page: AdminOperationsPlaceholderPage, props: { title: 'System status' }, titleKey: 'routes.systemStatus.title', meta: { module: 'Admin', status: 'placeholder', purpose: 'Future system status admin placeholder.' } },
+  { path: '/admin/system', access: ADMIN, page: AdminOperationsPlaceholderPage, copy: ADMIN_COPY, props: { title: 'System status' }, titleKey: 'routes.systemStatus.title', meta: { module: 'Admin', status: 'placeholder', purpose: 'Future system status admin placeholder.' } },
 ]
 
 // ---------------------------------------------------------------------------

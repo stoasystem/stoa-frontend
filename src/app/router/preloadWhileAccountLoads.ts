@@ -1,9 +1,9 @@
 import { useEffect } from 'react'
 import { matchRoutes, useLocation } from 'react-router-dom'
 import { justReloadedForFailedPage } from '@/app/chunkReload'
-import type { LazyPage } from '@/app/router/lazyPage'
 import { isAdmitted } from '@/app/router/routeAccess'
 import { legacyRedirects, pageRoutes, type PageRoute } from '@/app/router/routeManifest'
+import i18n from '@/i18n'
 import { showDemoSurfaces } from '@/lib/env'
 import { readTabAccount } from '@/lib/tabAccount'
 import { normalizeUserRole, useAuthStore } from '@/store/authStore'
@@ -16,8 +16,10 @@ import { normalizeUserRole, useAuthStore } from '@/store/authStore'
  * then: the star map's, about 77 kB gzip, only once a reply that takes 1-3 s
  * on a cold start had come. Now, while the account is read, the page this
  * address shows the role the tab remembers starts loading (`readTabAccount`):
- * a teacher's, a parent's or an administrator's as well as a student's (#456),
- * and a student's when the tab does not remember whose it was.
+ * a teacher's, a parent's, an administrator's or an organisation role's as
+ * well as a student's (#456), and a student's when the tab does not remember
+ * whose it was. The copy the page reads that loads on demand (`copy`, the
+ * administrators') loads with it, or the page would wait for that instead.
  *
  * Nothing here decides what is shown. The guards still wait for the account,
  * and a tab that turns out to be someone else's has fetched and evaluated code
@@ -31,8 +33,8 @@ const routes: { path: string; page?: PageRoute }[] = [
   ...legacyRedirects.filter((redirect) => !redirect.onlyFor).map((redirect) => ({ path: redirect.from })),
 ]
 
-/** The page to load while the account is read, given the role the tab remembers, if any. */
-export function pageToPreload(pathname: string, rememberedRole: string | undefined): LazyPage | null {
+/** The route whose page loads while the account is read, given the role the tab remembers, if any. */
+export function routeToPreload(pathname: string, rememberedRole: string | undefined): PageRoute | null {
   const matches = matchRoutes(routes, pathname) ?? []
   const matched = matches[matches.length - 1]?.route.page
   // Only a role route waits for the account; every other page loads at once.
@@ -43,7 +45,7 @@ export function pageToPreload(pathname: string, rememberedRole: string | undefin
   // normalizeUserRole has it for the account itself.
   const role = normalizeUserRole(rememberedRole)
   if (!isAdmitted(matched.access, { role }, true)) return null
-  return matched.page
+  return matched
 }
 
 export function usePreloadWhileAccountLoads() {
@@ -52,6 +54,11 @@ export function usePreloadWhileAccountLoads() {
 
   useEffect(() => {
     if (!accountLoading || justReloadedForFailedPage()) return
-    pageToPreload(pathname, readTabAccount()?.role)?.preload()
+    const route = routeToPreload(pathname, readTabAccount()?.role)
+    if (!route) return
+    route.page.preload()
+    // Never rejects: copy that fails to load reads in English, as it would
+    // have when the page asked for it.
+    if (route.copy) void i18n.loadNamespaces([...route.copy])
   }, [accountLoading, pathname])
 }

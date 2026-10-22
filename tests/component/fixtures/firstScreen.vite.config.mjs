@@ -4,12 +4,19 @@
  * FIRST_SCREEN_REPORT. Plain JavaScript: the test project's TypeScript
  * settings are not the ones vite.config.ts is checked with.
  *
- * The first screen is what src/main.tsx imports, the modules its start-up
+ * The first screen imports what src/main.tsx imports, the modules its start-up
  * imports on demand (the stylesheet, i18n, React, the App), and everything
- * those import statically. A chunk that holds any of it loads before the
- * first render. For every chunk the report lists the installed packages'
- * modules in it that the first screen never imports: in a first-screen chunk,
- * that is code every visitor downloads for a page they may never open.
+ * those import statically. Its chunks are the ones that load before the first
+ * render: the entry, the chunks that hold those start-up imports, and the
+ * chunks these import statically (#456 audit: a chunk merely holding a module
+ * the first screen imports may still load later). For every chunk the report
+ * lists the installed packages' modules in it that the first screen never
+ * imports: in a first-screen chunk, that is code every visitor downloads for
+ * a page they may never open.
+ *
+ * "Imports" follows the module graph before tree-shaking, so a module a
+ * package's index re-exports counts as imported wherever the index is, used or
+ * not: lucide-react's icons, for one, all count as the first screen's.
  *
  * Each entry: { name, fileName, firstScreen, notImported: ['package/path', ...] }.
  */
@@ -35,31 +42,40 @@ function firstScreenReport() {
     name: 'stoa:first-screen-report',
     apply: 'build',
     generateBundle(_options, bundle) {
+      const staticClosure = (starts) => {
+        const seen = new Set()
+        const queue = [...starts]
+        while (queue.length > 0) {
+          const id = queue.pop()
+          if (seen.has(id)) continue
+          seen.add(id)
+          queue.push(...(this.getModuleInfo(id)?.importedIds ?? []))
+        }
+        return seen
+      }
       const entry = this.getModuleInfo(ENTRY)
       if (!entry) this.error(`no module ${ENTRY}`)
-      const firstScreen = new Set()
-      const queue = [ENTRY, ...entry.dynamicallyImportedIds]
+      const startUp = [ENTRY, ...entry.dynamicallyImportedIds]
+      const imported = staticClosure(startUp)
+
+      const chunks = Object.values(bundle).filter((output) => output.type === 'chunk')
+      const firstScreenFiles = new Set()
+      const queue = chunks.filter((chunk) => startUp.some((id) => chunk.moduleIds.includes(id))).map((chunk) => chunk.fileName)
       while (queue.length > 0) {
-        const id = queue.pop()
-        if (firstScreen.has(id)) continue
-        firstScreen.add(id)
-        queue.push(...(this.getModuleInfo(id)?.importedIds ?? []))
+        const fileName = queue.pop()
+        if (firstScreenFiles.has(fileName)) continue
+        firstScreenFiles.add(fileName)
+        queue.push(...bundle[fileName].imports)
       }
-      const report = Object.values(bundle).flatMap((output) => {
-        if (output.type !== 'chunk') return []
-        const rendered = Object.entries(output.modules).filter(([, module]) => module.renderedLength > 0)
-        return [
-          {
-            name: output.name,
-            fileName: output.fileName,
-            firstScreen: rendered.some(([id]) => firstScreen.has(id)),
-            notImported: rendered.flatMap(([id]) => {
-              const installed = installedPath(id)
-              return installed !== null && !firstScreen.has(id) ? [installed] : []
-            }),
-          },
-        ]
-      })
+
+      const report = chunks.map((chunk) => ({
+        name: chunk.name,
+        fileName: chunk.fileName,
+        firstScreen: firstScreenFiles.has(chunk.fileName),
+        notImported: Object.entries(chunk.modules)
+          .filter(([id, module]) => module.renderedLength > 0 && !imported.has(id))
+          .flatMap(([id]) => installedPath(id) ?? []),
+      }))
       writeFileSync(process.env.FIRST_SCREEN_REPORT, JSON.stringify(report, null, 2))
     },
   }

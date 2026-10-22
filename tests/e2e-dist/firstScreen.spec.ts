@@ -4,12 +4,15 @@ import { expect, test } from './support/fixtures'
 import { WEB_ORIGIN } from './support/origins'
 import { signInAsStudent } from './support/signIn'
 import { StudentWorld } from './support/student'
-import { signInAsTeacher, TeacherWorld } from './support/teacher'
+import { ADMIN, signInAt, StaffWorld, TEACHER } from './support/staff'
 
 // The star map's own chunk; Vite asks for the chunks it imports beside it.
 const MAP_CODE = /^\/assets\/MapPages-[\w-]+\.js$/
 // The teacher's home, their request queue.
 const TEACHER_HOME_CODE = /^\/assets\/TeacherDashboardPage-[\w-]+\.js$/
+// An administrator's page that asks the backend for nothing, and their copy.
+const ADMIN_PAGE_CODE = /^\/assets\/OperationsPlaceholder-[\w-]+\.js$/
+const ADMIN_COPY = /^\/assets\/admin-[\w-]+\.js$/
 // Longer than a Lambda cold start (1-3 s): if the map's code waits for the
 // account, it is asked for only after this.
 const HOLD_MS = 5_000
@@ -112,8 +115,8 @@ test("a teacher's reload loads their home's code while /auth/me is answered, and
   page,
   backend,
 }) => {
-  new TeacherWorld(backend).install()
-  await signInAsTeacher(page)
+  new StaffWorld(backend, TEACHER).install()
+  await signInAt(page, TEACHER, '/teacher')
   const home = page.getByRole('heading', { name: 'Teacher support requests' })
   await expect(home).toBeVisible()
   await page.waitForLoadState('networkidle')
@@ -126,6 +129,33 @@ test("a teacher's reload loads their home's code while /auth/me is answered, and
   expect(seen[0], 'what came first after the reload').toBe('code asked for')
   expect(seen).toContain('/auth/me answered')
   expect(seen.filter((event) => event === 'code asked for')).toHaveLength(1)
+  expect(await page.evaluate('window.__skeletonShown === true'), 'the page skeleton was drawn').toBe(false)
+})
+
+// An administrator's page also reads copy that loads on demand (#414). It
+// comes with the page's code, or the page would wait for it behind the
+// skeleton once the account is in (#456 audit).
+test("an administrator's reload loads the page's code and the administrators' copy while /auth/me is answered", async ({
+  page,
+  backend,
+}) => {
+  new StaffWorld(backend, ADMIN).install()
+  await signInAt(page, ADMIN, '/admin/system')
+  const heading = page.getByRole('heading', { name: 'System status', exact: true })
+  await expect(heading).toBeVisible()
+  await page.waitForLoadState('networkidle')
+  const seen = accountAfterCode(page, backend, ADMIN_PAGE_CODE)
+  page.on('request', (request) => {
+    if (ADMIN_COPY.test(new URL(request.url()).pathname)) seen.push('copy asked for')
+  })
+  await page.addInitScript({ content: WATCH_SKELETON })
+
+  await page.reload()
+  await expect(heading).toBeVisible()
+
+  expect(seen[0], 'what came first after the reload').toBe('code asked for')
+  expect(seen.indexOf('copy asked for'), 'the copy asked for before /auth/me answered').toBeGreaterThan(0)
+  expect(seen.indexOf('copy asked for')).toBeLessThan(seen.indexOf('/auth/me answered'))
   expect(await page.evaluate('window.__skeletonShown === true'), 'the page skeleton was drawn').toBe(false)
 })
 
@@ -217,24 +247,29 @@ test("after a reload for a teacher's failed home, the next document waits for th
   page,
   backend,
 }) => {
-  new TeacherWorld(backend).install()
-  await signInAsTeacher(page)
+  new StaffWorld(backend, TEACHER).install()
+  await signInAt(page, TEACHER, '/teacher')
   const home = page.getByRole('heading', { name: 'Teacher support requests' })
   await expect(home).toBeVisible()
   await page.waitForLoadState('networkidle')
   const documents = documentLoads(page)
   let documentsSeen = 0
   let secondBegan = 0
+  let accountIn = false
   page.on('request', (request) => {
     if (!request.isNavigationRequest() || request.frame() !== page.mainFrame()) return
     documentsSeen += 1
+    accountIn = false
     if (documentsSeen === 2) secondBegan = Date.now()
+  })
+  page.on('response', (response) => {
+    if (new URL(response.url()).pathname === '/auth/me') accountIn = true
   })
   const refused: string[] = []
   await page.route('**/assets/TeacherDashboardPage-*.js', async (route) => {
     const down = documentsSeen === 1 || (documentsSeen === 2 && Date.now() - secondBegan < 800)
     if (!down) return route.fallback()
-    refused.push(`document ${documentsSeen}`)
+    refused.push(`document ${documentsSeen}, ${accountIn ? 'after' : 'before'} the account`)
     return route.abort('internetdisconnected')
   })
   backend.holdUntil('GET', '/auth/me', () => pause(1_500))
@@ -242,7 +277,8 @@ test("after a reload for a teacher's failed home, the next document waits for th
   await page.reload()
   await expect(home).toBeVisible({ timeout: 20_000 })
 
-  expect(refused).toEqual(['document 1'])
+  // Refused while loaded ahead: the render took the preload's failure over.
+  expect(refused).toEqual(['document 1, before the account'])
   expect(documents(), 'the reload, then the one reload for the failed code').toBe(2)
   await expect(page.getByRole('alert')).toHaveCount(0)
 })
