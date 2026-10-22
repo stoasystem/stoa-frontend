@@ -58,6 +58,16 @@
        {"name": {"en": "Spread", "de": "Streuung", "fr": "Dispersion", "it": "Dispersione"}},
        {"name": {"en": "Box plots", "de": "Boxplots", "fr": "Boîtes à moustaches", "it": "Box plot"}}
      ]},
+    {"topicId": "calculus", "subjectId": "math", "weight": 0, "lit": 0,
+     "name": {"en": "Calculus", "de": "Analysis", "fr": "Analyse", "it": "Analisi"},
+     "stars": [
+       {"name": {"en": "Rate of change", "de": "Änderungsrate", "fr": "Taux de variation", "it": "Tasso di variazione"}},
+       {"name": {"en": "Limits", "de": "Grenzwerte", "fr": "Limites", "it": "Limiti"}},
+       {"name": {"en": "The derivative", "de": "Die Ableitung", "fr": "La dérivée", "it": "La derivata"}},
+       {"name": {"en": "Rules of differentiation", "de": "Ableitungsregeln", "fr": "Règles de dérivation", "it": "Regole di derivazione"}},
+       {"name": {"en": "Curve sketching", "de": "Kurvendiskussion", "fr": "Étude de fonctions", "it": "Studio di funzione"}},
+       {"name": {"en": "Integrals", "de": "Integrale", "fr": "Intégrales", "it": "Integrali"}}
+     ]},
     {"topicId": "mechanics", "subjectId": "physics", "weight": 1.2, "lit": 0.7,
      "name": {"en": "Mechanics", "de": "Mechanik", "fr": "Mécanique", "it": "Meccanica"},
      "stars": [

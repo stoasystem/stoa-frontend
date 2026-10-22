@@ -95,6 +95,24 @@ type NebulaSpec = (typeof data.nebulae)[number]
 
 const enrolled = new Map(data.galaxies.map((galaxy) => [galaxy.subjectId, galaxy.enrolled]))
 
+/**
+ * PROTOTYPE #476 (find a star from Ask): the calculus nebula, by hand, outside
+ * the size budget, so the rest of the sky draws what it drew. Nothing in it is
+ * lit; its stars wait on one another in a chain, and the first on two lit
+ * function stars: "I want to practise derivatives" has a way to light.
+ */
+const STORY_TOPIC = 'calculus'
+/** Edges by unit order: [from, to]; `functions-1` and `functions-2` are lit at 1000 and 2000 stars. */
+const STORY_EDGES: [string, string][] = [
+  ['functions-1', 'calculus-1'],
+  ['functions-2', 'calculus-1'],
+  ['calculus-1', 'calculus-2'],
+  ['calculus-2', 'calculus-3'],
+  ['calculus-3', 'calculus-4'],
+  ['calculus-4', 'calculus-5'],
+  ['calculus-2', 'calculus-6'],
+]
+
 /** Size 10, by hand: every state, both recommendations, the cross-subject prerequisite. */
 const TEN: Record<string, LearningState[]> = {
   numbers: ['lit'],
@@ -109,12 +127,16 @@ const TEN: Record<string, LearningState[]> = {
 /** Each nebula's learning states, in unit order: lit, in progress, ready, then locked. */
 function planFor(size: FixtureSize): Map<string, LearningState[]> {
   if (size === 10) return new Map(Object.entries(TEN))
-  const total = data.nebulae.reduce((sum, nebula) => sum + nebula.weight, 0)
-  const counts = data.nebulae.map((nebula) => Math.max(4, Math.floor((nebula.weight / total) * size)))
+  const budgeted = data.nebulae.filter((nebula) => nebula.topicId !== STORY_TOPIC)
+  const story = data.nebulae.find((nebula) => nebula.topicId === STORY_TOPIC)
+  const total = budgeted.reduce((sum, nebula) => sum + nebula.weight, 0)
+  const counts = budgeted.map((nebula) => Math.max(4, Math.floor((nebula.weight / total) * size)))
   let short = size - counts.reduce((sum, n) => sum + n, 0)
   for (let i = 0; short > 0; i = (i + 1) % counts.length, short -= 1) counts[i] += 1
-  return new Map(
-    data.nebulae.map((nebula, i) => {
+  const storyPlan: [string, LearningState[]][] = story ? [[STORY_TOPIC, story.stars.map((_, k) => (k === 0 ? 'ready' : 'locked'))]] : []
+  return new Map([
+    ...storyPlan,
+    ...budgeted.map((nebula, i) => {
       const n = counts[i]
       const taken = enrolled.get(nebula.subjectId) ?? false
       const lit = taken ? Math.floor(n * nebula.lit) : 0
@@ -126,7 +148,7 @@ function planFor(size: FixtureSize): Map<string, LearningState[]> {
       }
       return [nebula.topicId, states] as const
     }),
-  )
+  ])
 }
 
 type Built = {
@@ -281,7 +303,9 @@ function prerequisitesFor(members: Map<string, Omit<Star, 'x' | 'y'>[]>, rand: (
     edges.push({ from, to })
   }
   const any = <T,>(list: T[]) => list[Math.floor(rand() * list.length)]
-  const relations = data.relations.filter(([a, b]) => members.has(a) && members.has(b))
+  const relations = data.relations.filter(([a, b]) => members.has(a) && members.has(b) && a !== STORY_TOPIC && b !== STORY_TOPIC)
+
+  if (members.has(STORY_TOPIC)) for (const [from, to] of STORY_EDGES) add(from, to)
 
   // The cross-subject prerequisite the story needs: optics' Refraction waits for the demo knowledge point.
   if (members.get(data.bridge.topicId)?.some((star) => star.unitId === data.bridge.unitId)) {
