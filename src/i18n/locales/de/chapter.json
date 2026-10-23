@@ -120,5 +120,15 @@
     "tryAgain": "Nochmals versuchen",
     "youAreHere": "Du bist hier",
     "yourAnswer": "Deine Antwort"
+  },
+  "skill": {
+    "extensionNote": "Erweiterung: ein Bonus, wenn du sie machst. Fürs Leuchten des Sterns zählt sie nicht.",
+    "inStar": "In {{star}}",
+    "lit": "Dieser kleine Stern leuchtet.",
+    "progress": "Fortschritt des kleinen Sterns",
+    "sets": "Übungsreihen",
+    "setsDone": "{{done}} von {{total}} Übungsreihen erledigt",
+    "toGo_one": "Noch {{count}} Übungsreihe.",
+    "toGo_other": "Noch {{count}} Übungsreihen."
   }
 }

@@ -30,6 +30,7 @@ import {
   saveDemoNotificationPreferences,
   setDemoLanguage,
 } from '@/dev/preview/demoSource'
+import { starCountFrom } from '@/dev/preview/surfaces'
 import { isSupportedLanguage } from '@/i18n/languages'
 import { commandMessageIds } from '@/services/chat/commandMessageIds'
 import type { ChatMessage, ConversationSummary } from '@/types/chat'
@@ -210,6 +211,10 @@ const routes: Array<[method: string, pattern: string, handler: Handler]> = [
 
   // Chapter and practice stage
   ['GET', '/practice/curriculum/catalog', () => demo().demoChapter.catalog],
+  // The sky beside the chapter (#501): what the map says of the demo knowledge point and its
+  // small stars, at the page's star count. Loaded when asked: nothing of the app before interception.
+  ['GET', '/practice/knowledge-map', async () =>
+    (await import('@/dev/preview/lighting')).demoKnowledgeMap(starCountFrom(new URLSearchParams(window.location.search).get('points')))],
   ['GET', '/practice/:subjectId/:topicId/roadmap', ({ params }) => {
     const { roadmap } = demoChapterNow()
     return params.subjectId === roadmap.subjectId && params.topicId === roadmap.topicId ? roadmap : null

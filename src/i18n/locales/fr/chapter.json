@@ -125,5 +125,16 @@
     "tryAgain": "Réessayer",
     "youAreHere": "Tu es ici",
     "yourAnswer": "Ta réponse"
+  },
+  "skill": {
+    "extensionNote": "Approfondissement : un bonus si tu le fais. Il ne compte pas pour allumer l’étoile.",
+    "inStar": "Dans {{star}}",
+    "lit": "Cette petite étoile est allumée.",
+    "progress": "Progression de la petite étoile",
+    "sets": "Séries d’exercices",
+    "setsDone": "{{done}} séries sur {{total}} faites",
+    "toGo_one": "Encore {{count}} série.",
+    "toGo_many": "Encore {{count}} séries.",
+    "toGo_other": "Encore {{count}} séries."
   }
 }

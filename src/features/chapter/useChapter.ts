@@ -19,7 +19,7 @@
  * opens, and says neither.
  */
 import { useMemo } from 'react'
-import type { LearningState } from '@/features/starmap/model/starMap'
+import type { KnowledgeSkill, LearningState } from '@/features/starmap/model/starMap'
 import { useCurriculumCatalogQuery } from '@/hooks/practice/useCurriculumCatalogQuery'
 import { useKnowledgeMapQuery } from '@/hooks/practice/useKnowledgeMapQuery'
 import { usePracticeRoadmapQuery } from '@/hooks/practice/usePracticeRoadmapQuery'
@@ -49,6 +49,8 @@ export type Chapter = {
   nextLessonId: string | null
   /** The knowledge point as the star map has it, or null while the sky cannot be read. */
   star: { state: LearningState; unmetExercises: number } | null
+  /** Its small stars as the star map has them (#501); `[]` while the sky cannot be read. */
+  skills: KnowledgeSkill[]
 }
 
 export type ChapterQuery =
@@ -98,6 +100,7 @@ export function useChapter(unitId: string | undefined): ChapterQuery {
   const found = skyQuery.data?.stars.find((candidate) => candidate.unitId === unitId)
   const starState = found?.state
   const unmetExercises = found?.unmetExercises ?? 0
+  const skills = found?.skills
 
   return useMemo<ChapterQuery>(() => {
     if (!unitId) return { status: 'missing' }
@@ -140,15 +143,26 @@ export function useChapter(unitId: string | undefined): ChapterQuery {
         total: lessons.length,
         nextLessonId: nextLessonOf(lessons),
         star: starState ? { state: starState, unmetExercises } : null,
+        skills: skills ?? [],
       },
     }
-  }, [unitId, unit, catalog, catalogLoading, catalogFailed, refetchCatalog, roadmap, roadmapLoading, refetchRoadmap, skyLoading, starState, unmetExercises])
+  }, [unitId, unit, catalog, catalogLoading, catalogFailed, refetchCatalog, roadmap, roadmapLoading, refetchRoadmap, skyLoading, starState, unmetExercises, skills])
 }
 
 /** `/chapter/:unitId` and `/chapter/:unitId/:lessonId`, each segment encoded once. */
 export function chapterPath(unitId: string, lessonId?: string) {
   const base = `/chapter/${encodeURIComponent(unitId)}`
   return lessonId ? `${base}/${encodeURIComponent(lessonId)}` : base
+}
+
+/**
+ * A small star's own page (#501): its star's chapter, narrowed to the practice
+ * sets of the small star, as `?skill=`.
+ */
+export const SKILL_PARAM = 'skill'
+
+export function skillPath(unitId: string, skillId: string) {
+  return `${chapterPath(unitId)}?${new URLSearchParams({ [SKILL_PARAM]: skillId })}`
 }
 
 /** Test out of a lesson: the short quiz on `/chapter/:unitId/:lessonId`, as `?mode=quiz`. */

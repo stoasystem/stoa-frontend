@@ -469,7 +469,18 @@ export type KnowledgeMapResponse = {
     recommendation: { source: 'system' | 'teacher' } | null
     x: number
     y: number
-    skills: { skillId: string; name: string; lit: boolean }[]
+    /**
+     * `extension` and `missingPrerequisites` only when they apply
+     * (stoa-backend#127, #501); a `unitId` naming this very star means its
+     * earlier stages.
+     */
+    skills: {
+      skillId: string
+      name: string
+      lit: boolean
+      extension?: boolean
+      missingPrerequisites?: { unitId: string; name: string }[]
+    }[]
     chapter: {
       lessonCount: number
       lessonsDone: number

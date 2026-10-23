@@ -26,7 +26,7 @@
 import type { TFunction } from 'i18next'
 import { useMemo, useSyncExternalStore, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
-import { DEMO_BRIDGE_STAR, DEMO_KNOWLEDGE_POINT, demoKnowledgePointState, demoSky, localize } from '@/dev/demo/data'
+import { DEMO_BRIDGE_STAR, DEMO_KNOWLEDGE_POINT, demoKnowledgePointState, demoPracticeSets, demoSkillsAfter, demoSky, localize } from '@/dev/demo/data'
 import {
   acknowledgeLit,
   completedLessons,
@@ -39,6 +39,7 @@ import { readDemoStarMap } from '@/dev/demo/sky/source'
 import { LightingEventSourceContext, type LightingEventSource } from '@/features/starmap/lighting/lightingEvents'
 import { orderedStars, subjectOfNebula, type Nebula, type Star, type StarMap } from '@/features/starmap/model/starMap'
 import { StarMapSourceContext, type FixtureSize, type StarMapSource } from '@/features/starmap/starMapSource'
+import type { KnowledgeMapResponse } from '@/types/practice'
 
 export const demoLightingSource: LightingEventSource = {
   unacknowledged: async () => unacknowledgedLit(),
@@ -62,7 +63,9 @@ export function demoStarMapOverride(map: StarMap, size: FixtureSize, completed: 
   if (!hasPoint && !hasBridge) return { ...map, prerequisites }
 
   const remaining = kp.lessons.filter((lesson) => !completed.includes(lesson.lessonId))
-  const next = remaining[0]
+  const nameOf = (unitId: string) => map.stars.find((star) => star.unitId === unitId)?.name ?? unitId
+  // The core first, then the extension practice sets (#501), as the backend's `nextLesson` does.
+  const next = demoPracticeSets().find((lesson) => !completed.includes(lesson.lessonId))
   const bridgeOpens = sky.prerequisites.filter((edge) => edge.to === DEMO_BRIDGE_STAR).every((edge) => isLit(edge.from))
 
   let stars: Star[] = map.stars.map((star) => {
@@ -72,7 +75,8 @@ export function demoStarMapOverride(map: StarMap, size: FixtureSize, completed: 
         state,
         progress: (kp.lessons.length - remaining.length) / kp.lessons.length,
         unmetExercises: remaining.reduce((sum, lesson) => sum + lesson.exercises, 0),
-        skills: state === 'lit' ? star.skills.map((skill) => ({ ...skill, lit: true })) : star.skills,
+        // Each small star lights from its own practice sets (#501): the extension one on its own.
+        skills: demoSkillsAfter(star.skills, completed, sky.extensionPrerequisite, nameOf),
         chapter: {
           lessonCount: kp.lessons.length,
           lessonsDone: kp.lessons.length - remaining.length,
@@ -105,6 +109,29 @@ export function demoStarMapOverride(map: StarMap, size: FixtureSize, completed: 
     summary: inFocus ? { ...map.summary, lit: map.summary.lit + delta } : map.summary,
     subjects: map.subjects.map((subject) => (subject.subjectId === kp.subjectId ? { ...subject, lit: subject.lit + delta } : subject)),
   }
+}
+
+/**
+ * `GET /practice/knowledge-map` as the demo backend answers it: the sky of
+ * `size` stars after the lessons completed so far, as the star map is drawn.
+ * The map takes its sky through the source seam; the chapter reads this one
+ * for what the sky says of its knowledge point, its small stars among it (#501).
+ */
+export function demoKnowledgeMap(size: FixtureSize): KnowledgeMapResponse {
+  const sky = demoSky(size, demoLanguage())
+  const subjectId = DEMO_KNOWLEDGE_POINT.subjectId
+  const map = demoStarMapOverride(
+    {
+      subject: { subjectId, name: sky.galaxies.find((galaxy) => galaxy.subjectId === subjectId)?.name ?? subjectId },
+      nebulae: sky.nebulae,
+      stars: sky.stars,
+      prerequisites: sky.prerequisites,
+      summary: sky.summary,
+      subjects: sky.galaxies,
+    },
+    size,
+  )
+  return { subjectId, galaxies: map.subjects, nebulae: sky.nebulae, stars: map.stars, prerequisites: map.prerequisites, summary: map.summary }
 }
 
 const longNebulae = new WeakMap<Nebula[], { t: TFunction<'starmap'>; nebulae: Nebula[] }>()
