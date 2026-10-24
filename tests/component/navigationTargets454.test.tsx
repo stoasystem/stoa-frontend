@@ -26,7 +26,7 @@ import { BrowserRouter, Link, MemoryRouter, createPath, resolvePath, useLocation
 import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest'
 import { askPathFor, legacyRedirects, moderationPathFor } from '@/app/router/routeManifest'
 import { NOTIFICATION_TARGETS, notificationTargetPath } from '@/components/notifications/notificationTargets'
-import { chapterPath, quizPath } from '@/features/chapter/useChapter'
+import { chapterPath, quizPath, skillPath } from '@/features/chapter/useChapter'
 import { StarCard } from '@/features/starmap/components/StarCard'
 import { pathForTarget } from '@/features/starmap/view/layers'
 import { reviewReturnPath } from '@/features/starmap/view/reviewReturn'
@@ -161,6 +161,7 @@ function builtTargets(): Built[] {
     add('chapterPath', id, chapterPath(id))
     add('chapterPath lesson', id, chapterPath(id, id))
     add('quizPath', id, quizPath(id, id))
+    add('skillPath', id, skillPath(id, id))
     add('reviewReturnPath', { star: `/map/${id}` }, reviewReturnPath({ star: `/map/${id}` }))
   }
 

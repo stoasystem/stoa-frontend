@@ -71,7 +71,14 @@
     "review_many": "Réviser {{count}} exercices",
     "review_other": "Réviser {{count}} exercices",
     "reviewSoon": "Bientôt disponible",
-    "sheetDetails": "Affiche ou masque les détails de cette étoile"
+    "sheetDetails": "Affiche ou masque les détails de cette étoile",
+    "extension": "Approfondissement",
+    "extensionNote": "Approfondissement : un bonus si tu le fais. Il ne compte pas pour allumer l’étoile.",
+    "lightFirst": "À allumer d’abord :",
+    "earlierStages": "Termine d’abord les niveaux précédents de cette étoile.",
+    "stillOpen": "Tu peux quand même t’y exercer dès maintenant.",
+    "practise": "S’exercer : {{name}}",
+    "skillsLoading": "Chargement des petites étoiles de cette étoile…"
   },
   "state": {
     "lit": "Allumée",

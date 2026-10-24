@@ -54,6 +54,13 @@ export type StarMapSource = {
   status?: StarMapReadStatus
   /** Ask for the sky again after an `error`. */
   retry?: () => void
+  /**
+   * A star was picked (#503): a source that sends the sky as a skeleton loads
+   * the stars around it in full, unless it has them already.
+   */
+  select?: (unitId: string) => void
+  /** The map came on screen (#503): a source whose sky went stale reads it again. */
+  arrive?: () => void
 }
 
 /** A sky with nothing in it yet: what the application draws until #48. */

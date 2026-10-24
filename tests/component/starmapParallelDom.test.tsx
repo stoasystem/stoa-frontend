@@ -231,8 +231,8 @@ describe('the star layer is HTML', () => {
     expect(within(card).getByText('Trigonometry · In progress')).toBeInTheDocument()
     expect(within(card).getByRole('progressbar', { name: '1 of 3 lessons done' })).toHaveAttribute('aria-valuenow', '33')
     expect(within(card).getByText('Suggested next')).toBeInTheDocument()
-    expect(within(card).getByText('Opposite and adjacent sides, lit')).toBeInTheDocument()
-    expect(within(card).getByText('Sine as a ratio, not lit yet')).toBeInTheDocument()
+    expect(within(card).getByText('Sides of a right triangle, lit')).toBeInTheDocument()
+    expect(within(card).getByText('Calculating with sine and cosine, not lit yet')).toBeInTheDocument()
     expect(within(card).getByRole('link', { name: 'Continue' })).toHaveAttribute('href', '/chapter/demo-sine-cosine')
   })
 

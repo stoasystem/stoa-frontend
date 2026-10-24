@@ -882,16 +882,34 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
         }
         if (skills?.length) {
           // Skill points: small dots on an arc over the star, clear of its name (#72 point 1).
+          // An extension small star (#501) is smaller and dashed while dark, and lit it glows.
           const radius = frame.glyphSize * 0.62
           const dot = Math.max(1.6, frame.glyphSize * 0.045)
+          const extension = scene.skillExtension?.[i]
           skills.forEach((lit, k) => {
             const angle = Math.PI * (7 / 6 + ((2 / 3) * (k + 0.5)) / skills.length)
+            const sx = px + Math.cos(angle) * radius
+            const sy = py + Math.sin(angle) * radius
+            const extra = extension?.[k] === true
             ctx.globalAlpha = fade * Math.min(1, frame.showSkills)
+            if (extra && lit) {
+              ctx.save()
+              ctx.translate(sx, sy)
+              halo(ctx, dot * 2, dot * 1.2, colours.lit, 0.7)
+              ctx.restore()
+            }
             ctx.beginPath()
-            ctx.arc(px + Math.cos(angle) * radius, py + Math.sin(angle) * radius, dot, 0, Math.PI * 2)
+            ctx.arc(sx, sy, extra && !lit ? dot * 0.8 : dot, 0, Math.PI * 2)
             if (lit) {
               ctx.fillStyle = colours.lit
               ctx.fill()
+            } else if (extra) {
+              ctx.save()
+              ctx.setLineDash([Math.max(0.8, dot * 0.6), Math.max(0.8, dot * 0.6)])
+              ctx.strokeStyle = withAlpha(colours.text, 0.4)
+              ctx.lineWidth = 1
+              ctx.stroke()
+              ctx.restore()
             } else {
               ctx.strokeStyle = withAlpha(colours.text, 0.55)
               ctx.lineWidth = 1

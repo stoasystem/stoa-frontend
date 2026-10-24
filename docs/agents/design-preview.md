@@ -34,8 +34,12 @@ npm run dev -- --host 127.0.0.1 --port 5173
 | `map` / `map-nebula` / `map-star` | `/map/math`、`/map/math/trigonometry`、`/map/math/trigonometry/demo-sine-cosine` | 可看；#134 起这三个是「什么都没选 / 选了三角函数 / 选了演示知识点」，打开时缩放分别是全景、星形 28 px、34 px，之后可以无级缩放；演示知识点的星卡片「Continue」进入章节 |
 | `map-focus-optics` / `map-focus-star` | `/map/physics`（键盘聚焦「光学」）、`/map/math/trigonometry`（聚焦演示知识点） | 可看：聚焦时点亮的连线（#121） |
 | `map-optics` / `map-refraction` | `/map/physics/optics`、`/map/physics/optics/demo-refraction` | 可看：跨学科前置（#121） |
-| `chapter` | `/chapter/demo-sine-cosine` | 可看：3 个课时，开场时第 1 课已完成 |
-| `lesson` | `/chapter/demo-sine-cosine/demo-sine-cosine-2` | 可看：4 道题（单选 ×2、填空、排序），能答错、重试、答对、完成课时 |
+| `chapter` | `/chapter/demo-sine-cosine` | 可看：3 个核心课时加 1 个拓展练习集，开场时第 1 课已完成 |
+| `lesson` | `/chapter/demo-sine-cosine/demo-sine-cosine--rechnen--1` | 可看：4 道题（单选 ×2、填空、排序），能答错、重试、答对、完成课时 |
+| `skill` | `/chapter/demo-sine-cosine?skill=demo-sine-cosine--rechnen` | 可看：一颗分两个 Stufe 的小星（#501），当前该做的那组高亮 |
+| `skill-extension` | `/chapter/demo-sine-cosine?skill=demo-sine-cosine--begruenden` | 可看：拓展小星，带「先完成本星前面的阶段」和「先点亮：X」提示，练习照样能进 |
+
+演示知识点按知识库的形状组织（#501，stoa-backend#127）：三颗小星是题型 `demo-sine-cosine--<题型>`，练习集 id 是 `<小星>--<阶段>`；「Begründen und Beweisen」是拓展小星，做完只点亮它自己，星只按三个核心课时点亮。演示后端也答 `GET /practice/knowledge-map`（按页面的 `points`；`view=skeleton` 时不带小星）和 `GET /practice/knowledge-map/stars`（#503，一颗星和它周边的星，带小星与练习集），章节和小星页从后者读小星的点亮、提示和练习集归属。星图本身仍走演示数据源，不经这两个接口。
 | `ask` / `ask-conversation` | `/ask`、`/ask/demo-ask-sine` | 可看；桌面为侧栏，手机为全屏 sheet；`demo-ask-sine` 带一位进行中的老师；能发消息（答复为固定文字）、请老师 |
 | `me` | `/me` | 可看 |
 | `account-menu` | `/me` 并自动打开头像菜单 | 可看，能退出（回到登录页） |
