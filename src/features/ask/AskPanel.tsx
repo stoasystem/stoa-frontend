@@ -13,6 +13,7 @@ import { ASK_PANEL } from '@/features/ask/askLayout'
 import { TeacherHelpAction, TeacherHelpStatusCard } from '@/features/ask/TeacherHelp'
 import type { AskController } from '@/features/ask/useAskController'
 import { useAskConversation } from '@/features/ask/useAskConversation'
+import { useFindStarSeam } from '@/features/starmap/findStarPrototypeSeam'
 import {
   quoteBelongs,
   quoteField,
@@ -95,6 +96,7 @@ export function AskPanel({
   practice?: AskPractice
 }) {
   const { t } = useTranslation('chat')
+  const seam = useFindStarSeam()
   const { conversationId, draft, setDraft, select, close } = controller
   const conversationsQuery = useConversationsQuery()
   const availability = useTeacherAvailabilityQuery().data
@@ -279,6 +281,11 @@ export function AskPanel({
   function submit(value: string) {
     const content = value.trim()
     if (!content) return
+    // PROTOTYPE #476: the design preview's find-a-star prototype may take the question instead.
+    if (seam.askSubmit?.(content)) {
+      setDraft('')
+      return
+    }
     // Pressing send while a file is still going up is held by the composer's
     // `busy`, which says so; this is the second lock, so a question can never
     // leave without the file it was written for.
@@ -509,6 +516,7 @@ function AskThread({
   teachersOnline: boolean | undefined
 }) {
   const { t } = useTranslation('chat')
+  const { threadEnd } = useFindStarSeam()
   const queryClient = useQueryClient()
   const scroller = useRef<HTMLDivElement>(null)
   const [helpError, setHelpError] = useState<string | null>(null)
@@ -616,6 +624,7 @@ function AskThread({
             after={entry.message.id === lastAnswerId ? helpAction : undefined}
           />
         ))}
+        {threadEnd}
       </div>
       <p className="sr-only" aria-live="polite" data-ask-announcer>
         {announcement}

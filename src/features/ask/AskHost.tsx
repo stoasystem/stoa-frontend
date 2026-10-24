@@ -16,6 +16,7 @@ import { useAskKeyboard } from '@/features/ask/useAskKeyboard'
 import { useSheetDrag } from '@/features/ask/useSheetDrag'
 import { WIDE_QUERY, useMediaQuery } from '@/hooks/layout/useMediaQuery'
 import { useCoverShell } from '@/layouts/shellCover'
+import { useFindStarSeam } from '@/features/starmap/findStarPrototypeSeam'
 
 /**
  * The planet with Ask on it (#12 points 1 and 6; #13 point 1).
@@ -64,6 +65,8 @@ export function AskHost({
   const reducedMotion = useMediaQuery('(prefers-reduced-motion: reduce)')
   const composing = useRef(false)
   useCoverShell(modal)
+  // PROTOTYPE #476: a no-op outside the design preview's find-a-star prototype.
+  const seam = useFindStarSeam()
 
   // Closed again: the focus goes back to where Ask was opened from.
   useEffect(() => {
@@ -88,17 +91,19 @@ export function AskHost({
   // the field from under it. Ask opens once the composition ends.
   const onDockedChange = useCallback(
     (value: string) => {
-      if (value.trim().length > 0 && !composing.current) controller.openWithDraft(value)
+      if (seam.dockedChange?.(value)) controller.setDraft(value)
+      else if (value.trim().length > 0 && !composing.current) controller.openWithDraft(value)
       else controller.setDraft(value)
     },
-    [controller],
+    [controller, seam],
   )
   const onDockedCompositionEnd = useCallback(
     (value: string) => {
       composing.current = false
+      if (seam.dockedChange?.(value)) return
       if (value.trim().length > 0) controller.openWithDraft(value)
     },
-    [controller],
+    [controller, seam],
   )
 
   return (
@@ -128,6 +133,7 @@ export function AskHost({
             }
           >
             <div className="w-full" style={{ maxWidth: wide ? DOCKED_COMPOSER.desktop.width : undefined }}>
+              {seam.aboveDocked}
               <Composer
                 value={controller.draft}
                 onChange={onDockedChange}
@@ -135,7 +141,9 @@ export function AskHost({
                   composing.current = true
                 }}
                 onCompositionEnd={onDockedCompositionEnd}
-                onSubmit={(value) => controller.openWithDraft(value)}
+                onSubmit={(value) => {
+                  if (!seam.dockedSubmit?.(value)) controller.openWithDraft(value)
+                }}
                 label={t('ask.composerLabel')}
                 placeholder={wide ? t('ask.dockedPlaceholder') : t('ask.dockedPlaceholderPhone')}
               />

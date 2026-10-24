@@ -23,6 +23,7 @@ import { FirstLandingBubble } from '@/features/starmap/onboarding/FirstLandingBu
 import { FirstSubjectQuestion } from '@/features/starmap/onboarding/FirstSubjectQuestion'
 import { useFirstLanding } from '@/features/starmap/onboarding/useFirstLanding'
 import { useFirstReveal } from '@/features/starmap/onboarding/useFirstReveal'
+import { useFindStarSeam } from '@/features/starmap/findStarPrototypeSeam'
 import { DEFAULT_SUBJECT_ID, DEMO_STAR_COUNT, fixtureSizeFrom, foveationFrom, useStarMap } from '@/features/starmap/useStarMap'
 import { pathForTarget, resolveTarget, type LayerTarget } from '@/features/starmap/view/layers'
 import { markLoginFirstScreenReady } from '@/lib/loginTiming'
@@ -58,6 +59,10 @@ export function StarMapRoute({ relations = false, longNames = false }: { relatio
   // its recommended star with Murmi beside it, and after the first lighting sees the galaxy (plan A).
   const first = useFirstLanding(map, stage.target, ownerId)
   const firstReveal = useFirstReveal(map, first.target, stage.reveal)
+  // PROTOTYPE #476: the design preview's find-a-star prototype, a no-op everywhere else.
+  const seam = useFindStarSeam()
+  const { onMap: seamOnMap, release: seamRelease } = seam
+  useEffect(() => seamOnMap?.(stage.map), [seamOnMap, stage.map])
 
   // Sign-in timing, handed over from ChatPage / LearnPage (#45): a student
   // lands on the map now, so its first drawn frame ends the wait. The mark is
@@ -67,9 +72,11 @@ export function StarMapRoute({ relations = false, longNames = false }: { relatio
 
   // A nebula or star lives under its own galaxy's route: one sky, so it may be another subject's.
   const onNavigate = useCallback(
-    (next: LayerTarget) =>
-      navigate({ pathname: pathForTarget(next.layer === 'map' ? map.subject.subjectId : subjectOfNebula(map, next.nebulaId), next), search: location.search }),
-    [navigate, map, location.search],
+    (next: LayerTarget) => {
+      seamRelease?.()
+      void navigate({ pathname: pathForTarget(next.layer === 'map' ? map.subject.subjectId : subjectOfNebula(map, next.nebulaId), next), search: location.search })
+    },
+    [navigate, map, location.search, seamRelease],
   )
   // Panned to another galaxy: the route (and with it the header and the switcher) follows, in place.
   const onCentreGalaxy = useCallback(
@@ -85,10 +92,11 @@ export function StarMapRoute({ relations = false, longNames = false }: { relatio
   if (map.subjects.length === 0) return <EmptyStarMap onShown={onFirstFrame} />
 
   return (
-    <StarMapView demo={demo} map={stage.map} target={firstReveal.target ?? first.target} onNavigate={onNavigate} land={stage.land} onFirstFrame={onFirstFrame} onCentreGalaxy={onCentreGalaxy} foveate={search.has('foveation') ? foveationFrom(search) : false}
+    <StarMapView demo={demo} map={stage.map} target={seam.target ?? firstReveal.target ?? first.target} onNavigate={onNavigate} land={stage.land} onFirstFrame={onFirstFrame} onCentreGalaxy={onCentreGalaxy} foveate={search.has('foveation') ? foveationFrom(search) : false}
       overlay={(locate, watch) => (
         <>
           <LightingOverlay map={map} locate={locate} watch={watch} onReveal={firstReveal.onReveal} />
+          {seam.overlay?.(locate, watch)}
           {first.asking && <FirstSubjectQuestion subjects={first.asking} onChoose={first.choose} />}
           {first.star && (
             // In the design preview only the demo knowledge point has a chapter, as on the star's card.

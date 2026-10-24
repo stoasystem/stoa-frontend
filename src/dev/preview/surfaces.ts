@@ -105,6 +105,15 @@ export const SURFACES: readonly Surface[] = [
     demo: 'newcomer',
     readyWhen: '[data-first-landing] [data-shown]',
   },
+  // PROTOTYPE #476: "I want to keep practising derivatives" typed under the map finds that star.
+  // Variants `&variant=A|B|C`, recogniser `&recognizer=local|backend` (src/dev/preview/findStar/).
+  {
+    id: 'find-star',
+    label: 'Prototype #476 · find a star from Ask',
+    path: (points) => withPoints(`/map/${subjectId}`, points),
+    signedIn: true,
+    stars: true,
+  },
   // The whole first sign-in (docs/research/user-onboarding-design.md): the invitation link,
   // signing in, which subject school is on, and the first landing on "Integers", where the
   // course starts. That star has no chapter in the preview, so the walk-through ends there.
