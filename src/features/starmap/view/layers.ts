@@ -21,8 +21,12 @@ import { SHEET, ZOOM } from '@/features/starmap/view/semanticZoom'
 import type { NebulaDisc } from '@/features/starmap/view/geometry'
 
 export type LayerTarget =
-  /** `fly`: pull back to the galaxy even from a choice let go (the first reveal), not stay. */
-  | { layer: 'map'; fly?: true }
+  /**
+   * `fly`: pull back even from a choice let go (the first reveal), not stay;
+   * `frame`: the stars to frame instead of the whole galaxy, and `flightMs`
+   * how long the pull-back takes.
+   */
+  | { layer: 'map'; fly?: true; frame?: readonly string[]; flightMs?: number }
   /** `whole`: the nebula seen whole, `star` kept in view: back on the map from a lighting (#140). */
   | { layer: 'nebula'; nebulaId: string; whole?: { star: string } }
   | { layer: 'star'; nebulaId: string; unitId: string }
@@ -127,6 +131,34 @@ export function wholeNebulaView(
   }
   const fy = viewport.height > 0 ? ((viewport.top ?? 0) + usable / 2) / viewport.height : 0.5
   return { cx, cy, k, fx: 0.5, fy }
+}
+
+/**
+ * A few stars framed together (the first reveal: the star just lit and the
+ * one recommended next): all of them within `ZOOM.revealFill` of the band
+ * between the page's controls, centred in it, at a zoom within `zoom` -- never
+ * further out than the galaxy, never closer than its nebulae seen whole. Null
+ * when none of them is on the map.
+ */
+export function framedView(
+  unitIds: readonly string[],
+  stars: readonly Pick<Star, 'unitId' | 'x' | 'y'>[],
+  viewport: Viewport,
+  bounds: Bounds,
+  [least, most]: readonly [number, number],
+): View | null {
+  const own = stars.filter((candidate) => unitIds.includes(candidate.unitId))
+  if (own.length === 0) return null
+  const xs = own.map((candidate) => candidate.x)
+  const ys = own.map((candidate) => candidate.y)
+  const [minX, maxX, minY, maxY] = [Math.min(...xs), Math.max(...xs), Math.min(...ys), Math.max(...ys)]
+  const usable = usableHeight(viewport)
+  const base = baseScale(viewport, bounds)
+  const room = { width: ZOOM.revealFill * viewport.width, height: ZOOM.revealFill * usable }
+  const fit = Math.min(room.width / Math.max(1e-6, (maxX - minX) * base), room.height / Math.max(1e-6, (maxY - minY) * base))
+  const k = Math.max(least, Math.min(most, fit))
+  const fy = viewport.height > 0 ? ((viewport.top ?? 0) + usable / 2) / viewport.height : 0.5
+  return { cx: (minX + maxX) / 2, cy: (minY + maxY) / 2, k, fx: 0.5, fy }
 }
 
 /** Where a choice is seen: its centre, and where on screen (`fx`, `fy`); the engine sets the zoom (`view/semanticZoom.ts`'s `ZOOM`). */

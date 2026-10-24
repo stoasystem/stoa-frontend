@@ -115,12 +115,41 @@
   }
 }
 
+@keyframes starmap-first-landing-out {
+  from {
+    opacity: 1;
+    transform: none;
+  }
+  to {
+    opacity: 0;
+    transform: translateY(4px) scale(0.98);
+  }
+}
+
+@keyframes starmap-first-landing-fade-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
 .starmap-first-landing[data-shown] {
   animation: starmap-first-landing-in var(--motion-panel) var(--ease-standard) both;
+}
+
+/* Waved away: quicker than it came (BUBBLE_EXIT_MS), and nothing to press while it goes. */
+.starmap-first-landing[data-leaving] {
+  animation: starmap-first-landing-out 160ms var(--ease-out) both;
 }
 
 @media (prefers-reduced-motion: reduce) {
   .starmap-first-landing[data-shown] {
     animation: starmap-first-landing-fade var(--motion-reduced) linear both;
+  }
+
+  .starmap-first-landing[data-leaving] {
+    animation: starmap-first-landing-fade-out var(--motion-reduced) linear both;
   }
 }

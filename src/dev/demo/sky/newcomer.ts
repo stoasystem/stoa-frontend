@@ -6,11 +6,12 @@
  *   - Nothing lit, nothing in progress, no skill lit, nothing due for review.
  *   - With nothing lit, a star is ready only if it has no prerequisite at
  *     all (CONTEXT.md); every other star is locked.
- *   - The demo knowledge point is a root: the prerequisites into it are left
- *     out, so it is ready, and it is mathematics' recommendation on purpose,
- *     as in the demo sky, so "Start this star" leads into a real chapter.
- *     Every other subject the student takes is recommended by the backend's
- *     rule (#9 point 8): its first ready star, in order.
+ *   - Every subject the student takes is recommended by the backend's rule
+ *     (#9 point 8): its first ready star in course order, which is where the
+ *     course starts -- in mathematics "Integers", not the demo knowledge point
+ *     the demo sky recommends on purpose (sine and cosine is no first star).
+ *     That star is a placeholder: it has no chapter, so the walk-through stops
+ *     at the first landing.
  *
  * The demo knowledge point follows the lessons completed on the page (the
  * demo backend's state, which `startAsNewcomer` empties): in progress after
@@ -36,7 +37,7 @@ function newcomerParts(map: StarMap): Made {
   if (hit) return hit
 
   const kp = DEMO_KNOWLEDGE_POINT.unitId
-  const prerequisites = map.prerequisites.filter((edge) => edge.to !== kp)
+  const prerequisites = map.prerequisites
   const waits = new Set(prerequisites.map((edge) => edge.to))
   const fresh: Star[] = map.stars.map((star) => ({
     ...star,
@@ -54,7 +55,7 @@ function newcomerParts(map: StarMap): Made {
   const ordered = orderedStars({ nebulae: map.nebulae, stars: fresh })
   for (const subjectId of taken) {
     const own = ordered.filter((star) => subjectOfNebula(map, star.nebulaId) === subjectId)
-    const pick = own.find((star) => star.unitId === kp) ?? own.find((star) => star.state === 'ready')
+    const pick = own.find((star) => star.state === 'ready')
     if (pick) picks.add(pick.unitId)
   }
   const stars = fresh.map((star) => (picks.has(star.unitId) ? { ...star, recommendation: { source: 'system' as const } } : star))

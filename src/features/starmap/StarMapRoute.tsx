@@ -90,7 +90,10 @@ export function StarMapRoute({ relations = false, longNames = false }: { relatio
         <>
           <LightingOverlay map={map} locate={locate} watch={watch} onReveal={firstReveal.onReveal} />
           {first.asking && <FirstSubjectQuestion subjects={first.asking} onChoose={first.choose} />}
-          {first.star && <FirstLandingBubble star={first.star} locate={locate} watch={watch} onDismiss={first.dismiss} />}
+          {first.star && (
+            // In the design preview only the demo knowledge point has a chapter, as on the star's card.
+            <FirstLandingBubble star={first.star} startable={!(demo && first.star.chapter.lessonCount === 0)} locate={locate} watch={watch} onDismiss={first.dismiss} />
+          )}
           {firstReveal.star && firstReveal.next && (
             <FirstLandingBubble key={firstReveal.star.unitId} star={firstReveal.star} next={firstReveal.next} locate={locate} watch={watch} onDismiss={firstReveal.dismiss} />
           )}

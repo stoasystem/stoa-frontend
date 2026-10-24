@@ -8,7 +8,9 @@
  * star while the map moves and draws nothing while the map is still: it
  * follows frame by frame from an input on the map until the star has stopped
  * moving, then waits for the next one (#330 M4). It arrives once the star is
- * on screen; with reduced motion it fades in, nothing moves.
+ * on screen and the camera has come to rest there -- never mid-flight, where
+ * it would chase its star across the sky -- and goes with a short fade when
+ * waved away; with reduced motion it fades in and out, nothing moves.
  *
  * The same bubble closes the first landing after the student's first star is
  * lit (`next`): beside the star recommended now, it says what lighting did
@@ -19,13 +21,20 @@ import { useTranslation } from 'react-i18next'
 import { Link, useNavigate } from 'react-router-dom'
 import { Button } from '@/components/base'
 import { Murmi } from '@/components/brand/Murmi'
+import { cn } from '@/lib/utils'
 import type { JumpState } from '@/features/chapter/jump'
 import { animationFrameScheduler, type FrameScheduler, type StarOnScreen } from '@/features/starmap/engine/starMapEngine'
 import { placeBesideStar, type LabelSide, type Rect } from '@/features/starmap/lighting/labelPlace'
 import type { Star } from '@/features/starmap/model/starMap'
+import { usePrefersReducedMotion } from '@/features/starmap/motion/usePrefersReducedMotion'
 
 /** Frames the star must stay put before the bubble stops following it. */
 const STILL_FRAMES = 12
+/** Frames the star must stay put before the bubble first arrives: the camera has landed. */
+const SETTLE_FRAMES = 4
+/** The fade out when waved away, ms (`starmap.css`; reduced motion: `--motion-reduced`). */
+export const BUBBLE_EXIT_MS = 160
+const REDUCED_EXIT_MS = 200
 /** Narrower than this, the bubble does not fit beside its star: it docks across the map instead. */
 const DOCK_BELOW_PX = 560
 /** The gutter a docked bubble keeps from the map's edges and its controls, CSS px. */
@@ -74,6 +83,8 @@ export type FirstLandingBubbleProps = {
   star: Star
   /** After the first lighting: the route of `star`, the next one, which the bubble leads to. */
   next?: string
+  /** Whether `star` has a chapter to start: not the design preview's placeholder stars (as the star's card). */
+  startable?: boolean
   /** Where a star is drawn now, from the map's engine. */
   locate: (unitId: string) => StarOnScreen | null
   /** Calls `listener` when the map comes to rest; returns the way to stop. */
@@ -83,13 +94,15 @@ export type FirstLandingBubbleProps = {
   scheduler?: FrameScheduler
 }
 
-export function FirstLandingBubble({ star, next, locate, watch, onDismiss, scheduler = animationFrameScheduler }: FirstLandingBubbleProps) {
+export function FirstLandingBubble({ star, next, startable = true, locate, watch, onDismiss, scheduler = animationFrameScheduler }: FirstLandingBubbleProps) {
   const { t } = useTranslation('starmap')
   const navigate = useNavigate()
   const titleId = useId()
   const rootRef = useRef<HTMLDivElement>(null)
   const boxRef = useRef<HTMLElement>(null)
   const [placed, setPlaced] = useState(false)
+  const [leaving, setLeaving] = useState(false)
+  const reducedMotion = usePrefersReducedMotion()
   const chapterTo = `/chapter/${encodeURIComponent(star.unitId)}`
 
   useEffect(() => {
@@ -100,6 +113,7 @@ export function FirstLandingBubble({ star, next, locate, watch, onDismiss, sched
     let still = 0
     let last: StarOnScreen | null = null
     let side: LabelSide | undefined
+    let arrived = false
 
     const frame = () => {
       handle = null
@@ -107,8 +121,12 @@ export function FirstLandingBubble({ star, next, locate, watch, onDismiss, sched
       const width = root.clientWidth
       const height = root.clientHeight
       const inside = spot !== null && spot.x >= 0 && spot.x <= width && spot.y >= 0 && spot.y <= height
-      box.style.visibility = inside ? 'visible' : 'hidden'
-      if (spot && inside) {
+      still = last && spot && last.x === spot.x && last.y === spot.y ? still + 1 : 0
+      last = spot
+      // The first time, only once the camera has landed: the bubble does not chase a flight.
+      arrived ||= inside && still >= SETTLE_FRAMES
+      box.style.visibility = inside && arrived ? 'visible' : 'hidden'
+      if (spot && inside && arrived) {
         const controls = controlsOver(root, box)
         const docked = width < DOCK_BELOW_PX
         if (!docked) box.style.width = ''
@@ -128,9 +146,7 @@ export function FirstLandingBubble({ star, next, locate, watch, onDismiss, sched
         box.dataset.side = at.side
         setPlaced(true)
       }
-      still = last && spot && last.x === spot.x && last.y === spot.y ? still + 1 : 0
-      last = spot
-      if (still < STILL_FRAMES) handle = scheduler.request(frame)
+      if (!arrived || still < STILL_FRAMES) handle = scheduler.request(frame)
     }
     const follow = () => {
       still = 0
@@ -162,10 +178,22 @@ export function FirstLandingBubble({ star, next, locate, watch, onDismiss, sched
     navigate(chapterTo, { state })
   }
 
+  // Waved away: a short fade, then gone.
+  const dismissRef = useRef(onDismiss)
+  useEffect(() => {
+    dismissRef.current = onDismiss
+  }, [onDismiss])
+  useEffect(() => {
+    if (!leaving) return
+    const timer = window.setTimeout(() => dismissRef.current(), reducedMotion ? REDUCED_EXIT_MS : BUBBLE_EXIT_MS)
+    return () => window.clearTimeout(timer)
+  }, [leaving, reducedMotion])
+  const leave = () => setLeaving(true)
+
   function onKeyDown(event: KeyboardEvent<HTMLElement>) {
     if (event.key !== 'Escape') return
     event.stopPropagation()
-    onDismiss()
+    leave()
   }
 
   return (
@@ -175,12 +203,13 @@ export function FirstLandingBubble({ star, next, locate, watch, onDismiss, sched
         data-starmap-overlay
         aria-labelledby={titleId}
         onKeyDown={onKeyDown}
-        className="pointer-events-auto absolute left-0 top-0 w-[min(320px,calc(100%-32px))]"
+        className={cn('absolute left-0 top-0 w-[min(320px,calc(100%-32px))]', leaving ? 'pointer-events-none' : 'pointer-events-auto')}
         style={{ visibility: 'hidden' }}
       >
         <div
           className="starmap-first-landing space-y-2 rounded-[var(--corner-card)] border border-solid border-[color:var(--sky-glass-border)] px-4 py-3 text-on-sky"
           data-shown={placed || undefined}
+          data-leaving={leaving || undefined}
           style={{ background: 'var(--sky-glass)', backdropFilter: 'blur(var(--sky-glass-blur))', WebkitBackdropFilter: 'blur(var(--sky-glass-blur))' }}
         >
           <div className="flex items-center gap-2">
@@ -193,16 +222,20 @@ export function FirstLandingBubble({ star, next, locate, watch, onDismiss, sched
             {next ? t('firstReveal.body', { name: star.name }) : t('firstLanding.body')}
           </p>
           <div className="flex flex-wrap items-center gap-x-2 gap-y-1 pt-0.5">
-            <Button asChild lift variant="onSky" size="small">
-              {next ? (
+            {next ? (
+              <Button asChild lift variant="onSky" size="small">
                 <Link to={next}>{t('firstReveal.show')}</Link>
-              ) : (
-                <Link to={chapterTo} onClick={start}>
-                  {t('firstLanding.start')}
-                </Link>
-              )}
-            </Button>
-            <Button variant="onSkyPlain" size="small" onClick={onDismiss}>
+              </Button>
+            ) : (
+              startable && (
+                <Button asChild lift variant="onSky" size="small">
+                  <Link to={chapterTo} onClick={start}>
+                    {t('firstLanding.start')}
+                  </Link>
+                </Button>
+              )
+            )}
+            <Button variant="onSkyPlain" size="small" onClick={leave}>
               {next ? t('firstReveal.later') : t('firstLanding.later')}
             </Button>
           </div>

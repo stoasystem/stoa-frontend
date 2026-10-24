@@ -106,7 +106,8 @@ export const SURFACES: readonly Surface[] = [
     readyWhen: '[data-first-landing] [data-shown]',
   },
   // The whole first sign-in (docs/research/user-onboarding-design.md): the invitation link,
-  // signing in, which subject school is on, the first landing, a chapter, the first lighting.
+  // signing in, which subject school is on, and the first landing on "Integers", where the
+  // course starts. That star has no chapter in the preview, so the walk-through ends there.
   {
     id: 'onboarding',
     label: 'First sign-in · the whole onboarding',

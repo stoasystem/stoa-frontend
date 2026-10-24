@@ -22,9 +22,11 @@ import { demoStarMap } from '@/dev/demo/sky/demoStarMap'
 import { DEMO_KNOWLEDGE_POINT } from '@/dev/demo/sky/demoSky'
 import { asNewcomer } from '@/dev/demo/sky/newcomer'
 import { firstLandingFor, isFirstLit, isNewcomer, startableSubjects } from '@/features/starmap/onboarding/firstLanding'
-import { dockedPlace, FirstLandingBubble } from '@/features/starmap/onboarding/FirstLandingBubble'
+import { BUBBLE_EXIT_MS, dockedPlace, FirstLandingBubble } from '@/features/starmap/onboarding/FirstLandingBubble'
 import { useFirstLanding, type FirstLanding } from '@/features/starmap/onboarding/useFirstLanding'
-import { REVEAL_HOLD_MS, useFirstReveal, type FirstReveal } from '@/features/starmap/onboarding/useFirstReveal'
+import { REVEAL_FLIGHT_MS, REVEAL_HOLD_MS, useFirstReveal, type FirstReveal } from '@/features/starmap/onboarding/useFirstReveal'
+import { FirstSubjectQuestion } from '@/features/starmap/onboarding/FirstSubjectQuestion'
+import { framedView } from '@/features/starmap/view/layers'
 import { FLARE_MS, FLARE_PEAK_MS } from '@/features/starmap/lighting/flare'
 import { ZOOM } from '@/features/starmap/view/semanticZoom'
 import { subjectOfNebula, type StarMap } from '@/features/starmap/model/starMap'
@@ -34,6 +36,9 @@ import { fakeClock } from './starmapHarness'
 
 const KP = DEMO_KNOWLEDGE_POINT.unitId
 const TOPIC = DEMO_KNOWLEDGE_POINT.topicId
+/** Where a newcomer starts: mathematics' first star in course order (#9 point 8), "Integers". */
+const START = 'numbers-1'
+const START_TOPIC = 'numbers'
 
 const demoMap = (size: 10 | 1000 = 1000): StarMap =>
   demoStarMapOverride(demoStarMap('math', size, i18n.getFixedT('en', 'starmap'), { language: 'en' }), size)
@@ -56,11 +61,11 @@ describe('who is new', () => {
   })
 
   it('lands a newcomer on the recommended star of the galaxy in focus, its nebula seen whole', () => {
-    expect(firstLandingFor(newcomerMap(), { layer: 'map' })).toEqual({ layer: 'nebula', nebulaId: TOPIC, whole: { star: KP } })
+    expect(firstLandingFor(newcomerMap(), { layer: 'map' })).toEqual({ layer: 'nebula', nebulaId: START_TOPIC, whole: { star: START } })
   })
 
   it('leaves a chosen nebula or star, and a student who has started, as they are', () => {
-    expect(firstLandingFor(newcomerMap(), { layer: 'nebula', nebulaId: TOPIC })).toBeNull()
+    expect(firstLandingFor(newcomerMap(), { layer: 'nebula', nebulaId: START_TOPIC })).toBeNull()
     expect(firstLandingFor(newcomerMap(), { layer: 'star', nebulaId: TOPIC, unitId: KP })).toBeNull()
     expect(firstLandingFor(demoMap(), { layer: 'map' })).toBeNull()
   })
@@ -80,14 +85,16 @@ describe("the design preview's newcomer sky", () => {
       expect(map.subjects.every((galaxy) => galaxy.lit === 0)).toBe(true)
     })
 
-    it(`recommends one ready star in each subject the student takes, the demo knowledge point in mathematics (${size} stars)`, () => {
+    it(`recommends one ready star in each subject the student takes, where the course starts (${size} stars)`, () => {
       const map = newcomerMap(size)
       const recommended = map.stars.filter((star) => star.recommendation)
       const subjects = recommended.map((star) => subjectOfNebula(map, star.nebulaId))
       expect(new Set(subjects).size).toBe(subjects.length)
       expect(subjects.sort()).toEqual(map.subjects.filter((galaxy) => galaxy.enrolled).map((galaxy) => galaxy.subjectId).sort())
       expect(recommended.every((star) => star.state === 'ready')).toBe(true)
-      expect(map.stars.find((star) => star.unitId === KP)?.recommendation).toEqual({ source: 'system' })
+      // Not the demo knowledge point (sine and cosine is no first star): "Integers", first in course order.
+      expect(map.stars.find((star) => star.unitId === START)?.recommendation).toEqual({ source: 'system' })
+      expect(map.stars.find((star) => star.unitId === KP)?.recommendation).toBeNull()
     })
   }
 
@@ -119,30 +126,30 @@ describe('on the route', () => {
         <Probe map={map} out={out} />
       </MemoryRouter>,
     )
-    expect(out.path).toBe(`/map/math/${TOPIC}`)
-    expect(out.state).toEqual({ firstLanding: KP })
-    expect(out.current?.target).toEqual({ layer: 'nebula', nebulaId: TOPIC, whole: { star: KP } })
-    expect(out.current?.star?.unitId).toBe(KP)
+    expect(out.path).toBe(`/map/math/${START_TOPIC}`)
+    expect(out.state).toEqual({ firstLanding: START })
+    expect(out.current?.target).toEqual({ layer: 'nebula', nebulaId: START_TOPIC, whole: { star: START } })
+    expect(out.current?.star?.unitId).toBe(START)
 
     // The nebula's page, mounted afresh with the state the galaxy's left it.
     const again = probe()
     render(
-      <MemoryRouter initialEntries={[{ pathname: `/map/math/${TOPIC}`, state: { firstLanding: KP } }]}>
+      <MemoryRouter initialEntries={[{ pathname: `/map/math/${START_TOPIC}`, state: { firstLanding: START } }]}>
         <Probe map={map} out={again} />
       </MemoryRouter>,
     )
-    expect(again.current?.target).toEqual({ layer: 'nebula', nebulaId: TOPIC, whole: { star: KP } })
-    expect(again.current?.star?.unitId).toBe(KP)
+    expect(again.current?.target).toEqual({ layer: 'nebula', nebulaId: START_TOPIC, whole: { star: START } })
+    expect(again.current?.star?.unitId).toBe(START)
   })
 
   it('opens a nebula reached any other way as before', () => {
     const out = probe()
     render(
-      <MemoryRouter initialEntries={[`/map/math/${TOPIC}`]}>
+      <MemoryRouter initialEntries={[`/map/math/${START_TOPIC}`]}>
         <Probe map={newcomerMap()} out={out} />
       </MemoryRouter>,
     )
-    expect(out.current?.target).toEqual({ layer: 'nebula', nebulaId: TOPIC })
+    expect(out.current?.target).toEqual({ layer: 'nebula', nebulaId: START_TOPIC })
     expect(out.current?.star).toBeNull()
   })
 
@@ -158,7 +165,7 @@ describe('on the route', () => {
     )
     act(() => out.current?.dismiss())
     expect(out.current?.star).toBeNull()
-    expect(out.current?.target).toEqual({ layer: 'nebula', nebulaId: TOPIC, whole: { star: KP } })
+    expect(out.current?.target).toEqual({ layer: 'nebula', nebulaId: START_TOPIC, whole: { star: START } })
 
     const later = probe()
     render(
@@ -175,7 +182,7 @@ describe('on the route', () => {
         <Probe map={map} ownerId="student-2" out={someoneElse} />
       </MemoryRouter>,
     )
-    expect(someoneElse.current?.star?.unitId).toBe(KP)
+    expect(someoneElse.current?.star?.unitId).toBe(START)
   })
 })
 
@@ -228,7 +235,7 @@ describe('plan B, the question', () => {
       </MemoryRouter>,
     )
     act(() => out.current?.choose(null))
-    expect(out.current?.target).toEqual({ layer: 'nebula', nebulaId: TOPIC, whole: { star: KP } })
+    expect(out.current?.target).toEqual({ layer: 'nebula', nebulaId: START_TOPIC, whole: { star: START } })
   })
 })
 
@@ -260,6 +267,54 @@ function RevealProbe({ map, out }: { map: StarMap; out: { current: FirstReveal |
   return null
 }
 
+describe('the question card', () => {
+  afterEach(() => {
+    vi.useRealTimers()
+  })
+
+  it('fades before the answer goes, and takes one answer only', () => {
+    vi.useFakeTimers()
+    const answers: (string | null)[] = []
+    render(
+      <I18nextProvider i18n={i18n}>
+        <FirstSubjectQuestion subjects={startableSubjects(newcomerMap())} onChoose={(id) => answers.push(id)} />
+      </I18nextProvider>,
+    )
+    fireEvent.click(screen.getByRole('button', { name: 'Mathematics' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Physics' }))
+    expect(answers).toEqual([])
+    expect(document.querySelector('[data-first-question] [data-leaving]')).not.toBeNull()
+    act(() => {
+      vi.advanceTimersByTime(BUBBLE_EXIT_MS)
+    })
+    expect(answers).toEqual(['math'])
+  })
+})
+
+describe('framing the reveal', () => {
+  const viewport = { width: 1000, height: 800 }
+  const bounds = { minX: 0, minY: 0, maxX: 1, maxY: 1 }
+  const stars = [
+    { unitId: 'a', x: 0.2, y: 0.4 },
+    { unitId: 'b', x: 0.6, y: 0.5 },
+    { unitId: 'far', x: 0.95, y: 0.95 },
+  ]
+
+  it('centres the stars it frames, at a zoom inside its limits', () => {
+    const view = framedView(['a', 'b'], stars, viewport, bounds, [0.5, 50])!
+    expect(view.cx).toBeCloseTo(0.4)
+    expect(view.cy).toBeCloseTo(0.45)
+    expect(view.k).toBeGreaterThan(0.5)
+    expect(view.k).toBeLessThan(50)
+  })
+
+  it('never goes further out than the galaxy, nor closer than its limit', () => {
+    expect(framedView(['a', 'far'], stars, viewport, bounds, [3, 50])!.k).toBe(3)
+    expect(framedView(['a'], stars, viewport, bounds, [0.5, 4])!.k).toBe(4)
+    expect(framedView(['missing'], stars, viewport, bounds, [0.5, 4])).toBeNull()
+  })
+})
+
 describe('the reveal', () => {
   afterEach(() => {
     vi.useRealTimers()
@@ -282,7 +337,8 @@ describe('the reveal', () => {
     })
     const next = map.stars.find((star) => star.recommendation && subjectOfNebula(map, star.nebulaId) === 'math')!
     expect(out.path).toBe('/map/math')
-    expect(out.current?.target).toEqual({ layer: 'map', fly: true })
+    // Framed: the star just lit and the next one, flown out to slowly.
+    expect(out.current?.target).toEqual({ layer: 'map', fly: true, frame: [KP, next.unitId], flightMs: REVEAL_FLIGHT_MS })
     expect(out.current?.star?.unitId).toBe(next.unitId)
     expect(out.current?.next).toBe(`/map/math/${next.nebulaId}/${next.unitId}`)
   })
@@ -327,9 +383,50 @@ describe('the bubble', () => {
     expect(clock.pending).toBe(0)
     expect(screen.getByRole('heading', { name: `Start here: ${star.name}` })).toBeTruthy()
     expect(screen.getByRole('link', { name: 'Start this star' }).getAttribute('href')).toBe(`/chapter/${KP}`)
+    // Waved away: it fades first, then goes.
+    vi.useFakeTimers()
     fireEvent.click(screen.getByRole('button', { name: 'Look around first' }))
-    fireEvent.keyDown(screen.getByRole('complementary'), { key: 'Escape' })
-    expect(dismissed).toBe(2)
+    expect(dismissed).toBe(0)
+    expect(layer.querySelector('[data-leaving]')).not.toBeNull()
+    act(() => {
+      vi.advanceTimersByTime(BUBBLE_EXIT_MS)
+    })
+    expect(dismissed).toBe(1)
+    vi.useRealTimers()
+  })
+
+  it("offers no way in to a star with no chapter (the design preview's placeholders)", () => {
+    const star = newcomerMap().stars.find((candidate) => candidate.unitId === START)!
+    render(
+      <I18nextProvider i18n={i18n}>
+        <MemoryRouter>
+          <FirstLandingBubble star={star} startable={false} locate={() => null} onDismiss={() => {}} scheduler={fakeClock()} />
+        </MemoryRouter>
+      </I18nextProvider>,
+    )
+    // Not placed yet (no star on screen), so read the markup rather than what a reader is given.
+    const bubble = document.querySelector('[data-first-landing]')!
+    expect(bubble.querySelector('a[href^="/chapter/"]')).toBeNull()
+    expect([...bubble.querySelectorAll('button')].map((button) => button.textContent)).toEqual(['Look around first'])
+  })
+
+  it('arrives only once its star has stopped moving: never mid-flight', () => {
+    const star = newcomerMap().stars.find((candidate) => candidate.unitId === KP)!
+    const clock = fakeClock()
+    let x = 0
+    render(
+      <I18nextProvider i18n={i18n}>
+        <MemoryRouter>
+          <FirstLandingBubble star={star} locate={() => ({ x: (x += 5), y: 100, size: 20 })} onDismiss={() => {}} scheduler={clock} />
+        </MemoryRouter>
+      </I18nextProvider>,
+    )
+    const layer = document.querySelector<HTMLElement>('[data-first-landing]')!
+    Object.defineProperty(layer, 'clientWidth', { value: 1024 })
+    Object.defineProperty(layer, 'clientHeight', { value: 700 })
+    act(() => clock.advance(300))
+    expect(layer.querySelector('[data-shown]')).toBeNull()
+    expect(layer.querySelector('aside')!.style.visibility).toBe('hidden')
   })
 
   it('docks above the controls along the bottom on a phone, and under the top ones when that would cover the star', () => {
