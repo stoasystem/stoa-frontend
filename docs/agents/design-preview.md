@@ -39,7 +39,7 @@ npm run dev -- --host 127.0.0.1 --port 5173
 | `skill` | `/chapter/demo-sine-cosine?skill=demo-sine-cosine--rechnen` | 可看：一颗分两个 Stufe 的小星（#501），当前该做的那组高亮 |
 | `skill-extension` | `/chapter/demo-sine-cosine?skill=demo-sine-cosine--begruenden` | 可看：拓展小星，带「先完成本星前面的阶段」和「先点亮：X」提示，练习照样能进 |
 
-演示知识点按知识库的形状组织（#501，stoa-backend#127）：三颗小星是题型 `demo-sine-cosine--<题型>`，练习集 id 是 `<小星>--<阶段>`；「Begründen und Beweisen」是拓展小星，做完只点亮它自己，星只按三个核心课时点亮。演示后端也答 `GET /practice/knowledge-map`（按页面的 `points`），章节和小星页从那里读小星的点亮与提示。
+演示知识点按知识库的形状组织（#501，stoa-backend#127）：三颗小星是题型 `demo-sine-cosine--<题型>`，练习集 id 是 `<小星>--<阶段>`；「Begründen und Beweisen」是拓展小星，做完只点亮它自己，星只按三个核心课时点亮。演示后端也答 `GET /practice/knowledge-map`（按页面的 `points`；`view=skeleton` 时不带小星）和 `GET /practice/knowledge-map/stars`（#503，一颗星和它周边的星，带小星与练习集），章节和小星页从后者读小星的点亮、提示和练习集归属。星图本身仍走演示数据源，不经这两个接口。
 | `ask` / `ask-conversation` | `/ask`、`/ask/demo-ask-sine` | 可看；桌面为侧栏，手机为全屏 sheet；`demo-ask-sine` 带一位进行中的老师；能发消息（答复为固定文字）、请老师 |
 | `me` | `/me` | 可看 |
 | `account-menu` | `/me` 并自动打开头像菜单 | 可看，能退出（回到登录页） |

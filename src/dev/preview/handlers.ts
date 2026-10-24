@@ -57,6 +57,8 @@ const refuse = (status: number, code: string, message: string): Refusal => ({ [R
 const isRefusal = (data: unknown): data is Refusal => typeof data === 'object' && data !== null && REFUSAL in data
 
 const now = () => new Date().toISOString()
+/** The page's star count (`?points=`), which sizes the sky the demo backend answers with. */
+const pageStarCount = () => starCountFrom(new URLSearchParams(window.location.search).get('points'))
 
 /*
  * The notification preferences as the backend keeps them
@@ -213,8 +215,11 @@ const routes: Array<[method: string, pattern: string, handler: Handler]> = [
   ['GET', '/practice/curriculum/catalog', () => demo().demoChapter.catalog],
   // The sky beside the chapter (#501): what the map says of the demo knowledge point and its
   // small stars, at the page's star count. Loaded when asked: nothing of the app before interception.
-  ['GET', '/practice/knowledge-map', async () =>
-    (await import('@/dev/preview/lighting')).demoKnowledgeMap(starCountFrom(new URLSearchParams(window.location.search).get('points')))],
+  ['GET', '/practice/knowledge-map', async ({ query }) =>
+    (await import('@/dev/preview/lighting')).demoKnowledgeMap(pageStarCount(), query.get('view') === 'skeleton' ? 'skeleton' : 'full')],
+  // The stars around one in full (#503).
+  ['GET', '/practice/knowledge-map/stars', async ({ query }) =>
+    (await import('@/dev/preview/lighting')).demoKnowledgeStars(pageStarCount(), query.get('around'))],
   ['GET', '/practice/:subjectId/:topicId/roadmap', ({ params }) => {
     const { roadmap } = demoChapterNow()
     return params.subjectId === roadmap.subjectId && params.topicId === roadmap.topicId ? roadmap : null

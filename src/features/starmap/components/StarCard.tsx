@@ -154,6 +154,13 @@ export function StarCardDetails({ map, demo = false, star }: { map: StarMap; dem
         </p>
       )}
 
+      {/* A skeleton's star whose small stars are on their way, not a star without any (#503). */}
+      {star.skillsKnown === false && (
+        <p data-skills-loading role="status" className="m-0 text-[13px] text-[color:var(--on-sky-text-caption)]">
+          {t('star.skillsLoading')}
+        </p>
+      )}
+
       {star.skills.length > 0 && (
         <section aria-labelledby="starmap-star-skills" className="flex flex-col gap-1.5">
           <h2 id="starmap-star-skills" className="m-0 text-[13px] font-semibold text-[color:var(--on-sky-text-body)]">

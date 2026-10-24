@@ -18,17 +18,26 @@
  * The ZAP stars' skills are tags on exercises (`brueche-kuerzen`), not
  * question types: their ids do not start with their star's id, they have no
  * practice sets of their own, and they stay what they were, dots with names.
+ *
+ * The stars read in full (#503) do say it: each practice set names its
+ * `skillId`. Where they are at hand that is what counts, and the names only
+ * stand in where they are not.
  */
 import type { KnowledgeSkill, MissingPrerequisite } from '@/features/starmap/model/starMap'
+import type { KnowledgeMapPracticeSet } from '@/types/practice'
 
 /** Whether `skill` is a question type of `unitId` with practice sets of its own, not a tag on exercises. */
 export function isQuestionType(skill: Pick<KnowledgeSkill, 'skillId'>, unitId: string): boolean {
   return skill.skillId.startsWith(`${unitId}--`) && skill.skillId.length > unitId.length + 2
 }
 
-/** Whether `lessonId` is one of the practice sets of the small star `skillId`. */
-export function isPracticeSetOf(lessonId: string, skillId: string): boolean {
-  return lessonId.startsWith(`${skillId}--`)
+/**
+ * Whether `lessonId` is one of the practice sets of the small star `skillId`:
+ * as `practiceSets` says, when the backend sent them (#503), else by name.
+ */
+export function isPracticeSetOf(lessonId: string, skillId: string, practiceSets: readonly KnowledgeMapPracticeSet[] = []): boolean {
+  const said = practiceSets.find((set) => set.lessonId === lessonId)
+  return said ? said.skillId === skillId : lessonId.startsWith(`${skillId}--`)
 }
 
 /**

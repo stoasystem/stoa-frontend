@@ -17,13 +17,20 @@
  * while one it builds on is unlit; the roadmap does not say so, so its lessons
  * not done yet are read as locked here. Without the sky the chapter still
  * opens, and says neither.
+ *
+ * With the sky sent as a skeleton (#503) the point itself is read in full
+ * from the stars around it (`/knowledge-map/stars?around=`): its state, its
+ * small stars and which practice set is whose. Those stars are what an answer
+ * reads again; without them (a backend before stoa-backend#127) the chapter
+ * takes the point from the sky, as it always has.
  */
 import { useMemo } from 'react'
 import type { KnowledgeSkill, LearningState } from '@/features/starmap/model/starMap'
 import { useCurriculumCatalogQuery } from '@/hooks/practice/useCurriculumCatalogQuery'
 import { useKnowledgeMapQuery } from '@/hooks/practice/useKnowledgeMapQuery'
+import { useKnowledgeMapStarsQuery } from '@/hooks/practice/useKnowledgeMapStars'
 import { usePracticeRoadmapQuery } from '@/hooks/practice/usePracticeRoadmapQuery'
-import type { RoadmapLessonStatus } from '@/types/practice'
+import type { KnowledgeMapPracticeSet, RoadmapLessonStatus } from '@/types/practice'
 
 export type ChapterLessonStatus = RoadmapLessonStatus
 
@@ -51,6 +58,8 @@ export type Chapter = {
   star: { state: LearningState; unmetExercises: number } | null
   /** Its small stars as the star map has them (#501); `[]` while the sky cannot be read. */
   skills: KnowledgeSkill[]
+  /** Its practice sets, each under its small star (#503); `[]` when the backend does not say. */
+  practiceSets: KnowledgeMapPracticeSet[]
 }
 
 export type ChapterQuery =
@@ -97,10 +106,17 @@ export function useChapter(unitId: string | undefined): ChapterQuery {
   // pending on every refetch (an answer asks for one), and the stage would
   // take the exercise away each time.
   const skyLoading = skyQuery.isLoading && skyQuery.errorUpdateCount === 0
-  const found = skyQuery.data?.stars.find((candidate) => candidate.unitId === unitId)
+  const skeleton = skyQuery.data?.view === 'skeleton'
+  const aroundQuery = useKnowledgeMapStarsQuery(unitId ?? null, { enabled: Boolean(unitId) && skeleton })
+  // Waited for once, like the sky; a refusal leaves the point to the sky.
+  const aroundLoading = aroundQuery.isLoading && aroundQuery.errorUpdateCount === 0
+  const full = aroundQuery.data?.stars.find((candidate) => candidate.unitId === unitId)
+  const found = full ?? skyQuery.data?.stars.find((candidate) => candidate.unitId === unitId)
   const starState = found?.state
   const unmetExercises = found?.unmetExercises ?? 0
-  const skills = found?.skills
+  // A skeleton's own small stars are not known, not none.
+  const skills = full ? full.skills : skeleton ? undefined : found?.skills
+  const practiceSets = full?.practiceSets
 
   return useMemo<ChapterQuery>(() => {
     if (!unitId) return { status: 'missing' }
@@ -110,7 +126,7 @@ export function useChapter(unitId: string | undefined): ChapterQuery {
     // or roadmap that never arrived is an error (#417).
     if (catalogFailed && !catalog) return { status: 'error', retry: () => void refetchCatalog() }
     if (!unit) return { status: 'missing' }
-    if (roadmapLoading || skyLoading) return { status: 'loading' }
+    if (roadmapLoading || skyLoading || aroundLoading) return { status: 'loading' }
     if (!roadmap) return { status: 'error', retry: () => void refetchRoadmap() }
     const roadmapUnit = roadmap.units.find((candidate) => candidate.id === unitId)
     if (!roadmapUnit) return { status: 'missing' }
@@ -144,9 +160,10 @@ export function useChapter(unitId: string | undefined): ChapterQuery {
         nextLessonId: nextLessonOf(lessons),
         star: starState ? { state: starState, unmetExercises } : null,
         skills: skills ?? [],
+        practiceSets: practiceSets ?? [],
       },
     }
-  }, [unitId, unit, catalog, catalogLoading, catalogFailed, refetchCatalog, roadmap, roadmapLoading, refetchRoadmap, skyLoading, starState, unmetExercises, skills])
+  }, [unitId, unit, catalog, catalogLoading, catalogFailed, refetchCatalog, roadmap, roadmapLoading, refetchRoadmap, skyLoading, aroundLoading, starState, unmetExercises, skills, practiceSets])
 }
 
 /** `/chapter/:unitId` and `/chapter/:unitId/:lessonId`, each segment encoded once. */

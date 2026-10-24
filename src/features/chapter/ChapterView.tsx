@@ -57,7 +57,7 @@ export function ChapterView({ unitId }: { unitId: string | undefined }) {
         <div className="mx-auto flex w-full max-w-[720px] flex-col gap-6">
           {query.status !== 'ready' ? (
             <ChapterState query={query} />
-          ) : skill && query.chapter.lessons.some((lesson) => isPracticeSetOf(lesson.id, skill.skillId)) ? (
+          ) : skill && query.chapter.lessons.some((lesson) => isPracticeSetOf(lesson.id, skill.skillId, query.chapter.practiceSets)) ? (
             <SkillBody chapter={query.chapter} skill={skill} />
           ) : (
             <ChapterBody chapter={query.chapter} />
@@ -203,7 +203,7 @@ function SkillBody({ chapter, skill }: { chapter: Chapter; skill: KnowledgeSkill
   const { t } = useTranslation('chapter')
   const sky = useKnowledgeMapQuery().data
   const sets = chapter.lessons
-    .filter((lesson) => isPracticeSetOf(lesson.id, skill.skillId))
+    .filter((lesson) => isPracticeSetOf(lesson.id, skill.skillId, chapter.practiceSets))
     .map((lesson) => ({ ...lesson, title: stageTitle(lesson.title, skill.name) }))
   const done = sets.filter((lesson) => lesson.status === 'completed').length
   const nextId = nextLessonOf(sets)

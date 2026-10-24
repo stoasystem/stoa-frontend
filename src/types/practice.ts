@@ -500,4 +500,43 @@ export type KnowledgeMapResponse = {
    * only; the backfill's are never listed.
    */
   unacknowledgedLit?: string[]
+  /**
+   * `skeleton` (#503, stoa-backend#127): every star with its state and place,
+   * and every `skills` left empty -- not computed, rather than none. The few
+   * stars around one come in full from `/knowledge-map/stars`. Absent: the
+   * whole sky in full, as a backend before #127 sends it.
+   */
+  view?: 'full' | 'skeleton'
+}
+
+export type KnowledgeMapStar = KnowledgeMapResponse['stars'][number]
+
+/** One practice set of a star, in its order, under its small star (#503). */
+export type KnowledgeMapPracticeSet = {
+  lessonId: string
+  title: string
+  order: number
+  exerciseCount: number
+  skillId: string | null
+  status: 'completed' | 'available'
+  extension?: boolean
+}
+
+/** A star around the one in focus, in full: small stars, practice sets, what it needs (#503). */
+export type KnowledgeMapNeighbour = KnowledgeMapStar & {
+  relation: 'focus' | 'prerequisite' | 'next' | 'neighbour'
+  prerequisiteUnitIds: string[]
+  practiceSets: KnowledgeMapPracticeSet[]
+}
+
+/**
+ * `GET /practice/knowledge-map/stars` (#503): a star and at most fifteen
+ * around it -- its prerequisites, the stars that need it, its neighbours in
+ * its nebula. Without `around`, the star the student last practised in, else
+ * the map's recommendation; `focus` is null when the subject has no star.
+ */
+export type KnowledgeMapNeighbourhood = {
+  subjectId: string
+  focus: string | null
+  stars: KnowledgeMapNeighbour[]
 }

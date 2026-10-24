@@ -73,7 +73,8 @@
     "lightFirst": "Zuerst zum Leuchten bringen:",
     "earlierStages": "Schliesse zuerst die früheren Stufen dieses Sterns ab.",
     "stillOpen": "Üben kannst du sie trotzdem schon jetzt.",
-    "practise": "{{name}} üben"
+    "practise": "{{name}} üben",
+    "skillsLoading": "Die kleinen Sterne dieses Sterns werden geladen …"
   },
   "state": {
     "lit": "Leuchtet",

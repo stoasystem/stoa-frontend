@@ -77,7 +77,8 @@
     "lightFirst": "Da accendere prima:",
     "earlierStages": "Completa prima i livelli precedenti di questa stella.",
     "stillOpen": "Puoi comunque esercitarti già ora.",
-    "practise": "Esercitati: {{name}}"
+    "practise": "Esercitati: {{name}}",
+    "skillsLoading": "Caricamento delle piccole stelle di questa stella…"
   },
   "state": {
     "lit": "Accesa",

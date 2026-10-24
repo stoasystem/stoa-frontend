@@ -73,7 +73,8 @@
     "lightFirst": "Light first:",
     "earlierStages": "Finish the earlier stages of this star first.",
     "stillOpen": "You can practise it now all the same.",
-    "practise": "Practise {{name}}"
+    "practise": "Practise {{name}}",
+    "skillsLoading": "Loading this star’s small stars…"
   },
   "state": {
     "lit": "Lit",

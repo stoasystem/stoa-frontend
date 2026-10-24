@@ -77,7 +77,8 @@
     "lightFirst": "À allumer d’abord :",
     "earlierStages": "Termine d’abord les niveaux précédents de cette étoile.",
     "stillOpen": "Tu peux quand même t’y exercer dès maintenant.",
-    "practise": "S’exercer : {{name}}"
+    "practise": "S’exercer : {{name}}",
+    "skillsLoading": "Chargement des petites étoiles de cette étoile…"
   },
   "state": {
     "lit": "Allumée",

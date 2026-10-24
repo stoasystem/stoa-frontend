@@ -16,8 +16,18 @@
  * `demo` stays false. The Demo notice belongs to the design preview and the
  * bench; a student looking at their own knowledge points is not looking at a
  * demonstration.
+ *
+ * The sky comes in two layers (#503): a skeleton of every star without its
+ * small stars, and the few stars around one in full
+ * (`hooks/practice/useKnowledgeMapStars.ts`). The source reads the stars
+ * around where the student last practised as soon as the skeleton is here,
+ * and those around any star picked that it has not got; their small stars are
+ * laid onto the skeleton's stars, and a star still without them says so
+ * (`skillsKnown: false`) rather than drawn as a star with none. A backend
+ * before stoa-backend#127 sends the sky in full and is asked for nothing more.
  */
-import { useMemo, type ReactNode } from 'react'
+import { useCallback, useMemo, type ReactNode } from 'react'
+import { useQueryClient } from '@tanstack/react-query'
 import {
   StarMapSourceContext,
   emptyStarMap,
@@ -29,7 +39,9 @@ import {
 import type { StarMap } from '@/features/starmap/model/starMap'
 import { nebulaLinks } from '@/features/starmap/model/links'
 import { layoutSky } from '@/features/starmap/layout/layout'
-import { useKnowledgeMapQuery } from '@/hooks/practice/useKnowledgeMapQuery'
+import { KNOWLEDGE_MAP_STALE_MS, useKnowledgeMapQuery } from '@/hooks/practice/useKnowledgeMapQuery'
+import { practiceQueryKeys } from '@/services/practice/practiceQueryKeys'
+import { loadStarsAround, useKnowledgeMapStarsQuery, useStarDetails, type StarDetails } from '@/hooks/practice/useKnowledgeMapStars'
 import { useAuthStore } from '@/store/authStore'
 import type { KnowledgeMapResponse } from '@/types/practice'
 
@@ -118,8 +130,28 @@ function placement(sky: KnowledgeMapResponse): Placement {
   return made
 }
 
-export function projectStarMap(response: KnowledgeMapResponse, { subjectId }: StarMapRequest): StarMap {
-  const { stars: placedStars, subjects } = placement(response)
+/**
+ * The placed stars with the small stars loaded so far laid on (#503). The same
+ * array for the same stars and the same loads, so the engine keeps its scene
+ * between two reads that changed nothing.
+ */
+const detailed = new WeakMap<KnowledgeMapResponse['stars'], { details: StarDetails; stars: StarMap['stars'] }>()
+
+function withDetails(placedStars: KnowledgeMapResponse['stars'], skeleton: boolean, details: StarDetails): StarMap['stars'] {
+  if (!skeleton) return placedStars
+  const known = detailed.get(placedStars)
+  if (known?.details === details) return known.stars
+  const stars = placedStars.map((star) => {
+    const full = details.get(star.unitId)
+    return full ? { ...star, skills: full.skills, skillsKnown: true } : { ...star, skillsKnown: false }
+  })
+  detailed.set(placedStars, { details, stars })
+  return stars
+}
+
+export function projectStarMap(response: KnowledgeMapResponse, { subjectId }: StarMapRequest, details: StarDetails = new Map()): StarMap {
+  const { stars: placed, subjects } = placement(response)
+  const placedStars = withDetails(placed, response.view === 'skeleton', details)
   const sky = { ...response, stars: placedStars }
   const focus = subjectId || sky.subjectId
   const nebulaeOfFocus = new Set(
@@ -173,17 +205,38 @@ function ReadModelSource({ children }: { children: ReactNode }) {
   // query by subject would make every switch of galaxy a fetch, and the first
   // read a chicken-and-egg. The query is the chapter's too: one definition (#368).
   const { data, status, refetch } = useKnowledgeMapQuery()
+  const skeleton = data?.view === 'skeleton'
+  const client = useQueryClient()
+  const details = useStarDetails()
+  // The stars around where the student last practised, as soon as the skeleton is here (#503).
+  useKnowledgeMapStarsQuery(null, { enabled: skeleton })
+
+  const select = useCallback(
+    (unitId: string) => {
+      if (skeleton && !details.has(unitId)) void loadStarsAround(client, unitId)
+    },
+    [skeleton, details, client],
+  )
+  // Exercises answered elsewhere refresh only their own stars; the skeleton
+  // follows when the map is back on screen (#503).
+  // Read from the cache when called, so it stays one function: the map calls it once, on arrival.
+  const arrive = useCallback(() => {
+    const read = client.getQueryState(practiceQueryKeys.knowledgeMap(''))
+    if (read?.data && (read.isInvalidated || Date.now() - read.dataUpdatedAt > KNOWLEDGE_MAP_STALE_MS)) void refetch()
+  }, [client, refetch])
 
   const source = useMemo<StarMapSource>(
     () => ({
-      read: (request) => (data ? projectStarMap(data, request) : emptyStarMap(request.subjectId)),
+      read: (request) => (data ? projectStarMap(data, request, details) : emptyStarMap(request.subjectId)),
       demo: false,
       // A sky already drawn stays drawn when a later refetch fails. Nobody
       // but a student asks for one, so for anybody else there is nothing to wait for.
       status: data ? 'success' : isStudent ? status : 'success',
       retry: () => void refetch(),
+      select,
+      arrive,
     }),
-    [data, status, isStudent, refetch],
+    [data, details, status, isStudent, refetch, select, arrive],
   )
 
   return <StarMapSourceContext.Provider value={source}>{children}</StarMapSourceContext.Provider>

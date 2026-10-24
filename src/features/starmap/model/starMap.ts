@@ -98,6 +98,12 @@ export type Star = {
   x: number
   y: number
   skills: KnowledgeSkill[]
+  /**
+   * False while the sky is a skeleton and this star's small stars have not
+   * been loaded yet (#503): `skills` is empty because it is not known, not
+   * because there are none. Absent: `skills` is what the star has.
+   */
+  skillsKnown?: boolean
   chapter: ChapterSummary
 }
 

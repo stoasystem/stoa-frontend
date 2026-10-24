@@ -39,7 +39,7 @@ import { readDemoStarMap } from '@/dev/demo/sky/source'
 import { LightingEventSourceContext, type LightingEventSource } from '@/features/starmap/lighting/lightingEvents'
 import { orderedStars, subjectOfNebula, type Nebula, type Star, type StarMap } from '@/features/starmap/model/starMap'
 import { StarMapSourceContext, type FixtureSize, type StarMapSource } from '@/features/starmap/starMapSource'
-import type { KnowledgeMapResponse } from '@/types/practice'
+import type { KnowledgeMapNeighbour, KnowledgeMapNeighbourhood, KnowledgeMapResponse } from '@/types/practice'
 
 export const demoLightingSource: LightingEventSource = {
   unacknowledged: async () => unacknowledgedLit(),
@@ -116,8 +116,67 @@ export function demoStarMapOverride(map: StarMap, size: FixtureSize, completed: 
  * `size` stars after the lessons completed so far, as the star map is drawn.
  * The map takes its sky through the source seam; the chapter reads this one
  * for what the sky says of its knowledge point, its small stars among it (#501).
+ * Asked for the skeleton (#503), every star comes without its small stars.
  */
-export function demoKnowledgeMap(size: FixtureSize): KnowledgeMapResponse {
+export function demoKnowledgeMap(size: FixtureSize, view: 'full' | 'skeleton' = 'full'): KnowledgeMapResponse {
+  const sky = demoFollowedSky(size)
+  if (view === 'full') return sky
+  return { ...sky, view: 'skeleton', stars: sky.stars.map((star) => ({ ...star, skills: [] })) }
+}
+
+/** How many stars of a nebula on each side of the one in focus come with it, and the most one answer sends. */
+const NEIGHBOURS_EACH_SIDE = 2
+const MAX_NEIGHBOURHOOD = 15
+
+/**
+ * `GET /practice/knowledge-map/stars` as the demo backend answers it (#503):
+ * the star `around` (else the demo knowledge point, where the demo student
+ * last practised) in full, with its prerequisites, the stars that need it and
+ * its neighbours in its nebula, as stoa-backend's `neighbourhood` picks them.
+ * Only the demo knowledge point has practice sets.
+ */
+export function demoKnowledgeStars(size: FixtureSize, around: string | null): KnowledgeMapNeighbourhood {
+  const sky = demoFollowedSky(size)
+  const kp = DEMO_KNOWLEDGE_POINT
+  const byId = new Map(sky.stars.map((star) => [star.unitId, star]))
+  const focus = around && byId.has(around) ? around : kp.unitId
+  if (!byId.has(focus)) return { subjectId: kp.subjectId, focus: null, stars: [] }
+  const picked = new Map<string, KnowledgeMapNeighbour['relation']>([[focus, 'focus']])
+  const add = (unitId: string, relation: KnowledgeMapNeighbour['relation']) => {
+    if (byId.has(unitId) && !picked.has(unitId) && picked.size < MAX_NEIGHBOURHOOD) picked.set(unitId, relation)
+  }
+  const needs = (unitId: string) => sky.prerequisites.filter((edge) => edge.to === unitId).map((edge) => edge.from)
+  for (const unitId of needs(focus)) add(unitId, 'prerequisite')
+  for (const edge of sky.prerequisites) if (edge.from === focus) add(edge.to, 'next')
+  const nebula = sky.stars.filter((star) => star.nebulaId === byId.get(focus)!.nebulaId).sort((a, b) => a.order - b.order)
+  const at = nebula.findIndex((star) => star.unitId === focus)
+  for (const star of nebula.slice(Math.max(0, at - NEIGHBOURS_EACH_SIDE), at + NEIGHBOURS_EACH_SIDE + 1)) add(star.unitId, 'neighbour')
+
+  const completed = completedLessons()
+  const language = demoLanguage()
+  const practiceSets = demoPracticeSets().map((lesson, index) => ({
+    lessonId: lesson.lessonId,
+    title: localize(lesson.title, language),
+    order: index + 1,
+    exerciseCount: lesson.exercises,
+    skillId: lesson.skillId,
+    status: completed.includes(lesson.lessonId) ? ('completed' as const) : ('available' as const),
+    ...(kp.extensionLessons.some((extension) => extension.lessonId === lesson.lessonId) ? { extension: true } : {}),
+  }))
+  return {
+    subjectId: kp.subjectId,
+    focus,
+    stars: [...picked].map(([unitId, relation]) => ({
+      ...byId.get(unitId)!,
+      relation,
+      prerequisiteUnitIds: needs(unitId),
+      practiceSets: unitId === kp.unitId ? practiceSets : [],
+    })),
+  }
+}
+
+/** The whole sky as the demo backend has it after the lessons completed so far, small stars included. */
+function demoFollowedSky(size: FixtureSize): KnowledgeMapResponse {
   const sky = demoSky(size, demoLanguage())
   const subjectId = DEMO_KNOWLEDGE_POINT.subjectId
   const map = demoStarMapOverride(
