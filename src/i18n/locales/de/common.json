@@ -69,7 +69,8 @@
       "save": "Speichern",
       "saveFailed": "Die Klassenstufe wurde nicht gespeichert. Versuch es noch einmal.",
       "saved": "Gespeichert.",
-      "unavailable": "Die Klassenstufe kann gerade nicht geladen werden."
+      "unavailable": "Die Klassenstufe kann gerade nicht geladen werden.",
+      "refreshFailed": "Die Klassenstufe konnte gerade nicht aktualisiert werden."
     },
     "language": {
       "heading": "Sprache"

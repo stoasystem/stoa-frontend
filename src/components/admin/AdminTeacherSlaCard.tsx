@@ -25,15 +25,18 @@ export function AdminTeacherSlaCard({
         <CardTitle className="text-base">{t('sla.title')}</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        {isError ? (
+        {/* Figures read before are real ones: they stay when the stats cannot
+            be read again, a language switch or a return to the page (#457). */}
+        {isError && (
           <p role="alert" className="flex items-center gap-2 text-sm text-destructive">
             <AlertTriangle className="h-4 w-4" aria-hidden="true" />
-            {t('sla.unavailable')}
+            {stats ? t('sla.refreshFailed') : t('sla.unavailable')}
           </p>
-        ) : !stats ? (
-          <p className="text-sm text-muted-foreground">{isLoading ? t('sla.loading') : t('sla.unavailable')}</p>
-        ) : (
+        )}
+        {stats ? (
           <SlaFigures stats={stats} />
+        ) : isError ? null : (
+          <p className="text-sm text-muted-foreground">{isLoading ? t('sla.loading') : t('sla.unavailable')}</p>
         )}
       </CardContent>
     </Card>

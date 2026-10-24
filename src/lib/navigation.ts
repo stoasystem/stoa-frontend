@@ -1,8 +1,8 @@
 import { matchPath } from 'react-router-dom'
 import {
+  homePathFor,
   navAreaForRole,
   pageRoutes,
-  roleHomePaths,
   type AppNavArea,
   type AppNavIcon,
   type RouteStatus,
@@ -73,7 +73,7 @@ export function getNavItemsForUserRole(role: UserRole, options: NavOptions = {})
 }
 
 export function getHomePathForUserRole(role: UserRole) {
-  return roleHomePaths[navAreaForRole(role)]
+  return homePathFor(role)
 }
 
 export function getStartPracticePath(user: Pick<User, 'role'> | null | undefined) {

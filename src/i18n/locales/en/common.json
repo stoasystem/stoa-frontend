@@ -69,7 +69,8 @@
       "save": "Save",
       "saveFailed": "Your year group was not saved. Try again.",
       "saved": "Saved.",
-      "unavailable": "Your year group can't be loaded right now."
+      "unavailable": "Your year group can't be loaded right now.",
+      "refreshFailed": "Your year group couldn't be refreshed right now."
     },
     "language": {
       "heading": "Language"

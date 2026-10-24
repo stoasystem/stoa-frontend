@@ -46,13 +46,15 @@ export function CurriculumRolloutPanel({
       <Card className="border-primary/15 bg-card/95">
         <CardContent className="space-y-5 p-5">
           {isLoading && <p className="text-sm text-muted-foreground">{t('curriculumRollout.loading')}</p>}
+          {/* A catalog on screen stays when it cannot be read again, after a
+              change on the page or a language switch (#457). */}
           {isError && (
-            <p className="flex items-center gap-2 text-sm text-destructive">
+            <p role="alert" className="flex items-center gap-2 text-sm text-destructive">
               <CircleAlert className="h-4 w-4" aria-hidden="true" />
-              {t('curriculumRollout.error')}
+              {catalog ? t('curriculumRollout.refreshFailed') : t('curriculumRollout.error')}
             </p>
           )}
-          {!isLoading && !isError && catalog && (
+          {!isLoading && catalog && (
             <>
               <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                 <div>

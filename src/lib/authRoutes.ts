@@ -5,6 +5,7 @@ import {
   FORBIDDEN_PATH,
   UNAUTHORIZED_PATH,
   legacyRedirects,
+  homePathFor,
   navAreaForRole,
   pageRoutes,
   LOGIN_PATH,
@@ -16,9 +17,13 @@ import type { UserRole } from '@/types/user'
 // The one screen an account under a forced password change can still use.
 export { CHANGE_PASSWORD_PATH }
 
-/** Where a signed-in account starts: its role's home in the route manifest. */
+/**
+ * Where a signed-in account starts: its role's home in the route manifest,
+ * `/forbidden` for a role it has no home for (a role added on the backend
+ * first, or `constructor`, which a bare lookup would answer with a function).
+ */
 export function getDefaultRouteForRole(role: UserRole) {
-  return roleHomePaths[navAreaForRole(role)]
+  return homePathFor(role)
 }
 
 export function canAccessRoute(role: UserRole, allowedRoles: UserRole[]) {
@@ -105,9 +110,9 @@ export type ForcedChangeState = { from: Path }
 export type RouteTarget = { to: string; state?: ForcedChangeState }
 
 function homeOf(role: UserRole): string {
-  // A role the manifest has no home for is refused outright; left undefined,
-  // the redirect would resolve to wherever an empty path happens to point.
-  return (getDefaultRouteForRole(role) as string | undefined) ?? FORBIDDEN_PATH
+  // A role the manifest has no home for is refused outright: getDefaultRouteForRole
+  // answers `/forbidden` for it.
+  return getDefaultRouteForRole(role)
 }
 
 /*

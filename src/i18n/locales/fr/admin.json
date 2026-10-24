@@ -38,6 +38,7 @@
     "statusChanged": "Statut changé en {{status}}.",
     "statusFailed": "Le statut n'a pas pu être changé.",
     "loadFailed": "La liste des comptes n'a pas pu être chargée.",
+    "refreshFailed": "La liste des comptes n'a pas pu être actualisée. Le dernier état chargé reste affiché.",
     "empty": "Aucun compte dans ce groupe.",
     "columnNumber": "Numéro",
     "columnName": "Nom",
@@ -74,6 +75,7 @@
     "incomplete": "La liste s’est arrêtée après {{shown}} comptes et n’est pas complète. Affinez les filtres ou chargez-en davantage.",
     "loadMore": "Charger la suite",
     "loadingMore": "Chargement de la suite…",
+    "loadMoreFailed": "Les comptes suivants n'ont pas pu être chargés. Veuillez réessayer.",
     "actionFor": "{{action}} : {{account}}",
     "confirm": {
       "title": {
@@ -144,6 +146,7 @@
       "saved_other": "Enregistré : {{count}} cas par semaine.",
       "loading": "Lecture du nombre actuel…",
       "loadFailed": "Le nombre actuel n'a pas pu être lu.",
+      "refreshFailed": "Le nombre actuel n'a pas pu être relu. Le nombre lu auparavant reste affiché.",
       "saveFailed": "Le nombre n'a pas pu être enregistré.",
       "outOfRange": "Saisissez un nombre entier entre 0 et {{maximum}}.",
       "zeroWarning": "Zéro désactive entièrement le soutien enseignant pour cet élève — il lui sera dit de contacter un administrateur, et non que sa semaine est épuisée."
@@ -229,7 +232,8 @@
     "atRisk": "À risque",
     "breached": "Dépassées",
     "loading": "Chargement des délais de réponse…",
-    "unavailable": "Les délais de réponse ne sont pas disponibles pour le moment. Aucun chiffre n’est affiché pour éviter des valeurs erronées."
+    "unavailable": "Les délais de réponse ne sont pas disponibles pour le moment. Aucun chiffre n’est affiché pour éviter des valeurs erronées.",
+    "refreshFailed": "Les délais de réponse n’ont pas pu être actualisés. Les derniers chiffres chargés restent affichés."
   },
   "placeholder": {
     "eyebrow": "Administration",
@@ -352,6 +356,7 @@
     "resentNotDelivered": "Invitation créée, mais l’e-mail n’a pas été distribué.",
     "resendFailed": "Impossible de renvoyer l’invitation.",
     "statementFailed": "La lettre de motivation n’a pas pu être chargée.",
+    "statementRefreshFailed": "La lettre de motivation n’a pas pu être actualisée. Le dernier état chargé reste affiché.",
     "noStatement": "Aucune lettre de motivation n’a été soumise.",
     "reasonLabel": "Motif de la décision",
     "confirm": {

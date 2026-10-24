@@ -64,6 +64,7 @@
       "label": "Unterhaltungen",
       "loading": "Deine Unterhaltungen werden geladen…",
       "failed": "Deine Unterhaltungen konnten nicht geladen werden.",
+      "refreshFailed": "Deine Unterhaltungen konnten nicht aktualisiert werden. Angezeigt wird der zuletzt geladene Stand.",
       "retry": "Erneut versuchen",
       "untitled": "Neue Unterhaltung"
     },

@@ -249,6 +249,7 @@
     "more": "Plus",
     "account": "Compte et famille",
     "accountLoading": "Vérification du compte…",
+    "accountRefreshFailed": "N’a pas pu être actualisé pour le moment.",
     "accountReady_one": "Prêt · {{count}} enfant lié",
     "accountReady_many": "Prêt · {{count}} enfants liés",
     "accountReady_other": "Prêt · {{count}} enfants liés",

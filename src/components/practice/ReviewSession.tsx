@@ -79,7 +79,10 @@ export function ReviewSession({ unitId }: { unitId?: string } = {}) {
     return <p className="text-sm text-muted-foreground">{t('review.loading')}</p>
   }
 
-  if (dueQuery.isError) {
+  // Only a list that never arrived is an error. One on screen stays when a
+  // read behind it fails -- a language switch reads everything again, so does
+  // a reconnect -- and with it the answers typed and the feedback (#457).
+  if (dueQuery.isError && !dueQuery.data) {
     return (
       <div className="flex flex-col items-start gap-3">
         <p className="m-0 text-sm text-destructive">{t('review.loadFailed')}</p>
@@ -96,12 +99,21 @@ export function ReviewSession({ unitId }: { unitId?: string } = {}) {
     )
   }
 
+  // No Try again here: a list read again drops the questions already
+  // answered, and their feedback with them.
+  const refreshFailed = dueQuery.isError ? (
+    <p role="alert" className="m-0 text-sm text-destructive">{t('review.refreshFailed')}</p>
+  ) : null
+
   if (cards.length === 0) {
     return (
-      <EmptyState
-        title={t('review.emptyTitle')}
-        description={t('review.emptyBody')}
-      />
+      <div className="space-y-4">
+        <EmptyState
+          title={t('review.emptyTitle')}
+          description={t('review.emptyBody')}
+        />
+        {refreshFailed}
+      </div>
     )
   }
 
@@ -110,6 +122,7 @@ export function ReviewSession({ unitId }: { unitId?: string } = {}) {
       <p className="text-sm text-muted-foreground">
         {t('review.due', { count: cards.length })}
       </p>
+      {refreshFailed}
       {cards.map((card) => (
         <ReviewQuestion key={card.challengeId} card={card} onAnswer={onAnswer} />
       ))}
@@ -188,24 +201,28 @@ function ReviewQuestion({ card, onAnswer }: { card: ReviewCard; onAnswer: () => 
           </div>
 
           <div className="flex flex-col">
-            {/* Here before the verdict, so the verdict is read when it arrives
-                -- also while the focus goes on to Try again (#408). */}
+            {/* Here before the verdict, so a wrong one is read when it arrives,
+                while the focus goes on to Try again (#408). */}
             <div
-              ref={verdictArea}
-              tabIndex={-1}
               role="status"
               aria-live="polite"
-              data-review-feedback={result ? (result.correct ? 'correct' : 'wrong') : undefined}
-              className="outline-none"
+              data-review-feedback={result && !result.correct ? 'wrong' : undefined}
             >
               {/* The explanation states the answer, so the card holds it back
                   until the student has found it; the feedback points the way. */}
-              {result && (
-                <FeedbackCard correct={result.correct} feedback={result.feedback} explanation={result.explanation}>
-                  {result.correct && <p className={cn('m-0 text-[13px]', bodyOnSky)}>{t('review.comesBackLater')}</p>}
-                </FeedbackCard>
+              {result && !result.correct && (
+                <FeedbackCard correct={false} feedback={result.feedback} />
               )}
             </div>
+            {/* A right one takes the focus, which reads it, so it stays out of
+                the region: in it, it was read a second time (#453). */}
+            {result?.correct && (
+              <div ref={verdictArea} tabIndex={-1} data-review-feedback="correct" className="outline-none">
+                <FeedbackCard correct feedback={result.feedback} explanation={result.explanation}>
+                  <p className={cn('m-0 text-[13px]', bodyOnSky)}>{t('review.comesBackLater')}</p>
+                </FeedbackCard>
+              </div>
+            )}
             {result ? (
               !result.correct && (
                 <Button

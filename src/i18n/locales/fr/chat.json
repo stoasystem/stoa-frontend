@@ -64,6 +64,7 @@
       "label": "Conversations",
       "loading": "Chargement de tes conversations…",
       "failed": "Tes conversations n’ont pas pu être chargées.",
+      "refreshFailed": "Tes conversations n’ont pas pu être actualisées. Le dernier état chargé reste affiché.",
       "retry": "Réessayer",
       "untitled": "Nouvelle conversation"
     },

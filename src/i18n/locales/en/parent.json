@@ -248,6 +248,7 @@
     "more": "More",
     "account": "Account and family",
     "accountLoading": "Checking the account…",
+    "accountRefreshFailed": "Could not be refreshed just now.",
     "accountReady_one": "Ready · {{count}} linked child",
     "accountReady_other": "Ready · {{count}} linked children",
     "accountAttention_one": "Needs attention: {{issue}}",

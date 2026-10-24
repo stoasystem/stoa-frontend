@@ -64,6 +64,7 @@
       "label": "Conversations",
       "loading": "Loading your conversations…",
       "failed": "Your conversations could not be loaded.",
+      "refreshFailed": "Your conversations could not be refreshed. Showing what was loaded before.",
       "retry": "Try again",
       "untitled": "New conversation"
     },
