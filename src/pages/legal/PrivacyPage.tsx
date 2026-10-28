@@ -5,7 +5,7 @@ import { Seo } from '@/components/common/Seo'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { MarketingLayout } from '@/layouts/MarketingLayout'
 
-const sectionKeys = ['dataWeCollect', 'studentLearning', 'visibility', 'useRetention', 'thirdParties'] as const
+const sectionKeys = ['dataWeCollect', 'studentLearning', 'visibility', 'useRetention', 'thirdParties', 'dataLocation'] as const
 
 export function PrivacyPage() {
   const { t } = useTranslation('legal')
