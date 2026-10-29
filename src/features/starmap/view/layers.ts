@@ -189,6 +189,13 @@ export function outerTarget(target: LayerTarget): LayerTarget {
   return { layer: 'map' }
 }
 
+/**
+ * Navigation state that hands the focus to a star's card once it opens: the
+ * star was asked for from elsewhere (#487, a card in Ask), so its card is
+ * where the student reads on, not the map under it.
+ */
+export type StarCardFocus = { focusStarCard: string }
+
 /** The route a choice lives at (#72 point 8). */
 export function pathForTarget(subjectId: string, target: LayerTarget): string {
   const subject = `/map/${encodeURIComponent(subjectId)}`

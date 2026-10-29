@@ -8,7 +8,7 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 import { resetDemoServer } from '@/dev/preview/demoSource'
 import { answer, DEMO_FAIL_ONCE, DEMO_FIND_STAR, failsThisTime, streamedAnswer } from '@/dev/preview/handlers'
-import { DEMO_BRIDGE_STAR } from '@/dev/demo/sky/demoSky'
+import { DEMO_BRIDGE_STAR, DEMO_KNOWLEDGE_POINT } from '@/dev/demo/data'
 import { commandMessageIds } from '@/services/chat/commandMessageIds'
 import type { Conversation, ConversationListResponse } from '@/types/chat'
 
@@ -74,7 +74,7 @@ describe('Ask in the design preview', () => {
 
   it('keeps a conversation whose last answer found a star (#487)', async () => {
     const thread = await read('demo-ask-light')
-    expect(thread.messages.slice(-1)[0]).toMatchObject({ role: 'assistant', targetUnit: { unitId: 'demo-sine-cosine' } })
+    expect(thread.messages.slice(-1)[0]).toMatchObject({ role: 'assistant', targetUnit: { unitId: DEMO_KNOWLEDGE_POINT.unitId } })
     expect(thread.messages.slice(0, -1).every((message) => message.targetUnit === null)).toBe(true)
   })
 })

@@ -154,7 +154,7 @@
       "link": "See it on the map"
     },
     "target": {
-      "label": "A star on your map",
+      "label": "{{name}} on your star map",
       "show": "See the way on the star map"
     },
     "reopen": {

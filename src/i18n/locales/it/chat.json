@@ -155,7 +155,7 @@
       "link": "Vedi sulla mappa"
     },
     "target": {
-      "label": "Una stella sulla tua mappa",
+      "label": "{{name}} sulla tua mappa stellare",
       "show": "Vedi il percorso sulla mappa stellare"
     },
     "reopen": {

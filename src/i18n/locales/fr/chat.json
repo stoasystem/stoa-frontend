@@ -155,7 +155,7 @@
       "link": "Voir sur la carte"
     },
     "target": {
-      "label": "Une étoile sur ta carte",
+      "label": "{{name}} sur ta carte du ciel",
       "show": "Voir le chemin sur la carte du ciel"
     },
     "reopen": {

@@ -30,7 +30,7 @@ import {
   saveDemoNotificationPreferences,
   setDemoLanguage,
 } from '@/dev/preview/demoSource'
-import { DEMO_BRIDGE_STAR } from '@/dev/demo/sky/demoSky'
+import { DEMO_BRIDGE_STAR } from '@/dev/demo/data'
 import { isSupportedLanguage } from '@/i18n/languages'
 import { commandMessageIds } from '@/services/chat/commandMessageIds'
 import type { ChatMessage, ConversationSummary } from '@/types/chat'

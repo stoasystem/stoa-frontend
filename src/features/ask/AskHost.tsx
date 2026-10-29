@@ -65,9 +65,12 @@ export function AskHost({
   const composing = useRef(false)
   useCoverShell(modal)
 
-  // Closed again: the focus goes back to where Ask was opened from.
+  // Closed again: the focus goes back to where Ask was opened from -- unless
+  // closing it sent the student somewhere that took the focus itself (a star's
+  // card, from a card in Ask, #487).
   useEffect(() => {
-    if (wasOpen.current && !open) docked.current?.querySelector<HTMLElement>('[data-composer-field]')?.focus()
+    const lost = !document.activeElement || document.activeElement === document.body
+    if (wasOpen.current && !open && lost) docked.current?.querySelector<HTMLElement>('[data-composer-field]')?.focus()
     wasOpen.current = open
   }, [open])
 

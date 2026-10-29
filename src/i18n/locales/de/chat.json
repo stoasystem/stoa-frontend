@@ -154,7 +154,7 @@
       "link": "Auf der Karte ansehen"
     },
     "target": {
-      "label": "Ein Stern auf deiner Karte",
+      "label": "{{name}} auf deiner Sternkarte",
       "show": "Weg auf der Sternkarte ansehen"
     },
     "reopen": {
