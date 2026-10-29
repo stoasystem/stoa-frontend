@@ -50,6 +50,13 @@ vi.mock('@/services/files/prepareImage', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@/services/files/prepareImage')>()),
   prepareImage: vi.fn(async (file: File) => file),
 }))
+// Off in the app until #512; each test that needs the buttons turns it on.
+let attachmentsWork = false
+vi.mock('@/features/ask/attachmentsSwitch', () => ({
+  get ATTACHMENTS_WORK() {
+    return attachmentsWork
+  },
+}))
 vi.mock('@/services/teacherHelp/teacherHelpApi', () => ({
   getTeacherAvailability: vi.fn(async () => ({ online: false, availableTeachers: 0 })),
   getTeacherHelpRequest: vi.fn(async () => {
@@ -145,6 +152,7 @@ beforeEach(async () => {
 })
 
 afterEach(() => {
+  attachmentsWork = false
   window.matchMedia = originalMatchMedia
   sessionStorage.clear()
   vi.clearAllMocks()
@@ -308,10 +316,53 @@ describe('a question that carries a file', () => {
 /**
  * Taking a photo and choosing one are two entries (#509): `capture` makes a
  * phone open its camera, and takes the gallery away, so the chooser has none.
- * The buttons themselves wait behind `ATTACHMENTS_WORK` (#512); the Composer's
- * camera button is baseComponentSizes'.
+ * The buttons wait behind `ATTACHMENTS_WORK` (#512), which these turn on; the
+ * Composer's own camera button is baseComponentSizes'.
  */
 describe('the camera and the chooser', () => {
+  /** A phone (`coarse`) or a laptop, at the width the panel is opened at. */
+  function pointer(coarse: boolean) {
+    const base = window.matchMedia
+    window.matchMedia = ((query: string) =>
+      query === '(pointer: coarse)' ? { ...base(query), matches: coarse } : base(query)) as typeof window.matchMedia
+  }
+
+  it('on a phone, opens the camera from the camera and the chooser from the +', async () => {
+    attachmentsWork = true
+    pointer(true)
+    const ask = openAsk()
+    await ask.findByText('Linear equations')
+    const cameraClick = vi.spyOn(camera(), 'click').mockImplementation(() => {})
+    const pickerClick = vi.spyOn(picker(), 'click').mockImplementation(() => {})
+
+    await userEvent.click(ask.getByRole('button', { name: 'Take a photo' }))
+    expect(cameraClick).toHaveBeenCalledTimes(1)
+    expect(pickerClick).not.toHaveBeenCalled()
+
+    await userEvent.click(ask.getByRole('button', { name: 'Choose a photo or file' }))
+    expect(pickerClick).toHaveBeenCalledTimes(1)
+    expect(cameraClick).toHaveBeenCalledTimes(1)
+  })
+
+  it('on a laptop, shows the + alone: `capture` would open a second chooser there', async () => {
+    attachmentsWork = true
+    pointer(false)
+    const ask = openAsk()
+    await ask.findByText('Linear equations')
+
+    expect(ask.getByRole('button', { name: 'Choose a photo or file' })).toBeInTheDocument()
+    expect(ask.queryByRole('button', { name: 'Take a photo' })).toBeNull()
+  })
+
+  it('shows neither while the switch is off (the negative control)', async () => {
+    pointer(true)
+    const ask = openAsk()
+    await ask.findByText('Linear equations')
+
+    expect(ask.queryByRole('button', { name: 'Take a photo' })).toBeNull()
+    expect(ask.queryByRole('button', { name: 'Choose a photo or file' })).toBeNull()
+  })
+
   it('opens the back camera for a photo, and only for a photo', async () => {
     const ask = openAsk()
     await ask.findByText('Linear equations')
