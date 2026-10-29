@@ -24,7 +24,7 @@ import { act, useEffect, useRef } from 'react'
 import { I18nextProvider } from 'react-i18next'
 import { BrowserRouter, Link, MemoryRouter, createPath, resolvePath, useLocation, useNavigate, type To } from 'react-router-dom'
 import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest'
-import { askPathFor, legacyRedirects, moderationPathFor } from '@/app/router/routeManifest'
+import { askPathFor, legacyRedirects, moderationPathFor, teacherRequestPathFor } from '@/app/router/routeManifest'
 import { NOTIFICATION_TARGETS, notificationTargetPath } from '@/components/notifications/notificationTargets'
 import { chapterPath, quizPath } from '@/features/chapter/useChapter'
 import { StarCard } from '@/features/starmap/components/StarCard'
@@ -134,6 +134,7 @@ function builtTargets(): Built[] {
   for (const id of HOSTILE) {
     add('askPathFor', id, askPathFor(id))
     add('moderationPathFor', id, moderationPathFor(id))
+    add('teacherRequestPathFor', id, teacherRequestPathFor(id))
     add('reviewReturnPath', id, reviewReturnPath(id))
     add('reviewReturnPath', { star: id }, reviewReturnPath({ star: id }))
   }
@@ -150,6 +151,8 @@ function builtTargets(): Built[] {
       for (const targetId of HOSTILE) {
         const event = { targetType, targetId } as Parameters<typeof notificationTargetPath>[0]
         add(`notificationTargetPath(${role})`, event, notificationTargetPath(event, role))
+        const offered = { ...event, eventType: 'teacher_help_dispatched' } as Parameters<typeof notificationTargetPath>[0]
+        add(`notificationTargetPath(${role}, offered)`, offered, notificationTargetPath(offered, role))
       }
     }
   }

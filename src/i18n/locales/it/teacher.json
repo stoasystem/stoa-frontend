@@ -97,6 +97,17 @@
       "busy": "Al momento occupato",
       "unavailable": "Non accetta studenti",
       "paused": "In pausa"
+    },
+    "notifications": {
+      "title": "Impostazioni delle notifiche",
+      "description": "Una richiesta di aiuto assegnata a te compare sempre nelle tue notifiche.",
+      "dispatchEmail": {
+        "title": "E-mail per le nuove richieste di aiuto",
+        "body": "Un’e-mail ogni volta che ti viene assegnata una richiesta di aiuto, con la materia e un link. Non contiene mai ciò che lo studente ha scritto."
+      },
+      "loading": "Caricamento delle impostazioni delle notifiche…",
+      "unavailable": "Non è stato possibile caricare le impostazioni delle notifiche.",
+      "saveFailed": "Non è stato possibile salvare l’impostazione. Riprova."
     }
   },
   "requests": {

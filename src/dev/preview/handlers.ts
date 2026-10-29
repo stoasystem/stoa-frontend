@@ -78,6 +78,8 @@ function notificationPreferences() {
   return {
     userId: demo().demoStudent.id,
     preferences: withDefaults(demoNotificationPreferences()),
+    // A teacher's switch; the demo student has no help requests offered to them.
+    dispatchEmail: true,
     supportedCategories: PREFERENCE_CATEGORIES,
     supportedChannels: PREFERENCE_CHANNELS,
     updatedAt: null as string | null,

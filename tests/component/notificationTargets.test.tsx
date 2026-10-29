@@ -130,6 +130,40 @@ describe('a notification in the bell', () => {
     expect(search).toBe('?case=m-1')
   })
 
+  // stoa-backend#141: the offer names the help request itself, which the
+  // dispatch email links to as well (#511).
+  it('opens the help request offered to a teacher', async () => {
+    renderBell('teacher', [
+      event({
+        eventId: 'e-8',
+        recipientRole: 'teacher',
+        eventType: 'teacher_help_dispatched',
+        targetType: 'question',
+        targetId: 'req-42',
+        title: 'Neue Hilfeanfrage für Sie',
+        summary: 'Fach: Mathematik. Bitte nehmen Sie die Anfrage innerhalb von 10 Minuten an.',
+      }),
+    ])
+    await openBell()
+
+    // The backend wrote it in the teacher's language; it is shown as sent.
+    await userEvent.click(screen.getByRole('button', { name: /Neue Hilfeanfrage für Sie/ }))
+
+    expect(pathname).toBe('/teacher/requests/req-42')
+    expect(markRead).toHaveBeenCalledWith('e-8')
+  })
+
+  it("still opens a teacher's queue for a question, which is not a help request", async () => {
+    renderBell('teacher', [
+      event({ recipientRole: 'teacher', eventType: 'teacher_requested', targetType: 'question', targetId: 'q-3', title: 'Help wanted' }),
+    ])
+    await openBell()
+
+    await userEvent.click(screen.getByRole('button', { name: /Help wanted/ }))
+
+    expect(pathname).toBe('/teacher')
+  })
+
   it('is only marked read when there is no page for it, and stays open', async () => {
     renderBell('parent', [event({ eventId: 'e-3', targetType: 'subscription_request', title: 'Subscription updated' })])
     await openBell()
@@ -213,6 +247,20 @@ describe('every notification target', () => {
     'x'.repeat(200),
   ])('keeps a conversation id that is not an id (%s) out of the address', (targetId) => {
     expect(notificationTargetPath({ targetType: 'conversation', targetId }, 'student')).toBe('/ask')
+  })
+
+  it.each(['..', '../admin', '//evil.com', 'r-1/..', 'javascript:alert(1)', 'r-1?x=1', 123, null])(
+    'keeps an offered request id that is not an id (%s) out of the address',
+    (targetId) => {
+      const offered = { eventType: 'teacher_help_dispatched', targetType: 'question', targetId } as unknown as NotificationEvent
+      expect(notificationTargetPath(offered, 'teacher')).toBe('/teacher')
+    },
+  )
+
+  it('gives an offered request no target for a role it is not offered to', () => {
+    const offered = { eventType: 'teacher_help_dispatched', targetType: 'question', targetId: 'req-1' } as const
+    expect(notificationTargetPath(offered, 'student')).toBe('/ask')
+    expect(notificationTargetPath(offered, 'admin')).toBeNull()
   })
 
   it('trims a conversation id the backend padded', () => {
