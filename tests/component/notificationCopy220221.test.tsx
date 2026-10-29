@@ -87,13 +87,15 @@ beforeEach(async () => {
 })
 
 describe("the system page's operational notifications in German", () => {
-  it('reads a new moderation case, which the backend sends in English, in German', () => {
+  // The backend renders it in the admin's language when the list is read
+  // (stoa-backend#161, #518); the labels around it are the app's.
+  it('reads a new moderation case in German, as the backend rendered it', () => {
     adminEvents.items = [
       adminEvent({
         eventType: 'moderation_case_update',
         targetType: 'moderation_case',
-        title: 'New moderation case',
-        summary: 'medium moderation case reported.',
+        title: 'Neuer Moderationsfall',
+        summary: 'Ein Moderationsfall mit mittlerem Schweregrad wurde gemeldet.',
       }),
     ]
     render(wrap(<AdminOperationalNotificationsCard />))
@@ -140,10 +142,6 @@ describe('the operational labels exist in all four languages', () => {
     for (const type of EVENT_TYPES) expect(labels.eventTypes[type], `${lng} ${type}`).toBeTruthy()
     for (const target of TARGET_TYPES) expect(labels.targetTypes[target], `${lng} ${target}`).toBeTruthy()
     for (const status of STATUSES) expect(common.notifications.itemStatus[status], `${lng} ${status}`).toBeTruthy()
-    for (const severity of ['Low', 'Medium', 'High']) {
-      const copy = common.notifications.events[`moderationCreated${severity}`]
-      expect(copy?.title && copy?.summary, `${lng} ${severity}`).toBeTruthy()
-    }
   })
 })
 

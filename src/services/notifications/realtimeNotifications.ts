@@ -65,11 +65,31 @@ export function parseRealtimeNotificationMessage(data: string): NotificationEven
   }
 }
 
+/*
+ * "New moderation case" and "Teacher help requested" go to a whole role (no
+ * `recipientId`) and are written before anyone reads them, so their push
+ * carries the English the backend stored; only `GET /notifications` and
+ * `GET /admin/notifications` render them in the reader's language
+ * (stoa-backend#161). Their push is taken as word that something new is
+ * there, and the lists are read again (#518).
+ */
+const RENDERED_ON_READ = new Set(['moderation_case_update:moderation_case', 'teacher_requested:question'])
+
+function isRenderedOnRead(event: NotificationEvent) {
+  return !event.recipientId && RENDERED_ON_READ.has(`${event.eventType}:${event.targetType}`)
+}
+
 export function mergeRealtimeNotification(
   queryClient: QueryClient,
   event: NotificationEvent,
   user: User,
 ) {
+  if (isRenderedOnRead(event)) {
+    // The bell's count sits under the list's key, so it is read again too.
+    void queryClient.invalidateQueries({ queryKey: notificationQueryKeys.list() })
+    void queryClient.invalidateQueries({ queryKey: notificationQueryKeys.adminList() })
+    return
+  }
   const listed = queryClient
     .getQueryData<NotificationListResponse>(notificationQueryKeys.list())
     ?.items.some((item) => item.eventId === event.eventId)

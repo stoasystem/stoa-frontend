@@ -1,5 +1,4 @@
 import type { TFunction } from 'i18next'
-import { subjectDisplayLabel } from '@/components/chat/conversationTitle'
 import type { NotificationEvent } from '@/types/notification'
 
 /*
@@ -16,9 +15,13 @@ import type { NotificationEvent } from '@/types/notification'
  * The English below is never shown: it is the backend's wording, matched to
  * pick a translation, and lives here rather than beside the bell so the
  * untranslated-copy check reads it as the data it is.
+ *
+ * A notification sent to a whole role ("New moderation case", "Teacher help
+ * requested") is not here: the backend renders it in each reader's language
+ * when the list is read (stoa-backend#161), so it is shown as sent (#518).
  */
 
-type Copy = { key: string; title: string; summary: string | ((event: NotificationEvent) => string | null) }
+type Copy = { key: string; title: string; summary: string }
 
 // untranslated-ok: the backend's English, matched to pick a translation, never shown.
 const KNOWN: Record<string, Copy[]> = {
@@ -38,42 +41,18 @@ const KNOWN: Record<string, Copy[]> = {
     { key: 'helpExpiredReturned', title: 'No teacher was available', summary: "Your request for a teacher expired. This week's teacher help was given back." },
     { key: 'helpExpired', title: 'No teacher was available', summary: 'Your request for a teacher expired.' },
   ],
-  // The one admin event the backend still writes in English rather than from
-  // its catalogue, addressed to the admin role as a whole (#220).
-  'moderation_case_update:moderation_case': (['Low', 'Medium', 'High'] as const).map((severity) => ({
-    key: `moderationCreated${severity}`,
-    title: 'New moderation case',
-    summary: `${severity.toLowerCase()} moderation case reported.`,
-  })),
-  'teacher_requested:question': [
-    {
-      key: 'helpRequested',
-      title: 'Teacher help requested',
-      summary: (event) => {
-        const subject = event.metadata?.subject
-        return typeof subject === 'string' && subject ? `A student requested help for a ${subject} question.` : null
-      },
-    },
-  ],
 }
 
 /** The title and summary to show, in the reader's language where the English is known. */
 export function notificationText(
-  event: Pick<NotificationEvent, 'eventType' | 'targetType' | 'title' | 'summary' | 'metadata'>,
+  event: Pick<NotificationEvent, 'eventType' | 'targetType' | 'title' | 'summary'>,
   t: TFunction<['common', 'chat']>,
 ): { title: string; summary: string } {
   const candidates = KNOWN[`${event.eventType}:${event.targetType}`] ?? []
-  const match = candidates.find((copy) => {
-    const summary = typeof copy.summary === 'function' ? copy.summary(event as NotificationEvent) : copy.summary
-    return copy.title === event.title && summary !== null && summary === event.summary
-  })
+  const match = candidates.find((copy) => copy.title === event.title && copy.summary === event.summary)
   if (!match) return { title: event.title, summary: event.summary }
-
-  const subject = typeof event.metadata?.subject === 'string'
-    ? subjectDisplayLabel(event.metadata.subject, t as unknown as TFunction<'chat'>)
-    : ''
   return {
     title: t(`common:notifications.events.${match.key}.title`),
-    summary: t(`common:notifications.events.${match.key}.summary`, { subject }),
+    summary: t(`common:notifications.events.${match.key}.summary`),
   }
 }
