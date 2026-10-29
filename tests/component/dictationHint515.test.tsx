@@ -14,7 +14,7 @@ import { I18nextProvider } from 'react-i18next'
 import { MemoryRouter } from 'react-router-dom'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
-import { Composer } from '@/components/base/Composer'
+import { Composer, type DictationHintPlacement } from '@/components/base/Composer'
 import i18n from '@/i18n'
 import { dictationPlatform, type DictationPlatform } from '@/lib/dictationPlatform'
 import { PrivacyPage } from '@/pages/legal/PrivacyPage'
@@ -72,12 +72,25 @@ afterEach(() => {
   Reflect.deleteProperty(window.navigator, 'maxTouchPoints')
 })
 
-function Harness({ dictationHint = true }: { dictationHint?: boolean }) {
+function Harness({
+  dictationHint = 'floating',
+  busy = false,
+}: {
+  dictationHint?: DictationHintPlacement
+  busy?: boolean
+}) {
   const [value, setValue] = useState('')
   return (
     <I18nextProvider i18n={i18n}>
       <button type="button">elsewhere</button>
-      <Composer value={value} onChange={setValue} onSubmit={vi.fn()} label="Ask" dictationHint={dictationHint} />
+      <Composer
+        value={value}
+        onChange={setValue}
+        onSubmit={vi.fn()}
+        label="Ask"
+        dictationHint={dictationHint}
+        busy={busy}
+      />
     </I18nextProvider>
   )
 }
@@ -125,10 +138,55 @@ describe('the dictation line beside the Ask field', () => {
     })
   }
 
-  it('stays off in a composer that did not ask for it (the teacher reply)', async () => {
+  it('stays off in a composer that did not ask for it', async () => {
     pretend(AGENTS[0][1], 0)
-    render(<Harness dictationHint={false} />)
+    render(
+      <I18nextProvider i18n={i18n}>
+        <Composer value="" onChange={vi.fn()} onSubmit={vi.fn()} label="Ask" />
+      </I18nextProvider>,
+    )
     await userEvent.click(screen.getByRole('textbox', { name: 'Ask' }))
+    expect(line()).toBeNull()
+  })
+
+  it('is not a live region, so focusing the field does not announce it on its own', async () => {
+    pretend(AGENTS[0][1], 0)
+    render(<Harness />)
+    await userEvent.click(screen.getByRole('textbox', { name: 'Ask' }))
+    const shown = line()!
+    expect(shown).not.toBeNull()
+    expect(shown).not.toHaveAttribute('role')
+    expect(shown).not.toHaveAttribute('aria-live')
+    expect(shown.closest('[aria-live], [role="status"], [role="alert"], [role="log"]')).toBeNull()
+  })
+
+  it('stays away while an answer is still coming', async () => {
+    pretend(AGENTS[0][1], 0)
+    render(<Harness busy />)
+    await userEvent.click(screen.getByRole('textbox', { name: 'Ask' }))
+    expect(line()).toBeNull()
+  })
+
+  it('floats inside the composer, or takes a line of its own above it when inline', async () => {
+    await i18n.changeLanguage('de')
+    pretend(AGENTS[0][1], 0)
+    const { unmount } = render(<Harness />)
+    await userEvent.click(screen.getByRole('textbox', { name: 'Ask' }))
+    expect(line()!.closest('form')).not.toBeNull()
+    unmount()
+
+    render(<Harness dictationHint="inline" />)
+    const field = screen.getByRole('textbox', { name: 'Ask' })
+    await userEvent.click(field)
+    const shown = line()!
+    // In the host's flow, right before the composer, so it covers nothing over it.
+    expect(shown.closest('form')).toBeNull()
+    expect(shown.nextElementSibling).toBe(field.closest('form'))
+    expect(field).toHaveAccessibleDescription(i18n.t('composer.dictation.windows', { ns: 'common' }))
+    // Coming and going above the composer does not remount the field under the cursor.
+    await userEvent.type(field, 'xy')
+    expect(field).toHaveFocus()
+    expect(field).toHaveValue('xy')
     expect(line()).toBeNull()
   })
 
@@ -147,6 +205,11 @@ describe('the dictation line beside the Ask field', () => {
 })
 
 describe('the dictation copy in every language', () => {
+  // The words that make each sentence the one for its device: the Mac has a
+  // key, the phone a keyboard on the screen. Swapping two sentences fails here.
+  const MAC_KEY = { de: 'Mikrofontaste', en: 'microphone key', fr: 'touche micro', it: 'tasto del microfono' } as const
+  const ON_SCREEN_KEYBOARD = { de: 'Tastatur', en: 'keyboard', fr: 'clavier', it: 'tastiera' } as const
+
   for (const locale of LOCALES) {
     it(`has one sentence per device in ${locale}, each naming its own way in`, async () => {
       await i18n.changeLanguage(locale)
@@ -154,6 +217,10 @@ describe('the dictation copy in every language', () => {
       expect(say('windows')).toContain('Win + H')
       expect(say('mac')).not.toContain('Win + H')
       expect(say('touch')).not.toContain('Win + H')
+      expect(say('mac')).toContain(MAC_KEY[locale])
+      expect(say('mac')).not.toContain(ON_SCREEN_KEYBOARD[locale])
+      expect(say('touch')).toContain(ON_SCREEN_KEYBOARD[locale])
+      expect(say('touch')).not.toContain(MAC_KEY[locale])
       expect(new Set([say('windows'), say('mac'), say('touch')]).size).toBe(3)
       for (const platform of ['windows', 'mac', 'touch'] as const) {
         expect(say(platform)).not.toBe(`composer.dictation.${platform}`)
@@ -163,12 +230,26 @@ describe('the dictation copy in every language', () => {
 })
 
 describe('the privacy page on dictation', () => {
-  // "Only the text" in each language: the sentence #494 settled on.
-  const ONLY_TEXT = {
-    de: 'STOA bekommt nur den Text',
-    en: 'STOA only receives the text',
-    fr: 'STOA ne reçoit que le texte',
-    it: 'STOA riceve solo il testo',
+  // What the section promises, sentence by sentence: the voice stays with the
+  // device's system (#494) and STOA records none. Pinned whole, so a sentence
+  // that keeps its keywords and turns its meaning does not pass.
+  const PROMISES = {
+    de: [
+      'Die Sprache wird dann vom System des Geräts verarbeitet, STOA bekommt nur den Text.',
+      'STOA selbst nimmt keine Sprache auf.',
+    ],
+    en: [
+      "The voice is then processed by the device's system, and STOA only receives the text.",
+      'STOA itself does not record any voice.',
+    ],
+    fr: [
+      "La voix est alors traitée par le système de l'appareil, et STOA ne reçoit que le texte.",
+      "STOA n'enregistre lui-même aucune voix.",
+    ],
+    it: [
+      'La voce viene allora elaborata dal sistema del dispositivo e STOA riceve solo il testo.',
+      'STOA stesso non registra alcuna voce.',
+    ],
   } as const
 
   for (const locale of LOCALES) {
@@ -186,8 +267,16 @@ describe('the privacy page on dictation', () => {
       )
       const text = document.body.textContent ?? ''
       expect(text).toContain(i18n.t('privacy.sections.voiceInput.title', { ns: 'legal' }))
-      expect(text).toContain(ONLY_TEXT[locale])
       expect(text).toContain('Win + H')
+      const sentences = i18n.t('privacy.sections.voiceInput.body', { ns: 'legal' }).split(/(?<=\.)\s+/)
+      for (const promise of PROMISES[locale]) {
+        expect(sentences).toContain(promise)
+        expect(text).toContain(promise)
+      }
+      // Nothing beside them says what STOA does with the voice.
+      for (const sentence of sentences.filter((said) => said.includes('STOA'))) {
+        expect(PROMISES[locale]).toContain(sentence)
+      }
     })
   }
 })

@@ -14,7 +14,7 @@
       },
       "voiceInput": {
         "title": "Diktieren statt tippen",
-        "body": "Fragen lassen sich auch diktieren, zum Beispiel mit Win + H unter Windows, mit der Mikrofontaste am Mac oder mit dem Mikrofon auf der Handytastatur. Die Stimme verarbeitet dann das System des Geräts, STOA bekommt nur den Text. Für die Spracherkennung gelten die Datenschutzregeln des Geräteherstellers (zum Beispiel Microsoft, Apple oder Google). STOA selbst nimmt keine Sprache auf."
+        "body": "Fragen lassen sich auch diktieren, zum Beispiel mit Win + H unter Windows, mit der Mikrofontaste oder dem Tastenkürzel fürs Diktieren am Mac oder mit dem Mikrofon auf der Handytastatur. Die Sprache wird dann vom System des Geräts verarbeitet, STOA bekommt nur den Text. Für die Spracherkennung gelten die Datenschutzregeln des Anbieters von Betriebssystem oder Tastatur (zum Beispiel Microsoft, Apple oder Google). STOA selbst nimmt keine Sprache auf."
       },
       "visibility": {
         "title": "Sichtbarkeit für Eltern und Lehrpersonen",

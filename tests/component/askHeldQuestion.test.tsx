@@ -262,6 +262,10 @@ describe('Ask beside an exercise says how to dictate (#515)', () => {
       const { container } = mount(<Stage />)
       await userEvent.click(within(container.querySelector<HTMLElement>('[data-ask-docked]')!).getByRole('textbox'))
       expect(container.querySelector('[data-composer-dictation]')).toHaveAttribute('data-composer-dictation', 'mac')
+      expect(container.querySelector('[data-composer-dictation]')).toHaveAttribute(
+        'data-composer-dictation-placement',
+        'floating',
+      )
     } finally {
       Reflect.deleteProperty(window.navigator, 'userAgent')
     }

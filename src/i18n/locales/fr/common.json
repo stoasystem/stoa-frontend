@@ -32,7 +32,7 @@
     },
     "dictation": {
       "windows": "Tu préfères parler ? Appuie sur Win + H et dis ta question.",
-      "mac": "Tu préfères parler ? Appuie sur la touche micro et dis ta question.",
+      "mac": "Tu préfères parler ? Appuie sur la touche micro ou sur ton raccourci de dictée.",
       "touch": "Tu préfères parler ? Touche le micro sur ton clavier."
     }
   },

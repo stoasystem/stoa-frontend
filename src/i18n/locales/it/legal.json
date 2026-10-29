@@ -14,7 +14,7 @@
       },
       "voiceInput": {
         "title": "Dettare invece di scrivere",
-        "body": "Le domande si possono anche dettare, per esempio con Win + H su Windows, con il tasto del microfono su un Mac o con il microfono sulla tastiera del telefono. La voce viene allora elaborata dal sistema del dispositivo e STOA riceve solo il testo. Per il riconoscimento vocale valgono le regole sulla privacy del produttore del dispositivo (per esempio Microsoft, Apple o Google). STOA stesso non registra alcuna voce."
+        "body": "Le domande si possono anche dettare, per esempio con Win + H su Windows, con il tasto del microfono o la scorciatoia di dettatura su un Mac, o con il microfono sulla tastiera del telefono. La voce viene allora elaborata dal sistema del dispositivo e STOA riceve solo il testo. Per il riconoscimento vocale valgono le regole sulla privacy del fornitore del sistema operativo o della tastiera (per esempio Microsoft, Apple o Google). STOA stesso non registra alcuna voce."
       },
       "visibility": {
         "title": "Visibilità per genitori e insegnanti",

@@ -29,10 +29,21 @@ export interface ComposerProps {
   onCompositionStart?: () => void
   /** An input method finished composing; the field's value then. */
   onCompositionEnd?: (value: string) => void
-  /** Ask's fields: while empty and focused, say how to dictate on this device (#515). */
-  dictationHint?: boolean
+  /**
+   * Ask's fields: while empty and focused, say how to dictate on this device
+   * (#515). `floating` puts the line in the free space over the composer, like
+   * the reason for not sending; `inline` gives it a line of its own above, for
+   * a host with something to read right over the composer (Ask's panel).
+   */
+  dictationHint?: DictationHintPlacement
   className?: string
 }
+
+export type DictationHintPlacement = 'floating' | 'inline'
+
+/** The lines over the composer: the reason for not sending, how to dictate. */
+const LINE_TEXT = 'm-0 text-center text-[13px] text-[color:var(--on-sky-text-body,var(--secondary))]'
+const FLOATING_LINE = cn('pointer-events-none absolute inset-x-0 bottom-full mb-1.5', LINE_TEXT)
 
 /** Why send would not go out yet. Pressing it says which, rather than doing nothing. */
 type SendBlocked = 'empty' | 'busy'
@@ -68,7 +79,7 @@ export function Composer({
   busy = false,
   onCompositionStart,
   onCompositionEnd,
-  dictationHint = false,
+  dictationHint,
   className,
 }: ComposerProps) {
   const { t } = useTranslation('common')
@@ -83,8 +94,9 @@ export function Composer({
   const empty = value.trim().length === 0
   const canSend = !disabled && !busy && !empty
   // Only when there is nothing to read in the field yet and the child is about
-  // to write: once a word is in, the line has done its work and goes.
-  const dictation = platform && focused && empty && !disabled && !blocked ? platform : null
+  // to write: once a word is in, the line has done its work and goes. Not while
+  // an answer is still coming, which is what the child is reading then.
+  const dictation = platform && focused && empty && !disabled && !busy && !blocked ? platform : null
 
   // The answer arrived: the reason for holding send went with it.
   useEffect(() => {
@@ -159,21 +171,24 @@ export function Composer({
       id={hintId}
       data-composer-hint={blocked ?? undefined}
       role="status"
-      className="pointer-events-none absolute inset-x-0 bottom-full m-0 mb-1.5 text-center text-[13px] text-[color:var(--on-sky-text-body,var(--secondary))]"
+      className={FLOATING_LINE}
     >
       {blocked ? t(`composer.sendBlocked.${blocked}`) : null}
     </p>
   )
   /*
-   * In the same free space as the reason for not sending, which takes its
-   * place when there is one. Not a live region: it would be read out on every
-   * focus. The field points at it instead, so it is heard with the field.
+   * Floating, it shares the free space with the reason for not sending, which
+   * takes its place when there is one. Not a live region: it would be read
+   * out on every focus. The field points at it instead, so it is heard with
+   * the field.
    */
+  const inline = dictationHint === 'inline'
   const dictationLine = dictation && (
     <p
       id={dictationId}
       data-composer-dictation={dictation}
-      className="pointer-events-none absolute inset-x-0 bottom-full m-0 mb-1.5 text-center text-[13px] text-[color:var(--on-sky-text-body,var(--secondary))]"
+      data-composer-dictation-placement={dictationHint}
+      className={inline ? cn(LINE_TEXT, 'pb-1') : FLOATING_LINE}
     >
       {t(`composer.dictation.${dictation}`)}
     </p>
@@ -210,8 +225,12 @@ export function Composer({
     </>
   )
 
+  /*
+   * Inline, the line sits above the form in the host's own flow, so it pushes
+   * up rather than covering what the host shows over the composer.
+   */
   if (variant === 'docked') {
-    return (
+    const form = (
       <form
         data-composer="docked"
         onSubmit={submit}
@@ -227,15 +246,23 @@ export function Composer({
         }}
       >
         {hint}
-        {dictationLine}
+        {!inline && dictationLine}
         {attach}
         {fieldParts}
         {send}
       </form>
     )
+    return inline ? (
+      <>
+        {dictationLine}
+        {form}
+      </>
+    ) : (
+      form
+    )
   }
 
-  return (
+  const form = (
     <form
       data-composer="full"
       onSubmit={submit}
@@ -248,7 +275,7 @@ export function Composer({
       }}
     >
       {hint}
-      {dictationLine}
+      {!inline && dictationLine}
       {fieldParts}
       <div data-composer-footer className="flex items-center gap-1.5" style={{ height: COMPOSER.full.footer }}>
         {attach}
@@ -257,5 +284,13 @@ export function Composer({
         {send}
       </div>
     </form>
+  )
+  return inline ? (
+    <>
+      {dictationLine}
+      {form}
+    </>
+  ) : (
+    form
   )
 }

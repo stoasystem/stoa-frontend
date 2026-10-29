@@ -32,7 +32,7 @@
     },
     "dictation": {
       "windows": "Rather talk? Press Win + H and say your question.",
-      "mac": "Rather talk? Press the microphone key and say your question.",
+      "mac": "Rather talk? Press the microphone key or your dictation shortcut.",
       "touch": "Rather talk? Tap the microphone on your keyboard."
     }
   },

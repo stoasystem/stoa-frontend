@@ -14,7 +14,7 @@
       },
       "voiceInput": {
         "title": "Dicter au lieu de taper",
-        "body": "Les questions peuvent aussi être dictées, par exemple avec Win + H sous Windows, la touche micro sur un Mac ou le micro du clavier d'un téléphone. La voix est alors traitée par le système de l'appareil, et STOA ne reçoit que le texte. La reconnaissance vocale relève des règles de confidentialité du fabricant de l'appareil (par exemple Microsoft, Apple ou Google). STOA n'enregistre lui-même aucune voix."
+        "body": "Les questions peuvent aussi être dictées, par exemple avec Win + H sous Windows, la touche micro ou le raccourci de dictée sur un Mac, ou le micro du clavier d'un téléphone. La voix est alors traitée par le système de l'appareil, et STOA ne reçoit que le texte. La reconnaissance vocale relève des règles de confidentialité du fournisseur du système d'exploitation ou du clavier (par exemple Microsoft, Apple ou Google). STOA n'enregistre lui-même aucune voix."
       },
       "visibility": {
         "title": "Visibilité pour les parents et les enseignants",
