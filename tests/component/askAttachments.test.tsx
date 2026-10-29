@@ -140,6 +140,7 @@ beforeEach(async () => {
   getConversationMock.mockResolvedValue(conversation())
   progressMock.mockResolvedValue({ status: 'completed', steps: [] } as never)
   streamMock.mockResolvedValue('streamed')
+  prepareMock.mockImplementation(async (file: File) => file)
 })
 
 afterEach(() => {
@@ -193,6 +194,55 @@ describe('a question that carries a file', () => {
     await waitFor(() => expect(uploadMock).toHaveBeenCalledTimes(1))
     expect(uploadMock.mock.calls[0][0].file).toMatchObject({ name: 'IMG_0001.jpg', type: 'image/jpeg' })
     expect(await ask.findByText('IMG_0001.jpg')).toBeInTheDocument()
+  })
+
+  it('prepares photos chosen together one at a time, so a phone holds one in memory', async () => {
+    uploadMock.mockImplementation(async ({ file }) => uploaded(`up-${file.name}`, file.name))
+    const finish: Array<() => void> = []
+    prepareMock.mockImplementation(
+      (file: File) => new Promise<File>((resolve) => finish.push(() => resolve(file))),
+    )
+    const ask = openAsk()
+    await ask.findByText('Linear equations')
+
+    await userEvent.upload(picker(), [photo('a.png'), photo('b.png'), photo('c.png')])
+    await waitFor(() => expect(prepareMock).toHaveBeenCalledTimes(1))
+    await new Promise((resolve) => setTimeout(resolve, 20))
+    expect(prepareMock).toHaveBeenCalledTimes(1)
+
+    finish[0]()
+    await waitFor(() => expect(prepareMock).toHaveBeenCalledTimes(2))
+    expect(prepareMock.mock.calls[1][0].name).toBe('b.png')
+    finish[1]()
+    await waitFor(() => expect(prepareMock).toHaveBeenCalledTimes(3))
+    finish[2]()
+    await waitFor(() => expect(uploadMock).toHaveBeenCalledTimes(3))
+  })
+
+  it('goes on to the next photo when one cannot be prepared', async () => {
+    uploadMock.mockImplementation(async ({ file }) => uploaded(`up-${file.name}`, file.name))
+    prepareMock.mockRejectedValueOnce(new ImagePreparationError('a.png could not be opened.'))
+    const ask = openAsk()
+    await ask.findByText('Linear equations')
+
+    await userEvent.upload(picker(), [photo('a.png'), photo('b.png')])
+
+    await waitFor(() => expect(uploadMock).toHaveBeenCalledTimes(1))
+    expect(uploadMock.mock.calls[0][0].file.name).toBe('b.png')
+  })
+
+  it('does not call a photo that came out of shrinking over the limit "too big" (#508)', async () => {
+    const over = new File([new Uint8Array(8)], 'exercise.jpg', { type: 'image/jpeg' })
+    Object.defineProperty(over, 'size', { value: 10 * 1024 * 1024 + 1 })
+    prepareMock.mockResolvedValueOnce(over)
+    const ask = openAsk()
+    await ask.findByText('Linear equations')
+
+    await userEvent.upload(picker(), photo())
+
+    expect(await ask.findByText('This file could not be added. Try again.')).toBeInTheDocument()
+    expect(ask.queryByText(/Photos may be up to/)).toBeNull()
+    expect(uploadMock).not.toHaveBeenCalled()
   })
 
   it('sends a document as it is, unprepared (the negative control)', async () => {

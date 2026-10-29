@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { UploadRejectedError, uploadFile } from '@/services/files/fileApi'
+import { uploadFile } from '@/services/files/fileApi'
 import { problemFor, type AttachmentProblem } from '@/services/files/attachmentProblems'
 import { prepareImage } from '@/services/files/prepareImage'
 import {
@@ -34,14 +34,20 @@ export type AttachmentDraft = {
 const EXPIRY_MARGIN_MS = 2 * 60 * 1000
 
 /**
- * A photo goes up as the JPEG the browser made of it (#508), held against the
- * backend's limits once more; any other file goes up as it is.
+ * A photo goes up as the JPEG the browser made of it (#508); any other file
+ * goes up as it is. Photos are prepared one at a time (`serially`): eight
+ * chosen at once and decoded together held all eight in a phone's memory.
+ *
+ * The JPEG is held against the backend's 10 MB once more. At 1568 px a side
+ * it cannot come near that, so one that does is a fault here, not a photo too
+ * big to send, and is said as one: the tray's "too big" names the 30 MB a
+ * photo may be as chosen.
  */
-async function prepareAndUpload(file: File) {
+async function prepareAndUpload(file: File, serially: <T>(work: () => Promise<T>) => Promise<T>) {
   if (!isPreparedImage(file.name)) return uploadFile({ file })
-  const prepared = await prepareImage(file)
+  const prepared = await serially(() => prepareImage(file))
   if (uploadRejectionFor(prepared) === 'tooLarge') {
-    throw new UploadRejectedError('too_large', `${prepared.name} is still too large once shrunk.`)
+    throw new Error(`${prepared.name} is still over the upload limit once shrunk.`)
   }
   return uploadFile({ file: prepared })
 }
@@ -81,6 +87,13 @@ export function useAttachmentUploads() {
   /** More files were chosen than a message carries; the extras were left out. */
   const [overflow, setOverflow] = useState(false)
   const held = useRef<AttachmentDraft[]>([])
+  // The photo being prepared, which the next one waits for.
+  const preparing = useRef<Promise<unknown>>(Promise.resolve())
+  const serially = useCallback(<T,>(work: () => Promise<T>) => {
+    const done = preparing.current.then(work)
+    preparing.current = done.catch(() => undefined)
+    return done
+  }, [])
   const mounted = useRef(true)
   useEffect(() => {
     mounted.current = true
@@ -123,7 +136,7 @@ export function useAttachmentUploads() {
       })
       write([...held.current, ...made])
       for (const { localId, file } of started) {
-        void prepareAndUpload(file).then(
+        void prepareAndUpload(file, serially).then(
           // Named as it went up: a HEIC is a JPEG by now.
           (upload) =>
             settle(localId, {
@@ -138,7 +151,7 @@ export function useAttachmentUploads() {
         )
       }
     },
-    [settle, write],
+    [serially, settle, write],
   )
 
   const remove = useCallback(

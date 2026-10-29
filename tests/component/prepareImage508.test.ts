@@ -10,7 +10,13 @@
  */
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { problemFor } from '@/services/files/attachmentProblems'
-import { IMAGE_LONG_EDGE, ImagePreparationError, prepareImage } from '@/services/files/prepareImage'
+import {
+  HEIC_DECODE_LIMIT_MS,
+  IMAGE_LONG_EDGE,
+  ImagePreparationError,
+  prepareImage,
+  shownSize,
+} from '@/services/files/prepareImage'
 
 vi.mock('heic-to', () => ({ heicTo: vi.fn() }))
 
@@ -27,6 +33,50 @@ function phoneJpeg(name = 'IMG_0001.jpg') {
   return new File([new Uint8Array([0xff, 0xd8, 0xff, 0xe1]), exif, new Uint8Array(1024)], name, {
     type: 'image/jpeg',
   })
+}
+
+/**
+ * A JPEG's header as a camera writes it: an EXIF block holding the
+ * Orientation tag, then the frame header with the stored width and height.
+ */
+function cameraJpeg(width: number, height: number, orientation: number, little = true) {
+  const u16 = (value: number) => (little ? [value & 0xff, value >> 8] : [value >> 8, value & 0xff])
+  const u32 = (value: number) => (little ? [...u16(value & 0xffff), ...u16(value >>> 16)] : [...u16(value >>> 16), ...u16(value & 0xffff)])
+  const tiff = [
+    ...(little ? [0x49, 0x49] : [0x4d, 0x4d]),
+    ...u16(42),
+    ...u32(8),
+    ...u16(1),
+    ...u16(0x0112),
+    ...u16(3),
+    ...u32(1),
+    ...u16(orientation),
+    0,
+    0,
+    ...u32(0),
+  ]
+  const app1 = [0x45, 0x78, 0x69, 0x66, 0, 0, ...tiff]
+  const sof = [8, height >> 8, height & 0xff, width >> 8, width & 0xff, 3, 1, 0x22, 0, 2, 0x11, 1, 3, 0x11, 1]
+  return new File(
+    [
+      new Uint8Array([
+        0xff, 0xd8,
+        0xff, 0xe1, (app1.length + 2) >> 8, (app1.length + 2) & 0xff, ...app1,
+        0xff, 0xc0, (sof.length + 2) >> 8, (sof.length + 2) & 0xff, ...sof,
+      ]),
+      new Uint8Array(256),
+    ],
+    'IMG_0004.jpg',
+    { type: 'image/jpeg' },
+  )
+}
+
+function pngOf(width: number, height: number) {
+  const bytes = new Uint8Array(64)
+  bytes.set([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0, 0, 0, 13, 0x49, 0x48, 0x44, 0x52])
+  new DataView(bytes.buffer).setUint32(16, width)
+  new DataView(bytes.buffer).setUint32(20, height)
+  return new File([bytes], 'shot.png', { type: 'image/png' })
 }
 
 const bitmap = (width: number, height: number) => ({ width, height, close: vi.fn() }) as unknown as ImageBitmap
@@ -123,6 +173,47 @@ describe('a photo from a phone', () => {
   })
 })
 
+describe('a photo decoded at the size it goes up at', () => {
+  it('reads a camera JPEG’s size from its header, turned as its EXIF says', async () => {
+    expect(await shownSize(cameraJpeg(4032, 3024, 1))).toEqual({ width: 4032, height: 3024 })
+    expect(await shownSize(cameraJpeg(4032, 3024, 6))).toEqual({ width: 3024, height: 4032 })
+    expect(await shownSize(cameraJpeg(4032, 3024, 8, false))).toEqual({ width: 3024, height: 4032 })
+    expect(await shownSize(cameraJpeg(4032, 3024, 3))).toEqual({ width: 4032, height: 3024 })
+    expect(await shownSize(pngOf(2400, 1080))).toEqual({ width: 2400, height: 1080 })
+    expect(await shownSize(new File([new Uint8Array(64)], 'x.jpg'))).toBeNull()
+  })
+
+  it('asks the browser for 1568 px on the long edge, never the whole 12 MP', async () => {
+    createImageBitmapMock.mockResolvedValue(bitmap(1176, 1568))
+    const file = cameraJpeg(4032, 3024, 6)
+
+    await prepareImage(file)
+
+    expect(createImageBitmapMock).toHaveBeenCalledWith(file, {
+      imageOrientation: 'from-image',
+      resizeWidth: 1176,
+      resizeQuality: 'high',
+    })
+    expect([drawn.width, drawn.height]).toEqual([1176, 1568])
+  })
+
+  it('names the width a screenshot keeps its shape by', async () => {
+    createImageBitmapMock.mockResolvedValue(bitmap(1568, 706))
+
+    await prepareImage(pngOf(2400, 1080))
+
+    expect(createImageBitmapMock.mock.calls[0][1]).toMatchObject({ resizeWidth: 1568 })
+  })
+
+  it('decodes a small one as it is (the negative control)', async () => {
+    createImageBitmapMock.mockResolvedValue(bitmap(800, 600))
+
+    await prepareImage(pngOf(800, 600))
+
+    expect(createImageBitmapMock.mock.calls[0][1]).toEqual({ imageOrientation: 'from-image' })
+  })
+})
+
 describe('an iPhone’s HEIC', () => {
   const heic = () => new File([new Uint8Array(2048)], 'IMG_0002.HEIC', { type: 'image/heic' })
 
@@ -153,6 +244,22 @@ describe('an iPhone’s HEIC', () => {
     await prepareImage(new File([new Uint8Array(8)], 'IMG_0003.heif'))
 
     expect(heicToMock).toHaveBeenCalledTimes(1)
+  })
+
+  it('is given up on when the decoder never answers, rather than left adding forever', async () => {
+    vi.useFakeTimers()
+    try {
+      createImageBitmapMock.mockRejectedValue(new Error('no'))
+      heicToMock.mockReturnValue(new Promise(() => {}))
+
+      const refused = prepareImage(heic()).catch((error: unknown) => error)
+      await vi.advanceTimersByTimeAsync(HEIC_DECODE_LIMIT_MS)
+
+      expect(await refused).toBeInstanceOf(ImagePreparationError)
+      expect(problemFor(await refused)).toBe('unreadable')
+    } finally {
+      vi.useRealTimers()
+    }
   })
 
   it('that cannot be opened at all is a problem the student can read', async () => {
