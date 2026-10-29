@@ -18,7 +18,7 @@
  * skip, and Ask and 「问这段」 are off.
  */
 import { ChevronLeft, Heart, Lightbulb, Lock, Sparkles } from 'lucide-react'
-import { useEffect, useMemo, useRef, useState, type MutableRefObject, type ReactNode } from 'react'
+import { useEffect, useId, useMemo, useRef, useState, type MutableRefObject, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link, useSearchParams } from 'react-router-dom'
 import { Murmi } from '@/components/brand/Murmi'
@@ -28,6 +28,7 @@ import { MathRenderer } from '@/components/ui/MathRenderer'
 import { pathForTarget } from '@/features/starmap/view/layers'
 import type { AskPractice } from '@/features/ask/practiceContext'
 import { AnswerInput, bodyOnSky, FeedbackCard, glass } from '@/features/chapter/answerControls'
+import { ExerciseFigure } from '@/features/chapter/ExerciseFigure'
 import { StageWithAsk, STAGE_SIDE_QUERY } from '@/features/chapter/StageAsk'
 import { quizTroubleIsRestartable, quizTroubleKey } from '@/features/chapter/quiz'
 import { chapterPath, isOpenLesson, lessonAfter, QUIZ_MODE, useChapter, type Chapter } from '@/features/chapter/useChapter'
@@ -380,6 +381,7 @@ function Exercise({
   arrived: MutableRefObject<boolean>
 }) {
   const prompt = useRef<HTMLHeadingElement>(null)
+  const promptId = useId()
   const mode = run.quiz ? 'quiz' : 'lesson'
 
   // A new exercise, the quiz begun, or back from it: the keyboard and the
@@ -448,6 +450,7 @@ function Exercise({
               {challenge.topic && <p className={cn('m-0 text-[17px]', bodyOnSky)}>{challenge.topic}</p>}
               <h2
                 ref={prompt}
+                id={promptId}
                 tabIndex={-1}
                 data-stage-prompt
                 className="m-0 text-on-sky outline-none"
@@ -459,6 +462,7 @@ function Exercise({
               >
                 <MathRenderer>{challenge.prompt}</MathRenderer>
               </h2>
+              {challenge.figure && <ExerciseFigure svg={challenge.figure} labelledBy={promptId} className="mt-2" />}
             </div>
 
             <form

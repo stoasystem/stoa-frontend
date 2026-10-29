@@ -93,6 +93,14 @@ export type PracticeChallenge = {
   type: PracticeChallengeType
   prompt: string
   options?: string[]
+  /**
+   * The drawing the question needs, under it (stoa-backend#127, #504): one
+   * `<svg>` the backend checked against its allowlist, in the reader's
+   * language. Absent or null when there is none. Drawn by `ExerciseFigure`.
+   */
+  figure?: string | null
+  /** One drawing per option, in the options' order; `""` (or null) where an option has none. */
+  optionFigures?: (string | null)[] | null
   /** Whether `POST /practice/hints` has a hint for this exercise. */
   hintAvailable: boolean
   correctAnswer: string | string[]
@@ -421,6 +429,9 @@ export type ReviewCard = {
   topicId: string
   prompt: string
   options: string[]
+  /** As on `PracticeChallenge`. */
+  figure?: string | null
+  optionFigures?: (string | null)[] | null
   type: string
   dueAt: string
   lapses: number

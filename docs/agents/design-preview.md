@@ -35,7 +35,7 @@ npm run dev -- --host 127.0.0.1 --port 5173
 | `map-focus-optics` / `map-focus-star` | `/map/physics`（键盘聚焦「光学」）、`/map/math/trigonometry`（聚焦演示知识点） | 可看：聚焦时点亮的连线（#121） |
 | `map-optics` / `map-refraction` | `/map/physics/optics`、`/map/physics/optics/demo-refraction` | 可看：跨学科前置（#121） |
 | `chapter` | `/chapter/demo-sine-cosine` | 可看：3 个课时，开场时第 1 课已完成 |
-| `lesson` | `/chapter/demo-sine-cosine/demo-sine-cosine-2` | 可看：4 道题（单选 ×2、填空、排序），能答错、重试、答对、完成课时 |
+| `lesson` | `/chapter/demo-sine-cosine/demo-sine-cosine-2` | 可看：5 道题（单选 ×2、填空、排序、选项是图的单选），能答错、重试、答对、完成课时；第 1 题带题干图（图上「Hypotenuse」随界面语言变），第 5 题三个选项都是图（#504） |
 | `ask` / `ask-conversation` | `/ask`、`/ask/demo-ask-sine` | 可看；桌面为侧栏，手机为全屏 sheet；`demo-ask-sine` 带一位进行中的老师；能发消息（答复为固定文字）、请老师 |
 | `me` | `/me` | 可看 |
 | `account-menu` | `/me` 并自动打开头像菜单 | 可看，能退出（回到登录页） |
