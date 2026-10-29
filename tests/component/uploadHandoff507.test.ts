@@ -32,7 +32,6 @@ vi.mock('@/services/files/prepareImage', async (importOriginal) => ({
 }))
 
 const post = vi.mocked(httpClient.post)
-const put = vi.mocked(httpClient.put)
 const get = vi.mocked(httpClient.get)
 
 const photo = () => new File([new Uint8Array(2048)], 'exercise.png', { type: 'image/png' })
@@ -58,13 +57,16 @@ function answerUploads(complete: Record<string, unknown> | ApiError) {
         },
       }
     }
+    // The part's bytes go to S3 on this URL (#516; uploadDirectS3516).
+    if (url === '/files/up-1/parts/1') {
+      return { data: { uploadId: 'up-1', partNumber: 1, url: 'https://s3.example/part', method: 'PUT', headers: {} } }
+    }
     if (url === '/files/up-1/complete') {
       if (complete instanceof ApiError) throw complete
       return { data: { uploadId: 'up-1', ...complete } }
     }
     throw new Error(`unexpected POST ${url}`)
   })
-  put.mockResolvedValue({ data: {} })
 }
 
 const invalid = () => new ApiError('Invalid.', { status: 422, code: 'upload_invalid' })
@@ -72,9 +74,11 @@ const invalid = () => new ApiError('Invalid.', { status: 422, code: 'upload_inva
 beforeEach(() => {
   expiresAt = new Date(Date.now() + 30 * 60 * 1000).toISOString()
   answerUploads({ status: 'validated', attachment: null })
+  vi.stubGlobal('fetch', vi.fn(async () => new Response(null, { status: 200 })))
 })
 
 afterEach(() => {
+  vi.unstubAllGlobals()
   sessionStorage.clear()
   vi.clearAllMocks()
 })
@@ -88,7 +92,7 @@ describe('an upload that passed', () => {
       mimeType: 'image/png',
       sizeBytes: 2048,
     })
-    expect(post).toHaveBeenCalledWith('/files/up-1/complete', { partCount: 1 })
+    expect(post).toHaveBeenCalledWith('/files/up-1/complete', { partCount: 1 }, expect.anything())
   })
 
   it('is refused with the 422 a file that does not pass gets, in words the tray has', async () => {

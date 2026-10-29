@@ -21,6 +21,20 @@ export type UploadIntentResponse = {
   status: string
 }
 
+/**
+ * `UploadPartUrlResponse`: where one part's bytes go, on S3, and the headers
+ * the PUT must carry. The URL is signed for this part's exact length and
+ * SHA-256, and lasts 300 s (stoa-backend#152, ADR-004).
+ */
+export type UploadPartUrlResponse = {
+  uploadId: string
+  partNumber: number
+  url: string
+  method: 'PUT'
+  headers: Record<string, string>
+  expiresAt: string
+}
+
 export type AttachmentSummary = {
   attachmentId: string
   filename: string

@@ -28,7 +28,10 @@ const BY_CODE: Readonly<Record<string, AttachmentProblem>> = {
   upload_too_large: 'tooLarge',
   upload_type_not_supported: 'unsupported',
   upload_content_mismatch: 'unsupported',
-  upload_invalid: 'unsupported',
+  // Also what `complete` answers when a part never reached S3 (#516): "this
+  // kind cannot be sent" would be wrong there; "not added, try again" is true
+  // of both.
+  upload_invalid: 'failed',
   upload_not_found: 'expired',
   upload_expired: 'expired',
   upload_chunk_conflict: 'expired',
