@@ -9,6 +9,7 @@ import { trackEvent } from '@/services/analytics/analyticsClient'
 import { chatQueryKeys } from '@/services/chat/chatQueryKeys'
 import { toUserFacingError } from '@/lib/userFacingText'
 import type { ChatAttachment, ChatMessage, ChatStreamEvent, Conversation } from '@/types/chat'
+import type { AttachmentReference } from '@/types/file'
 import { commandMessageIds } from '@/services/chat/commandMessageIds'
 import { watchGeneration, type GenerationOutcome } from '@/services/chat/generationWatch'
 import {
@@ -67,8 +68,42 @@ function createLocalId(prefix: string) {
   return `${prefix}-${Date.now()}-${Math.random().toString(16).slice(2)}`
 }
 
+/**
+ * The codes a message is refused with when an upload it carries is no longer
+ * there to make an attachment of: past its 30 minutes, or gone. Sending it
+ * again cannot help; choosing the file again can (#507).
+ */
+const UPLOAD_GONE = new Set(['upload_expired', 'upload_not_found'])
+
 function getErrorMessage(error: unknown) {
+  const code = error && typeof error === 'object' && 'code' in error ? (error as { code?: unknown }).code : undefined
+  if (typeof code === 'string' && UPLOAD_GONE.has(code)) return i18n.t('chat:ask.attachments.errors.sendExpired')
   return toUserFacingError(error, streamErrorFallback())
+}
+
+/**
+ * A failed message sent again as a new one, with the files the server saved
+ * from it. Once the server has taken a message its uploads are consumed --
+ * the attachments are made of them -- and `{uploadId}` is refused as
+ * `upload_not_found` from then on, so the retry names the attachments the
+ * server's copy of the message carries, in the order they were sent. A
+ * message the server never took still has its uploads, and keeps them (#507).
+ */
+function withSavedAttachments(
+  payload: SendStreamingMessagePayload,
+  saved: ChatMessage | undefined,
+): SendStreamingMessagePayload {
+  const references = payload.attachmentIds
+  const attachments = saved?.attachments
+  if (!references?.length || !attachments || attachments.length !== references.length) return payload
+  return {
+    ...payload,
+    attachmentIds: references.map(
+      (reference, index): AttachmentReference =>
+        'uploadId' in reference ? { attachmentId: attachments[index].id } : reference,
+    ),
+    attachments,
+  }
 }
 
 /**
@@ -623,9 +658,16 @@ export function useStreamingChat(conversationId: string | null) {
       if (!message?.retryPayload || busyRef.current) return
 
       const { idempotencyKey, ...payload } = message.retryPayload
-      void sendStreamingMessage(payload, idempotencyKey, message)
+      // The same command sends the same body; a new one names what the
+      // server saved of the first, if it saved anything.
+      const saved = idempotencyKey
+        ? undefined
+        : queryClient
+            .getQueryData<Conversation>(chatQueryKeys.conversation(conversationId ?? ''))
+            ?.messages.find((server) => server.id === message.id && server.role === 'student')
+      void sendStreamingMessage(withSavedAttachments(payload, saved), idempotencyKey, message)
     },
-    [localMessages, sendStreamingMessage],
+    [conversationId, localMessages, queryClient, sendStreamingMessage],
   )
 
   return {

@@ -48,8 +48,8 @@ async function completeUpload(uploadId: string, partCount: number) {
  * What comes back is the upload, not an attachment: `complete` answers
  * `{"status":"validated","attachment":null}` by design, and the attachment is
  * made when a message carries `{uploadId}` (stoa-backend `complete_upload`,
- * `SendMessageRequest.attachmentIds`; #495, #507). Any other status means the
- * file did not pass, and is thrown.
+ * `SendMessageRequest.attachmentIds`; #495, #507). Any other status is not
+ * done, and is thrown.
  */
 export async function uploadFile({
   file,
@@ -73,16 +73,16 @@ export async function uploadFile({
     await putChunk(intent.uploadId, partNumber, file.slice(start, start + intent.chunkBytes))
   }
 
+  // A file that does not pass is refused with a 422 and its code, not answered
+  // with a status; anything but `validated` here is not done.
   const completed = await completeUpload(intent.uploadId, partCount)
-  if (completed.status === 'invalid') {
-    throw new UploadRejectedError('unsupported_type', 'The upload did not pass validation.')
-  }
   if (completed.status !== 'validated') {
     throw new Error(`Upload finished with status ${completed.status}.`)
   }
 
   return {
     uploadId: completed.uploadId,
+    expiresAt: intent.expiresAt,
     filename: file.name,
     mimeType: file.type,
     sizeBytes: file.size,

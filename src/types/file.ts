@@ -44,6 +44,11 @@ export type CompleteUploadResponse = {
  */
 export type ValidatedUpload = {
   uploadId: string
+  /**
+   * When the upload stops being one a message may carry: the intent's
+   * `expiresAt`, validated or not (`UPLOAD_INTENT_TTL_SECONDS`, 30 minutes).
+   */
+  expiresAt: string
   filename: string
   mimeType: string
   sizeBytes: number

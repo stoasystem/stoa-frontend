@@ -14,11 +14,11 @@
 import { act, renderHook, waitFor } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { useAttachmentUploads } from '@/features/uploads/useAttachmentUploads'
-import { readPendingMessage, writePendingMessage } from '@/lib/pendingChatMessages'
-import { httpClient } from '@/services/api/httpClient'
-import { getConversation } from '@/services/chat/chatApi'
+import { readFailedMessages, readPendingMessage, writePendingMessage } from '@/lib/pendingChatMessages'
+import { ApiError, httpClient } from '@/services/api/httpClient'
+import { getConversation, sendConversationMessage } from '@/services/chat/chatApi'
 import { problemFor } from '@/services/files/attachmentProblems'
-import { UploadRejectedError, uploadFile } from '@/services/files/fileApi'
+import { uploadFile } from '@/services/files/fileApi'
 
 vi.mock('@/services/api/httpClient', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@/services/api/httpClient')>()),
@@ -31,14 +31,20 @@ const get = vi.mocked(httpClient.get)
 
 const photo = () => new File([new Uint8Array(2048)], 'exercise.png', { type: 'image/png' })
 
-/** The upload API as it answers: intent, part, then `complete` with `status`. */
-function answerUploads(complete: Record<string, unknown>) {
+/** The intent's 30 minutes, from now. */
+let expiresAt: string
+
+/**
+ * The upload API as it answers: intent, part, then `complete` with `status`,
+ * or with the 422 a file that does not pass is refused with.
+ */
+function answerUploads(complete: Record<string, unknown> | ApiError) {
   post.mockImplementation(async (url: string) => {
     if (url === '/files/intents') {
       return {
         data: {
           uploadId: 'up-1',
-          expiresAt: '2026-10-29T10:30:00Z',
+          expiresAt,
           maxBytes: 10 * 1024 * 1024,
           chunkBytes: 5 * 1024 * 1024,
           acceptedTypes: ['image/png'],
@@ -46,13 +52,19 @@ function answerUploads(complete: Record<string, unknown>) {
         },
       }
     }
-    if (url === '/files/up-1/complete') return { data: { uploadId: 'up-1', ...complete } }
+    if (url === '/files/up-1/complete') {
+      if (complete instanceof ApiError) throw complete
+      return { data: { uploadId: 'up-1', ...complete } }
+    }
     throw new Error(`unexpected POST ${url}`)
   })
   put.mockResolvedValue({ data: {} })
 }
 
+const invalid = () => new ApiError('Invalid.', { status: 422, code: 'upload_invalid' })
+
 beforeEach(() => {
+  expiresAt = new Date(Date.now() + 30 * 60 * 1000).toISOString()
   answerUploads({ status: 'validated', attachment: null })
 })
 
@@ -65,6 +77,7 @@ describe('an upload that passed', () => {
   it('is the validated upload, though `complete` names no attachment', async () => {
     await expect(uploadFile({ file: photo() })).resolves.toEqual({
       uploadId: 'up-1',
+      expiresAt,
       filename: 'exercise.png',
       mimeType: 'image/png',
       sizeBytes: 2048,
@@ -72,13 +85,13 @@ describe('an upload that passed', () => {
     expect(post).toHaveBeenCalledWith('/files/up-1/complete', { partCount: 1 })
   })
 
-  it('is refused when `complete` says it did not pass, in words the tray has', async () => {
-    answerUploads({ status: 'invalid', attachment: null })
+  it('is refused with the 422 a file that does not pass gets, in words the tray has', async () => {
+    answerUploads(invalid())
 
     const refused = await uploadFile({ file: photo() }).catch((error: unknown) => error)
 
-    expect(refused).toBeInstanceOf(UploadRejectedError)
-    expect(problemFor(refused)).toBe('unsupported')
+    expect(refused).toBeInstanceOf(ApiError)
+    expect(problemFor(refused)).toBe(problemFor(invalid()))
   })
 
   it('is not taken as done while the server is still on it', async () => {
@@ -101,14 +114,49 @@ describe('the composer, from upload to reference', () => {
   })
 
   it('fails the file, and sends nothing for it, when the upload did not pass (the negative control)', async () => {
-    answerUploads({ status: 'invalid', attachment: null })
+    answerUploads(invalid())
     const { result } = renderHook(() => useAttachmentUploads())
 
     act(() => result.current.add([photo()]))
     await waitFor(() => expect(result.current.drafts[0]?.state).toBe('failed'))
 
-    expect(result.current.drafts[0]?.problem).toBe('unsupported')
+    expect(result.current.drafts[0]?.problem).toBe(problemFor(invalid()))
     expect(result.current.readyReferences).toEqual([])
+  })
+})
+
+describe('an upload past its 30 minutes', () => {
+  async function readyWith(expiry: string) {
+    expiresAt = expiry
+    const { result } = renderHook(() => useAttachmentUploads())
+    act(() => result.current.add([photo()]))
+    await waitFor(() => expect(result.current.drafts[0]?.state).toBe('ready'))
+    return result
+  }
+
+  it('is failed as `expired` before the question goes out, which is held', async () => {
+    const result = await readyWith(new Date(Date.now() + 60 * 1000).toISOString())
+
+    let held = false
+    act(() => {
+      held = result.current.expireStale()
+    })
+
+    expect(held).toBe(true)
+    expect(result.current.drafts[0]).toMatchObject({ state: 'failed', problem: 'expired' })
+    expect(result.current.readyReferences).toEqual([])
+  })
+
+  it('is sent while it has time left (the negative control)', async () => {
+    const result = await readyWith(new Date(Date.now() + 20 * 60 * 1000).toISOString())
+
+    let held = true
+    act(() => {
+      held = result.current.expireStale()
+    })
+
+    expect(held).toBe(false)
+    expect(result.current.readyReferences).toEqual([{ uploadId: 'up-1' }])
   })
 })
 
@@ -141,6 +189,28 @@ describe('a message waiting in the tab', () => {
     })
 
     expect(readPendingMessage('c1')?.attachmentIds).toEqual([{ uploadId: 'up-1' }])
+  })
+
+  it('keeps only references the backend takes on a failed one too, to send again', () => {
+    sessionStorage.setItem(
+      'stoa_failed_chat_messages:c1',
+      JSON.stringify([
+        {
+          owner: 'u-1',
+          student: {
+            id: 's1',
+            conversationId: 'c1',
+            role: 'student',
+            content: 'Here it is',
+            createdAt: '2026-10-29T10:00:00Z',
+            status: 'failed',
+            retryPayload: { content: 'Here it is', attachmentIds: [{ uploadId: 'up-1' }, 'att-3', {}] },
+          },
+        },
+      ]),
+    )
+
+    expect(readFailedMessages('c1', 'u-1')[0].student.retryPayload.attachmentIds).toEqual([{ uploadId: 'up-1' }])
   })
 })
 
@@ -189,5 +259,36 @@ describe('the conversation read back', () => {
       },
     ])
     expect('attachments' in conversation.messages[1]).toBe(false)
+  })
+
+  it('names them so in the answer to a message sent without streaming, too', async () => {
+    const message = (id: string, role: string, attachments?: unknown[]) => ({
+      id,
+      conversationId: 'c1',
+      role,
+      content: 'x',
+      createdAt: '2026-10-29T10:00:00Z',
+      ...(attachments ? { attachments } : {}),
+    })
+    post.mockResolvedValue({
+      data: {
+        studentMessage: message('s1', 'student', [
+          {
+            attachmentId: 'att-1',
+            filename: 'a.jpg',
+            mediaType: 'image/jpeg',
+            sizeBytes: 9,
+            status: 'active',
+            createdAt: '2026-10-29T10:00:00Z',
+          },
+        ]),
+        assistantMessage: message('a1', 'assistant'),
+      },
+    })
+
+    const sent = await sendConversationMessage('c1', { content: 'x', attachmentIds: [{ uploadId: 'up-1' }] })
+
+    expect(sent.studentMessage.attachments).toMatchObject([{ id: 'att-1', mimeType: 'image/jpeg' }])
+    expect('attachments' in sent.assistantMessage).toBe(false)
   })
 })

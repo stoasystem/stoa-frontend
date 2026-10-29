@@ -114,8 +114,8 @@ const photo = (name = 'exercise.png', size = 2048) =>
   new File([new Uint8Array(size)], name, { type: 'image/png' })
 
 /** What `uploadFile` gives for a file that went up whole and passed: the upload, validated. */
-function uploaded(uploadId: string, filename: string) {
-  return { uploadId, filename, mimeType: 'image/png', sizeBytes: 2048 }
+function uploaded(uploadId: string, filename: string, expiresAt = new Date(Date.now() + 30 * 60 * 1000).toISOString()) {
+  return { uploadId, expiresAt, filename, mimeType: 'image/png', sizeBytes: 2048 }
 }
 
 const originalMatchMedia = window.matchMedia
@@ -157,6 +157,20 @@ describe('a question that carries a file', () => {
     const payload = streamMock.mock.calls[0][0].payload
     expect(payload.attachmentIds).toEqual([{ uploadId: 'up-1' }])
     expect(payload.content).toBe('What did I do wrong?')
+  })
+
+  it('holds the question when a file waited past its upload’s 30 minutes, and says to choose it again (#507)', async () => {
+    uploadMock.mockResolvedValue(uploaded('up-1', 'exercise.png', new Date(Date.now() + 30 * 1000).toISOString()))
+    const ask = openAsk()
+    await ask.findByText('Linear equations')
+
+    await userEvent.upload(picker(), photo())
+    await waitFor(() => expect(ask.queryByText('Adding…')).toBeNull())
+    await userEvent.type(ask.getByRole('textbox', { name: 'Your question' }), 'Here it is{Enter}')
+
+    expect(await ask.findByText('This file took too long. Choose it again.')).toBeInTheDocument()
+    expect(streamMock).not.toHaveBeenCalled()
+    expect(ask.getByRole('textbox', { name: 'Your question' })).toHaveValue('Here it is')
   })
 
   it('sends no ids at all when nothing was attached (the negative control)', async () => {

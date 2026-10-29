@@ -122,14 +122,27 @@ function readStoredFailed(conversationId: string): StoredFailedMessage[] {
   try {
     const value: unknown = JSON.parse(sessionStorage.getItem(failedKey(conversationId)) ?? '[]')
     if (!Array.isArray(value)) return []
-    return value.filter(
-      (entry): entry is StoredFailedMessage =>
-        typeof entry === 'object' &&
-        entry !== null &&
-        typeof (entry as StoredFailedMessage).owner === 'string' &&
-        typeof (entry as StoredFailedMessage).student?.id === 'string' &&
-        typeof (entry as StoredFailedMessage).student?.retryPayload?.content === 'string',
-    )
+    return value
+      .filter(
+        (entry): entry is StoredFailedMessage =>
+          typeof entry === 'object' &&
+          entry !== null &&
+          typeof (entry as StoredFailedMessage).owner === 'string' &&
+          typeof (entry as StoredFailedMessage).student?.id === 'string' &&
+          typeof (entry as StoredFailedMessage).student?.retryPayload?.content === 'string',
+      )
+      .map((entry) => {
+        // Sent again as kept: only references the backend takes (#507).
+        const { attachmentIds, ...retryPayload } = entry.student.retryPayload
+        const references = attachmentReferences(attachmentIds)
+        return {
+          ...entry,
+          student: {
+            ...entry.student,
+            retryPayload: references ? { ...retryPayload, attachmentIds: references } : retryPayload,
+          },
+        }
+      })
   } catch {
     return []
   }

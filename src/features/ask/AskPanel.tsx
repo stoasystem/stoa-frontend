@@ -190,6 +190,8 @@ export function AskPanel({
 
   function startConversation(content: string, quote?: AskQuote | null) {
     if (creatingRef.current || createConversation.isPending) return
+    // A file that waited past its upload's 30 minutes says so in the tray.
+    if (attachments.expireStale()) return
     const attachmentIds = attachments.readyReferences
     const carried = attachmentIds.length > 0
     const grade = conversationGrade(profile?.grade)
@@ -284,6 +286,8 @@ export function AskPanel({
     // `busy`, which says so; this is the second lock, so a question can never
     // leave without the file it was written for.
     if (attachments.uploading) return
+    // A file that waited past its upload's 30 minutes is chosen again first.
+    if (attachments.expireStale()) return
     if (!conversationId) {
       startConversation(content, quote)
       return

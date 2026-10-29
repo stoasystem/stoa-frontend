@@ -18,9 +18,14 @@ export type AttachmentDraft = {
    * when `state` is `ready`; the attachment itself is made when the message is.
    */
   uploadId?: string
+  /** When the upload can no longer be sent, from its intent; with `uploadId`. */
+  expiresAt?: string
   /** Why it failed, as something the student can read. */
   problem?: AttachmentProblem
 }
+
+/** Time enough for a question to reach the server once it is sent. */
+const EXPIRY_MARGIN_MS = 2 * 60 * 1000
 
 let counter = 0
 const nextLocalId = () => `attachment-${Date.now()}-${(counter += 1)}`
@@ -96,7 +101,7 @@ export function useAttachmentUploads() {
       write([...held.current, ...made])
       for (const { localId, file } of started) {
         void uploadFile({ file }).then(
-          (upload) => settle(localId, { state: 'ready', uploadId: upload.uploadId }),
+          (upload) => settle(localId, { state: 'ready', uploadId: upload.uploadId, expiresAt: upload.expiresAt }),
           (error: unknown) => settle(localId, { state: 'failed', problem: problemFor(error) }),
         )
       }
@@ -127,6 +132,31 @@ export function useAttachmentUploads() {
     write(held.current.filter((draft) => draft.state !== 'ready'))
   }, [write])
 
+  /**
+   * An upload is one a message may carry for 30 minutes from its intent,
+   * validated or not, and is refused as `upload_expired` after. Before a
+   * question goes out, a file that is past that, or nearly, is failed as
+   * `expired` -- which says to choose it again -- and the question is held, so
+   * it never leaves without the file it was written for (#507). True when one
+   * was.
+   */
+  const expireStale = useCallback(() => {
+    const limit = Date.now() + EXPIRY_MARGIN_MS
+    const stale = (draft: AttachmentDraft) =>
+      draft.state === 'ready' && draft.expiresAt !== undefined && Date.parse(draft.expiresAt) <= limit
+    if (!held.current.some(stale)) return false
+    setOverflow(false)
+    write(
+      held.current.map(
+        (draft): AttachmentDraft =>
+          stale(draft)
+            ? { ...draft, state: 'failed', problem: 'expired', uploadId: undefined, expiresAt: undefined }
+            : draft,
+      ),
+    )
+    return true
+  }, [write])
+
   const ready = drafts.filter(hasId)
 
   return {
@@ -136,6 +166,7 @@ export function useAttachmentUploads() {
     remove,
     clear,
     clearSent,
+    expireStale,
     /** What the message refers to, in the order the files were chosen. */
     readyReferences: ready.map((draft): AttachmentReference => ({ uploadId: draft.uploadId })),
     /**
