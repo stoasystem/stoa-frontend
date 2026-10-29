@@ -70,6 +70,7 @@ async function start() {
         onChange={setValue}
         onSubmit={() => setValue('')}
         onAttach={() => {}}
+        onCapture={() => {}}
         dictationHint="floating"
         footerStart={
           variant === 'full' ? (

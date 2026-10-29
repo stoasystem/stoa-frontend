@@ -168,8 +168,10 @@
         "unsupported": "Diese Art von Datei kann nicht gesendet werden. Fotos, PDF, Word, PowerPoint, Excel und Textdateien gehen.",
         "empty": "Diese Datei ist leer. Wähl eine andere.",
         "expired": "Diese Datei hat zu lange gebraucht. Wähl sie noch einmal.",
+        "sendExpired": "Eine angehängte Datei hat zu lange gebraucht. Wähl sie noch einmal aus und frag dann noch einmal.",
         "quota": "Für Dateien ist kein Platz mehr frei. Entferne zuerst eine ältere.",
         "unavailable": "Dateien lassen sich gerade nicht hinzufügen. Versuch es gleich noch einmal.",
+        "unreadable": "Dieses Foto lässt sich nicht öffnen. Versuch ein anderes oder einen Screenshot.",
         "failed": "Diese Datei konnte nicht hinzugefügt werden. Versuch es noch einmal."
       }
     }

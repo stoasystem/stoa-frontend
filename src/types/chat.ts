@@ -1,3 +1,5 @@
+import type { AttachmentReference } from '@/types/file'
+
 export type ChatRole = 'student' | 'assistant' | 'teacher' | 'system'
 
 export type ChatMessageStatus =
@@ -76,7 +78,7 @@ export type ConversationListResponse = {
 
 export type SendMessageRequest = {
   content: string
-  attachmentIds?: string[]
+  attachmentIds?: AttachmentReference[]
   practiceContext?: PracticeContextRef
   quote?: MessageQuote
 }
