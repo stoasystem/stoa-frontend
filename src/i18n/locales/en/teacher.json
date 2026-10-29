@@ -73,7 +73,7 @@
       "unavailable": "Image not available",
       "failed": "The image could not be loaded.",
       "retry": "Try again",
-      "retryNamed": "Load image again: {{name}}"
+      "retryNamed": "Try again: {{name}}"
     }
   },
   "profile": {

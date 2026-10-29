@@ -4,10 +4,12 @@
  * T1 - a picture is a thumbnail read with the teacher's token, named for a
  *      screen reader, and opens larger in a dialog the keyboard can close.
  * T2 - a message without files shows none, and reads none.
- * T3 - a picture this teacher may not read (403/404), one removed, or one the
- *      browser cannot draw is a placeholder, not an error, and is not asked
- *      for again; any other failure offers to load it again.
- * T4 - a picture is read once: not again with every poll of the request.
+ * T3 - a picture this teacher may not read (403/404), one removed, one that
+ *      came back as anything but PNG or JPEG, or one the browser cannot draw
+ *      is a placeholder, not an error, and is not asked for again; any other
+ *      failure offers to load it again, and is named by what it says.
+ * T4 - a picture is read once: not again with every poll of the request, nor
+ *      on a language switch; a read that fails again keeps it on screen.
  */
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { act, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
@@ -123,6 +125,8 @@ describe('T1: a picture the student sent', () => {
     const thumbnail = within(open).getByRole('img')
     expect(thumbnail).toHaveAttribute('alt', named(copy.alt, 'tafel.png'))
     expect(thumbnail).toHaveAttribute('src', 'blob:test/1')
+    // Still drawn from it: the address is not let go while it is on screen.
+    expect(revoked).not.toContain('blob:test/1')
     expect(mockedContent).toHaveBeenCalledWith('r1', 'att-1')
     expect(screen.getByRole('list', { name: copy.label })).toBeInTheDocument()
   })
@@ -137,6 +141,7 @@ describe('T1: a picture the student sent', () => {
     const dialog = await screen.findByRole('dialog', { name: 'tafel.png' })
     const large = within(dialog).getByRole('img', { name: named(copy.alt, 'tafel.png') })
     expect(large).toHaveAttribute('src', 'blob:test/1')
+    expect(revoked).not.toContain('blob:test/1')
 
     await userEvent.keyboard('{Escape}')
     await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
@@ -202,6 +207,28 @@ describe('T3: a picture the teacher cannot see', () => {
     expect(screen.queryByRole('button', { name: named(copy.open, 'tafel.png') })).toBeNull()
   })
 
+  it.each(['text/html', 'image/svg+xml', 'application/octet-stream', ''])(
+    'is a placeholder when what came back is %j, and gets no address',
+    async (type) => {
+      mockedContent.mockResolvedValue(new Blob(['<svg/>'], { type }))
+      renderCard(request([message([picture()])]))
+
+      expect(await screen.findByText(copy.unavailable)).toBeInTheDocument()
+      expect(screen.queryByRole('img')).toBeNull()
+      expect(created).toEqual([])
+    },
+  )
+
+  it('draws a JPEG, and a type with parameters', async () => {
+    mockedContent.mockResolvedValueOnce(new Blob(['jpg'], { type: 'image/jpeg' }))
+    mockedContent.mockResolvedValueOnce(new Blob(['png'], { type: 'image/png;foo=bar' }))
+    renderCard(
+      request([message([picture(), picture({ attachmentId: 'att-2', filename: 'heft.png' })])]),
+    )
+    expect(await screen.findByRole('button', { name: named(copy.open, 'tafel.png') })).toBeInTheDocument()
+    expect(await screen.findByRole('button', { name: named(copy.open, 'heft.png') })).toBeInTheDocument()
+  })
+
   it('offers to load it again after any other failure', async () => {
     mockedContent.mockRejectedValue(new ApiError('boom', { status: 500 }))
     renderCard(request([message([picture()])]))
@@ -212,7 +239,11 @@ describe('T3: a picture the teacher cannot see', () => {
     expect(screen.queryByText(copy.unavailable)).toBeNull()
 
     mockedContent.mockResolvedValue(new Blob(['png'], { type: 'image/png' }))
-    await userEvent.click(screen.getByRole('button', { name: named(copy.retryNamed, 'tafel.png') }))
+    // Its name starts with what it says on it (WCAG 2.5.3, label in name).
+    const retry = screen.getByRole('button', { name: named(copy.retryNamed, 'tafel.png') })
+    expect(retry).toHaveTextContent(copy.retry)
+    expect(retry.getAttribute('aria-label')?.startsWith(retry.textContent ?? '')).toBe(true)
+    await userEvent.click(retry)
     expect(await screen.findByRole('button', { name: named(copy.open, 'tafel.png') })).toBeInTheDocument()
     expect(mockedContent).toHaveBeenCalledTimes(3)
   })
@@ -241,6 +272,33 @@ describe('T4: a picture is read once', () => {
     expect(screen.getByRole('button', { name: named(copy.open, 'tafel.png') })).toBeInTheDocument()
   })
 
+  it('is not read again when a language switch invalidates every query', async () => {
+    mockedContent.mockResolvedValue(new Blob(['png'], { type: 'image/png' }))
+    const { client } = renderCard(request([message([picture()])]))
+    await screen.findByRole('button', { name: named(copy.open, 'tafel.png') })
+
+    // What AppProviders does on `languageChanged`.
+    await act(async () => {
+      await client.invalidateQueries()
+    })
+    expect(mockedContent).toHaveBeenCalledTimes(1)
+  })
+
+  it('keeps a picture on screen when a later read of it fails', async () => {
+    mockedContent.mockResolvedValue(new Blob(['png'], { type: 'image/png' }))
+    const { client } = renderCard(request([message([picture()])]))
+    await screen.findByRole('button', { name: named(copy.open, 'tafel.png') })
+
+    mockedContent.mockRejectedValue(new ApiError('boom', { status: 500 }))
+    const query = client.getQueryCache().find({ queryKey: teacherQueryKeys.helpRequestAttachment('r1', 'att-1') })
+    await act(async () => {
+      await query?.fetch().catch(() => undefined)
+    })
+    await waitFor(() => expect(query?.state.status).toBe('error'))
+    expect(screen.getByRole('button', { name: named(copy.open, 'tafel.png') })).toBeInTheDocument()
+    expect(screen.queryByText(copy.failed)).toBeNull()
+  })
+
   it('is not read again when it leaves the screen and comes back', async () => {
     mockedContent.mockResolvedValue(new Blob(['png'], { type: 'image/png' }))
     const { rerender } = renderCard(request([message([picture()])]))
@@ -262,6 +320,8 @@ describe('copy', () => {
     for (const locale of [de, en, fr, italian]) {
       const lines = locale.detail.attachments
       for (const key of ['alt', 'open', 'retryNamed'] as const) expect(lines[key]).toContain('{{name}}')
+      // The retry button's name starts with its visible text (WCAG 2.5.3).
+      expect(lines.retryNamed.startsWith(lines.retry)).toBe(true)
       for (const key of ['label', 'loading', 'unavailable', 'failed', 'retry'] as const) {
         expect(lines[key]).not.toContain('{{')
       }

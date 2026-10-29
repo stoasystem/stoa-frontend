@@ -47,19 +47,34 @@ export function HelpRequestAttachments({
   )
 }
 
+/**
+ * What the browser is asked to draw: the two types the backend takes as a
+ * picture. The summary's `mediaType` is what the upload claimed; this is what
+ * came back, checked before it gets an address (#510).
+ */
+const DRAWN_TYPES = new Set(['image/png', 'image/jpeg'])
+
+function drawnType(blob: Blob) {
+  return DRAWN_TYPES.has(blob.type.split(';')[0].trim().toLowerCase())
+}
+
 const TILE = 'flex min-h-24 w-32 flex-col items-center justify-center gap-1 rounded-md border bg-secondary p-2 text-center text-xs text-muted-foreground'
 
 function AttachmentImage({ requestId, attachment }: { requestId: string; attachment: AttachmentSummary }) {
   const { t } = useTranslation('teacher')
   const query = useTeacherHelpAttachmentQuery(requestId, attachment.attachmentId)
-  const url = useObjectUrl(query.data)
+  const blob = query.data && drawnType(query.data) ? query.data : undefined
+  const url = useObjectUrl(blob)
   // Read, but not a picture the browser can draw.
   const [undrawable, setUndrawable] = useState(false)
   const name = attachment.filename
   const alt = t('detail.attachments.alt', { name })
 
-  if (undrawable || isHelpRequestOutOfReach(query.error)) return <Unavailable filename={name} />
-  if (query.isError) {
+  if (undrawable || (query.data && !blob) || isHelpRequestOutOfReach(query.error)) {
+    return <Unavailable filename={name} />
+  }
+  // A failed read again keeps a picture already on screen.
+  if (query.isError && !query.data) {
     return (
       <div className={TILE} data-attachment-state="failed">
         <span>{t('detail.attachments.failed')}</span>
