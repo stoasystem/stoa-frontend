@@ -1,7 +1,13 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { uploadFile } from '@/services/files/fileApi'
 import { problemFor, type AttachmentProblem } from '@/services/files/attachmentProblems'
-import { ATTACHMENTS_PER_MESSAGE, rejectionFor } from '@/services/files/uploadLimits'
+import { prepareImage } from '@/services/files/prepareImage'
+import {
+  ATTACHMENTS_PER_MESSAGE,
+  isPreparedImage,
+  rejectionFor,
+  uploadRejectionFor,
+} from '@/services/files/uploadLimits'
 import type { ChatAttachment } from '@/types/chat'
 import type { AttachmentReference } from '@/types/file'
 
@@ -27,6 +33,25 @@ export type AttachmentDraft = {
 /** Time enough for a question to reach the server once it is sent. */
 const EXPIRY_MARGIN_MS = 2 * 60 * 1000
 
+/**
+ * A photo goes up as the JPEG the browser made of it (#508); any other file
+ * goes up as it is. Photos are prepared one at a time (`serially`): eight
+ * chosen at once and decoded together held all eight in a phone's memory.
+ *
+ * The JPEG is held against the backend's 10 MB once more. At 1568 px a side
+ * it cannot come near that, so one that does is a fault here, not a photo too
+ * big to send, and is said as one: the tray's "too big" names the 30 MB a
+ * photo may be as chosen.
+ */
+async function prepareAndUpload(file: File, serially: <T>(work: () => Promise<T>) => Promise<T>) {
+  if (!isPreparedImage(file.name)) return uploadFile({ file })
+  const prepared = await serially(() => prepareImage(file))
+  if (uploadRejectionFor(prepared) === 'tooLarge') {
+    throw new Error(`${prepared.name} is still over the upload limit once shrunk.`)
+  }
+  return uploadFile({ file: prepared })
+}
+
 let counter = 0
 const nextLocalId = () => `attachment-${Date.now()}-${(counter += 1)}`
 
@@ -43,6 +68,10 @@ const hasId = (draft: AttachmentDraft): draft is AttachmentDraft & { uploadId: s
  * The ids are the uploads' own: an upload that passed is `validated`, and the
  * message that carries `{uploadId}` is what makes it an attachment (#507).
  *
+ * A photo is shrunk and written again as a JPEG in the browser first
+ * (`prepareImage`, #508), which drops its EXIF and turns a HEIC into
+ * something the backend takes.
+ *
  * Nothing here reads the server's prose. A file that cannot be sent at all is
  * refused before the first request (`rejectionFor`); a request that fails comes
  * back as one of a handful of problems with a sentence of its own.
@@ -58,6 +87,13 @@ export function useAttachmentUploads() {
   /** More files were chosen than a message carries; the extras were left out. */
   const [overflow, setOverflow] = useState(false)
   const held = useRef<AttachmentDraft[]>([])
+  // The photo being prepared, which the next one waits for.
+  const preparing = useRef<Promise<unknown>>(Promise.resolve())
+  const serially = useCallback(<T,>(work: () => Promise<T>) => {
+    const done = preparing.current.then(work)
+    preparing.current = done.catch(() => undefined)
+    return done
+  }, [])
   const mounted = useRef(true)
   useEffect(() => {
     mounted.current = true
@@ -100,13 +136,22 @@ export function useAttachmentUploads() {
       })
       write([...held.current, ...made])
       for (const { localId, file } of started) {
-        void uploadFile({ file }).then(
-          (upload) => settle(localId, { state: 'ready', uploadId: upload.uploadId, expiresAt: upload.expiresAt }),
+        void prepareAndUpload(file, serially).then(
+          // Named as it went up: a HEIC is a JPEG by now.
+          (upload) =>
+            settle(localId, {
+              state: 'ready',
+              uploadId: upload.uploadId,
+              expiresAt: upload.expiresAt,
+              filename: upload.filename,
+              mimeType: upload.mimeType,
+              sizeBytes: upload.sizeBytes,
+            }),
           (error: unknown) => settle(localId, { state: 'failed', problem: problemFor(error) }),
         )
       }
     },
-    [settle, write],
+    [serially, settle, write],
   )
 
   const remove = useCallback(

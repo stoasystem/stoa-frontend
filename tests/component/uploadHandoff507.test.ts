@@ -25,6 +25,12 @@ vi.mock('@/services/api/httpClient', async (importOriginal) => ({
   httpClient: { get: vi.fn(), post: vi.fn(), put: vi.fn(), patch: vi.fn(), delete: vi.fn() },
 }))
 
+// jsdom draws nothing; shrinking a photo is prepareImage508's.
+vi.mock('@/services/files/prepareImage', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@/services/files/prepareImage')>()),
+  prepareImage: vi.fn(async (file: File) => file),
+}))
+
 const post = vi.mocked(httpClient.post)
 const put = vi.mocked(httpClient.put)
 const get = vi.mocked(httpClient.get)

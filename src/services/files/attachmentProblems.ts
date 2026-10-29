@@ -1,4 +1,5 @@
 import { ApiError } from '@/services/api/httpClient'
+import { ImagePreparationError } from '@/services/files/prepareImage'
 import { UploadRejectedError } from '@/services/files/fileApi'
 
 /**
@@ -20,6 +21,7 @@ export type AttachmentProblem =
   | 'quota'
   | 'unavailable'
   | 'tooMany'
+  | 'unreadable'
   | 'failed'
 
 const BY_CODE: Readonly<Record<string, AttachmentProblem>> = {
@@ -36,6 +38,8 @@ const BY_CODE: Readonly<Record<string, AttachmentProblem>> = {
 }
 
 export function problemFor(error: unknown): AttachmentProblem {
+  // The browser could not open the photo to shrink it (#508).
+  if (error instanceof ImagePreparationError) return 'unreadable'
   if (error instanceof UploadRejectedError) {
     return error.reason === 'too_large' ? 'tooLarge' : 'unsupported'
   }
