@@ -92,7 +92,7 @@ describe('an upload that passed', () => {
       mimeType: 'image/png',
       sizeBytes: 2048,
     })
-    expect(post).toHaveBeenCalledWith('/files/up-1/complete', { partCount: 1 })
+    expect(post).toHaveBeenCalledWith('/files/up-1/complete', { partCount: 1 }, expect.anything())
   })
 
   it('is refused with the 422 a file that does not pass gets, in words the tray has', async () => {

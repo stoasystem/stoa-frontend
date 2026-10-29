@@ -25,7 +25,7 @@ export const OFF_API_CALLS = [
   {
     file: 'src/services/files/fileApi.ts',
     text: 'fetch(part.url',
-    // ADR-004, stoa-backend#152: the URL is the one `POST /files/{id}/parts/{n}`
+    // stoa-backend's ADR-004 and #152: the URL is the one `POST /files/{id}/parts/{n}`
     // signed for this part alone, which is the call checked here (#516).
     reason: "a part's bytes go straight to S3, on the URL the API presigned for it",
   },

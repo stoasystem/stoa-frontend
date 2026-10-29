@@ -13,10 +13,12 @@
  * OpenAPI gives, and the global `fetch` that S3 would answer.
  */
 import { createHash } from 'node:crypto'
+import { act, renderHook, waitFor } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { useAttachmentUploads } from '@/features/uploads/useAttachmentUploads'
 import { ApiError, httpClient } from '@/services/api/httpClient'
 import { problemFor } from '@/services/files/attachmentProblems'
-import { UploadPartError, uploadFile } from '@/services/files/fileApi'
+import { PART_PUT_LIMIT_MS, UploadPartError, uploadFile } from '@/services/files/fileApi'
 
 vi.mock('@/services/api/httpClient', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@/services/api/httpClient')>()),
@@ -61,7 +63,7 @@ beforeEach(() => {
           expiresAt: '2026-10-29T10:30:00Z',
           maxBytes: 10 * MiB,
           chunkBytes: CHUNK_BYTES,
-          acceptedTypes: ['image/png'],
+          acceptedTypes: ['image/png', 'application/pdf'],
           status: 'pending_upload',
         },
       }
@@ -114,7 +116,7 @@ describe('a photo of nearly 10 MiB', () => {
       'S3 2',
       'POST /files/up-1/complete',
     ])
-    expect(post).toHaveBeenLastCalledWith('/files/up-1/complete', { partCount: 2 })
+    expect(post).toHaveBeenLastCalledWith('/files/up-1/complete', { partCount: 2 }, expect.anything())
   })
 
   it('asks for each URL with the part’s exact length and its SHA-256 in hex', async () => {
@@ -124,11 +126,16 @@ describe('a photo of nearly 10 MiB', () => {
 
     const first = bytes.subarray(0, CHUNK_BYTES)
     const second = bytes.subarray(CHUNK_BYTES)
-    expect(post).toHaveBeenCalledWith('/files/up-1/parts/1', { sizeBytes: CHUNK_BYTES, checksumSha256: checksum(first) })
-    expect(post).toHaveBeenCalledWith('/files/up-1/parts/2', {
-      sizeBytes: second.length,
-      checksumSha256: checksum(second),
-    })
+    expect(post).toHaveBeenCalledWith(
+      '/files/up-1/parts/1',
+      { sizeBytes: CHUNK_BYTES, checksumSha256: checksum(first) },
+      expect.anything(),
+    )
+    expect(post).toHaveBeenCalledWith(
+      '/files/up-1/parts/2',
+      { sizeBytes: second.length, checksumSha256: checksum(second) },
+      expect.anything(),
+    )
     expect(checksum(first)).toMatch(/^[0-9a-f]{64}$/)
   })
 
@@ -227,5 +234,106 @@ describe('a part the API will not sign', () => {
     expect(failed).toBe(conflict)
     expect(problemFor(failed)).toBe('expired')
     expect(s3).not.toHaveBeenCalled()
+    // A refusal is the answer: the URL is not asked for again.
+    expect(post.mock.calls.filter(([url]) => url === '/files/up-1/parts/1')).toHaveLength(1)
+  })
+
+  it('is asked for once more when the API could not answer', async () => {
+    const answer = post.getMockImplementation()!
+    let refused = false
+    post.mockImplementation(async (url: string, body?: unknown) => {
+      if (url === '/files/up-1/parts/1' && !refused) {
+        refused = true
+        throw new ApiError('Service unavailable.', { status: 503, code: 'upload_service_unavailable' })
+      }
+      return answer(url, body)
+    })
+
+    await expect(uploadFile({ file: new File(['photo'], 'p.png', { type: 'image/png' }) })).resolves.toMatchObject({
+      uploadId: 'up-1',
+    })
+    expect(partUrlsAsked[1]).toBe(1)
+    expect(post.mock.calls.filter(([url]) => url === '/files/up-1/parts/1')).toHaveLength(2)
+  })
+})
+
+describe('a part that never reached S3', () => {
+  it('is "not added, try again" when `complete` says so, not "this kind cannot be sent"', async () => {
+    const answer = post.getMockImplementation()!
+    post.mockImplementation(async (url: string, body?: unknown) => {
+      if (url === '/files/up-1/complete') throw new ApiError('Invalid.', { status: 422, code: 'upload_invalid' })
+      return answer(url, body)
+    })
+
+    const failed = await uploadFile({ file: new File(['photo'], 'p.png', { type: 'image/png' }) }).catch(
+      (error: unknown) => error,
+    )
+
+    expect(problemFor(failed)).toBe('failed')
+  })
+})
+
+/** S3 as a line that never finishes: the PUT ends only when it is let go. */
+function hangingS3() {
+  s3.mockImplementation(
+    (_url, init) =>
+      new Promise<Response>((_, reject) =>
+        init.signal?.addEventListener('abort', () => reject(new DOMException('Aborted', 'AbortError'))),
+      ),
+  )
+}
+
+describe('a PUT that hangs', () => {
+  it('is let go after its time and sent again on a fresh URL', async () => {
+    // Only the timers: hashing the part is WebCrypto's, on a thread of its own.
+    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] })
+    try {
+      hangingS3()
+      s3.mockImplementationOnce(
+        (_url, init) =>
+          new Promise<Response>((_, reject) =>
+            init.signal?.addEventListener('abort', () => reject(new DOMException('Aborted', 'AbortError'))),
+          ),
+      ).mockResolvedValueOnce(new Response(null, { status: 200 }))
+
+      const done = uploadFile({ file: new File(['photo'], 'p.png', { type: 'image/png' }) })
+      while (s3.mock.calls.length === 0) await new Promise((resolve) => setImmediate(resolve))
+      await vi.advanceTimersByTimeAsync(PART_PUT_LIMIT_MS - 1000)
+      expect(partUrlsAsked[1]).toBe(1)
+      await vi.advanceTimersByTimeAsync(1000)
+
+      await expect(done).resolves.toMatchObject({ uploadId: 'up-1' })
+      expect(partUrlsAsked[1]).toBe(2)
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+})
+
+describe('a file taken out of the tray while it goes up', () => {
+  it('stops its PUT, and the upload is never completed', async () => {
+    hangingS3()
+    const { result } = renderHook(() => useAttachmentUploads())
+
+    act(() => result.current.add([new File(['notes'], 'notes.pdf', { type: 'application/pdf' })]))
+    await waitFor(() => expect(s3).toHaveBeenCalledTimes(1))
+    const putSignal = s3.mock.calls[0][1].signal!
+    expect(putSignal.aborted).toBe(false)
+
+    act(() => result.current.remove(result.current.drafts[0].localId))
+
+    expect(putSignal.aborted).toBe(true)
+    await new Promise((resolve) => setTimeout(resolve, 20))
+    expect(s3).toHaveBeenCalledTimes(1)
+    expect(sent).not.toContain('POST /files/up-1/complete')
+  })
+
+  it('goes up whole when it is left in (the negative control)', async () => {
+    const { result } = renderHook(() => useAttachmentUploads())
+
+    act(() => result.current.add([new File(['notes'], 'notes.pdf', { type: 'application/pdf' })]))
+
+    await waitFor(() => expect(result.current.drafts[0]?.state).toBe('ready'))
+    expect(sent).toContain('POST /files/up-1/complete')
   })
 })

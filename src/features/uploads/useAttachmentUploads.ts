@@ -43,13 +43,20 @@ const EXPIRY_MARGIN_MS = 2 * 60 * 1000
  * big to send, and is said as one: the tray's "too big" names the 30 MB a
  * photo may be as chosen.
  */
-async function prepareAndUpload(file: File, serially: <T>(work: () => Promise<T>) => Promise<T>) {
-  if (!isPreparedImage(file.name)) return uploadFile({ file })
-  const prepared = await serially(() => prepareImage(file))
+async function prepareAndUpload(
+  file: File,
+  serially: <T>(work: () => Promise<T>) => Promise<T>,
+  signal: AbortSignal,
+) {
+  if (!isPreparedImage(file.name)) return uploadFile({ file, signal })
+  // One taken out while it waited its turn is not opened at all.
+  const prepared = await serially(() =>
+    signal.aborted ? Promise.reject(new DOMException('aborted', 'AbortError')) : prepareImage(file),
+  )
   if (uploadRejectionFor(prepared) === 'tooLarge') {
     throw new Error(`${prepared.name} is still over the upload limit once shrunk.`)
   }
-  return uploadFile({ file: prepared })
+  return uploadFile({ file: prepared, signal })
 }
 
 let counter = 0
@@ -88,6 +95,14 @@ export function useAttachmentUploads() {
   /** More files were chosen than a message carries; the extras were left out. */
   const [overflow, setOverflow] = useState(false)
   const held = useRef<AttachmentDraft[]>([])
+  // Each file still on its way, by row: taking it out stops its upload (#516).
+  const inFlight = useRef(new Map<string, AbortController>())
+  const letGo = useCallback((localIds: Iterable<string>) => {
+    for (const localId of localIds) {
+      inFlight.current.get(localId)?.abort()
+      inFlight.current.delete(localId)
+    }
+  }, [])
   // The photo being prepared, which the next one waits for.
   const preparing = useRef<Promise<unknown>>(Promise.resolve())
   const serially = useCallback(<T,>(work: () => Promise<T>) => {
@@ -98,8 +113,12 @@ export function useAttachmentUploads() {
   const mounted = useRef(true)
   useEffect(() => {
     mounted.current = true
+    const uploads = inFlight.current
     return () => {
       mounted.current = false
+      // Closed with files still going up: nothing will send them.
+      for (const controller of uploads.values()) controller.abort()
+      uploads.clear()
     }
   }, [])
 
@@ -137,19 +156,25 @@ export function useAttachmentUploads() {
       })
       write([...held.current, ...made])
       for (const { localId, file } of started) {
-        void prepareAndUpload(file, serially).then(
-          // Named as it went up: a HEIC is a JPEG by now.
-          (upload) =>
-            settle(localId, {
-              state: 'ready',
-              uploadId: upload.uploadId,
-              expiresAt: upload.expiresAt,
-              filename: upload.filename,
-              mimeType: upload.mimeType,
-              sizeBytes: upload.sizeBytes,
-            }),
-          (error: unknown) => settle(localId, { state: 'failed', problem: problemFor(error) }),
-        )
+        const controller = new AbortController()
+        inFlight.current.set(localId, controller)
+        void prepareAndUpload(file, serially, controller.signal)
+          .finally(() => {
+            if (inFlight.current.get(localId) === controller) inFlight.current.delete(localId)
+          })
+          .then(
+            // Named as it went up: a HEIC is a JPEG by now.
+            (upload) =>
+              settle(localId, {
+                state: 'ready',
+                uploadId: upload.uploadId,
+                expiresAt: upload.expiresAt,
+                filename: upload.filename,
+                mimeType: upload.mimeType,
+                sizeBytes: upload.sizeBytes,
+              }),
+            (error: unknown) => settle(localId, { state: 'failed', problem: problemFor(error) }),
+          )
       }
     },
     [serially, settle, write],
@@ -158,15 +183,17 @@ export function useAttachmentUploads() {
   const remove = useCallback(
     (localId: string) => {
       setOverflow(false)
+      letGo([localId])
       write(held.current.filter((draft) => draft.localId !== localId))
     },
-    [write],
+    [letGo, write],
   )
 
   const clear = useCallback(() => {
     setOverflow(false)
+    letGo([...inFlight.current.keys()])
     write([])
-  }, [write])
+  }, [letGo, write])
 
   /**
    * The question went out with the files that were ready. One that failed stays
