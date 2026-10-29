@@ -30,6 +30,11 @@
     "sendBlocked": {
       "empty": "Écris d’abord ta question, puis envoie-la.",
       "busy": "C’est encore en cours d’envoi. Réessaie dans un instant."
+    },
+    "dictation": {
+      "windows": "Tu préfères parler ? Appuie sur Win + H et dis ta question.",
+      "mac": "Tu préfères parler ? Appuie sur la touche micro ou sur ton raccourci de dictée.",
+      "touch": "Tu préfères parler ? Touche le micro sur ton clavier."
     }
   },
   "errorBoundary": {

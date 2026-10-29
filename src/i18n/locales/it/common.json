@@ -30,6 +30,11 @@
     "sendBlocked": {
       "empty": "Scrivi prima la tua domanda, poi invia.",
       "busy": "È ancora in invio. Riprova tra un attimo."
+    },
+    "dictation": {
+      "windows": "Preferisci parlare? Premi Win + H e di’ la tua domanda.",
+      "mac": "Preferisci parlare? Premi il tasto del microfono o la tua scorciatoia per dettare.",
+      "touch": "Preferisci parlare? Tocca il microfono sulla tastiera."
     }
   },
   "errorBoundary": {

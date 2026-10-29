@@ -30,6 +30,11 @@
     "sendBlocked": {
       "empty": "Write your question first, then send.",
       "busy": "This is still going out. Try again in a moment."
+    },
+    "dictation": {
+      "windows": "Rather talk? Press Win + H and say your question.",
+      "mac": "Rather talk? Press the microphone key or your dictation shortcut.",
+      "touch": "Rather talk? Tap the microphone on your keyboard."
     }
   },
   "errorBoundary": {

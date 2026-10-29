@@ -457,6 +457,7 @@ export function AskPanel({
           onSubmit={submit}
           onAttach={ATTACHMENTS_WORK ? () => picker.current?.click() : undefined}
           onCapture={ATTACHMENTS_WORK && touch ? () => camera.current?.click() : undefined}
+          dictationHint="inline"
           label={t('ask.composerLabel')}
           placeholder={practice ? t('ask.practice.placeholder') : t('ask.placeholder')}
           busy={isStreaming || createConversation.isPending || attachments.uploading}
