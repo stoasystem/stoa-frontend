@@ -46,7 +46,7 @@ const KNOWN: Record<string, Copy[]> = {
 /** The title and summary to show, in the reader's language where the English is known. */
 export function notificationText(
   event: Pick<NotificationEvent, 'eventType' | 'targetType' | 'title' | 'summary'>,
-  t: TFunction<['common', 'chat']>,
+  t: TFunction<'common'>,
 ): { title: string; summary: string } {
   const candidates = KNOWN[`${event.eventType}:${event.targetType}`] ?? []
   const match = candidates.find((copy) => copy.title === event.title && copy.summary === event.summary)

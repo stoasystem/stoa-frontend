@@ -13,7 +13,7 @@ import { notificationText } from '@/lib/notificationCopy'
 const events = deCommon.notifications.events
 
 function t() {
-  return i18n.getFixedT('de', ['common', 'chat']) as unknown as TFunction<['common', 'chat']>
+  return i18n.getFixedT('de', 'common') as unknown as TFunction<'common'>
 }
 
 function event(eventType: string, targetType: string, title: string, summary: string, metadata: Record<string, unknown> = {}) {

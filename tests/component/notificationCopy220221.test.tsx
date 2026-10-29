@@ -16,10 +16,11 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import i18n from '@/i18n'
 
 const adminEvents = vi.hoisted(() => ({ items: [] as unknown[] }))
+const bellEvents = vi.hoisted(() => ({ items: [] as unknown[] }))
 
 vi.mock('@/hooks/notifications/useNotificationsQuery', () => ({
   useAdminNotificationsQuery: () => ({ data: adminEvents, isLoading: false, isError: false }),
-  useNotificationsQuery: () => ({ data: { items: [] }, isLoading: false, isError: false }),
+  useNotificationsQuery: () => ({ data: bellEvents, isLoading: false, isError: false }),
   useUnreadNotificationCountQuery: () => ({ data: 0 }),
   useMarkNotificationReadMutation: () => ({ mutate: vi.fn() }),
   useArchiveNotificationMutation: () => ({ mutate: vi.fn() }),
@@ -84,6 +85,7 @@ function adminEvent(fields: Record<string, unknown>) {
 beforeEach(async () => {
   await i18n.changeLanguage('de')
   adminEvents.items = []
+  bellEvents.items = []
 })
 
 describe("the system page's operational notifications in German", () => {
@@ -142,6 +144,31 @@ describe('the operational labels exist in all four languages', () => {
     for (const type of EVENT_TYPES) expect(labels.eventTypes[type], `${lng} ${type}`).toBeTruthy()
     for (const target of TARGET_TYPES) expect(labels.targetTypes[target], `${lng} ${target}`).toBeTruthy()
     for (const status of STATUSES) expect(common.notifications.itemStatus[status], `${lng} ${status}`).toBeTruthy()
+  })
+})
+
+// stoa-backend#161 (#518): the backend renders a help request sent to every
+// teacher in the reader's language; the bell shows it as it came.
+describe("a German teacher's bell", () => {
+  it('shows a help request in German, as the backend rendered it', async () => {
+    useAuthStore.setState({ user: { id: 't', email: 't@test.stoaedu.ch', name: 'T', role: 'teacher' } as never })
+    bellEvents.items = [
+      adminEvent({
+        eventId: 'e-help',
+        recipientRole: 'teacher',
+        eventType: 'teacher_requested',
+        targetType: 'question',
+        title: 'Hilfe angefragt',
+        summary: 'Eine Schülerin oder ein Schüler bittet um Hilfe bei einer Frage in Mathematik.',
+        metadata: { subject: 'math' },
+      }),
+    ]
+    render(wrap(<NotificationCenter />))
+    await userEvent.click(screen.getByRole('button', { name: /^Mitteilungen/ }))
+
+    expect(screen.getByText('Hilfe angefragt')).toBeInTheDocument()
+    expect(screen.getByText('Eine Schülerin oder ein Schüler bittet um Hilfe bei einer Frage in Mathematik.')).toBeInTheDocument()
+    expect(screen.queryByText(/requested|math/)).toBeNull()
   })
 })
 
