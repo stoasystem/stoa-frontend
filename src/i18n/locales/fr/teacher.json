@@ -64,7 +64,17 @@
     "reportContext": "Envoyer le contexte de cette demande à la modération interne.",
     "noNotes": "Aucune note d’enseignant pour l’instant.",
     "replyPaused": "Impossible d’actualiser la demande pour le moment. Votre brouillon est conservé ; vous pourrez l’envoyer dès que la connexion sera rétablie.",
-    "openAutomation": "Attribuer des exercices à {{name}} dans l’automatisation de l’apprentissage"
+    "openAutomation": "Attribuer des exercices à {{name}} dans l’automatisation de l’apprentissage",
+    "attachments": {
+      "label": "Pièces jointes",
+      "alt": "Image envoyée par l’élève : {{name}}",
+      "open": "Agrandir l’image : {{name}}",
+      "loading": "Chargement de l’image …",
+      "unavailable": "Image non disponible",
+      "failed": "Impossible de charger l’image.",
+      "retry": "Réessayer",
+      "retryNamed": "Recharger l’image : {{name}}"
+    }
   },
   "profile": {
     "eyebrow": "Compte enseignant",

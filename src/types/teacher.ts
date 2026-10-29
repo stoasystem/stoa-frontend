@@ -1,4 +1,5 @@
 import type { ChatMessage } from '@/types/chat'
+import type { AttachmentSummary } from '@/types/file'
 import type { PracticeTeacherRequestContext } from '@/types/practice'
 import type { TeacherHelpStatus } from '@/types/teacherHelp'
 
@@ -45,6 +46,15 @@ export type TeacherHelpRequestNote = {
   responseFormat?: string
 }
 
+/**
+ * A message of the help request's conversation as the teacher reads it. Its
+ * attachments come as the server's summaries (`attachmentId`, `mediaType`),
+ * not in the shape the student's own thread keeps them (#510).
+ */
+export type TeacherHelpMessage = Omit<ChatMessage, 'attachments'> & {
+  attachments?: AttachmentSummary[]
+}
+
 export type TeacherHelpRequestDetail = {
   requestId: string
   conversationId: string
@@ -57,7 +67,7 @@ export type TeacherHelpRequestDetail = {
   status: TeacherHelpStatus
   requestMessage?: string
   practiceContext?: PracticeTeacherRequestContext
-  messages: ChatMessage[]
+  messages: TeacherHelpMessage[]
   notes?: TeacherHelpRequestNote[]
   firstTeacherActionAt?: string
   sla?: TeacherSlaSnapshot

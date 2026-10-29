@@ -34,6 +34,19 @@ export async function getTeacherHelpRequestDetail(requestId: string) {
   return response.data
 }
 
+/**
+ * The bytes of a file the student sent in this help request (#510). The route
+ * wants the teacher's token, so an `<img src>` cannot read it: the caller
+ * shows the blob. 403/404 when this teacher may not read it (any more).
+ */
+export async function getTeacherHelpRequestAttachment(requestId: string, attachmentId: string) {
+  const response = await httpClient.get<Blob>(
+    apiPath`/teachers/me/help-requests/${requestId}/attachments/${attachmentId}/content`,
+    { responseType: 'blob' },
+  )
+  return response.data
+}
+
 export async function updateTeacherHelpRequestStatus({
   requestId,
   status,

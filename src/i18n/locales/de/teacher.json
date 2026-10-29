@@ -64,7 +64,17 @@
     "reportContext": "Diesen Anfragekontext an die interne Moderation senden.",
     "noNotes": "Noch keine Notizen der Lehrperson.",
     "replyPaused": "Die Anfrage konnte gerade nicht neu geladen werden. Ihr Entwurf bleibt erhalten; Sie können ihn senden, sobald die Verbindung wieder steht.",
-    "openAutomation": "Übungen für {{name}} in der Lernautomatisierung zuweisen"
+    "openAutomation": "Übungen für {{name}} in der Lernautomatisierung zuweisen",
+    "attachments": {
+      "label": "Anhänge",
+      "alt": "Bild der lernenden Person: {{name}}",
+      "open": "Bild vergrössern: {{name}}",
+      "loading": "Bild wird geladen …",
+      "unavailable": "Bild nicht verfügbar",
+      "failed": "Bild konnte nicht geladen werden.",
+      "retry": "Erneut laden",
+      "retryNamed": "Bild erneut laden: {{name}}"
+    }
   },
   "profile": {
     "eyebrow": "Lehrpersonen-Konto",
