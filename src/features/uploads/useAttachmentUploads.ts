@@ -3,6 +3,7 @@ import { uploadFile } from '@/services/files/fileApi'
 import { problemFor, type AttachmentProblem } from '@/services/files/attachmentProblems'
 import { ATTACHMENTS_PER_MESSAGE, rejectionFor } from '@/services/files/uploadLimits'
 import type { ChatAttachment } from '@/types/chat'
+import type { AttachmentReference } from '@/types/file'
 
 /** One file chosen in the composer, from the moment it is picked. */
 export type AttachmentDraft = {
@@ -12,8 +13,11 @@ export type AttachmentDraft = {
   sizeBytes: number
   mimeType: string
   state: 'uploading' | 'ready' | 'failed'
-  /** The id a message refers to. Present exactly when `state` is `ready`. */
-  attachmentId?: string
+  /**
+   * The validated upload a message refers to, as `{uploadId}`. Present exactly
+   * when `state` is `ready`; the attachment itself is made when the message is.
+   */
+  uploadId?: string
   /** Why it failed, as something the student can read. */
   problem?: AttachmentProblem
 }
@@ -21,8 +25,8 @@ export type AttachmentDraft = {
 let counter = 0
 const nextLocalId = () => `attachment-${Date.now()}-${(counter += 1)}`
 
-const hasId = (draft: AttachmentDraft): draft is AttachmentDraft & { attachmentId: string } =>
-  Boolean(draft.attachmentId)
+const hasId = (draft: AttachmentDraft): draft is AttachmentDraft & { uploadId: string } =>
+  Boolean(draft.uploadId)
 
 /**
  * The files waiting to go out with the next question (#125).
@@ -31,6 +35,8 @@ const hasId = (draft: AttachmentDraft): draft is AttachmentDraft & { attachmentI
  * front of it did, with the online classroom. This is that front: files are
  * uploaded as soon as they are chosen, so pressing send only has ids to pass,
  * and `attachmentIds` on the message is never a promise the upload has not kept.
+ * The ids are the uploads' own: an upload that passed is `validated`, and the
+ * message that carries `{uploadId}` is what makes it an attachment (#507).
  *
  * Nothing here reads the server's prose. A file that cannot be sent at all is
  * refused before the first request (`rejectionFor`); a request that fails comes
@@ -90,13 +96,7 @@ export function useAttachmentUploads() {
       write([...held.current, ...made])
       for (const { localId, file } of started) {
         void uploadFile({ file }).then(
-          (file) =>
-            settle(localId, {
-              state: file.status === 'failed' ? 'failed' : 'ready',
-              ...(file.status === 'failed'
-                ? { problem: 'failed' as const }
-                : { attachmentId: file.id }),
-            }),
+          (upload) => settle(localId, { state: 'ready', uploadId: upload.uploadId }),
           (error: unknown) => settle(localId, { state: 'failed', problem: problemFor(error) }),
         )
       }
@@ -136,12 +136,15 @@ export function useAttachmentUploads() {
     remove,
     clear,
     clearSent,
-    /** The ids to send, in the order they were chosen. */
-    readyIds: ready.map((draft) => draft.attachmentId),
-    /** The same files as the message's own bubble shows them, before the server replies. */
+    /** What the message refers to, in the order the files were chosen. */
+    readyReferences: ready.map((draft): AttachmentReference => ({ uploadId: draft.uploadId })),
+    /**
+     * The same files as the message's own bubble shows them, before the server
+     * replies; until it does, the upload's id stands in for the attachment's.
+     */
     readyAttachments: ready.map(
       (draft): ChatAttachment => ({
-        id: draft.attachmentId,
+        id: draft.uploadId,
         filename: draft.filename,
         mimeType: draft.mimeType,
         sizeBytes: draft.sizeBytes,

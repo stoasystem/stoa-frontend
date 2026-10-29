@@ -1,4 +1,5 @@
 import type { ChatAttachment, ChatMessage, MessageQuote, PracticeContextRef } from '@/types/chat'
+import type { AttachmentReference } from '@/types/file'
 
 /**
  * One message on its way: what was asked, and the idempotency key that makes
@@ -11,7 +12,7 @@ import type { ChatAttachment, ChatMessage, MessageQuote, PracticeContextRef } fr
 export type PendingMessage = {
   idempotencyKey: string
   content: string
-  attachmentIds?: string[]
+  attachmentIds?: AttachmentReference[]
   attachments?: ChatAttachment[]
   askedAt: string
   /** Sent again as it was: the same command carries the same fields (#56). */
@@ -28,6 +29,24 @@ export type PendingMessage = {
 export const PENDING_MESSAGE_KEY_PREFIX = 'stoa_pending_chat_message:'
 const pendingKey = (conversationId: string) => `${PENDING_MESSAGE_KEY_PREFIX}${conversationId}`
 
+/**
+ * The references kept with a message, as `AttachmentReference` allows them:
+ * exactly one of `uploadId` and `attachmentId`. Anything else -- a bare id kept
+ * before references were sent (#507) -- is left out rather than sent for the
+ * backend to refuse the whole message over.
+ */
+function attachmentReferences(value: unknown): AttachmentReference[] | undefined {
+  if (!Array.isArray(value)) return undefined
+  const references = value.flatMap((entry): AttachmentReference[] => {
+    if (typeof entry !== 'object' || entry === null) return []
+    const { uploadId, attachmentId } = entry as Record<string, unknown>
+    if (typeof uploadId === 'string' && attachmentId === undefined) return [{ uploadId }]
+    if (typeof attachmentId === 'string' && uploadId === undefined) return [{ attachmentId }]
+    return []
+  })
+  return references.length > 0 ? references : undefined
+}
+
 export function readPendingMessage(conversationId: string): PendingMessage | null {
   try {
     const raw = sessionStorage.getItem(pendingKey(conversationId))
@@ -37,7 +56,7 @@ export function readPendingMessage(conversationId: string): PendingMessage | nul
     return {
       idempotencyKey: value.idempotencyKey,
       content: value.content,
-      attachmentIds: value.attachmentIds,
+      attachmentIds: attachmentReferences(value.attachmentIds),
       attachments: value.attachments,
       askedAt: typeof value.askedAt === 'string' ? value.askedAt : new Date(0).toISOString(),
       ...(value.practiceContext ? { practiceContext: value.practiceContext } : {}),

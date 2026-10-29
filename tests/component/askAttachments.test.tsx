@@ -2,10 +2,12 @@
  * Files sent with a question (#125).
  *
  * The backend's upload path never went away -- intent, chunks, complete, then
- * the attachment's id on the message -- only the front of it did, with the
+ * the upload's id on the message -- only the front of it did, with the
  * online classroom. These drive the real panel and let only the two services at
  * the edge be answered, so what is asserted is what would leave the browser:
- * the file goes up before the question does, the question carries its id, and a
+ * the file goes up before the question does, the question carries `{uploadId}`
+ * (#507; `uploadFile` itself, against the real `complete` answer, is
+ * `uploadHandoff507.test.ts`), and a
  * file that cannot be sent is refused in words the student can act on, never in
  * the server's own English.
  */
@@ -111,17 +113,9 @@ const picker = () => document.querySelector<HTMLInputElement>('input[type="file"
 const photo = (name = 'exercise.png', size = 2048) =>
   new File([new Uint8Array(size)], name, { type: 'image/png' })
 
-/** `/files/.../complete` as it answers for a file that went up whole. */
-function uploaded(id: string, filename: string) {
-  return {
-    id,
-    uploadId: `u-${id}`,
-    filename,
-    mimeType: 'image/png',
-    sizeBytes: 2048,
-    status: 'uploaded' as const,
-    createdAt: '2026-10-11T10:00:00.000Z',
-  }
+/** What `uploadFile` gives for a file that went up whole and passed: the upload, validated. */
+function uploaded(uploadId: string, filename: string) {
+  return { uploadId, filename, mimeType: 'image/png', sizeBytes: 2048 }
 }
 
 const originalMatchMedia = window.matchMedia
@@ -147,8 +141,8 @@ afterEach(() => {
 })
 
 describe('a question that carries a file', () => {
-  it('uploads it when it is chosen and sends its id with the question', async () => {
-    uploadMock.mockResolvedValue(uploaded('att-1', 'exercise.png'))
+  it('uploads it when it is chosen and sends it with the question by its upload id', async () => {
+    uploadMock.mockResolvedValue(uploaded('up-1', 'exercise.png'))
     const ask = openAsk()
     await ask.findByText('Linear equations')
 
@@ -161,7 +155,7 @@ describe('a question that carries a file', () => {
     await waitFor(() => expect(streamMock).toHaveBeenCalledTimes(1))
 
     const payload = streamMock.mock.calls[0][0].payload
-    expect(payload.attachmentIds).toEqual(['att-1'])
+    expect(payload.attachmentIds).toEqual([{ uploadId: 'up-1' }])
     expect(payload.content).toBe('What did I do wrong?')
   })
 
@@ -177,7 +171,7 @@ describe('a question that carries a file', () => {
   })
 
   it('shows the file on the student’s own bubble, before the server has seen it', async () => {
-    uploadMock.mockResolvedValue(uploaded('att-1', 'exercise.png'))
+    uploadMock.mockResolvedValue(uploaded('up-1', 'exercise.png'))
     streamMock.mockImplementation(() => new Promise(() => {}))
     const ask = openAsk()
     await ask.findByText('Linear equations')
@@ -206,7 +200,7 @@ describe('a question that carries a file', () => {
     expect(streamMock).not.toHaveBeenCalled()
     expect(ask.getByText('This is still going out. Try again in a moment.')).toBeInTheDocument()
 
-    finish(uploaded('att-1', 'exercise.png'))
+    finish(uploaded('up-1', 'exercise.png'))
     await waitFor(() => expect(ask.queryByText('Adding…')).toBeNull())
   })
 })
@@ -238,7 +232,7 @@ describe('a file that cannot be sent', () => {
   })
 
   it('lets a photo just under that limit through (the negative control)', async () => {
-    uploadMock.mockResolvedValue(uploaded('att-1', 'scan.png'))
+    uploadMock.mockResolvedValue(uploaded('up-1', 'scan.png'))
     const ask = openAsk()
     await ask.findByText('Linear equations')
 
@@ -284,7 +278,7 @@ describe('a file that cannot be sent', () => {
   })
 
   it('takes a file back out again', async () => {
-    uploadMock.mockResolvedValue(uploaded('att-1', 'exercise.png'))
+    uploadMock.mockResolvedValue(uploaded('up-1', 'exercise.png'))
     const ask = openAsk()
     await ask.findByText('Linear equations')
 

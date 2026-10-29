@@ -29,13 +29,14 @@ import {
  * answers 200, and `POST /files/{id}/complete` answers 200 with
  * `{"status":"validated","attachment":null}` -- every time, however often it
  * is called. `GET /files/attachments` answers 503 `upload_service_unavailable`.
- * So an upload completes and never becomes an attachment, and `uploadFile`
- * throws on exactly that case.
+ * That answer is the design, not the fault: the attachment is made when a
+ * message carries `{uploadId}`, and `uploadFile` now takes `validated` as done
+ * and the message sends the upload's id (#495, #507).
  *
  * The picker, the tray, the limits and their tests are all here and tested;
- * what is withheld is the button, because a paperclip that cannot finish is
- * worse than no paperclip. Flip this to `true` once a complete answers with an
- * attachment on production.
+ * what is withheld is the button, until the model reads the image too
+ * (stoa-backend#135) and a smoke run on production has sent one. Opening it
+ * is #512's.
  */
 const ATTACHMENTS_WORK = false
 import { AttachmentTray } from '@/features/uploads/AttachmentTray'
@@ -189,7 +190,7 @@ export function AskPanel({
 
   function startConversation(content: string, quote?: AskQuote | null) {
     if (creatingRef.current || createConversation.isPending) return
-    const attachmentIds = attachments.readyIds
+    const attachmentIds = attachments.readyReferences
     const carried = attachmentIds.length > 0
     const grade = conversationGrade(profile?.grade)
     const askedAt = new Date().toISOString()
@@ -288,7 +289,7 @@ export function AskPanel({
       return
     }
     if (isStreaming) return
-    const attachmentIds = attachments.readyIds
+    const attachmentIds = attachments.readyReferences
     const carried = attachments.readyAttachments
     setDraft('')
     clearQuote()

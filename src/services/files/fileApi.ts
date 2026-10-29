@@ -5,6 +5,7 @@ import type {
   UploadIntentResponse,
   UploadPurpose,
   UploadedFile,
+  ValidatedUpload,
 } from '@/types/file'
 
 export class UploadRejectedError extends Error {
@@ -41,14 +42,22 @@ async function completeUpload(uploadId: string, partCount: number) {
   return response.data
 }
 
-/** Upload one file through the intent, chunk and complete steps the API defines. */
+/**
+ * Upload one file through the intent, chunk and complete steps the API defines.
+ *
+ * What comes back is the upload, not an attachment: `complete` answers
+ * `{"status":"validated","attachment":null}` by design, and the attachment is
+ * made when a message carries `{uploadId}` (stoa-backend `complete_upload`,
+ * `SendMessageRequest.attachmentIds`; #495, #507). Any other status means the
+ * file did not pass, and is thrown.
+ */
 export async function uploadFile({
   file,
   purpose = 'conversation_attachment',
 }: {
   file: File
   purpose?: UploadPurpose
-}): Promise<UploadedFile> {
+}): Promise<ValidatedUpload> {
   const intent = await createUploadIntent(file, purpose)
 
   if (file.size > intent.maxBytes) {
@@ -65,19 +74,18 @@ export async function uploadFile({
   }
 
   const completed = await completeUpload(intent.uploadId, partCount)
-  const attachment = completed.attachment
-  if (!attachment) {
-    throw new Error(`Upload finished with status ${completed.status} and no attachment.`)
+  if (completed.status === 'invalid') {
+    throw new UploadRejectedError('unsupported_type', 'The upload did not pass validation.')
+  }
+  if (completed.status !== 'validated') {
+    throw new Error(`Upload finished with status ${completed.status}.`)
   }
 
   return {
-    id: attachment.attachmentId,
     uploadId: completed.uploadId,
-    filename: attachment.filename,
-    mimeType: attachment.mediaType,
-    sizeBytes: attachment.sizeBytes,
-    status: attachment.status === 'active' ? 'uploaded' : 'failed',
-    createdAt: attachment.createdAt,
+    filename: file.name,
+    mimeType: file.type,
+    sizeBytes: file.size,
   }
 }
 
