@@ -41,6 +41,7 @@ const EVENT_TYPES = [
   'teacher_takeover',
   'teacher_reply',
   'teacher_help_expired',
+  'teacher_help_dispatched',
   'moderation_case_update',
   'subscription_request_update',
   'learning_profile_update',
@@ -117,6 +118,21 @@ describe("the system page's operational notifications in German", () => {
     expect(screen.getByText('Fehlgeschlagen')).toBeInTheDocument()
     expect(screen.getByText('Änderung an einer Abonnementanfrage · Abonnementanfrage')).toBeInTheDocument()
     expect(screen.queryByText(/failed|subscription/)).toBeNull()
+  })
+
+  // stoa-backend#141 (#511): named, not filed under "other".
+  it('names a help request assigned to a teacher in German', () => {
+    adminEvents.items = [
+      adminEvent({
+        eventType: 'teacher_help_dispatched',
+        targetType: 'question',
+        title: 'Neue Hilfeanfrage für Sie',
+        summary: 'Fach: Mathematik. Bitte nehmen Sie die Anfrage innerhalb von 10 Minuten an.',
+      }),
+    ]
+    render(wrap(<AdminOperationalNotificationsCard />))
+    expect(screen.getByText(/^Hilfeanfrage zugewiesen · /)).toBeInTheDocument()
+    expect(screen.queryByText(/Anderes Ereignis|teacher_help_dispatched/)).toBeNull()
   })
 
   it('shows a type or status it does not know as a translated "other", never the id', () => {

@@ -10,8 +10,8 @@ import {
  * A teacher's notification settings (stoa-backend#141). Every help request
  * offered to a teacher leaves a notification in the bell, which cannot be
  * switched off, since the offer lapses unanswered; the reminder email that
- * goes with it can. The email's footer sends the teacher here by this card's
- * title.
+ * goes with it can. The card is named as the bell is in each language
+ * ("Mitteilungen"), like the student's group on /me.
  *
  * Solid `bg-card` (--surface), the background the contrast gate rates the off
  * toggle against.

@@ -870,6 +870,7 @@
       "learning_profile_update": "Änderung am Lernprofil",
       "moderation_case_update": "Änderung an einem Moderationsfall",
       "subscription_request_update": "Änderung an einer Abonnementanfrage",
+      "teacher_help_dispatched": "Hilfeanfrage zugewiesen",
       "teacher_help_expired": "Lehrpersonenhilfe abgelaufen",
       "teacher_reply": "Antwort einer Lehrperson",
       "teacher_requested": "Lehrperson angefragt",

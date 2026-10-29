@@ -884,6 +884,7 @@
       "learning_profile_update": "Mise à jour du profil d’apprentissage",
       "moderation_case_update": "Mise à jour d’un cas de modération",
       "subscription_request_update": "Mise à jour d’une demande d’abonnement",
+      "teacher_help_dispatched": "Demande d’aide attribuée",
       "teacher_help_expired": "Aide enseignante expirée",
       "teacher_reply": "Réponse d’un enseignant",
       "teacher_requested": "Enseignant demandé",

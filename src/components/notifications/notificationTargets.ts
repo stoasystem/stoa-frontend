@@ -10,8 +10,9 @@
  * request, a report the role cannot open) has no target: clicking it only
  * marks it read.
  *
- * A key may also name the event, `eventType:targetType`, where one event
- * means something else by the same target type; it is looked up first.
+ * Where one event means something else by the same target type, it has its
+ * own entry in NOTIFICATION_EVENT_TARGETS, looked up first. Only an event the
+ * payload names reaches those: a `targetType` alone never does.
  *
  * Every path here must be a page the manifest opens to that role; the test
  * holds each one against the manifest's access.
@@ -40,9 +41,6 @@ export const NOTIFICATION_TARGETS: Record<AppNavArea, Readonly<Record<string, Re
     recommendation: () => '/assignments',
   },
   teacher: {
-    // A help request offered to this teacher names the request itself
-    // (stoa-backend#141).
-    'teacher_help_dispatched:question': (id) => teacherRequestPathFor(id),
     // The request queue; a `question` id is not a help-request id.
     question: () => '/teacher',
   },
@@ -59,6 +57,17 @@ export const NOTIFICATION_TARGETS: Record<AppNavArea, Readonly<Record<string, Re
   organization: {},
 }
 
+/** By role area, then event type, then target type. */
+export const NOTIFICATION_EVENT_TARGETS: Partial<
+  Record<AppNavArea, Readonly<Record<string, Readonly<Record<string, Resolve>>>>>
+> = {
+  teacher: {
+    // A help request offered to this teacher names the request itself
+    // (stoa-backend#141).
+    teacher_help_dispatched: { question: (id) => teacherRequestPathFor(id) },
+  },
+}
+
 /** The page a notification opens for `role`, or null when it has none. */
 export function notificationTargetPath(event: Target, role: UserRole): string | null {
   const has = (object: object, key: string) => Object.prototype.hasOwnProperty.call(object, key)
@@ -67,12 +76,15 @@ export function notificationTargetPath(event: Target, role: UserRole): string | 
   // to have the declared type. Anything off is no target, never a throw that
   // would take the bell down with it.
   if (!has(NOTIFICATION_TARGETS, area)) return null
-  const targets = NOTIFICATION_TARGETS[area]
   const { eventType, targetType, targetId } = event as { eventType?: unknown; targetType: unknown; targetId: unknown }
   if (typeof targetType !== 'string') return null
-  const byEvent = typeof eventType === 'string' ? `${eventType}:${targetType}` : null
+  const id = typeof targetId === 'string' ? targetId : ''
   // Own keys only: a `targetType` of "constructor" must not reach Object's.
-  const key = byEvent && has(targets, byEvent) ? byEvent : targetType
-  if (!has(targets, key)) return null
-  return targets[key](typeof targetId === 'string' ? targetId : '')
+  const byEvent = has(NOTIFICATION_EVENT_TARGETS, area) ? NOTIFICATION_EVENT_TARGETS[area]! : {}
+  if (typeof eventType === 'string' && has(byEvent, eventType) && has(byEvent[eventType], targetType)) {
+    return byEvent[eventType][targetType](id)
+  }
+  const targets = NOTIFICATION_TARGETS[area]
+  if (!has(targets, targetType)) return null
+  return targets[targetType](id)
 }

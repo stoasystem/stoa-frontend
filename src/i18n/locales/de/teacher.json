@@ -99,7 +99,7 @@
       "paused": "Pausiert"
     },
     "notifications": {
-      "title": "Benachrichtigungseinstellungen",
+      "title": "Mitteilungen",
       "description": "Eine Hilfeanfrage, die Ihnen zugewiesen wird, erscheint immer in den Mitteilungen.",
       "dispatchEmail": {
         "title": "E-Mail bei neuen Hilfeanfragen",

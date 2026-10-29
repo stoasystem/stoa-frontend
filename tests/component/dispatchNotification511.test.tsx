@@ -8,7 +8,7 @@
  * checked is what reaches `PATCH /notifications/preferences`.
  */
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { render, screen, waitFor } from '@testing-library/react'
+import { act, render, renderHook, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { http, HttpResponse } from 'msw'
 import { Suspense } from 'react'
@@ -17,6 +17,10 @@ import { MemoryRouter } from 'react-router-dom'
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest'
 import { AppRoutes } from '@/app/router/AppRoutes'
 import { TeacherNotificationSettingsCard } from '@/components/teacher/TeacherNotificationSettingsCard'
+import {
+  useUpdateDispatchEmailMutation,
+  useUpdateNotificationPreferencesMutation,
+} from '@/hooks/notifications/useNotificationPreferences'
 import i18n from '@/i18n'
 import deTeacher from '@/i18n/locales/de/teacher.json'
 import { type CurrentUser, useAuthStore } from '@/store/authStore'
@@ -178,5 +182,69 @@ describe('the dispatch email switch', () => {
     const german = [de.description, de.dispatchEmail.body, de.saveFailed].join(' ')
     expect(german).toMatch(/\bIhnen\b|\bSie\b/)
     expect(german).not.toMatch(/\b(du|dir|dich|dein\w*)\b/i)
+  })
+})
+
+/*
+ * The switch and the matrix are written by two mutations, and each PATCH is
+ * answered with the whole stored record, which goes straight into the cache.
+ * Two writes in flight at once could land in either order, and the older
+ * answer would then show over the newer; they wait for each other instead.
+ */
+describe('a dispatch email write and a matrix write', () => {
+  it('go one after the other, never both at once', async () => {
+    const order: string[] = []
+    let release = () => {}
+    const held = new Promise<void>((resolve) => {
+      release = resolve
+    })
+    let inFlight = 0
+    let most = 0
+    mswServer.use(
+      http.get('https://api.test/notifications/preferences', () =>
+        HttpResponse.json({
+          userId: 't-1',
+          preferences: MATRIX,
+          dispatchEmail: true,
+          supportedCategories: Object.keys(MATRIX),
+          supportedChannels: ['email_digest', 'in_app', 'push', 'realtime'],
+          updatedAt: null,
+        }),
+      ),
+      http.patch('https://api.test/notifications/preferences', async ({ request }) => {
+        const sent = (await request.json()) as Record<string, unknown>
+        const which = 'dispatchEmail' in sent ? 'dispatchEmail' : 'matrix'
+        inFlight += 1
+        most = Math.max(most, inFlight)
+        order.push(`start ${which}`)
+        if (which === 'matrix') await held
+        order.push(`end ${which}`)
+        inFlight -= 1
+        return HttpResponse.json({
+          userId: 't-1',
+          preferences: MATRIX,
+          dispatchEmail: which === 'dispatchEmail' ? sent.dispatchEmail : true,
+          supportedCategories: Object.keys(MATRIX),
+          supportedChannels: ['email_digest', 'in_app', 'push', 'realtime'],
+          updatedAt: null,
+        })
+      }),
+    )
+    const queryClient = client()
+    const { result } = renderHook(
+      () => ({ matrix: useUpdateNotificationPreferencesMutation(), dispatch: useUpdateDispatchEmailMutation() }),
+      { wrapper: ({ children }) => <QueryClientProvider client={queryClient}>{children}</QueryClientProvider> },
+    )
+
+    act(() => result.current.matrix.mutate((matrix) => matrix))
+    await waitFor(() => expect(order).toEqual(['start matrix']))
+    act(() => result.current.dispatch.mutate(false))
+    // Give the second write every chance to go out early.
+    await new Promise((resolve) => setTimeout(resolve, 50))
+    expect(order).toEqual(['start matrix'])
+
+    release()
+    await waitFor(() => expect(order).toEqual(['start matrix', 'end matrix', 'start dispatchEmail', 'end dispatchEmail']))
+    expect(most).toBe(1)
   })
 })

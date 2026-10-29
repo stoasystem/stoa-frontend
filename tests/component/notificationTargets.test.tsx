@@ -11,7 +11,11 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { isAdmitted } from '@/app/router/AppRoutes'
 import { askPathFor, navAreaForRole, pageRoutes } from '@/app/router/routeManifest'
 import { NotificationCenter } from '@/components/notifications/NotificationCenter'
-import { NOTIFICATION_TARGETS, notificationTargetPath } from '@/components/notifications/notificationTargets'
+import {
+  NOTIFICATION_EVENT_TARGETS,
+  NOTIFICATION_TARGETS,
+  notificationTargetPath,
+} from '@/components/notifications/notificationTargets'
 import { type CurrentUser, useAuthStore } from '@/store/authStore'
 import type { NotificationEvent } from '@/types/notification'
 import type { UserRole } from '@/types/user'
@@ -216,9 +220,17 @@ function routeFor(path: string) {
 
 describe('every notification target', () => {
   it.each(ALL_ROLES)('is a page that admits a %s', (role) => {
-    const targets = Object.keys(NOTIFICATION_TARGETS[navAreaForRole(role)]).map((targetType) =>
-      notificationTargetPath({ targetType, targetId: 'id-1' }, role),
-    )
+    const area = navAreaForRole(role)
+    const targets = [
+      ...Object.keys(NOTIFICATION_TARGETS[area]).map((targetType) =>
+        notificationTargetPath({ targetType, targetId: 'id-1' }, role),
+      ),
+      ...Object.entries(NOTIFICATION_EVENT_TARGETS[area] ?? {}).flatMap(([eventType, byTarget]) =>
+        Object.keys(byTarget).map((targetType) =>
+          notificationTargetPath({ eventType, targetType, targetId: 'id-1' } as NotificationEvent, role),
+        ),
+      ),
+    ]
 
     const refused = targets.filter((path) => {
       const route = path ? routeFor(path) : undefined
@@ -257,10 +269,23 @@ describe('every notification target', () => {
     },
   )
 
-  it('gives an offered request no target for a role it is not offered to', () => {
+  it('leads any other role where its own target type does, never to the request', () => {
     const offered = { eventType: 'teacher_help_dispatched', targetType: 'question', targetId: 'req-1' } as const
     expect(notificationTargetPath(offered, 'student')).toBe('/ask')
     expect(notificationTargetPath(offered, 'admin')).toBeNull()
+  })
+
+  // Only an event the payload names reaches an event's own target: a target
+  // type spelled like one, or an event type off an object prototype, does not.
+  it.each([
+    [{ targetType: 'teacher_help_dispatched:question', targetId: 'req-1' }, null],
+    [{ targetType: 'teacher_help_dispatched', targetId: 'req-1' }, null],
+    [{ eventType: 'constructor', targetType: 'question', targetId: 'req-1' }, '/teacher'],
+    [{ eventType: '__proto__', targetType: 'question', targetId: 'req-1' }, '/teacher'],
+    [{ eventType: 'teacher_help_dispatched', targetType: 'constructor', targetId: 'req-1' }, null],
+    [{ eventType: 'teacher_help_dispatched', targetType: 'conversation', targetId: 'req-1' }, null],
+  ])('reaches an offered request only by its event (%o)', (payload, path) => {
+    expect(notificationTargetPath(payload as unknown as NotificationEvent, 'teacher')).toBe(path)
   })
 
   it('trims a conversation id the backend padded', () => {
