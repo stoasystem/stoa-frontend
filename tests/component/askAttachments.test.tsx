@@ -116,7 +116,8 @@ function openAsk() {
   return within(screen.getByRole('complementary', { name: 'Ask' }))
 }
 
-const picker = () => document.querySelector<HTMLInputElement>('input[type="file"]')!
+const picker = () => document.querySelector<HTMLInputElement>('input[type="file"]:not([data-ask-camera])')!
+const camera = () => document.querySelector<HTMLInputElement>('input[type="file"][data-ask-camera]')!
 
 const photo = (name = 'exercise.png', size = 2048) =>
   new File([new Uint8Array(size)], name, { type: 'image/png' })
@@ -301,6 +302,47 @@ describe('a question that carries a file', () => {
 
     finish(uploaded('up-1', 'exercise.png'))
     await waitFor(() => expect(ask.queryByText('Adding…')).toBeNull())
+  })
+})
+
+/**
+ * Taking a photo and choosing one are two entries (#509): `capture` makes a
+ * phone open its camera, and takes the gallery away, so the chooser has none.
+ * The buttons themselves wait behind `ATTACHMENTS_WORK` (#512); the Composer's
+ * camera button is baseComponentSizes'.
+ */
+describe('the camera and the chooser', () => {
+  it('opens the back camera for a photo, and only for a photo', async () => {
+    const ask = openAsk()
+    await ask.findByText('Linear equations')
+
+    expect(camera().getAttribute('capture')).toBe('environment')
+    expect(camera().accept).toBe('image/*')
+    expect(camera().multiple).toBe(false)
+  })
+
+  it('leaves the chooser without `capture`, so the gallery and files stay open (the negative control)', async () => {
+    const ask = openAsk()
+    await ask.findByText('Linear equations')
+
+    expect(picker().hasAttribute('capture')).toBe(false)
+    expect(picker().multiple).toBe(true)
+    expect(picker().accept.split(',')).toEqual(expect.arrayContaining(['.pdf', '.jpg', '.heic']))
+  })
+
+  it('puts the photo taken in the tray, shrunk, and sends it with the question', async () => {
+    uploadMock.mockResolvedValue(uploaded('up-1', 'image.jpg'))
+    const ask = openAsk()
+    await ask.findByText('Linear equations')
+
+    const taken = new File([new Uint8Array(2048)], 'image.jpg', { type: 'image/jpeg' })
+    await userEvent.upload(camera(), taken)
+    await ask.findByText('image.jpg')
+    expect(prepareMock.mock.calls[0][0]).toBe(taken)
+
+    await userEvent.type(ask.getByRole('textbox', { name: 'Your question' }), 'This one{Enter}')
+    await waitFor(() => expect(streamMock).toHaveBeenCalledTimes(1))
+    expect(streamMock.mock.calls[0][0].payload.attachmentIds).toEqual([{ uploadId: 'up-1' }])
   })
 })
 

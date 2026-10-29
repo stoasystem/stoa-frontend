@@ -24,7 +24,8 @@
     "tryAgain": "Riprova"
   },
   "composer": {
-    "attach": "Aggiungi una foto o un file",
+    "attach": "Scegli una foto o un file",
+    "capture": "Scatta una foto",
     "send": "Invia",
     "sendBlocked": {
       "empty": "Scrivi prima la tua domanda, poi invia.",

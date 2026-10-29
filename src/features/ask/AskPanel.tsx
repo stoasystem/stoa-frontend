@@ -44,6 +44,7 @@ import { useAttachmentUploads } from '@/features/uploads/useAttachmentUploads'
 import { ACCEPT_ATTRIBUTE } from '@/services/files/uploadLimits'
 import { useConversationsQuery } from '@/hooks/chat/useConversationsQuery'
 import { useCreateConversationMutation } from '@/hooks/chat/useCreateConversationMutation'
+import { TOUCH_QUERY, useMediaQuery } from '@/hooks/layout/useMediaQuery'
 import { useTeacherAvailabilityQuery } from '@/hooks/chat/useTeacherAvailabilityQuery'
 import { useRecommendationsQuery } from '@/hooks/learning/useWeakTopicsQuery'
 import { useStudentProfileQuery } from '@/hooks/student/useStudentProfileQuery'
@@ -181,6 +182,11 @@ export function AskPanel({
   // The files chosen for the next question, uploaded as they are picked (#125).
   const attachments = useAttachmentUploads()
   const picker = useRef<HTMLInputElement>(null)
+  // Taking a photo and choosing one are two entries (#509): with `capture` a
+  // phone opens the camera and offers no gallery, without it the gallery and
+  // files. Only where the camera opens is there a camera to show.
+  const camera = useRef<HTMLInputElement>(null)
+  const touch = useMediaQuery(TOUCH_QUERY)
   const { clearSent } = attachments
 
   // The exercise on screen goes out with every question asked beside it: the
@@ -448,11 +454,24 @@ export function AskPanel({
             event.target.value = ''
           }}
         />
+        <input
+          ref={camera}
+          type="file"
+          accept="image/*"
+          capture="environment"
+          data-ask-camera
+          className="hidden"
+          onChange={(event) => {
+            attachments.add(Array.from(event.target.files ?? []))
+            event.target.value = ''
+          }}
+        />
         <Composer
           value={draft}
           onChange={setDraft}
           onSubmit={submit}
           onAttach={ATTACHMENTS_WORK ? () => picker.current?.click() : undefined}
+          onCapture={ATTACHMENTS_WORK && touch ? () => camera.current?.click() : undefined}
           label={t('ask.composerLabel')}
           placeholder={practice ? t('ask.practice.placeholder') : t('ask.placeholder')}
           busy={isStreaming || createConversation.isPending || attachments.uploading}
