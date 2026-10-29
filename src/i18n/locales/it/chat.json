@@ -169,6 +169,7 @@
         "unsupported": "Questo tipo di file non si può inviare. Foto, PDF, Word, PowerPoint, Excel e file di testo sì.",
         "empty": "Questo file è vuoto. Scegline un altro.",
         "expired": "Questo file ha impiegato troppo tempo. Scegli di nuovo.",
+        "sendExpired": "Un file allegato ha impiegato troppo tempo. Sceglilo di nuovo, poi rifai la domanda.",
         "quota": "Non c’è più spazio per i file. Rimuovine prima uno più vecchio.",
         "unavailable": "Al momento non si possono aggiungere file. Riprova tra un attimo.",
         "failed": "Non è stato possibile aggiungere questo file. Riprova."
