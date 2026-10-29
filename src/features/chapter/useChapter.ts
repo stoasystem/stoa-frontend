@@ -17,13 +17,20 @@
  * while one it builds on is unlit; the roadmap does not say so, so its lessons
  * not done yet are read as locked here. Without the sky the chapter still
  * opens, and says neither.
+ *
+ * With the sky sent as a skeleton (#503) the point itself is read in full
+ * from the stars around it (`/knowledge-map/stars?around=`): its state, its
+ * small stars and which practice set is whose. Those stars are what an answer
+ * reads again; without them (a backend before stoa-backend#127) the chapter
+ * takes the point from the sky, as it always has.
  */
 import { useMemo } from 'react'
-import type { LearningState } from '@/features/starmap/model/starMap'
+import type { KnowledgeSkill, LearningState } from '@/features/starmap/model/starMap'
 import { useCurriculumCatalogQuery } from '@/hooks/practice/useCurriculumCatalogQuery'
 import { useKnowledgeMapQuery } from '@/hooks/practice/useKnowledgeMapQuery'
+import { subjectOfStar, useKnowledgeMapStarsQuery } from '@/hooks/practice/useKnowledgeMapStars'
 import { usePracticeRoadmapQuery } from '@/hooks/practice/usePracticeRoadmapQuery'
-import type { RoadmapLessonStatus } from '@/types/practice'
+import type { KnowledgeMapPracticeSet, RoadmapLessonStatus } from '@/types/practice'
 
 export type ChapterLessonStatus = RoadmapLessonStatus
 
@@ -49,6 +56,10 @@ export type Chapter = {
   nextLessonId: string | null
   /** The knowledge point as the star map has it, or null while the sky cannot be read. */
   star: { state: LearningState; unmetExercises: number } | null
+  /** Its small stars as the star map has them (#501); `[]` while the sky cannot be read. */
+  skills: KnowledgeSkill[]
+  /** Its practice sets, each under its small star (#503); `[]` when the backend does not say. */
+  practiceSets: KnowledgeMapPracticeSet[]
 }
 
 export type ChapterQuery =
@@ -80,7 +91,16 @@ export function lessonAfter(chapter: Chapter, lessonId: string): ChapterLesson |
   return rest.find((lesson) => isOpenLesson(lesson.status)) ?? null
 }
 
-export function useChapter(unitId: string | undefined): ChapterQuery {
+export type ChapterOptions = {
+  /**
+   * Wait for the point's small stars before the chapter is ready (#503): the
+   * small star's own page cannot say which practice sets are its own without
+   * them. The practice stage does not wait: its exercise does not need them.
+   */
+  waitForSkills?: boolean
+}
+
+export function useChapter(unitId: string | undefined, { waitForSkills = false }: ChapterOptions = {}): ChapterQuery {
   const catalogQuery = useCurriculumCatalogQuery()
   const catalog = catalogQuery.data
   const unit = catalog?.units.find((candidate) => candidate.id === unitId)
@@ -95,9 +115,19 @@ export function useChapter(unitId: string | undefined): ChapterQuery {
   // pending on every refetch (an answer asks for one), and the stage would
   // take the exercise away each time.
   const skyLoading = skyQuery.isLoading && skyQuery.errorUpdateCount === 0
-  const found = skyQuery.data?.stars.find((candidate) => candidate.unitId === unitId)
+  const skeleton = skyQuery.data?.view === 'skeleton'
+  // In the point's own galaxy: the backend finds `around` only in the subject it is asked about.
+  const subjectId = (unitId && subjectOfStar(skyQuery.data, unitId)) || unit?.subjectId || null
+  const aroundQuery = useKnowledgeMapStarsQuery(subjectId, unitId ?? null, { enabled: Boolean(unitId) && skeleton })
+  // Waited for once, like the sky, and only when asked to; a refusal leaves the point to the sky.
+  const aroundLoading = waitForSkills && aroundQuery.isLoading && aroundQuery.errorUpdateCount === 0
+  const full = aroundQuery.data?.stars.find((candidate) => candidate.unitId === unitId)
+  const found = full ?? skyQuery.data?.stars.find((candidate) => candidate.unitId === unitId)
   const starState = found?.state
   const unmetExercises = found?.unmetExercises ?? 0
+  // A skeleton's own small stars are not known, not none.
+  const skills = full ? full.skills : skeleton ? undefined : found?.skills
+  const practiceSets = full?.practiceSets
 
   return useMemo<ChapterQuery>(() => {
     if (!unitId) return { status: 'missing' }
@@ -107,7 +137,7 @@ export function useChapter(unitId: string | undefined): ChapterQuery {
     // or roadmap that never arrived is an error (#417).
     if (catalogFailed && !catalog) return { status: 'error', retry: () => void refetchCatalog() }
     if (!unit) return { status: 'missing' }
-    if (roadmapLoading || skyLoading) return { status: 'loading' }
+    if (roadmapLoading || skyLoading || aroundLoading) return { status: 'loading' }
     if (!roadmap) return { status: 'error', retry: () => void refetchRoadmap() }
     const roadmapUnit = roadmap.units.find((candidate) => candidate.id === unitId)
     if (!roadmapUnit) return { status: 'missing' }
@@ -140,15 +170,27 @@ export function useChapter(unitId: string | undefined): ChapterQuery {
         total: lessons.length,
         nextLessonId: nextLessonOf(lessons),
         star: starState ? { state: starState, unmetExercises } : null,
+        skills: skills ?? [],
+        practiceSets: practiceSets ?? [],
       },
     }
-  }, [unitId, unit, catalog, catalogLoading, catalogFailed, refetchCatalog, roadmap, roadmapLoading, refetchRoadmap, skyLoading, starState, unmetExercises])
+  }, [unitId, unit, catalog, catalogLoading, catalogFailed, refetchCatalog, roadmap, roadmapLoading, refetchRoadmap, skyLoading, aroundLoading, starState, unmetExercises, skills, practiceSets])
 }
 
 /** `/chapter/:unitId` and `/chapter/:unitId/:lessonId`, each segment encoded once. */
 export function chapterPath(unitId: string, lessonId?: string) {
   const base = `/chapter/${encodeURIComponent(unitId)}`
   return lessonId ? `${base}/${encodeURIComponent(lessonId)}` : base
+}
+
+/**
+ * A small star's own page (#501): its star's chapter, narrowed to the practice
+ * sets of the small star, as `?skill=`.
+ */
+export const SKILL_PARAM = 'skill'
+
+export function skillPath(unitId: string, skillId: string) {
+  return `${chapterPath(unitId)}?${new URLSearchParams({ [SKILL_PARAM]: skillId })}`
 }
 
 /** Test out of a lesson: the short quiz on `/chapter/:unitId/:lessonId`, as `?mode=quiz`. */

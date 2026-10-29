@@ -190,10 +190,13 @@ export function ConstellationPath({
   unitId,
   lessons,
   nextLessonId,
+  label,
 }: {
   unitId: string
   lessons: readonly ChapterLesson[]
   nextLessonId: string | null | undefined
+  /** The list's heading: the chapter's lessons, or a small star's practice sets (#501). */
+  label?: string
 }) {
   const { t } = useTranslation('chapter')
   return (
@@ -203,7 +206,7 @@ export function ConstellationPath({
         className="m-0 uppercase text-[color:var(--on-sky-text-caption)]"
         style={{ font: 'var(--t-section)', letterSpacing: 'var(--t-section-tracking)' }}
       >
-        {t('chapter.listLabel')}
+        {label ?? t('chapter.listLabel')}
       </h2>
       <ol
         data-chapter-lessons

@@ -43,8 +43,23 @@ export type LearningState = (typeof LEARNING_STATES)[number]
 /** A suggestion laid over a learning state; at most one per subject (#9 point 8). */
 export type Recommendation = { source: 'system' | 'teacher' }
 
-/** A skill of the unit's exercises (#9 point 10). `[]` until stoa-backend#58. */
-export type KnowledgeSkill = { skillId: string; name: string; lit: boolean }
+/** A star the student has not mastered what a small star's next practice needs from (#501). */
+export type MissingPrerequisite = { unitId: string; name: string }
+
+/**
+ * A skill of the unit's exercises (#9 point 10), drawn as a small star. In a
+ * knowledge-base star it is a question type (#501, `model/skillPractice.ts`):
+ * `extension` only on one that deepens the star and does not count for
+ * lighting it; `missingPrerequisites` only while its next practice needs
+ * knowledge not mastered yet -- a hint, never a lock (ADR 0004).
+ */
+export type KnowledgeSkill = {
+  skillId: string
+  name: string
+  lit: boolean
+  extension?: boolean
+  missingPrerequisites?: MissingPrerequisite[]
+}
 
 /**
  * A nebula: one topic. In a map of the whole sky (#119) it names the galaxy
@@ -83,6 +98,14 @@ export type Star = {
   x: number
   y: number
   skills: KnowledgeSkill[]
+  /**
+   * False while the sky is a skeleton and this star's small stars have not
+   * been loaded yet (#503): `skills` is empty because it is not known, not
+   * because there are none. Absent: `skills` is what the star has.
+   */
+  skillsKnown?: boolean
+  /** The read of this star's small stars failed (#503): the card says so and offers to read again. */
+  skillsFailed?: boolean
   chapter: ChapterSummary
 }
 

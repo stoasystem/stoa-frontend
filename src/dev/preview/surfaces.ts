@@ -38,6 +38,13 @@ const { subjectId, topicId, unitId } = DEMO_KNOWLEDGE_POINT
 const [firstLesson] = DEMO_KNOWLEDGE_POINT.lessons
 /** The lesson the chapter goes on with: the first one not done when the preview opens. */
 const nextLesson = DEMO_KNOWLEDGE_POINT.lessons[DEMO_KNOWLEDGE_POINT.lessonsDone] ?? firstLesson
+/** The small star with more than one stage, and the extension one (#501). */
+const coreStages = DEMO_KNOWLEDGE_POINT.skills.find(
+  (skill) => DEMO_KNOWLEDGE_POINT.lessons.filter((lesson) => lesson.skillId === skill.skillId).length > 1,
+)!
+const extension = DEMO_KNOWLEDGE_POINT.skills.find((skill) => skill.extension)!
+/** `skillPath` of the chapter, spelled out: no application module loads before the preview's interception. */
+const skillPath = (unit: string, skillId: string) => `/chapter/${unit}?skill=${encodeURIComponent(skillId)}`
 
 /** The physics nebula of `DEMO_BRIDGE_STAR` (`demo-sky.json`'s `bridge.topicId`). */
 const DEMO_BRIDGE_TOPIC = 'optics'
@@ -96,6 +103,10 @@ export const SURFACES: readonly Surface[] = [
   },
   { id: 'chapter', label: 'Chapter', path: () => `/chapter/${unitId}`, signedIn: true, stars: false },
   { id: 'lesson', label: 'Practice stage', path: () => `/chapter/${unitId}/${nextLesson.lessonId}`, signedIn: true, stars: false },
+  // #501: a small star's own page -- a core one in two stages, and the
+  // extension one with what it asks to be learned first.
+  { id: 'skill', label: 'Small star · stages', path: () => skillPath(unitId, coreStages.skillId), signedIn: true, stars: false },
+  { id: 'skill-extension', label: 'Small star · extension', path: () => skillPath(unitId, extension.skillId), signedIn: true, stars: false },
   // #181: the review page with questions due, one of each way of answering.
   { id: 'review', label: 'Review', path: () => `/review/${unitId}`, signedIn: true, stars: false, demo: 'review-due', readyWhen: 'main form, main [role="radiogroup"], main textarea, main input' },
   { id: 'ask', label: 'Ask · new question', path: (points) => withPoints('/ask', points), signedIn: true, stars: true },

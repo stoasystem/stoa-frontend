@@ -71,7 +71,16 @@
     "review_many": "Ripassa {{count}} esercizi",
     "review_other": "Ripassa {{count}} esercizi",
     "reviewSoon": "Disponibile a breve",
-    "sheetDetails": "Mostra o nasconde i dettagli di questa stella"
+    "sheetDetails": "Mostra o nasconde i dettagli di questa stella",
+    "extension": "Approfondimento",
+    "extensionNote": "Approfondimento: un bonus se lo fai. Non conta per accendere la stella.",
+    "lightFirst": "Da accendere prima:",
+    "earlierStages": "Completa prima i livelli precedenti di questa stella.",
+    "stillOpen": "Puoi comunque esercitarti già ora.",
+    "practise": "Esercitati: {{name}}",
+    "skillsLoading": "Caricamento delle piccole stelle di questa stella…",
+    "skillsFailed": "Non è stato possibile caricare le piccole stelle di questa stella.",
+    "skillsRetry": "Riprova"
   },
   "state": {
     "lit": "Accesa",

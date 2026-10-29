@@ -23,6 +23,7 @@ vi.mock('@/services/practice/practiceApi', async (importOriginal) => ({
 
 const { demoChapter, DEMO_KNOWLEDGE_POINT } = demo
 const lessonIds = DEMO_KNOWLEDGE_POINT.lessons.map((lesson) => lesson.lessonId)
+const extensionIds = DEMO_KNOWLEDGE_POINT.extensionLessons.map((lesson) => lesson.lessonId)
 
 describe('the contract', () => {
   it('exports the named, typed objects the preview reads', () => {
@@ -62,10 +63,13 @@ describe('the demo knowledge point’s chapter', () => {
     const sky = demo.demoSky(1000)
     const star = sky.stars.find((candidate) => candidate.unitId === demoChapter.unitId)!
     expect(sky.knowledgePointId).toBe(demoChapter.unitId)
-    expect(star.chapter.lessonCount).toBe(demoChapter.lessons.length)
+    // The star counts its core lessons only; the extension set does not light it (#501).
+    const core = demoChapter.lessons.filter((lesson) => lessonIds.includes(lesson.id))
+    expect(core.length).toBe(demoChapter.lessons.length - extensionIds.length)
+    expect(star.chapter.lessonCount).toBe(core.length)
     expect(star.chapter.lessonsDone).toBe(demoChapter.completed.length)
     expect(star.chapter.nextLesson?.lessonId).toBe(demoChapter.roadmap.currentLessonId)
-    const remaining = demoChapter.lessons.filter((lesson) => !demoChapter.completed.includes(lesson.id))
+    const remaining = core.filter((lesson) => !demoChapter.completed.includes(lesson.id))
     expect(star.unmetExercises).toBe(remaining.reduce((sum, lesson) => sum + lesson.challenges.length, 0))
     expect(demoChapter.catalog.units.map((unit) => unit.id)).toEqual([demoChapter.unitId])
     expect(demoChapter.catalog.lessons.map((lesson) => lesson.exerciseCount)).toEqual(demoChapter.lessons.map((lesson) => lesson.challenges.length))
@@ -75,7 +79,7 @@ describe('the demo knowledge point’s chapter', () => {
     expect(demoChapter.lessons.length).toBeGreaterThanOrEqual(3)
     for (const language of supportedLanguages) {
       for (const lesson of demo.demoLessons(language)) {
-        expect(lesson.challenges.length).toBeGreaterThanOrEqual(3)
+        expect(lesson.challenges.length).toBeGreaterThanOrEqual(2)
         for (const challenge of lesson.challenges) {
           if (challenge.type === 'multiple_choice') expect(challenge.options).toContain(challenge.correctAnswer)
           if (challenge.type === 'ordering') expect([...(challenge.correctAnswer as string[])].sort()).toEqual([...challenge.options!].sort())
@@ -89,7 +93,7 @@ describe('the demo knowledge point’s chapter', () => {
   it('walks a wrong answer, a right one, a finished lesson and a lit star', () => {
     expect(demo.demoKnowledgePointState()).toBe('in_progress')
     const roadmap = demo.demoRoadmap()
-    expect(roadmap.units[0].lessons.map((lesson) => lesson.status)).toEqual(['completed', 'current', 'available'])
+    expect(roadmap.units[0].lessons.map((lesson) => lesson.status)).toEqual(['completed', 'current', 'available', 'available'])
 
     const current = demoChapter.lessons.find((lesson) => lesson.id === roadmap.currentLessonId)!
     const first = current.challenges[0]
@@ -103,12 +107,14 @@ describe('the demo knowledge point’s chapter', () => {
 
     expect(demo.demoLessonResult(current.id)).toMatchObject({ lessonId: current.id, correctCount: current.challenges.length })
     const afterTwo = [...demoChapter.completed, current.id]
-    expect(demo.demoRoadmap(afterTwo).units[0].lessons.map((lesson) => lesson.status)).toEqual(['completed', 'completed', 'current'])
+    expect(demo.demoRoadmap(afterTwo).units[0].lessons.map((lesson) => lesson.status)).toEqual(['completed', 'completed', 'current', 'available'])
     expect(demo.demoKnowledgePointState(afterTwo)).toBe('in_progress')
-    const done = demo.demoRoadmap(lessonIds)
+    // The core lights the star; the extension set is what is left after it (#501).
+    expect(demo.demoKnowledgePointState(lessonIds)).toBe('lit')
+    expect(demo.demoRoadmap(lessonIds).currentLessonId).toBe(extensionIds[0])
+    const done = demo.demoRoadmap([...lessonIds, ...extensionIds])
     expect(done.currentLessonId).toBeUndefined()
     expect(done.progress).toBe(1)
-    expect(demo.demoKnowledgePointState(lessonIds)).toBe('lit')
     expect(demo.checkDemoAnswer('not-a-demo-exercise', 'x')).toBeNull()
   })
 
@@ -123,10 +129,10 @@ describe('the demo knowledge point’s chapter', () => {
       subjectId: 'math',
       topicId: 'trigonometry',
       done: 1,
-      total: 3,
+      total: 4,
       nextLessonId: lessonIds[1],
     })
-    expect(result.current.chapter.lessons.map((lesson) => lesson.exerciseCount)).toEqual([3, 4, 3])
+    expect(result.current.chapter.lessons.map((lesson) => lesson.exerciseCount)).toEqual([3, 4, 3, 2])
   })
 })
 

@@ -125,5 +125,16 @@
     "tryAgain": "Riprova",
     "youAreHere": "Sei qui",
     "yourAnswer": "La tua risposta"
+  },
+  "skill": {
+    "extensionNote": "Approfondimento: un bonus se lo fai. Non conta per accendere la stella.",
+    "inStar": "In {{star}}",
+    "lit": "Questa piccola stella è accesa.",
+    "progress": "Progresso della piccola stella",
+    "sets": "Serie di esercizi",
+    "setsDone": "{{done}} serie su {{total}} svolte",
+    "toGo_one": "Ancora {{count}} serie.",
+    "toGo_many": "Ancora {{count}} serie.",
+    "toGo_other": "Ancora {{count}} serie."
   }
 }

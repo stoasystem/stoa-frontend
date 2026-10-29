@@ -61,19 +61,76 @@ export const DEMO_KNOWLEDGE_POINT = {
   topicId: data.knowledgePoint.topicId,
   gradeLevel: data.knowledgePoint.gradeLevel,
   name: data.knowledgePoint.name as Localized,
-  lessons: data.knowledgePoint.lessons.map((lesson) => ({
-    lessonId: lesson.lessonId,
-    title: lesson.title as Localized,
-    exercises: lesson.exercises,
-  })),
+  /** The core practice sets, in order: the star lights once they are all done. */
+  lessons: data.knowledgePoint.lessons.map(practiceSet),
+  /** The extension practice sets (#501): after the core, and not counted for lighting. */
+  extensionLessons: data.knowledgePoint.extensionLessons.map(practiceSet),
   /** Lessons already completed when the preview opens. */
   lessonsDone: data.knowledgePoint.lessonsDone,
-  skills: data.knowledgePoint.skills.map((skill, index) => ({
-    skillId: `${data.knowledgePoint.unitId}-skill-${index + 1}`,
+  /** The small stars: question types, each `{unitId}--{type}` like the knowledge base's (#501). */
+  skills: data.knowledgePoint.skills.map((skill) => ({
+    skillId: skillIdOf(skill.slug),
     name: skill.name as Localized,
-    lit: skill.lit,
+    extension: 'extension' in skill && skill.extension === true,
   })),
 } as const
+
+function skillIdOf(slug: string): string {
+  return `${data.knowledgePoint.unitId}--${slug}`
+}
+
+function practiceSet(lesson: { lessonId: string; skill: string; title: unknown; exercises: number }) {
+  return { lessonId: lesson.lessonId, skillId: skillIdOf(lesson.skill), title: lesson.title as Localized, exercises: lesson.exercises }
+}
+
+/** Every practice set of the demo knowledge point, core first, as the chapter lists them. */
+export function demoPracticeSets() {
+  return [...DEMO_KNOWLEDGE_POINT.lessons, ...DEMO_KNOWLEDGE_POINT.extensionLessons]
+}
+
+/**
+ * The demo knowledge point's small stars after `completed` (#501), in the
+ * backend's terms: a small star is lit once every practice set of it is
+ * done; the extension one asks for the star's own core stages first while
+ * they are not done, and for `elsewhere` -- a star of another nebula that
+ * never lights in the preview -- always. Names are the caller's to fill in.
+ */
+export function demoSkillStates(
+  completed: readonly string[],
+  elsewhere: string | undefined,
+): Map<string, { lit: boolean; extension: boolean; missing: string[] }> {
+  const sets = demoPracticeSets()
+  const coreDone = DEMO_KNOWLEDGE_POINT.lessons.every((lesson) => completed.includes(lesson.lessonId))
+  return new Map(
+    DEMO_KNOWLEDGE_POINT.skills.map((skill) => {
+      const own = sets.filter((lesson) => lesson.skillId === skill.skillId)
+      const lit = own.length > 0 && own.every((lesson) => completed.includes(lesson.lessonId))
+      const missing = skill.extension && !lit ? [...(coreDone ? [] : [DEMO_KNOWLEDGE_POINT.unitId]), ...(elsewhere ? [elsewhere] : [])] : []
+      return [skill.skillId, { lit, extension: skill.extension, missing }] as const
+    }),
+  )
+}
+
+/** `star.skills` as the demo backend would send them after `completed`, names taken from `nameOf`. */
+export function demoSkillsAfter(
+  skills: readonly KnowledgeSkill[],
+  completed: readonly string[],
+  elsewhere: string | undefined,
+  nameOf: (unitId: string) => string,
+): KnowledgeSkill[] {
+  const states = demoSkillStates(completed, elsewhere)
+  return skills.map(({ skillId, name }) => {
+    const state = states.get(skillId)
+    if (!state) return { skillId, name, lit: false }
+    return {
+      skillId,
+      name,
+      lit: state.lit,
+      ...(state.extension ? { extension: true } : {}),
+      ...(state.missing.length > 0 ? { missingPrerequisites: state.missing.map((unitId) => ({ unitId, name: nameOf(unitId) })) } : {}),
+    }
+  })
+}
 
 /** The physics star whose one unlit prerequisite is the demo knowledge point. */
 export const DEMO_BRIDGE_STAR = data.bridge.unitId
@@ -89,7 +146,12 @@ export function demoStarKind(unitId: string): DemoStarKind {
  * The design preview's sky, which says which star is the demo knowledge
  * point and where each galaxy lies along the band (`layoutSky`).
  */
-export type DemoSky = Sky & { knowledgePointId: string; galaxyBoxes: Record<string, GalaxyBox> }
+export type DemoSky = Sky & {
+  knowledgePointId: string
+  galaxyBoxes: Record<string, GalaxyBox>
+  /** The star the demo knowledge point's extension small star asks to be lit first (#501). */
+  extensionPrerequisite: string | undefined
+}
 
 type NebulaSpec = (typeof data.nebulae)[number]
 
@@ -174,7 +236,8 @@ function build(size: FixtureSize): Built {
 
           let skills: KnowledgeSkill[] = []
           if (isKp) {
-            skills = kp.skills.map((skill) => ({ skillId: skill.skillId, name: skill.name.en, lit: skill.lit }))
+            // Lit and hints follow the lessons done; filled in once the star they point at exists.
+            skills = kp.skills.map((skill) => ({ skillId: skill.skillId, name: skill.name.en, lit: false }))
             kp.skills.forEach((skill) => skillName.set(skill.skillId, skill.name))
           } else if (named?.skills && !isBridge) {
             skills = named.skills.map((name, s) => {
@@ -210,6 +273,20 @@ function build(size: FixtureSize): Built {
         })
         members.set(spec.topicId, list)
       })
+  }
+
+  // What the extension small star asks to be lit first (#501): a star the preview never lights,
+  // in the last mathematics nebula before trigonometry that has one.
+  const kpNebula = nebulae.findIndex((nebula) => nebula.topicId === kp.topicId)
+  const elsewhere = nebulae
+    .slice(0, Math.max(0, kpNebula))
+    .filter((nebula) => nebula.subjectId === kp.subjectId)
+    .reverse()
+    .map((nebula) => members.get(nebula.topicId)!.find((star) => star.state !== 'lit'))
+    .find(Boolean)?.unitId
+  const opening = kp.lessons.slice(0, kp.lessonsDone).map((lesson) => lesson.lessonId)
+  for (const star of stars) {
+    if (star.unitId === kp.unitId) star.skills = demoSkillsAfter(star.skills, opening, elsewhere, (unitId) => starName.get(unitId)!('en'))
   }
 
   const recommended = recommendationsFor(nebulae, stars)
@@ -255,6 +332,7 @@ function build(size: FixtureSize): Built {
       prerequisites,
       summary: { lit: stars.filter((star) => star.state === 'lit').length, total: stars.length, streakDays: 5, score: 1240 },
       knowledgePointId: kp.unitId,
+      extensionPrerequisite: elsewhere,
       galaxyBoxes: Object.fromEntries(layout.galaxies),
     },
     starName,
@@ -391,7 +469,13 @@ export function demoSky(size: FixtureSize, language: SupportedLanguage = 'en'): 
     stars: sky.stars.map((star) => ({
       ...star,
       name: starName.get(star.unitId)!(language),
-      skills: star.skills.map((skill) => ({ ...skill, name: localize(skillName.get(skill.skillId)!, language) })),
+      skills: star.skills.map((skill) => ({
+        ...skill,
+        name: localize(skillName.get(skill.skillId)!, language),
+        ...(skill.missingPrerequisites
+          ? { missingPrerequisites: skill.missingPrerequisites.map((item) => ({ ...item, name: starName.get(item.unitId)!(language) })) }
+          : {}),
+      })),
       chapter: star.chapter.nextLesson
         ? { ...star.chapter, nextLesson: { ...star.chapter.nextLesson, title: localize(nextLessonTitle, language) } }
         : star.chapter,

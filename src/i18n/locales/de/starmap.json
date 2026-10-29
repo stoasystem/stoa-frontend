@@ -67,7 +67,16 @@
     "review_one": "{{count}} Aufgabe wiederholen",
     "review_other": "{{count}} Aufgaben wiederholen",
     "reviewSoon": "Bald verfügbar",
-    "sheetDetails": "Zeigt oder verbirgt die Details dieses Sterns"
+    "sheetDetails": "Zeigt oder verbirgt die Details dieses Sterns",
+    "extension": "Erweiterung",
+    "extensionNote": "Erweiterung: ein Bonus, wenn du sie machst. Fürs Leuchten des Sterns zählt sie nicht.",
+    "lightFirst": "Zuerst zum Leuchten bringen:",
+    "earlierStages": "Schliesse zuerst die früheren Stufen dieses Sterns ab.",
+    "stillOpen": "Üben kannst du sie trotzdem schon jetzt.",
+    "practise": "{{name}} üben",
+    "skillsLoading": "Die kleinen Sterne dieses Sterns werden geladen …",
+    "skillsFailed": "Die kleinen Sterne dieses Sterns konnten nicht geladen werden.",
+    "skillsRetry": "Erneut versuchen"
   },
   "state": {
     "lit": "Leuchtet",

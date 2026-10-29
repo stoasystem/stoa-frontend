@@ -25,6 +25,7 @@ import type {
   PracticeTeacherHelpResponse,
   CurriculumCatalog,
   CurriculumProgressSummary,
+  KnowledgeMapNeighbourhood,
   KnowledgeMapResponse,
 } from '@/types/practice'
 
@@ -225,10 +226,26 @@ export function normalizeCurriculumSubjectId(subjectId?: string) {
   return aliases[normalized] ?? normalized
 }
 
-/** The star map read model (stoa-backend#59). `subjectId` is the galaxy in focus. */
-export async function getKnowledgeMap(subjectId?: string) {
+/**
+ * The star map read model (stoa-backend#59). `subjectId` is the galaxy in
+ * focus. As a skeleton (#503): every star, none of its small stars; a backend
+ * before stoa-backend#127 ignores `view` and sends the sky in full.
+ */
+export async function getKnowledgeMap(subjectId?: string, view: 'full' | 'skeleton' = 'skeleton') {
   const response = await httpClient.get<KnowledgeMapResponse>('/practice/knowledge-map', {
-    params: subjectId ? { subjectId } : undefined,
+    params: { ...(subjectId ? { subjectId } : {}), view },
+  })
+  return response.data
+}
+
+/**
+ * The few stars around `around` in full (#503); without it, around where the
+ * student last practised. `subjectId` is the galaxy to look in: the backend
+ * finds `around` only there, and without it takes the first subject.
+ */
+export async function getKnowledgeMapStars({ subjectId, around }: { subjectId?: string; around?: string } = {}) {
+  const response = await httpClient.get<KnowledgeMapNeighbourhood>('/practice/knowledge-map/stars', {
+    params: { ...(subjectId ? { subjectId } : {}), ...(around ? { around } : {}) },
   })
   return response.data
 }

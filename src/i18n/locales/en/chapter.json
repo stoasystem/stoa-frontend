@@ -120,5 +120,15 @@
     "tryAgain": "Try again",
     "youAreHere": "You are here",
     "yourAnswer": "Your answer"
+  },
+  "skill": {
+    "extensionNote": "Extension: a bonus when you do it. It does not count towards lighting the star.",
+    "inStar": "In {{star}}",
+    "lit": "This small star is lit.",
+    "progress": "Small star progress",
+    "sets": "Practice sets",
+    "setsDone": "{{done}} of {{total}} practice sets done",
+    "toGo_one": "{{count}} practice set to go.",
+    "toGo_other": "{{count}} practice sets to go."
   }
 }
