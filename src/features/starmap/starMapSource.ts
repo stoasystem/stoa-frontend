@@ -55,10 +55,14 @@ export type StarMapSource = {
   /** Ask for the sky again after an `error`. */
   retry?: () => void
   /**
-   * A star was picked (#503): a source that sends the sky as a skeleton loads
-   * the stars around it in full, unless it has them already.
+   * What the map is on (#503): a star, or with `unitId` null a galaxy. A
+   * source that sends the sky as a skeleton reads the stars around it in full
+   * -- around that star, else around where the student last practised in that
+   * galaxy -- unless it has that star already, in the language on screen.
    */
-  select?: (unitId: string) => void
+  focus?: (target: { subjectId: string; unitId: string | null }) => void
+  /** Read the small stars of the star in focus again, after a read of them failed. */
+  retrySkills?: () => void
   /** The map came on screen (#503): a source whose sky went stale reads it again. */
   arrive?: () => void
 }

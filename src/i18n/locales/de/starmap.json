@@ -74,7 +74,9 @@
     "earlierStages": "Schliesse zuerst die früheren Stufen dieses Sterns ab.",
     "stillOpen": "Üben kannst du sie trotzdem schon jetzt.",
     "practise": "{{name}} üben",
-    "skillsLoading": "Die kleinen Sterne dieses Sterns werden geladen …"
+    "skillsLoading": "Die kleinen Sterne dieses Sterns werden geladen …",
+    "skillsFailed": "Die kleinen Sterne dieses Sterns konnten nicht geladen werden.",
+    "skillsRetry": "Erneut versuchen"
   },
   "state": {
     "lit": "Leuchtet",

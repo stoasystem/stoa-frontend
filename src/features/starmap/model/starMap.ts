@@ -104,6 +104,8 @@ export type Star = {
    * because there are none. Absent: `skills` is what the star has.
    */
   skillsKnown?: boolean
+  /** The read of this star's small stars failed (#503): the card says so and offers to read again. */
+  skillsFailed?: boolean
   chapter: ChapterSummary
 }
 

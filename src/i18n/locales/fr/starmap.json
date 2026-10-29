@@ -78,7 +78,9 @@
     "earlierStages": "Termine d’abord les niveaux précédents de cette étoile.",
     "stillOpen": "Tu peux quand même t’y exercer dès maintenant.",
     "practise": "S’exercer : {{name}}",
-    "skillsLoading": "Chargement des petites étoiles de cette étoile…"
+    "skillsLoading": "Chargement des petites étoiles de cette étoile…",
+    "skillsFailed": "Les petites étoiles de cette étoile n’ont pas pu être chargées.",
+    "skillsRetry": "Réessayer"
   },
   "state": {
     "lit": "Allumée",

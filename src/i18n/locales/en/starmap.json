@@ -74,7 +74,9 @@
     "earlierStages": "Finish the earlier stages of this star first.",
     "stillOpen": "You can practise it now all the same.",
     "practise": "Practise {{name}}",
-    "skillsLoading": "Loading this star’s small stars…"
+    "skillsLoading": "Loading this star’s small stars…",
+    "skillsFailed": "This star’s small stars could not be loaded.",
+    "skillsRetry": "Try again"
   },
   "state": {
     "lit": "Lit",

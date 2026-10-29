@@ -28,7 +28,7 @@ import { useMemo } from 'react'
 import type { KnowledgeSkill, LearningState } from '@/features/starmap/model/starMap'
 import { useCurriculumCatalogQuery } from '@/hooks/practice/useCurriculumCatalogQuery'
 import { useKnowledgeMapQuery } from '@/hooks/practice/useKnowledgeMapQuery'
-import { useKnowledgeMapStarsQuery } from '@/hooks/practice/useKnowledgeMapStars'
+import { subjectOfStar, useKnowledgeMapStarsQuery } from '@/hooks/practice/useKnowledgeMapStars'
 import { usePracticeRoadmapQuery } from '@/hooks/practice/usePracticeRoadmapQuery'
 import type { KnowledgeMapPracticeSet, RoadmapLessonStatus } from '@/types/practice'
 
@@ -91,7 +91,16 @@ export function lessonAfter(chapter: Chapter, lessonId: string): ChapterLesson |
   return rest.find((lesson) => isOpenLesson(lesson.status)) ?? null
 }
 
-export function useChapter(unitId: string | undefined): ChapterQuery {
+export type ChapterOptions = {
+  /**
+   * Wait for the point's small stars before the chapter is ready (#503): the
+   * small star's own page cannot say which practice sets are its own without
+   * them. The practice stage does not wait: its exercise does not need them.
+   */
+  waitForSkills?: boolean
+}
+
+export function useChapter(unitId: string | undefined, { waitForSkills = false }: ChapterOptions = {}): ChapterQuery {
   const catalogQuery = useCurriculumCatalogQuery()
   const catalog = catalogQuery.data
   const unit = catalog?.units.find((candidate) => candidate.id === unitId)
@@ -107,9 +116,11 @@ export function useChapter(unitId: string | undefined): ChapterQuery {
   // take the exercise away each time.
   const skyLoading = skyQuery.isLoading && skyQuery.errorUpdateCount === 0
   const skeleton = skyQuery.data?.view === 'skeleton'
-  const aroundQuery = useKnowledgeMapStarsQuery(unitId ?? null, { enabled: Boolean(unitId) && skeleton })
-  // Waited for once, like the sky; a refusal leaves the point to the sky.
-  const aroundLoading = aroundQuery.isLoading && aroundQuery.errorUpdateCount === 0
+  // In the point's own galaxy: the backend finds `around` only in the subject it is asked about.
+  const subjectId = (unitId && subjectOfStar(skyQuery.data, unitId)) || unit?.subjectId || null
+  const aroundQuery = useKnowledgeMapStarsQuery(subjectId, unitId ?? null, { enabled: Boolean(unitId) && skeleton })
+  // Waited for once, like the sky, and only when asked to; a refusal leaves the point to the sky.
+  const aroundLoading = waitForSkills && aroundQuery.isLoading && aroundQuery.errorUpdateCount === 0
   const full = aroundQuery.data?.stars.find((candidate) => candidate.unitId === unitId)
   const found = full ?? skyQuery.data?.stars.find((candidate) => candidate.unitId === unitId)
   const starState = found?.state

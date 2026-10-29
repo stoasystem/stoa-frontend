@@ -43,9 +43,10 @@ const plainOnSky =
   'inline-flex min-h-11 items-center gap-1 self-start text-[15px] font-semibold text-[color:var(--on-sky-plain)] no-underline hover:opacity-70 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring'
 
 export function ChapterView({ unitId }: { unitId: string | undefined }) {
-  const query = useChapter(unitId)
   const [params] = useSearchParams()
   const skillId = params.get(SKILL_PARAM)
+  // A small star's page waits for the small stars, or it would open as the whole chapter first.
+  const query = useChapter(unitId, { waitForSkills: Boolean(skillId) })
   const skill =
     query.status === 'ready' && skillId
       ? query.chapter.skills.find((candidate) => candidate.skillId === skillId && isQuestionType(candidate, query.chapter.unitId))

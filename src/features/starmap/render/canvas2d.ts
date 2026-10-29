@@ -242,6 +242,13 @@ const LIGHT_PIXELS = 12_000_000
 /** A nebula's haze: the atmosphere token at its core, warming with the lit share up to 9% gold. */
 export const HAZE = { core: 0.5, mid: 0.3, warmthBase: 0.03, warmthLit: 0.06 } as const
 
+/**
+ * An extension small star on the canvas (#501), against a core one: dark, a
+ * ring this much smaller and fainter; lit, the same gold dot with a glow of
+ * this reach (in dot radii) around it.
+ */
+export const EXTENSION_DOT = { darkScale: 0.75, darkAlpha: 0.35, glow: 2, glowBlur: 1.2, glowAlpha: 0.7 } as const
+
 export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canvas2DOptions = {}): StarMapRenderer | null {
   const context = canvas.getContext('2d', { alpha: false })
   if (!context) return null
@@ -882,7 +889,8 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
         }
         if (skills?.length) {
           // Skill points: small dots on an arc over the star, clear of its name (#72 point 1).
-          // An extension small star (#501) is smaller and dashed while dark, and lit it glows.
+          // An extension small star (#501) is a smaller, fainter ring while dark (the dot is
+          // two pixels or less: dashes would blur into a ring), and lit it carries a glow.
           const radius = frame.glyphSize * 0.62
           const dot = Math.max(1.6, frame.glyphSize * 0.045)
           const extension = scene.skillExtension?.[i]
@@ -895,21 +903,18 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
             if (extra && lit) {
               ctx.save()
               ctx.translate(sx, sy)
-              halo(ctx, dot * 2, dot * 1.2, colours.lit, 0.7)
+              halo(ctx, dot * EXTENSION_DOT.glow, dot * EXTENSION_DOT.glowBlur, colours.lit, EXTENSION_DOT.glowAlpha)
               ctx.restore()
             }
             ctx.beginPath()
-            ctx.arc(sx, sy, extra && !lit ? dot * 0.8 : dot, 0, Math.PI * 2)
+            ctx.arc(sx, sy, extra && !lit ? dot * EXTENSION_DOT.darkScale : dot, 0, Math.PI * 2)
             if (lit) {
               ctx.fillStyle = colours.lit
               ctx.fill()
             } else if (extra) {
-              ctx.save()
-              ctx.setLineDash([Math.max(0.8, dot * 0.6), Math.max(0.8, dot * 0.6)])
-              ctx.strokeStyle = withAlpha(colours.text, 0.4)
+              ctx.strokeStyle = withAlpha(colours.text, EXTENSION_DOT.darkAlpha)
               ctx.lineWidth = 1
               ctx.stroke()
-              ctx.restore()
             } else {
               ctx.strokeStyle = withAlpha(colours.text, 0.55)
               ctx.lineWidth = 1

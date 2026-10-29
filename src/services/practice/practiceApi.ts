@@ -238,7 +238,11 @@ export async function getKnowledgeMap(subjectId?: string, view: 'full' | 'skelet
   return response.data
 }
 
-/** The few stars around `around` in full (#503); without it, around where the student last practised. */
+/**
+ * The few stars around `around` in full (#503); without it, around where the
+ * student last practised. `subjectId` is the galaxy to look in: the backend
+ * finds `around` only there, and without it takes the first subject.
+ */
 export async function getKnowledgeMapStars({ subjectId, around }: { subjectId?: string; around?: string } = {}) {
   const response = await httpClient.get<KnowledgeMapNeighbourhood>('/practice/knowledge-map/stars', {
     params: { ...(subjectId ? { subjectId } : {}), ...(around ? { around } : {}) },
