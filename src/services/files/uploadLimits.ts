@@ -67,6 +67,14 @@ export const ACCEPT_ATTRIBUTE = [...new Set([...Object.keys(MIME_BY_EXTENSION), 
   .map((extension) => `.${extension}`)
   .join(',')
 
+/**
+ * For the camera's `accept` (#509). With `capture`, a phone opens the camera
+ * for an image type; what it takes is a JPEG (a HEIC on some iPhones), which
+ * `PREPARED_IMAGE_TYPES` covers. Anything else `rejectionFor` refuses as it
+ * would from the chooser.
+ */
+export const CAMERA_ACCEPT_ATTRIBUTE = 'image/*'
+
 /** A photo the browser prepares before it goes up (#508). */
 export function isPreparedImage(filename: string) {
   return Object.prototype.hasOwnProperty.call(PREPARED_IMAGE_TYPES, extensionOf(filename))

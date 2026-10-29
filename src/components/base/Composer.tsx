@@ -1,4 +1,4 @@
-import { ArrowUp, Plus } from 'lucide-react'
+import { ArrowUp, Camera, Plus } from 'lucide-react'
 import { useEffect, useId, useRef, useState, type FormEvent, type KeyboardEvent, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { IconButton } from '@/components/base/IconButton'
@@ -17,6 +17,11 @@ export interface ComposerProps {
   variant?: ComposerVariant
   /** Shows the + (photo or file) when given. */
   onAttach?: () => void
+  /**
+   * Shows the camera beside the + when given (#509): it takes a photo, where
+   * the + chooses one that is already there.
+   */
+  onCapture?: () => void
   /** Full composer only: between + and send, e.g. the subject picker. */
   footerStart?: ReactNode
   disabled?: boolean
@@ -59,6 +64,7 @@ export function Composer({
   placeholder,
   variant = 'docked',
   onAttach,
+  onCapture,
   footerStart,
   disabled = false,
   describedBy,
@@ -119,6 +125,17 @@ export function Composer({
       glyph={spec.attachGlyph}
       variant="tinted"
       onClick={onAttach}
+      disabled={disabled}
+    />
+  )
+  const capture = onCapture && (
+    <IconButton
+      label={t('composer.capture')}
+      icon={Camera}
+      size={spec.attach}
+      glyph={spec.attachGlyph}
+      variant="tinted"
+      onClick={onCapture}
       disabled={disabled}
     />
   )
@@ -200,6 +217,7 @@ export function Composer({
       >
         {hint}
         {attach}
+        {capture}
         {fieldParts}
         {send}
       </form>
@@ -222,6 +240,7 @@ export function Composer({
       {fieldParts}
       <div data-composer-footer className="flex items-center gap-1.5" style={{ height: COMPOSER.full.footer }}>
         {attach}
+        {capture}
         {footerStart}
         <div className="flex-1" />
         {send}
