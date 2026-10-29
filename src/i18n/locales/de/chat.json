@@ -153,6 +153,10 @@
       "body": "Du hast das Kapitel abgeschlossen. Der Stern leuchtet jetzt auf deiner Karte.",
       "link": "Auf der Karte ansehen"
     },
+    "target": {
+      "label": "Ein Stern auf deiner Karte",
+      "show": "Weg auf der Sternkarte ansehen"
+    },
     "reopen": {
       "open": "Fragen öffnen",
       "resume": "Zurück zu deinem Gespräch"

@@ -154,6 +154,10 @@
       "body": "Tu as terminé son chapitre. L’étoile brille maintenant sur ta carte.",
       "link": "Voir sur la carte"
     },
+    "target": {
+      "label": "Une étoile sur ta carte",
+      "show": "Voir le chemin sur la carte du ciel"
+    },
     "reopen": {
       "open": "Ouvrir les questions",
       "resume": "Revenir à ta conversation"

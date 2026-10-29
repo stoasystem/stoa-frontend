@@ -220,6 +220,8 @@ export function useStreamingChat(conversationId: string | null) {
             ? {
                 ...message,
                 status: event.status,
+                // The star the answer offers (#487), on screen before the conversation is read back.
+                targetUnit: event.targetUnit ?? null,
               }
             : message,
         ),
