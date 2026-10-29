@@ -190,6 +190,48 @@ describe('the dictation line beside the Ask field', () => {
     expect(line()).toBeNull()
   })
 
+  it('inline, keeps its room when it hides, so nothing over the composer moves under a click', async () => {
+    await i18n.changeLanguage('de')
+    pretend(AGENTS[0][1], 0)
+    const { rerender } = render(<Harness dictationHint="inline" />)
+    const field = screen.getByRole('textbox', { name: 'Ask' })
+    const row = () => document.querySelector<HTMLElement>('[data-composer-dictation-placement="inline"]')
+    const sentence = i18n.t('composer.dictation.windows', { ns: 'common' })
+
+    // Before the field is focused the row is there already, holding the
+    // sentence that sizes it, unseen and unheard.
+    const kept = row()!
+    expect(kept).toHaveTextContent(sentence)
+    expect(kept).not.toBeVisible()
+    expect(field).not.toHaveAttribute('aria-describedby')
+
+    await userEvent.click(field)
+    expect(row()).toBe(kept)
+    expect(kept).toBeVisible()
+
+    // Pressing something over the composer takes the focus away: the row
+    // stays, with the same words, only unseen.
+    await userEvent.click(screen.getByRole('button', { name: 'elsewhere' }))
+    expect(row()).toBe(kept)
+    expect(kept).toHaveTextContent(sentence)
+    expect(kept).not.toBeVisible()
+
+    await userEvent.click(field)
+    await userEvent.type(field, 'x')
+    expect(row()).toBe(kept)
+    expect(kept).not.toBeVisible()
+
+    rerender(<Harness dictationHint="inline" busy />)
+    expect(row()).toBe(kept)
+  })
+
+  it('inline, takes no room on a system it has nothing to say for', async () => {
+    pretend(AGENTS[5][1], 0)
+    render(<Harness dictationHint="inline" />)
+    await userEvent.click(screen.getByRole('textbox', { name: 'Ask' }))
+    expect(document.querySelector('[data-composer-dictation-placement]')).toBeNull()
+  })
+
   it('gives way to the reason send did not go out', async () => {
     await i18n.changeLanguage('de')
     pretend(AGENTS[0][1], 0)

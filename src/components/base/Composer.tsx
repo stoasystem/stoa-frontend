@@ -32,8 +32,9 @@ export interface ComposerProps {
   /**
    * Ask's fields: while empty and focused, say how to dictate on this device
    * (#515). `floating` puts the line in the free space over the composer, like
-   * the reason for not sending; `inline` gives it a line of its own above, for
-   * a host with something to read right over the composer (Ask's panel).
+   * the reason for not sending; `inline` gives it a line of its own above, kept
+   * whether it shows or not, for a host with something to read or press right
+   * over the composer (Ask's panel).
    */
   dictationHint?: DictationHintPlacement
   className?: string
@@ -183,16 +184,35 @@ export function Composer({
    * the field.
    */
   const inline = dictationHint === 'inline'
-  const dictationLine = dictation && (
-    <p
-      id={dictationId}
-      data-composer-dictation={dictation}
-      data-composer-dictation-placement={dictationHint}
-      className={inline ? cn(LINE_TEXT, 'pb-1') : FLOATING_LINE}
-    >
-      {t(`composer.dictation.${dictation}`)}
-    </p>
-  )
+  /*
+   * Inline, the line keeps its room whether it shows or not, and only its
+   * words come and go. Taking the room on focus and giving it back on blur
+   * moved everything over the composer by a line in the middle of a click:
+   * pressing "Send again" took the focus off the empty field, the line went,
+   * the message moved, and the click landed on nothing.
+   */
+  const dictationLine = inline
+    ? platform && (
+        <p
+          id={dictationId}
+          data-composer-dictation={dictation ?? undefined}
+          data-composer-dictation-placement="inline"
+          className={cn(LINE_TEXT, 'pb-1')}
+          style={dictation ? undefined : { visibility: 'hidden' }}
+        >
+          {t(`composer.dictation.${platform}`)}
+        </p>
+      )
+    : dictation && (
+        <p
+          id={dictationId}
+          data-composer-dictation={dictation}
+          data-composer-dictation-placement="floating"
+          className={FLOATING_LINE}
+        >
+          {t(`composer.dictation.${dictation}`)}
+        </p>
+      )
   const fieldDescribedBy =
     [describedBy, blocked ? hintId : undefined, dictation ? dictationId : undefined].filter(Boolean).join(' ') ||
     undefined
@@ -226,8 +246,8 @@ export function Composer({
   )
 
   /*
-   * Inline, the line sits above the form in the host's own flow, so it pushes
-   * up rather than covering what the host shows over the composer.
+   * Inline, the line sits above the form in the host's own flow, so it covers
+   * nothing the host shows over the composer.
    */
   if (variant === 'docked') {
     const form = (
