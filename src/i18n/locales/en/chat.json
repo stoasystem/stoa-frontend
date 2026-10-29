@@ -171,6 +171,7 @@
         "sendExpired": "A file you added took too long to go out. Choose it again, then ask again.",
         "quota": "There is no room left for files. Remove an older one first.",
         "unavailable": "Files cannot be added right now. Try again in a moment.",
+        "unreadable": "This photo could not be opened. Try another one, or a screenshot.",
         "failed": "This file could not be added. Try again."
       }
     }

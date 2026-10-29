@@ -44,6 +44,12 @@ vi.mock('@/services/files/fileApi', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@/services/files/fileApi')>()),
   uploadFile: vi.fn(),
 }))
+// jsdom draws nothing: what a photo becomes is prepareImage508's. Here it is
+// answered, so what is asserted is that the prepared file is the one sent.
+vi.mock('@/services/files/prepareImage', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@/services/files/prepareImage')>()),
+  prepareImage: vi.fn(async (file: File) => file),
+}))
 vi.mock('@/services/teacherHelp/teacherHelpApi', () => ({
   getTeacherAvailability: vi.fn(async () => ({ online: false, availableTeachers: 0 })),
   getTeacherHelpRequest: vi.fn(async () => {
@@ -61,11 +67,13 @@ vi.mock('@/services/learning/memoryApi', () => ({
 import { getConversation } from '@/services/chat/chatApi'
 import { getGenerationProgress, streamConversationMessage } from '@/services/chat/chatStreamApi'
 import { uploadFile } from '@/services/files/fileApi'
+import { ImagePreparationError, prepareImage } from '@/services/files/prepareImage'
 
 const getConversationMock = vi.mocked(getConversation)
 const streamMock = vi.mocked(streamConversationMessage)
 const progressMock = vi.mocked(getGenerationProgress)
 const uploadMock = vi.mocked(uploadFile)
+const prepareMock = vi.mocked(prepareImage)
 
 function conversation(messages: ChatMessage[] = []): Conversation {
   return {
@@ -173,6 +181,33 @@ describe('a question that carries a file', () => {
     expect(ask.getByRole('textbox', { name: 'Your question' })).toHaveValue('Here it is')
   })
 
+  it('takes an iPhone’s HEIC and sends the JPEG made of it (#508)', async () => {
+    uploadMock.mockResolvedValue(uploaded('up-1', 'IMG_0001.jpg'))
+    prepareMock.mockResolvedValueOnce(new File([new Uint8Array(4096)], 'IMG_0001.jpg', { type: 'image/jpeg' }))
+    const ask = openAsk()
+    await ask.findByText('Linear equations')
+
+    expect(picker().accept.split(',')).toEqual(expect.arrayContaining(['.heic', '.heif', '.jpg', '.png']))
+    await userEvent.upload(picker(), new File([new Uint8Array(2048)], 'IMG_0001.HEIC', { type: 'image/heic' }))
+
+    await waitFor(() => expect(uploadMock).toHaveBeenCalledTimes(1))
+    expect(uploadMock.mock.calls[0][0].file).toMatchObject({ name: 'IMG_0001.jpg', type: 'image/jpeg' })
+    expect(await ask.findByText('IMG_0001.jpg')).toBeInTheDocument()
+  })
+
+  it('sends a document as it is, unprepared (the negative control)', async () => {
+    uploadMock.mockResolvedValue({ ...uploaded('up-1', 'notes.pdf'), mimeType: 'application/pdf', sizeBytes: 3 })
+    const ask = openAsk()
+    await ask.findByText('Linear equations')
+
+    const pdf = new File(['pdf'], 'notes.pdf', { type: 'application/pdf' })
+    await userEvent.upload(picker(), pdf)
+
+    await waitFor(() => expect(uploadMock).toHaveBeenCalledTimes(1))
+    expect(prepareMock).not.toHaveBeenCalled()
+    expect(uploadMock.mock.calls[0][0].file).toBe(pdf)
+  })
+
   it('sends no ids at all when nothing was attached (the negative control)', async () => {
     const ask = openAsk()
     await ask.findByText('Linear equations')
@@ -233,29 +268,44 @@ describe('a file that cannot be sent', () => {
     expect(uploadMock).not.toHaveBeenCalled()
   })
 
-  it('refuses a photo over the 10 MB the backend allows one, before any request leaves', async () => {
+  it('refuses a photo over the 30 MB the browser will open, before it is opened', async () => {
     const ask = openAsk()
     await ask.findByText('Linear equations')
 
     const big = photo('scan.png', 1)
-    Object.defineProperty(big, 'size', { value: 10 * 1024 * 1024 + 1 })
+    Object.defineProperty(big, 'size', { value: 30 * 1024 * 1024 + 1 })
     await userEvent.upload(picker(), big)
 
-    expect(await ask.findByText(/Photos may be up to 10 MB/)).toBeInTheDocument()
+    expect(await ask.findByText(/Photos may be up to 30 MB/)).toBeInTheDocument()
+    expect(prepareMock).not.toHaveBeenCalled()
     expect(uploadMock).not.toHaveBeenCalled()
   })
 
-  it('lets a photo just under that limit through (the negative control)', async () => {
-    uploadMock.mockResolvedValue(uploaded('up-1', 'scan.png'))
+  it('lets a photo over the backend’s 10 MB through, since it is shrunk first (#508)', async () => {
+    uploadMock.mockResolvedValue(uploaded('up-1', 'scan.jpg'))
+    prepareMock.mockResolvedValueOnce(new File([new Uint8Array(4096)], 'scan.jpg', { type: 'image/jpeg' }))
     const ask = openAsk()
     await ask.findByText('Linear equations')
 
-    const justFits = photo('scan.png', 1)
-    Object.defineProperty(justFits, 'size', { value: 10 * 1024 * 1024 })
-    await userEvent.upload(picker(), justFits)
+    const large = photo('scan.png', 1)
+    Object.defineProperty(large, 'size', { value: 30 * 1024 * 1024 })
+    await userEvent.upload(picker(), large)
 
     await waitFor(() => expect(uploadMock).toHaveBeenCalledTimes(1))
-    expect(ask.queryByText(/Photos may be up to 10 MB/)).toBeNull()
+    expect(prepareMock.mock.calls[0][0]).toBe(large)
+    expect(uploadMock.mock.calls[0][0].file).toMatchObject({ name: 'scan.jpg', type: 'image/jpeg', size: 4096 })
+    expect(ask.queryByText(/Photos may be up to/)).toBeNull()
+  })
+
+  it('says so in the student’s words when the browser cannot open a photo (#508)', async () => {
+    prepareMock.mockRejectedValueOnce(new ImagePreparationError('exercise.png could not be opened.'))
+    const ask = openAsk()
+    await ask.findByText('Linear equations')
+
+    await userEvent.upload(picker(), photo())
+
+    expect(await ask.findByText('This photo could not be opened. Try another one, or a screenshot.')).toBeInTheDocument()
+    expect(uploadMock).not.toHaveBeenCalled()
   })
 
   it('turns the upload API’s code into our own sentence, and never shows its English', async () => {
@@ -271,7 +321,7 @@ describe('a file that cannot be sent', () => {
 
     await userEvent.upload(picker(), photo('huge.png'))
 
-    expect(await ask.findByText(/Photos may be up to 10 MB, other files up to 50 MB/)).toBeInTheDocument()
+    expect(await ask.findByText(/Photos may be up to 30 MB, other files up to 50 MB/)).toBeInTheDocument()
     // The server's own prose is written for whoever wrote the request.
     expect(ask.queryByText('This file is too large. Choose a smaller file.')).toBeNull()
   })

@@ -6,14 +6,10 @@ import type { AttachmentDraft } from '@/features/uploads/useAttachmentUploads'
 import {
   ATTACHMENTS_PER_MESSAGE,
   DOCUMENT_MAX_BYTES,
-  IMAGE_EXTENSIONS,
-  IMAGE_MAX_BYTES,
-  extensionOf,
+  IMAGE_SOURCE_MAX_BYTES,
+  isPreparedImage,
   megabytes,
 } from '@/services/files/uploadLimits'
-
-const isImage = (filename: string) =>
-  (IMAGE_EXTENSIONS as readonly string[]).includes(extensionOf(filename))
 
 /**
  * The files waiting over the composer (#125): one row each, with what is
@@ -70,7 +66,7 @@ function Tray({
               className="flex items-center gap-2 rounded-[12px] border border-[color:var(--card-border)] bg-surface px-2.5 py-1.5"
             >
               <span aria-hidden="true" className="shrink-0 text-caption">
-                {isImage(draft.filename) ? (
+                {isPreparedImage(draft.filename) ? (
                   <ImageGlyph size={ICON.rowLeading} strokeWidth={ICON.stroke} />
                 ) : (
                   <FileText size={ICON.rowLeading} strokeWidth={ICON.stroke} />
@@ -86,7 +82,8 @@ function Tray({
                 {draft.state === 'failed' && (
                   <span role="alert" className="text-[12px] text-red">
                     {t(`ask.attachments.errors.${draft.problem ?? 'failed'}`, {
-                      imageLimit: megabytes(IMAGE_MAX_BYTES),
+                      // A photo as chosen: it is shrunk far under the backend's own limit (#508).
+                      imageLimit: megabytes(IMAGE_SOURCE_MAX_BYTES),
                       fileLimit: megabytes(DOCUMENT_MAX_BYTES),
                     })}
                   </span>
