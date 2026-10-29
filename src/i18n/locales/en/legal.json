@@ -12,6 +12,10 @@
         "title": "Student learning data",
         "body": "Learning data can include recent questions, conversation metadata, weak topics, teacher-support requests, report summaries, and progress signals used to support the student and inform parents."
       },
+      "voiceInput": {
+        "title": "Dictating instead of typing",
+        "body": "Questions can also be dictated, for example with Win + H on Windows, the microphone key on a Mac or the microphone on a phone's keyboard. The voice is then processed by the device's system, and STOA only receives the text. The speech recognition is covered by the privacy terms of the device's maker (for example Microsoft, Apple or Google). STOA itself does not record any voice."
+      },
       "visibility": {
         "title": "Parent and teacher visibility",
         "body": "Parents can see learning summaries, reports, focus areas, and teacher involvement. Teachers can see the context needed to answer a help request, including the relevant question and prior explanation."

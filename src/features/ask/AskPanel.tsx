@@ -448,6 +448,7 @@ export function AskPanel({
           onChange={setDraft}
           onSubmit={submit}
           onAttach={ATTACHMENTS_WORK ? () => picker.current?.click() : undefined}
+          dictationHint
           label={t('ask.composerLabel')}
           placeholder={practice ? t('ask.practice.placeholder') : t('ask.placeholder')}
           busy={isStreaming || createConversation.isPending || attachments.uploading}

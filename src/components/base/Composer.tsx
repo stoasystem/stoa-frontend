@@ -3,6 +3,7 @@ import { useEffect, useId, useRef, useState, type FormEvent, type KeyboardEvent,
 import { useTranslation } from 'react-i18next'
 import { IconButton } from '@/components/base/IconButton'
 import { COMPOSER } from '@/components/base/sizes'
+import { dictationPlatform } from '@/lib/dictationPlatform'
 import { cn } from '@/lib/utils'
 
 export type ComposerVariant = 'docked' | 'full'
@@ -28,6 +29,8 @@ export interface ComposerProps {
   onCompositionStart?: () => void
   /** An input method finished composing; the field's value then. */
   onCompositionEnd?: (value: string) => void
+  /** Ask's fields: while empty and focused, say how to dictate on this device (#515). */
+  dictationHint?: boolean
   className?: string
 }
 
@@ -65,16 +68,23 @@ export function Composer({
   busy = false,
   onCompositionStart,
   onCompositionEnd,
+  dictationHint = false,
   className,
 }: ComposerProps) {
   const { t } = useTranslation('common')
   const fieldId = useId()
   const hintId = `${fieldId}-send-hint`
+  const dictationId = `${fieldId}-dictation`
   const field = useRef<HTMLTextAreaElement>(null)
   const [blocked, setBlocked] = useState<SendBlocked | null>(null)
+  const [focused, setFocused] = useState(false)
+  const [platform] = useState(() => (dictationHint ? dictationPlatform() : null))
   const spec = COMPOSER[variant]
   const empty = value.trim().length === 0
   const canSend = !disabled && !busy && !empty
+  // Only when there is nothing to read in the field yet and the child is about
+  // to write: once a word is in, the line has done its work and goes.
+  const dictation = platform && focused && empty && !disabled && !blocked ? platform : null
 
   // The answer arrived: the reason for holding send went with it.
   useEffect(() => {
@@ -154,7 +164,23 @@ export function Composer({
       {blocked ? t(`composer.sendBlocked.${blocked}`) : null}
     </p>
   )
-  const fieldDescribedBy = [describedBy, blocked ? hintId : undefined].filter(Boolean).join(' ') || undefined
+  /*
+   * In the same free space as the reason for not sending, which takes its
+   * place when there is one. Not a live region: it would be read out on every
+   * focus. The field points at it instead, so it is heard with the field.
+   */
+  const dictationLine = dictation && (
+    <p
+      id={dictationId}
+      data-composer-dictation={dictation}
+      className="pointer-events-none absolute inset-x-0 bottom-full m-0 mb-1.5 text-center text-[13px] text-[color:var(--on-sky-text-body,var(--secondary))]"
+    >
+      {t(`composer.dictation.${dictation}`)}
+    </p>
+  )
+  const fieldDescribedBy =
+    [describedBy, blocked ? hintId : undefined, dictation ? dictationId : undefined].filter(Boolean).join(' ') ||
+    undefined
   const fieldParts = (
     <>
       <label htmlFor={fieldId} className="sr-only">
@@ -170,6 +196,8 @@ export function Composer({
         disabled={disabled}
         aria-describedby={fieldDescribedBy}
         onChange={(event) => change(event.target.value)}
+        onFocus={() => setFocused(true)}
+        onBlur={() => setFocused(false)}
         onKeyDown={onKeyDown}
         onCompositionStart={onCompositionStart}
         onCompositionEnd={onCompositionEnd && ((event) => onCompositionEnd(event.currentTarget.value))}
@@ -199,6 +227,7 @@ export function Composer({
         }}
       >
         {hint}
+        {dictationLine}
         {attach}
         {fieldParts}
         {send}
@@ -219,6 +248,7 @@ export function Composer({
       }}
     >
       {hint}
+      {dictationLine}
       {fieldParts}
       <div data-composer-footer className="flex items-center gap-1.5" style={{ height: COMPOSER.full.footer }}>
         {attach}

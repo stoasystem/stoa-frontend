@@ -12,6 +12,10 @@
         "title": "Lerndaten von Schülerinnen und Schülern",
         "body": "Lerndaten können letzte Fragen, Konversationsmetadaten, Fokusbereiche, Anfragen an Lehrpersonen, Berichtszusammenfassungen und Fortschrittssignale umfassen, die den Schüler unterstützen und Eltern informieren."
       },
+      "voiceInput": {
+        "title": "Diktieren statt tippen",
+        "body": "Fragen lassen sich auch diktieren, zum Beispiel mit Win + H unter Windows, mit der Mikrofontaste am Mac oder mit dem Mikrofon auf der Handytastatur. Die Stimme verarbeitet dann das System des Geräts, STOA bekommt nur den Text. Für die Spracherkennung gelten die Datenschutzregeln des Geräteherstellers (zum Beispiel Microsoft, Apple oder Google). STOA selbst nimmt keine Sprache auf."
+      },
       "visibility": {
         "title": "Sichtbarkeit für Eltern und Lehrpersonen",
         "body": "Eltern können Lernzusammenfassungen, Berichte, Fokusbereiche und Beteiligung von Lehrpersonen sehen. Lehrpersonen sehen den Kontext, der für eine Hilfeanfrage notwendig ist."
