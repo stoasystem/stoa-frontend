@@ -18,6 +18,19 @@ export const PASSTHROUGH_CALLS = [
   { file: 'src/services/api/httpClient.ts', text: 'httpClient.request(config)' },
 ]
 
+// Requests that do not go to the API at all, named by the text the call starts
+// with in the one file it is in. Anything else in services that is not read as
+// an API path still fails.
+export const OFF_API_CALLS = [
+  {
+    file: 'src/services/files/fileApi.ts',
+    text: 'fetch(part.url',
+    // ADR-004, stoa-backend#152: the URL is the one `POST /files/{id}/parts/{n}`
+    // signed for this part alone, which is the call checked here (#516).
+    reason: "a part's bytes go straight to S3, on the URL the API presigned for it",
+  },
+]
+
 // Calls the backend does not serve yet, each with why that is safe for now.
 // An entry fails the check once it is no longer needed, so the list cannot
 // outlive the gap it excuses.
@@ -157,6 +170,7 @@ export function collectCalls(sources) {
 
   for (const { file, source } of sources) {
     const passthrough = PASSTHROUGH_CALLS.filter((entry) => entry.file === file)
+    const offApi = OFF_API_CALLS.filter((entry) => entry.file === file)
 
     for (const start of source.matchAll(/\bhttpClient\.(\w+)\s*[<(]/g)) {
       const at = start.index
@@ -175,6 +189,7 @@ export function collectCalls(sources) {
     let methods
     for (const start of source.matchAll(/\bfetch\s*\(/g)) {
       const at = start.index
+      if (offApi.some((entry) => source.startsWith(entry.text, at))) continue
       FETCH_CALL.lastIndex = at
       const match = FETCH_CALL.exec(source)
       const path = match && (match[1] ?? (match[2] ? constants.get(match[2]) : match[3]))

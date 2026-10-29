@@ -61,10 +61,11 @@ const hasId = (draft: AttachmentDraft): draft is AttachmentDraft & { uploadId: s
 /**
  * The files waiting to go out with the next question (#125).
  *
- * The backend's upload path -- intent, chunks, complete -- never went away; the
- * front of it did, with the online classroom. This is that front: files are
- * uploaded as soon as they are chosen, so pressing send only has ids to pass,
- * and `attachmentIds` on the message is never a promise the upload has not kept.
+ * The backend's upload path -- intent, parts (straight to S3, #516), complete
+ * -- never went away; the front of it did, with the online classroom. This is
+ * that front: files are uploaded as soon as they are chosen, so pressing send
+ * only has ids to pass, and `attachmentIds` on the message is never a promise
+ * the upload has not kept.
  * The ids are the uploads' own: an upload that passed is `validated`, and the
  * message that carries `{uploadId}` is what makes it an attachment (#507).
  *
