@@ -73,17 +73,18 @@ export function useFirstLanding(map: StarMap, target: LayerTarget, ownerId: stri
   const dismissedKey = `${DISMISSED_KEY}.${ownerId}`
   const answerKey = `${ANSWER_KEY}.${ownerId}`
 
-  type Arrival = { landing: LayerTarget | null; asking: boolean }
+  type Arrival = { landing: LayerTarget | null; asking: boolean; followed: boolean }
   const arriving = (): Arrival => {
-    if (readTab(dismissedKey) === '1') return { landing: null, asking: false }
+    if (readTab(dismissedKey) === '1') return { landing: null, asking: false, followed: false }
     const carried = landingStarIn(location.state)
     const nebulaId = target.layer === 'nebula' ? target.nebulaId : null
     const star = carried && nebulaId && isNewcomer(map) ? map.stars.find((candidate) => candidate.unitId === carried) : undefined
-    if (star && star.nebulaId === nebulaId) return { landing: landingOn(star), asking: false }
-    if (target.layer !== 'map' || !isNewcomer(map)) return { landing: null, asking: false }
+    // Carried here by the route: it already follows the landing.
+    if (star && star.nebulaId === nebulaId) return { landing: landingOn(star), asking: false, followed: true }
+    if (target.layer !== 'map' || !isNewcomer(map)) return { landing: null, asking: false, followed: false }
     const answer = readTab(answerKey)
-    if (answer === null && startableSubjects(map).length > 1) return { landing: null, asking: true }
-    return { landing: firstLandingFor(map, target, answer || undefined), asking: false }
+    if (answer === null && startableSubjects(map).length > 1) return { landing: null, asking: true, followed: false }
+    return { landing: firstLandingFor(map, target, answer || undefined), asking: false, followed: false }
   }
   const [arrived, setArrived] = useState(() => map.stars.length > 0)
   const [first] = useState(arriving)
@@ -91,18 +92,32 @@ export function useFirstLanding(map: StarMap, target: LayerTarget, ownerId: stri
   const [asking, setAsking] = useState(first.asking)
   /** The landing was chosen on this page: the route waits for the flight. */
   const [flying, setFlying] = useState(false)
+  /**
+   * The route has reached the landing's nebula. From then on the galaxy's
+   * route is the student going back out (the way back, the switcher, a pinch
+   * that settles on the galaxy), and ends the landing; before, it is the
+   * route still to be put right.
+   */
+  const [followed, setFollowed] = useState(first.followed)
   const [dismissed, setDismissed] = useState(false)
   if (!arrived && map.stars.length > 0) {
     const now = arriving()
     setArrived(true)
     setLanding(now.landing)
     setAsking(now.asking)
+    setFollowed(now.followed)
   }
 
-  const landed = landing !== null && (target.layer === 'map' || sameTarget(landing, target))
+  const landed = landing !== null && (sameTarget(landing, target) || (!followed && target.layer === 'map'))
   useEffect(() => {
     if (!landing || landing.layer !== 'nebula') return
-    if (target.layer === 'map') {
+    if (sameTarget(landing, target)) {
+      // The route has caught up with what is shown.
+      if (!followed) setFollowed(true)
+      if (flying) setFlying(false)
+      return
+    }
+    if (target.layer === 'map' && !followed) {
       // The route follows what is shown: the nebula's, in place of the galaxy's.
       const state: LandingState | undefined = landing.whole ? { firstLanding: landing.whole.star } : undefined
       const follow = () => {
@@ -115,11 +130,9 @@ export function useFirstLanding(map: StarMap, target: LayerTarget, ownerId: stri
       const timer = window.setTimeout(follow, ZOOM.flightMs + 80)
       return () => window.clearTimeout(timer)
     }
-    if (!sameTarget(landing, target)) {
-      // The student moved on: the landing is over.
-      setLanding(null)
-    }
-  }, [landing, target, map, navigate, search, flying])
+    // The student moved on (another nebula, a star, back out to the galaxy): the landing is over.
+    setLanding(null)
+  }, [landing, target, map, navigate, search, flying, followed])
 
   const dismiss = useCallback(() => {
     writeTab(dismissedKey, '1')

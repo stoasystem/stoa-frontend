@@ -16,7 +16,7 @@
  * lit (`next`): beside the star recommended now, it says what lighting did
  * and leads to that star's card.
  */
-import { useEffect, useId, useRef, useState, type KeyboardEvent, type MouseEvent } from 'react'
+import { useEffect, useId, useRef, useState, type MouseEvent } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link, useNavigate } from 'react-router-dom'
 import { Button } from '@/components/base'
@@ -34,7 +34,8 @@ const STILL_FRAMES = 12
 const SETTLE_FRAMES = 4
 /** The fade out when waved away, ms (`starmap.css`; reduced motion: `--motion-reduced`). */
 export const BUBBLE_EXIT_MS = 160
-const REDUCED_EXIT_MS = 200
+/** The same, with reduced motion: `--motion-reduced`. */
+export const REDUCED_EXIT_MS = 200
 /** Narrower than this, the bubble does not fit beside its star: it docks across the map instead. */
 const DOCK_BELOW_PX = 560
 /** The gutter a docked bubble keeps from the map's edges and its controls, CSS px. */
@@ -185,24 +186,47 @@ export function FirstLandingBubble({ star, next, startable = true, locate, watch
   }, [onDismiss])
   useEffect(() => {
     if (!leaving) return
-    const timer = window.setTimeout(() => dismissRef.current(), reducedMotion ? REDUCED_EXIT_MS : BUBBLE_EXIT_MS)
+    const timer = window.setTimeout(() => {
+      // Focus was on the bubble, or nowhere: hand it to the star the bubble pointed at, or the map.
+      const root = rootRef.current
+      const active = document.activeElement
+      const lost = !active || active === document.body || (root !== null && root.contains(active))
+      if (lost && root) {
+        const stage = root.parentElement
+        const link = [...(stage?.querySelectorAll<HTMLElement>('[data-unit]') ?? [])].find((candidate) => candidate.dataset.unit === star.unitId)
+        ;(link ?? stage)?.focus({ preventScroll: true })
+      }
+      dismissRef.current()
+    }, reducedMotion ? REDUCED_EXIT_MS : BUBBLE_EXIT_MS)
     return () => window.clearTimeout(timer)
-  }, [leaving, reducedMotion])
+  }, [leaving, reducedMotion, star.unitId])
   const leave = () => setLeaving(true)
 
-  function onKeyDown(event: KeyboardEvent<HTMLElement>) {
-    if (event.key !== 'Escape') return
-    event.stopPropagation()
-    leave()
-  }
+  // Escape sends Murmi away wherever focus is on the map -- the bubble does not take focus -- and
+  // only Murmi: the map's own Escape waits for the next press. Not while a dialog (Ask's sheet,
+  // the help) is open over the map: that Escape is the dialog's.
+  useEffect(() => {
+    if (!placed || leaving) return
+    const onKey = (event: globalThis.KeyboardEvent) => {
+      if (event.key !== 'Escape' || event.defaultPrevented) return
+      if (document.querySelector('[role="dialog"][aria-modal="true"]')) return
+      event.stopPropagation()
+      setLeaving(true)
+    }
+    window.addEventListener('keydown', onKey, true)
+    return () => window.removeEventListener('keydown', onKey, true)
+  }, [placed, leaving])
 
   return (
     <div ref={rootRef} data-first-landing={star.unitId} className="pointer-events-none absolute inset-0">
+      {/* Said once when Murmi arrives; the bubble itself is not a live region. */}
+      <p role="status" className="sr-only">
+        {placed && !leaving ? (next ? t('firstReveal.title') : t('firstLanding.title', { name: star.name })) : ''}
+      </p>
       <aside
         ref={boxRef}
         data-starmap-overlay
         aria-labelledby={titleId}
-        onKeyDown={onKeyDown}
         className={cn('absolute left-0 top-0 w-[min(320px,calc(100%-32px))]', leaving ? 'pointer-events-none' : 'pointer-events-auto')}
         style={{ visibility: 'hidden' }}
       >

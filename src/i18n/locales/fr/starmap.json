@@ -28,7 +28,7 @@
   },
   "firstReveal": {
     "title": "Ta première étoile brille !",
-    "body": "Chaque étoile allumée ouvre celles qui en dépendent. Ensuite : {{name}}.",
+    "body": "Elle brille maintenant en or sur ta carte du ciel. Ensuite : {{name}}.",
     "show": "Voir l’étoile suivante",
     "later": "Compris"
   },

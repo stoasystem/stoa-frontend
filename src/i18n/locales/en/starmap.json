@@ -28,7 +28,7 @@
   },
   "firstReveal": {
     "title": "Your first star is lit!",
-    "body": "Every star you light opens the ones that build on it. Next up: {{name}}.",
+    "body": "It now shines gold on your star map. Next up: {{name}}.",
     "show": "Show me the next star",
     "later": "Got it"
   },

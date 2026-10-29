@@ -18,7 +18,7 @@ import { FLARE_MS, FLARE_PEAK_MS } from '@/features/starmap/lighting/flare'
 import { subjectOfNebula, type Star, type StarMap } from '@/features/starmap/model/starMap'
 import { usePrefersReducedMotion } from '@/features/starmap/motion/usePrefersReducedMotion'
 import { isFirstLit, recommendedIn } from '@/features/starmap/onboarding/firstLanding'
-import { pathForTarget, type LayerTarget } from '@/features/starmap/view/layers'
+import { pathForTarget, sameTarget, type LayerTarget } from '@/features/starmap/view/layers'
 
 /** How long the lit star is held in view after its flare, before the camera pulls back. */
 export const REVEAL_HOLD_MS = 900
@@ -45,9 +45,11 @@ export function useFirstReveal(map: StarMap, target: LayerTarget, reveal: (unitI
   const [dismissed, setDismissed] = useState(false)
   const timer = useRef<number | null>(null)
   const mapRef = useRef(map)
+  const targetRef = useRef(target)
   useEffect(() => {
     mapRef.current = map
-  }, [map])
+    targetRef.current = target
+  }, [map, target])
   useEffect(
     () => () => {
       if (timer.current !== null) window.clearTimeout(timer.current)
@@ -64,7 +66,11 @@ export function useFirstReveal(map: StarMap, target: LayerTarget, reveal: (unitI
       const subjectId = subjectOfNebula(now, star.nebulaId)
       // At the flare's brightest moment: wait for it to go out, hold, then pull back.
       const wait = (reducedMotion ? 0 : FLARE_MS - FLARE_PEAK_MS) + REVEAL_HOLD_MS
+      // Where the student is while the flare plays. If they have gone somewhere else by the time
+      // it is over -- another star's card, another nebula -- the reveal does not pull them back.
+      const watching = targetRef.current
       timer.current = window.setTimeout(() => {
+        if (!sameTarget(targetRef.current, watching)) return
         const next = recommendedIn(mapRef.current, subjectId)
         setRevealing({ subjectId, lit: unitId, next: next?.unitId ?? null })
         void navigate({ pathname: pathForTarget(subjectId, { layer: 'map' }), search }, { replace: true })

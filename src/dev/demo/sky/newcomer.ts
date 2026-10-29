@@ -4,20 +4,21 @@
  * galaxies, nebulae, stars and places; no evidence at all.
  *
  *   - Nothing lit, nothing in progress, no skill lit, nothing due for review.
- *   - With nothing lit, a star is ready only if it has no prerequisite at
- *     all (CONTEXT.md); every other star is locked.
- *   - Every subject the student takes is recommended by the backend's rule
- *     (#9 point 8): its first ready star in course order, which is where the
- *     course starts -- in mathematics "Integers", not the demo knowledge point
- *     the demo sky recommends on purpose (sine and cosine is no first star).
- *     That star is a placeholder: it has no chapter, so the walk-through stops
- *     at the first landing.
+ *   - Every star is ready to start: prerequisites do not lock a knowledge
+ *     point (ADR 0004). A star with a prerequisite not yet lit only carries
+ *     that as a hint, which this read model does not draw yet (#484).
+ *   - Each subject the student takes is recommended by #474's rule (CONTEXT.md,
+ *     "Recommendation"): with nothing lit, the first star of the outer fringe
+ *     (not lit, its prerequisites all lit or none) in course order -- in
+ *     mathematics "Integers", not the demo knowledge point the demo sky
+ *     recommends on purpose. That star is a placeholder: it has no chapter,
+ *     so the walk-through stops at the first landing.
  *
  * The demo knowledge point follows the lessons completed on the page (the
  * demo backend's state, which `startAsNewcomer` empties): in progress after
- * the first, lit after the last. Once it is lit, the stars that waited only
- * for it are ready, and mathematics' recommendation moves on by the
- * backend's rule.
+ * the first, lit after the last. Once it is lit, mathematics' recommendation
+ * follows it (#474): its successors in the outer fringe first, else the next
+ * fringe star after it in course order.
  *
  * Arrays are kept per input, so the same map gives the same sky (the engine
  * compares by identity).
@@ -41,7 +42,7 @@ function newcomerParts(map: StarMap): Made {
   const waits = new Set(prerequisites.map((edge) => edge.to))
   const fresh: Star[] = map.stars.map((star) => ({
     ...star,
-    state: waits.has(star.unitId) ? 'locked' : 'ready',
+    state: 'ready',
     progress: 0,
     unmetExercises: star.unitId === kp ? DEMO_KNOWLEDGE_POINT.lessons.reduce((sum, lesson) => sum + lesson.exercises, 0) : 0,
     reviewDue: 0,
@@ -55,7 +56,8 @@ function newcomerParts(map: StarMap): Made {
   const ordered = orderedStars({ nebulae: map.nebulae, stars: fresh })
   for (const subjectId of taken) {
     const own = ordered.filter((star) => subjectOfNebula(map, star.nebulaId) === subjectId)
-    const pick = own.find((star) => star.state === 'ready')
+    // Nothing is lit: the outer fringe is the stars with no prerequisite.
+    const pick = own.find((star) => !waits.has(star.unitId))
     if (pick) picks.add(pick.unitId)
   }
   const stars = fresh.map((star) => (picks.has(star.unitId) ? { ...star, recommendation: { source: 'system' as const } } : star))
@@ -97,15 +99,20 @@ function withProgress(map: StarMap, parts: Made, completed: readonly string[], l
         },
   )
   if (state === 'lit') {
-    const lit = new Set([kp.unitId])
+    // #474: no star in progress, so the recommendation follows the star just lit. The outer fringe:
+    // not lit, every prerequisite lit (the demo knowledge point is the only lit star).
     const into = new Map<string, string[]>()
     for (const edge of parts.prerequisites) into.set(edge.to, [...(into.get(edge.to) ?? []), edge.from])
-    stars = stars.map((star) => (star.state === 'locked' && (into.get(star.unitId) ?? []).every((from) => lit.has(from)) ? { ...star, state: 'ready' as const } : star))
-    // A lit point is no longer what to learn next: its subject's recommendation moves on (#9 point 8).
+    const inFringe = (star: Star) => star.state !== 'lit' && (into.get(star.unitId) ?? []).every((from) => from === kp.unitId)
     const own = orderedStars({ nebulae: map.nebulae, stars }).filter((star) => subjectOfNebula(map, star.nebulaId) === kp.subjectId)
-    const pick = own.find((star) => star.state === 'in_progress') ?? own.find((star) => star.state === 'ready')
+    const after = own.findIndex((star) => star.unitId === kp.unitId)
+    const successors = own.filter((star) => inFringe(star) && (into.get(star.unitId) ?? []).includes(kp.unitId))
+    const onward = [...own.slice(after + 1), ...own.slice(0, after)].find(inFringe)
+    const pick = successors[0] ?? onward
+    // At most one per subject: mathematics' recommendation moves, wherever it was.
+    const math = new Set(own.map((star) => star.unitId))
     stars = stars.map((star) =>
-      star.unitId === kp.unitId ? { ...star, recommendation: null } : star.unitId === pick?.unitId ? { ...star, recommendation: { source: 'system' as const } } : star,
+      !math.has(star.unitId) ? star : { ...star, recommendation: star.unitId === pick?.unitId ? { source: 'system' as const } : null },
     )
   }
   known.set(key, stars)

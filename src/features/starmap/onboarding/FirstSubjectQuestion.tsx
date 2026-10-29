@@ -17,10 +17,8 @@ import { Button } from '@/components/base'
 import { Murmi } from '@/components/brand/Murmi'
 import type { Galaxy } from '@/features/starmap/model/starMap'
 import { usePrefersReducedMotion } from '@/features/starmap/motion/usePrefersReducedMotion'
-import { BUBBLE_EXIT_MS } from '@/features/starmap/onboarding/FirstLandingBubble'
+import { BUBBLE_EXIT_MS, REDUCED_EXIT_MS } from '@/features/starmap/onboarding/FirstLandingBubble'
 import { cn } from '@/lib/utils'
-
-const REDUCED_EXIT_MS = 200
 
 export type FirstSubjectQuestionProps = {
   subjects: readonly Galaxy[]

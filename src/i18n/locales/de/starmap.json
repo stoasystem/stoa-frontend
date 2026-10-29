@@ -28,7 +28,7 @@
   },
   "firstReveal": {
     "title": "Dein erster Stern leuchtet!",
-    "body": "Jeder Stern, den du zum Leuchten bringst, öffnet die, die darauf aufbauen. Als Nächstes: {{name}}.",
+    "body": "Er leuchtet jetzt golden auf deiner Sternkarte. Als Nächstes: {{name}}.",
     "show": "Nächsten Stern zeigen",
     "later": "Alles klar"
   },

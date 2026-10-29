@@ -4,11 +4,12 @@
  * sky, where nothing says where to begin, but on the recommended star of the
  * galaxy in focus, its nebula seen whole, with Murmi beside it.
  *
- * Who is new is read from the sky, never stored: no star lit and none in
- * progress. So the truth stays the backend's (#9), a shared browser is right
- * for whoever is signed in (ADR 0003), and signing out clears nothing that
- * matters. A student who looked around and left lands here again next time,
- * which is what they still have to do.
+ * Who is new is read from the sky: no star lit and none in progress. So the
+ * truth stays the backend's (#9), a shared browser is right for whoever is
+ * signed in (ADR 0003), and signing out clears nothing that matters. A student
+ * who looked around and left lands here again next time, which is what they
+ * still have to do. Only two conveniences are kept, in this tab's
+ * sessionStorage and per account: plan B's answer and "Look around first".
  *
  * Plan B comes first when there is a choice to make: a student who takes
  * more than one subject is asked which one school is on now, and lands on

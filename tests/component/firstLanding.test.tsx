@@ -15,7 +15,7 @@
  */
 import { act, fireEvent, render, screen } from '@testing-library/react'
 import { I18nextProvider } from 'react-i18next'
-import { MemoryRouter, useLocation } from 'react-router-dom'
+import { MemoryRouter, useLocation, useNavigate, type NavigateFunction } from 'react-router-dom'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { demoStarMapOverride } from '@/dev/preview/lighting'
 import { demoStarMap } from '@/dev/demo/sky/demoStarMap'
@@ -32,7 +32,8 @@ import { ZOOM } from '@/features/starmap/view/semanticZoom'
 import { subjectOfNebula, type StarMap } from '@/features/starmap/model/starMap'
 import { resolveTarget, type LayerTarget } from '@/features/starmap/view/layers'
 import i18n from '@/i18n'
-import { fakeClock } from './starmapHarness'
+import { StarMapEngine } from '@/features/starmap/engine/starMapEngine'
+import { fakeClock, recordingRenderer, THEME } from './starmapHarness'
 
 const KP = DEMO_KNOWLEDGE_POINT.unitId
 const TOPIC = DEMO_KNOWLEDGE_POINT.topicId
@@ -73,12 +74,10 @@ describe('who is new', () => {
 
 describe("the design preview's newcomer sky", () => {
   for (const size of [10, 1000] as const) {
-    it(`has no evidence and keeps CONTEXT.md's states true (${size} stars)`, () => {
+    it(`has no evidence, and every star is ready to start (ADR 0004) (${size} stars)`, () => {
       const map = newcomerMap(size)
-      const waits = new Set(map.prerequisites.map((edge) => edge.to))
       for (const star of map.stars) {
-        expect(star.state === 'lit' || star.state === 'in_progress').toBe(false)
-        expect(star.state).toBe(waits.has(star.unitId) ? 'locked' : 'ready')
+        expect(star.state).toBe('ready')
         expect(star.reviewDue).toBe(0)
         expect(star.skills.every((skill) => !skill.lit)).toBe(true)
       }
@@ -104,8 +103,9 @@ describe("the design preview's newcomer sky", () => {
   })
 })
 
-function Probe({ map, ownerId = 'student-1', out }: { map: StarMap; ownerId?: string; out: { current: FirstLanding | null; path: string; state: unknown } }) {
+function Probe({ map, ownerId = 'student-1', out }: { map: StarMap; ownerId?: string; out: { current: FirstLanding | null; path: string; state: unknown; go?: NavigateFunction } }) {
   const location = useLocation()
+  out.go = useNavigate()
   const [, , , topicId, unitId] = location.pathname.split('/')
   const target: LayerTarget = resolveTarget(map, topicId, unitId)
   out.current = useFirstLanding(map, target, ownerId)
@@ -114,7 +114,7 @@ function Probe({ map, ownerId = 'student-1', out }: { map: StarMap; ownerId?: st
   return null
 }
 
-const probe = () => ({ current: null as FirstLanding | null, path: '', state: null as unknown })
+const probe = () => ({ current: null as FirstLanding | null, path: '', state: null as unknown, go: undefined as NavigateFunction | undefined })
 
 describe('on the route', () => {
   it('puts the route right to the nebula, carrying the landing to the page it mounts', () => {
@@ -183,6 +183,66 @@ describe('on the route', () => {
       </MemoryRouter>,
     )
     expect(someoneElse.current?.star?.unitId).toBe(START)
+  })
+})
+
+describe('going back out after the landing (#467 audit)', () => {
+  afterEach(() => {
+    vi.useRealTimers()
+  })
+
+  const landedOn = () => {
+    answeredMath()
+    const out = probe()
+    render(
+      <MemoryRouter initialEntries={['/map/math']}>
+        <Probe map={newcomerMap()} out={out} />
+      </MemoryRouter>,
+    )
+    expect(out.path).toBe(`/map/math/${START_TOPIC}`)
+    return out
+  }
+
+  it('lets the way back to the galaxy stay on the galaxy, and ends the landing', () => {
+    const out = landedOn()
+    act(() => {
+      void out.go!('/map/math')
+    })
+    expect(out.path).toBe('/map/math')
+    expect(out.current?.target).toEqual({ layer: 'map' })
+    expect(out.current?.star).toBeNull()
+  })
+
+  it('lets the switcher fly to another galaxy after "Look around first"', () => {
+    const out = landedOn()
+    act(() => out.current?.dismiss())
+    act(() => {
+      void out.go!('/map/physics')
+    })
+    expect(out.path).toBe('/map/physics')
+    expect(out.current?.target).toEqual({ layer: 'map' })
+  })
+
+  it("after plan B's flight, lets the student back out too", () => {
+    vi.useFakeTimers()
+    const out = probe()
+    render(
+      <MemoryRouter initialEntries={['/map/math']}>
+        <Probe map={newcomerMap()} out={out} />
+      </MemoryRouter>,
+    )
+    act(() => out.current?.choose('math'))
+    act(() => {
+      vi.advanceTimersByTime(ZOOM.flightMs + 100)
+    })
+    expect(out.path).toBe(`/map/math/${START_TOPIC}`)
+    act(() => {
+      void out.go!('/map/math')
+    })
+    act(() => {
+      vi.advanceTimersByTime(ZOOM.flightMs + 100)
+    })
+    expect(out.path).toBe('/map/math')
   })
 })
 
@@ -259,8 +319,9 @@ describe('the first lighting', () => {
   })
 })
 
-function RevealProbe({ map, out }: { map: StarMap; out: { current: FirstReveal | null; path: string; revealed: string[] } }) {
+function RevealProbe({ map, out }: { map: StarMap; out: { current: FirstReveal | null; path: string; revealed: string[]; go?: NavigateFunction } }) {
   const location = useLocation()
+  out.go = useNavigate()
   const [, , , topicId, unitId] = location.pathname.split('/')
   out.current = useFirstReveal(map, resolveTarget(map, topicId, unitId), (id) => out.revealed.push(id))
   out.path = location.pathname
@@ -315,6 +376,31 @@ describe('framing the reveal', () => {
   })
 })
 
+describe('the engine framing the reveal (#467 audit)', () => {
+  it('frames the star just lit and the next one, both on screen, closer than the galaxy', () => {
+    const map = newcomerMap(1000, ALL_LESSONS)
+    const next = map.stars.find((star) => star.recommendation && subjectOfNebula(map, star.nebulaId) === 'math')!
+    const engine = (target: LayerTarget) => {
+      const clock = fakeClock()
+      const e = new StarMapEngine({ renderer: recordingRenderer(), theme: THEME, reducedMotion: false, scheduler: clock, now: clock.now, galaxy: true })
+      e.setViewport(1280, 800, 1, { top: 108, bottom: 164 })
+      e.setData(map, target)
+      clock.advance(20)
+      return e
+    }
+    const framed = engine({ layer: 'map', fly: true, frame: [KP, next.unitId], flightMs: REVEAL_FLIGHT_MS })
+    const galaxy = engine({ layer: 'map' })
+    for (const unitId of [KP, next.unitId]) {
+      const spot = framed.starOnScreen(unitId)!
+      expect(spot.x).toBeGreaterThan(0)
+      expect(spot.x).toBeLessThan(1280)
+      expect(spot.y).toBeGreaterThan(108)
+      expect(spot.y).toBeLessThan(800 - 164)
+    }
+    expect(framed.zoom.starPx).toBeGreaterThan(galaxy.zoom.starPx)
+  })
+})
+
 describe('the reveal', () => {
   afterEach(() => {
     vi.useRealTimers()
@@ -341,6 +427,28 @@ describe('the reveal', () => {
     expect(out.current?.target).toEqual({ layer: 'map', fly: true, frame: [KP, next.unitId], flightMs: REVEAL_FLIGHT_MS })
     expect(out.current?.star?.unitId).toBe(next.unitId)
     expect(out.current?.next).toBe(`/map/math/${next.nebulaId}/${next.unitId}`)
+  })
+
+  it('leaves a student who has gone elsewhere while the flare played where they are (#467 audit)', () => {
+    vi.useFakeTimers()
+    const map = newcomerMap(1000, ALL_LESSONS)
+    const other = map.stars.find((star) => star.nebulaId === TOPIC && star.unitId !== KP)!
+    const out = { current: null as FirstReveal | null, path: '', revealed: [] as string[], go: undefined as NavigateFunction | undefined }
+    render(
+      <MemoryRouter initialEntries={[`/map/math/${TOPIC}`]}>
+        <RevealProbe map={map} out={out} />
+      </MemoryRouter>,
+    )
+    act(() => out.current?.onReveal(KP))
+    act(() => {
+      void out.go!(`/map/math/${TOPIC}/${other.unitId}`)
+    })
+    act(() => {
+      vi.advanceTimersByTime(FLARE_MS - FLARE_PEAK_MS + REVEAL_HOLD_MS)
+    })
+    expect(out.path).toBe(`/map/math/${TOPIC}/${other.unitId}`)
+    expect(out.current?.target).toBeNull()
+    expect(out.current?.star).toBeNull()
   })
 
   it('does nothing for a star that is not the first lit', () => {
@@ -392,6 +500,41 @@ describe('the bubble', () => {
       vi.advanceTimersByTime(BUBBLE_EXIT_MS)
     })
     expect(dismissed).toBe(1)
+    vi.useRealTimers()
+  })
+
+  it('goes on Escape wherever focus is on the map, says it arrived, and hands focus to its star (#467 audit)', () => {
+    const star = newcomerMap().stars.find((candidate) => candidate.unitId === KP)!
+    const clock = fakeClock()
+    let dismissed = 0
+    render(
+      <I18nextProvider i18n={i18n}>
+        <MemoryRouter>
+          <div data-stage tabIndex={-1}>
+            <a href="#star" data-unit={KP}>
+              {star.name}
+            </a>
+            <FirstLandingBubble star={star} locate={() => ({ x: 100, y: 100, size: 20 })} onDismiss={() => (dismissed += 1)} scheduler={clock} />
+          </div>
+        </MemoryRouter>
+      </I18nextProvider>,
+    )
+    const layer = document.querySelector<HTMLElement>('[data-first-landing]')!
+    Object.defineProperty(layer, 'clientWidth', { value: 1024 })
+    Object.defineProperty(layer, 'clientHeight', { value: 700 })
+    act(() => clock.advance(500))
+    expect(screen.getByRole('status').textContent).toBe(`Start here: ${star.name}`)
+
+    vi.useFakeTimers()
+    // Focus is not in the bubble: Escape still sends Murmi away.
+    ;(document.activeElement as HTMLElement | null)?.blur()
+    fireEvent.keyDown(document.body, { key: 'Escape' })
+    expect(layer.querySelector('[data-leaving]')).not.toBeNull()
+    act(() => {
+      vi.advanceTimersByTime(BUBBLE_EXIT_MS)
+    })
+    expect(dismissed).toBe(1)
+    expect(document.activeElement?.getAttribute('data-unit')).toBe(KP)
     vi.useRealTimers()
   })
 
