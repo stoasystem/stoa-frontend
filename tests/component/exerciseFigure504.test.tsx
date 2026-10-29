@@ -133,6 +133,39 @@ describe('cleanFigure', () => {
     expect(figure.svg.querySelector('text')?.textContent).toBe('click')
   })
 
+  // #504 audit: Chromium fetched each of these from the other site, with the Referer.
+  it.each([
+    ['an upper-case URL(', 'fill="URL(https://evil.example/p.svg#p)"'],
+    ['a CSS escape for the u', 'fill="\\75 rl(https://evil.example/p.svg#p)"'],
+    ['an escape anywhere in the name', 'stroke="u\\72l(https://evil.example/p.svg#p)"'],
+    ['an upper-case marker', 'marker-end="URL(https://evil.example/m.svg#m)"'],
+    ['a space before the bracket', 'fill="url (https://evil.example/p.svg#p)"'],
+    ['a local-looking reference in another case', 'marker-end="URL(#arrow)"'],
+    ['an id the figure does not have', 'marker-end="url(#elsewhere)"'],
+  ])('drops a reference out of the figure: %s', (_case, attribute) => {
+    const figure = cleanFigure(
+      `<svg xmlns="${SVG}" viewBox="0 0 10 10"><defs><marker id="arrow"><path d="M0,0 L1,1"/></marker></defs><line x1="0" y1="0" x2="5" y2="5" ${attribute}/></svg>`,
+      'p-',
+    )!
+    const line = figure.svg.querySelector('line')!
+    expect(line.getAttribute('x2')).toBe('5')
+    expect(Array.from(line.attributes).map((item) => item.name)).toEqual(['x1', 'y1', 'x2', 'y2'])
+  })
+
+  it('keeps a backslash in a name, which is read out and never parsed as CSS', () => {
+    const figure = cleanFigure(`<svg xmlns="${SVG}" viewBox="0 0 10 10" aria-label="Winkel \\alpha"><rect width="5" height="5"/></svg>`, 'p-')!
+    expect(figure.svg.getAttribute('aria-label')).toBe('Winkel \\alpha')
+  })
+
+  it('is never taller than most of the screen, whatever its viewBox, and keeps its shape', () => {
+    const { svg } = cleanFigure(`<svg xmlns="${SVG}" viewBox="0 0 400 4000000" preserveAspectRatio="none"><rect width="5" height="5"/></svg>`, 'p-')!
+    expect(svg.style.maxHeight).toBe('70vh')
+    expect(svg).toHaveAttribute('preserveAspectRatio', 'xMidYMid meet')
+    // Its own alignment, short of stretching, is its own.
+    const aligned = cleanFigure(`<svg xmlns="${SVG}" viewBox="0 0 10 10" preserveAspectRatio="xMinYMin meet"><rect width="5" height="5"/></svg>`, 'p-')!
+    expect(aligned.svg).toHaveAttribute('preserveAspectRatio', 'xMinYMin meet')
+  })
+
   it('draws nothing from text that holds no svg', () => {
     expect(cleanFigure('', 'p-')).toBeNull()
     expect(cleanFigure('<script>window.__figure504("script")</script>', 'p-')).toBeNull()

@@ -10,17 +10,16 @@ import { useTranslation } from 'react-i18next'
 import { MathRenderer } from '@/components/ui/MathRenderer'
 import { ExerciseFigure } from '@/features/chapter/ExerciseFigure'
 import { cn } from '@/lib/utils'
+import type { ExerciseFigures } from '@/types/practice'
 
 /** What is picked or typed. An order is a list; everything else is text. */
 export type AnswerValue = string | string[]
 
 /** As much of an exercise or a review card as answering it needs. */
-export type AnswerChallenge = {
+export type AnswerChallenge = Pick<ExerciseFigures, 'optionFigures'> & {
   challengeId: string
   type: string
   options?: string[] | null
-  /** One drawing per option, `""` or null where an option has none (#504). */
-  optionFigures?: (string | null)[] | null
 }
 
 export const bodyOnSky = 'text-[color:var(--on-sky-text-body)]'
