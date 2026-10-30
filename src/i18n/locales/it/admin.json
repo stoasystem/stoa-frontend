@@ -315,12 +315,37 @@
     "surface": {
       "question": "Domanda",
       "ai_answer": "Risposta dell’IA",
-      "teacher_reply": "Risposta del docente"
+      "teacher_reply": "Risposta del docente",
+      "image_upload": "Caricamento immagine"
     },
     "events": {
       "reported": "Segnalato",
       "updated": "Aggiornato",
-      "note_added": "Nota aggiunta"
+      "note_added": "Nota aggiunta",
+      "image_blocked": "Immagine bloccata",
+      "image_deleted": "Immagine eliminata"
+    },
+    "image": {
+      "title": "Immagine bloccata",
+      "listLine": "Immagine bloccata · {{categories}}",
+      "alt": "L'immagine bloccata dalla moderazione",
+      "show": "Mostra immagine",
+      "hide": "Sfoca immagine",
+      "loading": "Caricamento immagine...",
+      "failed": "Impossibile caricare l'immagine.",
+      "retry": "Riprova",
+      "deleted": "Immagine eliminata",
+      "deletedOn": "Immagine eliminata il {{date}}",
+      "undrawable": "Questa immagine non può essere mostrata qui.",
+      "hits": "Bloccata per",
+      "noHits": "Nessun rilevamento registrato.",
+      "uploader": "Caricata da",
+      "uploadedAt": "Caricata il",
+      "conversation": "Conversazione",
+      "role": {
+        "student": "studente",
+        "teacher": "insegnante"
+      }
     }
   },
   "teacherApplications": {

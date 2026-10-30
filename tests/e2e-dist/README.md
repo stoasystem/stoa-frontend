@@ -80,6 +80,12 @@ sees it in Ask as a thumbnail the browser drew, read with their own token from
 for the same switch, and the test handles it as `attachments.spec.ts` does.
 `MockBackend` answers a file's bytes with `raw`.
 
+`moderationImage.spec.ts`: an administrator opens an `image_upload` case in the
+moderation queue (#538, stoa-backend#139). The image moderation refused is read
+with the administrator's token from `/admin/moderation/cases/{id}/image`, drawn
+from an object URL and blurred until "Show image"; the case names what it was
+blocked for. A deleted image is said to be deleted, and not asked for.
+
 `forcedChange.spec.ts`: a student whose password an administrator reset opens
 `/ask`, signs in, is sent to the password change with only Help and Log out in
 the shell, reloads it, changes the password, and "Continue" opens `/ask`; the

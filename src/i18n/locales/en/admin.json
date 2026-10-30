@@ -313,12 +313,37 @@
     "surface": {
       "question": "Question",
       "ai_answer": "AI answer",
-      "teacher_reply": "Teacher reply"
+      "teacher_reply": "Teacher reply",
+      "image_upload": "Image upload"
     },
     "events": {
       "reported": "Reported",
       "updated": "Updated",
-      "note_added": "Note added"
+      "note_added": "Note added",
+      "image_blocked": "Image blocked",
+      "image_deleted": "Image deleted"
+    },
+    "image": {
+      "title": "Blocked image",
+      "listLine": "Blocked image · {{categories}}",
+      "alt": "The image moderation blocked",
+      "show": "Show image",
+      "hide": "Blur image",
+      "loading": "Loading image...",
+      "failed": "Could not load the image.",
+      "retry": "Try again",
+      "deleted": "Image deleted",
+      "deletedOn": "Image deleted on {{date}}",
+      "undrawable": "This image cannot be shown here.",
+      "hits": "Blocked for",
+      "noHits": "No hits recorded.",
+      "uploader": "Uploaded by",
+      "uploadedAt": "Uploaded",
+      "conversation": "Conversation",
+      "role": {
+        "student": "student",
+        "teacher": "teacher"
+      }
     }
   },
   "teacherApplications": {
