@@ -173,6 +173,7 @@
         "quota": "Il n’y a plus de place pour des fichiers. Retires-en un plus ancien d’abord.",
         "unavailable": "Impossible d’ajouter des fichiers pour le moment. Réessaie dans un instant.",
         "unreadable": "Impossible d’ouvrir cette photo. Essaie une autre photo ou une capture d’écran.",
+        "blocked": "Cette image ne peut pas être envoyée. Choisis-en une autre ou décris l’exercice avec tes mots.",
         "failed": "Ce fichier n’a pas pu être ajouté. Réessaie."
       }
     }

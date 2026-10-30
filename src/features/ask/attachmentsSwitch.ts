@@ -11,9 +11,12 @@
  * and the message sends the upload's id (#495, #507).
  *
  * The picker, the tray, the limits and their tests are all here and tested;
- * what is withheld is the button, until the model reads the image too
- * (stoa-backend#135) and a smoke run on production has sent one. Opening it
- * is #512's: here, a module of its own so tests can drive the buttons with
- * it on (#509).
+ * what is withheld is the button. The backend side is live since 2026-10-29:
+ * the model reads the image (stoa-backend#135) and moderation refuses one as
+ * `upload_content_blocked` (#138, said in the tray since #512). What is left is
+ * a smoke run on production that sends one -- its checklist is in #512's PR.
+ * Then this turns `true`: a module of its own so tests can drive the buttons
+ * with it on (#509), and `tests/e2e-dist/attachments.spec.ts` opens the
+ * chooser from the button once it is.
  */
 export const ATTACHMENTS_WORK = false

@@ -63,6 +63,16 @@ back reloads nothing, and offline it waits for the connection; a stylesheet
 that failed is put back before the next page that loads is shown, and failing
 again holds back no page that never failed on it (#272, #401, #447).
 
+`attachments.spec.ts`: a photo chosen in Ask is shrunk to a JPEG in the
+browser, goes up by intent, part URL, a PUT straight to S3 (answered in
+`support/uploads.ts`, which refuses a part whose SHA-256 is not the one signed
+for) and `complete`, and the question carries it as `{ uploadId }`; a picture
+image moderation refuses (`422 upload_content_blocked`, stoa-backend#138) is
+said to be refused in the tray, and the question goes out without it (#512).
+While `ATTACHMENTS_WORK` is off the file goes into the chooser input directly
+and the test checks the button is absent; once it is on, the test opens the
+chooser from the button.
+
 `forcedChange.spec.ts`: a student whose password an administrator reset opens
 `/ask`, signs in, is sent to the password change with only Help and Log out in
 the shell, reloads it, changes the password, and "Continue" opens `/ask`; the
@@ -103,7 +113,11 @@ No retries. A test that needs one is a finding.
   stoa-backend#81 the backend declares the 401 of every operation that takes a
   bearer token and of sign-in, refresh and sign-out, the 409 of the generation
   progress and the 404 of the teacher-help status; a mock's reply there is held
-  to that schema. Any other 4xx is held to FastAPI's `{ detail }` envelope only.
+  to that schema. Any other 4xx is held to FastAPI's `{ detail }` envelope only,
+  and so is a 422 the backend raises itself (`detail` an object, not the
+  request-validation list the document declares for 422): an upload's
+  `upload_content_blocked`, say. Which codes exist is asserted from the
+  document's own enum where a test depends on one (`contract.enumOf`).
 - The star map still reads fixture data, so the knowledge-map read model is
   not exercised; when #48 connects it, its mock must be added here.
 - Chromium on a desktop viewport only. No real Cognito, Bedrock or SES.
