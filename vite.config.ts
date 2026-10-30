@@ -93,6 +93,8 @@ export default defineConfig({
           // dependency. KaTeX is loaded on demand, so it is left unnamed and
           // travels with the screen that needs it.
           if (normalizedId.includes('/katex/')) return undefined
+          // The HEIC decoder (3 MB) is loaded only for a HEIC photo (#508).
+          if (normalizedId.includes('/heic-to/')) return undefined
           const installed = installedPath(normalizedId)
           if (LATER_PAGES_ONLY.some((prefix) => installed.startsWith(prefix))) return undefined
 

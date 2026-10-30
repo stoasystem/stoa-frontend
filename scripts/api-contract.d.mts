@@ -6,6 +6,7 @@ export type BackendRoutes = Map<string, Set<string>>
 
 export const MIN_CHECKED_CALLS: number
 export const PASSTHROUGH_CALLS: { file: string; text: string }[]
+export const OFF_API_CALLS: { file: string; text: string; reason: string }[]
 export const KNOWN_GAPS: KnownGap[]
 export function normalise(path: string): string
 export function loadBackendRoutes(inventory: { method: string; path: string }[]): BackendRoutes

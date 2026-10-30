@@ -169,8 +169,10 @@
         "unsupported": "Ce type de fichier ne peut pas être envoyé. Les photos, PDF, Word, PowerPoint, Excel et fichiers texte, oui.",
         "empty": "Ce fichier est vide. Choisis-en un autre.",
         "expired": "Ce fichier a pris trop de temps. Choisis-le à nouveau.",
+        "sendExpired": "Un fichier joint a pris trop de temps. Choisis-le à nouveau, puis repose ta question.",
         "quota": "Il n’y a plus de place pour des fichiers. Retires-en un plus ancien d’abord.",
         "unavailable": "Impossible d’ajouter des fichiers pour le moment. Réessaie dans un instant.",
+        "unreadable": "Impossible d’ouvrir cette photo. Essaie une autre photo ou une capture d’écran.",
         "failed": "Ce fichier n’a pas pu être ajouté. Réessaie."
       }
     }

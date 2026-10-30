@@ -27,3 +27,9 @@ export function useMediaQuery(query: string): boolean {
 export const WIDE_QUERY = '(min-width: 640px)'
 /** The admin source list needs room beside the page. */
 export const SOURCE_LIST_QUERY = '(min-width: 768px)'
+/**
+ * A touch screen as the main pointer: a phone or a tablet, where `capture`
+ * opens the camera. Desktop browsers ignore `capture` and show the file
+ * chooser, so a camera button there would only be a second + (#509).
+ */
+export const TOUCH_QUERY = '(pointer: coarse)'

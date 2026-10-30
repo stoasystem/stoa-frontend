@@ -21,28 +21,15 @@ import {
   type AskQuote,
 } from '@/features/ask/practiceContext'
 
-/**
- * The paperclip stays off until the upload pipeline hands back an attachment.
- *
- * Measured against production on 2026-10-11, signed in as two different
- * accounts: `POST /files/intents` answers 200, `PUT /files/{id}/chunks/1`
- * answers 200, and `POST /files/{id}/complete` answers 200 with
- * `{"status":"validated","attachment":null}` -- every time, however often it
- * is called. `GET /files/attachments` answers 503 `upload_service_unavailable`.
- * So an upload completes and never becomes an attachment, and `uploadFile`
- * throws on exactly that case.
- *
- * The picker, the tray, the limits and their tests are all here and tested;
- * what is withheld is the button, because a paperclip that cannot finish is
- * worse than no paperclip. Flip this to `true` once a complete answers with an
- * attachment on production.
- */
-const ATTACHMENTS_WORK = false
+// The paperclip and the camera wait behind this switch; why, and who opens
+// it (#512), is written where it is set.
+import { ATTACHMENTS_WORK } from '@/features/ask/attachmentsSwitch'
 import { AttachmentTray } from '@/features/uploads/AttachmentTray'
 import { useAttachmentUploads } from '@/features/uploads/useAttachmentUploads'
-import { ACCEPT_ATTRIBUTE } from '@/services/files/uploadLimits'
+import { ACCEPT_ATTRIBUTE, CAMERA_ACCEPT_ATTRIBUTE } from '@/services/files/uploadLimits'
 import { useConversationsQuery } from '@/hooks/chat/useConversationsQuery'
 import { useCreateConversationMutation } from '@/hooks/chat/useCreateConversationMutation'
+import { TOUCH_QUERY, useMediaQuery } from '@/hooks/layout/useMediaQuery'
 import { useTeacherAvailabilityQuery } from '@/hooks/chat/useTeacherAvailabilityQuery'
 import { useRecommendationsQuery } from '@/hooks/learning/useWeakTopicsQuery'
 import { useStudentProfileQuery } from '@/hooks/student/useStudentProfileQuery'
@@ -180,6 +167,11 @@ export function AskPanel({
   // The files chosen for the next question, uploaded as they are picked (#125).
   const attachments = useAttachmentUploads()
   const picker = useRef<HTMLInputElement>(null)
+  // Taking a photo and choosing one are two entries (#509): with `capture` a
+  // phone opens the camera and offers no gallery, without it the gallery and
+  // files. Only where the camera opens is there a camera to show.
+  const camera = useRef<HTMLInputElement>(null)
+  const touch = useMediaQuery(TOUCH_QUERY)
   const { clearSent } = attachments
 
   // The exercise on screen goes out with every question asked beside it: the
@@ -189,7 +181,9 @@ export function AskPanel({
 
   function startConversation(content: string, quote?: AskQuote | null) {
     if (creatingRef.current || createConversation.isPending) return
-    const attachmentIds = attachments.readyIds
+    // A file that waited past its upload's 30 minutes says so in the tray.
+    if (attachments.expireStale()) return
+    const attachmentIds = attachments.readyReferences
     const carried = attachmentIds.length > 0
     const grade = conversationGrade(profile?.grade)
     const askedAt = new Date().toISOString()
@@ -283,12 +277,14 @@ export function AskPanel({
     // `busy`, which says so; this is the second lock, so a question can never
     // leave without the file it was written for.
     if (attachments.uploading) return
+    // A file that waited past its upload's 30 minutes is chosen again first.
+    if (attachments.expireStale()) return
     if (!conversationId) {
       startConversation(content, quote)
       return
     }
     if (isStreaming) return
-    const attachmentIds = attachments.readyIds
+    const attachmentIds = attachments.readyReferences
     const carried = attachments.readyAttachments
     setDraft('')
     clearQuote()
@@ -443,11 +439,25 @@ export function AskPanel({
             event.target.value = ''
           }}
         />
+        <input
+          ref={camera}
+          type="file"
+          accept={CAMERA_ACCEPT_ATTRIBUTE}
+          capture="environment"
+          data-ask-camera
+          className="hidden"
+          onChange={(event) => {
+            attachments.add(Array.from(event.target.files ?? []))
+            event.target.value = ''
+          }}
+        />
         <Composer
           value={draft}
           onChange={setDraft}
           onSubmit={submit}
           onAttach={ATTACHMENTS_WORK ? () => picker.current?.click() : undefined}
+          onCapture={ATTACHMENTS_WORK && touch ? () => camera.current?.click() : undefined}
+          dictationHint="inline"
           label={t('ask.composerLabel')}
           placeholder={practice ? t('ask.practice.placeholder') : t('ask.placeholder')}
           busy={isStreaming || createConversation.isPending || attachments.uploading}
