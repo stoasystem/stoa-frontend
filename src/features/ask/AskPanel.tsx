@@ -581,7 +581,8 @@ function AskThread({
     startedAt: messages[0]?.createdAt,
   })
   const entries = threadEntries(messages, moments)
-  const helpUnderId = helpOfferedUnder(messages)
+  const offer = helpOffer(messages)
+  const suggested = offer?.suggested ?? false
   const offerHelp = !helpActive && !isStreaming && !requestHelp.isPending
   // The same element from one render to the next, so the answer it sits under
   // is not drawn again at every key typed in the composer (#416).
@@ -594,10 +595,11 @@ function AskThread({
           requesting={requesting}
           teachersOnline={teachersOnline}
           support={teacherSupport}
+          suggested={suggested}
           error={helpError}
         />
       ) : undefined,
-    [helpError, offerHelp, request, requesting, teacherSupport, teachersOnline],
+    [helpError, offerHelp, request, requesting, suggested, teacherSupport, teachersOnline],
   )
 
   // Keep the latest message in view as the thread grows -- unless the student
@@ -655,7 +657,7 @@ function AskThread({
             teacherName={help?.teacherName}
             onRetry={retryMessage}
             onAskAboutStep={onAskAboutStep}
-            after={entry.message.id === helpUnderId ? helpAction : undefined}
+            after={entry.message.id === offer?.id ? helpAction : undefined}
           />
         ))}
       </div>
@@ -730,23 +732,17 @@ export function threadEntries(messages: readonly ChatMessage[], moments: readonl
 }
 
 /**
- * The answer "Ask a teacher" sits under (#506): the latest one the assistant
- * finished in which it suggested a teacher, and nowhere while it is writing or
- * its latest answer failed. An answer written before the sections were kept
- * cannot say, so the latest one of those offers it as every answer did (#12
- * point 2).
+ * Where "Ask a teacher" sits: under the latest answer the assistant finished,
+ * always there and quiet (#12 point 2), and nowhere while it is writing or its
+ * latest answer failed. When that answer suggests a teacher it is offered
+ * plainly (#506); an answer from before the sections cannot say so.
  */
-export function helpOfferedUnder(messages: readonly ChatMessage[]) {
-  let latest = true
+export function helpOffer(messages: readonly ChatMessage[]): { id: string; suggested: boolean } | null {
   for (let index = messages.length - 1; index >= 0; index -= 1) {
     const message = messages[index]
     if (message.role !== 'assistant') continue
-    if (latest) {
-      if (message.status === 'streaming' || message.status === 'failed') return null
-      if (!message.structured) return message.id
-      latest = false
-    }
-    if (message.structured?.suggestTeacher === true && message.status !== 'failed') return message.id
+    if (message.status === 'streaming' || message.status === 'failed') return null
+    return { id: message.id, suggested: message.structured?.suggestTeacher === true }
   }
   return null
 }

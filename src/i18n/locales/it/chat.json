@@ -115,6 +115,7 @@
     "help": {
       "request": "Chiedi a un insegnante",
       "requesting": "Richiesta in corso…",
+      "suggested": "Su questo può aiutarti un insegnante.",
       "offline": "Al momento nessun insegnante è online. Quando torna, risponderà qui.",
       "remaining_one": "Ancora {{count}} richiesta a un insegnante questa settimana",
       "remaining_many": "Ancora {{count}} richieste a un insegnante questa settimana",
@@ -145,10 +146,10 @@
         "waiting_no_teacher": "La tua richiesta resta aperta. Appena un insegnante sarà libero, la prenderà in carico e risponderà in questa conversazione.",
         "assigned": "La risposta apparirà in questa conversazione.",
         "in_progress": "Le risposte appaiono in questa conversazione.",
-        "resolved": "Ti serve altro aiuto? Continua a chiedere qui. Se un insegnante può aiutarti, la risposta te lo proporrà.",
-        "cancelled": "Ti serve altro aiuto? Continua a chiedere qui. Se un insegnante può aiutarti, la risposta te lo proporrà.",
-        "withdrawn": "Ti serve aiuto comunque? Continua a chiedere qui. Se un insegnante può aiutarti, la risposta te lo proporrà.",
-        "expired": "La tua richiesta è scaduta. Continua a chiedere qui. Se un insegnante può aiutarti, la risposta te lo proporrà."
+        "resolved": "Ti serve altro aiuto? Chiedi di nuovo a un insegnante sotto una risposta.",
+        "cancelled": "Ti serve altro aiuto? Chiedi di nuovo a un insegnante sotto una risposta.",
+        "withdrawn": "Ti serve aiuto comunque? Chiedi di nuovo a un insegnante sotto una risposta.",
+        "expired": "La tua richiesta è scaduta. Chiedi di nuovo a un insegnante sotto una risposta."
       },
       "fallback": {
         "title": "Aiuto di un insegnante richiesto",

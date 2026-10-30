@@ -114,6 +114,7 @@
     "help": {
       "request": "Lehrperson fragen",
       "requesting": "Lehrperson wird gefragt…",
+      "suggested": "Dabei kann dir eine Lehrperson helfen.",
       "offline": "Gerade ist keine Lehrperson online. Sobald sie wieder da ist, antwortet sie hier.",
       "remaining_one": "Diese Woche noch {{count}} Anfrage an eine Lehrperson",
       "remaining_other": "Diese Woche noch {{count}} Anfragen an eine Lehrperson",
@@ -143,10 +144,10 @@
         "waiting_no_teacher": "Deine Anfrage bleibt offen. Sobald eine Lehrperson frei ist, übernimmt sie die Anfrage und antwortet in dieser Unterhaltung.",
         "assigned": "Die Antwort erscheint in dieser Unterhaltung.",
         "in_progress": "Die Antworten erscheinen in dieser Unterhaltung.",
-        "resolved": "Brauchst du mehr Hilfe? Frag hier weiter. Wenn eine Lehrperson helfen kann, bietet dir die Antwort eine an.",
-        "cancelled": "Brauchst du mehr Hilfe? Frag hier weiter. Wenn eine Lehrperson helfen kann, bietet dir die Antwort eine an.",
-        "withdrawn": "Brauchst du doch Hilfe? Frag hier weiter. Wenn eine Lehrperson helfen kann, bietet dir die Antwort eine an.",
-        "expired": "Deine Anfrage ist abgelaufen. Frag hier weiter. Wenn eine Lehrperson helfen kann, bietet dir die Antwort eine an."
+        "resolved": "Brauchst du mehr Hilfe? Frag unter einer Antwort erneut eine Lehrperson.",
+        "cancelled": "Brauchst du mehr Hilfe? Frag unter einer Antwort erneut eine Lehrperson.",
+        "withdrawn": "Brauchst du doch Hilfe? Frag unter einer Antwort erneut eine Lehrperson.",
+        "expired": "Deine Anfrage ist abgelaufen. Frag unter einer Antwort erneut eine Lehrperson."
       },
       "fallback": {
         "title": "Lehrperson angefragt",

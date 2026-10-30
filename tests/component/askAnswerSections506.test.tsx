@@ -3,8 +3,8 @@
  * real panel with only the API answered here: the steps and the answer at
  * once, the hints and the similar exercises opened one at a time, the related
  * knowledge points as labels; "I don't get this step" quoting that step; "Ask
- * a teacher" only under an answer that suggests one, greyed when the week's
- * requests are used up. An answer from before the sections, and a follow-up,
+ * a teacher" always under the latest answer, quiet, and offered plainly when
+ * that answer suggests one; greyed when the week's requests are used up. An answer from before the sections, and a follow-up,
  * show their text as they always did. Laid out the same whether the answer
  * was read back or has just been written.
  */
@@ -15,7 +15,7 @@ import { I18nextProvider } from 'react-i18next'
 import { MemoryRouter } from 'react-router-dom'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { AskHost } from '@/features/ask/AskHost'
-import { helpOfferedUnder } from '@/features/ask/AskPanel'
+import { helpOffer } from '@/features/ask/AskPanel'
 import i18n from '@/i18n'
 import { ApiError } from '@/services/api/httpClient'
 import { resetAsk } from '@/store/askStore'
@@ -226,7 +226,7 @@ describe('an answer read back in its sections', () => {
 
   it('says its sections in German', async () => {
     await i18n.changeLanguage('de')
-    getConversationMock.mockResolvedValue(conversation([answer('a1', SECTIONS)]))
+    getConversationMock.mockResolvedValue(conversation([answer('a1', { ...SECTIONS, suggestTeacher: true })]))
     render(
       <I18nextProvider i18n={i18n}>
         <QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}>
@@ -239,6 +239,7 @@ describe('an answer read back in its sections', () => {
     expect(await screen.findByRole('list', { name: 'Schritte' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Tipp zeigen' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Diesen Schritt verstehe ich nicht (Schritt 1)' })).toBeInTheDocument()
+    expect(await screen.findByText('Dabei kann dir eine Lehrperson helfen.')).toBeInTheDocument()
     expect(document.body.textContent).not.toMatch(/ask\.answer\./)
   })
 })
@@ -329,14 +330,41 @@ describe("I don't get this step", () => {
 })
 
 describe('Ask a teacher', () => {
-  it('is offered only under an answer that suggests a teacher', async () => {
+  it('is always there under the latest answer, quiet, when the answer does not suggest a teacher', async () => {
+    availabilityMock.mockResolvedValue({ online: true, availableTeachers: 2, teacherSupport: support() })
     getConversationMock.mockResolvedValue(conversation([answer('a1', SECTIONS)]))
+    requestHelpMock.mockResolvedValue({ requestId: 'r1', conversationId: 'c1', status: 'pending', createdAt: '2026-10-29T10:00:00.000Z' })
     const ask = openAsk()
-    await thread(ask).findByRole('list', { name: 'Steps' })
-    expect(ask.queryByRole('button', { name: 'Ask a teacher' })).not.toBeInTheDocument()
+
+    const button = await ask.findByRole('button', { name: 'Ask a teacher' })
+    expect(bubble(ask, 'a1').getByText('x = 5').closest('[data-message-role]')).toContainElement(button)
+    expect(button).toHaveAttribute('data-variant', 'plain')
+    expect(button.closest('[data-help-action]')).not.toHaveAttribute('data-help-suggested')
+    expect(ask.queryByText('A teacher could help you with this.')).not.toBeInTheDocument()
+    // Quiet: the week's count is said where a teacher is suggested.
+    await waitFor(() => expect(availabilityMock).toHaveBeenCalled())
+    expect(ask.queryByText(/left this week/)).not.toBeInTheDocument()
+
+    await userEvent.click(button)
+    await waitFor(() => expect(requestHelpMock).toHaveBeenCalledWith({ conversationId: 'c1' }))
   })
 
-  it('sits under the answer that suggested it, also once a follow-up came after it', async () => {
+  it('is offered plainly under an answer that suggests a teacher', async () => {
+    getConversationMock.mockResolvedValue(
+      conversation([message('s1', 'student', 'Solve 3x + 5 = 20.'), answer('a1', { ...SECTIONS, suggestTeacher: true })]),
+    )
+    const ask = openAsk()
+
+    const button = await ask.findByRole('button', { name: 'Ask a teacher' })
+    expect(button).toHaveAttribute('data-variant', 'tinted')
+    const offer = button.closest('[data-help-action]') as HTMLElement
+    expect(offer).toHaveAttribute('data-help-suggested')
+    expect(within(offer).getByText('A teacher could help you with this.')).toBeInTheDocument()
+    expect(bubble(ask, 'a1').getByText('x = 5').closest('[data-message-role]')).toContainElement(button)
+    expect(ask.getAllByRole('button', { name: 'Ask a teacher' })).toHaveLength(1)
+  })
+
+  it('goes quiet again under a follow-up that does not suggest one, and sits under it', async () => {
     getConversationMock.mockResolvedValue(
       conversation([
         answer('a1', { ...SECTIONS, suggestTeacher: true }),
@@ -347,17 +375,20 @@ describe('Ask a teacher', () => {
     const ask = openAsk()
     await thread(ask).findByText('Because 3x means 3 · x.')
     const button = await ask.findByRole('button', { name: 'Ask a teacher' })
-    expect(bubble(ask, 'a1').getByText('x = 5').closest('[data-message-role]')).toContainElement(button)
+    expect(ask.getAllByRole('button', { name: 'Ask a teacher' })).toHaveLength(1)
+    expect(thread(ask).getByText('Because 3x means 3 · x.').closest('[data-message-role]')).toContainElement(button)
+    expect(button).toHaveAttribute('data-variant', 'plain')
+    expect(ask.queryByText('A teacher could help you with this.')).not.toBeInTheDocument()
   })
 
-  it('is still offered under the latest answer from before the sections', () => {
-    expect(helpOfferedUnder([answer('a1', null)])).toBe('a1')
-    expect(helpOfferedUnder([answer('a1', { ...SECTIONS, suggestTeacher: true }), answer('a2', null)])).toBe('a2')
-    expect(helpOfferedUnder([answer('a1', null), answer('a2', SECTIONS)])).toBeNull()
-    expect(helpOfferedUnder([answer('a1', { ...SECTIONS, suggestTeacher: true }), answer('a2', SECTIONS, '')])).toBe('a1')
-    expect(
-      helpOfferedUnder([answer('a1', { ...SECTIONS, suggestTeacher: true }), message('a2', 'assistant', '', { status: 'streaming' })]),
-    ).toBeNull()
+  it('sits under the latest answer once it is whole, from before the sections too', () => {
+    expect(helpOffer([answer('a1', null)])).toEqual({ id: 'a1', suggested: false })
+    expect(helpOffer([answer('a1', { ...SECTIONS, suggestTeacher: true }), answer('a2', null)])).toEqual({ id: 'a2', suggested: false })
+    expect(helpOffer([answer('a1', null), answer('a2', { ...SECTIONS, suggestTeacher: true })])).toEqual({ id: 'a2', suggested: true })
+    expect(helpOffer([answer('a1', SECTIONS), message('s2', 'student', 'And now?')])).toEqual({ id: 'a1', suggested: false })
+    expect(helpOffer([answer('a1', SECTIONS), message('a2', 'assistant', '', { status: 'streaming' })])).toBeNull()
+    expect(helpOffer([answer('a1', SECTIONS), message('a2', 'assistant', 'Failed.', { status: 'failed' })])).toBeNull()
+    expect(helpOffer([message('s1', 'student', 'Hello?')])).toBeNull()
   })
 
   it('asks for help in this conversation and reads the week’s allowance again at once', async () => {

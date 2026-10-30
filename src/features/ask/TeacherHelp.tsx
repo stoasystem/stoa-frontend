@@ -3,6 +3,7 @@ import { useId } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Button, Pill, type PillTone } from '@/components/base'
 import { ICON, ROW } from '@/components/base/sizes'
+import { cn } from '@/lib/utils'
 import type { TeacherHelpRequest, TeacherHelpStatus, TeacherSupportStanding } from '@/types/teacherHelp'
 
 /*
@@ -95,12 +96,17 @@ export function TeacherHelpStatusCard({
  * "Ask a teacher", under the latest answer (#12 point 2). It stays available
  * while no teacher is online, and then says so without promising a time: the
  * availability's `nextWindow` has never had a value (#12 point 7).
+ *
+ * Quiet, a plain button, unless the answer above it suggests a teacher (#506):
+ * then it says so in a card of its own, with a tinted button, and tells how many of
+ * the week's requests are left.
  */
 export function TeacherHelpAction({
   onRequest,
   requesting,
   teachersOnline,
   support,
+  suggested = false,
   error,
 }: {
   onRequest: () => void
@@ -112,6 +118,8 @@ export function TeacherHelpAction({
    * still answered in words below.
    */
   support?: TeacherSupportStanding | null
+  /** The answer above suggests a teacher (`structured.suggestTeacher`). */
+  suggested?: boolean
   error?: string | null
 }) {
   const { t } = useTranslation('chat')
@@ -125,9 +133,16 @@ export function TeacherHelpAction({
       : t('teacher.errors.allowanceExhausted')
 
   return (
-    <div data-help-action data-help-blocked={blocked || undefined} className="flex flex-col items-start gap-1">
+    <div
+      data-help-action
+      data-help-suggested={suggested || undefined}
+      data-help-blocked={blocked || undefined}
+      className={cn('flex flex-col items-start gap-1', suggested && 'gap-2 self-stretch border border-[color:var(--card-border)] bg-surface')}
+      style={suggested ? { padding: '10px 12px', borderRadius: ROW.groupRadius } : undefined}
+    >
+      {suggested && <p className="text-[14px] font-semibold leading-[1.35] text-ink">{t('ask.help.suggested')}</p>}
       <Button
-        variant="plain"
+        variant={suggested ? 'tinted' : 'plain'}
         size="small"
         onClick={onRequest}
         disabled={requesting || blocked}
@@ -141,7 +156,7 @@ export function TeacherHelpAction({
         <p id={noteId} className="text-[13px] leading-[1.4] text-caption">
           {blockedNote}
         </p>
-      ) : support && support.weeklyCases > 0 ? (
+      ) : suggested && support && support.weeklyCases > 0 ? (
         <p data-help-remaining className="text-[13px] leading-[1.4] text-caption">
           {t('ask.help.remaining', { count: support.remainingCases })}
         </p>
