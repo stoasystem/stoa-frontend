@@ -3,7 +3,13 @@
  * real route it ships under. `preview.html?surface=<id>` opens one; the
  * comparison page lists them.
  */
-import { DEMO_BRIDGE_STAR, DEMO_HELP_CONVERSATION_ID, DEMO_KNOWLEDGE_POINT, type FixtureSize } from '@/dev/demo/data'
+import {
+  DEMO_BRIDGE_STAR,
+  DEMO_HELP_CONVERSATION_ID,
+  DEMO_KNOWLEDGE_POINT,
+  DEMO_SECTIONS_CONVERSATION_ID,
+  type FixtureSize,
+} from '@/dev/demo/data'
 
 export const STAR_COUNTS = [10, 1000, 2000] as const satisfies readonly FixtureSize[]
 export type StarCount = (typeof STAR_COUNTS)[number]
@@ -100,6 +106,7 @@ export const SURFACES: readonly Surface[] = [
   { id: 'review', label: 'Review', path: () => `/review/${unitId}`, signedIn: true, stars: false, demo: 'review-due', readyWhen: 'main form, main [role="radiogroup"], main textarea, main input' },
   { id: 'ask', label: 'Ask · new question', path: (points) => withPoints('/ask', points), signedIn: true, stars: true },
   { id: 'ask-conversation', label: 'Ask · conversation', path: (points) => withPoints(`/ask/${DEMO_HELP_CONVERSATION_ID}`, points), signedIn: true, stars: true },
+  { id: 'ask-sections', label: 'Ask · answer in sections', path: (points) => withPoints(`/ask/${DEMO_SECTIONS_CONVERSATION_ID}`, points), signedIn: true, stars: true },
   { id: 'me', label: '/me', path: () => '/me', signedIn: true, stars: false },
   { id: 'account-menu', label: 'Account menu', path: () => '/me', signedIn: true, stars: false, open: 'account-menu' },
   {

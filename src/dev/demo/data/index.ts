@@ -81,6 +81,7 @@ export {
 } from '@/dev/demo/data/chapter'
 export {
   DEMO_HELP_CONVERSATION_ID,
+  DEMO_SECTIONS_CONVERSATION_ID,
   DEMO_TEACHER_NAME,
   demoTeacherAvailability,
   demoTeacherHelpRequests,

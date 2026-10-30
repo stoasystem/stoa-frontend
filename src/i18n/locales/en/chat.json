@@ -92,6 +92,20 @@
       "startFailed": "The conversation could not be started. Try again.",
       "answerFailed": "The explanation could not be prepared right now. Please try again or ask a teacher."
     },
+    "answer": {
+      "steps": "Steps",
+      "answer": "Answer",
+      "stepUnclear": "I don't get this step",
+      "stepNumber": "Step {{n}}",
+      "stepQuestion": "I don't get this step. Can you explain it another way?",
+      "hints": "Hints",
+      "showHint": "Show a hint",
+      "nextHint": "Another hint",
+      "practice": "Practice",
+      "showExercise": "One more to practise",
+      "nextExercise": "Another one",
+      "related": "Related topics"
+    },
     "presence": {
       "online_one": "{{count}} teacher online",
       "online_other": "{{count}} teachers online",
@@ -101,6 +115,8 @@
       "request": "Ask a teacher",
       "requesting": "Asking a teacher…",
       "offline": "Teachers are not online right now. When they are back, they will reply here.",
+      "remaining_one": "{{count}} teacher request left this week",
+      "remaining_other": "{{count}} teacher requests left this week",
       "cardLabel": "Teacher support",
       "status": {
         "pending": "Waiting",
@@ -127,10 +143,10 @@
         "waiting_no_teacher": "Your request stays open. As soon as a teacher is free, they will take it and reply in this conversation.",
         "assigned": "Their reply will appear in this conversation.",
         "in_progress": "Their replies appear in this conversation.",
-        "resolved": "Need more help? Ask a teacher again under any answer.",
-        "cancelled": "Need more help? Ask a teacher again under any answer.",
-        "withdrawn": "Need help after all? Ask a teacher again under any answer.",
-        "expired": "Your request has closed. Ask a teacher again under any answer."
+        "resolved": "Need more help? Keep asking here. When a teacher would help, the answer offers one.",
+        "cancelled": "Need more help? Keep asking here. When a teacher would help, the answer offers one.",
+        "withdrawn": "Need help after all? Keep asking here. When a teacher would help, the answer offers one.",
+        "expired": "Your request has closed. Keep asking here. When a teacher would help, the answer offers one."
       },
       "fallback": {
         "title": "Teacher support requested",

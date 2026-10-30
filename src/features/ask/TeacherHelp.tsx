@@ -1,8 +1,9 @@
 import { GraduationCap } from 'lucide-react'
+import { useId } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Button, Pill, type PillTone } from '@/components/base'
 import { ICON, ROW } from '@/components/base/sizes'
-import type { TeacherHelpRequest, TeacherHelpStatus } from '@/types/teacherHelp'
+import type { TeacherHelpRequest, TeacherHelpStatus, TeacherSupportStanding } from '@/types/teacherHelp'
 
 /*
  * Motion and states, "Status pills": Pending navy tint, Assigned gold,
@@ -99,22 +100,55 @@ export function TeacherHelpAction({
   onRequest,
   requesting,
   teachersOnline,
+  support,
   error,
 }: {
   onRequest: () => void
   requesting: boolean
   teachersOnline: boolean | undefined
+  /**
+   * This week's allowance (stoa-backend#144), `null` when it could not be
+   * read: then the button stays and says nothing of it, and a refusal is
+   * still answered in words below.
+   */
+  support?: TeacherSupportStanding | null
   error?: string | null
 }) {
   const { t } = useTranslation('chat')
+  const blocked = support?.canRequest === false
+  const noteId = useId()
+  // Why it cannot be pressed, in the words a refusal would have used.
+  const blockedNote = !blocked
+    ? null
+    : support.blockedReason === 'teacher_support_not_included'
+      ? t('teacher.errors.planDenied')
+      : t('teacher.errors.allowanceExhausted')
 
   return (
-    <div data-help-action className="flex flex-col items-start gap-1">
-      <Button variant="plain" size="small" onClick={onRequest} disabled={requesting} aria-busy={requesting || undefined}>
+    <div data-help-action data-help-blocked={blocked || undefined} className="flex flex-col items-start gap-1">
+      <Button
+        variant="plain"
+        size="small"
+        onClick={onRequest}
+        disabled={requesting || blocked}
+        aria-busy={requesting || undefined}
+        aria-describedby={blockedNote ? noteId : undefined}
+      >
         <GraduationCap aria-hidden="true" size={ICON.rowLeading} strokeWidth={ICON.stroke} />
         {requesting ? t('ask.help.requesting') : t('ask.help.request')}
       </Button>
-      {teachersOnline === false && <p className="text-[13px] leading-[1.4] text-caption">{t('ask.help.offline')}</p>}
+      {blockedNote ? (
+        <p id={noteId} className="text-[13px] leading-[1.4] text-caption">
+          {blockedNote}
+        </p>
+      ) : support && support.weeklyCases > 0 ? (
+        <p data-help-remaining className="text-[13px] leading-[1.4] text-caption">
+          {t('ask.help.remaining', { count: support.remainingCases })}
+        </p>
+      ) : null}
+      {!blocked && teachersOnline === false && (
+        <p className="text-[13px] leading-[1.4] text-caption">{t('ask.help.offline')}</p>
+      )}
       {error && (
         <p role="alert" className="text-[13px] leading-[1.4] text-red">
           {error}

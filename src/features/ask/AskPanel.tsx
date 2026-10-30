@@ -1,12 +1,14 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { ChevronLeft, X } from 'lucide-react'
-import { useEffect, useLayoutEffect, useMemo, useRef, useState, type HTMLAttributes } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type HTMLAttributes } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 import { Button, Composer, IconButton, PresenceDot } from '@/components/base'
 import { conversationDisplayTitle, subjectDisplayLabel } from '@/components/chat/conversationTitle'
+import { MathRenderer } from '@/components/ui/MathRenderer'
 import { GRADE_SECTION_ID } from '@/features/account/GradeGroup'
 import { AskConversationList, AskEmptyState } from '@/features/ask/AskConversationList'
+import { hasSections, quoteCaption, sectionsSpokenText, type AnswerStep } from '@/features/ask/AskAnswerSections'
 import { AskLitCard } from '@/features/ask/AskLitCard'
 import { AskMessage } from '@/features/ask/AskMessage'
 import { ASK_PANEL } from '@/features/ask/askLayout'
@@ -14,6 +16,7 @@ import { TeacherHelpAction, TeacherHelpStatusCard } from '@/features/ask/Teacher
 import type { AskController } from '@/features/ask/useAskController'
 import { useAskConversation } from '@/features/ask/useAskConversation'
 import {
+  makeQuote,
   quoteBelongs,
   quoteField,
   useAskQuoteStore,
@@ -47,6 +50,7 @@ import { useAuthStore } from '@/store/authStore'
 import { litMomentsFor, useLitMoments, type LitMoment } from '@/store/litMomentsStore'
 import { learningSubjectOptions } from '@/types/learningProfile'
 import { QUOTE_MAX_LENGTH, type ChatMessage, type PracticeContextRef } from '@/types/chat'
+import type { TeacherSupportStanding } from '@/types/teacherHelp'
 
 export type AskLayout = 'panel' | 'sheet'
 
@@ -164,6 +168,18 @@ export function AskPanel({
       ? chosenQuote
       : null
   const clearQuote = () => setQuote(null)
+  // "I don't get this step" (#506): the step goes out as a quote of that part
+  // of the answer, with a question the student can change or send as it is.
+  const composerArea = useRef<HTMLDivElement>(null)
+  const { readDraft } = controller
+  const askAboutStep = useCallback(
+    ({ messageId, index, text }: AnswerStep) => {
+      setQuote(makeQuote(text, { kind: 'message', id: messageId, part: { section: 'steps', index } }, conversationId))
+      if (!readDraft().trim()) setDraft(t('ask.answer.stepQuestion'))
+      composerArea.current?.querySelector('textarea')?.focus()
+    },
+    [conversationId, readDraft, setDraft, setQuote, t],
+  )
   // The files chosen for the next question, uploaded as they are picked (#125).
   const attachments = useAttachmentUploads()
   const picker = useRef<HTMLInputElement>(null)
@@ -355,6 +371,8 @@ export function AskPanel({
           ask={ask}
           layout={layout}
           teachersOnline={teachersOnline}
+          teacherSupport={availability?.teacherSupport ?? null}
+          onAskAboutStep={askAboutStep}
         />
       ) : (
         <div ref={listArea} className="flex min-h-0 flex-1 flex-col overflow-y-auto" style={{ padding: phone ? '8px 6px' : '10px 8px' }}>
@@ -404,7 +422,7 @@ export function AskPanel({
         </div>
       )}
 
-      <div className="shrink-0" style={{ padding: phone ? '0 12px 34px' : '0 14px 16px' }}>
+      <div ref={composerArea} className="shrink-0" style={{ padding: phone ? '0 12px 34px' : '0 14px 16px' }}>
         {isStreaming && (
           <div className="flex justify-end pb-1">
             <Button variant="plain" size="small" onClick={ask.stopStreaming}>
@@ -480,8 +498,11 @@ function PendingQuote({ quote, onRemove }: { quote: AskQuote; onRemove: () => vo
       className="mb-1.5 flex items-start gap-2 rounded-[12px] border border-[color:var(--card-border)] bg-surface px-3 py-2"
     >
       <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-        <span className="text-[12px] font-semibold text-caption">{t('ask.quote.title')}</span>
-        <span className="truncate text-[13px] text-ink">{quote.text}</span>
+        <span className="text-[12px] font-semibold text-caption">{quoteCaption(quote, t)}</span>
+        {/* A step of an answer carries its formulas: drawn, as on the bubble it came from (#506). */}
+        <span className="truncate text-[13px] text-ink">
+          <MathRenderer plain>{quote.text}</MathRenderer>
+        </span>
         {quote.truncated && (
           <span role="status" className="text-[12px] text-caption">
             {t('ask.quote.truncated', { count: QUOTE_MAX_LENGTH })}
@@ -512,11 +533,16 @@ function AskThread({
   ask,
   layout,
   teachersOnline,
+  teacherSupport,
+  onAskAboutStep,
 }: {
   conversationId: string
   ask: ReturnType<typeof useAskConversation>
   layout: AskLayout
   teachersOnline: boolean | undefined
+  /** This week's allowance, or `null` when it could not be read: then none is shown. */
+  teacherSupport: TeacherSupportStanding | null
+  onAskAboutStep: (step: AnswerStep) => void
 }) {
   const { t } = useTranslation('chat')
   const queryClient = useQueryClient()
@@ -536,10 +562,14 @@ function AskThread({
       // The card shows the request as the server reports it, read back from
       // the server: not the answer to this POST, and never a guess.
       void queryClient.invalidateQueries({ queryKey: chatQueryKeys.teacherHelpRequest(conversationId) })
+      // One of the week's requests is gone: said now, not at the next minute's read (#506).
+      void queryClient.invalidateQueries({ queryKey: chatQueryKeys.teacherAvailability() })
     },
     onError: (error) => {
       trackEvent('teacher_help_request_failed', { reason: teacherHelpErrorKey(error) })
       setHelpError(t(teacherHelpErrorKey(error)))
+      // A refusal for the allowance or the plan may be news to the reading on screen.
+      void queryClient.invalidateQueries({ queryKey: chatQueryKeys.teacherAvailability() })
     },
   })
 
@@ -551,7 +581,7 @@ function AskThread({
     startedAt: messages[0]?.createdAt,
   })
   const entries = threadEntries(messages, moments)
-  const lastAnswerId = latestAnswerId(messages)
+  const helpUnderId = helpOfferedUnder(messages)
   const offerHelp = !helpActive && !isStreaming && !requestHelp.isPending
   // The same element from one render to the next, so the answer it sits under
   // is not drawn again at every key typed in the composer (#416).
@@ -563,10 +593,11 @@ function AskThread({
           onRequest={() => request()}
           requesting={requesting}
           teachersOnline={teachersOnline}
+          support={teacherSupport}
           error={helpError}
         />
       ) : undefined,
-    [helpError, offerHelp, request, requesting, teachersOnline],
+    [helpError, offerHelp, request, requesting, teacherSupport, teachersOnline],
   )
 
   // Keep the latest message in view as the thread grows -- unless the student
@@ -623,7 +654,8 @@ function AskThread({
             message={entry.message}
             teacherName={help?.teacherName}
             onRetry={retryMessage}
-            after={entry.message.id === lastAnswerId ? helpAction : undefined}
+            onAskAboutStep={onAskAboutStep}
+            after={entry.message.id === helpUnderId ? helpAction : undefined}
           />
         ))}
       </div>
@@ -664,8 +696,17 @@ function useFinishedReplyAnnouncement(
     const fresh = finished.filter((message) => !known.has(message.id))
     for (const message of fresh) known.add(message.id)
     const latest = fresh[fresh.length - 1]
-    // A teacher's reply says who it is from; an answer is the assistant's.
-    if (latest) setAnnouncement(latest.role === 'teacher' ? `${names.teacher}: ${latest.content}` : latest.content)
+    // A teacher's reply says who it is from; an answer is the assistant's, read
+    // as it is shown: in sections, its steps and answer, not the hint (#506).
+    if (latest) {
+      setAnnouncement(
+        latest.role === 'teacher'
+          ? `${names.teacher}: ${latest.content}`
+          : hasSections(latest.structured)
+            ? sectionsSpokenText(latest.structured)
+            : latest.content,
+      )
+    }
   }, [loaded, messages, names.teacher])
   return announcement
 }
@@ -688,13 +729,24 @@ export function threadEntries(messages: readonly ChatMessage[], moments: readonl
   return entries
 }
 
-/** The latest answer the assistant finished: the request for a teacher sits under it. */
-function latestAnswerId(messages: readonly ChatMessage[]) {
+/**
+ * The answer "Ask a teacher" sits under (#506): the latest one the assistant
+ * finished in which it suggested a teacher, and nowhere while it is writing or
+ * its latest answer failed. An answer written before the sections were kept
+ * cannot say, so the latest one of those offers it as every answer did (#12
+ * point 2).
+ */
+export function helpOfferedUnder(messages: readonly ChatMessage[]) {
+  let latest = true
   for (let index = messages.length - 1; index >= 0; index -= 1) {
     const message = messages[index]
-    if (message.role === 'assistant') {
-      return message.status === 'streaming' || message.status === 'failed' ? null : message.id
+    if (message.role !== 'assistant') continue
+    if (latest) {
+      if (message.status === 'streaming' || message.status === 'failed') return null
+      if (!message.structured) return message.id
+      latest = false
     }
+    if (message.structured?.suggestTeacher === true && message.status !== 'failed') return message.id
   }
   return null
 }

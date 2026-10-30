@@ -92,6 +92,20 @@
       "startFailed": "Die Unterhaltung konnte nicht gestartet werden. Versuch es noch einmal.",
       "answerFailed": "Die Erklärung konnte gerade nicht erstellt werden. Versuch es noch einmal oder frag eine Lehrperson."
     },
+    "answer": {
+      "steps": "Schritte",
+      "answer": "Antwort",
+      "stepUnclear": "Diesen Schritt verstehe ich nicht",
+      "stepNumber": "Schritt {{n}}",
+      "stepQuestion": "Diesen Schritt verstehe ich nicht. Kannst du ihn anders erklären?",
+      "hints": "Tipps",
+      "showHint": "Tipp zeigen",
+      "nextHint": "Noch ein Tipp",
+      "practice": "Üben",
+      "showExercise": "Noch eine Übung",
+      "nextExercise": "Noch eine",
+      "related": "Passende Themen"
+    },
     "presence": {
       "online_one": "{{count}} Lehrperson online",
       "online_other": "{{count}} Lehrpersonen online",
@@ -101,6 +115,8 @@
       "request": "Lehrperson fragen",
       "requesting": "Lehrperson wird gefragt…",
       "offline": "Gerade ist keine Lehrperson online. Sobald sie wieder da ist, antwortet sie hier.",
+      "remaining_one": "Diese Woche noch {{count}} Anfrage an eine Lehrperson",
+      "remaining_other": "Diese Woche noch {{count}} Anfragen an eine Lehrperson",
       "cardLabel": "Unterstützung durch eine Lehrperson",
       "status": {
         "pending": "Wartet",
@@ -127,10 +143,10 @@
         "waiting_no_teacher": "Deine Anfrage bleibt offen. Sobald eine Lehrperson frei ist, übernimmt sie die Anfrage und antwortet in dieser Unterhaltung.",
         "assigned": "Die Antwort erscheint in dieser Unterhaltung.",
         "in_progress": "Die Antworten erscheinen in dieser Unterhaltung.",
-        "resolved": "Brauchst du mehr Hilfe? Frag unter einer Antwort erneut eine Lehrperson.",
-        "cancelled": "Brauchst du mehr Hilfe? Frag unter einer Antwort erneut eine Lehrperson.",
-        "withdrawn": "Brauchst du doch Hilfe? Frag unter einer Antwort erneut eine Lehrperson.",
-        "expired": "Deine Anfrage ist abgelaufen. Frag unter einer Antwort erneut eine Lehrperson."
+        "resolved": "Brauchst du mehr Hilfe? Frag hier weiter. Wenn eine Lehrperson helfen kann, bietet dir die Antwort eine an.",
+        "cancelled": "Brauchst du mehr Hilfe? Frag hier weiter. Wenn eine Lehrperson helfen kann, bietet dir die Antwort eine an.",
+        "withdrawn": "Brauchst du doch Hilfe? Frag hier weiter. Wenn eine Lehrperson helfen kann, bietet dir die Antwort eine an.",
+        "expired": "Deine Anfrage ist abgelaufen. Frag hier weiter. Wenn eine Lehrperson helfen kann, bietet dir die Antwort eine an."
       },
       "fallback": {
         "title": "Lehrperson angefragt",

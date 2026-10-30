@@ -92,6 +92,20 @@
       "startFailed": "La conversation n’a pas pu démarrer. Réessaie.",
       "answerFailed": "L’explication n’a pas pu être préparée pour le moment. Réessaie ou demande à un enseignant."
     },
+    "answer": {
+      "steps": "Étapes",
+      "answer": "Réponse",
+      "stepUnclear": "Je ne comprends pas cette étape",
+      "stepNumber": "Étape {{n}}",
+      "stepQuestion": "Je ne comprends pas cette étape. Tu peux l’expliquer autrement ?",
+      "hints": "Indices",
+      "showHint": "Montrer un indice",
+      "nextHint": "Encore un indice",
+      "practice": "S’entraîner",
+      "showExercise": "Encore un exercice",
+      "nextExercise": "Encore un",
+      "related": "Notions liées"
+    },
     "presence": {
       "online_one": "{{count}} enseignant en ligne",
       "online_many": "{{count}} enseignants en ligne",
@@ -102,6 +116,9 @@
       "request": "Demander à un enseignant",
       "requesting": "Demande en cours…",
       "offline": "Aucun enseignant n’est en ligne pour le moment. À son retour, il répondra ici.",
+      "remaining_one": "Encore {{count}} demande d’enseignant cette semaine",
+      "remaining_many": "Encore {{count}} demandes d’enseignant cette semaine",
+      "remaining_other": "Encore {{count}} demandes d’enseignant cette semaine",
       "cardLabel": "Aide d’un enseignant",
       "status": {
         "pending": "En attente",
@@ -128,10 +145,10 @@
         "waiting_no_teacher": "Ta demande reste ouverte. Dès qu’un enseignant sera disponible, il la prendra en charge et répondra dans cette conversation.",
         "assigned": "Sa réponse apparaîtra dans cette conversation.",
         "in_progress": "Ses réponses apparaissent dans cette conversation.",
-        "resolved": "Besoin de plus d’aide ? Redemande à un enseignant sous une réponse.",
-        "cancelled": "Besoin de plus d’aide ? Redemande à un enseignant sous une réponse.",
-        "withdrawn": "Finalement besoin d’aide ? Redemande à un enseignant sous une réponse.",
-        "expired": "Ta demande a expiré. Redemande à un enseignant sous une réponse."
+        "resolved": "Besoin de plus d’aide ? Continue à poser tes questions ici. Si un enseignant peut t’aider, la réponse te le proposera.",
+        "cancelled": "Besoin de plus d’aide ? Continue à poser tes questions ici. Si un enseignant peut t’aider, la réponse te le proposera.",
+        "withdrawn": "Finalement besoin d’aide ? Continue à poser tes questions ici. Si un enseignant peut t’aider, la réponse te le proposera.",
+        "expired": "Ta demande a expiré. Continue à poser tes questions ici. Si un enseignant peut t’aider, la réponse te le proposera."
       },
       "fallback": {
         "title": "Aide d’un enseignant demandée",
