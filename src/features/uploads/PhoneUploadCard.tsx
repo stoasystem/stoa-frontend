@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { Button, IconButton } from '@/components/base'
 import { QrCode } from '@/features/uploads/QrCode'
 import type { PhoneCodeView } from '@/features/uploads/usePhoneUploadCode'
-import { useObjectUrl } from '@/hooks/files/useObjectUrl'
+import { useObjectUrl } from '@/features/uploads/drawnImage'
 import { phoneUploadUrl } from '@/services/files/uploadCodeApi'
 import type { ValidatedUpload } from '@/types/file'
 

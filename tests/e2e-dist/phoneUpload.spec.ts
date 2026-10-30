@@ -103,7 +103,6 @@ test('Ask shows the code as a QR, and adds the phone’s photo only once the stu
   await desk.install(page)
   const phone = new PhoneUploadDesk(backend, desk)
   phone.install()
-  await phone.answerPreview(page)
   await signInAsStudent(page)
 
   // A code belongs to a conversation: the first question starts one.

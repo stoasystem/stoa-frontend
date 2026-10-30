@@ -1,6 +1,5 @@
-import type { Page } from '@playwright/test'
 import type { MockBackend, Reply } from './backend'
-import { API_ORIGIN, WEB_ORIGIN } from './origins'
+import { WEB_ORIGIN } from './origins'
 import type { UploadDesk } from './uploads'
 
 const MiB = 1024 * 1024
@@ -31,6 +30,8 @@ export class PhoneUploadDesk {
   completed = false
   /** Answered by `redeem` in place of spending the code: an expired one, say. */
   redeemRefusal: Reply | null = null
+  /** Each read of the photo by the computer, with the session it carried. */
+  readonly previews: Array<{ authorization?: string }> = []
 
   constructor(
     private readonly backend: MockBackend,
@@ -89,34 +90,14 @@ export class PhoneUploadDesk {
       this.completed = true
       return { status: 200, body: { status: 'validated' } }
     })
-  }
-
-  /**
-   * The photo for the computer to show before it is added: the JPEG the phone
-   * sent, as bytes. The contract's mock answers JSON only, so this route is
-   * answered here, over it (Playwright tries the route added last first).
-   */
-  readonly previews: Array<{ authorization?: string }> = []
-  async answerPreview(page: Page) {
-    await page.route(`${API_ORIGIN}/conversations/*/upload-codes/*/content`, async (route) => {
-      const request = route.request()
-      const cors = {
-        'access-control-allow-origin': WEB_ORIGIN,
-        'access-control-allow-credentials': 'true',
-        'access-control-allow-methods': 'GET, OPTIONS',
-        'access-control-allow-headers': request.headers()['access-control-request-headers'] ?? '*',
-      }
-      if (request.method() === 'OPTIONS') {
-        await route.fulfill({ status: 204, headers: cors })
-        return
-      }
-      this.previews.push({ authorization: request.headers().authorization })
+    // The photo for the computer to show before it is added: the JPEG the phone sent.
+    b.on('GET', '/conversations/{conv_id}/upload-codes/{code_id}/content', ({ headers }) => {
+      this.previews.push({ authorization: headers.authorization })
       const sent = this.desk.puts.find((put) => put.uploadId === this.uploadId)
       if (!this.completed || !sent) {
-        await route.fulfill({ status: 404, headers: cors, json: codeRefused().body })
-        return
+        return { status: 404, body: { detail: { code: 'upload_not_found', message: 'Not found.', correlationId: 'e2e-correlation' } } }
       }
-      await route.fulfill({ status: 200, headers: { ...cors, 'content-type': 'image/jpeg' }, body: sent.bytes })
+      return { status: 200, raw: { contentType: 'image/jpeg', bytes: sent.bytes } }
     })
   }
 }

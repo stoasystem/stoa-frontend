@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { useCallback, useEffect, useState } from 'react'
+import { drawnType } from '@/features/uploads/drawnImage'
 import { chatQueryKeys } from '@/services/chat/chatQueryKeys'
 import { phoneUploadProblemFor } from '@/services/files/attachmentProblems'
 import { createUploadCode, readUploadCode, readUploadCodePhoto } from '@/services/files/uploadCodeApi'
@@ -122,12 +123,15 @@ export function usePhoneUploadCode(conversationId: string | null) {
     else if (!isCode(made)) view = { step: 'unmade', problem: made.problem }
     else if (ready) {
       const redeemedAt = state?.redeemedAt ? Date.parse(state.redeemedAt) : now
+      // Only a PNG or JPEG is given an address to draw (#510): anything else
+      // is a photo that cannot be shown, and so cannot be added.
+      const drawable = photo.data && drawnType(photo.data) ? photo.data : undefined
       view = {
         step: 'ready',
         uploadId: ready,
         expiresAt: new Date(redeemedAt + UPLOAD_LIFETIME_MS).toISOString(),
-        photo: photo.data,
-        photoFailed: photo.isError,
+        photo: drawable,
+        photoFailed: photo.isError || (photo.data !== undefined && !drawable),
       }
     } else if (state?.status === 'failed') view = { step: 'failed' }
     else {

@@ -345,6 +345,18 @@ describe('the photo the phone sent', () => {
     expect(ask.queryByRole('button', { name: 'Add photo' })).toBeNull()
   })
 
+  it('is not drawn, nor offered, when what comes back is not a PNG or JPEG (#510)', async () => {
+    ready()
+    photoMock.mockResolvedValue(new Blob(['<svg onload="alert(1)"/>'], { type: 'image/svg+xml' }))
+    const ask = openAsk()
+    await ask.findByText('Linear equations')
+    await userEvent.click(ask.getByRole('button', { name: PHONE }))
+
+    expect(await ask.findByText('The photo cannot be shown here. Make a new code and send it again.')).toBeInTheDocument()
+    expect(ask.queryByRole('img', { name: 'The photo from your phone' })).toBeNull()
+    expect(ask.queryByRole('button', { name: 'Add photo' })).toBeNull()
+  })
+
   it('is held against the upload’s 30 minutes from when the phone took the code (#507)', async () => {
     // Taken 29 minutes ago: past the two minutes a question needs to go out.
     ready(minutesFromNow(-29))
