@@ -1,4 +1,5 @@
 import { ApiError } from '@/services/api/httpClient'
+import { ImagePreparationError } from '@/services/files/prepareImage'
 import { UploadRejectedError } from '@/services/files/fileApi'
 
 /**
@@ -20,13 +21,17 @@ export type AttachmentProblem =
   | 'quota'
   | 'unavailable'
   | 'tooMany'
+  | 'unreadable'
   | 'failed'
 
 const BY_CODE: Readonly<Record<string, AttachmentProblem>> = {
   upload_too_large: 'tooLarge',
   upload_type_not_supported: 'unsupported',
   upload_content_mismatch: 'unsupported',
-  upload_invalid: 'unsupported',
+  // Also what `complete` answers when a part never reached S3 (#516): "this
+  // kind cannot be sent" would be wrong there; "not added, try again" is true
+  // of both.
+  upload_invalid: 'failed',
   upload_not_found: 'expired',
   upload_expired: 'expired',
   upload_chunk_conflict: 'expired',
@@ -36,6 +41,8 @@ const BY_CODE: Readonly<Record<string, AttachmentProblem>> = {
 }
 
 export function problemFor(error: unknown): AttachmentProblem {
+  // The browser could not open the photo to shrink it (#508).
+  if (error instanceof ImagePreparationError) return 'unreadable'
   if (error instanceof UploadRejectedError) {
     return error.reason === 'too_large' ? 'tooLarge' : 'unsupported'
   }

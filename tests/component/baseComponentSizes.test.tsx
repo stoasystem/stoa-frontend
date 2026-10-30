@@ -401,6 +401,29 @@ describe('Composer (Sizes: docked 46, full ~150)', () => {
     expect(send.querySelector('svg')).toHaveAttribute('width', '18')
   })
 
+  it('puts the camera beside the + at the same size, only when asked to (#509)', async () => {
+    const onAttach = vi.fn()
+    const onCapture = vi.fn()
+    const { rerender } = render(
+      <Composer label="Ask" value="" onChange={() => {}} onSubmit={() => {}} onAttach={onAttach} onCapture={onCapture} />,
+    )
+
+    const camera = screen.getByRole('button', { name: 'composer.capture' })
+    expect(camera).toHaveStyle({ width: '32px', height: '32px' })
+    expect(camera.querySelector('svg')).toHaveAttribute('width', '20')
+    await userEvent.click(camera)
+    expect(onCapture).toHaveBeenCalledTimes(1)
+    expect(onAttach).not.toHaveBeenCalled()
+    await userEvent.click(screen.getByRole('button', { name: 'composer.attach' }))
+    expect(onAttach).toHaveBeenCalledTimes(1)
+    expect(onCapture).toHaveBeenCalledTimes(1)
+
+    // The negative control: no handler, no camera.
+    rerender(<Composer label="Ask" value="" onChange={() => {}} onSubmit={() => {}} onAttach={onAttach} />)
+    expect(screen.queryByRole('button', { name: 'composer.capture' })).toBeNull()
+    expect(screen.getByRole('button', { name: 'composer.attach' })).toBeInTheDocument()
+  })
+
   it('opens full at ~150 with a 78 field and a 32 footer, radius 18', () => {
     const { container } = render(<Harness variant="full" onSubmit={() => {}} />)
 
