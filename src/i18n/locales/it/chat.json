@@ -173,6 +173,7 @@
         "quota": "Non c’è più spazio per i file. Rimuovine prima uno più vecchio.",
         "unavailable": "Al momento non si possono aggiungere file. Riprova tra un attimo.",
         "unreadable": "Questa foto non si può aprire. Prova con un’altra o con uno screenshot.",
+        "blocked": "Questa immagine non si può inviare. Scegline un’altra oppure descrivi l’esercizio a parole.",
         "failed": "Non è stato possibile aggiungere questo file. Riprova."
       }
     }

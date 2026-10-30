@@ -172,6 +172,7 @@
         "quota": "There is no room left for files. Remove an older one first.",
         "unavailable": "Files cannot be added right now. Try again in a moment.",
         "unreadable": "This photo could not be opened. Try another one, or a screenshot.",
+        "blocked": "This picture cannot be sent. Choose a different one, or describe the question in words.",
         "failed": "This file could not be added. Try again."
       }
     }

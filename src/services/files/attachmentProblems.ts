@@ -22,6 +22,7 @@ export type AttachmentProblem =
   | 'unavailable'
   | 'tooMany'
   | 'unreadable'
+  | 'blocked'
   | 'failed'
 
 const BY_CODE: Readonly<Record<string, AttachmentProblem>> = {
@@ -32,6 +33,10 @@ const BY_CODE: Readonly<Record<string, AttachmentProblem>> = {
   // kind cannot be sent" would be wrong there; "not added, try again" is true
   // of both.
   upload_invalid: 'failed',
+  // Image moderation turned the picture down (stoa-backend#138). It is final --
+  // there is no appeal, and sending it again is refused as `upload_not_found`
+  // -- so the sentence offers another picture or words, never "try again".
+  upload_content_blocked: 'blocked',
   upload_not_found: 'expired',
   upload_expired: 'expired',
   upload_chunk_conflict: 'expired',
