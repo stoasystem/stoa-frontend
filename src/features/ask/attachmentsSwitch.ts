@@ -1,26 +1,24 @@
 /**
- * The paperclip stays off until the upload pipeline hands back an attachment.
+ * The paperclip, the camera and a teacher's "Add picture" are on.
  *
  * Measured against production on 2026-10-11, signed in as two different
  * accounts: `POST /files/intents` answers 200, `PUT /files/{id}/chunks/1`
  * answers 200, and `POST /files/{id}/complete` answers 200 with
  * `{"status":"validated","attachment":null}` -- every time, however often it
- * is called. `GET /files/attachments` answers 503 `upload_service_unavailable`.
- * That answer is the design, not the fault: the attachment is made when a
- * message carries `{uploadId}`, and `uploadFile` now takes `validated` as done
- * and the message sends the upload's id (#495, #507).
+ * is called. That answer is the design, not the fault: the attachment is made
+ * when a message carries `{uploadId}`, and `uploadFile` takes `validated` as
+ * done and the message sends the upload's id (#495, #507).
  *
- * The picker, the tray, the limits and their tests are all here and tested;
- * what is withheld is the button. The backend side is live since 2026-10-29:
- * the model reads the image (stoa-backend#135) and moderation refuses one as
- * `upload_content_blocked` (#138, said in the tray since #512). What is left is
- * a smoke run on production that sends one -- its checklist is in #512's PR.
- * Then this turns `true`: a module of its own so tests can drive the buttons
- * with it on (#509), and `tests/e2e-dist/attachments.spec.ts` opens the
- * chooser from the button once it is.
+ * The smoke run on production that this waited for passed on 2026-10-30
+ * (#512, its record in the issue): a large photo straight to S3 without the
+ * token, the model reading it, the attachment read back after a reload, a
+ * HEIC, moderation's refusal said in English and German with the question
+ * still sent, and a PDF in two parts. Still a person's to check once this is
+ * live: the camera button opening the back camera on a real phone (#509), and
+ * a teacher's reply with a picture (#513).
  *
- * A teacher's reply adds pictures through the same pipeline (#513), so its
- * button waits for this too; `tests/e2e-dist/teacherReplyImages.spec.ts`
- * opens that chooser from its button once it is on.
+ * A module of its own so tests can drive the buttons either way (#509);
+ * `tests/e2e-dist/attachments.spec.ts` and `teacherReplyImages.spec.ts` open
+ * the chooser from the button while it is on.
  */
-export const ATTACHMENTS_WORK = false
+export const ATTACHMENTS_WORK = true
