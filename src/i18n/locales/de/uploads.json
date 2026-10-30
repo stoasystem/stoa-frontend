@@ -6,5 +6,26 @@
     "uploaded": "Hochgeladen",
     "failed": "Fehlgeschlagen",
     "rejected": "Abgelehnt"
+  },
+  "phone": {
+    "title": "Foto an deinen Computer senden",
+    "intro": "Fotografier deine Aufgabe oder wähl ein Foto aus. Es landet direkt bei deiner Frage auf dem Computer.",
+    "noCode": "In diesem Link fehlt der Code. Scanne den QR-Code auf deinem Computer noch einmal.",
+    "take": "Foto machen",
+    "choose": "Foto auswählen",
+    "sending": "Dein Foto wird gesendet…",
+    "sent": "Fertig! Geh zurück zu deinem Computer: Dort wartet dein Foto, bis du es hinzufügst.",
+    "retry": "Noch einmal versuchen",
+    "stops": {
+      "codeInvalid": "Dieser Code ist abgelaufen oder wurde schon benutzt. Erstell auf deinem Computer einen neuen.",
+      "rateLimited": "Gerade zu viele Versuche. Warte einen Moment und versuch es dann noch einmal.",
+      "blocked": "Dieses Bild kann nicht gesendet werden. Erstell auf deinem Computer einen neuen Code und wähl ein anderes Bild oder beschreib deine Frage in Worten.",
+      "tooLarge": "Dieses Foto ist zu gross. Es darf bis {{limit}} gross sein. Wähl ein anderes.",
+      "unsupported": "Von hier aus kannst du nur Fotos senden. Wähl ein Foto.",
+      "empty": "Dieses Foto ist leer. Wähl ein anderes.",
+      "unreadable": "Dieses Foto lässt sich nicht öffnen. Versuch ein anderes oder einen Screenshot.",
+      "retry": "Das hat nicht geklappt. Prüf deine Verbindung und versuch es noch einmal.",
+      "newCode": "Das hat nicht geklappt. Erstell auf deinem Computer einen neuen Code und versuch es noch einmal."
+    }
   }
 }

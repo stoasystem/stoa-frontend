@@ -26,6 +26,7 @@
   "composer": {
     "attach": "Foto oder Datei auswählen",
     "capture": "Foto aufnehmen",
+    "phone": "Foto vom Handy senden",
     "send": "Senden",
     "sendBlocked": {
       "empty": "Schreib zuerst deine Frage, dann senden.",
@@ -313,6 +314,9 @@
     },
     "terms": {
       "title": "Nutzungsbedingungen"
+    },
+    "phoneUpload": {
+      "title": "Foto senden"
     },
     "unauthorized": {
       "title": "Anmeldung erforderlich"

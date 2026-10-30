@@ -193,6 +193,32 @@
         "failed": "Diese Datei konnte nicht hinzugefügt werden. Versuch es noch einmal."
       }
     },
+    "phone": {
+      "label": "Foto vom Handy",
+      "close": "Schliessen",
+      "title": "Mit dem Handy scannen",
+      "qrLabel": "QR-Code, um ein Foto vom Handy zu senden",
+      "qrFailed": "Der QR-Code lässt sich nicht anzeigen. Lade die Seite neu und versuch es noch einmal.",
+      "making": "Code wird erstellt…",
+      "unmade": {
+        "rateLimited": "Zu viele Codes in kurzer Zeit. Warte einen Moment und versuch es dann noch einmal.",
+        "failed": "Der Code konnte nicht erstellt werden. Versuch es noch einmal."
+      },
+      "waiting": "Richte die Kamera deines Handys auf den Code und mach oder wähl dort ein Foto.",
+      "validFor": "Gilt noch {{time}}",
+      "uploading": "Dein Handy sendet das Foto…",
+      "ready": "Ist das dein Foto? Füg es deiner Frage hinzu.",
+      "loadingPhoto": "Foto wird geladen…",
+      "photoFailed": "Das Foto lässt sich hier nicht anzeigen. Erstell einen neuen Code und sende es noch einmal.",
+      "photoAlt": "Das Foto von deinem Handy",
+      "photoName": "Handyfoto",
+      "add": "Foto hinzufügen",
+      "notMine": "Nicht meins",
+      "failed": "Das Foto ist nicht angekommen. Erstell einen neuen Code und versuch es noch einmal.",
+      "expired": "Dieser Code ist abgelaufen. Erstell einen neuen.",
+      "newCode": "Neuer Code",
+      "tryAgain": "Noch einmal versuchen"
+    },
     "teacherImages": {
       "label": "Bilder der Lehrperson",
       "alt": "Bild von {{teacher}}: {{name}}",

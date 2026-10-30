@@ -193,6 +193,32 @@
         "failed": "This file could not be added. Try again."
       }
     },
+    "phone": {
+      "label": "Photo from your phone",
+      "close": "Close",
+      "title": "Scan with your phone",
+      "qrLabel": "QR code to send a photo from your phone",
+      "qrFailed": "The QR code could not be shown. Reload the page and try again.",
+      "making": "Making a code…",
+      "unmade": {
+        "rateLimited": "Too many codes in a short time. Wait a moment, then try again.",
+        "failed": "The code could not be made. Try again."
+      },
+      "waiting": "Point your phone's camera at the code, then take or choose a photo there.",
+      "validFor": "Works for {{time}} more",
+      "uploading": "Your phone is sending the photo…",
+      "ready": "Is this your photo? Add it to your question.",
+      "loadingPhoto": "Loading the photo…",
+      "photoFailed": "The photo cannot be shown here. Make a new code and send it again.",
+      "photoAlt": "The photo from your phone",
+      "photoName": "phone-photo",
+      "add": "Add photo",
+      "notMine": "Not mine",
+      "failed": "The photo did not arrive. Make a new code and try again.",
+      "expired": "This code has expired. Make a new one.",
+      "newCode": "New code",
+      "tryAgain": "Try again"
+    },
     "teacherImages": {
       "label": "Pictures from the teacher",
       "alt": "Picture from {{teacher}}: {{name}}",

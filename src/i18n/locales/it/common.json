@@ -26,6 +26,7 @@
   "composer": {
     "attach": "Scegli una foto o un file",
     "capture": "Scatta una foto",
+    "phone": "Invia una foto dal telefono",
     "send": "Invia",
     "sendBlocked": {
       "empty": "Scrivi prima la tua domanda, poi invia.",
@@ -313,6 +314,9 @@
     },
     "terms": {
       "title": "Termini di utilizzo"
+    },
+    "phoneUpload": {
+      "title": "Invia una foto"
     },
     "unauthorized": {
       "title": "Accesso richiesto"
