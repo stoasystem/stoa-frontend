@@ -181,22 +181,6 @@
         "summary": "Ta demande d’aide à un·e enseignant·e a expiré. L’aide de cette semaine t’a été rendue.",
         "title": "Aucun·e enseignant·e disponible"
       },
-      "helpRequested": {
-        "summary": "Un·e élève demande de l’aide pour une question en {{subject}}.",
-        "title": "Aide demandée"
-      },
-      "moderationCreatedHigh": {
-        "summary": "Un cas de modération de gravité élevée a été signalé.",
-        "title": "Nouveau cas de modération"
-      },
-      "moderationCreatedLow": {
-        "summary": "Un cas de modération de gravité faible a été signalé.",
-        "title": "Nouveau cas de modération"
-      },
-      "moderationCreatedMedium": {
-        "summary": "Un cas de modération de gravité moyenne a été signalé.",
-        "title": "Nouveau cas de modération"
-      },
       "replyConversation": {
         "summary": "Ton enseignant·e a répondu dans ta conversation.",
         "title": "Ton enseignant·e a répondu"

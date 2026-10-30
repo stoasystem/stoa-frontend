@@ -13,9 +13,13 @@ import type {
 // is, and the bell counts its unread ones from it (#387).
 export const NOTIFICATION_PAGE_SIZE = 50
 
-export async function getNotifications() {
+// A query's `signal`: a read the query gave up on is called off (#518).
+type Read = { signal?: AbortSignal }
+
+export async function getNotifications({ signal }: Read = {}) {
   const response = await httpClient.get<NotificationListResponse>('/notifications', {
     params: { limit: NOTIFICATION_PAGE_SIZE },
+    signal,
   })
   return response.data
 }
@@ -29,15 +33,16 @@ export const UNREAD_COUNT_LIMIT = 100
  * The backend's `count` is the number of items it returned, so this one is
  * exact up to the limit.
  */
-export async function getUnreadNotificationCount() {
+export async function getUnreadNotificationCount({ signal }: Read = {}) {
   const response = await httpClient.get<NotificationListResponse>('/notifications', {
     params: { status: 'created', limit: UNREAD_COUNT_LIMIT },
+    signal,
   })
   return response.data.count
 }
 
-export async function getAdminNotifications() {
-  const response = await httpClient.get<NotificationListResponse>('/admin/notifications')
+export async function getAdminNotifications({ signal }: Read = {}) {
+  const response = await httpClient.get<NotificationListResponse>('/admin/notifications', { signal })
   return response.data
 }
 
