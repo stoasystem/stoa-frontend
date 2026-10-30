@@ -35,6 +35,8 @@ const signedIn = params.has('signedIn') ? params.get('signedIn') !== '0' : (surf
 const language = params.get('lang')
 const longNames = params.get('longNames') === '1'
 const newcomer = params.get('newcomer') === '1' || surface?.demo === 'newcomer'
+// PROTOTYPE #476: the find-a-star prototype over the map and Ask.
+const findStar = params.get('prototype') === 'find-star' || surface?.id === 'find-star'
 // Kept in the address: once the page moves, `path` replaces the surface, and a reload stays a newcomer's.
 if (newcomer && !params.has('newcomer')) {
   const url = new URL(window.location.href)
@@ -77,7 +79,7 @@ async function start() {
     import('react-dom/client'),
     import('react-router-dom'),
   ])
-  const [{ AppProviders }, { AppRoutes }, { AuthBootstrap }, { RouteArrival }, { PageSkeleton }, { useAuthStore }, { PreviewChrome }, { PreviewLighting }] =
+  const [{ AppProviders }, { AppRoutes }, { AuthBootstrap }, { RouteArrival }, { PageSkeleton }, { useAuthStore }, { PreviewChrome }, { PreviewLighting }, { FindStarPrototype }] =
     await Promise.all([
       import('@/app/providers/AppProviders'),
       import('@/app/router/AppRoutes'),
@@ -87,6 +89,7 @@ async function start() {
       import('@/store/authStore'),
       import('@/dev/preview/PreviewChrome'),
       import('@/dev/preview/lighting'),
+      import('@/dev/preview/findStar/FindStarPrototype'),
     ])
 
   // Signed in the way the login form leaves it: a token in the store, the
@@ -106,11 +109,21 @@ async function start() {
           <MemoryRouter initialEntries={[path]}>
             <AuthBootstrap />
             <PreviewChrome initialPath={path} open={surface?.open} focus={surface?.focus} pending={surface?.pending} readyWhen={surface?.readyWhen} />
-            <RouteArrival>
-              <Suspense fallback={<PageSkeleton rows={4} />}>
-                <AppRoutes />
-              </Suspense>
-            </RouteArrival>
+            {findStar ? (
+              <FindStarPrototype>
+                <RouteArrival>
+                  <Suspense fallback={<PageSkeleton rows={4} />}>
+                    <AppRoutes />
+                  </Suspense>
+                </RouteArrival>
+              </FindStarPrototype>
+            ) : (
+              <RouteArrival>
+                <Suspense fallback={<PageSkeleton rows={4} />}>
+                  <AppRoutes />
+                </Suspense>
+              </RouteArrival>
+            )}
           </MemoryRouter>
         </PreviewLighting>
       </AppProviders>
