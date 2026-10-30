@@ -97,6 +97,17 @@
       "busy": "Currently busy",
       "unavailable": "Not accepting students",
       "paused": "Paused"
+    },
+    "notifications": {
+      "title": "Notification settings",
+      "description": "A help request assigned to you always appears in your notifications.",
+      "dispatchEmail": {
+        "title": "Email for new help requests",
+        "body": "An email each time a help request is assigned to you, with the subject and a link. It never contains what the student wrote."
+      },
+      "loading": "Loading notification settings…",
+      "unavailable": "Notification settings could not be loaded.",
+      "saveFailed": "The setting could not be saved. Please try again."
     }
   },
   "requests": {

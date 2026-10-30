@@ -870,6 +870,7 @@
       "learning_profile_update": "Learning profile update",
       "moderation_case_update": "Moderation case update",
       "subscription_request_update": "Subscription request update",
+      "teacher_help_dispatched": "Help request assigned",
       "teacher_help_expired": "Teacher help expired",
       "teacher_reply": "Teacher reply",
       "teacher_requested": "Teacher requested",

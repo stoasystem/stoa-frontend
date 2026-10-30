@@ -15,6 +15,7 @@ import { PageContainer } from '@/components/common/PageContainer'
 import { PageHeader } from '@/components/common/PageHeader'
 import { PageSkeleton } from '@/components/common/PageSkeleton'
 import { Badge } from '@/components/ui/badge'
+import { TeacherNotificationSettingsCard } from '@/components/teacher/TeacherNotificationSettingsCard'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { useTeacherProfileQuery } from '@/hooks/teacher/useTeacherProfileQuery'
 import { DashboardLayout } from '@/layouts/DashboardLayout'
@@ -46,6 +47,8 @@ export function TeacherProfilePage() {
             <CoverageCard profile={profile} />
           </section>
         )}
+        {/* Not behind the profile: the settings are read on their own. */}
+        <TeacherNotificationSettingsCard />
       </PageContainer>
     </DashboardLayout>
   )

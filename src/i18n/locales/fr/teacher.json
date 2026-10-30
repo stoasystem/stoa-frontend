@@ -97,6 +97,17 @@
       "busy": "Actuellement occupé",
       "unavailable": "N’accepte pas d’élèves",
       "paused": "En pause"
+    },
+    "notifications": {
+      "title": "Paramètres de notification",
+      "description": "Une demande d’aide qui vous est attribuée apparaît toujours dans vos notifications.",
+      "dispatchEmail": {
+        "title": "E-mail pour les nouvelles demandes d’aide",
+        "body": "Un e-mail chaque fois qu’une demande d’aide vous est attribuée, avec la matière et un lien. Il ne contient jamais ce que l’élève a écrit."
+      },
+      "loading": "Chargement des paramètres de notification…",
+      "unavailable": "Impossible de charger les paramètres de notification.",
+      "saveFailed": "Le réglage n’a pas pu être enregistré. Veuillez réessayer."
     }
   },
   "requests": {

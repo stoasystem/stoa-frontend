@@ -97,6 +97,17 @@
       "busy": "Zurzeit ausgelastet",
       "unavailable": "Nimmt keine Lernenden an",
       "paused": "Pausiert"
+    },
+    "notifications": {
+      "title": "Mitteilungen",
+      "description": "Eine Hilfeanfrage, die Ihnen zugewiesen wird, erscheint immer in den Mitteilungen.",
+      "dispatchEmail": {
+        "title": "E-Mail bei neuen Hilfeanfragen",
+        "body": "Eine E-Mail, sobald Ihnen eine Hilfeanfrage zugewiesen wird, mit Fach und Link. Was die Schülerin oder der Schüler geschrieben hat, steht nie darin."
+      },
+      "loading": "Benachrichtigungseinstellungen werden geladen …",
+      "unavailable": "Die Benachrichtigungseinstellungen konnten nicht geladen werden.",
+      "saveFailed": "Die Einstellung konnte nicht gespeichert werden. Bitte versuchen Sie es erneut."
     }
   },
   "requests": {

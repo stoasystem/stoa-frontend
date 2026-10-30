@@ -60,8 +60,16 @@ export async function getNotificationPreferences() {
  * The backend rebuilds the whole matrix from its defaults and the body, so a
  * category or channel left out of `preferences` goes back to its default.
  * Always send the full matrix the last GET returned, with the change applied.
+ * `dispatchEmail`, left out, keeps what is stored.
  */
 export async function updateNotificationPreferences(preferences: NotificationPreferenceMatrix) {
   const response = await httpClient.patch<NotificationPreferences>('/notifications/preferences', { preferences })
+  return response.data
+}
+
+// The dispatch email switch alone: the backend keeps the stored matrix when
+// `preferences` is left out (stoa-backend#141).
+export async function updateDispatchEmail(dispatchEmail: boolean) {
+  const response = await httpClient.patch<NotificationPreferences>('/notifications/preferences', { dispatchEmail })
   return response.data
 }
