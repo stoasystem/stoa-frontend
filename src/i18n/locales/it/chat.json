@@ -176,6 +176,32 @@
         "blocked": "Questa immagine non si può inviare. Scegline un’altra oppure descrivi l’esercizio a parole.",
         "failed": "Non è stato possibile aggiungere questo file. Riprova."
       }
+    },
+    "phone": {
+      "label": "Foto dal telefono",
+      "close": "Chiudi",
+      "title": "Scansiona con il telefono",
+      "qrLabel": "Codice QR per inviare una foto dal telefono",
+      "qrFailed": "Il codice QR non si può mostrare. Ricarica la pagina e riprova.",
+      "making": "Creazione del codice…",
+      "unmade": {
+        "rateLimited": "Troppi codici in poco tempo. Aspetta un attimo, poi riprova.",
+        "failed": "Non è stato possibile creare il codice. Riprova."
+      },
+      "waiting": "Inquadra il codice con la fotocamera del telefono, poi scatta o scegli una foto.",
+      "validFor": "Valido ancora {{time}}",
+      "uploading": "Il tuo telefono sta inviando la foto…",
+      "ready": "È la tua foto? Aggiungila alla tua domanda.",
+      "loadingPhoto": "Caricamento della foto…",
+      "photoFailed": "La foto non si può mostrare qui. Crea un nuovo codice e inviala di nuovo.",
+      "photoAlt": "La foto dal tuo telefono",
+      "photoName": "foto-telefono",
+      "add": "Aggiungi la foto",
+      "notMine": "Non è mia",
+      "failed": "La foto non è arrivata. Crea un nuovo codice e riprova.",
+      "expired": "Questo codice è scaduto. Creane uno nuovo.",
+      "newCode": "Nuovo codice",
+      "tryAgain": "Riprova"
     }
   }
 }

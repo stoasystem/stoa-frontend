@@ -74,3 +74,42 @@ export type ValidatedUpload = {
  * one of the two, or the backend answers 422.
  */
 export type AttachmentReference = { uploadId: string } | { attachmentId: string }
+
+/**
+ * `UploadCodeResponse`: a fresh code for a phone to put one photo into a
+ * conversation with (stoa-backend#146). `code` is in this response only; the
+ * QR carries it, and nothing stores it.
+ */
+export type UploadCode = {
+  codeId: string
+  code: string
+  expiresAt: string
+}
+
+/** `UploadCodeStatus`: how far the phone has got. */
+export type UploadCodeStatus = 'waiting' | 'uploading' | 'ready' | 'failed' | 'expired'
+
+/**
+ * `UploadCodeStatusResponse`. `redeemedAt` is when a phone took the code;
+ * `uploadId` comes only at `ready`, once the photo has passed. `expiresAt` is
+ * the code's until a phone takes it, then the phone's upload token's.
+ */
+export type UploadCodeState = {
+  codeId: string
+  status: UploadCodeStatus
+  expiresAt: string
+  redeemedAt?: string | null
+  uploadId?: string | null
+}
+
+/**
+ * `UploadCodeRedeemResponse`: what the phone carries for the rest of its one
+ * upload. The token, not the code, signs every part and the completion.
+ */
+export type UploadCodeRedemption = {
+  uploadToken: string
+  expiresAt: string
+  maxBytes: number
+  chunkBytes: number
+  acceptedTypes: string[]
+}

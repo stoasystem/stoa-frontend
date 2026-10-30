@@ -6,5 +6,26 @@
     "uploaded": "Caricato",
     "failed": "Non riuscito",
     "rejected": "Rifiutato"
+  },
+  "phone": {
+    "title": "Invia una foto al computer",
+    "intro": "Fotografa il tuo esercizio o scegli una foto. Arriva direttamente alla tua domanda sul computer.",
+    "noCode": "In questo link manca il codice. Scansiona di nuovo il codice QR sul computer.",
+    "take": "Scatta una foto",
+    "choose": "Scegli una foto",
+    "sending": "Invio della foto…",
+    "sent": "Fatto! Torna al computer: la tua foto ti aspetta lì, pronta da aggiungere.",
+    "retry": "Riprova",
+    "stops": {
+      "codeInvalid": "Questo codice è scaduto o è già stato usato. Creane uno nuovo sul computer.",
+      "rateLimited": "Troppi tentativi in questo momento. Aspetta un attimo, poi riprova.",
+      "blocked": "Questa immagine non si può inviare. Crea un nuovo codice sul computer e scegli un’altra immagine, oppure descrivi la tua domanda a parole.",
+      "tooLarge": "Questa foto è troppo grande. Può arrivare a {{limit}}. Scegline un’altra.",
+      "unsupported": "Da qui puoi inviare solo foto. Scegli una foto.",
+      "empty": "Questa foto è vuota. Scegline un’altra.",
+      "unreadable": "Questa foto non si può aprire. Prova con un’altra o con uno screenshot.",
+      "retry": "Non ha funzionato. Controlla la connessione e riprova.",
+      "newCode": "Non ha funzionato. Crea un nuovo codice sul computer e riprova."
+    }
   }
 }

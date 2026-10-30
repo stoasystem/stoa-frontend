@@ -73,6 +73,16 @@ While `ATTACHMENTS_WORK` is off the file goes into the chooser input directly
 and the test checks the button is absent; once it is on, the test opens the
 chooser from the button.
 
+`phoneUpload.spec.ts`: a photo from the phone by QR (#514). The phone's page,
+not signed in, takes the code from after the `#` and out of the address, spends
+it once on `redeem`, and sends the part to S3 and `complete` with the upload
+token only; no request carries the code or a session. An expired or used code
+(`404 upload_code_invalid`) is said, and nothing is sent. In Ask the button waits
+behind `ATTACHMENTS_WORK` like the paperclip: while it is off the test checks it
+is absent; once it is on, the QR is checked to encode the phone page's address
+with the code after the `#`, a second, signed-out browser sends the photo, and
+the computer shows it and adds it only when the student says so.
+
 `forcedChange.spec.ts`: a student whose password an administrator reset opens
 `/ask`, signs in, is sent to the password change with only Help and Log out in
 the shell, reloads it, changes the password, and "Continue" opens `/ask`; the

@@ -107,6 +107,10 @@ function isPublicAuthPath(url?: string, method?: string) {
   if (path === '/teacher-applications' && verb === 'post') return true
   if (path === '/teacher-applications/activation/claim' && verb === 'post') return true
   if (/^\/teacher-applications\/[^/]+\/status$/.test(path) && verb === 'get') return true
+  // The phone's side of a photo sent by QR (#514): the code, then its upload
+  // token, are the credential. A phone signed in as anyone -- a parent, say --
+  // sends no session with them, and a refusal there signs nobody out.
+  if (/^\/upload-codes\/(redeem|complete|parts\/\d+)$/.test(path) && verb === 'post') return true
   return false
 }
 

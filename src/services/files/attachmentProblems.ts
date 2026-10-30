@@ -58,3 +58,25 @@ export function problemFor(error: unknown): AttachmentProblem {
   }
   return 'failed'
 }
+
+/**
+ * What stopped a photo sent by QR (#514): an attachment's problems, and two of
+ * the code's own.
+ *
+ * Every refusal of a code or its upload token -- wrong, already used, past its
+ * ten minutes, its account in deletion -- is the same `404
+ * upload_code_invalid`, so a guesser learns nothing (stoa-backend#146): one
+ * sentence covers expired and used. Too many refusals from one address is
+ * `429 upload_code_rate_limited`; API Gateway's own throttle answers 429 too,
+ * with `{"message":"Too Many Requests"}` and no code (stoa-infra#10), so the
+ * status alone is read.
+ */
+export type PhoneUploadProblem = AttachmentProblem | 'codeInvalid' | 'rateLimited'
+
+export function phoneUploadProblemFor(error: unknown): PhoneUploadProblem {
+  if (error instanceof ApiError) {
+    if (error.code === 'upload_code_invalid') return 'codeInvalid'
+    if (error.status === 429 || error.code === 'upload_code_rate_limited') return 'rateLimited'
+  }
+  return problemFor(error)
+}

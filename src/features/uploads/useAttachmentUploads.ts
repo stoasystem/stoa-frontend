@@ -9,7 +9,7 @@ import {
   uploadRejectionFor,
 } from '@/services/files/uploadLimits'
 import type { ChatAttachment } from '@/types/chat'
-import type { AttachmentReference } from '@/types/file'
+import type { AttachmentReference, ValidatedUpload } from '@/types/file'
 
 /** One file chosen in the composer, from the moment it is picked. */
 export type AttachmentDraft = {
@@ -180,6 +180,23 @@ export function useAttachmentUploads() {
     [serially, settle, write],
   )
 
+  /**
+   * A photo already up and passed, which the student chose to add: the one a
+   * phone sent by QR (#514). It joins the tray ready, once, if there is room.
+   */
+  const adopt = useCallback(
+    (upload: ValidatedUpload) => {
+      if (held.current.some((draft) => draft.uploadId === upload.uploadId)) return
+      if (held.current.length >= ATTACHMENTS_PER_MESSAGE) {
+        setOverflow(true)
+        return
+      }
+      setOverflow(false)
+      write([...held.current, { localId: nextLocalId(), state: 'ready', ...upload }])
+    },
+    [write],
+  )
+
   const remove = useCallback(
     (localId: string) => {
       setOverflow(false)
@@ -236,6 +253,7 @@ export function useAttachmentUploads() {
     drafts,
     overflow,
     add,
+    adopt,
     remove,
     clear,
     clearSent,

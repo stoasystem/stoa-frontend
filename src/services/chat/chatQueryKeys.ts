@@ -7,4 +7,9 @@ export const chatQueryKeys = {
     [...chatQueryKeys.all, 'teacher-availability'] as const,
   teacherHelpRequest: (requestId: string) =>
     [...chatQueryKeys.all, 'teacher-help-request', requestId] as const,
+  /** How far the phone has got with a QR's code (#514). */
+  uploadCode: (conversationId: string, codeId: string) =>
+    [...chatQueryKeys.all, 'upload-code', conversationId, codeId] as const,
+  uploadCodePhoto: (conversationId: string, codeId: string) =>
+    [...chatQueryKeys.uploadCode(conversationId, codeId), 'photo'] as const,
 }

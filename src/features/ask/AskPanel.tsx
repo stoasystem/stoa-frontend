@@ -25,7 +25,9 @@ import {
 // it (#512), is written where it is set.
 import { ATTACHMENTS_WORK } from '@/features/ask/attachmentsSwitch'
 import { AttachmentTray } from '@/features/uploads/AttachmentTray'
+import { PhoneUploadCard } from '@/features/uploads/PhoneUploadCard'
 import { useAttachmentUploads } from '@/features/uploads/useAttachmentUploads'
+import { usePhoneUploadCode } from '@/features/uploads/usePhoneUploadCode'
 import { ACCEPT_ATTRIBUTE, CAMERA_ACCEPT_ATTRIBUTE } from '@/services/files/uploadLimits'
 import { useConversationsQuery } from '@/hooks/chat/useConversationsQuery'
 import { useCreateConversationMutation } from '@/hooks/chat/useCreateConversationMutation'
@@ -173,6 +175,10 @@ export function AskPanel({
   const camera = useRef<HTMLInputElement>(null)
   const touch = useMediaQuery(TOUCH_QUERY)
   const { clearSent } = attachments
+  // A photo taken on the phone, by a QR the computer shows (#514). The code
+  // is made for a conversation, so it is offered once one is open; on a phone
+  // the camera is right there instead.
+  const phoneCode = usePhoneUploadCode(conversationId)
 
   // The exercise on screen goes out with every question asked beside it: the
   // backend reads the exercise, the chapter and the learning state from the
@@ -426,6 +432,17 @@ export function AskPanel({
           </p>
         )}
         {quote && <PendingQuote quote={quote} onRemove={clearQuote} />}
+        {phoneCode.view && (
+          <PhoneUploadCard
+            view={phoneCode.view}
+            onAdd={(upload) => {
+              attachments.adopt(upload)
+              phoneCode.close()
+            }}
+            onRenew={phoneCode.start}
+            onClose={phoneCode.close}
+          />
+        )}
         <AttachmentTray drafts={attachments.drafts} overflow={attachments.overflow} onRemove={attachments.remove} />
         <input
           ref={picker}
@@ -457,6 +474,7 @@ export function AskPanel({
           onSubmit={submit}
           onAttach={ATTACHMENTS_WORK ? () => picker.current?.click() : undefined}
           onCapture={ATTACHMENTS_WORK && touch ? () => camera.current?.click() : undefined}
+          onPhone={ATTACHMENTS_WORK && !touch && conversationId ? phoneCode.start : undefined}
           dictationHint="inline"
           label={t('ask.composerLabel')}
           placeholder={practice ? t('ask.practice.placeholder') : t('ask.placeholder')}

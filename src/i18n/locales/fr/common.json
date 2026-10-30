@@ -26,6 +26,7 @@
   "composer": {
     "attach": "Choisir une photo ou un fichier",
     "capture": "Prendre une photo",
+    "phone": "Envoyer une photo depuis ton téléphone",
     "send": "Envoyer",
     "sendBlocked": {
       "empty": "Écris d’abord ta question, puis envoie-la.",
@@ -313,6 +314,9 @@
     },
     "terms": {
       "title": "Conditions d’utilisation"
+    },
+    "phoneUpload": {
+      "title": "Envoyer une photo"
     },
     "unauthorized": {
       "title": "Connexion requise"

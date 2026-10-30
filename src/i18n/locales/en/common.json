@@ -26,6 +26,7 @@
   "composer": {
     "attach": "Choose a photo or file",
     "capture": "Take a photo",
+    "phone": "Send a photo from your phone",
     "send": "Send",
     "sendBlocked": {
       "empty": "Write your question first, then send.",
@@ -313,6 +314,9 @@
     },
     "terms": {
       "title": "Terms of use"
+    },
+    "phoneUpload": {
+      "title": "Send a photo"
     },
     "unauthorized": {
       "title": "Sign-in required"
