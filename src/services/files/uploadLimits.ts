@@ -68,6 +68,14 @@ export const ACCEPT_ATTRIBUTE = [...new Set([...Object.keys(MIME_BY_EXTENSION), 
   .join(',')
 
 /**
+ * For a chooser that takes photos only: a teacher's reply carries JPEG and PNG,
+ * nothing else (`help_reply_image`, stoa-backend#145), and a HEIC becomes one.
+ */
+export const IMAGE_ACCEPT_ATTRIBUTE = Object.keys(PREPARED_IMAGE_TYPES)
+  .map((extension) => `.${extension}`)
+  .join(',')
+
+/**
  * For the camera's `accept` (#509). With `capture`, a phone opens the camera
  * for an image type; what it takes is a JPEG (a HEIC on some iPhones), which
  * `PREPARED_IMAGE_TYPES` covers. Anything else `rejectionFor` refuses as it
@@ -104,6 +112,11 @@ export function rejectionFor(file: File): 'unsupported' | 'tooLarge' | 'empty' |
     return null
   }
   return uploadRejectionFor(file)
+}
+
+/** As `rejectionFor`, for a purpose that takes photos only: any other file is `unsupported`. */
+export function imageRejectionFor(file: File): 'unsupported' | 'tooLarge' | 'empty' | null {
+  return isPreparedImage(file.name) ? rejectionFor(file) : 'unsupported'
 }
 
 /** Why the backend would refuse this file as it is, by its own table; `null` when it would not. */

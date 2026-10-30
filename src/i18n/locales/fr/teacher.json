@@ -73,7 +73,8 @@
       "unavailable": "Image non disponible",
       "failed": "Impossible de charger l’image.",
       "retry": "Réessayer",
-      "retryNamed": "Réessayer : {{name}}"
+      "retryNamed": "Réessayer : {{name}}",
+      "altTeacher": "Image de l’enseignant·e : {{name}}"
     }
   },
   "profile": {
@@ -233,7 +234,27 @@
       "tooManyBlocks": "Une réponse compte au maximum {{max}} blocs. Veuillez regrouper des blocs ou en supprimer un.",
       "tooLong": "La réponse est trop longue : {{length}} caractères sur {{max}} au maximum au total. Veuillez la raccourcir."
     },
-    "removeBlock": "Supprimer le bloc {{number}}"
+    "removeBlock": "Supprimer le bloc {{number}}",
+    "attachments": {
+      "add": "Ajouter une image",
+      "label": "Images jointes",
+      "remove": "Retirer {{name}}",
+      "uploading": "Ajout en cours…",
+      "uploadingFile": "Ajout de {{name}} en cours…",
+      "needsText": "Ajoutez quelques mots : une image seule ne peut pas encore être envoyée.",
+      "errors": {
+        "tooMany": "Une réponse comporte au maximum {{count}} images.",
+        "tooLarge": "Cette image est trop lourde. Les photos peuvent aller jusqu’à {{imageLimit}}.",
+        "unsupported": "Seules des photos peuvent être envoyées : JPEG, PNG ou HEIC.",
+        "empty": "Ce fichier est vide. Veuillez en choisir un autre.",
+        "expired": "Cette image a pris trop de temps. Veuillez la choisir à nouveau.",
+        "quota": "Il n’y a pas de place pour des images en ce moment.",
+        "unavailable": "Impossible d’ajouter des images pour le moment. Veuillez réessayer dans un instant.",
+        "unreadable": "Impossible d’ouvrir cette photo. Veuillez en essayer une autre ou une capture d’écran.",
+        "blocked": "Cette image ne peut pas être envoyée. Veuillez en choisir une autre ou la décrire avec des mots.",
+        "failed": "Cette image n’a pas pu être ajoutée. Veuillez réessayer."
+      }
+    }
   },
   "practiceContext": {
     "source": "Source : {{source}}",
@@ -380,6 +401,7 @@
       "tooManyBlocks": "Votre réponse n’a pas été acceptée : elle compte trop de blocs. Veuillez en regrouper.",
       "blockTooLong": "Votre réponse n’a pas été acceptée : l’un de ses blocs est trop long. Veuillez raccourcir ou diviser ce bloc.",
       "tooLong": "Votre réponse n’a pas été acceptée : elle est trop longue au total. Veuillez la raccourcir ou la diviser."
-    }
+    },
+    "replyImagesExpired": "La réponse n’a pas été envoyée : une image n’était plus valable. Veuillez la choisir à nouveau, puis renvoyer."
   }
 }
