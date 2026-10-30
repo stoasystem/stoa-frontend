@@ -27,6 +27,10 @@
       "thirdParties": {
         "title": "Service partners",
         "body": "Hosting, authentication, analytics, monitoring, and support partners may process limited data under appropriate service agreements."
+      },
+      "dataLocation": {
+        "title": "Where data is processed",
+        "body": "STOA stores data in Switzerland, in Amazon Web Services (AWS) data centres in Zurich. For AI explanations and the automatic check of uploaded images, requests are processed in AWS data centres in the EU; they are neither stored there nor used to train AI models. Before upload, STOA removes location data (EXIF) from photos. Images are kept for at most 365 days and deleted immediately when the account is deleted. Images blocked by the check are visible only to administrators and are deleted 90 days after they have been handled."
       }
     }
   },

@@ -27,6 +27,10 @@
       "thirdParties": {
         "title": "Fornitori di servizi",
         "body": "Fornitori di hosting, autenticazione, analisi, monitoraggio e assistenza possono trattare dati limitati secondo accordi appropriati."
+      },
+      "dataLocation": {
+        "title": "Dove vengono trattati i dati",
+        "body": "STOA conserva i dati in Svizzera, in centri dati di Amazon Web Services (AWS) a Zurigo. Per le spiegazioni dell'IA e il controllo automatico delle immagini caricate, le richieste vengono elaborate in centri dati di AWS nell'UE; lì non vengono né conservate né utilizzate per addestrare modelli di IA. Prima del caricamento, STOA rimuove i dati di posizione (EXIF) dalle foto. Le immagini vengono conservate al massimo 365 giorni e cancellate immediatamente alla cancellazione dell'account. Le immagini bloccate dal controllo sono visibili solo all'amministrazione e vengono cancellate 90 giorni dopo la loro gestione."
       }
     }
   },
