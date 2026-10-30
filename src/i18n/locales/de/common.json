@@ -24,11 +24,17 @@
     "tryAgain": "Erneut versuchen"
   },
   "composer": {
-    "attach": "Foto oder Datei hinzufügen",
+    "attach": "Foto oder Datei auswählen",
+    "capture": "Foto aufnehmen",
     "send": "Senden",
     "sendBlocked": {
       "empty": "Schreib zuerst deine Frage, dann senden.",
       "busy": "Das wird noch gesendet. Versuch es gleich noch einmal."
+    },
+    "dictation": {
+      "windows": "Lieber sprechen? Drück Win + H und sag deine Frage.",
+      "mac": "Lieber sprechen? Drück die Mikrofontaste oder dein Tastenkürzel fürs Diktieren.",
+      "touch": "Lieber sprechen? Tipp auf das Mikrofon auf deiner Tastatur."
     }
   },
   "errorBoundary": {
@@ -174,22 +180,6 @@
       "helpExpiredReturned": {
         "summary": "Deine Anfrage an eine Lehrperson ist abgelaufen. Die Lehrpersonenhilfe dieser Woche hast du zurückbekommen.",
         "title": "Keine Lehrperson verfügbar"
-      },
-      "helpRequested": {
-        "summary": "Eine Schülerin oder ein Schüler bittet um Hilfe bei einer Frage in {{subject}}.",
-        "title": "Hilfe angefragt"
-      },
-      "moderationCreatedHigh": {
-        "summary": "Ein Moderationsfall mit hohem Schweregrad wurde gemeldet.",
-        "title": "Neuer Moderationsfall"
-      },
-      "moderationCreatedLow": {
-        "summary": "Ein Moderationsfall mit niedrigem Schweregrad wurde gemeldet.",
-        "title": "Neuer Moderationsfall"
-      },
-      "moderationCreatedMedium": {
-        "summary": "Ein Moderationsfall mit mittlerem Schweregrad wurde gemeldet.",
-        "title": "Neuer Moderationsfall"
       },
       "replyConversation": {
         "summary": "Deine Lehrperson hat in deinem Gespräch geantwortet.",

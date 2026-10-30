@@ -514,6 +514,16 @@ export function moderationPathFor(caseId: unknown): string {
   return CONVERSATION_ID.test(id) ? `/admin/moderation?case=${encodeURIComponent(id)}` : '/admin/moderation'
 }
 
+/**
+ * A teacher's help request, `/teacher/requests/<id>`, or their request queue
+ * when there is no id. The dispatch email links the same address
+ * (stoa-backend#141).
+ */
+export function teacherRequestPathFor(requestId: unknown): string {
+  const id = typeof requestId === 'string' ? requestId.trim() : ''
+  return CONVERSATION_ID.test(id) ? `/teacher/requests/${id}` : '/teacher'
+}
+
 /*
  * How an old `/chat` link names a conversation. Today's ChatPage keeps the
  * open conversation in component state only and never writes it to the URL,

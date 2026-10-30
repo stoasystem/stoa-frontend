@@ -13,7 +13,7 @@ import { notificationText } from '@/lib/notificationCopy'
 const events = deCommon.notifications.events
 
 function t() {
-  return i18n.getFixedT('de', ['common', 'chat']) as unknown as TFunction<['common', 'chat']>
+  return i18n.getFixedT('de', 'common') as unknown as TFunction<'common'>
 }
 
 function event(eventType: string, targetType: string, title: string, summary: string, metadata: Record<string, unknown> = {}) {
@@ -36,13 +36,31 @@ describe('notification text in the reader language', () => {
     expect(notificationText(event(type, target, title, summary), t())).toEqual(german)
   })
 
-  it('names the subject of a help request in the reader language', () => {
-    const text = notificationText(
-      event('teacher_requested', 'question', 'Teacher help requested', 'A student requested help for a math question.', { subject: 'math' }),
-      t(),
-    )
-    expect(text.title).toBe(events.helpRequested.title)
-    expect(text.summary).toBe('Eine Schülerin oder ein Schüler bittet um Hilfe bei einer Frage in Mathematik.')
+  // stoa-backend#161: the two notifications sent to a whole role arrive in the
+  // reader's language, rendered by the backend when the list is read (#518).
+  it.each([
+    ['moderation_case_update', 'moderation_case', 'Neuer Moderationsfall', 'Ein Moderationsfall mit mittlerem Schweregrad wurde gemeldet.'],
+    ['teacher_requested', 'question', 'Hilfe angefragt', 'Eine Schülerin oder ein Schüler bittet um Hilfe bei einer Frage in Mathematik.'],
+    ['moderation_case_update', 'moderation_case', 'Nouveau cas de modération', 'Un cas de modération de gravité élevée a été signalé.'],
+  ])('shows %s on a %s as the backend rendered it for the reader', (type, target, title, summary) => {
+    expect(notificationText(event(type, target, title, summary, { subject: 'math' }), t())).toEqual({ title, summary })
+  })
+
+  // Rows written before stoa-backend#161 keep the old English; they are no
+  // longer translated here.
+  it.each([
+    ['moderation_case_update', 'moderation_case', 'New moderation case', 'medium moderation case reported.'],
+    ['teacher_requested', 'question', 'Teacher help requested', 'A student requested help for a math question.'],
+  ])('shows an old %s row in the English it was stored in', (type, target, title, summary) => {
+    expect(notificationText(event(type, target, title, summary, { subject: 'math' }), t())).toEqual({ title, summary })
+  })
+
+  it('no longer carries the copy the backend now renders itself', async () => {
+    for (const language of ['de', 'en', 'fr', 'it']) {
+      const common = (await import(`@/i18n/locales/${language}/common.json`)).default
+      const keys = Object.keys(common.notifications.events)
+      expect(keys.filter((key) => key === 'helpRequested' || key.startsWith('moderationCreated')), language).toEqual([])
+    }
   })
 
   it('shows a sentence the backend has reworded as it was sent', () => {

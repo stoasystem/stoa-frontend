@@ -92,6 +92,20 @@
       "startFailed": "The conversation could not be started. Try again.",
       "answerFailed": "The explanation could not be prepared right now. Please try again or ask a teacher."
     },
+    "answer": {
+      "steps": "Steps",
+      "answer": "Answer",
+      "stepUnclear": "I don't get this step",
+      "stepNumber": "Step {{n}}",
+      "stepQuestion": "I don't get this step. Can you explain it another way?",
+      "hints": "Hints",
+      "showHint": "Show a hint",
+      "nextHint": "Another hint",
+      "practice": "Practice",
+      "showExercise": "One more to practise",
+      "nextExercise": "Another one",
+      "related": "Related topics"
+    },
     "presence": {
       "online_one": "{{count}} teacher online",
       "online_other": "{{count}} teachers online",
@@ -100,7 +114,10 @@
     "help": {
       "request": "Ask a teacher",
       "requesting": "Asking a teacher…",
+      "suggested": "A teacher could help you with this.",
       "offline": "Teachers are not online right now. When they are back, they will reply here.",
+      "remaining_one": "{{count}} teacher request left this week",
+      "remaining_other": "{{count}} teacher requests left this week",
       "cardLabel": "Teacher support",
       "status": {
         "pending": "Waiting",
@@ -168,10 +185,23 @@
         "unsupported": "This kind of file cannot be sent. Photos, PDF, Word, PowerPoint, Excel and text files can.",
         "empty": "This file is empty. Choose another one.",
         "expired": "This file took too long. Choose it again.",
+        "sendExpired": "A file you added took too long to go out. Choose it again, then ask again.",
         "quota": "There is no room left for files. Remove an older one first.",
         "unavailable": "Files cannot be added right now. Try again in a moment.",
+        "unreadable": "This photo could not be opened. Try another one, or a screenshot.",
+        "blocked": "This picture cannot be sent. Choose a different one, or describe the question in words.",
         "failed": "This file could not be added. Try again."
       }
+    },
+    "teacherImages": {
+      "label": "Pictures from the teacher",
+      "alt": "Picture from {{teacher}}: {{name}}",
+      "open": "Enlarge picture: {{name}}",
+      "loading": "Loading picture…",
+      "unavailable": "Picture not available",
+      "failed": "The picture could not be loaded.",
+      "retry": "Load again",
+      "retryNamed": "Load again: {{name}}"
     }
   }
 }

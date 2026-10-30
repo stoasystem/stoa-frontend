@@ -38,6 +38,7 @@ npm run dev -- --host 127.0.0.1 --port 5173
 | `chapter` | `/chapter/demo-sine-cosine` | 可看：3 个课时，开场时第 1 课已完成 |
 | `lesson` | `/chapter/demo-sine-cosine/demo-sine-cosine-2` | 可看：4 道题（单选 ×2、填空、排序），能答错、重试、答对、完成课时 |
 | `ask` / `ask-conversation` | `/ask`、`/ask/demo-ask-sine` | 可看；桌面为侧栏，手机为全屏 sheet；`demo-ask-sine` 带一位进行中的老师；能发消息（答复为固定文字）、请老师 |
+| `ask-sections` | `/ask/demo-ask-fractions` | 可看：回答分板块（#506）——步骤各带「这一步没懂」、答案直接显示，提示与类似练习逐条点开，知识点为标签；回答建议找老师，下面的「找老师」是醒目版并带本周剩余次数（不建议时是一行低调的按钮，见 `demo-ask-light`） |
 | `me` | `/me` | 可看 |
 | `account-menu` | `/me` 并自动打开头像菜单 | 可看，能退出（回到登录页） |
 | `map-newcomer` | `/` → `/map/math/numbers` | 可看：新生首次落点。没有点亮、没有进行中，打开 `/` 时不看全景，落到推荐星（演示知识点）所在星云的整团视野，Murmi 气泡在星旁边（窄于 560 px 时停靠在底部控件上方）。起点「Integers」是占位星，所以气泡里没有「Start this star」；「Look around first」或 Esc 收起气泡、镜头不动；截图等气泡出现（`[data-first-landing] [data-shown]`）后再拍 |

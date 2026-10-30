@@ -7,4 +7,6 @@ export const chatQueryKeys = {
     [...chatQueryKeys.all, 'teacher-availability'] as const,
   teacherHelpRequest: (requestId: string) =>
     [...chatQueryKeys.all, 'teacher-help-request', requestId] as const,
+  attachmentContent: (attachmentId: string) =>
+    [...chatQueryKeys.all, 'attachment-content', attachmentId] as const,
 }

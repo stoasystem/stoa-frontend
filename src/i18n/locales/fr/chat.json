@@ -92,6 +92,20 @@
       "startFailed": "La conversation n’a pas pu démarrer. Réessaie.",
       "answerFailed": "L’explication n’a pas pu être préparée pour le moment. Réessaie ou demande à un enseignant."
     },
+    "answer": {
+      "steps": "Étapes",
+      "answer": "Réponse",
+      "stepUnclear": "Je ne comprends pas cette étape",
+      "stepNumber": "Étape {{n}}",
+      "stepQuestion": "Je ne comprends pas cette étape. Tu peux l’expliquer autrement ?",
+      "hints": "Indices",
+      "showHint": "Montrer un indice",
+      "nextHint": "Encore un indice",
+      "practice": "S’entraîner",
+      "showExercise": "Encore un exercice",
+      "nextExercise": "Encore un",
+      "related": "Notions liées"
+    },
     "presence": {
       "online_one": "{{count}} enseignant en ligne",
       "online_many": "{{count}} enseignants en ligne",
@@ -101,7 +115,11 @@
     "help": {
       "request": "Demander à un enseignant",
       "requesting": "Demande en cours…",
+      "suggested": "Un enseignant peut t’aider là-dessus.",
       "offline": "Aucun enseignant n’est en ligne pour le moment. À son retour, il répondra ici.",
+      "remaining_one": "Encore {{count}} demande d’enseignant cette semaine",
+      "remaining_many": "Encore {{count}} demandes d’enseignant cette semaine",
+      "remaining_other": "Encore {{count}} demandes d’enseignant cette semaine",
       "cardLabel": "Aide d’un enseignant",
       "status": {
         "pending": "En attente",
@@ -169,10 +187,23 @@
         "unsupported": "Ce type de fichier ne peut pas être envoyé. Les photos, PDF, Word, PowerPoint, Excel et fichiers texte, oui.",
         "empty": "Ce fichier est vide. Choisis-en un autre.",
         "expired": "Ce fichier a pris trop de temps. Choisis-le à nouveau.",
+        "sendExpired": "Un fichier joint a pris trop de temps. Choisis-le à nouveau, puis repose ta question.",
         "quota": "Il n’y a plus de place pour des fichiers. Retires-en un plus ancien d’abord.",
         "unavailable": "Impossible d’ajouter des fichiers pour le moment. Réessaie dans un instant.",
+        "unreadable": "Impossible d’ouvrir cette photo. Essaie une autre photo ou une capture d’écran.",
+        "blocked": "Cette image ne peut pas être envoyée. Choisis-en une autre ou décris l’exercice avec tes mots.",
         "failed": "Ce fichier n’a pas pu être ajouté. Réessaie."
       }
+    },
+    "teacherImages": {
+      "label": "Images de l’enseignant·e",
+      "alt": "Image de {{teacher}} : {{name}}",
+      "open": "Agrandir l’image : {{name}}",
+      "loading": "Chargement de l’image…",
+      "unavailable": "Image indisponible",
+      "failed": "L’image n’a pas pu être chargée.",
+      "retry": "Recharger",
+      "retryNamed": "Recharger : {{name}}"
     }
   }
 }

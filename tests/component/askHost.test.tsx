@@ -253,6 +253,37 @@ describe('Ask from the planet', () => {
   })
 })
 
+describe('Ask says how to dictate (#515)', () => {
+  const WINDOWS = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36'
+  const dictation = () => document.querySelector('[data-composer-dictation]')
+
+  beforeEach(() => {
+    Object.defineProperty(window.navigator, 'userAgent', { value: WINDOWS, configurable: true })
+  })
+  afterEach(() => {
+    Reflect.deleteProperty(window.navigator, 'userAgent')
+  })
+
+  it('in the docked composer below the planet', async () => {
+    show({ width: 1280 })
+    await userEvent.click(dockedField())
+    expect(dictation()).toHaveAttribute('data-composer-dictation', 'windows')
+    // Over the planet, the free space above the composer holds it.
+    expect(dictation()).toHaveAttribute('data-composer-dictation-placement', 'floating')
+  })
+
+  it("in Ask's own composer, on a line of its own", async () => {
+    show({ width: 1280, direct: null })
+    const panel = screen.getByRole('complementary', { name: 'Ask' })
+    await userEvent.click(within(panel).getByRole('textbox', { name: 'Your question' }))
+    expect(dictation()).toHaveAttribute('data-composer-dictation', 'windows')
+    // The panel shows things right over its composer (the year group link, a
+    // quote, attachments, the last message): the line takes its own room.
+    expect(dictation()).toHaveAttribute('data-composer-dictation-placement', 'inline')
+    expect(dictation()!.closest('form')).toBeNull()
+  })
+})
+
 describe('Ask opened directly at /ask or /ask/:id', () => {
   it('is a full-screen sheet on a phone, which is the page rather than a modal over it', () => {
     show({ width: 375, direct: 'c1' })

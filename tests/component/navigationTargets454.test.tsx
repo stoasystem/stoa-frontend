@@ -24,8 +24,12 @@ import { act, useEffect, useRef } from 'react'
 import { I18nextProvider } from 'react-i18next'
 import { BrowserRouter, Link, MemoryRouter, createPath, resolvePath, useLocation, useNavigate, type To } from 'react-router-dom'
 import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest'
-import { askPathFor, legacyRedirects, moderationPathFor } from '@/app/router/routeManifest'
-import { NOTIFICATION_TARGETS, notificationTargetPath } from '@/components/notifications/notificationTargets'
+import { askPathFor, legacyRedirects, moderationPathFor, teacherRequestPathFor } from '@/app/router/routeManifest'
+import {
+  NOTIFICATION_EVENT_TARGETS,
+  NOTIFICATION_TARGETS,
+  notificationTargetPath,
+} from '@/components/notifications/notificationTargets'
 import { chapterPath, quizPath } from '@/features/chapter/useChapter'
 import { StarCard } from '@/features/starmap/components/StarCard'
 import { pathForTarget } from '@/features/starmap/view/layers'
@@ -134,22 +138,35 @@ function builtTargets(): Built[] {
   for (const id of HOSTILE) {
     add('askPathFor', id, askPathFor(id))
     add('moderationPathFor', id, moderationPathFor(id))
+    add('teacherRequestPathFor', id, teacherRequestPathFor(id))
     add('reviewReturnPath', id, reviewReturnPath(id))
     add('reviewReturnPath', { star: id }, reviewReturnPath({ star: id }))
   }
 
   const targetTypes = new Set([
     ...Object.values(NOTIFICATION_TARGETS).flatMap((targets) => Object.keys(targets)),
+    ...Object.values(NOTIFICATION_EVENT_TARGETS).flatMap((byEvent) =>
+      Object.values(byEvent ?? {}).flatMap((targets) => Object.keys(targets)),
+    ),
     'constructor',
     '__proto__',
     'toString',
     '//evil.example/x',
+  ])
+  const eventTypes = new Set([
+    ...Object.values(NOTIFICATION_EVENT_TARGETS).flatMap((byEvent) => Object.keys(byEvent ?? {})),
+    'constructor',
+    '__proto__',
   ])
   for (const role of ROLES) {
     for (const targetType of targetTypes) {
       for (const targetId of HOSTILE) {
         const event = { targetType, targetId } as Parameters<typeof notificationTargetPath>[0]
         add(`notificationTargetPath(${role})`, event, notificationTargetPath(event, role))
+        for (const eventType of eventTypes) {
+          const named = { ...event, eventType } as Parameters<typeof notificationTargetPath>[0]
+          add(`notificationTargetPath(${role}, ${eventType})`, named, notificationTargetPath(named, role))
+        }
       }
     }
   }
