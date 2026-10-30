@@ -64,7 +64,17 @@
     "reportContext": "Invia il contesto di questa richiesta alla moderazione interna.",
     "noNotes": "Ancora nessuna nota dell’insegnante.",
     "replyPaused": "Al momento non è possibile aggiornare la richiesta. La tua bozza resta salvata: potrai inviarla appena la connessione torna.",
-    "openAutomation": "Assegna esercizi a {{name}} nell’automazione dell’apprendimento"
+    "openAutomation": "Assegna esercizi a {{name}} nell’automazione dell’apprendimento",
+    "attachments": {
+      "label": "Allegati",
+      "alt": "Immagine della persona che apprende: {{name}}",
+      "open": "Ingrandire l’immagine: {{name}}",
+      "loading": "Caricamento dell’immagine …",
+      "unavailable": "Immagine non disponibile",
+      "failed": "Impossibile caricare l’immagine.",
+      "retry": "Riprovare",
+      "retryNamed": "Riprovare: {{name}}"
+    }
   },
   "profile": {
     "eyebrow": "Account insegnante",

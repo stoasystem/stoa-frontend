@@ -1,12 +1,12 @@
 import { useTranslation } from 'react-i18next'
 import { formattingLocale } from '@/i18n/languages'
+import { HelpRequestAttachments } from '@/components/teacher/HelpRequestAttachments'
 import { HelpRequestStatusBadge } from '@/components/teacher/HelpRequestStatusBadge'
 import { ModerationReportDialog } from '@/components/moderation/ModerationReportDialog'
 import { TeacherSlaBadge } from '@/components/teacher/TeacherSlaBadge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { getSubjectLabel } from '@/lib/displayLabels'
-import type { ChatMessage } from '@/types/chat'
-import type { TeacherHelpRequestDetail } from '@/types/teacher'
+import type { TeacherHelpMessage, TeacherHelpRequestDetail } from '@/types/teacher'
 import { isOpenHelpRequest } from '@/types/teacherHelp'
 
 export function HelpRequestDetailCard({ request }: { request: TeacherHelpRequestDetail }) {
@@ -69,6 +69,7 @@ export function HelpRequestDetailCard({ request }: { request: TeacherHelpRequest
             </p>
             {/* Served by the backend, in whatever language it wrote it. */}
             <p className="mt-2 text-sm leading-6">{message.content}</p>
+            <HelpRequestAttachments requestId={request.requestId} attachments={message.attachments} />
             {(message.role === 'student' || message.role === 'assistant') && (
               <div className="mt-2 border-t pt-2">
                 <ModerationReportDialog
@@ -95,7 +96,7 @@ export function HelpRequestDetailCard({ request }: { request: TeacherHelpRequest
  * the student's conversation (same text, same time), and returns both; the
  * note keeps the formatting, so the message copy is the one left out (#271).
  */
-function conversationMessages(request: TeacherHelpRequestDetail): ChatMessage[] {
+function conversationMessages(request: TeacherHelpRequestDetail): TeacherHelpMessage[] {
   const noted = new Set((request.notes ?? []).map((note) => replyKey(note.createdAt, note.note)))
   return request.messages.filter(
     (message) => message.role !== 'teacher' || !noted.has(replyKey(message.createdAt, message.content)),

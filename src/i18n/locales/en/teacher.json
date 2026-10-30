@@ -64,7 +64,17 @@
     "reportContext": "Send this request context to the internal moderation queue.",
     "noNotes": "No teacher notes yet.",
     "replyPaused": "This request could not be refreshed just now. Your draft is kept; you can send it once the connection is back.",
-    "openAutomation": "Assign practice to {{name}} in learning automation"
+    "openAutomation": "Assign practice to {{name}} in learning automation",
+    "attachments": {
+      "label": "Attachments",
+      "alt": "Image from the student: {{name}}",
+      "open": "Enlarge image: {{name}}",
+      "loading": "Loading image …",
+      "unavailable": "Image not available",
+      "failed": "The image could not be loaded.",
+      "retry": "Try again",
+      "retryNamed": "Try again: {{name}}"
+    }
   },
   "profile": {
     "eyebrow": "Teacher account",
