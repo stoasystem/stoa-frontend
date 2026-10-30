@@ -12,4 +12,6 @@ export const chatQueryKeys = {
     [...chatQueryKeys.all, 'upload-code', conversationId, codeId] as const,
   uploadCodePhoto: (conversationId: string, codeId: string) =>
     [...chatQueryKeys.uploadCode(conversationId, codeId), 'photo'] as const,
+  attachmentContent: (attachmentId: string) =>
+    [...chatQueryKeys.all, 'attachment-content', attachmentId] as const,
 }

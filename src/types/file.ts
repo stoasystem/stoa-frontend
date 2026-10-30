@@ -1,6 +1,7 @@
 export type UploadedFileStatus = 'uploaded' | 'processing' | 'parsed' | 'failed'
 
-export type UploadPurpose = 'question_image' | 'conversation_attachment'
+/** `help_reply_image` is a teacher's, and only a teacher's (stoa-backend#145). */
+export type UploadPurpose = 'question_image' | 'conversation_attachment' | 'help_reply_image'
 
 export type UploadedFile = {
   id: string
@@ -113,3 +114,6 @@ export type UploadCodeRedemption = {
   chunkBytes: number
   acceptedTypes: string[]
 }
+
+/** `ReplyImageReference`: a teacher's reply names only its own validated uploads (stoa-backend#145). */
+export type ReplyImageReference = { uploadId: string }

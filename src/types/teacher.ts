@@ -44,6 +44,8 @@ export type TeacherHelpRequestNote = {
   // `null` for a plain-text reply.
   richContent?: TeacherReplyRichContent | null
   responseFormat?: string
+  /** The pictures the reply carried (stoa-backend#145); none on an older one. */
+  attachments?: AttachmentSummary[]
 }
 
 /**

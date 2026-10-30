@@ -201,6 +201,16 @@
       "expired": "Dieser Code ist abgelaufen. Erstell einen neuen.",
       "newCode": "Neuer Code",
       "tryAgain": "Noch einmal versuchen"
+    },
+    "teacherImages": {
+      "label": "Bilder der Lehrperson",
+      "alt": "Bild von {{teacher}}: {{name}}",
+      "open": "Bild vergrössern: {{name}}",
+      "loading": "Bild wird geladen …",
+      "unavailable": "Bild nicht verfügbar",
+      "failed": "Bild konnte nicht geladen werden.",
+      "retry": "Noch einmal laden",
+      "retryNamed": "Noch einmal laden: {{name}}"
     }
   }
 }

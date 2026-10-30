@@ -201,6 +201,16 @@
       "expired": "This code has expired. Make a new one.",
       "newCode": "New code",
       "tryAgain": "Try again"
+    },
+    "teacherImages": {
+      "label": "Pictures from the teacher",
+      "alt": "Picture from {{teacher}}: {{name}}",
+      "open": "Enlarge picture: {{name}}",
+      "loading": "Loading picture…",
+      "unavailable": "Picture not available",
+      "failed": "The picture could not be loaded.",
+      "retry": "Load again",
+      "retryNamed": "Load again: {{name}}"
     }
   }
 }

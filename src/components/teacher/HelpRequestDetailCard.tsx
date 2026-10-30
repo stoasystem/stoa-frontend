@@ -69,7 +69,11 @@ export function HelpRequestDetailCard({ request }: { request: TeacherHelpRequest
             </p>
             {/* Served by the backend, in whatever language it wrote it. */}
             <p className="mt-2 text-sm leading-6">{message.content}</p>
-            <HelpRequestAttachments requestId={request.requestId} attachments={message.attachments} />
+            <HelpRequestAttachments
+              requestId={request.requestId}
+              attachments={message.attachments}
+              byTeacher={message.role === 'teacher'}
+            />
             {(message.role === 'student' || message.role === 'assistant') && (
               <div className="mt-2 border-t pt-2">
                 <ModerationReportDialog

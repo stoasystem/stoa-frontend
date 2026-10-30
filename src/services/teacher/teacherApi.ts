@@ -1,6 +1,7 @@
 import { apiPath } from '@/services/api/apiPath'
 import { httpClient } from '@/services/api/httpClient'
 
+import type { ReplyImageReference } from '@/types/file'
 import type { TeacherHelpStatus } from '@/types/teacherHelp'
 import type {
   TeacherHelpRequestDetail,
@@ -63,18 +64,25 @@ export async function updateTeacherHelpRequestStatus({
   return response.data
 }
 
+/**
+ * A reply, with the pictures the teacher added as their validated uploads
+ * (`help_reply_image`, stoa-backend#145). A reply without any sends no
+ * `attachmentIds` at all, as before.
+ */
 export async function addTeacherHelpRequestNote({
   requestId,
   content,
   richContent,
+  attachmentIds = [],
 }: {
   requestId: string
   content: string
   richContent?: TeacherReplyRichContent
+  attachmentIds?: ReplyImageReference[]
 }) {
   const response = await httpClient.post<TeacherHelpRequestNote>(
     apiPath`/teachers/me/help-requests/${requestId}/notes`,
-    { content, richContent },
+    attachmentIds.length > 0 ? { content, richContent, attachmentIds } : { content, richContent },
   )
   return response.data
 }

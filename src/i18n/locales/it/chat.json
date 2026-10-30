@@ -202,6 +202,16 @@
       "expired": "Questo codice è scaduto. Creane uno nuovo.",
       "newCode": "Nuovo codice",
       "tryAgain": "Riprova"
+    },
+    "teacherImages": {
+      "label": "Immagini del docente",
+      "alt": "Immagine di {{teacher}}: {{name}}",
+      "open": "Ingrandisci immagine: {{name}}",
+      "loading": "Caricamento immagine…",
+      "unavailable": "Immagine non disponibile",
+      "failed": "Non è stato possibile caricare l’immagine.",
+      "retry": "Ricarica",
+      "retryNamed": "Ricarica: {{name}}"
     }
   }
 }

@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { FileText, ImageOff } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
+import { drawnType, useObjectUrl } from '@/features/uploads/drawnImage'
 import { useTeacherHelpAttachmentQuery } from '@/hooks/teacher/useTeacherHelpAttachmentQuery'
 import { isHelpRequestOutOfReach } from '@/lib/teacherHelpRequestConflict'
 import type { AttachmentSummary } from '@/types/file'
@@ -11,13 +12,18 @@ import type { AttachmentSummary } from '@/types/file'
  * The files the student sent with a message of the help request (#510). A
  * picture shows as a thumbnail that opens larger; one this teacher may not
  * read (any more), or one removed, is a placeholder, never an error.
+ *
+ * A teacher's reply carries pictures too (#513), read through the same route;
+ * `byTeacher` names them as the teacher's, not the student's.
  */
 export function HelpRequestAttachments({
   requestId,
   attachments,
+  byTeacher = false,
 }: {
   requestId: string
   attachments?: AttachmentSummary[]
+  byTeacher?: boolean
 }) {
   const { t } = useTranslation('teacher')
   if (!attachments || attachments.length === 0) return null
@@ -32,7 +38,7 @@ export function HelpRequestAttachments({
           {attachment.status !== 'active' ? (
             <Unavailable filename={attachment.filename} />
           ) : attachment.mediaType.startsWith('image/') ? (
-            <AttachmentImage requestId={requestId} attachment={attachment} />
+            <AttachmentImage requestId={requestId} attachment={attachment} byTeacher={byTeacher} />
           ) : (
             // Only pictures open here; another file is named, so the teacher
             // knows the student sent one.
@@ -47,20 +53,17 @@ export function HelpRequestAttachments({
   )
 }
 
-/**
- * What the browser is asked to draw: the two types the backend takes as a
- * picture. The summary's `mediaType` is what the upload claimed; this is what
- * came back, checked before it gets an address (#510).
- */
-const DRAWN_TYPES = new Set(['image/png', 'image/jpeg'])
-
-function drawnType(blob: Blob) {
-  return DRAWN_TYPES.has(blob.type.split(';')[0].trim().toLowerCase())
-}
-
 const TILE = 'flex min-h-24 w-32 flex-col items-center justify-center gap-1 rounded-md border bg-secondary p-2 text-center text-xs text-muted-foreground'
 
-function AttachmentImage({ requestId, attachment }: { requestId: string; attachment: AttachmentSummary }) {
+function AttachmentImage({
+  requestId,
+  attachment,
+  byTeacher,
+}: {
+  requestId: string
+  attachment: AttachmentSummary
+  byTeacher: boolean
+}) {
   const { t } = useTranslation('teacher')
   const query = useTeacherHelpAttachmentQuery(requestId, attachment.attachmentId)
   const blob = query.data && drawnType(query.data) ? query.data : undefined
@@ -68,7 +71,7 @@ function AttachmentImage({ requestId, attachment }: { requestId: string; attachm
   // Read, but not a picture the browser can draw.
   const [undrawable, setUndrawable] = useState(false)
   const name = attachment.filename
-  const alt = t('detail.attachments.alt', { name })
+  const alt = t(byTeacher ? 'detail.attachments.altTeacher' : 'detail.attachments.alt', { name })
 
   if (undrawable || (query.data && !blob) || isHelpRequestOutOfReach(query.error)) {
     return <Unavailable filename={name} />
@@ -126,19 +129,4 @@ function Unavailable({ filename }: { filename: string }) {
       <span>{t('detail.attachments.unavailable')}</span>
     </div>
   )
-}
-
-/** An address for the blob while it is on screen, released when it leaves. */
-function useObjectUrl(blob: Blob | undefined) {
-  const [url, setUrl] = useState<string>()
-  useEffect(() => {
-    if (!blob) return undefined
-    const next = URL.createObjectURL(blob)
-    setUrl(next)
-    return () => {
-      URL.revokeObjectURL(next)
-      setUrl(undefined)
-    }
-  }, [blob])
-  return url
 }

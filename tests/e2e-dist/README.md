@@ -83,6 +83,13 @@ is absent; once it is on, the QR is checked to encode the phone page's address
 with the code after the `#`, a second, signed-out browser sends the photo, and
 the computer shows it and adds it only when the student says so.
 
+`teacherReplyImages.spec.ts`: a teacher's picture goes up the same way, as
+`help_reply_image`, and the reply carries it as `{ uploadId }`; the student
+sees it in Ask as a thumbnail the browser drew, read with their own token from
+`/files/attachments/{id}/content` (#513, stoa-backend#145). The button waits
+for the same switch, and the test handles it as `attachments.spec.ts` does.
+`MockBackend` answers a file's bytes with `raw`.
+
 `forcedChange.spec.ts`: a student whose password an administrator reset opens
 `/ask`, signs in, is sent to the password change with only Help and Log out in
 the shell, reloads it, changes the password, and "Continue" opens `/ask`; the
