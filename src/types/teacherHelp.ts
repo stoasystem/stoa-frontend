@@ -50,9 +50,24 @@ export type TeacherHelpRequest = {
   updatedAt?: string
 }
 
+/**
+ * Whether this student can still ask a teacher this week (stoa-backend#144).
+ * `blockedReason` is the code a request would be refused with; only the
+ * allowance comes back with the week, at `resetsAt`.
+ */
+export type TeacherSupportStanding = {
+  canRequest: boolean
+  remainingCases: number
+  weeklyCases: number
+  blockedReason?: 'teacher_support_allowance_exhausted' | 'teacher_support_not_included' | null
+  resetsAt?: string | null
+}
+
 export type TeacherAvailability = {
   online: boolean
   availableTeachers: number
   nextWindow?: string
   responseTime?: string
+  /** `null` when it could not be read: then no allowance is shown at all. */
+  teacherSupport?: TeacherSupportStanding | null
 }

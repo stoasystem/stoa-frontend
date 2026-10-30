@@ -4,9 +4,10 @@ import { useTranslation } from 'react-i18next'
 import { Avatar, Button } from '@/components/base'
 import { ICON } from '@/components/base/sizes'
 import { MathRenderer } from '@/components/ui/MathRenderer'
+import { AskAnswerSections, hasSections, quoteCaption, type AnswerStep } from '@/features/ask/AskAnswerSections'
 import { TeacherReplyImages } from '@/features/ask/TeacherReplyImages'
 import { cn } from '@/lib/utils'
-import type { ChatAttachment, ChatMessage } from '@/types/chat'
+import type { ChatAttachment, ChatMessage, KnowledgePoint } from '@/types/chat'
 
 /*
  * One message in the Ask thread, as the canvas draws the conversation (Home ·
@@ -25,12 +26,18 @@ export const AskMessage = memo(function AskMessage({
   message,
   teacherName,
   onRetry,
+  onAskAboutStep,
+  onKnowledgePoint,
   after,
 }: {
   message: ChatMessage
   /** Who is helping, from the help request; the API does not name a message's author. */
   teacherName?: string | null
   onRetry?: (messageId: string) => void
+  /** "I don't get this step" on an answer laid out in sections (#506). */
+  onAskAboutStep?: (step: AnswerStep) => void
+  /** To a knowledge point's star: left to #487's card, so absent until it is given one. */
+  onKnowledgePoint?: (point: KnowledgePoint & { unitId: string }) => void
   /** Shown under the message: the request for a teacher, under the latest answer. */
   after?: ReactNode
 }) {
@@ -58,7 +65,7 @@ export const AskMessage = memo(function AskMessage({
               data-message-quote={message.quote.source.kind}
               className="m-0 flex flex-col gap-1 border-l-2 border-[color:color-mix(in_srgb,var(--on-accent)_45%,transparent)] pl-2.5 text-left"
             >
-              <figcaption className="text-[12px] font-semibold opacity-80">{t('ask.quote.title')}</figcaption>
+              <figcaption className="text-[12px] font-semibold opacity-80">{quoteCaption(message.quote, t)}</figcaption>
               <blockquote className="m-0 text-[14px] leading-[1.4] opacity-90">
                 <MathRenderer plain>{message.quote.text}</MathRenderer>
               </blockquote>
@@ -110,6 +117,9 @@ export const AskMessage = memo(function AskMessage({
 
   const streaming = message.status === 'streaming'
   const failed = message.status === 'failed'
+  // Laid out in its sections once it is whole (#506); while it is written,
+  // and for a follow-up or an answer from before the sections, the text.
+  const sections = !streaming && !failed && hasSections(message.structured) ? message.structured : null
   return (
     <div data-message-role="assistant" className="flex w-full flex-col items-start gap-2 self-start">
       <p className="sr-only">{t('ask.thread.assistant')}</p>
@@ -124,7 +134,14 @@ export const AskMessage = memo(function AskMessage({
         )}
         style={{ padding: '11px 15px', borderRadius: 18, borderBottomLeftRadius: 6, fontSize: 15, lineHeight: 1.45 }}
       >
-        {message.content ? (
+        {sections ? (
+          <AskAnswerSections
+            messageId={message.id}
+            structured={sections}
+            onAskAboutStep={onAskAboutStep}
+            onKnowledgePoint={onKnowledgePoint}
+          />
+        ) : message.content ? (
           failed ? message.content : <MathRenderer>{message.content}</MathRenderer>
         ) : streaming ? (
           <span className="text-caption">{t('ask.thread.thinking')}</span>

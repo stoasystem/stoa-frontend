@@ -33,10 +33,26 @@ export type PracticeContextRef = {
   unitId: string
 }
 
+/** The sections of an answer a quote can point at, as `StructuredAnswer` names them. */
+export type AnswerSection = 'steps' | 'answer' | 'hints' | 'similarExercises' | 'knowledgePoints'
+
+/**
+ * The part of an answer a quote was taken from (stoa-backend#132): one entry
+ * of a list section, counted from 0; `answer` is one text and takes no index.
+ * Only on a quote of an answer that carries sections and is `kind: 'answer'`;
+ * anything else is a 422.
+ */
+export type QuotePart = {
+  section: AnswerSection
+  index?: number | null
+}
+
 /** Where a quoted passage was taken from: an exercise, or an earlier message. */
 export type QuoteSource = {
   kind: 'challenge' | 'message'
   id: string
+  /** Which part of that answer; absent for a passage chosen by hand. */
+  part?: QuotePart | null
 }
 
 /** A passage quoted back to the assistant (#56). Longer than this is a 422. */
@@ -45,6 +61,29 @@ export const QUOTE_MAX_LENGTH = 500
 export type MessageQuote = {
   text: string
   source: QuoteSource
+}
+
+/** A knowledge point an answer names; `unitId` is its star once the backend can match one. */
+export type KnowledgePoint = {
+  name: string
+  unitId?: string | null
+}
+
+/**
+ * An answer in the sections the model wrote it in (stoa-backend#132). How they
+ * are laid out is this side's. `followUp` is an answer in plain words -- what
+ * a question about one point of an earlier answer gets -- with nothing in the
+ * list sections; the backend derives it from which sections are empty.
+ */
+export type StructuredAnswer = {
+  kind: 'answer' | 'followUp'
+  steps?: string[]
+  answer?: string
+  hints?: string[]
+  similarExercises?: string[]
+  knowledgePoints?: KnowledgePoint[]
+  /** True only when the model asked for a teacher; then the answer offers one. */
+  suggestTeacher?: boolean
 }
 
 export type ChatMessage = {
@@ -57,6 +96,11 @@ export type ChatMessage = {
   attachments?: ChatAttachment[]
   /** The passage this message quotes; `null` on every message without one. */
   quote?: MessageQuote | null
+  /**
+   * An answer's sections; `null` on students' and teachers' messages and on
+   * answers written before they were kept, which show `content` as it is.
+   */
+  structured?: StructuredAnswer | null
 }
 
 export type ConversationSummary = {
@@ -126,6 +170,8 @@ export type StreamMessageDoneEvent = {
   type: 'message_done'
   messageId: string
   status: 'completed'
+  /** The answer's sections (stoa-backend#132), there before the conversation is read back. */
+  structured?: StructuredAnswer | null
 }
 
 export type StreamMessageErrorEvent = {

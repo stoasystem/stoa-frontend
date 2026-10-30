@@ -255,6 +255,9 @@ export function useStreamingChat(conversationId: string | null) {
             ? {
                 ...message,
                 status: event.status,
+                // The sections come with the end of the answer (stoa-backend#132),
+                // so it is laid out in them before the conversation is read back.
+                ...(event.structured !== undefined ? { structured: event.structured } : {}),
               }
             : message,
         ),

@@ -37,6 +37,7 @@ npm run dev -- --host 127.0.0.1 --port 5173
 | `chapter` | `/chapter/demo-sine-cosine` | 可看：3 个课时，开场时第 1 课已完成 |
 | `lesson` | `/chapter/demo-sine-cosine/demo-sine-cosine-2` | 可看：4 道题（单选 ×2、填空、排序），能答错、重试、答对、完成课时 |
 | `ask` / `ask-conversation` | `/ask`、`/ask/demo-ask-sine` | 可看；桌面为侧栏，手机为全屏 sheet；`demo-ask-sine` 带一位进行中的老师；能发消息（答复为固定文字）、请老师 |
+| `ask-sections` | `/ask/demo-ask-fractions` | 可看：回答分板块（#506）——步骤各带「这一步没懂」、答案直接显示，提示与类似练习逐条点开，知识点为标签；回答建议找老师，下面的「找老师」是醒目版并带本周剩余次数（不建议时是一行低调的按钮，见 `demo-ask-light`） |
 | `me` | `/me` | 可看 |
 | `account-menu` | `/me` 并自动打开头像菜单 | 可看，能退出（回到登录页） |
 | `lighting` | `/map/math/trigonometry/demo-sine-cosine` | 可看：打开前把演示知识点的课时全部记为完成、点亮尚未确认；打开这颗星的地址，落在它所在星云的整团视野（地址换成星云的，#140），在这颗星上播放一次点亮动画（#51）；截图等动画结束（`data-lighting="done"`）后再拍 |

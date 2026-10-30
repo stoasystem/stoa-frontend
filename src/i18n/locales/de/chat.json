@@ -92,6 +92,20 @@
       "startFailed": "Die Unterhaltung konnte nicht gestartet werden. Versuch es noch einmal.",
       "answerFailed": "Die Erklärung konnte gerade nicht erstellt werden. Versuch es noch einmal oder frag eine Lehrperson."
     },
+    "answer": {
+      "steps": "Schritte",
+      "answer": "Antwort",
+      "stepUnclear": "Diesen Schritt verstehe ich nicht",
+      "stepNumber": "Schritt {{n}}",
+      "stepQuestion": "Diesen Schritt verstehe ich nicht. Kannst du ihn anders erklären?",
+      "hints": "Tipps",
+      "showHint": "Tipp zeigen",
+      "nextHint": "Noch ein Tipp",
+      "practice": "Üben",
+      "showExercise": "Noch eine Übung",
+      "nextExercise": "Noch eine",
+      "related": "Passende Themen"
+    },
     "presence": {
       "online_one": "{{count}} Lehrperson online",
       "online_other": "{{count}} Lehrpersonen online",
@@ -100,7 +114,10 @@
     "help": {
       "request": "Lehrperson fragen",
       "requesting": "Lehrperson wird gefragt…",
+      "suggested": "Dabei kann dir eine Lehrperson helfen.",
       "offline": "Gerade ist keine Lehrperson online. Sobald sie wieder da ist, antwortet sie hier.",
+      "remaining_one": "Diese Woche noch {{count}} Anfrage an eine Lehrperson",
+      "remaining_other": "Diese Woche noch {{count}} Anfragen an eine Lehrperson",
       "cardLabel": "Unterstützung durch eine Lehrperson",
       "status": {
         "pending": "Wartet",
