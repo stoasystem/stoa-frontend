@@ -18,5 +18,9 @@
  * Then this turns `true`: a module of its own so tests can drive the buttons
  * with it on (#509), and `tests/e2e-dist/attachments.spec.ts` opens the
  * chooser from the button once it is.
+ *
+ * A teacher's reply adds pictures through the same pipeline (#513), so its
+ * button waits for this too; `tests/e2e-dist/teacherReplyImages.spec.ts`
+ * opens that chooser from its button once it is on.
  */
 export const ATTACHMENTS_WORK = false

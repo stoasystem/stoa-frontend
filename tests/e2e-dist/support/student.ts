@@ -9,7 +9,15 @@ export const STUDENT = {
 }
 export const ACCESS_TOKEN = 'e2e-access-token'
 
-type Message = { id: string; conversationId: string; role: string; content: string; createdAt: string }
+type Message = {
+  id: string
+  conversationId: string
+  role: string
+  content: string
+  createdAt: string
+  /** `AttachmentSummary`s, as the backend lists a message's files. */
+  attachments?: unknown[]
+}
 type Command = {
   key: string
   conversationId: string
@@ -20,7 +28,7 @@ type Command = {
   attempt: number
   reads: number
 }
-type Conversation = { id: string; subject: string; grade: string; createdAt: string; messages: Message[] }
+export type Conversation = { id: string; subject: string; grade: string; createdAt: string; messages: Message[] }
 
 /**
  * One student and the parts of the backend a student's session touches:

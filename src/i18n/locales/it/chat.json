@@ -176,6 +176,16 @@
         "blocked": "Questa immagine non si può inviare. Scegline un’altra oppure descrivi l’esercizio a parole.",
         "failed": "Non è stato possibile aggiungere questo file. Riprova."
       }
+    },
+    "teacherImages": {
+      "label": "Immagini del docente",
+      "alt": "Immagine di {{teacher}}: {{name}}",
+      "open": "Ingrandisci immagine: {{name}}",
+      "loading": "Caricamento immagine…",
+      "unavailable": "Immagine non disponibile",
+      "failed": "Non è stato possibile caricare l’immagine.",
+      "retry": "Ricarica",
+      "retryNamed": "Ricarica: {{name}}"
     }
   }
 }

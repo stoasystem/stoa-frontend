@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { Avatar, Button } from '@/components/base'
 import { ICON } from '@/components/base/sizes'
 import { MathRenderer } from '@/components/ui/MathRenderer'
+import { TeacherReplyImages } from '@/features/ask/TeacherReplyImages'
 import { cn } from '@/lib/utils'
 import type { ChatAttachment, ChatMessage } from '@/types/chat'
 
@@ -102,6 +103,7 @@ export const AskMessage = memo(function AskMessage({
         >
           <MathRenderer plain>{message.content}</MathRenderer>
         </div>
+        <TeacherReplyImages attachments={message.attachments} teacher={name} />
       </div>
     )
   }
