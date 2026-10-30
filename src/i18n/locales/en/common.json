@@ -181,22 +181,6 @@
         "summary": "Your request for a teacher expired. This week's teacher help was given back.",
         "title": "No teacher was available"
       },
-      "helpRequested": {
-        "summary": "A student requested help with a {{subject}} question.",
-        "title": "Teacher help requested"
-      },
-      "moderationCreatedHigh": {
-        "summary": "A high-severity moderation case was reported.",
-        "title": "New moderation case"
-      },
-      "moderationCreatedLow": {
-        "summary": "A low-severity moderation case was reported.",
-        "title": "New moderation case"
-      },
-      "moderationCreatedMedium": {
-        "summary": "A medium-severity moderation case was reported.",
-        "title": "New moderation case"
-      },
       "replyConversation": {
         "summary": "Your teacher answered in your conversation.",
         "title": "Your teacher replied"

@@ -1,8 +1,12 @@
 import { FormEvent, useEffect, useMemo, useRef, useState } from 'react'
-import { Code2, List, Pilcrow, Send, Sigma, X } from 'lucide-react'
+import { Code2, ImagePlus, List, Pilcrow, Send, Sigma, X } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { RichTeacherReply } from '@/components/teacher/RichTeacherReply'
 import { Button } from '@/components/ui/button'
+import { AttachmentTray } from '@/features/uploads/AttachmentTray'
+import { useAttachmentUploads } from '@/features/uploads/useAttachmentUploads'
+import { IMAGE_ACCEPT_ATTRIBUTE } from '@/services/files/uploadLimits'
+import type { ReplyImageReference } from '@/types/file'
 import type { TeacherReplyBlock, TeacherReplyRichContent } from '@/types/teacher'
 
 type ComposerMode = TeacherReplyBlock['type']
@@ -63,18 +67,37 @@ function writeDraft(draftKey: string | undefined, draft: ComposerDraft) {
   }
 }
 
+/**
+ * The pictures a reply carries (#513), as their validated uploads, and what
+ * to do when the server would not take them: nothing was sent, and each is
+ * to be chosen again.
+ */
+export type ReplyImages = { references: ReplyImageReference[]; onRefused: () => void }
+
 export function TeacherReplyComposer({
   isSubmitting,
   onSubmit,
   disabled = false,
   draftKey,
+  allowImages = false,
 }: {
   isSubmitting: boolean
-  onSubmit: (content: string, richContent: TeacherReplyRichContent, onSuccess: () => void) => void
+  onSubmit: (
+    content: string,
+    richContent: TeacherReplyRichContent,
+    onSuccess: () => void,
+    images: ReplyImages,
+  ) => void
   /** Keeps the draft on screen but takes nothing in or out. */
   disabled?: boolean
   /** Keeps the draft in this tab's storage under this key, usually the request id. */
   draftKey?: string
+  /**
+   * Shows the button that adds pictures (stoa-backend#145). They go up as soon
+   * as they are chosen, as a student's do, and are not kept with the draft: an
+   * upload is good for 30 minutes, a draft for the whole tab.
+   */
+  allowImages?: boolean
 }) {
   const { t } = useTranslation('teacher')
   const [initialDraft] = useState(() => readDraft(draftKey))
@@ -82,7 +105,9 @@ export function TeacherReplyComposer({
   const [value, setValue] = useState(initialDraft.value)
   const [blocks, setBlocks] = useState<TeacherReplyBlock[]>(initialDraft.blocks)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
+  const picker = useRef<HTMLInputElement>(null)
   const wasSubmitting = useRef(isSubmitting)
+  const uploads = useAttachmentUploads({ purpose: 'help_reply_image', imagesOnly: true })
 
   useEffect(() => {
     writeDraft(draftKey, { mode, value, blocks })
@@ -103,7 +128,10 @@ export function TeacherReplyComposer({
   }, [blocks, mode, value])
   const problem = useMemo(() => replyProblem(previewBlocks), [previewBlocks])
   const locked = isSubmitting || disabled
-  const canSubmit = previewBlocks.length > 0 && !locked && !problem
+  // A reply waits for its pictures, and still needs words: the backend takes
+  // no reply made of pictures alone.
+  const canSubmit = previewBlocks.length > 0 && !locked && !problem && !uploads.uploading
+  const imagesWithoutText = uploads.readyReferences.length > 0 && previewBlocks.length === 0
 
   function addBlock() {
     const trimmed = value.trim()
@@ -121,13 +149,21 @@ export function TeacherReplyComposer({
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     if (!canSubmit) return
+    // A picture past its time is said, and the reply held, rather than refused.
+    if (uploads.expireStale()) return
     const richContent: TeacherReplyRichContent = { version: 1, blocks: previewBlocks }
-    onSubmit(plainTextFallback(richContent), richContent, () => {
-      setBlocks([])
-      setValue('')
-      setMode('paragraph')
-      textareaRef.current?.focus()
-    })
+    onSubmit(
+      plainTextFallback(richContent),
+      richContent,
+      () => {
+        setBlocks([])
+        setValue('')
+        setMode('paragraph')
+        uploads.clearSent()
+        textareaRef.current?.focus()
+      },
+      { references: uploads.readyReferences, onRefused: uploads.expireReady },
+    )
   }
 
   return (
@@ -204,7 +240,30 @@ export function TeacherReplyComposer({
           {t(`reply.unsafe.${problem.key}`, problem.values)}
         </p>
       )}
+      {/* The chooser and the tray are here either way; what `allowImages`
+          withholds is the button, as the student's paperclip is (#509). */}
+      <AttachmentTray copy="teacher" drafts={uploads.drafts} overflow={uploads.overflow} onRemove={uploads.remove} />
+      {imagesWithoutText && <p className="text-sm text-muted-foreground">{t('reply.attachments.needsText')}</p>}
+      <input
+        ref={picker}
+        type="file"
+        multiple
+        hidden
+        accept={IMAGE_ACCEPT_ATTRIBUTE}
+        data-teacher-reply-images
+        onChange={(event) => {
+          uploads.add(Array.from(event.target.files ?? []))
+          // The same picture can be chosen again after it was taken out.
+          event.target.value = ''
+        }}
+      />
       <div className="flex flex-wrap gap-2">
+        {allowImages && (
+          <Button type="button" variant="outline" disabled={locked} onClick={() => picker.current?.click()}>
+            <ImagePlus className="mr-2 h-4 w-4" aria-hidden="true" />
+            {t('reply.attachments.add')}
+          </Button>
+        )}
         <Button
           type="button"
           variant="outline"

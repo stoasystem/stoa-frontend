@@ -27,6 +27,10 @@
       "thirdParties": {
         "title": "Dienstleister",
         "body": "Hosting-, Authentifizierungs-, Analyse-, Monitoring- und Supportdienstleister können begrenzte Daten im Rahmen geeigneter Vereinbarungen verarbeiten."
+      },
+      "dataLocation": {
+        "title": "Wo Daten verarbeitet werden",
+        "body": "STOA speichert Daten in der Schweiz, in Rechenzentren von Amazon Web Services (AWS) in Zürich. Für KI-Erklärungen und die automatische Prüfung hochgeladener Bilder werden Anfragen in Rechenzentren von AWS in der EU verarbeitet; dort werden sie weder gespeichert noch zum Trainieren von KI-Modellen verwendet. Vor dem Hochladen entfernt STOA Standortangaben (EXIF) aus Fotos. Bilder werden höchstens 365 Tage aufbewahrt und bei Löschung des Kontos sofort gelöscht. Von der Prüfung blockierte Bilder sieht nur die Administration; sie werden 90 Tage nach der Bearbeitung gelöscht."
       }
     }
   },

@@ -205,6 +205,18 @@ export async function getUploadedFile(attachmentId: string) {
   return response.data
 }
 
+/**
+ * The bytes of one of the student's attachments -- a teacher's picture in a
+ * reply is one once it is sent (stoa-backend#145). The route wants the
+ * student's token, so an `<img src>` cannot read it: the caller shows the blob.
+ */
+export async function getAttachmentContent(attachmentId: string) {
+  const response = await httpClient.get<Blob>(apiPath`/files/attachments/${attachmentId}/content`, {
+    responseType: 'blob',
+  })
+  return response.data
+}
+
 export async function deleteUploadedFile(attachmentId: string) {
   await httpClient.delete(apiPath`/files/attachments/${attachmentId}`)
 }

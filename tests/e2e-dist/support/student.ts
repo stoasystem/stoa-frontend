@@ -16,6 +16,8 @@ type Message = {
   content: string
   createdAt: string
   structured?: Record<string, unknown>
+  /** `AttachmentSummary`s, as the backend lists a message's files. */
+  attachments?: unknown[]
 }
 type Command = {
   key: string
@@ -28,7 +30,7 @@ type Command = {
   attempt: number
   reads: number
 }
-type Conversation = { id: string; subject: string; grade: string; createdAt: string; messages: Message[] }
+export type Conversation = { id: string; subject: string; grade: string; createdAt: string; messages: Message[] }
 
 /**
  * One student and the parts of the backend a student's session touches:

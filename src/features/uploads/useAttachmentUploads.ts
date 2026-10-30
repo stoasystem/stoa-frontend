@@ -4,12 +4,13 @@ import { problemFor, type AttachmentProblem } from '@/services/files/attachmentP
 import { prepareImage } from '@/services/files/prepareImage'
 import {
   ATTACHMENTS_PER_MESSAGE,
+  imageRejectionFor,
   isPreparedImage,
   rejectionFor,
   uploadRejectionFor,
 } from '@/services/files/uploadLimits'
 import type { ChatAttachment } from '@/types/chat'
-import type { AttachmentReference } from '@/types/file'
+import type { UploadPurpose } from '@/types/file'
 
 /** One file chosen in the composer, from the moment it is picked. */
 export type AttachmentDraft = {
@@ -45,10 +46,11 @@ const EXPIRY_MARGIN_MS = 2 * 60 * 1000
  */
 async function prepareAndUpload(
   file: File,
+  purpose: UploadPurpose,
   serially: <T>(work: () => Promise<T>) => Promise<T>,
   signal: AbortSignal,
 ) {
-  if (!isPreparedImage(file.name)) return uploadFile({ file, signal })
+  if (!isPreparedImage(file.name)) return uploadFile({ file, purpose, signal })
   // One taken out while it waited its turn is not opened at all.
   const prepared = await serially(() =>
     signal.aborted ? Promise.reject(new DOMException('aborted', 'AbortError')) : prepareImage(file),
@@ -56,7 +58,7 @@ async function prepareAndUpload(
   if (uploadRejectionFor(prepared) === 'tooLarge') {
     throw new Error(`${prepared.name} is still over the upload limit once shrunk.`)
   }
-  return uploadFile({ file: prepared, signal })
+  return uploadFile({ file: prepared, purpose, signal })
 }
 
 let counter = 0
@@ -89,8 +91,15 @@ const hasId = (draft: AttachmentDraft): draft is AttachmentDraft & { uploadId: s
  * updater runs when React renders, which is after the handler that chose the
  * file has returned, so uploads started inside one were started from a list
  * nobody had filled in yet, and none of them ever left.
+ *
+ * A student's files go up as `conversation_attachment`. A teacher's reply takes
+ * photos only, as `help_reply_image` (#513): `imagesOnly` refuses anything else
+ * before it goes, as the backend would after.
  */
-export function useAttachmentUploads() {
+export function useAttachmentUploads({
+  purpose = 'conversation_attachment',
+  imagesOnly = false,
+}: { purpose?: UploadPurpose; imagesOnly?: boolean } = {}) {
   const [drafts, setDrafts] = useState<AttachmentDraft[]>([])
   /** More files were chosen than a message carries; the extras were left out. */
   const [overflow, setOverflow] = useState(false)
@@ -142,7 +151,7 @@ export function useAttachmentUploads() {
       setOverflow(chosen.length > room)
       const started: Array<{ localId: string; file: File }> = []
       const made = chosen.slice(0, room).map((file) => {
-        const rejection = rejectionFor(file)
+        const rejection = imagesOnly ? imageRejectionFor(file) : rejectionFor(file)
         const draft: AttachmentDraft = {
           localId: nextLocalId(),
           filename: file.name,
@@ -158,7 +167,7 @@ export function useAttachmentUploads() {
       for (const { localId, file } of started) {
         const controller = new AbortController()
         inFlight.current.set(localId, controller)
-        void prepareAndUpload(file, serially, controller.signal)
+        void prepareAndUpload(file, purpose, serially, controller.signal)
           .finally(() => {
             if (inFlight.current.get(localId) === controller) inFlight.current.delete(localId)
           })
@@ -177,7 +186,7 @@ export function useAttachmentUploads() {
           )
       }
     },
-    [serially, settle, write],
+    [imagesOnly, purpose, serially, settle, write],
   )
 
   const remove = useCallback(
@@ -230,6 +239,22 @@ export function useAttachmentUploads() {
     return true
   }, [write])
 
+  /**
+   * The server would not take the files the reply carried -- each already sent,
+   * or past its time -- and nothing was sent (#513). Each one ready is failed
+   * as `expired`, which says to choose it again.
+   */
+  const expireReady = useCallback(() => {
+    write(
+      held.current.map(
+        (draft): AttachmentDraft =>
+          draft.state === 'ready'
+            ? { ...draft, state: 'failed', problem: 'expired', uploadId: undefined, expiresAt: undefined }
+            : draft,
+      ),
+    )
+  }, [write])
+
   const ready = drafts.filter(hasId)
 
   return {
@@ -240,8 +265,9 @@ export function useAttachmentUploads() {
     clear,
     clearSent,
     expireStale,
+    expireReady,
     /** What the message refers to, in the order the files were chosen. */
-    readyReferences: ready.map((draft): AttachmentReference => ({ uploadId: draft.uploadId })),
+    readyReferences: ready.map((draft) => ({ uploadId: draft.uploadId })),
     /**
      * The same files as the message's own bubble shows them, before the server
      * replies; until it does, the upload's id stands in for the attachment's.

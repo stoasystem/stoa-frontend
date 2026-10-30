@@ -5,6 +5,7 @@ import { Avatar, Button } from '@/components/base'
 import { ICON } from '@/components/base/sizes'
 import { MathRenderer } from '@/components/ui/MathRenderer'
 import { AskAnswerSections, hasSections, quoteCaption, type AnswerStep } from '@/features/ask/AskAnswerSections'
+import { TeacherReplyImages } from '@/features/ask/TeacherReplyImages'
 import { cn } from '@/lib/utils'
 import type { ChatAttachment, ChatMessage, KnowledgePoint } from '@/types/chat'
 
@@ -109,6 +110,7 @@ export const AskMessage = memo(function AskMessage({
         >
           <MathRenderer plain>{message.content}</MathRenderer>
         </div>
+        <TeacherReplyImages attachments={message.attachments} teacher={name} />
       </div>
     )
   }

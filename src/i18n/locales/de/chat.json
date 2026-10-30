@@ -188,8 +188,19 @@
         "quota": "Für Dateien ist kein Platz mehr frei. Entferne zuerst eine ältere.",
         "unavailable": "Dateien lassen sich gerade nicht hinzufügen. Versuch es gleich noch einmal.",
         "unreadable": "Dieses Foto lässt sich nicht öffnen. Versuch ein anderes oder einen Screenshot.",
+        "blocked": "Dieses Bild kann nicht gesendet werden. Wähl ein anderes oder beschreib die Aufgabe in Worten.",
         "failed": "Diese Datei konnte nicht hinzugefügt werden. Versuch es noch einmal."
       }
+    },
+    "teacherImages": {
+      "label": "Bilder der Lehrperson",
+      "alt": "Bild von {{teacher}}: {{name}}",
+      "open": "Bild vergrössern: {{name}}",
+      "loading": "Bild wird geladen …",
+      "unavailable": "Bild nicht verfügbar",
+      "failed": "Bild konnte nicht geladen werden.",
+      "retry": "Noch einmal laden",
+      "retryNamed": "Noch einmal laden: {{name}}"
     }
   }
 }

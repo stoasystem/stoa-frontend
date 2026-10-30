@@ -1,4 +1,5 @@
 import type { ChatMessage } from '@/types/chat'
+import type { AttachmentSummary } from '@/types/file'
 import type { PracticeTeacherRequestContext } from '@/types/practice'
 import type { TeacherHelpStatus } from '@/types/teacherHelp'
 
@@ -43,6 +44,17 @@ export type TeacherHelpRequestNote = {
   // `null` for a plain-text reply.
   richContent?: TeacherReplyRichContent | null
   responseFormat?: string
+  /** The pictures the reply carried (stoa-backend#145); none on an older one. */
+  attachments?: AttachmentSummary[]
+}
+
+/**
+ * A message of the help request's conversation as the teacher reads it. Its
+ * attachments come as the server's summaries (`attachmentId`, `mediaType`),
+ * not in the shape the student's own thread keeps them (#510).
+ */
+export type TeacherHelpMessage = Omit<ChatMessage, 'attachments'> & {
+  attachments?: AttachmentSummary[]
 }
 
 export type TeacherHelpRequestDetail = {
@@ -57,7 +69,7 @@ export type TeacherHelpRequestDetail = {
   status: TeacherHelpStatus
   requestMessage?: string
   practiceContext?: PracticeTeacherRequestContext
-  messages: ChatMessage[]
+  messages: TeacherHelpMessage[]
   notes?: TeacherHelpRequestNote[]
   firstTeacherActionAt?: string
   sla?: TeacherSlaSnapshot

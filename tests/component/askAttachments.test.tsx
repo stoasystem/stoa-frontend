@@ -109,7 +109,8 @@ function emulateWidth(width: number) {
   }) as typeof window.matchMedia
 }
 
-function openAsk() {
+/** The panel as a student opens it, in whatever language i18n is in. */
+function renderAsk() {
   const client = new QueryClient({ defaultOptions: { queries: { retry: false } } })
   render(
     <I18nextProvider i18n={i18n}>
@@ -120,6 +121,10 @@ function openAsk() {
       </QueryClientProvider>
     </I18nextProvider>,
   )
+}
+
+function openAsk() {
+  renderAsk()
   return within(screen.getByRole('complementary', { name: 'Ask' }))
 }
 
@@ -467,6 +472,53 @@ describe('a file that cannot be sent', () => {
     expect(await ask.findByText(/Photos may be up to 30 MB, other files up to 50 MB/)).toBeInTheDocument()
     // The server's own prose is written for whoever wrote the request.
     expect(ask.queryByText('This file is too large. Choose a smaller file.')).toBeNull()
+  })
+
+  /**
+   * Image moderation (stoa-backend#138) answers `complete` with
+   * `422 upload_content_blocked`. There is no appeal (#512): the sentence says
+   * what the student can do instead, never to try the same picture again.
+   */
+  const BLOCKED = {
+    de: 'Dieses Bild kann nicht gesendet werden. Wähl ein anderes oder beschreib die Aufgabe in Worten.',
+    en: 'This picture cannot be sent. Choose a different one, or describe the question in words.',
+    fr: 'Cette image ne peut pas être envoyée. Choisis-en une autre ou décris l’exercice avec tes mots.',
+    it: 'Questa immagine non si può inviare. Scegline un’altra oppure descrivi l’esercizio a parole.',
+  } as const
+
+  const blocked = () =>
+    new ApiError('This image cannot be sent.', {
+      status: 422,
+      code: 'upload_content_blocked',
+      detail: { code: 'upload_content_blocked', message: 'This image cannot be sent.', correlationId: 'c-1' },
+    })
+
+  it.each(Object.entries(BLOCKED))('says in %s that a picture moderation refused cannot be sent (#512)', async (language, sentence) => {
+    await i18n.changeLanguage(language)
+    uploadMock.mockRejectedValue(blocked())
+    renderAsk()
+    await screen.findByText('Linear equations')
+
+    await userEvent.upload(picker(), photo())
+
+    const row = (await screen.findByText(sentence)).closest('li')!
+    expect(row).toHaveAttribute('data-attachment-state', 'failed')
+    expect(screen.queryByText('This image cannot be sent.')).toBeNull()
+  })
+
+  it('does not tell the student to send a refused picture again, and the question goes out without it', async () => {
+    uploadMock.mockRejectedValue(blocked())
+    const ask = openAsk()
+    await ask.findByText('Linear equations')
+
+    await userEvent.upload(picker(), photo())
+    await ask.findByText(BLOCKED.en)
+    // The generic failure says "Try again", which moderation would only refuse again.
+    expect(ask.queryByText(/Try again/)).toBeNull()
+
+    await userEvent.type(ask.getByRole('textbox', { name: 'Your question' }), 'It is a triangle with sides 3, 4, 5{Enter}')
+    await waitFor(() => expect(streamMock).toHaveBeenCalledTimes(1))
+    expect(streamMock.mock.calls[0][0].payload.attachmentIds).toBeUndefined()
   })
 
   it('leaves a failed file on screen when the question goes out without it', async () => {
