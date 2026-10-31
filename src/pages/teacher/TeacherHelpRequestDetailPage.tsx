@@ -17,7 +17,11 @@ import { AiTeacherToolsPanel } from '@/components/teacher/AiTeacherToolsPanel'
 import { CurriculumRolloutPanel } from '@/components/practice/CurriculumRolloutPanel'
 import { Button } from '@/components/ui/button'
 import { useCurriculumCatalogQuery } from '@/hooks/practice/useCurriculumCatalogQuery'
-import { useAddTeacherHelpRequestNoteMutation } from '@/hooks/teacher/useAddTeacherHelpRequestNoteMutation'
+import { ATTACHMENTS_WORK } from '@/features/ask/attachmentsSwitch'
+import {
+  isReplyImageRefusal,
+  useAddTeacherHelpRequestNoteMutation,
+} from '@/hooks/teacher/useAddTeacherHelpRequestNoteMutation'
 import { useTeacherHelpRequestDetailQuery } from '@/hooks/teacher/useTeacherHelpRequestDetailQuery'
 import { useTeacherAssistanceSummaryQuery } from '@/hooks/teacher/useTeacherAssistanceSummaryQuery'
 import { useUpdateTeacherHelpRequestMutation } from '@/hooks/teacher/useUpdateTeacherHelpRequestMutation'
@@ -203,18 +207,25 @@ export function TeacherHelpRequestDetailPage() {
                 {readFailed && (
                   <p role="status" className="text-sm text-muted-foreground">{tTeacher('detail.replyPaused')}</p>
                 )}
+                {/* Pictures go up the way a student's do, so they wait for the
+                    same switch: the pipeline's smoke run on production (#512). */}
                 <TeacherReplyComposer
                   key={requestId}
                   draftKey={requestId}
                   disabled={readFailed}
                   isSubmitting={addNote.isPending}
-                  onSubmit={(content, richContent, onSuccess) =>
-                    requestId && addNote.mutate({ requestId, content, richContent }, { onSuccess })
+                  allowImages={ATTACHMENTS_WORK}
+                  onSubmit={(content, richContent, onSuccess, images) =>
+                    requestId &&
+                    addNote.mutate(
+                      { requestId, content, richContent, attachmentIds: images.references },
+                      { onSuccess, onError: (error) => isReplyImageRefusal(error) && images.onRefused() },
+                    )
                   }
                 />
               </>
             )}
-            <TeacherRequestTimeline notes={requestQuery.data.notes ?? []} />
+            <TeacherRequestTimeline requestId={requestQuery.data.requestId} notes={requestQuery.data.notes ?? []} />
           </div>
         )}
       </PageContainer>

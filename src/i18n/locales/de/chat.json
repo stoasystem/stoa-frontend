@@ -90,7 +90,22 @@
       "stop": "Nicht mehr warten",
       "starting": "Die Unterhaltung wird gestartet…",
       "startFailed": "Die Unterhaltung konnte nicht gestartet werden. Versuch es noch einmal.",
-      "answerFailed": "Die Erklärung konnte gerade nicht erstellt werden. Versuch es noch einmal oder frag eine Lehrperson."
+      "answerFailed": "Die Erklärung konnte gerade nicht erstellt werden. Versuch es noch einmal oder frag eine Lehrperson.",
+      "dailyLimit": "Deine Nachrichten für heute sind aufgebraucht. Komm morgen wieder, oder frag eine Lehrperson, wenn du jetzt Hilfe brauchst."
+    },
+    "answer": {
+      "steps": "Schritte",
+      "answer": "Antwort",
+      "stepUnclear": "Diesen Schritt verstehe ich nicht",
+      "stepNumber": "Schritt {{n}}",
+      "stepQuestion": "Diesen Schritt verstehe ich nicht. Kannst du ihn anders erklären?",
+      "hints": "Tipps",
+      "showHint": "Tipp zeigen",
+      "nextHint": "Noch ein Tipp",
+      "practice": "Üben",
+      "showExercise": "Noch eine Übung",
+      "nextExercise": "Noch eine",
+      "related": "Passende Themen"
     },
     "presence": {
       "online_one": "{{count}} Lehrperson online",
@@ -100,7 +115,10 @@
     "help": {
       "request": "Lehrperson fragen",
       "requesting": "Lehrperson wird gefragt…",
+      "suggested": "Dabei kann dir eine Lehrperson helfen.",
       "offline": "Gerade ist keine Lehrperson online. Sobald sie wieder da ist, antwortet sie hier.",
+      "remaining_one": "Diese Woche noch {{count}} Anfrage an eine Lehrperson",
+      "remaining_other": "Diese Woche noch {{count}} Anfragen an eine Lehrperson",
       "cardLabel": "Unterstützung durch eine Lehrperson",
       "status": {
         "pending": "Wartet",
@@ -172,10 +190,49 @@
         "unsupported": "Diese Art von Datei kann nicht gesendet werden. Fotos, PDF, Word, PowerPoint, Excel und Textdateien gehen.",
         "empty": "Diese Datei ist leer. Wähl eine andere.",
         "expired": "Diese Datei hat zu lange gebraucht. Wähl sie noch einmal.",
+        "sendExpired": "Eine angehängte Datei hat zu lange gebraucht. Wähl sie noch einmal aus und frag dann noch einmal.",
         "quota": "Für Dateien ist kein Platz mehr frei. Entferne zuerst eine ältere.",
         "unavailable": "Dateien lassen sich gerade nicht hinzufügen. Versuch es gleich noch einmal.",
+        "unreadable": "Dieses Foto lässt sich nicht öffnen. Versuch ein anderes oder einen Screenshot.",
+        "blocked": "Dieses Bild kann nicht gesendet werden. Wähl ein anderes oder beschreib die Aufgabe in Worten.",
         "failed": "Diese Datei konnte nicht hinzugefügt werden. Versuch es noch einmal."
       }
+    },
+    "phone": {
+      "label": "Foto vom Handy",
+      "close": "Schliessen",
+      "title": "Mit dem Handy scannen",
+      "qrLabel": "QR-Code, um ein Foto vom Handy zu senden",
+      "qrFailed": "Der QR-Code lässt sich nicht anzeigen. Lade die Seite neu und versuch es noch einmal.",
+      "making": "Code wird erstellt…",
+      "unmade": {
+        "rateLimited": "Zu viele Codes in kurzer Zeit. Warte einen Moment und versuch es dann noch einmal.",
+        "failed": "Der Code konnte nicht erstellt werden. Versuch es noch einmal."
+      },
+      "waiting": "Richte die Kamera deines Handys auf den Code und mach oder wähl dort ein Foto.",
+      "validFor": "Gilt noch {{time}}",
+      "uploading": "Dein Handy sendet das Foto…",
+      "ready": "Ist das dein Foto? Füg es deiner Frage hinzu.",
+      "loadingPhoto": "Foto wird geladen…",
+      "photoFailed": "Das Foto lässt sich hier nicht anzeigen. Erstell einen neuen Code und sende es noch einmal.",
+      "photoAlt": "Das Foto von deinem Handy",
+      "photoName": "Handyfoto",
+      "add": "Foto hinzufügen",
+      "notMine": "Nicht meins",
+      "failed": "Das Foto ist nicht angekommen. Erstell einen neuen Code und versuch es noch einmal.",
+      "expired": "Dieser Code ist abgelaufen. Erstell einen neuen.",
+      "newCode": "Neuer Code",
+      "tryAgain": "Noch einmal versuchen"
+    },
+    "teacherImages": {
+      "label": "Bilder der Lehrperson",
+      "alt": "Bild von {{teacher}}: {{name}}",
+      "open": "Bild vergrössern: {{name}}",
+      "loading": "Bild wird geladen …",
+      "unavailable": "Bild nicht verfügbar",
+      "failed": "Bild konnte nicht geladen werden.",
+      "retry": "Noch einmal laden",
+      "retryNamed": "Noch einmal laden: {{name}}"
     }
   }
 }

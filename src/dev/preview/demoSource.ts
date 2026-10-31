@@ -133,6 +133,8 @@ export function demoReviewDue(): ReviewDueResponse {
     topicId: lesson.topicId,
     prompt: challenge.prompt,
     options: challenge.options ?? [],
+    ...(challenge.figure ? { figure: challenge.figure } : {}),
+    ...(challenge.optionFigures ? { optionFigures: challenge.optionFigures } : {}),
     type: challenge.type,
     dueAt: generatedAt,
     lapses: index === 0 ? 2 : 0,

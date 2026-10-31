@@ -1,3 +1,5 @@
+import type { AttachmentReference } from '@/types/file'
+
 export type ChatRole = 'student' | 'assistant' | 'teacher' | 'system'
 
 export type ChatMessageStatus =
@@ -31,10 +33,26 @@ export type PracticeContextRef = {
   unitId: string
 }
 
+/** The sections of an answer a quote can point at, as `StructuredAnswer` names them. */
+export type AnswerSection = 'steps' | 'answer' | 'hints' | 'similarExercises' | 'knowledgePoints'
+
+/**
+ * The part of an answer a quote was taken from (stoa-backend#132): one entry
+ * of a list section, counted from 0; `answer` is one text and takes no index.
+ * Only on a quote of an answer that carries sections and is `kind: 'answer'`;
+ * anything else is a 422.
+ */
+export type QuotePart = {
+  section: AnswerSection
+  index?: number | null
+}
+
 /** Where a quoted passage was taken from: an exercise, or an earlier message. */
 export type QuoteSource = {
   kind: 'challenge' | 'message'
   id: string
+  /** Which part of that answer; absent for a passage chosen by hand. */
+  part?: QuotePart | null
 }
 
 /** A passage quoted back to the assistant (#56). Longer than this is a 422. */
@@ -54,6 +72,29 @@ export type TargetUnit = {
   unitId: string
 }
 
+/** A knowledge point an answer names; `unitId` is its star once the backend can match one. */
+export type KnowledgePoint = {
+  name: string
+  unitId?: string | null
+}
+
+/**
+ * An answer in the sections the model wrote it in (stoa-backend#132). How they
+ * are laid out is this side's. `followUp` is an answer in plain words -- what
+ * a question about one point of an earlier answer gets -- with nothing in the
+ * list sections; the backend derives it from which sections are empty.
+ */
+export type StructuredAnswer = {
+  kind: 'answer' | 'followUp'
+  steps?: string[]
+  answer?: string
+  hints?: string[]
+  similarExercises?: string[]
+  knowledgePoints?: KnowledgePoint[]
+  /** True only when the model asked for a teacher; then the answer offers one. */
+  suggestTeacher?: boolean
+}
+
 export type ChatMessage = {
   id: string
   conversationId: string
@@ -66,6 +107,11 @@ export type ChatMessage = {
   quote?: MessageQuote | null
   /** On an answer: the star it offers to fly to (#487). */
   targetUnit?: TargetUnit | null
+  /**
+   * An answer's sections; `null` on students' and teachers' messages and on
+   * answers written before they were kept, which show `content` as it is.
+   */
+  structured?: StructuredAnswer | null
 }
 
 export type ConversationSummary = {
@@ -87,7 +133,7 @@ export type ConversationListResponse = {
 
 export type SendMessageRequest = {
   content: string
-  attachmentIds?: string[]
+  attachmentIds?: AttachmentReference[]
   practiceContext?: PracticeContextRef
   quote?: MessageQuote
 }
@@ -137,6 +183,8 @@ export type StreamMessageDoneEvent = {
   status: 'completed'
   /** The same star the stored answer carries (#487). */
   targetUnit?: TargetUnit | null
+  /** The answer's sections (stoa-backend#132), there before the conversation is read back. */
+  structured?: StructuredAnswer | null
 }
 
 export type StreamMessageErrorEvent = {

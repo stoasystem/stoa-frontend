@@ -24,11 +24,18 @@
     "tryAgain": "Réessayer"
   },
   "composer": {
-    "attach": "Ajouter une photo ou un fichier",
+    "attach": "Choisir une photo ou un fichier",
+    "capture": "Prendre une photo",
+    "phone": "Envoyer une photo depuis ton téléphone",
     "send": "Envoyer",
     "sendBlocked": {
       "empty": "Écris d’abord ta question, puis envoie-la.",
       "busy": "C’est encore en cours d’envoi. Réessaie dans un instant."
+    },
+    "dictation": {
+      "windows": "Tu préfères parler ? Appuie sur Win + H et dis ta question.",
+      "mac": "Tu préfères parler ? Appuie sur la touche micro ou sur ton raccourci de dictée.",
+      "touch": "Tu préfères parler ? Touche le micro sur ton clavier."
     }
   },
   "errorBoundary": {
@@ -175,22 +182,6 @@
         "summary": "Ta demande d’aide à un·e enseignant·e a expiré. L’aide de cette semaine t’a été rendue.",
         "title": "Aucun·e enseignant·e disponible"
       },
-      "helpRequested": {
-        "summary": "Un·e élève demande de l’aide pour une question en {{subject}}.",
-        "title": "Aide demandée"
-      },
-      "moderationCreatedHigh": {
-        "summary": "Un cas de modération de gravité élevée a été signalé.",
-        "title": "Nouveau cas de modération"
-      },
-      "moderationCreatedLow": {
-        "summary": "Un cas de modération de gravité faible a été signalé.",
-        "title": "Nouveau cas de modération"
-      },
-      "moderationCreatedMedium": {
-        "summary": "Un cas de modération de gravité moyenne a été signalé.",
-        "title": "Nouveau cas de modération"
-      },
       "replyConversation": {
         "summary": "Ton enseignant·e a répondu dans ta conversation.",
         "title": "Ton enseignant·e a répondu"
@@ -323,6 +314,9 @@
     },
     "terms": {
       "title": "Conditions d’utilisation"
+    },
+    "phoneUpload": {
+      "title": "Envoyer une photo"
     },
     "unauthorized": {
       "title": "Connexion requise"

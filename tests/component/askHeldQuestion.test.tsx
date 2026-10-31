@@ -241,3 +241,33 @@ describe('a quote chosen beside an exercise', () => {
     expect(vi.mocked(streamConversationMessage).mock.calls[0][0].payload).not.toHaveProperty('quote')
   })
 })
+
+describe('Ask beside an exercise says how to dictate (#515)', () => {
+  it('in the docked composer under the stage on a phone', async () => {
+    vi.mocked(getConversations).mockResolvedValue({ items: [] } as never)
+    const mac = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Safari/605.1.15'
+    Object.defineProperty(window.navigator, 'userAgent', { value: mac, configurable: true })
+    // Narrow: Ask starts closed and the composer is docked under the exercise.
+    window.matchMedia = ((query: string) => ({
+      matches: false,
+      media: query,
+      onchange: null,
+      addEventListener() {},
+      removeEventListener() {},
+      addListener() {},
+      removeListener() {},
+      dispatchEvent: () => false,
+    })) as never
+    try {
+      const { container } = mount(<Stage />)
+      await userEvent.click(within(container.querySelector<HTMLElement>('[data-ask-docked]')!).getByRole('textbox'))
+      expect(container.querySelector('[data-composer-dictation]')).toHaveAttribute('data-composer-dictation', 'mac')
+      expect(container.querySelector('[data-composer-dictation]')).toHaveAttribute(
+        'data-composer-dictation-placement',
+        'floating',
+      )
+    } finally {
+      Reflect.deleteProperty(window.navigator, 'userAgent')
+    }
+  })
+})

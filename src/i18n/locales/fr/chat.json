@@ -90,7 +90,22 @@
       "stop": "Ne plus attendre",
       "starting": "La conversation démarre…",
       "startFailed": "La conversation n’a pas pu démarrer. Réessaie.",
-      "answerFailed": "L’explication n’a pas pu être préparée pour le moment. Réessaie ou demande à un enseignant."
+      "answerFailed": "L’explication n’a pas pu être préparée pour le moment. Réessaie ou demande à un enseignant.",
+      "dailyLimit": "Tu as utilisé tous tes messages pour aujourd’hui. Reviens demain, ou demande à un enseignant si tu as besoin d’aide maintenant."
+    },
+    "answer": {
+      "steps": "Étapes",
+      "answer": "Réponse",
+      "stepUnclear": "Je ne comprends pas cette étape",
+      "stepNumber": "Étape {{n}}",
+      "stepQuestion": "Je ne comprends pas cette étape. Tu peux l’expliquer autrement ?",
+      "hints": "Indices",
+      "showHint": "Montrer un indice",
+      "nextHint": "Encore un indice",
+      "practice": "S’entraîner",
+      "showExercise": "Encore un exercice",
+      "nextExercise": "Encore un",
+      "related": "Notions liées"
     },
     "presence": {
       "online_one": "{{count}} enseignant en ligne",
@@ -101,7 +116,11 @@
     "help": {
       "request": "Demander à un enseignant",
       "requesting": "Demande en cours…",
+      "suggested": "Un enseignant peut t’aider là-dessus.",
       "offline": "Aucun enseignant n’est en ligne pour le moment. À son retour, il répondra ici.",
+      "remaining_one": "Encore {{count}} demande d’enseignant cette semaine",
+      "remaining_many": "Encore {{count}} demandes d’enseignant cette semaine",
+      "remaining_other": "Encore {{count}} demandes d’enseignant cette semaine",
       "cardLabel": "Aide d’un enseignant",
       "status": {
         "pending": "En attente",
@@ -173,10 +192,49 @@
         "unsupported": "Ce type de fichier ne peut pas être envoyé. Les photos, PDF, Word, PowerPoint, Excel et fichiers texte, oui.",
         "empty": "Ce fichier est vide. Choisis-en un autre.",
         "expired": "Ce fichier a pris trop de temps. Choisis-le à nouveau.",
+        "sendExpired": "Un fichier joint a pris trop de temps. Choisis-le à nouveau, puis repose ta question.",
         "quota": "Il n’y a plus de place pour des fichiers. Retires-en un plus ancien d’abord.",
         "unavailable": "Impossible d’ajouter des fichiers pour le moment. Réessaie dans un instant.",
+        "unreadable": "Impossible d’ouvrir cette photo. Essaie une autre photo ou une capture d’écran.",
+        "blocked": "Cette image ne peut pas être envoyée. Choisis-en une autre ou décris l’exercice avec tes mots.",
         "failed": "Ce fichier n’a pas pu être ajouté. Réessaie."
       }
+    },
+    "phone": {
+      "label": "Photo depuis ton téléphone",
+      "close": "Fermer",
+      "title": "Scanne avec ton téléphone",
+      "qrLabel": "Code QR pour envoyer une photo depuis ton téléphone",
+      "qrFailed": "Le code QR ne peut pas s’afficher. Recharge la page et réessaie.",
+      "making": "Création du code…",
+      "unmade": {
+        "rateLimited": "Trop de codes en peu de temps. Attends un moment, puis réessaie.",
+        "failed": "Le code n’a pas pu être créé. Réessaie."
+      },
+      "waiting": "Vise le code avec l’appareil photo de ton téléphone, puis prends ou choisis une photo.",
+      "validFor": "Valable encore {{time}}",
+      "uploading": "Ton téléphone envoie la photo…",
+      "ready": "C’est bien ta photo ? Ajoute-la à ta question.",
+      "loadingPhoto": "Chargement de la photo…",
+      "photoFailed": "La photo ne peut pas s’afficher ici. Crée un nouveau code et renvoie-la.",
+      "photoAlt": "La photo de ton téléphone",
+      "photoName": "photo-telephone",
+      "add": "Ajouter la photo",
+      "notMine": "Pas la mienne",
+      "failed": "La photo n’est pas arrivée. Crée un nouveau code et réessaie.",
+      "expired": "Ce code a expiré. Crées-en un nouveau.",
+      "newCode": "Nouveau code",
+      "tryAgain": "Réessayer"
+    },
+    "teacherImages": {
+      "label": "Images de l’enseignant·e",
+      "alt": "Image de {{teacher}} : {{name}}",
+      "open": "Agrandir l’image : {{name}}",
+      "loading": "Chargement de l’image…",
+      "unavailable": "Image indisponible",
+      "failed": "L’image n’a pas pu être chargée.",
+      "retry": "Recharger",
+      "retryNamed": "Recharger : {{name}}"
     }
   }
 }

@@ -35,3 +35,23 @@ test('control: a reply that breaks the backend contract is caught, for that reas
   // Caught as it should be; cleared so the fixture's own check passes.
   backend.problems.length = 0
 })
+
+test('control: the content security policy is enforced, and a violation is caught (#533)', async ({ page, backend }) => {
+  new StudentWorld(backend).install()
+  await page.goto('/login')
+  await expect(page.locator('input[type=password]').first()).toBeVisible()
+  // What the policy is for: script the page did not load from its own origin
+  // does not run.
+  const ran = await page.evaluate(`(() => {
+    const script = document.createElement('script')
+    script.textContent = 'window.__inlineRan = true'
+    document.head.append(script)
+    return window.__inlineRan === true
+  })()`)
+  expect(ran).toBe(false)
+  await expect.poll(() => backend.problems).toEqual([
+    expect.stringMatching(/^CSP: Executing inline script violates the following Content Security Policy directive 'script-src 'self''/),
+  ])
+  // Caught as it should be; cleared so the fixture's own check passes.
+  backend.problems.length = 0
+})

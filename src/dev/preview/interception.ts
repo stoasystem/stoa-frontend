@@ -29,6 +29,7 @@
  */
 import { AxiosError, AxiosHeaders, type AxiosAdapter, type AxiosInstance, type AxiosResponse } from 'axios'
 import { answer, failsThisTime, streamedAnswer, type PreviewReply } from '@/dev/preview/handlers'
+import type { MessageQuote } from '@/types/chat'
 
 export const API_ORIGIN = 'https://api.design-preview.invalid'
 
@@ -127,7 +128,7 @@ function installFetch() {
     const body = init?.body ?? null
     const stream = /^\/conversations\/([^/]+)\/messages\/stream$/.exec(apiPath(url))
     if (stream && method === 'POST') {
-      const sent = parseBody(body) as { content?: string; idempotencyKey?: string } | null
+      const sent = parseBody(body) as { content?: string; idempotencyKey?: string; quote?: MessageQuote } | null
       const key = sent?.idempotencyKey ?? `demo-${Date.now()}`
       const fails = failsThisTime(sent?.content ?? '', key)
       journal().answered.push({ method, url: apiPath(url), status: fails ? 503 : 200 })
@@ -138,7 +139,7 @@ function installFetch() {
           headers: { 'content-type': 'application/json' },
         })
       }
-      const events = await streamedAnswer(decodeURIComponent(stream[1]), sent?.content ?? '', key)
+      const events = await streamedAnswer(decodeURIComponent(stream[1]), sent?.content ?? '', key, sent?.quote)
       // Sent a little at a time, as a real answer arrives.
       const encoder = new TextEncoder()
       const body$ = new ReadableStream<Uint8Array>({

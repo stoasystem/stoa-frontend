@@ -1,4 +1,4 @@
-import type { QueryClient } from '@tanstack/react-query'
+import { focusManager, type QueryClient } from '@tanstack/react-query'
 import type {
   NotificationEvent,
   NotificationEventType,
@@ -65,11 +65,87 @@ export function parseRealtimeNotificationMessage(data: string): NotificationEven
   }
 }
 
+/*
+ * "New moderation case" and "Teacher help requested" go to a whole role (no
+ * `recipientId`) and are written before anyone reads them, so their push
+ * carries the English the backend stored; only `GET /notifications` and
+ * `GET /admin/notifications` render them in the reader's language
+ * (stoa-backend#161). Their push is taken as word that something new is
+ * there, and the lists are read again (#518).
+ *
+ * By hand from the backend: `notification_service.ROLE_MESSAGES` has one
+ * entry per row rendered on read, `moderation.created` (written as
+ * `moderation_case_update` on a `moderation_case`) and `teacher_requested`
+ * (on a `question`). A key added there belongs here too.
+ */
+const RENDERED_ON_READ = new Set(['moderation_case_update:moderation_case', 'teacher_requested:question'])
+
+function isRenderedOnRead(event: NotificationEvent) {
+  return !event.recipientId && RENDERED_ON_READ.has(`${event.eventType}:${event.targetType}`)
+}
+
+/*
+ * How the lists are read again. Marked stale at once, so a view opened
+ * meanwhile reads afresh; then read once, a moment after the first push of a
+ * run, however many arrive in it. A read still on its way is not called off.
+ * In a hidden tab nothing is read until the tab is shown again (#413): while
+ * realtime is live the lists do not read on focus by themselves.
+ */
+export const ROLE_REFETCH_DELAY_MS = 1_000
+
+const refetchDue = new WeakMap<QueryClient, ReturnType<typeof setTimeout>>()
+const waitingToBeShown = new WeakMap<QueryClient, () => void>()
+
+function refetchLists(queryClient: QueryClient) {
+  // The bell's count sits under the list's key, so it is read with it.
+  for (const queryKey of [notificationQueryKeys.list(), notificationQueryKeys.adminList()]) {
+    // A read on its way may have left before the push: it is let finish, then
+    // one more read follows it.
+    const onItsWay = queryClient.getQueryState(queryKey)?.fetchStatus === 'fetching'
+    const again = () => queryClient.refetchQueries({ queryKey, type: 'active' }, { cancelRefetch: false })
+    void queryClient
+      .refetchQueries({ queryKey, type: 'active', stale: true }, { cancelRefetch: false })
+      .then(() => (onItsWay ? again() : undefined))
+  }
+}
+
+function refetchWhenShown(queryClient: QueryClient) {
+  if (focusManager.isFocused()) {
+    refetchLists(queryClient)
+    return
+  }
+  if (waitingToBeShown.has(queryClient)) return
+  const unsubscribe = focusManager.subscribe((focused) => {
+    if (!focused) return
+    unsubscribe()
+    waitingToBeShown.delete(queryClient)
+    refetchLists(queryClient)
+  })
+  waitingToBeShown.set(queryClient, unsubscribe)
+}
+
+function readListsAgain(queryClient: QueryClient) {
+  void queryClient.invalidateQueries({ queryKey: notificationQueryKeys.list(), refetchType: 'none' })
+  void queryClient.invalidateQueries({ queryKey: notificationQueryKeys.adminList(), refetchType: 'none' })
+  if (refetchDue.has(queryClient)) return
+  refetchDue.set(
+    queryClient,
+    setTimeout(() => {
+      refetchDue.delete(queryClient)
+      refetchWhenShown(queryClient)
+    }, ROLE_REFETCH_DELAY_MS),
+  )
+}
+
 export function mergeRealtimeNotification(
   queryClient: QueryClient,
   event: NotificationEvent,
   user: User,
 ) {
+  if (isRenderedOnRead(event)) {
+    readListsAgain(queryClient)
+    return
+  }
   const listed = queryClient
     .getQueryData<NotificationListResponse>(notificationQueryKeys.list())
     ?.items.some((item) => item.eventId === event.eventId)
