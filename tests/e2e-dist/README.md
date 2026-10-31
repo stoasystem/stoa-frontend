@@ -24,6 +24,10 @@ npm run test:e2e:dist
   names; required query parameters must be there and undeclared ones may not.
   A request to an operation the document does not have, or one no mock
   answers, is a problem too. The fixture fails the test if there are any.
+- **The content security policy.** Every page is served with production's
+  policy (`scripts/content-security-policy.mjs`, #533), enforced, with this
+  suite's hosts in production's places; a violation the browser reports is a
+  problem. Production sends it from CloudFront, report-only at first.
 - **Nothing else.** A request to any other host, or a WebSocket, is refused and
   is a problem; so is a file the site does not have (a 404, as on the CDN,
   instead of index.html). A broken build or a call that would carry the token
@@ -113,10 +117,11 @@ browser already puts such a page at the top, on a desktop); the sign-in page
 at `/` names itself in the tab and is announced on arriving from another page
 (#448).
 
-`controls.spec.ts` holds two controls. One is a negative control marked
+`controls.spec.ts` holds three controls. One is a negative control marked
 `test.fail()`: it fails while the app renders, and passes -- turning the suite
-red -- if it stops rendering. The other sends a reply that breaks the contract
-and asserts the exact problem the check reports.
+red -- if it stops rendering. One sends a reply that breaks the contract and
+asserts the exact problem the check reports. One adds an inline script to the
+page and asserts that it did not run and that the violation was caught.
 
 No retries. A test that needs one is a finding.
 
