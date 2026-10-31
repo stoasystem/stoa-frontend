@@ -53,6 +53,12 @@
   "star": {
     "progress": "{{percent}} % des leçons faites",
     "lessons": "{{done}} leçons faites sur {{total}}",
+    "quiz": {
+      "take": "Je sais déjà – teste-moi",
+      "cooling": "Tu pourras refaire le test à partir de {{when}}.",
+      "litByQuiz": "Allumée en réussissant le test de l’étoile",
+      "alsoTest": "Tu peux aussi tester toute l’étoile."
+    },
     "unmet_one": "Toutes les leçons sont faites : encore {{count}} exercice à réussir",
     "unmet_many": "Toutes les leçons sont faites : encore {{count}} exercices à réussir",
     "unmet_other": "Toutes les leçons sont faites : encore {{count}} exercices à réussir",

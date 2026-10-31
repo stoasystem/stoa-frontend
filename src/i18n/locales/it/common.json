@@ -416,6 +416,9 @@
       "body": "Questa schermata è in fase di rifacimento. Il link funziona già e resterà lo stesso.",
       "eyebrow": "Presto disponibile"
     },
+    "starQuiz": {
+      "title": "Test della stella"
+    },
     "unit": {
       "title": "Punto di conoscenza"
     }

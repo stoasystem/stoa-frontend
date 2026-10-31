@@ -214,6 +214,32 @@ export type LessonQuizAnswer = LessonQuizSession & {
   credentialExpiresAt: string | null
 }
 
+/**
+ * The star quiz (stoa-backend#165): one paper over a whole knowledge point, at
+ * least one exercise from each lesson, 6 to 10 in all, each asked once; a
+ * second wrong answer loses it. Passed, the whole star lights; lost, it can be
+ * taken again after `retryAt`. The paper, the count and the verdict are the
+ * backend's.
+ */
+export type StarQuizView = {
+  quizId: string
+  unitId: string
+  status: LessonQuizStatus
+  total: number
+  answered: number
+  mistakes: number
+  mistakesAllowed: number
+  /** The paper is good for 30 minutes. */
+  expiresAt: string
+  /** What it asks now, without its answer; null once it is over. */
+  exercise: PracticeExercise | null
+  /** When a lost quiz can be taken again; null otherwise. */
+  retryAt: string | null
+}
+
+/** One star quiz answer judged. Sent again, it gives the first result back (#113). */
+export type StarQuizAnswer = StarQuizView & { correct: boolean }
+
 export type PracticeLessonResult = {
   lessonId: string
   subjectId: string
@@ -499,8 +525,13 @@ export type KnowledgeMapResponse = {
     }
     /** When the point was first lit, ISO 8601 (stoa-backend#71). */
     litAt?: string | null
-    /** Seen happening, or written by the backfill (stoa-backend#71). Only `observed` is ever celebrated. */
-    litAtSource?: 'observed' | 'backfilled' | null
+    /**
+     * Seen happening, written by the backfill (stoa-backend#71), or lit by
+     * passing the star quiz (stoa-backend#165). The backfill's is never celebrated.
+     */
+    litAtSource?: 'observed' | 'backfilled' | 'quiz' | null
+    /** When a lost star quiz can be taken again; null when it can now (stoa-backend#165). */
+    starQuizRetryAt?: string | null
   }[]
   prerequisites: { from: string; to: string }[]
   summary: { lit: number; total: number; streakDays: number; score: number }

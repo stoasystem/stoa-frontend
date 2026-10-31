@@ -52,6 +52,12 @@
   "star": {
     "progress": "{{percent}}% of lessons done",
     "lessons": "{{done}} of {{total}} lessons done",
+    "quiz": {
+      "take": "I know this – test me",
+      "cooling": "You can take the test again from {{when}}.",
+      "litByQuiz": "Lit by passing the star quiz",
+      "alsoTest": "You can also test the whole star."
+    },
     "unmet_one": "All lessons done: {{count}} exercise still to get right",
     "unmet_other": "All lessons done: {{count}} exercises still to get right",
     "unmetPartial_one": "{{count}} exercise still to get right",

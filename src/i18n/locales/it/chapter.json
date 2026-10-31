@@ -119,5 +119,36 @@
     "tryAgain": "Riprova",
     "youAreHere": "Sei qui",
     "yourAnswer": "La tua risposta"
+  },
+  "starQuiz": {
+    "label": "Test della stella",
+    "heading": "Test della stella: {{star}}",
+    "drawing": "Sto preparando il test della stella…",
+    "backToStar": "Torna a {{star}} sulla mappa stellare",
+    "backToMap": "Torna alla mappa stellare",
+    "passed": {
+      "title": "Tutta la stella è accesa",
+      "body": "Lo sapevi già: {{star}} ora brilla sulla tua mappa stellare.",
+      "toMap": "Guardala sulla mappa stellare"
+    },
+    "failed": {
+      "title": "Non questa volta",
+      "body": "Potrai rifare il test della stella da {{when}}. Fino ad allora, le sue lezioni sono il modo per accenderla.",
+      "bodyLater": "Potrai rifare il test della stella domani. Fino ad allora, le sue lezioni sono il modo per accenderla.",
+      "toLessons": "Vai alle sue lezioni"
+    },
+    "trouble": {
+      "restart": "Ricomincia il test della stella",
+      "coolingUntil": "Potrai rifare questo test della stella da {{when}}.",
+      "unknownStar": "Questo punto di conoscenza non ha un test della stella.",
+      "alreadyLit": "Questa stella è già accesa.",
+      "coolingDown": "Potrai rifare questo test della stella domani.",
+      "unavailable": "Questa stella non ha ancora esercizi per un test.",
+      "notFound": "Questo test della stella non è più aperto.",
+      "finished": "Questo test della stella è già finito.",
+      "expired": "Il tempo per questo test della stella è scaduto: ognuno resta aperto 30 minuti.",
+      "outOfOrder": "Quella risposta era per un’altra domanda.",
+      "notStarted": "Non è stato possibile avviare il test della stella. Controlla la connessione e riprova."
+    }
   }
 }

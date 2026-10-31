@@ -106,6 +106,10 @@ export type Star = {
    * suggestion of what to learn first: the star opens all the same.
    */
   unlitPrerequisiteIds: string[]
+  /** Lit by passing its star quiz rather than by its exercises (stoa-backend#165). */
+  litAtSource?: 'observed' | 'backfilled' | 'quiz' | null
+  /** When a lost star quiz can be taken again, ISO 8601; null or absent when it can now (stoa-backend#165). */
+  starQuizRetryAt?: string | null
 }
 
 /** `from` is best lit before `to` (stoa-backend#56); it does not lock `to` (ADR 0004). Units, not topics. */

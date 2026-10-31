@@ -33,6 +33,7 @@ import { StageWithAsk, STAGE_SIDE_QUERY } from '@/features/chapter/StageAsk'
 import { quizTroubleIsRestartable, quizTroubleKey } from '@/features/chapter/quiz'
 import { chapterPath, isOpenLesson, lessonAfter, QUIZ_MODE, useChapter, type Chapter } from '@/features/chapter/useChapter'
 import { useLessonRun, type LessonRun } from '@/features/chapter/useLessonRun'
+import { formatRetryAt, starQuizTroubleIsRestartable, starQuizTroubleKey, useStarQuizRun, type StarQuizRun } from '@/features/chapter/useStarQuizRun'
 import { StarGlyph } from '@/features/starmap/components/StarGlyph'
 import { usePrefersReducedMotion } from '@/features/starmap/motion/usePrefersReducedMotion'
 import { useLessonQuery } from '@/hooks/practice/useLessonQuery'
@@ -801,5 +802,185 @@ function LessonDone({
         </div>
       </section>
     </div>
+  )
+}
+
+/**
+ * `/star-quiz/:unitId`: the star quiz (#486), on the stage and in the manner
+ * of the lesson quiz -- two hearts, no hint, no Ask, no skip. The paper and
+ * every verdict are the backend's (`useStarQuizRun`). Passed, the whole star
+ * is lit and the map celebrates it; lost, it can be taken again after a day,
+ * and its lessons are the way on meanwhile.
+ */
+export function StarQuizStage({ unitId }: { unitId: string | undefined }) {
+  const { t } = useTranslation('chapter')
+  const chapterQuery = useChapter(unitId)
+  const chapter = chapterQuery.status === 'ready' ? chapterQuery.chapter : null
+  const run = useStarQuizRun(unitId)
+  const side = useMediaQuery(STAGE_SIDE_QUERY)
+  const arrived = useRef(true)
+  const starPath = chapter
+    ? pathForTarget(chapter.subjectId, { layer: 'star', nebulaId: chapter.topicId, unitId: chapter.unitId })
+    : '/'
+  const { challenge } = run
+
+  return (
+    <AppLayout bleed surface="sky">
+      <div className="flex min-h-0 flex-1 flex-col">
+        <StageWithAsk subjectId={chapter?.subjectId ?? ''} off={t('quiz.askOff')}>
+          <StarQuizStrip run={run} chapter={chapter} starPath={starPath} side={side} />
+          {run.finished ? (
+            <StarQuizPassed chapter={chapter} starPath={starPath} />
+          ) : run.starTrouble ? (
+            <StarQuizTroubleView run={run} unitId={unitId} starPath={starPath} />
+          ) : run.failed ? (
+            <StarQuizFailed run={run} unitId={unitId} />
+          ) : run.quizPending ? (
+            <div className="flex items-center gap-2 p-6">
+              <Murmi mood="thinking" size="var(--murmi-inline)" />
+              <p role="status" className={cn('m-0 text-[15px]', bodyOnSky)}>
+                {t('starQuiz.drawing')}
+              </p>
+            </div>
+          ) : challenge ? (
+            <Exercise run={run} challenge={challenge} chapter={chapter} side={side} arrived={arrived} />
+          ) : null}
+        </StageWithAsk>
+      </div>
+    </AppLayout>
+  )
+}
+
+/** The strip under the bar: back to the star, which star and which question, the hearts. */
+function StarQuizStrip({ run, chapter, starPath, side }: { run: StarQuizRun; chapter: Chapter | null; starPath: string; side: boolean }) {
+  const { t } = useTranslation('chapter')
+  const title = chapter?.title ?? ''
+  const where = [
+    side ? title : null,
+    t('starQuiz.label'),
+    run.count > 0 && run.quiz ? t('stage.questionOf', { question: Math.min(run.index + 1, run.count), questions: run.count }) : null,
+  ]
+    .filter(Boolean)
+    .join(' · ')
+  return (
+    <div
+      className="grid shrink-0 items-center gap-2 border-b border-white/10"
+      style={{ gridTemplateColumns: '1fr auto 1fr', padding: side ? '6px 20px' : '4px 8px' }}
+    >
+      <Link to={starPath} className={cn(plainOnSky, 'justify-self-start')} aria-label={t('starQuiz.backToStar', { star: title })}>
+        <ChevronLeft size={side ? 18 : 24} strokeWidth={ICON.stroke} aria-hidden="true" />
+        {side && <span className="max-w-[220px] truncate">{title}</span>}
+      </Link>
+      <div className="flex min-w-0 flex-col items-center">
+        <h1 className="sr-only">{t('starQuiz.heading', { star: title })}</h1>
+        <p className="m-0 truncate text-[13px] font-semibold text-[color:var(--on-sky-text-body)]">{where}</p>
+      </div>
+      <div className="justify-self-end">{run.quiz && <Hearts left={run.quiz.hearts} total={run.quiz.total} />}</div>
+    </div>
+  )
+}
+
+/** One end of the star quiz: Murmi, a title that takes the keyboard, a sentence, the way on. */
+function StarQuizEnd({
+  name,
+  mood,
+  title,
+  body,
+  children,
+}: {
+  name: string
+  mood: 'delighted' | 'calm' | 'thinking'
+  title: string
+  body: string
+  children: ReactNode
+}) {
+  const heading = useRef<HTMLHeadingElement>(null)
+  useEffect(() => heading.current?.focus(), [])
+  return (
+    <div className="relative flex min-h-0 flex-1 items-center justify-center overflow-y-auto p-6">
+      <section aria-labelledby={`star-quiz-${name}-title`} data-star-quiz-end={name} className="flex max-w-[520px] flex-col items-center gap-4 text-center">
+        <Murmi mood={mood} size="var(--murmi-state)" />
+        <h2
+          ref={heading}
+          id={`star-quiz-${name}-title`}
+          tabIndex={-1}
+          className="m-0 text-on-sky outline-none"
+          style={{ font: 'var(--t-title1)', letterSpacing: 'var(--t-title1-tracking)' }}
+        >
+          {title}
+        </h2>
+        <p role={mood === 'thinking' ? 'alert' : undefined} className={cn('m-0 text-[17px]', bodyOnSky)}>
+          {body}
+        </p>
+        <div className="flex flex-col items-center gap-2 pt-2 sm:flex-row sm:gap-5">{children}</div>
+      </section>
+    </div>
+  )
+}
+
+function StarQuizPassed({ chapter, starPath }: { chapter: Chapter | null; starPath: string }) {
+  const { t } = useTranslation('chapter')
+  return (
+    <StarQuizEnd name="passed" mood="delighted" title={t('starQuiz.passed.title')} body={t('starQuiz.passed.body', { star: chapter?.title ?? '' })}>
+      <Button asChild lift variant="onSky" size="large" style={{ minWidth: 200 }}>
+        <Link to={starPath}>{t('starQuiz.passed.toMap')}</Link>
+      </Button>
+    </StarQuizEnd>
+  )
+}
+
+function StarQuizFailed({ run, unitId }: { run: StarQuizRun; unitId: string | undefined }) {
+  const { t, i18n } = useTranslation('chapter')
+  const when = run.retryAt ? formatRetryAt(run.retryAt, i18n.language) : null
+  return (
+    <StarQuizEnd
+      name="failed"
+      mood="calm"
+      title={t('starQuiz.failed.title')}
+      body={when ? t('starQuiz.failed.body', { when }) : t('starQuiz.failed.bodyLater')}
+    >
+      {unitId && (
+        <Button asChild lift variant="onSky" size="large" style={{ minWidth: 200 }}>
+          <Link to={chapterPath(unitId)}>{t('starQuiz.failed.toLessons')}</Link>
+        </Button>
+      )}
+    </StarQuizEnd>
+  )
+}
+
+function StarQuizTroubleView({ run, unitId, starPath }: { run: StarQuizRun; unitId: string | undefined; starPath: string }) {
+  const { t, i18n } = useTranslation('chapter')
+  const trouble = run.starTrouble!
+  const when = trouble.retryAt ? formatRetryAt(trouble.retryAt, i18n.language) : null
+  const body =
+    trouble.code === 'star_quiz_cooling_down' && when
+      ? t('starQuiz.trouble.coolingUntil', { when })
+      : t(starQuizTroubleKey(trouble.code))
+  return (
+    <StarQuizEnd name="trouble" mood="thinking" title={t('stage.trouble.title')} body={body}>
+      {starQuizTroubleIsRestartable(trouble.code) ? (
+        <>
+          <Button lift variant="onSky" size="large" onClick={run.restartQuiz} style={{ minWidth: 200 }}>
+            {t('starQuiz.trouble.restart')}
+          </Button>
+          <Link to={starPath} className={plainOnSky}>
+            {t('starQuiz.backToMap')}
+          </Link>
+        </>
+      ) : trouble.code === 'star_quiz_cooling_down' && unitId ? (
+        <>
+          <Button asChild lift variant="onSky" size="large" style={{ minWidth: 200 }}>
+            <Link to={chapterPath(unitId)}>{t('starQuiz.failed.toLessons')}</Link>
+          </Button>
+          <Link to={starPath} className={plainOnSky}>
+            {t('starQuiz.backToMap')}
+          </Link>
+        </>
+      ) : (
+        <Button asChild lift variant="onSky" size="large" style={{ minWidth: 200 }}>
+          <Link to={starPath}>{t('starQuiz.backToMap')}</Link>
+        </Button>
+      )}
+    </StarQuizEnd>
   )
 }

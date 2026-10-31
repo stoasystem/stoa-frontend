@@ -53,6 +53,12 @@
   "star": {
     "progress": "{{percent}}% delle lezioni svolte",
     "lessons": "{{done}} lezioni svolte su {{total}}",
+    "quiz": {
+      "take": "Lo so già – mettimi alla prova",
+      "cooling": "Potrai rifare il test da {{when}}.",
+      "litByQuiz": "Accesa superando il test della stella",
+      "alsoTest": "Puoi anche testare tutta la stella."
+    },
     "unmet_one": "Tutte le lezioni svolte: ancora {{count}} esercizio da risolvere correttamente",
     "unmet_many": "Tutte le lezioni svolte: ancora {{count}} esercizi da risolvere correttamente",
     "unmet_other": "Tutte le lezioni svolte: ancora {{count}} esercizi da risolvere correttamente",

@@ -240,6 +240,7 @@ const MapHomePage = lazyPage('MapHomePage', () => import('@/pages/map/MapPages')
 const MapPage = lazyPage('MapPage', () => import('@/pages/map/MapPages'))
 const ChapterPage = lazyPage('ChapterPage', () => import('@/pages/chapter/ChapterPages'))
 const LessonStagePage = lazyPage('LessonStagePage', () => import('@/pages/chapter/ChapterPages'))
+const StarQuizPage = lazyPage('StarQuizPage', () => import('@/pages/chapter/ChapterPages'))
 const AskPage = lazyPage('AskPage', () => import('@/pages/ask/AskPage'))
 const MePage = lazyPage('MePage', () => import('@/pages/me/MePage'))
 const StudentAssignmentsPage = lazyPage('StudentAssignmentsPage', () => import('@/pages/learning/StudentAssignmentsPage'))
@@ -354,6 +355,7 @@ export const pageRoutes: readonly PageRoute[] = [
   { path: '/map/:subjectId/:topicId/:unitId', access: STUDENT, page: MapPage, titleKey: 'studentRoutes.unit.title', meta: { module: 'Star map', status: 'demo', purpose: 'A star (unit, knowledge point) of a nebula.' } },
   { path: '/chapter/:unitId', access: STUDENT, page: ChapterPage, titleKey: 'studentRoutes.chapter.title', meta: { module: 'Chapter', status: 'core', purpose: 'The chapter of a knowledge point: its lessons in order, with progress.' } },
   { path: '/chapter/:unitId/:lessonId', access: STUDENT, page: LessonStagePage, titleKey: 'studentRoutes.lesson.title', meta: { module: 'Chapter', status: 'core', purpose: 'The practice stage of a lesson, with Ask beside it.' } },
+  { path: '/star-quiz/:unitId', access: STUDENT, page: StarQuizPage, titleKey: 'studentRoutes.starQuiz.title', meta: { module: 'Chapter', status: 'core', purpose: 'The star quiz: a whole knowledge point tested in one paper, to light it without its lessons.' } },
   {
     path: ASK_PATH,
     access: STUDENT,

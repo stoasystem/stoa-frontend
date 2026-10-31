@@ -165,6 +165,11 @@ export function chapterPath(unitId: string, lessonId?: string) {
   return lessonId ? `${base}/${encodeURIComponent(lessonId)}` : base
 }
 
+/** `/star-quiz/:unitId`: the star quiz of a knowledge point (#486), the segment encoded once. */
+export function starQuizPath(unitId: string) {
+  return `/star-quiz/${encodeURIComponent(unitId)}`
+}
+
 /** Test out of a lesson: the short quiz on `/chapter/:unitId/:lessonId`, as `?mode=quiz`. */
 export const QUIZ_MODE = 'quiz'
 

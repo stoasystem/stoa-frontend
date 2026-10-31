@@ -416,6 +416,9 @@
       "body": "Diese Ansicht wird gerade neu gebaut. Der Link funktioniert schon und bleibt gleich.",
       "eyebrow": "Bald verfügbar"
     },
+    "starQuiz": {
+      "title": "Sterntest"
+    },
     "unit": {
       "title": "Wissenspunkt"
     }
