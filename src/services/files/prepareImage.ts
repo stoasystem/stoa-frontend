@@ -105,7 +105,8 @@ async function decode(file: File): Promise<ImageBitmap> {
   }
   let timer: ReturnType<typeof setTimeout> | undefined
   try {
-    const { heicTo } = await import('heic-to')
+    // The build that needs no `unsafe-eval` under the content security policy (#533).
+    const { heicTo } = await import('heic-to/csp')
     const timedOut = new Promise<never>((_, reject) => {
       timer = setTimeout(() => reject(new Error('HEIC decoding took too long.')), HEIC_DECODE_LIMIT_MS)
     })
