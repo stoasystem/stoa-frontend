@@ -5,6 +5,7 @@ import { HelpRequestStatusBadge } from '@/components/teacher/HelpRequestStatusBa
 import { ModerationReportDialog } from '@/components/moderation/ModerationReportDialog'
 import { TeacherSlaBadge } from '@/components/teacher/TeacherSlaBadge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { MathRenderer } from '@/components/ui/MathRenderer'
 import { getSubjectLabel } from '@/lib/displayLabels'
 import type { TeacherHelpMessage, TeacherHelpRequestDetail } from '@/types/teacher'
 import { isOpenHelpRequest } from '@/types/teacherHelp'
@@ -67,8 +68,16 @@ export function HelpRequestDetailCard({ request }: { request: TeacherHelpRequest
             <p className="text-xs uppercase text-muted-foreground">
               {t(`detail.roles.${message.role}`, { defaultValue: message.role })}
             </p>
-            {/* Served by the backend, in whatever language it wrote it. */}
-            <p className="mt-2 text-sm leading-6">{message.content}</p>
+            {/* Served by the backend, in whatever language it wrote it. The
+              * assistant's answer is Markdown with formulas, drawn as Ask
+              * draws it for the student, line breaks kept (#545). */}
+            {message.role === 'assistant' ? (
+              <p data-assistant-answer className="mt-2 whitespace-pre-wrap break-words text-sm leading-6">
+                <MathRenderer>{message.content}</MathRenderer>
+              </p>
+            ) : (
+              <p className="mt-2 text-sm leading-6">{message.content}</p>
+            )}
             <HelpRequestAttachments
               requestId={request.requestId}
               attachments={message.attachments}
