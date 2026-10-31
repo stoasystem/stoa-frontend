@@ -12,6 +12,10 @@
         "title": "Student learning data",
         "body": "Learning data can include recent questions, conversation metadata, weak topics, teacher-support requests, report summaries, and progress signals used to support the student and inform parents."
       },
+      "voiceInput": {
+        "title": "Dictating instead of typing",
+        "body": "Questions can also be dictated, for example with Win + H on Windows, the microphone key or dictation shortcut on a Mac, or the microphone on a phone's keyboard. The voice is then processed by the device's system, and STOA only receives the text. The speech recognition is covered by the privacy terms of whoever provides the operating system or keyboard (for example Microsoft, Apple or Google). STOA itself does not record any voice."
+      },
       "visibility": {
         "title": "Parent and teacher visibility",
         "body": "Parents can see learning summaries, reports, focus areas, and teacher involvement. Teachers can see the context needed to answer a help request, including the relevant question and prior explanation."
@@ -23,6 +27,10 @@
       "thirdParties": {
         "title": "Service partners",
         "body": "Hosting, authentication, analytics, monitoring, and support partners may process limited data under appropriate service agreements."
+      },
+      "dataLocation": {
+        "title": "Where data is processed",
+        "body": "STOA stores data in Switzerland, in Amazon Web Services (AWS) data centres in Zurich. For AI explanations and the automatic check of uploaded images, requests are processed in AWS data centres in the EU; they are neither stored there nor used to train AI models. Before upload, STOA removes location data (EXIF) from photos. Images are kept for at most 365 days and deleted immediately when the account is deleted. Images blocked by the check are visible only to administrators and are deleted 90 days after they have been handled."
       }
     }
   },

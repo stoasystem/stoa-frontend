@@ -126,15 +126,25 @@ beforeEach(async () => {
   vi.mocked(getConversations).mockResolvedValue({
     items: [summary('c1', 'Linear equations'), summary('c2', 'Fractions')],
   })
+  // The first question goes out with the conversation, and Ask then watches
+  // its generation. Running for ever, that watch outlived the file and, ending
+  // after jsdom was gone, threw "window is not defined" (PR #537's CI run
+  // 41083798606); finished, it ends within the test that asked.
   vi.mocked(getGenerationProgress).mockResolvedValue({
     conversationId: 'c-new',
     steps: [],
     updatedAt: new Date().toISOString(),
-    status: 'ai_running',
+    status: 'completed',
   })
 })
 
-afterEach(() => {
+afterEach(async () => {
+  // A conversation started here is watched until its answer is done; let that
+  // watch end inside the file, before jsdom goes.
+  if (vi.mocked(createConversation).mock.calls.length > 0) {
+    await vi.waitFor(() => expect(getGenerationProgress).toHaveBeenCalled(), { timeout: 3000 })
+    await act(async () => {})
+  }
   window.matchMedia = originalMatchMedia
   sessionStorage.clear()
   vi.clearAllMocks()

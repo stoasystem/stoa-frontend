@@ -24,6 +24,10 @@ npm run test:e2e:dist
   names; required query parameters must be there and undeclared ones may not.
   A request to an operation the document does not have, or one no mock
   answers, is a problem too. The fixture fails the test if there are any.
+- **The content security policy.** Every page is served with production's
+  policy (`scripts/content-security-policy.mjs`, #533), enforced, with this
+  suite's hosts in production's places; a violation the browser reports is a
+  problem. Production sends it from CloudFront, report-only at first.
 - **Nothing else.** A request to any other host, or a WebSocket, is refused and
   is a problem; so is a file the site does not have (a 404, as on the CDN,
   instead of index.html). A broken build or a call that would carry the token
@@ -63,6 +67,39 @@ back reloads nothing, and offline it waits for the connection; a stylesheet
 that failed is put back before the next page that loads is shown, and failing
 again holds back no page that never failed on it (#272, #401, #447).
 
+`attachments.spec.ts`: a photo chosen in Ask is shrunk to a JPEG in the
+browser, goes up by intent, part URL, a PUT straight to S3 (answered in
+`support/uploads.ts`, which refuses a part whose SHA-256 is not the one signed
+for) and `complete`, and the question carries it as `{ uploadId }`; a picture
+image moderation refuses (`422 upload_content_blocked`, stoa-backend#138) is
+said to be refused in the tray, and the question goes out without it (#512).
+While `ATTACHMENTS_WORK` is off the file goes into the chooser input directly
+and the test checks the button is absent; once it is on, the test opens the
+chooser from the button.
+
+`phoneUpload.spec.ts`: a photo from the phone by QR (#514). The phone's page,
+not signed in, takes the code from after the `#` and out of the address, spends
+it once on `redeem`, and sends the part to S3 and `complete` with the upload
+token only; no request carries the code or a session. An expired or used code
+(`404 upload_code_invalid`) is said, and nothing is sent. In Ask the button waits
+behind `ATTACHMENTS_WORK` like the paperclip: while it is off the test checks it
+is absent; once it is on, the QR is checked to encode the phone page's address
+with the code after the `#`, a second, signed-out browser sends the photo, and
+the computer shows it and adds it only when the student says so.
+
+`teacherReplyImages.spec.ts`: a teacher's picture goes up the same way, as
+`help_reply_image`, and the reply carries it as `{ uploadId }`; the student
+sees it in Ask as a thumbnail the browser drew, read with their own token from
+`/files/attachments/{id}/content` (#513, stoa-backend#145). The button waits
+for the same switch, and the test handles it as `attachments.spec.ts` does.
+`MockBackend` answers a file's bytes with `raw`.
+
+`moderationImage.spec.ts`: an administrator opens an `image_upload` case in the
+moderation queue (#538, stoa-backend#139). The image moderation refused is read
+with the administrator's token from `/admin/moderation/cases/{id}/image`, drawn
+from an object URL and blurred until "Show image"; the case names what it was
+blocked for. A deleted image is said to be deleted, and not asked for.
+
 `forcedChange.spec.ts`: a student whose password an administrator reset opens
 `/ask`, signs in, is sent to the password change with only Help and Log out in
 the shell, reloads it, changes the password, and "Continue" opens `/ask`; the
@@ -80,10 +117,11 @@ browser already puts such a page at the top, on a desktop); the sign-in page
 at `/` names itself in the tab and is announced on arriving from another page
 (#448).
 
-`controls.spec.ts` holds two controls. One is a negative control marked
+`controls.spec.ts` holds three controls. One is a negative control marked
 `test.fail()`: it fails while the app renders, and passes -- turning the suite
-red -- if it stops rendering. The other sends a reply that breaks the contract
-and asserts the exact problem the check reports.
+red -- if it stops rendering. One sends a reply that breaks the contract and
+asserts the exact problem the check reports. One adds an inline script to the
+page and asserts that it did not run and that the violation was caught.
 
 No retries. A test that needs one is a finding.
 
@@ -103,7 +141,11 @@ No retries. A test that needs one is a finding.
   stoa-backend#81 the backend declares the 401 of every operation that takes a
   bearer token and of sign-in, refresh and sign-out, the 409 of the generation
   progress and the 404 of the teacher-help status; a mock's reply there is held
-  to that schema. Any other 4xx is held to FastAPI's `{ detail }` envelope only.
+  to that schema. Any other 4xx is held to FastAPI's `{ detail }` envelope only,
+  and so is a 422 the backend raises itself (`detail` an object, not the
+  request-validation list the document declares for 422): an upload's
+  `upload_content_blocked`, say. Which codes exist is asserted from the
+  document's own enum where a test depends on one (`contract.enumOf`).
 - The star map still reads fixture data, so the knowledge-map read model is
   not exercised; when #48 connects it, its mock must be added here.
 - Chromium on a desktop viewport only. No real Cognito, Bedrock or SES.

@@ -4,6 +4,7 @@ export type NotificationEventType =
   | 'teacher_requested'
   | 'teacher_takeover'
   | 'teacher_reply'
+  | 'teacher_help_dispatched'
   | 'moderation_case_update'
   | 'subscription_request_update'
   | 'learning_profile_update'
@@ -65,6 +66,8 @@ export type NotificationPreferenceMatrix = Record<string, Partial<Record<Notific
 export type NotificationPreferences = {
   userId: string
   preferences: NotificationPreferenceMatrix
+  /** A teacher's reminder email for each help request offered to them (stoa-backend#141). */
+  dispatchEmail: boolean
   supportedCategories: string[]
   supportedChannels: string[]
   updatedAt?: string | null

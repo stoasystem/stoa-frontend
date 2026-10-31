@@ -9,7 +9,8 @@ export type BackendRequest = {
   headers: Record<string, string>
   body: unknown
 }
-export type Reply = { status: number; body?: unknown }
+/** `raw` answers with bytes, not JSON: a file's content route. */
+export type Reply = { status: number; body?: unknown; raw?: { contentType: string; bytes: Buffer } }
 export type Handler = (request: BackendRequest) => Reply | Promise<Reply>
 export type Call = BackendRequest & { template: string }
 
@@ -106,11 +107,15 @@ export class MockBackend {
         return
       }
       const reply = await handler(backendRequest)
-      this.checkReply(where, op, reply)
+      if (!reply.raw) this.checkReply(where, op, reply)
       await route.fulfill({
         status: reply.status,
         headers: cors,
-        ...(reply.body === undefined ? {} : { json: reply.body }),
+        ...(reply.raw
+          ? { body: reply.raw.bytes, contentType: reply.raw.contentType }
+          : reply.body === undefined
+            ? {}
+            : { json: reply.body }),
       })
     })
   }

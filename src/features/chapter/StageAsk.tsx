@@ -195,6 +195,7 @@ export function StageWithAsk({
                   if (value.trim().length > 0) controller.openWithDraft(value)
                 }}
                 onSubmit={(value) => controller.openWithDraft(value)}
+                dictationHint="floating"
                 label={t('ask.composerLabel')}
                 placeholder={t('ask.practice.placeholder')}
               />

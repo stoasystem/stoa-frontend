@@ -32,7 +32,7 @@ import {
 } from '@/dev/preview/demoSource'
 import { isSupportedLanguage } from '@/i18n/languages'
 import { commandMessageIds } from '@/services/chat/commandMessageIds'
-import type { ChatMessage, ConversationSummary } from '@/types/chat'
+import type { ChatMessage, ConversationSummary, MessageQuote } from '@/types/chat'
 import type { NotificationPreferenceMatrix } from '@/types/notification'
 
 export type PreviewRequest = {
@@ -78,6 +78,8 @@ function notificationPreferences() {
   return {
     userId: demo().demoStudent.id,
     preferences: withDefaults(demoNotificationPreferences()),
+    // A teacher's switch; the demo student has no help requests offered to them.
+    dispatchEmail: true,
     supportedCategories: PREFERENCE_CATEGORIES,
     supportedChannels: PREFERENCE_CHANNELS,
     updatedAt: null as string | null,
@@ -275,11 +277,17 @@ const REPLY: Record<string, (content: string) => string> = {
 const replyTo = (content: string) => (REPLY[demoLanguage()] ?? REPLY.en)(content)
 
 /** A question and its answer as the backend stores them, with the ids it derives from the command. */
-async function exchange(conversationId: string, idempotencyKey: string, content: string): Promise<ChatMessage[]> {
+async function exchange(
+  conversationId: string,
+  idempotencyKey: string,
+  content: string,
+  quote?: MessageQuote,
+): Promise<ChatMessage[]> {
   const { studentMessageId, assistantMessageId } = await commandMessageIds(conversationId, idempotencyKey)
   const askedAt = now()
   return [
-    { id: studentMessageId, conversationId, role: 'student', content, createdAt: askedAt, status: 'completed' },
+    // Its quote kept, as the backend keeps it, so a step quoted from an answer (#506) reads back.
+    { id: studentMessageId, conversationId, role: 'student', content, createdAt: askedAt, status: 'completed', quote: quote ?? null },
     { id: assistantMessageId, conversationId, role: 'assistant', content: replyTo(content), createdAt: now(), status: 'completed' },
   ]
 }
@@ -307,8 +315,13 @@ export function failsThisTime(content: string, idempotencyKey: string): boolean 
  * (#183). The exchange is stored first, as the backend does, so reading the
  * conversation back afterwards (and after a reload) finds it.
  */
-export async function streamedAnswer(conversationId: string, content: string, idempotencyKey: string): Promise<string[]> {
-  const messages = await exchange(conversationId, idempotencyKey, content)
+export async function streamedAnswer(
+  conversationId: string,
+  content: string,
+  idempotencyKey: string,
+  quote?: MessageQuote,
+): Promise<string[]> {
+  const messages = await exchange(conversationId, idempotencyKey, content, quote)
   recordDemoExchange(conversationId, messages)
   const reply = messages[1]
   // Each word with the space after it; no lookbehind, which Safari before 16.4 cannot parse (#398).
