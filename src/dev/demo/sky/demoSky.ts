@@ -12,7 +12,7 @@
  *     state, no chapter;
  *   - prerequisites inside nebulae, between nebulae, and across subjects:
  *     physics optics needs mathematics trigonometry, and the demo knowledge
- *     point is the one prerequisite still holding "Refraction" locked.
+ *     point is the one prerequisite of "Refraction" not lit yet.
  *
  * Star dust (星尘) is not here: it is decoration painted by
  * `render/galaxy.ts`, never a `Star`.
@@ -20,8 +20,9 @@
  * Sizes 10 / 500 / 1000 / 2000 count the stars of the whole sky. Size 10 is
  * planned by hand; the others are generated from `demo-sky.json`, seeded, so
  * the same size gives the same sky. Learning states follow CONTEXT.md: a
- * ready star's prerequisites are all lit, a locked star has at least one that
- * is not. Recommendations: at most one per subject, none for a subject the
+ * star in progress or ready to start but drawn plainly has all its
+ * prerequisites lit; a waiting star (前置未点亮, ready to start all the same,
+ * ADR 0004) has at least one that is not, and lists them. Recommendations: at most one per subject, none for a subject the
  * student does not take; in mathematics it is the demo knowledge point, on
  * purpose, rather than the backend's first-in-order rule (#9 point 8).
  *
@@ -36,7 +37,7 @@ import {
   crossSubjectPrerequisites,
   type Galaxy,
   type KnowledgeSkill,
-  type LearningState,
+  type StarLook,
   type Prerequisite,
   type Sky,
   type SkyNebula,
@@ -93,21 +94,28 @@ export type DemoSky = Sky & { knowledgePointId: string; galaxyBoxes: Record<stri
 
 type NebulaSpec = (typeof data.nebulae)[number]
 
+/**
+ * A star while the sky is planned: drawn as it will look, `waiting` for one
+ * that is to have a prerequisite not lit yet. It becomes a ready star with
+ * those prerequisites listed once the edges are drawn (`build`).
+ */
+type Draft = Omit<Star, 'x' | 'y' | 'state' | 'unlitPrerequisiteIds'> & { state: StarLook }
+
 const enrolled = new Map(data.galaxies.map((galaxy) => [galaxy.subjectId, galaxy.enrolled]))
 
 /** Size 10, by hand: every state, both recommendations, the cross-subject prerequisite. */
-const TEN: Record<string, LearningState[]> = {
+const TEN: Record<string, StarLook[]> = {
   numbers: ['lit'],
   algebra: ['ready'],
-  trigonometry: ['in_progress', 'locked'],
+  trigonometry: ['in_progress', 'waiting'],
   mechanics: ['lit', 'in_progress'],
-  optics: ['ready', 'locked'],
+  optics: ['ready', 'waiting'],
   atoms: ['ready'],
-  reactions: ['locked'],
+  reactions: ['waiting'],
 }
 
-/** Each nebula's learning states, in unit order: lit, in progress, ready, then locked. */
-function planFor(size: FixtureSize): Map<string, LearningState[]> {
+/** Each nebula's stars as they will look, in unit order: lit, in progress, ready, then waiting. */
+function planFor(size: FixtureSize): Map<string, StarLook[]> {
   if (size === 10) return new Map(Object.entries(TEN))
   const total = data.nebulae.reduce((sum, nebula) => sum + nebula.weight, 0)
   const counts = data.nebulae.map((nebula) => Math.max(4, Math.floor((nebula.weight / total) * size)))
@@ -120,9 +128,9 @@ function planFor(size: FixtureSize): Map<string, LearningState[]> {
       const lit = taken ? Math.floor(n * nebula.lit) : 0
       const inProgress = taken ? Math.max(1, Math.round(n * 0.06)) : 0
       const ready = Math.max(1, Math.round(n * 0.12))
-      const states: LearningState[] = []
+      const states: StarLook[] = []
       for (let k = 0; k < n; k += 1) {
-        states.push(k < lit ? 'lit' : k < lit + inProgress ? 'in_progress' : k < lit + inProgress + ready ? 'ready' : 'locked')
+        states.push(k < lit ? 'lit' : k < lit + inProgress ? 'in_progress' : k < lit + inProgress + ready ? 'ready' : 'waiting')
       }
       return [nebula.topicId, states] as const
     }),
@@ -151,20 +159,20 @@ function build(size: FixtureSize): Built {
   const nextLesson = kp.lessons[kp.lessonsDone]
 
   const nebulae: SkyNebula[] = []
-  const stars: Omit<Star, 'x' | 'y'>[] = []
-  const members = new Map<string, Omit<Star, 'x' | 'y'>[]>()
+  const stars: Draft[] = []
+  const members = new Map<string, Draft[]>()
   let litSeen = 0
   for (const galaxy of data.galaxies) {
     specs
       .filter((spec) => spec.subjectId === galaxy.subjectId)
       .forEach((spec: NebulaSpec, index) => {
         nebulae.push({ topicId: spec.topicId, subjectId: spec.subjectId, name: spec.name.en, order: index + 1 })
-        const list: Omit<Star, 'x' | 'y'>[] = []
+        const list: Draft[] = []
         let placedKp = false
         let placedBridge = false
         plan.get(spec.topicId)!.forEach((state, k) => {
           const isKp = !placedKp && spec.topicId === kp.topicId && state === 'in_progress'
-          const isBridge = !placedBridge && spec.topicId === data.bridge.topicId && state === 'locked'
+          const isBridge = !placedBridge && spec.topicId === data.bridge.topicId && state === 'waiting'
           placedKp ||= isKp
           placedBridge ||= isBridge
           const unitId = isKp ? kp.unitId : isBridge ? data.bridge.unitId : `${spec.topicId}-${k + 1}`
@@ -184,7 +192,7 @@ function build(size: FixtureSize): Built {
             })
           }
           const reviewDue = state === 'lit' && litSeen++ % 6 === 0 ? 1 + Math.floor(rand() * 4) : 0
-          const star: Omit<Star, 'x' | 'y'> = {
+          const star: Draft = {
             unitId,
             name: starName.get(unitId)!('en'),
             nebulaId: spec.topicId,
@@ -214,7 +222,13 @@ function build(size: FixtureSize): Built {
 
   const recommended = recommendationsFor(nebulae, stars)
   const prerequisites = withWayIn(prerequisitesFor(members, rand), members, recommended)
-  const withMarks = stars.map((star) => (recommended.has(star.unitId) ? { ...star, recommendation: { source: 'system' as const } } : star))
+  const litIds = new Set(stars.filter((star) => star.state === 'lit').map((star) => star.unitId))
+  const withMarks: Omit<Star, 'x' | 'y'>[] = stars.map(({ state, ...star }) => ({
+    ...star,
+    state: state === 'waiting' ? 'ready' : state,
+    unlitPrerequisiteIds: prerequisites.filter((edge) => edge.to === star.unitId && !litIds.has(edge.from)).map((edge) => edge.from),
+    recommendation: recommended.has(star.unitId) ? { source: 'system' as const } : star.recommendation,
+  }))
 
   // One sky (#119): galaxies along a band, neighbours where prerequisites cross subjects.
   const unplaced = withMarks as Star[]
@@ -267,11 +281,11 @@ function build(size: FixtureSize): Built {
 
 /**
  * Edges that keep the states true: into a star that is lit, in progress or
- * ready only from lit stars; every locked star gets at least one unlit
+ * ready only from lit stars; every waiting star gets at least one unlit
  * prerequisite. Inside a nebula an edge runs from an earlier unit to a later
  * one, and between nebulae along `relations`, so the graph has no cycle.
  */
-function prerequisitesFor(members: Map<string, Omit<Star, 'x' | 'y'>[]>, rand: () => number): Prerequisite[] {
+function prerequisitesFor(members: Map<string, Draft[]>, rand: () => number): Prerequisite[] {
   const edges: Prerequisite[] = []
   const seen = new Set<string>()
   const add = (from: string, to: string) => {
@@ -295,14 +309,14 @@ function prerequisitesFor(members: Map<string, Omit<Star, 'x' | 'y'>[]>, rand: (
     const crossings = 1 + Math.floor(rand() * 3)
     for (let c = 0; c < crossings; c += 1) {
       const target = any(to)
-      if (target.state === 'locked' && target.unitId !== data.bridge.unitId) add(any(from).unitId, target.unitId)
+      if (target.state === 'waiting' && target.unitId !== data.bridge.unitId) add(any(from).unitId, target.unitId)
       else if (lit.length > 0) add(any(lit).unitId, target.unitId)
     }
   }
 
   for (const list of members.values()) {
     list.forEach((star, k) => {
-      if (k === 0 || star.state === 'locked' || rand() >= 0.25) return
+      if (k === 0 || star.state === 'waiting' || rand() >= 0.25) return
       const lit = list.slice(0, k).filter((before) => before.state === 'lit')
       if (lit.length > 0) add(any(lit).unitId, star.unitId)
     })
@@ -311,14 +325,14 @@ function prerequisitesFor(members: Map<string, Omit<Star, 'x' | 'y'>[]>, rand: (
   const stateOf = new Map([...members.values()].flat().map((star) => [star.unitId, star.state]))
   for (const [topic, list] of members) {
     list.forEach((star, k) => {
-      if (star.state !== 'locked') return
+      if (star.state !== 'waiting') return
       if (edges.some((edge) => edge.to === star.unitId && stateOf.get(edge.from) !== 'lit')) return
       const earlier = list.slice(0, k).filter((before) => before.state !== 'lit')
       const parents = relations
         .filter(([, child]) => child === topic)
         .flatMap(([parent]) => members.get(parent)!.filter((before) => before.state !== 'lit'))
       const pool = earlier.length > 0 ? earlier : parents
-      if (pool.length === 0) throw new Error(`demo sky: locked ${star.unitId} has no unlit star to wait for`)
+      if (pool.length === 0) throw new Error(`demo sky: waiting ${star.unitId} has no unlit star to wait for`)
       add(any(pool).unitId, star.unitId)
     })
   }
@@ -333,7 +347,7 @@ function prerequisitesFor(members: Map<string, Omit<Star, 'x' | 'y'>[]>, rand: (
  * the rest of the sky stays as it was, and no edge crosses nebulae, so the
  * layout does not move.
  */
-function withWayIn(edges: Prerequisite[], members: Map<string, Omit<Star, 'x' | 'y'>[]>, recommended: Set<string>): Prerequisite[] {
+function withWayIn(edges: Prerequisite[], members: Map<string, Draft[]>, recommended: Set<string>): Prerequisite[] {
   const seen = new Set(edges.map((edge) => `${edge.from}\u0000${edge.to}`))
   const out = [...edges]
   for (const list of members.values()) {
@@ -351,7 +365,7 @@ function withWayIn(edges: Prerequisite[], members: Map<string, Omit<Star, 'x' | 
 }
 
 /** At most one per subject the student takes: the demo knowledge point in its subject, else the backend's rule. */
-function recommendationsFor(nebulae: SkyNebula[], stars: Omit<Star, 'x' | 'y'>[]): Set<string> {
+function recommendationsFor(nebulae: SkyNebula[], stars: Draft[]): Set<string> {
   const picks = new Set<string>()
   for (const galaxy of data.galaxies) {
     if (!galaxy.enrolled) continue

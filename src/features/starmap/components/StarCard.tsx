@@ -15,7 +15,7 @@ import { Button } from '@/components/base'
 import { StarGlyph } from '@/features/starmap/components/StarGlyph'
 import { pathForTarget } from '@/features/starmap/view/layers'
 import type { ReviewReturnState } from '@/features/starmap/view/reviewReturn'
-import { subjectOfNebula, type Nebula, type Star, type StarMap } from '@/features/starmap/model/starMap'
+import { starLook, subjectOfNebula, type Nebula, type Star, type StarMap } from '@/features/starmap/model/starMap'
 import { cn } from '@/lib/utils'
 
 export type StarCardProps = {
@@ -31,8 +31,9 @@ export const STAR_TITLE_ID = 'starmap-star-title'
 
 /**
  * What a star's card says and where its main action leads: the chapter, by
- * the jump from `glyph` (#50 point 5), or nothing for a locked star or the
- * preview's placeholder stars.
+ * the jump from `glyph` (#50 point 5), or nothing for the preview's
+ * placeholder stars. A star with prerequisites not lit yet opens all the same
+ * (ADR 0004).
  */
 export function useStarCardAction(star: Star, demo: boolean, glyph: RefObject<HTMLElement | null>) {
   const { t } = useTranslation('starmap')
@@ -52,7 +53,7 @@ export function useStarCardAction(star: Star, demo: boolean, glyph: RefObject<HT
 
   const action =
     // In the design preview only the demo knowledge point has a chapter; a placeholder star has none.
-    star.state === 'locked' || (demo && star.chapter.lessonCount === 0)
+    demo && star.chapter.lessonCount === 0
       ? null
       : star.state === 'lit'
         ? t('star.open')
@@ -88,19 +89,17 @@ export function StarCardBack({ map, nebula }: { map: StarMap; nebula: Nebula }) 
   )
 }
 
-/** Everything a card says below the star's name: progress, markers, the next lesson, skills, what to light first, review. */
+/** Everything a card says below the star's name: progress, markers, the next lesson, skills, what to learn first, review. */
 export function StarCardDetails({ map, demo = false, star }: { map: StarMap; demo?: boolean; star: Star }) {
   const { t } = useTranslation('starmap')
   const here = useMapPath()
   const { lessonCount, lessonsDone, nextLesson } = star.chapter
   const percent = Math.round(Math.max(0, Math.min(1, star.progress)) * 100)
-  const prerequisites =
-    star.state === 'locked'
-      ? map.prerequisites
-          .filter((edge) => edge.to === star.unitId)
-          .map((edge) => map.stars.find((candidate) => candidate.unitId === edge.from))
-          .filter((candidate): candidate is Star => Boolean(candidate) && candidate!.state !== 'lit')
-      : []
+  // What to learn first (前置未点亮): a suggestion, in the order the curriculum
+  // states it; one the sky does not hold has nowhere to lead and is left out.
+  const prerequisites = star.unlitPrerequisiteIds
+    .map((unitId) => map.stars.find((candidate) => candidate.unitId === unitId))
+    .filter((candidate): candidate is Star => candidate !== undefined)
   const allLessonsDone = lessonCount > 0 && lessonsDone >= lessonCount
   // The review's way back is to this star, not to the whole sky (#411).
   const reviewFrom: ReviewReturnState = {
@@ -143,7 +142,7 @@ export function StarCardDetails({ map, demo = false, star }: { map: StarMap; dem
         </ul>
       )}
 
-      {nextLesson && star.state !== 'locked' && (
+      {nextLesson && (
         <p className="m-0 text-[13px] text-[color:var(--on-sky-text-body)]">
           {t('star.nextLesson', { title: nextLesson.title })}
         </p>
@@ -222,7 +221,7 @@ export function StarCard({ map, demo = false, star, nebula, reducedMotion }: Sta
       <div className="flex items-center gap-4">
         <div ref={glyph} className="shrink-0">
           <StarGlyph
-            state={star.state}
+            state={starLook(star)}
             size={96}
             progress={star.progress}
             recommended={Boolean(star.recommendation)}

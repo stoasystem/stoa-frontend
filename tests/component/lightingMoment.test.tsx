@@ -315,8 +315,9 @@ describe('the design preview follows its lessons', () => {
     expect(after.summary.lit).toBe(before.summary.lit + 1)
     // One recommendation per enrolled galaxy (#9 point 8), math's re-picked, physics' kept.
     expect(after.stars.filter((star) => star.recommendation && subjectOfNebula(after, star.nebulaId) === 'math')).toHaveLength(1)
-    expect(mapOf('physics', OPENING).stars.find((star) => star.unitId === DEMO_BRIDGE_STAR)?.state).toBe('locked')
-    expect(mapOf('physics', ALL_LESSONS).stars.find((star) => star.unitId === DEMO_BRIDGE_STAR)?.state).toBe('ready')
+    // Refraction is ready all along (ADR 0004); it only stops waiting on the point.
+    expect(mapOf('physics', OPENING).stars.find((star) => star.unitId === DEMO_BRIDGE_STAR)).toMatchObject({ state: 'ready', unlitPrerequisiteIds: [KP] })
+    expect(mapOf('physics', ALL_LESSONS).stars.find((star) => star.unitId === DEMO_BRIDGE_STAR)).toMatchObject({ state: 'ready', unlitPrerequisiteIds: [] })
   })
 
   it.each([10, 1000] as const)('changes only the lit point’s own galaxy, at %i stars (audit #1)', (size) => {

@@ -12,34 +12,32 @@
  * becomes one lit star up there. That is why the walked line is the same gold
  * as a lit star, and why the end of the path is the point itself.
  *
- * Every state is told by shape as well as by colour — filled, ringed, outlined,
- * dimmed — so it survives being read by someone who cannot separate the hues.
+ * Every state is told by shape as well as by colour — filled, ringed, outlined
+ * — so it survives being read by someone who cannot separate the hues.
  * Sizes and timings are tokens; nothing here is a measurement.
  */
-import { Check, Lock, Star } from 'lucide-react'
+import { Check, Star } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 import { ICON } from '@/components/base/sizes'
 import { chapterPath, isOpenLesson, quizPath, type ChapterLesson } from '@/features/chapter/useChapter'
 import { cn } from '@/lib/utils'
 
-type NodeState = 'done' | 'doing' | 'ready' | 'review' | 'locked'
+type NodeState = 'done' | 'doing' | 'ready' | 'review'
 
 function nodeState(lesson: ChapterLesson, upNext: boolean): NodeState {
   if (lesson.status === 'completed') return 'done'
-  if (lesson.status === 'locked') return 'locked'
   if (lesson.status === 'review') return 'review'
   return upNext || lesson.status === 'current' ? 'doing' : 'ready'
 }
 
-/** Filled gold, filled blue, outlined, gold-outlined, dimmed — in that order of reading. */
+/** Filled gold, filled blue, outlined, gold-outlined — in that order of reading. */
 const DISC: Record<NodeState, string> = {
   done: 'bg-lit text-[color:var(--on-sky-button-text)] shadow-[0_var(--press-depth)_0_var(--lit-deep)]',
   doing:
     'bg-[color:var(--accent-on-sky)] text-[color:var(--on-accent-on-sky)] shadow-[0_var(--press-depth)_0_rgba(0,0,0,0.45)]',
   ready: 'border-solid border-white/75 text-on-sky',
   review: 'border-solid border-[color:var(--lit)] text-[color:var(--lit)]',
-  locked: 'bg-white/[0.07] border-solid border-white/15 text-[color:var(--on-sky-text-muted)]',
 }
 
 /**
@@ -53,12 +51,10 @@ const DISC: Record<NodeState, string> = {
 const RING: Partial<Record<NodeState, string>> = {
   ready: 'var(--constellation-ring)',
   review: 'var(--constellation-ring)',
-  locked: 'var(--constellation-ring)',
 }
 
 function NodeFace({ state, number }: { state: NodeState; number: number }) {
   if (state === 'done') return <Check size={ICON.rowLeading} strokeWidth={2.5} aria-hidden="true" />
-  if (state === 'locked') return <Lock size={ICON.chip} strokeWidth={ICON.stroke} aria-hidden="true" />
   if (state === 'review') return <Star size={ICON.chip} strokeWidth={2} aria-hidden="true" />
   return <>{number}</>
 }
@@ -102,7 +98,6 @@ function Node({
 }) {
   const { t } = useTranslation('chapter')
   const state = nodeState(lesson, upNext)
-  const locked = state === 'locked'
   const status = upNext ? t('chapter.status.current') : t(`chapter.status.${lesson.status}`)
   const meta = t('chapter.lessonMeta', { minutes: lesson.estimatedMinutes ?? 10, count: lesson.exerciseCount })
 
@@ -155,7 +150,6 @@ function Node({
   // known height in its row rather than floating in the middle of whatever
   // text happens to be beside it.
   const row = 'flex min-w-0 items-start gap-3 text-inherit no-underline'
-  if (locked) return <div className={row}>{body}</div>
   return (
     <Link
       to={chapterPath(unitId, lesson.id)}

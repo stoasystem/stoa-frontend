@@ -24,7 +24,8 @@
     "keys": "Tasten: Pfeile zum Nächsten in dieser Richtung, Tab folgt dem Kurs, + und − zoomen.",
     "label": "Was die Sterne bedeuten",
     "pointer": "Ziehen verschiebt, Scrollen oder Zwei-Finger-Zoom zoomt. Einen Stern wählen zeigt sein Kapitel; ihn gedrückt ziehen (am Touchscreen erst halten) zeigt, womit er zusammenhängt.",
-    "reviewDue": "Wiederholung fällig"
+    "reviewDue": "Wiederholung fällig",
+    "waiting": "Baut auf Sternen auf, die noch nicht leuchten"
   },
   "lighting": {
     "announce": "{{name}} leuchtet jetzt"
@@ -59,7 +60,7 @@
     "skills": "Fähigkeiten",
     "skillLit": "{{name}}, leuchtet",
     "skillDark": "{{name}}, leuchtet noch nicht",
-    "prerequisites": "Zuerst zum Leuchten bringen",
+    "prerequisites": "Am besten zuerst lernen",
     "start": "Starten",
     "continue": "Weiter",
     "open": "Kapitel öffnen",
@@ -72,8 +73,7 @@
   "state": {
     "lit": "Leuchtet",
     "in_progress": "In Arbeit",
-    "ready": "Bereit zum Start",
-    "locked": "Gesperrt"
+    "ready": "Bereit zum Start"
   },
   "subjects": {
     "label": "Fächer"

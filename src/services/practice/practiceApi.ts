@@ -69,7 +69,7 @@ export async function submitChallengeAnswer(challengeId: string, payload: Practi
  * Draw the short quiz that can complete a lesson (stoa-backend#92). The paper
  * is composed server-side and kept there; nothing of it is decided here.
  *
- * 409 `lesson_locked` / `lesson_quiz_unavailable`.
+ * 409 `lesson_quiz_unavailable`.
  */
 export async function startLessonQuiz(lessonId: string, kind: LessonQuizKind) {
   const response = await httpClient.post<LessonQuizSession>(

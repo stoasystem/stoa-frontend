@@ -54,7 +54,8 @@ describe.each(FIXTURE_SIZES)('the %i-star demo sky', (size) => {
     expect(sky.stars.some((star) => star.reviewDue > 0)).toBe(true)
     expect(sky.stars.some((star) => star.skills.length > 0 && demoStarKind(star.unitId) === 'placeholder')).toBe(true)
     const chemistry = sky.stars.filter((star) => galaxyOf.get(star.unitId) === 'chemistry')
-    expect(chemistry.every((star) => star.state === 'ready' || star.state === 'locked')).toBe(true)
+    expect(chemistry.every((star) => star.state === 'ready')).toBe(true)
+    expect(chemistry.some((star) => star.unlitPrerequisiteIds.length > 0)).toBe(true)
     expect(chemistry.every((star) => star.reviewDue === 0 && star.progress === 0)).toBe(true)
   })
 
@@ -80,15 +81,15 @@ describe.each(FIXTURE_SIZES)('the %i-star demo sky', (size) => {
     }
   })
 
-  it('keeps learning states true to the prerequisites: ready means all lit, locked means one is not', () => {
+  it('lists exactly the prerequisites not lit yet, in progress and lit only from lit ones', () => {
     for (const edge of sky.prerequisites) {
       expect(stateOf.has(edge.from)).toBe(true)
       expect(stateOf.has(edge.to)).toBe(true)
     }
     for (const star of sky.stars) {
-      const before = sky.prerequisites.filter((edge) => edge.to === star.unitId).map((edge) => stateOf.get(edge.from))
-      if (star.state === 'locked') expect(before.some((state) => state !== 'lit')).toBe(true)
-      else expect(before.every((state) => state === 'lit')).toBe(true)
+      const unlit = sky.prerequisites.filter((edge) => edge.to === star.unitId && stateOf.get(edge.from) !== 'lit').map((edge) => edge.from)
+      expect(star.unlitPrerequisiteIds).toEqual(unlit)
+      if (star.state !== 'ready') expect(unlit).toEqual([])
     }
   })
 

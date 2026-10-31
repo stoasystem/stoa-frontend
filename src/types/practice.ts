@@ -458,7 +458,7 @@ export type ReviewSummary = {
  * The field names are the star map model's own (`@/features/starmap/model/starMap`),
  * so the source maps it across without renaming. `prerequisites` and each star's
  * `skills` arrive empty until stoa-backend#56 and #58 land; the map draws no
- * locks and no skill rows while they are.
+ * skill rows while they are.
  */
 export type KnowledgeMapResponse = {
   subjectId: string
@@ -475,7 +475,16 @@ export type KnowledgeMapResponse = {
     name: string
     nebulaId: string
     order: number
+    /**
+     * Nothing is locked since stoa-backend#125 (ADR 0004); `locked` is only
+     * what a backend from before it still says, read as ready.
+     */
     state: 'lit' | 'in_progress' | 'ready' | 'locked'
+    /**
+     * The stated prerequisites not lit yet, in the order stated; empty for a
+     * lit star (stoa-backend#125). Missing only from a backend before it.
+     */
+    unlitPrerequisiteIds?: string[]
     progress: number
     unmetExercises: number
     reviewDue: number

@@ -36,7 +36,7 @@
  * pans; a drag is never a tap.
  */
 import { nebulaLinks, starLinkIndices } from '@/features/starmap/model/links'
-import { LEARNING_STATES, orderedNebulae, orderedStars, type Star, type StarMap } from '@/features/starmap/model/starMap'
+import { orderedNebulae, orderedStars, STAR_LOOKS, starLook, type Star, type StarMap } from '@/features/starmap/model/starMap'
 import { breathAt, easeStandard, motionPolicy, type MotionPolicy } from '@/features/starmap/motion/motionPolicy'
 import type { EdgeLabelBox, SceneData, SceneFrame, StarMapRenderer, StarMapTheme } from '@/features/starmap/render/types'
 import {
@@ -241,13 +241,13 @@ const PINCH_SMOOTHING_MS = 40
 const PINCH_HOLD_MS = 100
 
 /**
- * A learning state as the renderer's small integer. One this front end does
- * not know (a newer backend's) is drawn as ready, as its card offers it, not
- * as lit: `indexOf`'s -1 clamped to 0 painted it gold (#368).
+ * How a star is drawn (`starLook`) as the renderer's small integer. A state
+ * this front end does not know (a newer backend's) is drawn as ready, as its
+ * card offers it, not as lit: `indexOf`'s -1 clamped to 0 painted it gold (#368).
  */
-function stateIndex(state: string): number {
-  const index = (LEARNING_STATES as readonly string[]).indexOf(state)
-  return index < 0 ? LEARNING_STATES.indexOf('ready') : index
+function stateIndex(star: Star): number {
+  const index = (STAR_LOOKS as readonly string[]).indexOf(starLook(star))
+  return index < 0 ? STAR_LOOKS.indexOf('ready') : index
 }
 
 /** Whether `next` only lets a choice of `previous` go: back to the galaxy, or the card closed on its own nebula. */
@@ -506,7 +506,7 @@ export class StarMapEngine {
     this.stars.forEach((star, i) => {
       scene.mapX[i] = star.x
       scene.mapY[i] = star.y
-      scene.state[i] = stateIndex(star.state)
+      scene.state[i] = stateIndex(star)
       scene.progress[i] = star.progress
       scene.reviewDue[i] = star.reviewDue > 0 ? 1 : 0
       scene.nebula[i] = this.nebulaIndex.get(star.nebulaId) ?? 0

@@ -20,7 +20,7 @@ import { describe, expect, it } from 'vitest'
 import { NEBULA_NAME_ALPHA } from '@/features/starmap/engine/starMapEngine'
 import { HAZE, INK } from '@/features/starmap/render/canvas2d'
 import { GALAXY_HAZE_ALPHA, KNOWLEDGE_GLOW_ALPHA, NEBULA_GLOW, SKY_MIST_ALPHA } from '@/features/starmap/render/galaxy'
-import { LOCKED_RING_ALPHA } from '@/features/starmap/render/glyph'
+import { WAITING_RING_ALPHA } from '@/features/starmap/render/glyph'
 import { LINK_INK } from '@/features/starmap/render/links'
 
 type RGBA = [number, number, number, number]
@@ -107,13 +107,13 @@ describe('names on the canvas keep 4.5:1', () => {
 /** A line's ink, alpha in the token, at `strength`, over `bg`. */
 const line = (name: string, bg: RGBA, strength = 1) => contrast(over(token(name), bg, strength), bg)
 
-describe('lines by tier (#121) and locked stars', () => {
+describe('lines by tier (#121) and waiting stars', () => {
   it('the canvas falls back to exactly the sky tokens', () => {
     const tokens = {
       recommended: '--starmap-link-recommended',
       inProgress: '--starmap-link-in-progress',
       walked: '--starmap-link-walked',
-      locked: '--starmap-link-locked',
+      waiting: '--starmap-link-waiting',
       bridge: '--starmap-bridge',
     } as const
     for (const [key, name] of Object.entries(tokens)) {
@@ -134,12 +134,12 @@ describe('lines by tier (#121) and locked stars', () => {
     expect(tiers[0]).toBeGreaterThan(tiers[1])
     expect(tiers[1]).toBeGreaterThan(tiers[2])
     // Tier 4 is drawn dashed (about a third inked), so its ink may be a little stronger than tier 3's.
-    for (const name of ['--starmap-link-walked', '--starmap-link-locked', '--starmap-bridge']) expect(line(name, sky)).toBeLessThan(3)
+    for (const name of ['--starmap-link-walked', '--starmap-link-waiting', '--starmap-bridge']) expect(line(name, sky)).toBeLessThan(3)
   })
 
   it('a locked star’s ring, on the sky and on stacked haze', () => {
-    expect(contrast(over(text, sky, LOCKED_RING_ALPHA), sky)).toBeGreaterThanOrEqual(3)
-    expect(contrast(over(text, haze, LOCKED_RING_ALPHA), haze)).toBeGreaterThanOrEqual(3)
+    expect(contrast(over(text, sky, WAITING_RING_ALPHA), sky)).toBeGreaterThanOrEqual(3)
+    expect(contrast(over(text, haze, WAITING_RING_ALPHA), haze)).toBeGreaterThanOrEqual(3)
   })
 })
 
@@ -150,7 +150,7 @@ it('one sky (#119) keeps readable states even at a fully lit nebula’s core', (
   expect(KNOWLEDGE_GLOW_ALPHA).toBeCloseTo(GALAXY_HAZE_ALPHA + NEBULA_GLOW.base + NEBULA_GLOW.lit, 9)
   const peak: RGBA = [255, 255, 255, 1]
   const background = over(peak, over(peak, sky, SKY_MIST_ALPHA), KNOWLEDGE_GLOW_ALPHA)
-  expect(contrast(over(text, background, LOCKED_RING_ALPHA), background)).toBeGreaterThanOrEqual(3)
+  expect(contrast(over(text, background, WAITING_RING_ALPHA), background)).toBeGreaterThanOrEqual(3)
   expect(line('--starmap-link-recommended', background)).toBeGreaterThanOrEqual(3)
   expect(line('--starmap-link-in-progress', background)).toBeGreaterThanOrEqual(3)
   expect(contrast(over(body, background, 0.8), background)).toBeGreaterThanOrEqual(4.5)

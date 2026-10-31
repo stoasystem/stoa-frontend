@@ -12,11 +12,11 @@ import type { Rgb } from '@/features/starmap/view/semanticZoom'
 
 export type RendererKind = 'canvas2d' | 'webgl'
 
-/** Learning states as small integers, in `LEARNING_STATES` order. */
+/** How stars are drawn, as small integers in `STAR_LOOKS` order. */
 export const STATE_LIT = 0
 export const STATE_IN_PROGRESS = 1
 export const STATE_READY = 2
-export const STATE_LOCKED = 3
+export const STATE_WAITING = 3
 
 /** The connection lines' inks (#121), from the `--starmap-link-*` and `--starmap-bridge` sky tokens. */
 export type LinkInk = {
@@ -26,8 +26,8 @@ export type LinkInk = {
   inProgress: string
   /** Tier 3: both ends lit, the path walked. */
   walked: string
-  /** Tier 4: into a locked star (star layer only, dashed). */
-  locked: string
+  /** Tier 4: into a waiting star (star layer only, dashed). */
+  waiting: string
   /** The panorama's soft bridges between nebulae, and the glow between galaxies. */
   bridge: string
 }

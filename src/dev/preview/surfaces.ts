@@ -95,7 +95,7 @@ export const SURFACES: readonly Surface[] = [
   },
   {
     id: 'map-refraction',
-    label: 'Star map · Refraction (locked, cross-subject)',
+    label: 'Star map · Refraction (waiting on a prerequisite, cross-subject)',
     path: (points) => withPoints(`/map/physics/${DEMO_BRIDGE_TOPIC}/${DEMO_BRIDGE_STAR}`, points),
     signedIn: true,
     stars: true,

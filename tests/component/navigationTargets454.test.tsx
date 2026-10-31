@@ -393,7 +393,7 @@ describe('#454: the real redirects and links keep hostile ids on this site', () 
 
   it.each(HOSTILE_STRINGS.filter((id) => id !== ''))('opens the chapter and the review of a star whose id is %j, here', (unitId) => {
     const map = skyMap(1000, 'math')
-    const base = map.stars.find((candidate) => candidate.state !== 'locked')!
+    const base = map.stars[0]
     const star = { ...base, unitId, reviewDue: 2 }
     const nebula = map.nebulae.find((candidate) => candidate.topicId === star.nebulaId)!
     const view = render(

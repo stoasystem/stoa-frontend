@@ -120,13 +120,11 @@ let seen: Seen
 let rules: Rules
 let quizCounter: number
 
-/** A lesson opens when the one before it is done; the first open one is up next. */
+/** Every lesson is open (ADR 0004); the first one not done is up next. */
 function statusOf(id: string) {
   if (completed.has(id)) return 'completed'
   const index = LESSONS.findIndex((lesson) => lesson.id === id)
-  const open = (i: number) => i === 0 || completed.has(LESSONS[i - 1].id)
-  if (!open(index)) return 'locked'
-  const first = LESSONS.findIndex((lesson, i) => !completed.has(lesson.id) && open(i))
+  const first = LESSONS.findIndex((lesson) => !completed.has(lesson.id))
   return first === index ? 'current' : 'available'
 }
 
@@ -659,19 +657,6 @@ describe('passing the quiz completes the lesson with its credential', () => {
 })
 
 describe('what the student reads when it goes wrong', () => {
-  it('a locked lesson: the reason, and no offer to take it again', async () => {
-    rules.startRefusal = { status: 409, code: 'lesson_locked' }
-    open('/chapter/u-5/l-2?mode=quiz')
-
-    // The point is locked, not the lesson: back to the chapter led to the same locked lessons (#342).
-    expect(
-      await screen.findByText('This knowledge point is still locked: light the ones it builds on first, on the star map.'),
-    ).toBeInTheDocument()
-    expect(trouble()).toHaveAttribute('data-quiz-trouble', 'lesson_locked')
-    expect(screen.queryByRole('button', { name: 'Start the quiz again' })).not.toBeInTheDocument()
-    expect(within(trouble() as HTMLElement).getByRole('link', { name: 'Star map' })).toHaveAttribute('href', '/map/math/algebra/u-5')
-  })
-
   it('a lesson with nothing to ask: its own sentence', async () => {
     rules.startRefusal = { status: 409, code: 'lesson_quiz_unavailable' }
     open('/chapter/u-5/l-2?mode=quiz')
@@ -770,7 +755,6 @@ describe('what the student reads when it goes wrong', () => {
     const KEYS = [
       'title',
       'restart',
-      'locked',
       'unavailable',
       'notFound',
       'notStarted',
@@ -1017,27 +1001,26 @@ describe('losing the quiz', () => {
     await user.click(await screen.findByRole('link', { name: 'Back to the chapter' }))
     expect(where()).toBe('/chapter/u-5')
     const rows = within(await screen.findByRole('list')).getAllByRole('listitem')
-    expect(rows.map((row) => row.getAttribute('data-lesson-status'))).toEqual(['completed', 'current', 'locked', 'locked'])
+    expect(rows.map((row) => row.getAttribute('data-lesson-status'))).toEqual(['completed', 'current', 'available', 'available'])
     expect(seen.completes).toEqual([])
   })
 })
 
 describe('testing out of a lesson from the chapter', () => {
-  it('offers 「跳过这一课」 on a lesson open to the student, never on a locked or a done one (#96)', async () => {
+  it('offers 「跳过这一课」 on every lesson not done yet, never on a done one (#96, ADR 0004)', async () => {
     open('/chapter/u-5')
     const rows = within(await screen.findByRole('list')).getAllByRole('listitem')
-    expect(rows.map((row) => row.getAttribute('data-lesson-status'))).toEqual(['completed', 'current', 'locked', 'locked'])
+    expect(rows.map((row) => row.getAttribute('data-lesson-status'))).toEqual(['completed', 'current', 'available', 'available'])
     expect(within(rows[0]).queryByRole('link', { name: /^Skip this lesson/ })).not.toBeInTheDocument()
     expect(within(rows[1]).getByRole('link', { name: 'Skip this lesson: Balancing both sides' })).toHaveAttribute('href', '/chapter/u-5/l-2?mode=quiz')
-    expect(within(rows[2]).queryByRole('link', { name: /^Skip this lesson/ })).not.toBeInTheDocument()
-    expect(within(rows[3]).queryByRole('link', { name: /^Skip this lesson/ })).not.toBeInTheDocument()
+    expect(within(rows[2]).getByRole('link', { name: /^Skip this lesson/ })).toHaveAttribute('href', '/chapter/u-5/l-3?mode=quiz')
+    expect(within(rows[3]).getByRole('link', { name: /^Skip this lesson/ })).toHaveAttribute('href', '/chapter/u-5/l-4?mode=quiz')
   })
 
-  it('a locked lesson offers no test-out, and ?mode=quiz on it shows the locked notice (#96)', async () => {
+  it('tests out of a lesson further on, before the one up next is done (ADR 0004)', async () => {
     open('/chapter/u-5/l-3?mode=quiz')
-    expect(await screen.findByRole('heading', { level: 1, name: 'This lesson is locked' })).toBeInTheDocument()
-    expect(screen.queryByText(/Quiz · Question \d+ of \d+$/)).not.toBeInTheDocument()
-    expect(seen.starts).toEqual([])
+    expect(await screen.findByText(/Quiz · Question \d+ of \d+$/)).toBeInTheDocument()
+    expect(seen.starts).toEqual([{ lessonId: 'l-3', kind: 'testOut' }])
   })
 
   it('opens a lesson already done as the lesson, not a quiz, even with ?mode=quiz (#96)', async () => {
