@@ -51,7 +51,7 @@ import { LINK_INK } from '@/features/starmap/render/links'
 import type { StarMapRenderer, StarMapTheme } from '@/features/starmap/render/types'
 import { nebulaDiscs } from '@/features/starmap/view/geometry'
 import { arrowDirection, courseNebulae, nearestInDirection } from '@/features/starmap/view/keyboardOrder'
-import { isWide, nebulaFocusSpot, NEBULA_FOCUS_HEIGHT, outerTarget, pathForTarget, sheetBand, starHintSpot, starLinkSize, type LayerTarget } from '@/features/starmap/view/layers'
+import { isWide, nebulaFocusSpot, NEBULA_FOCUS_HEIGHT, outerTarget, pathForTarget, sheetBand, starHintSpot, starLinkSize, type LayerTarget, type StarCardFocus } from '@/features/starmap/view/layers'
 import { CHOICE, SHEET, ZOOM } from '@/features/starmap/view/semanticZoom'
 import { ringNeighbour, SKY_WRAP } from '@/features/starmap/view/sky'
 import { cn } from '@/lib/utils'
@@ -198,7 +198,7 @@ export function StarMapView({ map, demo = false, target, onNavigate, land, onFir
   const { t, i18n } = useTranslation('starmap')
   // The map's own links keep the query (`?points=`, the dev switches), as its
   // navigation does: a switch must hand the engine the same sky (#123).
-  const { search } = useLocation()
+  const { search, state: arrival, key: arrivalKey } = useLocation()
   const here = (path: string) => path + search
   const reducedMotion = usePrefersReducedMotion()
   const stageRef = useRef<HTMLDivElement>(null)
@@ -640,6 +640,23 @@ export function StarMapView({ map, demo = false, target, onNavigate, land, onFir
   const parallelDomGone = useDeferredValue(target.layer === 'star')
   const currentNebula = target.layer === 'map' ? undefined : nebulae.find((n) => n.topicId === target.nebulaId)
   const currentStar = target.layer === 'star' ? stars.find((s) => s.unitId === target.unitId) : undefined
+  // Sent to a star from Ask (#487): its card takes the focus as it opens. The
+  // card may be swapped once the stage has its size (the phone's sheet for the
+  // wide card); the new one takes the focus over, if the old one still held it
+  // when it went (the focus then fell to the page, or the stage caught it).
+  const arrived = useRef<{ key: string; card: HTMLElement } | null>(null)
+  useEffect(() => {
+    const asked = (arrival as Partial<StarCardFocus> | null)?.focusStarCard
+    const card = cardRef.current?.querySelector<HTMLElement>('article')
+    if (!currentStar || asked !== currentStar.unitId || !card) return
+    const before = arrived.current
+    if (before?.key === arrivalKey) {
+      const dropped = document.activeElement === document.body || document.activeElement === stageRef.current
+      if (before.card === card || before.card.isConnected || !dropped) return
+    }
+    arrived.current = { key: arrivalKey, card }
+    card.focus({ preventScroll: true })
+  })
   const numberFormat = useMemo(() => new Intl.NumberFormat(formattingLocale(i18n.language)), [i18n.language])
   const mapPath = here(pathForTarget(subjectId, { layer: 'map' }))
   const subjects = map.subjects

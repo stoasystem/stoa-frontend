@@ -280,6 +280,8 @@ export function useStreamingChat(conversationId: string | null) {
             ? {
                 ...message,
                 status: event.status,
+                // The star the answer offers (#487), on screen before the conversation is read back.
+                targetUnit: event.targetUnit ?? null,
                 // The sections come with the end of the answer (stoa-backend#132),
                 // so it is laid out in them before the conversation is read back.
                 ...(event.structured !== undefined ? { structured: event.structured } : {}),

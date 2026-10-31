@@ -162,6 +162,8 @@ export function StarSheet({
     <article
       ref={sheet}
       aria-labelledby={STAR_TITLE_ID}
+      // Focusable from code: a star asked for from Ask opens with its sheet focused (#487).
+      tabIndex={-1}
       data-star-sheet={state}
       className="pointer-events-auto absolute inset-x-3 flex flex-col overflow-hidden rounded-[16px] border border-solid border-[color:var(--sky-glass-border)] text-on-sky"
       style={{

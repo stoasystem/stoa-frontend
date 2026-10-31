@@ -5,6 +5,7 @@
  */
 import {
   DEMO_BRIDGE_STAR,
+  DEMO_FIND_STAR_CONVERSATION_ID,
   DEMO_HELP_CONVERSATION_ID,
   DEMO_KNOWLEDGE_POINT,
   DEMO_SECTIONS_CONVERSATION_ID,
@@ -106,6 +107,8 @@ export const SURFACES: readonly Surface[] = [
   { id: 'review', label: 'Review', path: () => `/review/${unitId}`, signedIn: true, stars: false, demo: 'review-due', readyWhen: 'main form, main [role="radiogroup"], main textarea, main input' },
   { id: 'ask', label: 'Ask · new question', path: (points) => withPoints('/ask', points), signedIn: true, stars: true },
   { id: 'ask-conversation', label: 'Ask · conversation', path: (points) => withPoints(`/ask/${DEMO_HELP_CONVERSATION_ID}`, points), signedIn: true, stars: true },
+  // #487: an answer that found a star, read back with the conversation; its card flies to it.
+  { id: 'ask-find-star', label: 'Ask · find a star', path: (points) => withPoints(`/ask/${DEMO_FIND_STAR_CONVERSATION_ID}`, points), signedIn: true, stars: true },
   { id: 'ask-sections', label: 'Ask · answer in sections', path: (points) => withPoints(`/ask/${DEMO_SECTIONS_CONVERSATION_ID}`, points), signedIn: true, stars: true },
   { id: 'me', label: '/me', path: () => '/me', signedIn: true, stars: false },
   { id: 'account-menu', label: 'Account menu', path: () => '/me', signedIn: true, stars: false, open: 'account-menu' },

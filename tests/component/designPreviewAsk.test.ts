@@ -7,7 +7,8 @@
  */
 import { beforeEach, describe, expect, it } from 'vitest'
 import { resetDemoServer } from '@/dev/preview/demoSource'
-import { answer, DEMO_FAIL_ONCE, failsThisTime, streamedAnswer } from '@/dev/preview/handlers'
+import { answer, DEMO_FAIL_ONCE, DEMO_FIND_STAR, failsThisTime, streamedAnswer } from '@/dev/preview/handlers'
+import { DEMO_BRIDGE_STAR, DEMO_KNOWLEDGE_POINT } from '@/dev/demo/data'
 import { commandMessageIds } from '@/services/chat/commandMessageIds'
 import type { Conversation, ConversationListResponse } from '@/types/chat'
 
@@ -58,5 +59,22 @@ describe('Ask in the design preview', () => {
     // The retry is the same command, so the same key: it goes through.
     expect(failsThisTime(`Why? ${DEMO_FAIL_ONCE}`, 'key-fail')).toBe(false)
     expect(failsThisTime('Why?', 'key-plain')).toBe(false)
+  })
+
+  it('answers a marked question with a star to fly to, streamed and read back alike (#487)', async () => {
+    const events = await Promise.resolve(streamedAnswer('demo-ask-sine', `Refraction please ${DEMO_FIND_STAR}`, 'key-star'))
+    const done = events.find((event) => event.startsWith('event: message_done')) ?? ''
+    expect(JSON.parse(done.split('data: ')[1])).toMatchObject({ targetUnit: { unitId: DEMO_BRIDGE_STAR } })
+    const [student, reply] = (await read('demo-ask-sine')).messages.slice(-2)
+    expect([student.targetUnit, reply.targetUnit]).toEqual([null, { unitId: DEMO_BRIDGE_STAR }])
+    // An unmarked question finds no star.
+    await Promise.resolve(streamedAnswer('demo-ask-sine', 'Why?', 'key-plain-star'))
+    expect((await read('demo-ask-sine')).messages.slice(-1)[0]?.targetUnit).toBeNull()
+  })
+
+  it('keeps a conversation whose last answer found a star (#487)', async () => {
+    const thread = await read('demo-ask-light')
+    expect(thread.messages.slice(-1)[0]).toMatchObject({ role: 'assistant', targetUnit: { unitId: DEMO_KNOWLEDGE_POINT.unitId } })
+    expect(thread.messages.slice(0, -1).every((message) => message.targetUnit === null)).toBe(true)
   })
 })

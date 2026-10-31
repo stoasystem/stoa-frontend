@@ -30,6 +30,7 @@ import {
   saveDemoNotificationPreferences,
   setDemoLanguage,
 } from '@/dev/preview/demoSource'
+import { DEMO_BRIDGE_STAR } from '@/dev/demo/data'
 import { isSupportedLanguage } from '@/i18n/languages'
 import { commandMessageIds } from '@/services/chat/commandMessageIds'
 import type { ChatMessage, ConversationSummary, MessageQuote } from '@/types/chat'
@@ -276,6 +277,15 @@ const REPLY: Record<string, (content: string) => string> = {
 }
 const replyTo = (content: string) => (REPLY[demoLanguage()] ?? REPLY.en)(content)
 
+/**
+ * A question with this in it is answered as one that names a star to go to
+ * (#487): the answer carries the physics star Refraction, another galaxy than
+ * the maths one the map opens on, so the card and the flight to it can be
+ * seen. No assistant reads the question; the marker stands in for the backend
+ * recognising the star (stoa-backend#124).
+ */
+export const DEMO_FIND_STAR = '#star'
+
 /** A question and its answer as the backend stores them, with the ids it derives from the command. */
 async function exchange(
   conversationId: string,
@@ -285,10 +295,11 @@ async function exchange(
 ): Promise<ChatMessage[]> {
   const { studentMessageId, assistantMessageId } = await commandMessageIds(conversationId, idempotencyKey)
   const askedAt = now()
+  const targetUnit = content.includes(DEMO_FIND_STAR) ? { unitId: DEMO_BRIDGE_STAR } : null
   return [
     // Its quote kept, as the backend keeps it, so a step quoted from an answer (#506) reads back.
-    { id: studentMessageId, conversationId, role: 'student', content, createdAt: askedAt, status: 'completed', quote: quote ?? null },
-    { id: assistantMessageId, conversationId, role: 'assistant', content: replyTo(content), createdAt: now(), status: 'completed' },
+    { id: studentMessageId, conversationId, role: 'student', content, createdAt: askedAt, status: 'completed', quote: quote ?? null, targetUnit: null },
+    { id: assistantMessageId, conversationId, role: 'assistant', content: replyTo(content), createdAt: now(), status: 'completed', targetUnit },
   ]
 }
 
@@ -329,7 +340,7 @@ export async function streamedAnswer(
   const events: (readonly [string, object])[] = [
     ['message_start', { messageId: reply.id, conversationId, role: 'assistant', createdAt: reply.createdAt }],
     ...words.map((delta) => ['message_delta', { messageId: reply.id, delta }] as const),
-    ['message_done', { messageId: reply.id, status: 'completed' }],
+    ['message_done', { messageId: reply.id, status: 'completed', targetUnit: reply.targetUnit ?? null }],
   ]
   return events.map(([type, data]) => `event: ${type}\ndata: ${JSON.stringify(data)}\n\n`)
 }

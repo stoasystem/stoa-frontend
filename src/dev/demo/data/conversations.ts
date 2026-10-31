@@ -6,7 +6,7 @@
  * (`GET /conversations`, `GET /conversations/:id`, the teacher-help status and
  * availability).
  */
-import { localize, type Localized } from '@/dev/demo/sky/demoSky'
+import { DEMO_KNOWLEDGE_POINT, localize, type Localized } from '@/dev/demo/sky/demoSky'
 import type { SupportedLanguage } from '@/i18n/languages'
 import type { ChatMessage, ChatRole, Conversation, ConversationListResponse, StructuredAnswer } from '@/types/chat'
 import type { TeacherAvailability, TeacherHelpRequest } from '@/types/teacherHelp'
@@ -20,7 +20,8 @@ type Spec = {
   subject: string
   grade: string
   title: Localized
-  messages: { role: ChatRole; at: string; content: Localized; structured?: Record<SupportedLanguage, StructuredAnswer> }[]
+  /** `targetUnit`: on an answer, the star it offers to fly to (#487). */
+  messages: { role: ChatRole; at: string; content: Localized; structured?: Record<SupportedLanguage, StructuredAnswer>; targetUnit?: string }[]
 }
 
 /** An answer in its sections, in one language; `content` is the joined text the backend keeps beside it. */
@@ -194,6 +195,28 @@ const LIGHT: Spec = {
         "La luce cambia direzione passando dall'acqua all'aria: viene rifratta. L'occhio segue la luce in linea retta, perciò la parte sott'acqua sembra spostata. In ottica si chiama rifrazione e si basa su seno e coseno.",
       ),
     },
+    // Finding a star (#487): the student names one to practise, in maths, from a physics conversation.
+    {
+      role: 'student',
+      at: '2026-09-30T17:22:00.000Z',
+      content: L(
+        'Then I want to practise sine and cosine first.',
+        'Dann will ich zuerst Sinus und Kosinus üben.',
+        "Alors je veux d'abord m'entraîner sur le sinus et le cosinus.",
+        'Allora voglio prima esercitarmi su seno e coseno.',
+      ),
+    },
+    {
+      role: 'assistant',
+      at: '2026-09-30T17:22:15.000Z',
+      targetUnit: DEMO_KNOWLEDGE_POINT.unitId,
+      content: L(
+        'Good plan: refraction builds on them. Sine and cosine is a star in your maths galaxy; the card below takes you there.',
+        'Guter Plan: Die Brechung baut darauf auf. Sinus und Kosinus ist ein Stern in deiner Mathe-Galaxie; die Karte unten bringt dich hin.',
+        "Bonne idée : la réfraction s'appuie dessus. Sinus et cosinus est une étoile de ta galaxie des maths ; la carte ci-dessous t'y emmène.",
+        "Ottima idea: la rifrazione si basa su questo. Seno e coseno è una stella della tua galassia di matematica; la scheda qui sotto ti ci porta.",
+      ),
+    },
   ],
 }
 
@@ -228,6 +251,9 @@ const SPECS = [SINE, LIGHT, FRACTIONS]
 /** The conversation with a human-help request in progress. */
 export const DEMO_HELP_CONVERSATION_ID = SINE.id
 
+/** The conversation whose last answer found a star to fly to (#487). */
+export const DEMO_FIND_STAR_CONVERSATION_ID = LIGHT.id
+
 /** The conversation whose answer is laid out in sections (#506). */
 export const DEMO_SECTIONS_CONVERSATION_ID = FRACTIONS.id
 
@@ -242,6 +268,7 @@ export function demoConversationsFor(language: SupportedLanguage): Conversation[
       content: localize(message.content, language),
       createdAt: message.at,
       status: messageStatus(message.role),
+      targetUnit: message.targetUnit ? { unitId: message.targetUnit } : null,
       ...(message.structured ? { structured: message.structured[language] } : {}),
     }))
     const last = messages[messages.length - 1]

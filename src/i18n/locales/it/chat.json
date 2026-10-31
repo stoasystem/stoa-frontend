@@ -173,6 +173,10 @@
       "body": "Hai finito il suo capitolo. La stella ora brilla sulla tua mappa.",
       "link": "Vedi sulla mappa"
     },
+    "target": {
+      "label": "{{name}} sulla tua mappa stellare",
+      "show": "Vedi il percorso sulla mappa stellare"
+    },
     "reopen": {
       "open": "Apri le domande",
       "resume": "Torna alla tua conversazione"
