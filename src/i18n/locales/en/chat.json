@@ -90,7 +90,8 @@
       "stop": "Stop waiting",
       "starting": "Starting the conversation…",
       "startFailed": "The conversation could not be started. Try again.",
-      "answerFailed": "The explanation could not be prepared right now. Please try again or ask a teacher."
+      "answerFailed": "The explanation could not be prepared right now. Please try again or ask a teacher.",
+      "dailyLimit": "You have used all your messages for today. Come back tomorrow, or ask a teacher if you need help now."
     },
     "answer": {
       "steps": "Steps",

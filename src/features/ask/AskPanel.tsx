@@ -34,6 +34,7 @@ import { usePhoneUploadCode } from '@/features/uploads/usePhoneUploadCode'
 import { ACCEPT_ATTRIBUTE, CAMERA_ACCEPT_ATTRIBUTE } from '@/services/files/uploadLimits'
 import { useConversationsQuery } from '@/hooks/chat/useConversationsQuery'
 import { useCreateConversationMutation } from '@/hooks/chat/useCreateConversationMutation'
+import { refusedForToday } from '@/hooks/chat/useStreamingChat'
 import { TOUCH_QUERY, useMediaQuery } from '@/hooks/layout/useMediaQuery'
 import { useTeacherAvailabilityQuery } from '@/hooks/chat/useTeacherAvailabilityQuery'
 import { useRecommendationsQuery } from '@/hooks/learning/useWeakTopicsQuery'
@@ -673,7 +674,7 @@ function AskThread({
             key={entry.message.id}
             message={entry.message}
             teacherName={help?.teacherName}
-            onRetry={retryMessage}
+            onRetry={refusedForToday(entry.message) ? undefined : retryMessage}
             onAskAboutStep={onAskAboutStep}
             after={entry.message.id === offer?.id ? helpAction : undefined}
           />

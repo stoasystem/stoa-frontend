@@ -33,6 +33,8 @@ type LocalChatMessage = ChatMessage & {
   retryPayload?: RetryPayload
   /** On a failed student bubble: the bubble that stood for its answer. */
   failedAnswerId?: string
+  /** On a failed student bubble: the day the daily limit refused it (#541). */
+  limitDay?: string
 }
 
 /**
@@ -75,9 +77,32 @@ function createLocalId(prefix: string) {
  */
 const UPLOAD_GONE = new Set(['upload_expired', 'upload_not_found'])
 
-function getErrorMessage(error: unknown) {
+/**
+ * The code a message is refused with once the student's messages for the day
+ * are used up. The server counts the day in UTC, so until its date changes
+ * the same message is refused again: it says so, and offers no "send again"
+ * (#541). The refusal is not kept under its key, so the next day the same
+ * message goes out as itself.
+ */
+const DAILY_LIMIT = 'message_daily_limit'
+
+/** Today as the server counts the daily limit: its UTC date. */
+const limitDay = () => new Date().toISOString().slice(0, 10)
+
+/** A failed message the daily limit refused today, which sending again would only have refused again. */
+export function refusedForToday(message: ChatMessage): boolean {
+  return (message as LocalChatMessage).limitDay === limitDay()
+}
+
+function errorCode(error: unknown) {
   const code = error && typeof error === 'object' && 'code' in error ? (error as { code?: unknown }).code : undefined
-  if (typeof code === 'string' && UPLOAD_GONE.has(code)) return i18n.t('chat:ask.attachments.errors.sendExpired')
+  return typeof code === 'string' ? code : undefined
+}
+
+function getErrorMessage(error: unknown) {
+  const code = errorCode(error)
+  if (code && UPLOAD_GONE.has(code)) return i18n.t('chat:ask.attachments.errors.sendExpired')
+  if (code === DAILY_LIMIT) return i18n.t('chat:ask.thread.dailyLimit')
   return toUserFacingError(error, streamErrorFallback())
 }
 
@@ -533,6 +558,7 @@ export function useStreamingChat(conversationId: string | null) {
         }
 
         const retryPayload = sameMessageRetry(outcome.kind !== 'failed' || outcome.retryable)
+        const limited = errorCode(requestError) === DAILY_LIMIT ? { limitDay: limitDay() } : {}
         // What the answer's place showed when it failed: the steps written so
         // far, or the failure in words.
         const shown = localMessagesRef.current.find((message) => message.id === settledAssistantId)
@@ -550,8 +576,12 @@ export function useStreamingChat(conversationId: string | null) {
           status: 'failed',
           retryPayload,
           failedAnswerId: settledAssistantId,
+          ...limited,
         }
-        keepFailedMessage(conversationId, owner, { student: { ...studentBubble(), status: 'failed', retryPayload }, answer: failedAnswer })
+        keepFailedMessage(conversationId, owner, {
+          student: { ...studentBubble(), status: 'failed', retryPayload, ...limited },
+          answer: failedAnswer,
+        })
         setLocalMessages((messages) =>
           messages.map((message) => {
             if (message.id === studentMessageId) return { ...message, ...student }
