@@ -121,6 +121,8 @@ const routes: Array<[method: string, pattern: string, handler: Handler]> = [
       ? refuse(400, 'verification_code_invalid', 'Check the verification code and try again.')
       : { status: 'confirmed', emailVerificationStatus: 'verified', emailVerificationRequired: false,
           accountActivationStatus: 'active', resendAllowed: false }],
+  // The invitation link's page (/activate?token=...): any token is the demo student's invitation.
+  ['POST', '/auth/invitations/claim', () => ({ status: 'claimed', userId: demo().demoStudent.id, role: 'student', accountNumber: 'S-DEMO-0001' })],
   ['POST', '/auth/logout', () => ({ ok: true })],
   ['PATCH', '/auth/me/preferences/locale', ({ body }) => {
     const asked = field<string>(body, 'preferredLocale')

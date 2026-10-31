@@ -15,6 +15,23 @@
     "body": "Controlla la connessione e riprova.",
     "retry": "Riprova"
   },
+  "firstLanding": {
+    "title": "Inizia da qui: {{name}}",
+    "body": "Ogni stella è una cosa da imparare. Completa le sue lezioni e si accende.",
+    "start": "Inizia questa stella",
+    "later": "Prima dai un’occhiata"
+  },
+  "firstQuestion": {
+    "title": "Quale materia stai facendo adesso a scuola?",
+    "body": "Murmi ti porta a una buona prima stella.",
+    "unsure": "Non lo so"
+  },
+  "firstReveal": {
+    "title": "La tua prima stella è accesa!",
+    "body": "Ora brilla d’oro sulla tua mappa stellare. Poi: {{name}}.",
+    "show": "Mostra la prossima stella",
+    "later": "Capito"
+  },
   "help": {
     "open": "Come funziona la mappa stellare",
     "close": "Chiudi"

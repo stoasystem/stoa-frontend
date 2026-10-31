@@ -45,6 +45,13 @@ export class StudentWorld {
   autoFinishAfterReads: number | null = 2
   /** The next message accepted fails on its first attempt, as one the backend may answer if sent again. */
   failNextRetryably = false
+  /**
+   * A student who has not started anything (nothing lit, nothing in progress)
+   * gets the first landing (#467): the map opens on the recommended star's
+   * nebula with Murmi beside it. Off by default: the other specs are about a
+   * student's session, not the onboarding, and open on the galaxy.
+   */
+  newcomer = false
   /** The sections an answer to this question comes in (stoa-backend#132); others are text only. */
   readonly sections = new Map<string, Record<string, unknown>>()
   private clock = Date.parse('2026-09-29T08:00:00Z')
@@ -204,15 +211,15 @@ export class StudentWorld {
             name: 'Reducing fractions',
             nebulaId: 'fractions',
             order: 0,
-            state: 'ready',
-            progress: 0,
+            state: this.newcomer ? 'ready' : 'in_progress',
+            progress: this.newcomer ? 0 : 0.5,
             unmetExercises: 2,
             reviewDue: 0,
             recommendation: { source: 'system' },
             x: 0.5,
             y: 0.5,
             skills: [],
-            chapter: { lessonCount: 1, lessonsDone: 0, nextLesson: null },
+            chapter: this.newcomer ? { lessonCount: 2, lessonsDone: 0, nextLesson: null } : { lessonCount: 2, lessonsDone: 1, nextLesson: null },
           },
         ],
         prerequisites: [],
