@@ -90,7 +90,8 @@
       "stop": "Nicht mehr warten",
       "starting": "Die Unterhaltung wird gestartet…",
       "startFailed": "Die Unterhaltung konnte nicht gestartet werden. Versuch es noch einmal.",
-      "answerFailed": "Die Erklärung konnte gerade nicht erstellt werden. Versuch es noch einmal oder frag eine Lehrperson."
+      "answerFailed": "Die Erklärung konnte gerade nicht erstellt werden. Versuch es noch einmal oder frag eine Lehrperson.",
+      "dailyLimit": "Deine Nachrichten für heute sind aufgebraucht. Komm morgen wieder, oder frag eine Lehrperson, wenn du jetzt Hilfe brauchst."
     },
     "answer": {
       "steps": "Schritte",
