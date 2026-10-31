@@ -41,13 +41,13 @@ import { useRecommendationsQuery } from '@/hooks/learning/useWeakTopicsQuery'
 import { useStudentProfileQuery } from '@/hooks/student/useStudentProfileQuery'
 import { conversationGrade } from '@/lib/conversationGrade'
 import { rememberPendingMessage } from '@/lib/pendingChatMessages'
-import { teacherHelpErrorKey } from '@/lib/teacherHelpErrors'
+import { teacherHelpErrorKey, teacherHelpWithdrawErrorKey } from '@/lib/teacherHelpErrors'
 import { toUserFacingError } from '@/lib/userFacingText'
 import { cn } from '@/lib/utils'
 import { trackEvent } from '@/services/analytics/analyticsClient'
 import { ApiError } from '@/services/api/httpClient'
 import { chatQueryKeys } from '@/services/chat/chatQueryKeys'
-import { createTeacherHelpRequest } from '@/services/teacherHelp/teacherHelpApi'
+import { createTeacherHelpRequest, withdrawTeacherHelpRequest } from '@/services/teacherHelp/teacherHelpApi'
 import { sendDetached } from '@/services/chat/detachedSend'
 import { useAuthStore } from '@/store/authStore'
 import { litMomentsFor, useLitMoments, type LitMoment } from '@/store/litMomentsStore'
@@ -380,6 +380,7 @@ export function AskPanel({
           teachersOnline={teachersOnline}
           teacherSupport={availability?.teacherSupport ?? null}
           onAskAboutStep={askAboutStep}
+          onNewConversation={() => select(null)}
         />
       ) : (
         <div ref={listArea} className="flex min-h-0 flex-1 flex-col overflow-y-auto" style={{ padding: phone ? '8px 6px' : '10px 8px' }}>
@@ -554,6 +555,7 @@ function AskThread({
   teachersOnline,
   teacherSupport,
   onAskAboutStep,
+  onNewConversation,
 }: {
   conversationId: string
   ask: ReturnType<typeof useAskConversation>
@@ -562,12 +564,15 @@ function AskThread({
   /** This week's allowance, or `null` when it could not be read: then none is shown. */
   teacherSupport: TeacherSupportStanding | null
   onAskAboutStep: (step: AnswerStep) => void
+  /** Back to the list, where the next question starts a new conversation. */
+  onNewConversation: () => void
 }) {
   const { t } = useTranslation('chat')
   const queryClient = useQueryClient()
   const scroller = useRef<HTMLDivElement>(null)
   const [helpError, setHelpError] = useState<string | null>(null)
-  const { messages, help, helpActive, isStreaming, retryMessage, conversationQuery } = ask
+  const [withdrawError, setWithdrawError] = useState<string | null>(null)
+  const { messages, help, isStreaming, retryMessage, conversationQuery } = ask
 
   const requestHelp = useMutation({
     mutationFn: () => createTeacherHelpRequest({ conversationId }),
@@ -592,6 +597,19 @@ function AskThread({
     },
   })
 
+  // Taking the request back (#543). Like asking, what the card then shows is
+  // read back from the server, and so is the week's allowance, given back.
+  // A refusal reads both again too: a 409 means the request has moved on.
+  const withdrawHelp = useMutation({
+    mutationFn: () => withdrawTeacherHelpRequest(conversationId),
+    onSuccess: () => setWithdrawError(null),
+    onError: (error) => setWithdrawError(t(teacherHelpWithdrawErrorKey(error))),
+    onSettled: () => {
+      void queryClient.invalidateQueries({ queryKey: chatQueryKeys.teacherHelpRequest(conversationId) })
+      void queryClient.invalidateQueries({ queryKey: chatQueryKeys.teacherAvailability() })
+    },
+  })
+
   const ownerId = useAuthStore((state) => state.user?.id)
   // Only the moments of this conversation's subject that lit while it was open, or before it began (#267).
   const moments = litMomentsFor(useLitMoments(ownerId), {
@@ -602,7 +620,10 @@ function AskThread({
   const entries = threadEntries(messages, moments)
   const offer = helpOffer(messages)
   const suggested = offer?.suggested ?? false
-  const offerHelp = !helpActive && !isStreaming && !requestHelp.isPending
+  // A conversation has one request: once asked, help is not offered here
+  // again, open or over -- asking again would hand back the same request
+  // (#544). The card says where to ask next.
+  const offerHelp = !help && !isStreaming && !requestHelp.isPending
   // The same element from one render to the next, so the answer it sits under
   // is not drawn again at every key typed in the composer (#416).
   const { mutate: request, isPending: requesting } = requestHelp
@@ -640,7 +661,16 @@ function AskThread({
     <>
       {help && (
         <div className="shrink-0" style={{ padding: layout === 'sheet' ? '10px 14px 0' : '12px 18px 0' }}>
-          <TeacherHelpStatusCard request={help} teachersOnline={teachersOnline} />
+          <TeacherHelpStatusCard
+            request={help}
+            teachersOnline={teachersOnline}
+            withdraw={{
+              onWithdraw: () => withdrawHelp.mutate(),
+              withdrawing: withdrawHelp.isPending,
+              error: withdrawError,
+            }}
+            onNewConversation={onNewConversation}
+          />
         </div>
       )}
       <div
