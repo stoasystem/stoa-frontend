@@ -206,6 +206,14 @@ const routes: Array<[method: string, pattern: string, handler: Handler]> = [
     askedForTeacher.set(request.conversationId, request)
     return request
   }],
+  // Taken back while it waits (#543); one the demo data holds, or none, answers 404.
+  ['POST', '/teacher-help/conversations/:id/request/withdraw', ({ params }) => {
+    const asked = askedForTeacher.get(params.id)
+    if (!asked) return null
+    const withdrawn = { ...asked, status: 'withdrawn' }
+    askedForTeacher.set(params.id, withdrawn)
+    return withdrawn
+  }],
   // A conversation never handed to a teacher answers 404, as the backend does.
   ['GET', '/teacher-help/conversations/:id/request', ({ params }) =>
     demoTeacherHelpRequests.find((request) => request.conversationId === params.id) ?? askedForTeacher.get(params.id) ?? null],

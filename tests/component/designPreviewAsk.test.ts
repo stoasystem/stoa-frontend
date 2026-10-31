@@ -53,6 +53,15 @@ describe('Ask in the design preview', () => {
     expect(events.filter((event) => event.startsWith('event: message_delta')).length).toBeGreaterThan(3)
   })
 
+  it('takes back a teacher request asked in the preview, and reads it back withdrawn (#543)', async () => {
+    const created = (await request('POST', '/conversations', { subject: 'math', grade: '9', initialMessage: 'Help?' }))?.data as Conversation
+    await request('POST', '/teacher-help/request', { conversationId: created.id })
+    const withdrawn = await request('POST', `/teacher-help/conversations/${created.id}/request/withdraw`)
+    expect(withdrawn).toMatchObject({ status: 200, data: { conversationId: created.id, status: 'withdrawn' } })
+    expect((await request('GET', `/teacher-help/conversations/${created.id}/request`))?.data).toMatchObject({ status: 'withdrawn' })
+    expect((await request('POST', '/teacher-help/conversations/never-asked/request/withdraw'))?.status).toBe(404)
+  })
+
   it('fails a marked question once, and its retry goes through (#183)', () => {
     expect(failsThisTime(`Why? ${DEMO_FAIL_ONCE}`, 'key-fail')).toBe(true)
     // The retry is the same command, so the same key: it goes through.

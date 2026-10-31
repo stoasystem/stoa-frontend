@@ -145,10 +145,24 @@
         "waiting_no_teacher": "Deine Anfrage bleibt offen. Sobald eine Lehrperson frei ist, übernimmt sie die Anfrage und antwortet in dieser Unterhaltung.",
         "assigned": "Die Antwort erscheint in dieser Unterhaltung.",
         "in_progress": "Die Antworten erscheinen in dieser Unterhaltung.",
-        "resolved": "Brauchst du mehr Hilfe? Frag unter einer Antwort erneut eine Lehrperson.",
-        "cancelled": "Brauchst du mehr Hilfe? Frag unter einer Antwort erneut eine Lehrperson.",
-        "withdrawn": "Brauchst du doch Hilfe? Frag unter einer Antwort erneut eine Lehrperson.",
-        "expired": "Deine Anfrage ist abgelaufen. Frag unter einer Antwort erneut eine Lehrperson."
+        "resolved": "Brauchst du mehr Hilfe? Starte eine neue Unterhaltung und frag dort eine Lehrperson.",
+        "cancelled": "Brauchst du mehr Hilfe? Starte eine neue Unterhaltung und frag dort eine Lehrperson.",
+        "withdrawn": "Brauchst du doch Hilfe? Starte eine neue Unterhaltung und frag dort eine Lehrperson.",
+        "expired": "Deine Anfrage ist abgelaufen. Starte eine neue Unterhaltung, um erneut eine Lehrperson zu fragen."
+      },
+      "newConversation": "Neue Unterhaltung",
+      "withdraw": {
+        "action": "Anfrage zurückziehen",
+        "confirm": "Anfrage zurückziehen? Du bekommst die Anfrage dieser Woche zurück, kannst in dieser Unterhaltung aber keine Lehrperson mehr fragen.",
+        "yes": "Zurückziehen",
+        "withdrawing": "Wird zurückgezogen…",
+        "keep": "Anfrage behalten",
+        "errors": {
+          "accepted": "Eine Lehrperson hat deine Anfrage schon übernommen. Du kannst sie nicht mehr zurückziehen.",
+          "closed": "Diese Anfrage ist bereits beendet.",
+          "unavailable": "Zurückziehen geht gerade nicht. Versuch es gleich noch einmal.",
+          "generic": "Die Anfrage konnte nicht zurückgezogen werden. Versuch es noch einmal."
+        }
       },
       "fallback": {
         "title": "Lehrperson angefragt",

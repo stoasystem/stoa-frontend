@@ -145,10 +145,24 @@
         "waiting_no_teacher": "Your request stays open. As soon as a teacher is free, they will take it and reply in this conversation.",
         "assigned": "Their reply will appear in this conversation.",
         "in_progress": "Their replies appear in this conversation.",
-        "resolved": "Need more help? Ask a teacher again under any answer.",
-        "cancelled": "Need more help? Ask a teacher again under any answer.",
-        "withdrawn": "Need help after all? Ask a teacher again under any answer.",
-        "expired": "Your request has closed. Ask a teacher again under any answer."
+        "resolved": "Need more help? Start a new conversation and ask a teacher there.",
+        "cancelled": "Need more help? Start a new conversation and ask a teacher there.",
+        "withdrawn": "Need help after all? Start a new conversation and ask a teacher there.",
+        "expired": "Your request has closed. Start a new conversation to ask a teacher again."
+      },
+      "newConversation": "New conversation",
+      "withdraw": {
+        "action": "Withdraw request",
+        "confirm": "Withdraw your request? You get this week’s request back, but you cannot ask a teacher again in this conversation.",
+        "yes": "Withdraw",
+        "withdrawing": "Withdrawing…",
+        "keep": "Keep request",
+        "errors": {
+          "accepted": "A teacher has already taken your request, so it can no longer be withdrawn.",
+          "closed": "This request has already ended.",
+          "unavailable": "Withdrawing is briefly unavailable. Please try again in a moment.",
+          "generic": "The request could not be withdrawn. Please try again."
+        }
       },
       "fallback": {
         "title": "Teacher support requested",
