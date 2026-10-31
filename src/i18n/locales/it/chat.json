@@ -147,10 +147,24 @@
         "waiting_no_teacher": "La tua richiesta resta aperta. Appena un insegnante sarà libero, la prenderà in carico e risponderà in questa conversazione.",
         "assigned": "La risposta apparirà in questa conversazione.",
         "in_progress": "Le risposte appaiono in questa conversazione.",
-        "resolved": "Ti serve altro aiuto? Chiedi di nuovo a un insegnante sotto una risposta.",
-        "cancelled": "Ti serve altro aiuto? Chiedi di nuovo a un insegnante sotto una risposta.",
-        "withdrawn": "Ti serve aiuto comunque? Chiedi di nuovo a un insegnante sotto una risposta.",
-        "expired": "La tua richiesta è scaduta. Chiedi di nuovo a un insegnante sotto una risposta."
+        "resolved": "Ti serve altro aiuto? Apri una nuova conversazione e chiedi lì a un insegnante.",
+        "cancelled": "Ti serve altro aiuto? Apri una nuova conversazione e chiedi lì a un insegnante.",
+        "withdrawn": "Ti serve aiuto comunque? Apri una nuova conversazione e chiedi lì a un insegnante.",
+        "expired": "La tua richiesta è scaduta. Apri una nuova conversazione per chiedere di nuovo a un insegnante."
+      },
+      "newConversation": "Nuova conversazione",
+      "withdraw": {
+        "action": "Ritira la richiesta",
+        "confirm": "Ritirare la richiesta? Ti viene restituita la richiesta di questa settimana, ma in questa conversazione non potrai più chiedere a un insegnante.",
+        "yes": "Ritira",
+        "withdrawing": "Ritiro in corso…",
+        "keep": "Tieni la richiesta",
+        "errors": {
+          "accepted": "Un insegnante ha già preso in carico la tua richiesta, quindi non puoi più ritirarla.",
+          "closed": "Questa richiesta è già conclusa.",
+          "unavailable": "Al momento non è possibile ritirare la richiesta. Riprova tra poco.",
+          "generic": "Non è stato possibile ritirare la richiesta. Riprova."
+        }
       },
       "fallback": {
         "title": "Aiuto di un insegnante richiesto",

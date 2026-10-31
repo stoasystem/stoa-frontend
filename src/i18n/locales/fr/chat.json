@@ -147,10 +147,24 @@
         "waiting_no_teacher": "Ta demande reste ouverte. Dès qu’un enseignant sera disponible, il la prendra en charge et répondra dans cette conversation.",
         "assigned": "Sa réponse apparaîtra dans cette conversation.",
         "in_progress": "Ses réponses apparaissent dans cette conversation.",
-        "resolved": "Besoin de plus d’aide ? Redemande à un enseignant sous une réponse.",
-        "cancelled": "Besoin de plus d’aide ? Redemande à un enseignant sous une réponse.",
-        "withdrawn": "Finalement besoin d’aide ? Redemande à un enseignant sous une réponse.",
-        "expired": "Ta demande a expiré. Redemande à un enseignant sous une réponse."
+        "resolved": "Besoin de plus d’aide ? Ouvre une nouvelle conversation et demande à un enseignant.",
+        "cancelled": "Besoin de plus d’aide ? Ouvre une nouvelle conversation et demande à un enseignant.",
+        "withdrawn": "Finalement besoin d’aide ? Ouvre une nouvelle conversation et demande à un enseignant.",
+        "expired": "Ta demande a expiré. Ouvre une nouvelle conversation pour redemander à un enseignant."
+      },
+      "newConversation": "Nouvelle conversation",
+      "withdraw": {
+        "action": "Retirer la demande",
+        "confirm": "Retirer ta demande ? Tu récupères la demande de cette semaine, mais tu ne pourras plus demander à un enseignant dans cette conversation.",
+        "yes": "Retirer",
+        "withdrawing": "Retrait en cours…",
+        "keep": "Garder la demande",
+        "errors": {
+          "accepted": "Un enseignant a déjà pris ta demande, tu ne peux donc plus la retirer.",
+          "closed": "Cette demande est déjà terminée.",
+          "unavailable": "Le retrait est momentanément indisponible. Réessaie dans un instant.",
+          "generic": "La demande n’a pas pu être retirée. Réessaie."
+        }
       },
       "fallback": {
         "title": "Aide d’un enseignant demandée",
