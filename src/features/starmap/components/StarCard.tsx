@@ -7,10 +7,12 @@
  */
 import { ChevronLeft } from 'lucide-react'
 import type { MouseEvent, RefObject } from 'react'
-import { useRef } from 'react'
+import { useId, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import type { JumpState } from '@/features/chapter/jump'
+import { starQuizPath } from '@/features/chapter/useChapter'
+import { formatRetryAt } from '@/features/chapter/useStarQuizRun'
 import { Button } from '@/components/base'
 import { StarGlyph } from '@/features/starmap/components/StarGlyph'
 import { pathForTarget } from '@/features/starmap/view/layers'
@@ -128,6 +130,12 @@ export function StarCardDetails({ map, demo = false, star }: { map: StarMap; dem
         </div>
       )}
 
+      {star.state === 'lit' && star.litAtSource === 'quiz' && (
+        <p data-lit-by-quiz className="m-0 text-[13px] text-on-sky">
+          {t('star.quiz.litByQuiz')}
+        </p>
+      )}
+
       {(star.recommendation || star.reviewDue > 0 || star.unmetExercises > 0) && (
         <ul className="m-0 flex list-none flex-col gap-1 p-0 text-[13px] text-on-sky">
           {star.recommendation && <li>{t('marker.recommended')}</li>}
@@ -138,6 +146,7 @@ export function StarCardDetails({ map, demo = false, star }: { map: StarMap; dem
                 : t('star.unmetPartial', { count: star.unmetExercises })}
             </li>
           )}
+          {star.state === 'in_progress' && star.unmetExercises > 0 && allLessonsDone && <li data-star-quiz-also>{t('star.quiz.alsoTest')}</li>}
           {star.reviewDue > 0 && <li>{t('marker.reviewDue', { count: star.reviewDue })}</li>}
         </ul>
       )}
@@ -188,6 +197,8 @@ export function StarCardDetails({ map, demo = false, star }: { map: StarMap; dem
         </section>
       )}
 
+      {star.state !== 'lit' && !(demo && lessonCount === 0) && <StarQuizEntry star={star} />}
+
       {star.reviewDue > 0 && (
         <Button asChild lift variant="onSky" size="regular">
           <Link to={`/review/${encodeURIComponent(star.unitId)}`} state={reviewFrom}>
@@ -196,6 +207,37 @@ export function StarCardDetails({ map, demo = false, star }: { map: StarMap; dem
         </Button>
       )}
     </>
+  )
+}
+
+/**
+ * 「我会了，测一下」(#486): the star quiz, for every star not lit, whatever its
+ * lessons or prerequisites. After a lost one the backend says when it can be
+ * taken again (`starQuizRetryAt`); until then the button is there, off, with
+ * the time beside it.
+ */
+function StarQuizEntry({ star }: { star: Star }) {
+  const { t, i18n } = useTranslation('starmap')
+  const noteId = useId()
+  const retryAt = star.starQuizRetryAt ? Date.parse(star.starQuizRetryAt) : Number.NaN
+  if (star.starQuizRetryAt && retryAt > Date.now()) {
+    return (
+      <div className="flex flex-col items-start gap-1" data-star-quiz-cooling>
+        <Button variant="onSkyPlain" disabled aria-describedby={noteId}>
+          {t('star.quiz.take')}
+        </Button>
+        <p id={noteId} className="m-0 text-[13px] text-[color:var(--on-sky-text-body)]">
+          {t('star.quiz.cooling', { when: formatRetryAt(star.starQuizRetryAt, i18n.language) })}
+        </p>
+      </div>
+    )
+  }
+  return (
+    <Button asChild variant="onSkyPlain" className="self-start">
+      <Link to={starQuizPath(star.unitId)} data-star-quiz-take>
+        {t('star.quiz.take')}
+      </Link>
+    </Button>
   )
 }
 

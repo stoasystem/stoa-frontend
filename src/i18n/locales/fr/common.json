@@ -416,6 +416,9 @@
       "body": "Cet écran est en cours de refonte. Le lien fonctionne déjà et restera le même.",
       "eyebrow": "Bientôt disponible"
     },
+    "starQuiz": {
+      "title": "Test de l’étoile"
+    },
     "unit": {
       "title": "Point de connaissance"
     }

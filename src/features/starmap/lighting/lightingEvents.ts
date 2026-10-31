@@ -18,8 +18,11 @@
  */
 import { createContext, useContext } from 'react'
 
-/** Where a lit fact came from (#9 point 3): seen happening, or written by the backfill. */
-export type LitAtSource = 'observed' | 'backfilled'
+/**
+ * Where a lit fact came from (#9 point 3): seen happening, written by the
+ * backfill, or the star quiz passed (stoa-backend#165).
+ */
+export type LitAtSource = 'observed' | 'backfilled' | 'quiz'
 
 /** One knowledge point lit and not yet acknowledged. One per unit: a point is lit once, for good. */
 export type LitEvent = {
@@ -62,9 +65,9 @@ export const emptyLightingEventSource: LightingEventSource = {
   acknowledge: async () => {},
 }
 
-/** Only a point seen lit is celebrated; the backfill's never are (#51, stoa-backend#71). */
-export function isCelebrated(event: LitEvent): boolean {
-  return event.litAtSource === 'observed'
+/** A point seen lit, or lit by its star quiz, is celebrated; the backfill's never are (#51, stoa-backend#71, #486). */
+export function isCelebrated(event: Pick<LitEvent, 'litAtSource'>): boolean {
+  return event.litAtSource === 'observed' || event.litAtSource === 'quiz'
 }
 
 export const LightingEventSourceContext = createContext<LightingEventSource>(emptyLightingEventSource)

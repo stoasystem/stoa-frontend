@@ -114,5 +114,36 @@
     "tryAgain": "Nochmals versuchen",
     "youAreHere": "Du bist hier",
     "yourAnswer": "Deine Antwort"
+  },
+  "starQuiz": {
+    "label": "Sterntest",
+    "heading": "Sterntest: {{star}}",
+    "drawing": "Der Sterntest wird zusammengestellt…",
+    "backToStar": "Zurück zu {{star}} auf der Sternkarte",
+    "backToMap": "Zurück zur Sternkarte",
+    "passed": {
+      "title": "Der ganze Stern leuchtet",
+      "body": "Du konntest es: {{star}} leuchtet jetzt auf deiner Sternkarte.",
+      "toMap": "Auf der Sternkarte ansehen"
+    },
+    "failed": {
+      "title": "Diesmal nicht",
+      "body": "Ab {{when}} kannst du den Sterntest wieder machen. Bis dahin bringst du den Stern mit seinen Lektionen zum Leuchten.",
+      "bodyLater": "Morgen kannst du den Sterntest wieder machen. Bis dahin bringst du den Stern mit seinen Lektionen zum Leuchten.",
+      "toLessons": "Zu seinen Lektionen"
+    },
+    "trouble": {
+      "restart": "Sterntest neu starten",
+      "coolingUntil": "Ab {{when}} kannst du diesen Sterntest wieder machen.",
+      "unknownStar": "Zu diesem Wissenspunkt gibt es keinen Sterntest.",
+      "alreadyLit": "Dieser Stern leuchtet schon.",
+      "coolingDown": "Morgen kannst du diesen Sterntest wieder machen.",
+      "unavailable": "Dieser Stern hat noch keine Aufgaben für einen Test.",
+      "notFound": "Dieser Sterntest ist nicht mehr offen.",
+      "finished": "Dieser Sterntest ist schon vorbei.",
+      "expired": "Die Zeit für diesen Sterntest ist abgelaufen: Jeder ist 30 Minuten offen.",
+      "outOfOrder": "Diese Antwort gehörte zu einer anderen Frage.",
+      "notStarted": "Der Sterntest konnte nicht gestartet werden. Prüf deine Verbindung und versuch es noch einmal."
+    }
   }
 }

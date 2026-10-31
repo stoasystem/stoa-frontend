@@ -114,5 +114,36 @@
     "tryAgain": "Try again",
     "youAreHere": "You are here",
     "yourAnswer": "Your answer"
+  },
+  "starQuiz": {
+    "label": "Star quiz",
+    "heading": "Star quiz: {{star}}",
+    "drawing": "Putting the star quiz together…",
+    "backToStar": "Back to {{star}} on the star map",
+    "backToMap": "Back to the star map",
+    "passed": {
+      "title": "The whole star is lit",
+      "body": "You knew it: {{star}} now shines on your star map.",
+      "toMap": "See it on the star map"
+    },
+    "failed": {
+      "title": "Not this time",
+      "body": "You can take the star quiz again from {{when}}. Until then, its lessons are the way to light it.",
+      "bodyLater": "You can take the star quiz again tomorrow. Until then, its lessons are the way to light it.",
+      "toLessons": "Go to its lessons"
+    },
+    "trouble": {
+      "restart": "Start the star quiz again",
+      "coolingUntil": "You can take this star quiz again from {{when}}.",
+      "unknownStar": "This knowledge point has no star quiz.",
+      "alreadyLit": "This star is lit already.",
+      "coolingDown": "You can take this star quiz again tomorrow.",
+      "unavailable": "This star has no exercises a quiz could ask yet.",
+      "notFound": "This star quiz is no longer open.",
+      "finished": "This star quiz is already over.",
+      "expired": "This star quiz ran out of time: each one is open for 30 minutes.",
+      "outOfOrder": "That answer was for a different question.",
+      "notStarted": "The star quiz could not be started. Check your connection and try again."
+    }
   }
 }

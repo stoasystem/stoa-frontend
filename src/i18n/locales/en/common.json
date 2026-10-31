@@ -416,6 +416,9 @@
       "body": "This screen is being rebuilt. The link already works and will stay the same.",
       "eyebrow": "Coming soon"
     },
+    "starQuiz": {
+      "title": "Star quiz"
+    },
     "unit": {
       "title": "Knowledge point"
     }

@@ -119,5 +119,36 @@
     "tryAgain": "Réessayer",
     "youAreHere": "Tu es ici",
     "yourAnswer": "Ta réponse"
+  },
+  "starQuiz": {
+    "label": "Test de l’étoile",
+    "heading": "Test de l’étoile : {{star}}",
+    "drawing": "Préparation du test de l’étoile…",
+    "backToStar": "Retour à {{star}} sur la carte du ciel",
+    "backToMap": "Retour à la carte du ciel",
+    "passed": {
+      "title": "Toute l’étoile est allumée",
+      "body": "Tu savais déjà : {{star}} brille maintenant sur ta carte du ciel.",
+      "toMap": "La voir sur la carte du ciel"
+    },
+    "failed": {
+      "title": "Pas cette fois",
+      "body": "Tu pourras refaire le test de l’étoile à partir de {{when}}. D’ici là, ses leçons te permettent de l’allumer.",
+      "bodyLater": "Tu pourras refaire le test de l’étoile demain. D’ici là, ses leçons te permettent de l’allumer.",
+      "toLessons": "Aller à ses leçons"
+    },
+    "trouble": {
+      "restart": "Recommencer le test de l’étoile",
+      "coolingUntil": "Tu pourras refaire ce test de l’étoile à partir de {{when}}.",
+      "unknownStar": "Ce point de savoir n’a pas de test de l’étoile.",
+      "alreadyLit": "Cette étoile est déjà allumée.",
+      "coolingDown": "Tu pourras refaire ce test de l’étoile demain.",
+      "unavailable": "Cette étoile n’a pas encore d’exercices pour un test.",
+      "notFound": "Ce test de l’étoile n’est plus ouvert.",
+      "finished": "Ce test de l’étoile est déjà terminé.",
+      "expired": "Le temps de ce test de l’étoile est écoulé : chacun reste ouvert 30 minutes.",
+      "outOfOrder": "Cette réponse concernait une autre question.",
+      "notStarted": "Le test de l’étoile n’a pas pu démarrer. Vérifie ta connexion et réessaie."
+    }
   }
 }
