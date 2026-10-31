@@ -30,7 +30,7 @@ function Where() {
 const where = () => document.querySelector('[data-where]')!.textContent
 
 function starWithReviews(map: StarMap) {
-  const star = { ...map.stars.find((candidate) => candidate.state !== 'locked')!, reviewDue: 2 }
+  const star = { ...map.stars[0], reviewDue: 2 }
   const nebula = map.nebulae.find((candidate) => candidate.topicId === star.nebulaId)!
   const path = pathForTarget(subjectOfNebula(map, star.nebulaId), { layer: 'star', nebulaId: star.nebulaId, unitId: star.unitId })
   return { star, nebula, path }

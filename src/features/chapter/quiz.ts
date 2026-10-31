@@ -22,7 +22,6 @@
 
 /** Every refusal the three quiz endpoints name. */
 export const QUIZ_TROUBLES = [
-  'lesson_locked',
   'lesson_quiz_unavailable',
   'lesson_quiz_not_found',
   'lesson_quiz_expired',
@@ -41,7 +40,6 @@ export type QuizTroubleCode = (typeof QUIZ_TROUBLES)[number]
 export type QuizTrouble = QuizTroubleCode | 'quiz_not_started' | 'unknown'
 
 const SENTENCE: Record<QuizTrouble, string> = {
-  lesson_locked: 'stage.trouble.locked',
   lesson_quiz_unavailable: 'stage.trouble.unavailable',
   lesson_quiz_not_found: 'stage.trouble.notFound',
   lesson_quiz_expired: 'stage.trouble.expired',

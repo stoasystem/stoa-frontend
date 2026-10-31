@@ -10,22 +10,24 @@
  * model lands (#48) it may carry the chapter itself, and this can read it
  * from there instead.
  *
- * Whether the knowledge point is lit, or locked, is the star map's to say
- * (`GET /practice/knowledge-map`), not the lessons': a point lights once
- * every exercise in it has been answered right at least once, and a lesson
- * finished by passing a quiz leaves some unanswered (#342). A point is locked
- * while one it builds on is unlit; the roadmap does not say so, so its lessons
- * not done yet are read as locked here. Without the sky the chapter still
- * opens, and says neither.
+ * Whether the knowledge point is lit, and which points it builds on are not
+ * lit yet, is the star map's to say (`GET /practice/knowledge-map`), not the
+ * lessons': a point lights once every exercise in it has been answered right
+ * at least once, and a lesson finished by passing a quiz leaves some
+ * unanswered (#342). Points it builds on are only a suggestion: nothing is
+ * locked (ADR 0004), and every lesson stays open. Without the sky the chapter
+ * still opens, and says neither.
  */
 import { useMemo } from 'react'
 import type { LearningState } from '@/features/starmap/model/starMap'
 import { useCurriculumCatalogQuery } from '@/hooks/practice/useCurriculumCatalogQuery'
+import { unlitPrerequisiteIdsOf } from '@/features/starmap/readModelSource'
 import { useKnowledgeMapQuery } from '@/hooks/practice/useKnowledgeMapQuery'
 import { usePracticeRoadmapQuery } from '@/hooks/practice/usePracticeRoadmapQuery'
 import type { RoadmapLessonStatus } from '@/types/practice'
 
-export type ChapterLessonStatus = RoadmapLessonStatus
+/** A lesson's status; nothing is locked (ADR 0004), so a backend's old `locked` is read as available. */
+export type ChapterLessonStatus = Exclude<RoadmapLessonStatus, 'locked'>
 
 export type ChapterLesson = {
   id: string
@@ -48,8 +50,11 @@ export type Chapter = {
   /** The lesson to go on with: the one in progress, else the first open one. */
   nextLessonId: string | null
   /** The knowledge point as the star map has it, or null while the sky cannot be read. */
-  star: { state: LearningState; unmetExercises: number } | null
+  star: { state: LearningState; unmetExercises: number; unlitPrerequisites: ChapterPrerequisite[] } | null
 }
+
+/** A point the knowledge point builds on, not lit yet: what to learn first (前置未点亮). */
+export type ChapterPrerequisite = { unitId: string; name: string; nebulaId: string; subjectId: string }
 
 export type ChapterQuery =
   | { status: 'loading' }
@@ -95,9 +100,19 @@ export function useChapter(unitId: string | undefined): ChapterQuery {
   // pending on every refetch (an answer asks for one), and the stage would
   // take the exercise away each time.
   const skyLoading = skyQuery.isLoading && skyQuery.errorUpdateCount === 0
-  const found = skyQuery.data?.stars.find((candidate) => candidate.unitId === unitId)
-  const starState = found?.state
+  const sky = skyQuery.data
+  const found = sky?.stars.find((candidate) => candidate.unitId === unitId)
+  // A backend from before ADR 0004 may still say locked: that point is ready.
+  const starState = found ? (found.state === 'locked' ? 'ready' : found.state) : undefined
   const unmetExercises = found?.unmetExercises ?? 0
+  const unlitPrerequisites = useMemo<ChapterPrerequisite[]>(() => {
+    if (!sky || !found) return []
+    return unlitPrerequisiteIdsOf(found, sky).flatMap((id) => {
+      const before = sky.stars.find((candidate) => candidate.unitId === id)
+      const subjectId = sky.nebulae.find((nebula) => nebula.topicId === before?.nebulaId)?.subjectId
+      return before && subjectId ? [{ unitId: id, name: before.name, nebulaId: before.nebulaId, subjectId }] : []
+    })
+  }, [sky, found])
 
   return useMemo<ChapterQuery>(() => {
     if (!unitId) return { status: 'missing' }
@@ -117,14 +132,13 @@ export function useChapter(unitId: string | undefined): ChapterQuery {
         .filter((lesson) => lesson.unitId === unitId)
         .map((lesson) => [lesson.id, lesson.exerciseCount] as const),
     )
-    const locked = starState === 'locked'
     const lessons = [...roadmapUnit.lessons]
       .sort((a, b) => a.order - b.order)
       .map<ChapterLesson>((lesson) => ({
         id: lesson.id,
         title: lesson.title,
         order: lesson.order,
-        status: locked && lesson.status !== 'completed' ? 'locked' : lesson.status,
+        status: lesson.status === 'locked' ? 'available' : lesson.status,
         estimatedMinutes: lesson.estimatedMinutes,
         exerciseCount: counts.get(lesson.id) ?? lesson.challengeCount,
       }))
@@ -139,10 +153,10 @@ export function useChapter(unitId: string | undefined): ChapterQuery {
         done: lessons.filter((lesson) => lesson.status === 'completed').length,
         total: lessons.length,
         nextLessonId: nextLessonOf(lessons),
-        star: starState ? { state: starState, unmetExercises } : null,
+        star: starState ? { state: starState, unmetExercises, unlitPrerequisites } : null,
       },
     }
-  }, [unitId, unit, catalog, catalogLoading, catalogFailed, refetchCatalog, roadmap, roadmapLoading, refetchRoadmap, skyLoading, starState, unmetExercises])
+  }, [unitId, unit, catalog, catalogLoading, catalogFailed, refetchCatalog, roadmap, roadmapLoading, refetchRoadmap, skyLoading, starState, unmetExercises, unlitPrerequisites])
 }
 
 /** `/chapter/:unitId` and `/chapter/:unitId/:lessonId`, each segment encoded once. */

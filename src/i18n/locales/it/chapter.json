@@ -6,6 +6,7 @@
     "continue": "Continua: {{title}}",
     "empty": "Questo capitolo non ha ancora lezioni.",
     "failed": "Non è stato possibile caricare il capitolo.",
+    "firstLearn": "Da imparare prima",
     "lessonMeta_one": "{{minutes}} min · {{count}} esercizio",
     "lessonMeta_many": "{{minutes}} min · {{count}} esercizi",
     "lessonMeta_other": "{{minutes}} min · {{count}} esercizi",
@@ -14,7 +15,6 @@
     "listLabel": "Lezioni",
     "lit": "Questo punto di conoscenza è acceso.",
     "loading": "Caricamento del capitolo…",
-    "locked": "Questo punto di conoscenza è ancora bloccato. Accendi prima, sulla mappa stellare, i punti su cui si basa.",
     "missing": "Questo capitolo non è stato trovato.",
     "progress": "Avanzamento del capitolo",
     "unmet_one": "Manca {{count}} esercizio da risolvere correttamente prima che questo punto si accenda.",
@@ -29,7 +29,6 @@
       "available": "Pronta",
       "completed": "Completata",
       "current": "Prossima",
-      "locked": "Bloccata",
       "review": "Da ripassare"
     }
   },
@@ -93,10 +92,6 @@
     "noHint": "Non c’è un suggerimento per questo esercizio.",
     "lessonOf": "Lezione {{lesson}} di {{lessons}}",
     "loading": "Caricamento della lezione…",
-    "locked": {
-      "body": "Questo punto di conoscenza si basa su altri che non sono ancora accesi. Accendili prima sulla mappa stellare.",
-      "title": "Questa lezione è bloccata"
-    },
     "missing": "Questa lezione non è stata trovata.",
     "next": "Domanda successiva",
     "notQuite": "Non proprio",
@@ -113,7 +108,6 @@
       "credentialInvalid": "Il lasciapassare di questo quiz non vale per questa lezione. Rifai il quiz.",
       "expired": "Il quiz è durato troppo ed è scaduto. Avviane uno nuovo.",
       "finished": "Questo quiz è già finito. Avviane uno nuovo.",
-      "locked": "Questo punto di conoscenza è ancora bloccato: accendi prima, sulla mappa stellare, i punti su cui si basa.",
       "notFound": "Questo quiz non è più aperto. Avviane uno nuovo.",
       "notStarted": "Non è stato possibile avviare il quiz. Controlla la connessione e riprova.",
       "restart": "Ricomincia il quiz",

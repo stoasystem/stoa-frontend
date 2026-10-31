@@ -21,6 +21,7 @@ import { Link } from 'react-router-dom'
 import { Button } from '@/components/base'
 import { STAR_TITLE_ID, StarCardBack, StarCardDetails, useStarCardAction, type StarCardProps } from '@/features/starmap/components/StarCard'
 import { StarGlyph } from '@/features/starmap/components/StarGlyph'
+import { starLook } from '@/features/starmap/model/starMap'
 import { SHEET } from '@/features/starmap/view/semanticZoom'
 
 export type SheetState = 'collapsed' | 'expanded'
@@ -190,7 +191,7 @@ export function StarSheet({
         <div className="flex min-h-0 flex-1 items-center gap-2.5 px-3 pb-2">
           <div ref={glyph} className="shrink-0">
             <StarGlyph
-              state={star.state}
+              state={starLook(star)}
               size={36}
               progress={star.progress}
               recommended={Boolean(star.recommendation)}

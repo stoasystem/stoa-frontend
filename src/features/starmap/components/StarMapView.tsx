@@ -87,7 +87,7 @@ function readTheme(element: Element): StarMapTheme {
       recommended: read('--starmap-link-recommended', LINK_INK.recommended),
       inProgress: read('--starmap-link-in-progress', LINK_INK.inProgress),
       walked: read('--starmap-link-walked', LINK_INK.walked),
-      locked: read('--starmap-link-locked', LINK_INK.locked),
+      waiting: read('--starmap-link-waiting', LINK_INK.waiting),
       bridge: read('--starmap-bridge', LINK_INK.bridge),
     },
   }
@@ -168,6 +168,10 @@ function LegendKey({ t }: { t: UseTranslationResponse<'starmap', undefined>['t']
             {t(`state.${state}`)}
           </li>
         ))}
+        <li className="inline-flex items-center gap-1.5 text-[13px] text-[color:var(--on-sky-text-body)]">
+          <StarGlyph state="waiting" size={18} />
+          {t('legend.waiting')}
+        </li>
         <li className="inline-flex items-center gap-1.5 text-[13px] text-[color:var(--on-sky-text-body)]">
           <StarGlyph state="ready" size={18} recommended />
           {t('marker.recommended')}

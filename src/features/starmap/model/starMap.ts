@@ -13,7 +13,8 @@
  * the same way (`layout/layout.ts`).
  *
  * This front end's reading of the contract, to confirm when #48 wires the
- * endpoint in: the state strings (`lit`, `in_progress`, `ready`, `locked`);
+ * endpoint in: the state strings (`lit`, `in_progress`, `ready`; nothing is
+ * locked since ADR 0004);
  * `order` on nebulae and stars, which the keyboard order needs; one `name` per
  * nebula and star, already in the reader's language; `nebulaId` on each star;
  * unit-level `prerequisites`.
@@ -36,9 +37,24 @@
  * one star is the demo knowledge point and that all others are placeholders.
  */
 
-/** The four learning states, in priority order (#9 point 7). */
-export const LEARNING_STATES = ['lit', 'in_progress', 'ready', 'locked'] as const
+/** The three learning states, in priority order (#9 point 7); nothing is locked (ADR 0004). */
+export const LEARNING_STATES = ['lit', 'in_progress', 'ready'] as const
 export type LearningState = (typeof LEARNING_STATES)[number]
+
+/**
+ * How a star is drawn: its learning state, or `waiting` for a ready star some
+ * of whose prerequisites are not lit yet (前置未点亮, ADR 0004). That is a
+ * marker over the state, not a state: the star opens like any other, and only
+ * looks quieter, as a locked star used to. A star the student has started is
+ * drawn as in progress whatever its prerequisites; its card still says which
+ * to learn first.
+ */
+export const STAR_LOOKS = ['lit', 'in_progress', 'ready', 'waiting'] as const
+export type StarLook = (typeof STAR_LOOKS)[number]
+
+export function starLook(star: Pick<Star, 'state' | 'unlitPrerequisiteIds'>): StarLook {
+  return star.state === 'ready' && star.unlitPrerequisiteIds.length > 0 ? 'waiting' : star.state
+}
 
 /** A suggestion laid over a learning state; at most one per subject (#9 point 8). */
 export type Recommendation = { source: 'system' | 'teacher' }
@@ -84,9 +100,15 @@ export type Star = {
   y: number
   skills: KnowledgeSkill[]
   chapter: ChapterSummary
+  /**
+   * The prerequisites the curriculum states for it that are not lit yet, in
+   * the order stated (stoa-backend#125); empty for a lit star. Only a
+   * suggestion of what to learn first: the star opens all the same.
+   */
+  unlitPrerequisiteIds: string[]
 }
 
-/** `from` must be lit before `to` opens (stoa-backend#56). Units, not topics. */
+/** `from` is best lit before `to` (stoa-backend#56); it does not lock `to` (ADR 0004). Units, not topics. */
 export type Prerequisite = { from: string; to: string }
 
 /**

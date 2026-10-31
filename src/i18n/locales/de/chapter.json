@@ -6,6 +6,7 @@
     "continue": "Weiter: {{title}}",
     "empty": "Dieses Kapitel hat noch keine Lektionen.",
     "failed": "Das Kapitel konnte nicht geladen werden.",
+    "firstLearn": "Am besten zuerst lernen",
     "lessonMeta_one": "{{minutes}} Min. · {{count}} Aufgabe",
     "lessonMeta_other": "{{minutes}} Min. · {{count}} Aufgaben",
     "lessonNumber": "Lektion {{number}}",
@@ -13,7 +14,6 @@
     "listLabel": "Lektionen",
     "lit": "Dieser Wissenspunkt leuchtet.",
     "loading": "Das Kapitel wird geladen…",
-    "locked": "Dieser Wissenspunkt ist noch gesperrt. Bring zuerst auf der Sternkarte die Punkte zum Leuchten, auf denen er aufbaut.",
     "missing": "Dieses Kapitel wurde nicht gefunden.",
     "progress": "Fortschritt im Kapitel",
     "unmet_one": "Noch {{count}} Aufgabe richtig beantworten, bis dieser Punkt leuchtet.",
@@ -26,7 +26,6 @@
       "available": "Bereit",
       "completed": "Erledigt",
       "current": "Als Nächstes",
-      "locked": "Gesperrt",
       "review": "Wiederholen"
     }
   },
@@ -88,10 +87,6 @@
     "noHint": "Für diese Aufgabe gibt es keinen Tipp.",
     "lessonOf": "Lektion {{lesson}} von {{lessons}}",
     "loading": "Die Lektion wird geladen…",
-    "locked": {
-      "body": "Dieser Wissenspunkt baut auf Punkten auf, die noch nicht leuchten. Bring sie zuerst auf der Sternkarte zum Leuchten.",
-      "title": "Diese Lektion ist noch gesperrt"
-    },
     "missing": "Diese Lektion wurde nicht gefunden.",
     "next": "Nächste Aufgabe",
     "notQuite": "Noch nicht ganz",
@@ -108,7 +103,6 @@
       "credentialInvalid": "Der Nachweis aus diesem Quiz gilt nicht für diese Lektion. Mach das Quiz nochmals.",
       "expired": "Das Quiz hat zu lange gedauert und ist abgelaufen. Starte ein neues.",
       "finished": "Dieses Quiz ist bereits vorbei. Starte ein neues.",
-      "locked": "Dieser Wissenspunkt ist noch gesperrt: Bring zuerst auf der Sternkarte die Punkte zum Leuchten, auf denen er aufbaut.",
       "notFound": "Dieses Quiz ist nicht mehr offen. Starte ein neues.",
       "notStarted": "Das Quiz konnte nicht gestartet werden. Prüf deine Verbindung und versuch es nochmals.",
       "restart": "Quiz neu starten",

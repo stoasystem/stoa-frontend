@@ -10,12 +10,12 @@
  */
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { StarMapEngine } from '@/features/starmap/engine/starMapEngine'
-import { CROSS_SUBJECT_LINE, starLineLook, TIER_LOCKED, TIER_WALKED, type LinkView, type StarLine } from '@/features/starmap/model/linkTiers'
+import { CROSS_SUBJECT_LINE, starLineLook, TIER_WAITING, TIER_WALKED, type LinkView, type StarLine } from '@/features/starmap/model/linkTiers'
 import { orderedNebulae } from '@/features/starmap/model/starMap'
 import { createCanvas2DRenderer } from '@/features/starmap/render/canvas2d'
 import { keyStars } from '@/features/starmap/render/labels'
 import { drawLinks, GLOW_SPRITE_PX, glowDitherAmplitude, glowProfile, LINK_INK, paintGlowSprite } from '@/features/starmap/render/links'
-import { STATE_IN_PROGRESS, STATE_LIT, STATE_LOCKED, STATE_READY, type SceneData, type SceneFrame, type StarMapRenderer } from '@/features/starmap/render/types'
+import { STATE_IN_PROGRESS, STATE_LIT, STATE_WAITING, STATE_READY, type SceneData, type SceneFrame, type StarMapRenderer } from '@/features/starmap/render/types'
 import type { LayerTarget } from '@/features/starmap/view/layers'
 import { lineReveal, restStarNameAlpha, REVEAL, ZOOM } from '@/features/starmap/view/semanticZoom'
 import { fakeCanvas, fakeClock, fakeContext, skyMap, THEME, type CanvasCounter } from './starmapHarness'
@@ -94,7 +94,7 @@ describe('B2: at the nebula band only the key stars are named', () => {
     const key = keyStars(
       {
         count: 6,
-        state: [STATE_LIT, STATE_READY, STATE_IN_PROGRESS, STATE_LIT, STATE_LOCKED, STATE_READY],
+        state: [STATE_LIT, STATE_READY, STATE_IN_PROGRESS, STATE_LIT, STATE_WAITING, STATE_READY],
         starLinks: [{ from: 0, to: 1 }, { from: 3, to: 4 }, { from: 5, to: 2 }],
         recommended: 1,
         recommendations: [1],
@@ -172,14 +172,14 @@ describe('D1 / D2: locked lines for the star in focus only; across subjects a fa
 
   it('tier 4 is drawn for the star in focus and the dragged star, never for every star', () => {
     for (const px of [ZOOM.nebulaGlyph, ZOOM.starGlyph, ZOOM.maxGlyph]) {
-      expect(starLineLook(line(TIER_LOCKED), view(px)).strength).toBe(0)
-      expect(starLineLook(line(TIER_LOCKED), view(px, { focusStar: 1 })).strength).toBe(1)
-      expect(starLineLook(line(TIER_LOCKED), view(px, { dragStar: 2, drag: 1 })).lit).toBe(1)
+      expect(starLineLook(line(TIER_WAITING), view(px)).strength).toBe(0)
+      expect(starLineLook(line(TIER_WAITING), view(px, { focusStar: 1 })).strength).toBe(1)
+      expect(starLineLook(line(TIER_WAITING), view(px, { dragStar: 2, drag: 1 })).lit).toBe(1)
     }
   })
 
   it('a relation across subjects keeps a faint direction at the nebula band, whatever its tier; none on the panorama', () => {
-    for (const tier of [TIER_WALKED, TIER_LOCKED] as const) {
+    for (const tier of [TIER_WALKED, TIER_WAITING] as const) {
       expect(starLineLook(line(tier, true), view(ZOOM.nebulaGlyph)).strength).toBeGreaterThanOrEqual(CROSS_SUBJECT_LINE)
       expect(starLineLook(line(tier, true), view(ZOOM.nebulaGlyph)).reach).toBe(0)
       expect(starLineLook(line(tier, true), view(13)).strength).toBeCloseTo(CROSS_SUBJECT_LINE)
@@ -258,7 +258,7 @@ describe('H4: dragging, a linked star off screen in the same nebula is named its
       galaxies: [{ subjectId: 'a', name: 'Alpha', x0: 0, x1: 1, y0: 0.4, y1: 0.6, colour: { base: [140, 128, 224], name: [196, 190, 255] }, dim: 1, nebulae: [0, 1] }],
       mapX: Float32Array.from(mapX),
       mapY: Float32Array.from([0.5, 0.5, 0.52]),
-      state: Uint8Array.from([STATE_IN_PROGRESS, STATE_LOCKED, STATE_LIT]),
+      state: Uint8Array.from([STATE_IN_PROGRESS, STATE_WAITING, STATE_LIT]),
       progress: new Float32Array(3),
       reviewDue: new Uint8Array(3),
       recommended: -1,

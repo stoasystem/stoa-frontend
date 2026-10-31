@@ -17,7 +17,7 @@
  * are drawn here exactly as they arrive. In a quiz there are no hints, no
  * skip, and Ask and 「问这段」 are off.
  */
-import { ChevronLeft, Heart, Lightbulb, Lock, Sparkles } from 'lucide-react'
+import { ChevronLeft, Heart, Lightbulb, Sparkles } from 'lucide-react'
 import { useEffect, useId, useMemo, useRef, useState, type MutableRefObject, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link, useSearchParams } from 'react-router-dom'
@@ -55,14 +55,14 @@ export function LessonStage({ unitId, lessonId }: { unitId: string | undefined; 
   // A lesson from another unit is not this chapter's: a link that pairs them
   // finds nothing, as a chapter not in the catalog does.
   const inUnit = lesson !== undefined && (!unitId || lesson.unitId === unitId)
-  // Whether the chapter says it is locked. Until the chapter is read the stage
-  // waits rather than flash an exercise it may take back; if the chapter
-  // cannot be read the stage opens, and the backend still decides.
+  // Whether the chapter says the lesson is open. Until the chapter is read the
+  // stage waits rather than flash a quiz it may turn into the lesson; if the
+  // chapter cannot be read the stage opens, and the backend still decides.
   const status = chapter?.lessons.find((item) => item.id === lesson?.id)?.status
   // Testing out of the lesson from the chapter: only where the chapter says the
   // lesson is open (#81). Until stoa-backend#83 checks it this is the only
   // gate, so a lesson done, or one the chapter could not be read for, opens
-  // as the lesson itself; a locked one gets its notice like any other way in.
+  // as the lesson itself. Nothing is locked (ADR 0004).
   // Decided once, when the chapter first says: passing the quiz turns the
   // lesson done, and that must not turn the quiz on screen into the lesson.
   // A reload starts the quiz again from the beginning; nothing of it is kept.
@@ -82,9 +82,7 @@ export function LessonStage({ unitId, lessonId }: { unitId: string | undefined; 
         ? 'missing'
         : chapterQuery.status === 'loading'
           ? 'loading'
-          : status === 'locked'
-            ? 'locked'
-            : null
+          : null
   // Keyed by lesson and mode: the next lesson, or the quiz, starts a fresh run.
   return (
     <AppLayout bleed surface="sky">
@@ -102,7 +100,6 @@ export function LessonStage({ unitId, lessonId }: { unitId: string | undefined; 
             unitId={unitId}
             kind={notice ?? 'missing'}
             retry={() => void lessonQuery.refetch()}
-            starPath={chapter ? starPathOf(chapter.subjectId, chapter.topicId, chapter.unitId) : undefined}
           />
         </div>
       )}
@@ -110,13 +107,9 @@ export function LessonStage({ unitId, lessonId }: { unitId: string | undefined; 
   )
 }
 
-type StageNoticeKind = 'loading' | 'failed' | 'missing' | 'locked'
+type StageNoticeKind = 'loading' | 'failed' | 'missing'
 
-/** The knowledge point's own address on the star map. */
-const starPathOf = (subjectId: string, topicId: string, unitId: string) =>
-  pathForTarget(subjectId, { layer: 'star', nebulaId: topicId, unitId })
-
-function StageNotice({ unitId, kind, retry, starPath }: { unitId?: string; kind: StageNoticeKind; retry: () => void; starPath?: string }) {
+function StageNotice({ unitId, kind, retry }: { unitId?: string; kind: StageNoticeKind; retry: () => void }) {
   const { t } = useTranslation('chapter')
   return (
     <>
@@ -143,21 +136,6 @@ function StageNotice({ unitId, kind, retry, starPath }: { unitId?: string; kind:
             {t('stage.retry')}
           </Button>
         </>
-      ) : kind === 'locked' ? (
-        <div data-stage-locked className="flex flex-col items-start gap-1">
-          <h1 className="m-0 inline-flex items-center gap-2 text-[22px] font-semibold text-on-sky">
-            <Lock size={20} strokeWidth={ICON.stroke} aria-hidden="true" />
-            {t('stage.locked.title')}
-          </h1>
-          <p className={cn('m-0 text-[15px]', bodyOnSky)}>{t('stage.locked.body')}</p>
-          {/* What it builds on is found on the map: back to the chapter only
-            * leads to the same locked lessons again (#342). */}
-          {starPath && (
-            <Link to={starPath} className={plainOnSky}>
-              {t('chapter.backToMap')}
-            </Link>
-          )}
-        </div>
       ) : (
         <>
           <Murmi mood="calm" size="var(--murmi-state)" />
@@ -211,7 +189,7 @@ function LessonRunStage({
         {run.finished ? (
           <LessonDone lesson={lesson} unitId={unitId} chapter={chapter} testedOut={run.passedQuiz} />
         ) : run.trouble?.inQuiz ? (
-          <QuizTrouble run={run} unitId={unitId} starPath={starPathOf(lesson.subjectId, lesson.topicId, unitId)} />
+          <QuizTrouble run={run} unitId={unitId} />
         ) : run.failed ? (
           <QuizFailed run={run} unitId={unitId} />
         ) : run.quizPending ? (
@@ -638,7 +616,7 @@ function ActionRow({ run, side }: { run: LessonRun; side: boolean }) {
  * the way on. Which troubles a fresh paper gets past is `quiz.ts`; the rest
  * end at the chapter.
  */
-function QuizTrouble({ run, unitId, starPath }: { run: LessonRun; unitId: string; starPath: string }) {
+function QuizTrouble({ run, unitId }: { run: LessonRun; unitId: string }) {
   const { t } = useTranslation('chapter')
   const heading = useRef<HTMLHeadingElement>(null)
   useEffect(() => heading.current?.focus(), [])
@@ -675,14 +653,8 @@ function QuizTrouble({ run, unitId, starPath }: { run: LessonRun; unitId: string
               </Link>
             </>
           ) : (
-            // A locked point is opened on the map: its chapter only leads back
-            // to the same locked lessons (#342).
             <Button asChild lift variant="onSky" size="large" style={{ minWidth: 200 }}>
-              {code === 'lesson_locked' ? (
-                <Link to={starPath}>{t('chapter.backToMap')}</Link>
-              ) : (
-                <Link to={chapterPath(unitId)}>{t('stage.done.backToChapter')}</Link>
-              )}
+              <Link to={chapterPath(unitId)}>{t('stage.done.backToChapter')}</Link>
             </Button>
           )}
         </div>
