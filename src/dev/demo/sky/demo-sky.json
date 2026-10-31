@@ -145,7 +145,7 @@
     ],
     "lessons": [
       {"lessonId": "demo-sine-cosine-1", "exercises": 3, "title": {"en": "Sides of a right triangle", "de": "Seiten im rechtwinkligen Dreieck", "fr": "Les côtés du triangle rectangle", "it": "I lati del triangolo rettangolo"}},
-      {"lessonId": "demo-sine-cosine-2", "exercises": 4, "title": {"en": "Sine and cosine as ratios", "de": "Sinus und Kosinus als Verhältnisse", "fr": "Sinus et cosinus comme rapports", "it": "Seno e coseno come rapporti"}},
+      {"lessonId": "demo-sine-cosine-2", "exercises": 5, "title": {"en": "Sine and cosine as ratios", "de": "Sinus und Kosinus als Verhältnisse", "fr": "Sinus et cosinus comme rapports", "it": "Seno e coseno come rapporti"}},
       {"lessonId": "demo-sine-cosine-3", "exercises": 3, "title": {"en": "Finding a missing side", "de": "Fehlende Seiten berechnen", "fr": "Calculer un côté manquant", "it": "Calcolare un lato mancante"}}
     ],
     "lessonsDone": 1

@@ -75,7 +75,20 @@ export type PracticeRoadmap = {
   units: PracticeRoadmapUnit[]
 }
 
-export type PracticeChallenge = {
+/**
+ * The drawings an exercise may carry (stoa-backend#127, #504), on every
+ * student reply that hands one over: the lesson, the quiz, the review. Each is
+ * one `<svg>` the backend checked against its allowlist, in the reader's
+ * language; `ExerciseFigure` draws it.
+ */
+export type ExerciseFigures = {
+  /** Under the question. Absent or null when there is none. */
+  figure?: string | null
+  /** One per option, in the options' order; `""` (or null) where an option has none. */
+  optionFigures?: (string | null)[] | null
+}
+
+export type PracticeChallenge = ExerciseFigures & {
   /**
    * What `GET /practice/lessons/:id` actually calls it. It was declared as
    * `id` here, which is not a field the backend sends: every answer went to
@@ -414,7 +427,7 @@ export type PracticeChatLocationState = {
   prompt?: string
 }
 
-export type ReviewCard = {
+export type ReviewCard = ExerciseFigures & {
   challengeId: string
   lessonId: string
   subjectId: string

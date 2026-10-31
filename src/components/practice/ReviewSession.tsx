@@ -21,7 +21,7 @@
  * read (`bg-primary/10`, `bg-muted/40`), it is the whole token now, so what
  * `check:contrast` rates is what the screen shows.
  */
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useId, useRef, useState } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import { RotateCcw } from 'lucide-react'
@@ -29,6 +29,7 @@ import { Button } from '@/components/base'
 import { MathRenderer } from '@/components/ui/MathRenderer'
 import { EmptyState } from '@/components/common/EmptyState'
 import { AnswerInput, bodyOnSky, FeedbackCard, glass, type AnswerValue } from '@/features/chapter/answerControls'
+import { ExerciseFigure } from '@/features/chapter/ExerciseFigure'
 import { submitChallengeAnswer } from '@/services/practice/practiceApi'
 import { practiceQueryKeys } from '@/services/practice/practiceQueryKeys'
 import { useDueReviewQuery } from '@/hooks/practice/useReviewQueries'
@@ -134,6 +135,7 @@ function ReviewQuestion({ card, onAnswer }: { card: ReviewCard; onAnswer: () => 
   const { t } = useTranslation('practice')
   const { t: tStage } = useTranslation('chapter')
   const queryClient = useQueryClient()
+  const promptId = useId()
   const [answerValue, setAnswerValue] = useState<AnswerValue>(() => emptyAnswer(card.type))
   const [result, setResult] = useState<PracticeAnswerResult | null>(null)
   // Check goes away with the verdict, and Try again with the next attempt, so
@@ -176,7 +178,7 @@ function ReviewQuestion({ card, onAnswer }: { card: ReviewCard; onAnswer: () => 
   return (
     <article data-review-card className="flex flex-col gap-4 rounded-[16px] border px-[18px] py-5 text-on-sky" style={glass}>
       <div className="flex flex-wrap items-start justify-between gap-3">
-        <p className="m-0 min-w-0 flex-1 text-[17px] font-semibold leading-[1.4] text-on-sky">
+        <p id={promptId} className="m-0 min-w-0 flex-1 text-[17px] font-semibold leading-[1.4] text-on-sky">
           <MathRenderer>{card.prompt}</MathRenderer>
         </p>
         {card.lapses > 0 ? (
@@ -185,6 +187,8 @@ function ReviewQuestion({ card, onAnswer }: { card: ReviewCard; onAnswer: () => 
           </span>
         ) : null}
       </div>
+
+      {card.figure && <ExerciseFigure svg={card.figure} labelledBy={promptId} />}
 
       {unanswerable ? (
         <p className={cn('m-0 text-[15px]', bodyOnSky)}>{t('review.answerInLesson')}</p>

@@ -100,6 +100,15 @@ with the administrator's token from `/admin/moderation/cases/{id}/image`, drawn
 from an object URL and blurred until "Show image"; the case names what it was
 blocked for. A deleted image is said to be deleted, and not asked for.
 
+`exerciseFigures.spec.ts`: an exercise with a question's figure and a drawing
+per option, on the practice stage at 1280 and 375 px (#504). The figures are
+drawn (an svg with a size, under the question, named by it), the student
+answers by an option's letter, and nothing scrolls sideways. The question's
+figure also carries an `onload` and paint and a marker from another host
+(`URL(`, a CSS escape): cleaned, none of it is left, so nothing is fetched and
+the policy has nothing to refuse. Drawn as written, those three loads are
+policy violations and the test fails.
+
 `forcedChange.spec.ts`: a student whose password an administrator reset opens
 `/ask`, signs in, is sent to the password change with only Help and Log out in
 the shell, reloads it, changes the password, and "Continue" opens `/ask`; the

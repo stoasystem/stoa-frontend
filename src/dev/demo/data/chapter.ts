@@ -1,5 +1,5 @@
 /*
- * The demo knowledge point's chapter (#116): three lessons, ten exercises,
+ * The demo knowledge point's chapter (#116): three lessons, eleven exercises,
  * enough to walk a wrong answer, a right one, a finished lesson and a lit
  * star. In the shapes the chapter and the practice stage read
  * (`useChapter`, `useLessonQuery`, `useLessonRun`): the curriculum catalog,
@@ -32,6 +32,10 @@ type ExerciseSpec = {
   prompt: Localized
   /** Multiple choice and ordering: the choices, as shown. */
   options?: Localized[]
+  /** The question's drawing (#504), in each language where it has words. */
+  figure?: Localized
+  /** One drawing per option, `''` where an option has none (#504). */
+  optionFigures?: string[]
   /** The option index (multiple choice), the order of option indexes (ordering), or the text. */
   answer: number | number[] | Localized
   /** Other spellings of a text answer that count as right. */
@@ -50,6 +54,29 @@ const RATIOS = [
   L('opposite ÷ hypotenuse', 'Gegenkathete ÷ Hypotenuse', 'opposé ÷ hypoténuse', 'opposto ÷ ipotenusa'),
   L('adjacent ÷ hypotenuse', 'Ankathete ÷ Hypotenuse', 'adjacent ÷ hypoténuse', 'adiacente ÷ ipotenusa'),
   L('opposite ÷ adjacent', 'Gegenkathete ÷ Ankathete', 'opposé ÷ adjacent', 'opposto ÷ adiacente'),
+]
+
+/*
+ * Figures as the backend sends them (#504, stoa-backend#127): one <svg> each,
+ * within its allowlist, ink in currentColor. A figure with words comes in the
+ * reader's language; one with only letters is the same in all four.
+ */
+const svg = (viewBox: string, body: string) => `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${viewBox}">${body}</svg>`
+const triangleWith = (hypotenuse: string) =>
+  svg(
+    '0 0 240 150',
+    '<polygon points="20,130 220,130 20,30" fill="#e8eefc" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>' +
+      '<path d="M20,116 L34,116 L34,130" fill="none" stroke="currentColor" stroke-width="1.5"/>' +
+      '<path d="M188,130 A32,32 0 0 1 191.4,115.7" fill="none" stroke="currentColor" stroke-width="1.5"/>' +
+      '<text x="174" y="125" font-size="15" font-style="italic" text-anchor="middle">α</text>' +
+      `<text x="128" y="72" font-size="14">${hypotenuse}</text>`,
+  )
+const RIGHT_TRIANGLE = L(triangleWith('Hypotenuse'), triangleWith('Hypotenuse'), triangleWith('hypoténuse'), triangleWith('ipotenusa'))
+const outline = 'fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"'
+const TRIANGLES = [
+  svg('0 0 120 100', `<polygon points="10,90 110,90 70,12" ${outline}/>`),
+  svg('0 0 120 100', `<polygon points="15,90 105,90 15,15" ${outline}/><path d="M15,78 L27,78 L27,90" fill="none" stroke="currentColor" stroke-width="1.5"/>`),
+  svg('0 0 120 100', `<polygon points="10,90 75,90 115,30" ${outline}/>`),
 ]
 
 const PYTHAGORAS = L('Use $a^2 + b^2 = c^2$.', 'Nutze $a^2 + b^2 = c^2$.', 'Utilise $a^2 + b^2 = c^2$.', 'Usa $a^2 + b^2 = c^2$.')
@@ -128,6 +155,7 @@ const EXERCISES: ExerciseSpec[][] = [
         'Que vaut $\\sin\\alpha$ dans un triangle rectangle ?',
         'Quanto vale $\\sin\\alpha$ in un triangolo rettangolo?',
       ),
+      figure: RIGHT_TRIANGLE,
       options: RATIOS,
       answer: 0,
       hint: SOHCAHTOA,
@@ -166,6 +194,31 @@ const EXERCISES: ExerciseSpec[][] = [
         'Il seno cresce da 0° a 90°.',
       ),
       explanation: all('$0.5 < 0.87 < 1$'),
+    },
+    {
+      type: 'multiple_choice',
+      prompt: L(
+        'Which triangle has a right angle?',
+        'Welches Dreieck hat einen rechten Winkel?',
+        'Quel triangle a un angle droit ?',
+        'Quale triangolo ha un angolo retto?',
+      ),
+      // The options are drawings; their text is the drawing's label, and the answer is judged by it.
+      options: [all('A'), all('B'), all('C')],
+      optionFigures: TRIANGLES,
+      answer: 1,
+      hint: L(
+        'A right angle is marked with a small square.',
+        'Ein rechter Winkel wird mit einem kleinen Quadrat markiert.',
+        "Un angle droit est marqué d'un petit carré.",
+        'Un angolo retto è segnato con un piccolo quadrato.',
+      ),
+      explanation: L(
+        'Triangle B has a right angle, marked with the square.',
+        'Dreieck B hat einen rechten Winkel, markiert mit dem Quadrat.',
+        'Le triangle B a un angle droit, marqué par le carré.',
+        'Il triangolo B ha un angolo retto, segnato dal quadrato.',
+      ),
     },
   ],
   [
@@ -251,6 +304,8 @@ function challengeOf(spec: ExerciseSpec, lesson: number, exercise: number, langu
     type: spec.type,
     prompt: localize(spec.prompt, language),
     ...(options ? { options } : {}),
+    ...(spec.figure ? { figure: localize(spec.figure, language) } : {}),
+    ...(spec.optionFigures ? { optionFigures: spec.optionFigures } : {}),
     hintAvailable: true,
     correctAnswer,
     hint: localize(spec.hint, language),

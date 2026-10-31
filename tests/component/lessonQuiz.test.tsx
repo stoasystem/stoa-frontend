@@ -108,6 +108,8 @@ type Rules = {
   hint: (challengeId: string) => string | null | 'fail'
   /** Exercises the backend lists with `hintAvailable: false`. */
   noHint: string[]
+  /** Whether every exercise carries a figure, its word in the request's language (#504). */
+  figures: boolean
 }
 
 let completed: Set<string>
@@ -136,7 +138,11 @@ const exerciseIds = (lessonId: string) =>
     exerciseId(lessonId, i + 1),
   )
 
-function exerciseBody(challengeId: string) {
+/** A figure's word, as the backend picks the figure for the request's `Accept-Language`. */
+const CONE: Record<string, string> = { en: 'Cone', de: 'Kegel', fr: 'Cône', it: 'Cono' }
+const spoken = (request: Request) => request.headers.get('Accept-Language') ?? 'en'
+
+function exerciseBody(challengeId: string, language = 'en') {
   const lessonId = challengeId.split('-e')[0]
   const n = Number(challengeId.split('-e')[1])
   return {
@@ -150,10 +156,13 @@ function exerciseBody(challengeId: string) {
     type: 'text_input',
     prompt: `Exercise ${n}: what is ${n} × 2?`,
     hintAvailable: !rules.noHint.includes(challengeId),
+    ...(rules.figures
+      ? { figure: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 40"><text x="5" y="25">${CONE[language] ?? CONE.en}</text></svg>` }
+      : {}),
   }
 }
 
-function lessonBody(lessonId: string) {
+function lessonBody(lessonId: string, language = 'en') {
   const meta = LESSONS.find((lesson) => lesson.id === lessonId)!
   return {
     id: lessonId,
@@ -166,7 +175,7 @@ function lessonBody(lessonId: string) {
     difficulty: 'practice',
     status: statusOf(lessonId),
     estimatedMinutes: 10,
-    challenges: exerciseIds(lessonId).map(exerciseBody),
+    challenges: exerciseIds(lessonId).map((id) => exerciseBody(id, language)),
   }
 }
 
@@ -174,7 +183,7 @@ function lessonBody(lessonId: string) {
 const refuse = ({ status, code, extra }: Refusal) =>
   HttpResponse.json({ detail: { code, message: `refused: ${code}`, ...extra } }, { status })
 
-function quizView(session: QuizSession) {
+function quizView(session: QuizSession, language = 'en') {
   return {
     quizId: session.quizId,
     lessonId: session.lessonId,
@@ -186,7 +195,7 @@ function quizView(session: QuizSession) {
     expiresAt: FAR_FUTURE,
     exercise:
       session.status === 'inProgress' && session.queue.length > 0
-        ? exerciseBody(session.queue[0])
+        ? exerciseBody(session.queue[0], language)
         : null,
   }
 }
@@ -246,7 +255,9 @@ function backend() {
         ],
       }),
     ),
-    http.get(`${API}/practice/lessons/:lessonId`, ({ params }) => HttpResponse.json(lessonBody(String(params.lessonId)))),
+    http.get(`${API}/practice/lessons/:lessonId`, ({ params, request }) =>
+      HttpResponse.json(lessonBody(String(params.lessonId), spoken(request))),
+    ),
     // The chapter's star, unlit: what the chapter and the stage say about lit and locked is the sky's.
     http.get(`${API}/practice/knowledge-map`, () =>
       HttpResponse.json({
@@ -286,7 +297,7 @@ function backend() {
         status: 'inProgress',
       }
       quizzes.set(session.quizId, session)
-      return HttpResponse.json(quizView(session))
+      return HttpResponse.json(quizView(session, spoken(request)))
     }),
     http.post(`${API}/practice/lessons/:lessonId/quiz/:quizId/answer`, async ({ params, request }) => {
       const quizId = String(params.quizId)
@@ -314,7 +325,7 @@ function backend() {
       const credential = passed ? `cred-${session.quizId}` : null
       if (credential) credentials.set(credential, { lessonId: session.lessonId })
       return HttpResponse.json({
-        ...quizView(session),
+        ...quizView(session, spoken(request)),
         correct,
         credential,
         credentialExpiresAt: credential ? FAR_FUTURE : null,
@@ -390,6 +401,11 @@ function Where() {
 function open(at: string, { width = 1280, reducedMotion = false } = {}) {
   emulate(width, { reducedMotion })
   const client = new QueryClient({ defaultOptions: { queries: { retry: false }, mutations: { retry: false } } })
+  // What AppProviders does when the reader changes language: every cached reply
+  // is in the old one, so all of it is read again.
+  const relearn = () => void client.invalidateQueries()
+  i18n.on('languageChanged', relearn)
+  afterUnmount.push(() => i18n.off('languageChanged', relearn))
   render(
     <I18nextProvider i18n={i18n}>
       <QueryClientProvider client={client}>
@@ -481,6 +497,7 @@ async function skipIntoQuiz(rightOnes: number) {
 }
 
 const originalMatchMedia = window.matchMedia
+const afterUnmount: (() => void)[] = []
 // user-event's default `delay: 0` waits on a real timer between every key and
 // pointer step; `delay: null` keeps every action awaited and act()-wrapped and
 // drops only the idle timer (#133).
@@ -505,6 +522,7 @@ beforeEach(async () => {
     completeRefusal: null,
     hint: () => 'Add it to itself.',
     noHint: [],
+    figures: false,
   }
   useAuthStore.setState({
     user: { id: 'u-1', name: 'Lina Meier', email: 'lina@example.com', role: 'student' } as CurrentUser,
@@ -517,6 +535,7 @@ beforeEach(async () => {
   vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue(null)
 })
 afterEach(() => {
+  for (const undo of afterUnmount.splice(0)) undo()
   window.matchMedia = originalMatchMedia
   window.getSelection()?.removeAllRanges()
   mswServer.resetHandlers()
@@ -1133,5 +1152,40 @@ describe('Hint (#325)', () => {
       expect(first).toEqual({ challengeId: 'l-2-e1', idempotencyKey: expect.stringMatching(/^[A-Za-z0-9._~-]{1,64}$/) })
       expect(again.idempotencyKey).toBe(first.idempotencyKey)
     })
+  })
+})
+
+describe('a figure when the language changes (#504)', () => {
+  const figureWord = () => document.querySelector('[data-exercise-figure] text')?.textContent
+
+  it('changes at once in the lesson: the lesson is read again in the new language', async () => {
+    rules.figures = true
+    open('/chapter/u-5/l-2')
+    await onScreen()
+    await waitFor(() => expect(figureWord()).toBe('Cone'))
+
+    await act(() => i18n.changeLanguage('fr'))
+    await waitFor(() => expect(figureWord()).toBe('Cône'))
+  })
+
+  it('changes in a quiz from the next question: the one on screen came with the paper', async () => {
+    rules.figures = true
+    await skipIntoQuiz(0)
+    expect(figureWord()).toBe('Cone')
+
+    await act(() => i18n.changeLanguage('de'))
+    // The quiz's exercise is the paper's, not a query: nothing reads it again.
+    await new Promise((resolve) => setTimeout(resolve, 50))
+    expect(figureWord()).toBe('Cone')
+
+    // Answered in German now, so by what the controls are, not what they say.
+    await typeAnswer(right(await onScreen()))
+    const next = await waitFor(() => {
+      const button = document.querySelector<HTMLElement>('[data-stage-primary]:not([disabled])')
+      expect(button).not.toBeNull()
+      return button!
+    })
+    await user.click(next)
+    await waitFor(() => expect(figureWord()).toBe('Kegel'))
   })
 })

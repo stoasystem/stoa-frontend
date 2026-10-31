@@ -1353,3 +1353,45 @@ describe('a hint (#408)', () => {
     expect(document.querySelector('[data-stage-hint]')).toBe(region)
   })
 })
+
+describe('figures (#504)', () => {
+  const svg = (inner: string) => `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 80">${inner}</svg>`
+  const CONE = svg('<polygon points="10,70 60,10 110,70" fill="#bbbbbb" stroke="#000000"/><text x="60" y="78">Kegel</text>')
+
+  it('shows the question’s figure under it and each option’s with its letter', async () => {
+    vi.mocked(getPracticeLesson).mockResolvedValue({
+      ...lesson,
+      challenges: [
+        challenge('ch-1', {
+          prompt: 'Welcher Körper ist ein Kegel?',
+          figure: CONE,
+          options: ['A', 'B', 'C'],
+          optionFigures: [svg('<rect width="40" height="40"/>'), svg('<circle cx="40" cy="40" r="30"/>'), ''],
+          correctAnswer: 'B',
+        }),
+        lesson.challenges[1],
+      ],
+    })
+    open('/chapter/u-5/l-2', { width: 375 })
+
+    const heading = await screen.findByRole('heading', { level: 2, name: 'Welcher Körper ist ein Kegel?' })
+    const figure = screen.getByRole('img', { name: 'Welcher Körper ist ein Kegel?' })
+    // Under the question, in the passage a quote is taken from.
+    expect(heading.compareDocumentPosition(figure) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    expect(figure.closest('[data-quote-source="exercise"]')).toBe(heading.closest('[data-quote-source="exercise"]'))
+    expect(figure.querySelector('svg text')).toHaveTextContent('Kegel')
+
+    const options = screen.getAllByRole('radio').map((radio) => radio.closest('label')!)
+    expect(options.map((label) => label.querySelectorAll('[data-exercise-figure] svg').length)).toEqual([1, 1, 0])
+
+    await userEvent.click(screen.getByRole('radio', { name: 'B' }))
+    await userEvent.click(screen.getByRole('button', { name: 'Check answer' }))
+    expect(submitChallengeAnswer).toHaveBeenCalledWith('ch-1', { answer: 'B' })
+  })
+
+  it('shows no figure for a question that has none', async () => {
+    open('/chapter/u-5/l-2')
+    await screen.findByRole('heading', { level: 2, name: '3x + 5 = 20' })
+    expect(document.querySelector('[data-exercise-figure]')).toBeNull()
+  })
+})
