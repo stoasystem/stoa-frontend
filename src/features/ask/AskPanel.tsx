@@ -495,7 +495,9 @@ export function AskPanel({
           onAttach={ATTACHMENTS_WORK ? () => picker.current?.click() : undefined}
           onCapture={ATTACHMENTS_WORK && touch ? () => camera.current?.click() : undefined}
           onPhone={ATTACHMENTS_WORK && !touch && conversationId ? phoneCode.start : undefined}
-          dictationHint="inline"
+          // A new question has no conversation for the phone's photo yet (#554).
+          phoneLater={ATTACHMENTS_WORK && !touch && !conversationId}
+          dictation
           label={t('ask.composerLabel')}
           placeholder={practice ? t('ask.practice.placeholder') : t('ask.placeholder')}
           busy={isStreaming || createConversation.isPending || attachments.uploading}

@@ -340,32 +340,39 @@ describe('the camera and the chooser', () => {
     const cameraClick = vi.spyOn(camera(), 'click').mockImplementation(() => {})
     const pickerClick = vi.spyOn(picker(), 'click').mockImplementation(() => {})
 
-    await userEvent.click(ask.getByRole('button', { name: 'Take a photo' }))
+    // Both from the + menu (#553): taking a photo first, choosing one after it.
+    await userEvent.click(ask.getByRole('button', { name: 'Add a photo' }))
+    let menu = await screen.findByRole('menu')
+    expect(within(menu).getAllByRole('menuitem').map((item) => item.textContent)).toEqual(['Take a photo', 'Choose a photo or file'])
+    await userEvent.click(within(menu).getByRole('menuitem', { name: 'Take a photo' }))
     expect(cameraClick).toHaveBeenCalledTimes(1)
     expect(pickerClick).not.toHaveBeenCalled()
 
-    await userEvent.click(ask.getByRole('button', { name: 'Choose a photo or file' }))
+    await userEvent.click(ask.getByRole('button', { name: 'Add a photo' }))
+    menu = await screen.findByRole('menu')
+    await userEvent.click(within(menu).getByRole('menuitem', { name: 'Choose a photo or file' }))
     expect(pickerClick).toHaveBeenCalledTimes(1)
     expect(cameraClick).toHaveBeenCalledTimes(1)
   })
 
-  it('on a laptop, shows the + alone: `capture` would open a second chooser there', async () => {
+  it('on a laptop, offers no camera: `capture` would open a second chooser there', async () => {
     attachmentsWork = true
     pointer(false)
     const ask = openAsk()
     await ask.findByText('Linear equations')
 
-    expect(ask.getByRole('button', { name: 'Choose a photo or file' })).toBeInTheDocument()
-    expect(ask.queryByRole('button', { name: 'Take a photo' })).toBeNull()
+    await userEvent.click(ask.getByRole('button', { name: 'Add a photo' }))
+    const menu = await screen.findByRole('menu')
+    expect(within(menu).getByRole('menuitem', { name: 'Choose a photo or file' })).toBeInTheDocument()
+    expect(within(menu).queryByRole('menuitem', { name: 'Take a photo' })).toBeNull()
   })
 
-  it('shows neither while the switch is off (the negative control)', async () => {
+  it('shows no + while the switch is off (the negative control)', async () => {
     pointer(true)
     const ask = openAsk()
     await ask.findByText('Linear equations')
 
-    expect(ask.queryByRole('button', { name: 'Take a photo' })).toBeNull()
-    expect(ask.queryByRole('button', { name: 'Choose a photo or file' })).toBeNull()
+    expect(ask.queryByRole('button', { name: 'Add a photo' })).toBeNull()
   })
 
   it('opens the back camera for a photo, and only for a photo', async () => {

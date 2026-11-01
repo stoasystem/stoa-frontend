@@ -393,7 +393,7 @@ describe('Composer (Sizes: docked 46, full ~150)', () => {
 
     expect(form).toHaveStyle({ height: '46px', borderRadius: '23px' })
     expect(screen.getByRole('textbox', { name: 'Ask' })).toHaveStyle({ height: '32px' })
-    const attach = screen.getByRole('button', { name: 'composer.attach' })
+    const attach = screen.getByRole('button', { name: 'composer.add' })
     const send = screen.getByRole('button', { name: 'composer.send' })
     expect(attach).toHaveStyle({ width: '32px', height: '32px' })
     expect(attach.querySelector('svg')).toHaveAttribute('width', '20')
@@ -401,27 +401,29 @@ describe('Composer (Sizes: docked 46, full ~150)', () => {
     expect(send.querySelector('svg')).toHaveAttribute('width', '18')
   })
 
-  it('puts the camera beside the + at the same size, only when asked to (#509)', async () => {
+  it('puts the camera in the + menu, only when asked to (#509, #553)', async () => {
     const onAttach = vi.fn()
     const onCapture = vi.fn()
     const { rerender } = render(
       <Composer label="Ask" value="" onChange={() => {}} onSubmit={() => {}} onAttach={onAttach} onCapture={onCapture} />,
     )
+    // One + in the pill, the camera no longer beside it.
+    expect(screen.queryByRole('button', { name: 'composer.capture' })).toBeNull()
 
-    const camera = screen.getByRole('button', { name: 'composer.capture' })
-    expect(camera).toHaveStyle({ width: '32px', height: '32px' })
-    expect(camera.querySelector('svg')).toHaveAttribute('width', '20')
-    await userEvent.click(camera)
+    await userEvent.click(screen.getByRole('button', { name: 'composer.add' }))
+    await userEvent.click(screen.getByRole('menuitem', { name: 'composer.capture' }))
     expect(onCapture).toHaveBeenCalledTimes(1)
     expect(onAttach).not.toHaveBeenCalled()
-    await userEvent.click(screen.getByRole('button', { name: 'composer.attach' }))
+    await userEvent.click(screen.getByRole('button', { name: 'composer.add' }))
+    await userEvent.click(screen.getByRole('menuitem', { name: 'composer.attach' }))
     expect(onAttach).toHaveBeenCalledTimes(1)
     expect(onCapture).toHaveBeenCalledTimes(1)
 
-    // The negative control: no handler, no camera.
+    // The negative control: no handler, no camera in the menu.
     rerender(<Composer label="Ask" value="" onChange={() => {}} onSubmit={() => {}} onAttach={onAttach} />)
-    expect(screen.queryByRole('button', { name: 'composer.capture' })).toBeNull()
-    expect(screen.getByRole('button', { name: 'composer.attach' })).toBeInTheDocument()
+    await userEvent.click(screen.getByRole('button', { name: 'composer.add' }))
+    expect(screen.queryByRole('menuitem', { name: 'composer.capture' })).toBeNull()
+    expect(screen.getByRole('menuitem', { name: 'composer.attach' })).toBeInTheDocument()
   })
 
   it('opens full at ~150 with a 78 field and a 32 footer, radius 18', () => {
