@@ -11,6 +11,11 @@ export const practiceQueryKeys = {
   subjectPath: (subjectId: string, topicId: string) =>
     [...practiceQueryKeys.subjects(), subjectId, 'topics', topicId, 'path'] as const,
   knowledgeMap: (subjectId: string) => [...practiceQueryKeys.all, 'knowledge-map', subjectId] as const,
+  /** Every neighbourhood of stars in full (#503), to read or refresh them together. */
+  knowledgeMapStarsAll: () => [...practiceQueryKeys.all, 'knowledge-map-stars'] as const,
+  /** The stars around `around` in full (#503); '' asks for the backend's own focus. */
+  knowledgeMapStars: (subjectId: string, around: string) =>
+    [...practiceQueryKeys.knowledgeMapStarsAll(), subjectId, around] as const,
   roadmap: (subjectId: string, topicId: string) =>
     [...practiceQueryKeys.all, 'roadmap', subjectId, topicId] as const,
   lesson: (lessonId: string) => [...practiceQueryKeys.all, 'lessons', lessonId] as const,

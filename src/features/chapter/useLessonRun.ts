@@ -59,7 +59,7 @@ export type LessonRunOptions = {
 
 export function useLessonRun(lesson: PracticeLesson | undefined, { testOut = false }: LessonRunOptions = {}) {
   const [state, dispatch] = useReducer(practiceLessonReducer, initialPracticeLessonState)
-  const submitAnswer = useSubmitChallengeAnswerMutation()
+  const submitAnswer = useSubmitChallengeAnswerMutation({ unitId: lesson?.unitId })
   const completeLesson = useCompleteLessonMutation()
   const hintMutation = usePracticeHintMutation()
   const { reset: resetCheck } = submitAnswer

@@ -16,8 +16,21 @@
  * `demo` stays false. The Demo notice belongs to the design preview and the
  * bench; a student looking at their own knowledge points is not looking at a
  * demonstration.
+ *
+ * The sky comes in two layers (#503): a skeleton of every star without its
+ * small stars, and the few stars around one in full
+ * (`hooks/practice/useKnowledgeMapStars.ts`). The map says what it is on
+ * (`focus`): the source reads the stars around that star, or around where the
+ * student last practised in the galaxy in focus, always in that star's own
+ * galaxy -- one read at a time, the one the map is on. A star it already has
+ * in the language on screen is not read again. Their small stars are laid
+ * onto the skeleton's stars; a star still without them says so
+ * (`skillsKnown: false`, or `skillsFailed` with a retry) rather than drawn as
+ * a star with none. A backend before stoa-backend#127 sends the sky in full
+ * and is asked for nothing more.
  */
-import { useMemo, type ReactNode } from 'react'
+import { useCallback, useMemo, useState, type ReactNode } from 'react'
+import { useQueryClient } from '@tanstack/react-query'
 import {
   StarMapSourceContext,
   emptyStarMap,
@@ -29,7 +42,8 @@ import {
 import type { Star, StarMap } from '@/features/starmap/model/starMap'
 import { nebulaLinks } from '@/features/starmap/model/links'
 import { layoutSky } from '@/features/starmap/layout/layout'
-import { useKnowledgeMapQuery } from '@/hooks/practice/useKnowledgeMapQuery'
+import { KNOWLEDGE_MAP_KEY, KNOWLEDGE_MAP_STALE_MS, useKnowledgeMapQuery } from '@/hooks/practice/useKnowledgeMapQuery'
+import { useKnowledgeMapStarsQuery, useStarDetails, type StarDetails } from '@/hooks/practice/useKnowledgeMapStars'
 import { useAuthStore } from '@/store/authStore'
 import type { KnowledgeMapResponse } from '@/types/practice'
 
@@ -142,8 +156,50 @@ function placement(sky: KnowledgeMapResponse): Placement {
   return made
 }
 
-export function projectStarMap(response: KnowledgeMapResponse, { subjectId }: StarMapRequest): StarMap {
-  const { stars: placedStars, subjects } = placement(response)
+/**
+ * The placed stars with the small stars loaded so far laid on (#503). A star
+ * whose small stars did not change is the same object, and when none changed
+ * the array is the same one: a read that brought nothing new must not make
+ * the engine build its scene again, which would drop a drag in progress and
+ * fade every name anew.
+ */
+const detailed = new WeakMap<Star[], { details: StarDetails; failed: string | null; stars: StarMap['stars'] }>()
+
+function withDetails(
+  placedStars: Star[],
+  skeleton: boolean,
+  details: StarDetails,
+  failed: string | null,
+): StarMap['stars'] {
+  if (!skeleton) return placedStars
+  const known = detailed.get(placedStars)
+  if (known && known.details === details && known.failed === failed) return known.stars
+  let changed = !known
+  const stars = placedStars.map((star, index) => {
+    const full = details.get(star.unitId)
+    const skillsFailed = !full && star.unitId === failed
+    const before = known?.stars[index]
+    const same = full
+      ? before?.skillsKnown === true && before.skills === full.skills
+      : before?.skillsKnown === false && Boolean(before.skillsFailed) === skillsFailed
+    if (before && same) return before
+    changed = true
+    if (full) return { ...star, skills: full.skills, skillsKnown: true }
+    return { ...star, skillsKnown: false, ...(skillsFailed ? { skillsFailed: true } : {}) }
+  })
+  const kept = changed ? stars : known!.stars
+  detailed.set(placedStars, { details, failed, stars: kept })
+  return kept
+}
+
+export function projectStarMap(
+  response: KnowledgeMapResponse,
+  { subjectId }: StarMapRequest,
+  details: StarDetails = new Map(),
+  failed: string | null = null,
+): StarMap {
+  const { stars: placed, subjects } = placement(response)
+  const placedStars = withDetails(placed, response.view === 'skeleton', details, failed)
   const sky = { ...response, stars: placedStars }
   const focus = subjectId || sky.subjectId
   const nebulaeOfFocus = new Set(
@@ -197,17 +253,45 @@ function ReadModelSource({ children }: { children: ReactNode }) {
   // query by subject would make every switch of galaxy a fetch, and the first
   // read a chicken-and-egg. The query is the chapter's too: one definition (#368).
   const { data, status, refetch } = useKnowledgeMapQuery()
+  const skeleton = data?.view === 'skeleton'
+  const client = useQueryClient()
+  const { stars: details, outdated } = useStarDetails()
+  // What the map is on, and so the one neighbourhood read and watched (#503).
+  const [wanted, setWanted] = useState<{ subjectId: string; unitId: string | null } | null>(null)
+  const around = useKnowledgeMapStarsQuery(wanted?.subjectId ?? null, wanted?.unitId ?? null, { enabled: skeleton })
+  const failed = around.isError && !around.data ? (wanted?.unitId ?? null) : null
+
+  const focus = useCallback(
+    ({ subjectId, unitId }: { subjectId: string; unitId: string | null }) => {
+      // A star already here, in the language on screen, is not read again: the map stays on what it reads.
+      if (unitId && details.has(unitId) && !outdated.has(unitId)) return
+      setWanted((before) => (before?.subjectId === subjectId && before.unitId === unitId ? before : { subjectId, unitId }))
+    },
+    [details, outdated],
+  )
+  const { refetch: refetchAround } = around
+  const retrySkills = useCallback(() => void refetchAround(), [refetchAround])
+  // Exercises answered elsewhere refresh only their own stars; the skeleton
+  // follows when the map is back on screen (#503).
+  // Read from the cache when called, so it stays one function: the map calls it once, on arrival.
+  const arrive = useCallback(() => {
+    const read = client.getQueryState(KNOWLEDGE_MAP_KEY)
+    if (read?.data && (read.isInvalidated || Date.now() - read.dataUpdatedAt > KNOWLEDGE_MAP_STALE_MS)) void refetch()
+  }, [client, refetch])
 
   const source = useMemo<StarMapSource>(
     () => ({
-      read: (request) => (data ? projectStarMap(data, request) : emptyStarMap(request.subjectId)),
+      read: (request) => (data ? projectStarMap(data, request, details, failed) : emptyStarMap(request.subjectId)),
       demo: false,
       // A sky already drawn stays drawn when a later refetch fails. Nobody
       // but a student asks for one, so for anybody else there is nothing to wait for.
       status: data ? 'success' : isStudent ? status : 'success',
       retry: () => void refetch(),
+      focus,
+      retrySkills,
+      arrive,
     }),
-    [data, status, isStudent, refetch],
+    [data, details, failed, status, isStudent, refetch, focus, retrySkills, arrive],
   )
 
   return <StarMapSourceContext.Provider value={source}>{children}</StarMapSourceContext.Provider>

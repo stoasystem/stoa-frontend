@@ -7,6 +7,20 @@ import { useAuthStore } from '@/store/authStore'
  *  not between two glances at the map, so this is minutes rather than seconds. */
 export const KNOWLEDGE_MAP_STALE_MS = 2 * 60 * 1000
 
+/** The sky's one cache entry: the star map, the chapter, the lighting moment and an answer all name it so. */
+export const KNOWLEDGE_MAP_KEY = practiceQueryKeys.knowledgeMap('')
+
+/**
+ * Whether this account has a sky to read: a signed-in student, and not while
+ * an administrator's reset stands (#412). The skeleton and the stars around
+ * one (#503) ask the same question.
+ */
+export function useHasSky() {
+  return useAuthStore(
+    (state) => Boolean(state.isAuthenticated) && state.user?.role === 'student' && !state.user.mustChangePassword,
+  )
+}
+
 /**
  * `GET /practice/knowledge-map`, the whole sky: the one definition of the
  * query the star map (`readModelSource.tsx`) and the chapter read, so they
@@ -21,11 +35,9 @@ export const KNOWLEDGE_MAP_STALE_MS = 2 * 60 * 1000
  * sky, and a key per subject would make every switch of galaxy a fetch.
  */
 export function useKnowledgeMapQuery() {
-  const hasSky = useAuthStore(
-    (state) => Boolean(state.isAuthenticated) && state.user?.role === 'student' && !state.user.mustChangePassword,
-  )
+  const hasSky = useHasSky()
   return useQuery({
-    queryKey: practiceQueryKeys.knowledgeMap(''),
+    queryKey: KNOWLEDGE_MAP_KEY,
     queryFn: () => getKnowledgeMap(),
     enabled: hasSky,
     staleTime: KNOWLEDGE_MAP_STALE_MS,

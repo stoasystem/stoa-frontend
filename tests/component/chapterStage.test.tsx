@@ -1118,7 +1118,9 @@ describe('an answer moves the sky and the review (#342)', () => {
     const keys = invalidate.mock.calls.map(([filters]) => filters?.queryKey)
     expect(keys).toEqual(
       expect.arrayContaining([
-        ['practice', 'knowledge-map'],
+        // The sky (a full one, read again now) and the stars around the point (#503).
+        ['practice', 'knowledge-map', ''],
+        ['practice', 'knowledge-map-stars'],
         ['practice', 'review-due'],
         ['practice', 'review-summary'],
       ]),

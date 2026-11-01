@@ -91,6 +91,8 @@ export { DEMO_STUDENT_ID } from '@/dev/demo/data/student'
 export {
   DEMO_BRIDGE_STAR,
   DEMO_KNOWLEDGE_POINT,
+  demoPracticeSets,
+  demoSkillsAfter,
   demoSky,
   demoStarKind,
   localize,
