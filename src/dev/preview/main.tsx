@@ -9,7 +9,8 @@
  * `surface` is one of `surfaces.ts`; `path` opens any route instead;
  * `points` (10 / 1000 / 2000) sizes the star map; `lang` (de / en / fr / it)
  * the language; `longNames=1` gives the star map's nebulae long names, to
- * check labels; `fresh=1` forgets what the demo backend kept in this tab
+ * check labels; `newcomer=1` gives the sky of a student who has not started
+ * anything, to see the first landing; `fresh=1` forgets what the demo backend kept in this tab
  * (completed lessons, the lighting and its acknowledgement, #51, and Ask's
  * messages). Moving around inside the page writes the route back to `path` (with
  * `signedIn=0` once signed out, and `lang` once the language changes), so a
@@ -33,6 +34,13 @@ const path = params.get('path') ?? surface?.path(points) ?? '/'
 const signedIn = params.has('signedIn') ? params.get('signedIn') !== '0' : (surface?.signedIn ?? true)
 const language = params.get('lang')
 const longNames = params.get('longNames') === '1'
+const newcomer = params.get('newcomer') === '1' || surface?.demo === 'newcomer'
+// Kept in the address: once the page moves, `path` replaces the surface, and a reload stays a newcomer's.
+if (newcomer && !params.has('newcomer')) {
+  const url = new URL(window.location.href)
+  url.searchParams.set('newcomer', '1')
+  window.history.replaceState(null, '', url)
+}
 
 // For the screenshot script and the comparison page: what there is to open.
 ;(window as Window & { __stoaPreviewSurfaces?: unknown }).__stoaPreviewSurfaces = SURFACES.map(
@@ -46,7 +54,7 @@ async function start() {
   await installInterception()
   const { LANGUAGE_STORAGE_KEY, isSupportedLanguage } = await import('@/i18n/languages')
   if (language && isSupportedLanguage(language)) localStorage.setItem(LANGUAGE_STORAGE_KEY, language)
-  const [, { default: i18n, i18nReady }, { demo, setDemoLanguage, resetDemoServer, finishDemoKnowledgePoint, makeReviewDue }] = await Promise.all([
+  const [, { default: i18n, i18nReady }, { demo, setDemoLanguage, resetDemoServer, startAsNewcomer, finishDemoKnowledgePoint, makeReviewDue }] = await Promise.all([
     import('../../index.css'),
     import('@/i18n'),
     import('@/dev/preview/demoSource'),
@@ -57,6 +65,10 @@ async function start() {
   const reading = i18n.resolvedLanguage ?? i18n.language
   setDemoLanguage(isSupportedLanguage(reading) ? reading : 'en')
   if (params.get('fresh') === '1') resetDemoServer()
+  if (newcomer) startAsNewcomer(params.get('fresh') === '1')
+  // For a scripted walk-through (scripts/record-onboarding.mjs): the demo knowledge point's lessons
+  // done at once, as finishing them on the page would leave the demo backend.
+  ;(window as Window & { __stoaPreviewDemo?: unknown }).__stoaPreviewDemo = { finishDemoKnowledgePoint }
   if (surface?.demo === 'demo-point-finished') finishDemoKnowledgePoint()
   if (surface?.demo === 'review-due') makeReviewDue()
 
@@ -90,7 +102,7 @@ async function start() {
   createRoot(root).render(
     <StrictMode>
       <AppProviders>
-        <PreviewLighting longNames={longNames}>
+        <PreviewLighting longNames={longNames} newcomer={newcomer}>
           <MemoryRouter initialEntries={[path]}>
             <AuthBootstrap />
             <PreviewChrome initialPath={path} open={surface?.open} focus={surface?.focus} pending={surface?.pending} readyWhen={surface?.readyWhen} />

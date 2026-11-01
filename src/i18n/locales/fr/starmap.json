@@ -15,6 +15,23 @@
     "body": "Vérifie ta connexion et réessaie.",
     "retry": "Réessayer"
   },
+  "firstLanding": {
+    "title": "Commence ici : {{name}}",
+    "body": "Chaque étoile est une chose à apprendre. Termine ses leçons et elle s’allume.",
+    "start": "Commencer cette étoile",
+    "later": "D’abord explorer"
+  },
+  "firstQuestion": {
+    "title": "Quelle matière travailles-tu en ce moment à l’école ?",
+    "body": "Murmi t’emmène vers une bonne première étoile.",
+    "unsure": "Je ne sais pas"
+  },
+  "firstReveal": {
+    "title": "Ta première étoile brille !",
+    "body": "Elle brille maintenant en or sur ta carte du ciel. Ensuite : {{name}}.",
+    "show": "Voir l’étoile suivante",
+    "later": "Compris"
+  },
   "help": {
     "open": "Comment fonctionne la carte du ciel",
     "close": "Fermer"

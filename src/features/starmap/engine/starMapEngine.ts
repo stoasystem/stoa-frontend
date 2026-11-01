@@ -69,7 +69,7 @@ import { createInertia, type Inertia } from '@/features/starmap/view/inertia'
 import { createStarDrag, linkedStars, stepStarDrag, type StarDrag } from '@/features/starmap/view/starDrag'
 import { shortestDx } from '@/features/starmap/render/links'
 import { nebulaShade } from '@/features/starmap/render/galaxy'
-import { hitsNebulaName, interpolateView, sameTarget, starPickRadius, viewForTarget, wholeNebulaView, type LayerTarget } from '@/features/starmap/view/layers'
+import { framedView, hitsNebulaName, interpolateView, sameTarget, starPickRadius, viewForTarget, wholeNebulaView, type LayerTarget } from '@/features/starmap/view/layers'
 import {
   anchorAt,
   kForGlyph,
@@ -579,7 +579,7 @@ export class StarMapEngine {
       let to = this.viewFor(target)
       // A star opens at least as close as the map already is.
       if (target.layer === 'star') to = this.limit({ ...to, k: Math.max(to.k, this.view.k) })
-      this.panTo(to, ZOOM.flightMs)
+      this.panTo(to, target.layer === 'map' && target.flightMs ? target.flightMs : ZOOM.flightMs)
     }
     this.positionsStale = true
     this.invalidate()
@@ -1096,6 +1096,13 @@ export class StarMapEngine {
     if (target.layer === 'map') {
       if (this.skyGalaxies.length === 0) return this.limit(overviewView(this.bounds, this.viewport))
       const galaxy = this.skyGalaxies.find((candidate) => candidate.subjectId === this.map!.subject.subjectId)
+      if (target.frame && galaxy) {
+        // The first reveal: the star just lit and the next one, between the galaxy and its nebulae.
+        const glyphK = (glyph: number) => kForGlyph(glyph, this.viewport, this.bounds, this.spacing)
+        const least = galaxyView(galaxy, this.skyGalaxies, this.bounds, this.viewport).k
+        const framed = framedView(target.frame, this.map.stars, this.viewport, this.bounds, [least, Math.max(least, glyphK(ZOOM.wholeNebulaGlyph[0]))])
+        if (framed) return this.limit(this.onRing(framed))
+      }
       // A subject with no galaxy on the band (no knowledge points, #329): once
       // the sky is drawn, stay where the student is looking rather than fly
       // to the first galaxy; at rest the route follows the galaxy in view.

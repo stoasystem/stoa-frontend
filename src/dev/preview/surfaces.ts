@@ -34,7 +34,7 @@ export type Surface = {
    */
   focus?: string
   /** The demo backend's state to start from, when it is not #116's opening state. */
-  demo?: 'demo-point-finished' | 'review-due'
+  demo?: 'demo-point-finished' | 'review-due' | 'newcomer'
   /** What must be on the page before it counts as ready, for the screenshot. */
   readyWhen?: string
   /** Why the surface cannot be shown yet, if it cannot. */
@@ -100,6 +100,28 @@ export const SURFACES: readonly Surface[] = [
     path: (points) => withPoints(`/map/physics/${DEMO_BRIDGE_TOPIC}/${DEMO_BRIDGE_STAR}`, points),
     signedIn: true,
     stars: true,
+  },
+  // The first landing (plan A): a student who has not started anything opens the app on
+  // the recommended star's nebula, Murmi beside the star, instead of the whole sky.
+  {
+    id: 'map-newcomer',
+    label: 'Star map · newcomer, first landing',
+    path: (points) => withPoints('/', points),
+    signedIn: true,
+    stars: true,
+    demo: 'newcomer',
+    readyWhen: '[data-first-landing] [data-shown]',
+  },
+  // The whole first sign-in (docs/research/user-onboarding-design.md): the invitation link,
+  // signing in, which subject school is on, and the first landing on "Integers", where the
+  // course starts. That star has no chapter in the preview, so the walk-through ends there.
+  {
+    id: 'onboarding',
+    label: 'First sign-in · the whole onboarding',
+    path: () => '/activate?token=demo-invitation',
+    signedIn: false,
+    stars: false,
+    demo: 'newcomer',
   },
   { id: 'chapter', label: 'Chapter', path: () => `/chapter/${unitId}`, signedIn: true, stars: false },
   { id: 'lesson', label: 'Practice stage', path: () => `/chapter/${unitId}/${nextLesson.lessonId}`, signedIn: true, stars: false },

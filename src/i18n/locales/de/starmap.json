@@ -15,6 +15,23 @@
     "body": "Prüf deine Verbindung und versuch es nochmals.",
     "retry": "Erneut versuchen"
   },
+  "firstLanding": {
+    "title": "Hier anfangen: {{name}}",
+    "body": "Jeder Stern ist etwas zum Lernen. Schliess seine Lektionen ab, dann leuchtet er.",
+    "start": "Mit diesem Stern beginnen",
+    "later": "Erst umschauen"
+  },
+  "firstQuestion": {
+    "title": "Welches Fach hast du gerade in der Schule?",
+    "body": "Murmi bringt dich dort zu einem guten ersten Stern.",
+    "unsure": "Weiss nicht"
+  },
+  "firstReveal": {
+    "title": "Dein erster Stern leuchtet!",
+    "body": "Er leuchtet jetzt golden auf deiner Sternkarte. Als Nächstes: {{name}}.",
+    "show": "Nächsten Stern zeigen",
+    "later": "Alles klar"
+  },
   "help": {
     "open": "So funktioniert die Sternkarte",
     "close": "Schliessen"

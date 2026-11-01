@@ -21,7 +21,10 @@
  *     like the bench's `&relations=fixture`, puts the prerequisites in.
  *
  * `PreviewLighting` provides both around the app; with `longNames` (the
- * preview's `&longNames=1`) the source also gives the nebulae long names.
+ * preview's `&longNames=1`) the source also gives the nebulae long names,
+ * and with `newcomer` (`&newcomer=1`, the `map-newcomer` surface) the sky of
+ * a student who has not started anything (`src/dev/demo/sky/newcomer.ts`),
+ * which follows the demo knowledge point's lessons completed on the page.
  */
 import type { TFunction } from 'i18next'
 import { useMemo, useSyncExternalStore, type ReactNode } from 'react'
@@ -35,6 +38,7 @@ import {
   onDemoServerChange,
   unacknowledgedLit,
 } from '@/dev/preview/demoSource'
+import { asNewcomer } from '@/dev/demo/sky/newcomer'
 import { readDemoStarMap } from '@/dev/demo/sky/source'
 import { LightingEventSourceContext, type LightingEventSource } from '@/features/starmap/lighting/lightingEvents'
 import { orderedStars, subjectOfNebula, type Nebula, type Star, type StarMap } from '@/features/starmap/model/starMap'
@@ -124,7 +128,7 @@ export function withLongNebulaNames(map: StarMap, t: TFunction<'starmap'>): Star
   return { ...map, nebulae }
 }
 
-export function PreviewLighting({ children, longNames = false }: { children: ReactNode; longNames?: boolean }) {
+export function PreviewLighting({ children, longNames = false, newcomer = false }: { children: ReactNode; longNames?: boolean; newcomer?: boolean }) {
   const version = useSyncExternalStore(onDemoServerChange, demoServerVersion)
   const { t } = useTranslation('starmap')
   // A new source when the demo backend changes, so the map is drawn again.
@@ -134,11 +138,15 @@ export function PreviewLighting({ children, longNames = false }: { children: Rea
     return {
       demo: true,
       read: (request) => {
-        const followed = demoStarMapOverride(readDemoStarMap(request), request.size, completed)
+        const read = readDemoStarMap(request)
+        // The newcomer's sky is built from the demo sky's own arrays, so the engine keeps its tiles.
+        const followed = newcomer
+          ? asNewcomer({ ...read, prerequisites: read.prerequisites.length > 0 ? read.prerequisites : demoSky(request.size).prerequisites }, completed, demoLanguage())
+          : demoStarMapOverride(read, request.size, completed)
         return longNames ? withLongNebulaNames(followed, t) : followed
       },
     }
-  }, [version, longNames, t])
+  }, [version, longNames, newcomer, t])
   return (
     <LightingEventSourceContext.Provider value={demoLightingSource}>
       <StarMapSourceContext.Provider value={source}>{children}</StarMapSourceContext.Provider>
