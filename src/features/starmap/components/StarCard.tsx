@@ -250,6 +250,8 @@ export function StarCard({ map, demo = false, star, nebula, reducedMotion }: Sta
   return (
     <article
       aria-labelledby={STAR_TITLE_ID}
+      // Focusable from code: a star asked for from Ask opens with its card focused (#487).
+      tabIndex={-1}
       className="pointer-events-auto absolute right-12 top-1/2 flex w-[340px] -translate-y-1/2 flex-col gap-3 rounded-[16px] border border-[color:var(--sky-glass-border)] p-[18px] text-on-sky"
       style={{
         background: 'var(--sky-glass)',

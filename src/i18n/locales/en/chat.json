@@ -185,6 +185,10 @@
       "body": "You finished its chapter. The star now shines on your map.",
       "link": "See it on the map"
     },
+    "target": {
+      "label": "{{name}} on your star map",
+      "show": "See the way on the star map"
+    },
     "reopen": {
       "open": "Open Ask",
       "resume": "Back to your conversation"
