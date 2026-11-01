@@ -24,18 +24,22 @@
     "tryAgain": "Erneut versuchen"
   },
   "composer": {
+    "add": "Foto hinzufügen",
     "attach": "Foto oder Datei auswählen",
     "capture": "Foto aufnehmen",
     "phone": "Foto vom Handy senden",
+    "phoneLater": "Schick zuerst deine Frage, dann kannst du ein Foto vom Handy dazugeben.",
     "send": "Senden",
     "sendBlocked": {
       "empty": "Schreib zuerst deine Frage, dann senden.",
       "busy": "Das wird noch gesendet. Versuch es gleich noch einmal."
     },
     "dictation": {
+      "label": "Mit der Stimme fragen",
       "windows": "Lieber sprechen? Drück Win + H und sag deine Frage.",
       "mac": "Lieber sprechen? Drück die Mikrofontaste oder dein Tastenkürzel fürs Diktieren.",
-      "touch": "Lieber sprechen? Tipp auf das Mikrofon auf deiner Tastatur."
+      "touch": "Lieber sprechen? Tipp auf das Mikrofon auf deiner Tastatur.",
+      "privacy": "Dein Gerät macht aus deiner Stimme Text. STOA bekommt nur den Text."
     }
   },
   "errorBoundary": {

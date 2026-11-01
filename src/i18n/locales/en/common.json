@@ -24,18 +24,22 @@
     "tryAgain": "Try again"
   },
   "composer": {
+    "add": "Add a photo",
     "attach": "Choose a photo or file",
     "capture": "Take a photo",
     "phone": "Send a photo from your phone",
+    "phoneLater": "Send your question first, then you can add a photo from your phone.",
     "send": "Send",
     "sendBlocked": {
       "empty": "Write your question first, then send.",
       "busy": "This is still going out. Try again in a moment."
     },
     "dictation": {
+      "label": "Ask by voice",
       "windows": "Rather talk? Press Win + H and say your question.",
       "mac": "Rather talk? Press the microphone key or your dictation shortcut.",
-      "touch": "Rather talk? Tap the microphone on your keyboard."
+      "touch": "Rather talk? Tap the microphone on your keyboard.",
+      "privacy": "Your device turns your voice into text. STOA only receives the text."
     }
   },
   "errorBoundary": {

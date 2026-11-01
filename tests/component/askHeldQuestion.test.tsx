@@ -242,7 +242,7 @@ describe('a quote chosen beside an exercise', () => {
   })
 })
 
-describe('Ask beside an exercise says how to dictate (#515)', () => {
+describe('Ask beside an exercise says how to dictate, behind a microphone (#515, #553)', () => {
   it('in the docked composer under the stage on a phone', async () => {
     vi.mocked(getConversations).mockResolvedValue({ items: [] } as never)
     const mac = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Safari/605.1.15'
@@ -260,12 +260,9 @@ describe('Ask beside an exercise says how to dictate (#515)', () => {
     })) as never
     try {
       const { container } = mount(<Stage />)
-      await userEvent.click(within(container.querySelector<HTMLElement>('[data-ask-docked]')!).getByRole('textbox'))
+      const docked = within(container.querySelector<HTMLElement>('[data-ask-docked]')!)
+      await userEvent.click(docked.getByRole('button', { name: 'Ask by voice' }))
       expect(container.querySelector('[data-composer-dictation]')).toHaveAttribute('data-composer-dictation', 'mac')
-      expect(container.querySelector('[data-composer-dictation]')).toHaveAttribute(
-        'data-composer-dictation-placement',
-        'floating',
-      )
     } finally {
       Reflect.deleteProperty(window.navigator, 'userAgent')
     }

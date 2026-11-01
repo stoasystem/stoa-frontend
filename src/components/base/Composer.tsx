@@ -1,8 +1,9 @@
-import { ArrowUp, Camera, Plus, Smartphone } from 'lucide-react'
+import { ArrowUp, Camera, Image as ImageGlyph, Mic, Plus, Smartphone, type LucideIcon } from 'lucide-react'
 import { useEffect, useId, useRef, useState, type FormEvent, type KeyboardEvent, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { IconButton } from '@/components/base/IconButton'
 import { COMPOSER } from '@/components/base/sizes'
+import * as Menu from '@radix-ui/react-dropdown-menu'
 import { dictationPlatform } from '@/lib/dictationPlatform'
 import { cn } from '@/lib/utils'
 
@@ -16,18 +17,23 @@ export interface ComposerProps {
   label: string
   placeholder?: string
   variant?: ComposerVariant
-  /** Shows the + (photo or file) when given. */
-  onAttach?: () => void
   /**
-   * Shows the camera beside the + when given (#509): it takes a photo, where
-   * the + chooses one that is already there.
+   * The + opens a menu of the ways to add a picture (#553), each shown when
+   * given. `onAttach` chooses one already on the device.
    */
+  onAttach?: () => void
+  /** Takes a photo with the device's camera (#509): a phone or a tablet. */
   onCapture?: () => void
   /**
-   * Shows the phone beside the + when given (#514): a photo taken on the phone,
-   * sent here by a QR. For a computer, where there is no camera to open.
+   * A photo taken on the phone, sent here by a QR (#514): for a computer,
+   * where there is no camera to open.
    */
   onPhone?: () => void
+  /**
+   * The phone's way is there but cannot be used yet (no conversation to send
+   * the photo into, #554): the menu shows it, off, with the reason.
+   */
+  phoneLater?: boolean
   /** Full composer only: between + and send, e.g. the subject picker. */
   footerStart?: ReactNode
   disabled?: boolean
@@ -40,21 +46,19 @@ export interface ComposerProps {
   /** An input method finished composing; the field's value then. */
   onCompositionEnd?: (value: string) => void
   /**
-   * Ask's fields: while empty and focused, say how to dictate on this device
-   * (#515). `floating` puts the line in the free space over the composer, like
-   * the reason for not sending; `inline` gives it a line of its own above, kept
-   * whether it shows or not, for a host with something to read or press right
-   * over the composer (Ask's panel).
+   * Ask's fields: a microphone that says how to dictate on this device (#515,
+   * #553). STOA starts no dictation itself (ADR 0005); the device's own types
+   * into the field like a keyboard. No microphone where the device is not known.
    */
-  dictationHint?: DictationHintPlacement
+  dictation?: boolean
   className?: string
 }
 
-export type DictationHintPlacement = 'floating' | 'inline'
-
-/** The lines over the composer: the reason for not sending, how to dictate. */
+/** The line over the composer: the reason for not sending. */
 const LINE_TEXT = 'm-0 text-center text-[13px] text-[color:var(--on-sky-text-body,var(--secondary))]'
 const FLOATING_LINE = cn('pointer-events-none absolute inset-x-0 bottom-full mb-1.5', LINE_TEXT)
+
+type AddAction = { key: 'capture' | 'attach' | 'phone'; icon: LucideIcon; label: string; note?: string; run?: () => void }
 
 /** Why send would not go out yet. Pressing it says which, rather than doing nothing. */
 type SendBlocked = 'empty' | 'busy'
@@ -86,13 +90,14 @@ export function Composer({
   onAttach,
   onCapture,
   onPhone,
+  phoneLater = false,
   footerStart,
   disabled = false,
   describedBy,
   busy = false,
   onCompositionStart,
   onCompositionEnd,
-  dictationHint,
+  dictation = false,
   className,
 }: ComposerProps) {
   const { t } = useTranslation('common')
@@ -101,15 +106,35 @@ export function Composer({
   const dictationId = `${fieldId}-dictation`
   const field = useRef<HTMLTextAreaElement>(null)
   const [blocked, setBlocked] = useState<SendBlocked | null>(null)
-  const [focused, setFocused] = useState(false)
-  const [platform] = useState(() => (dictationHint ? dictationPlatform() : null))
+  const [platform] = useState(() => (dictation ? dictationPlatform() : null))
+  const [dictationOpen, setDictationOpen] = useState(false)
+  const mic = useRef<HTMLButtonElement>(null)
+  const bubble = useRef<HTMLDivElement>(null)
   const spec = COMPOSER[variant]
   const empty = value.trim().length === 0
   const canSend = !disabled && !busy && !empty
-  // Only when there is nothing to read in the field yet and the child is about
-  // to write: once a word is in, the line has done its work and goes. Not while
-  // an answer is still coming, which is what the child is reading then.
-  const dictation = platform && focused && empty && !disabled && !busy && !blocked ? platform : null
+
+  // The way to dictate stays until it is put away: Esc, the microphone again,
+  // or a press anywhere else. Esc gives the keyboard back to the microphone.
+  useEffect(() => {
+    if (!dictationOpen) return
+    function onKey(event: globalThis.KeyboardEvent) {
+      if (event.key !== 'Escape') return
+      setDictationOpen(false)
+      mic.current?.focus()
+    }
+    function onPress(event: PointerEvent) {
+      const target = event.target as Node
+      if (bubble.current?.contains(target) || mic.current?.contains(target)) return
+      setDictationOpen(false)
+    }
+    document.addEventListener('keydown', onKey)
+    document.addEventListener('pointerdown', onPress)
+    return () => {
+      document.removeEventListener('keydown', onKey)
+      document.removeEventListener('pointerdown', onPress)
+    }
+  }, [dictationOpen])
 
   // The answer arrived: the reason for holding send went with it.
   useEffect(() => {
@@ -146,38 +171,70 @@ export function Composer({
     }
   }
 
-  const attach = onAttach && (
-    <IconButton
-      label={t('composer.attach')}
-      icon={Plus}
-      size={spec.attach}
-      glyph={spec.attachGlyph}
-      variant="tinted"
-      onClick={onAttach}
-      disabled={disabled}
-    />
-  )
-  const capture = onCapture && (
-    <IconButton
-      label={t('composer.capture')}
-      icon={Camera}
-      size={spec.attach}
-      glyph={spec.attachGlyph}
-      variant="tinted"
-      onClick={onCapture}
-      disabled={disabled}
-    />
-  )
-  const phone = onPhone && (
-    <IconButton
-      label={t('composer.phone')}
-      icon={Smartphone}
-      size={spec.attach}
-      glyph={spec.attachGlyph}
-      variant="tinted"
-      onClick={onPhone}
-      disabled={disabled}
-    />
+  /*
+   * One + for every way to add a picture (#553): a child pressing it expects
+   * the choice, and found a file dialog with no word of the phone. A phone or
+   * tablet takes a photo or chooses one; a computer chooses one or has the
+   * phone take it. A way that cannot be used yet stays in the list with its
+   * reason, reachable and read out, rather than going missing.
+   */
+  const actions = [
+    onCapture && { key: 'capture', icon: Camera, label: t('composer.capture'), run: onCapture },
+    onAttach && { key: 'attach', icon: ImageGlyph, label: t('composer.attach'), run: onAttach },
+    onPhone
+      ? { key: 'phone', icon: Smartphone, label: t('composer.phone'), run: onPhone }
+      : phoneLater && { key: 'phone', icon: Smartphone, label: t('composer.phone'), note: t('composer.phoneLater') },
+  ].filter(Boolean) as AddAction[]
+  const add = actions.length > 0 && (
+    <Menu.Root modal={false}>
+      <Menu.Trigger asChild disabled={disabled}>
+        <IconButton
+          label={t('composer.add')}
+          icon={Plus}
+          size={spec.attach}
+          glyph={spec.attachGlyph}
+          variant="tinted"
+          disabled={disabled}
+          data-composer-add
+        />
+      </Menu.Trigger>
+      {/* Not in a portal: in the composer's own surface, so it takes the
+        * panel's colours (on the sky, dark) rather than the page's. The sky's
+        * surface is glass; laid over the ground, it hides what is under it. */}
+      <Menu.Content
+        side="top"
+        align="start"
+        sideOffset={8}
+        data-composer-menu
+        className="z-50 min-w-[240px] max-w-[320px] rounded-[12px] border border-[color:var(--float-border)] [background:linear-gradient(var(--surface),var(--surface)),var(--ground)] p-1.5 text-ink shadow-[var(--shadow-float)]"
+      >
+        {actions.map((action) => (
+          <Menu.Item
+            key={action.key}
+            data-composer-action={action.key}
+            aria-disabled={action.run ? undefined : true}
+            onSelect={(event) => {
+              if (!action.run) {
+                // Off: the menu stays, and its reason stays on screen.
+                event.preventDefault()
+                return
+              }
+              action.run()
+            }}
+            className={cn(
+              'flex min-h-11 cursor-pointer select-none items-start gap-2.5 rounded-[8px] px-2.5 py-2 text-[15px] focus:bg-fill',
+              !action.run && 'cursor-default text-caption',
+            )}
+          >
+            <action.icon size={18} strokeWidth={1.8} aria-hidden="true" className="mt-0.5 shrink-0" />
+            <span className="flex min-w-0 flex-col gap-0.5">
+              <span>{action.label}</span>
+              {action.note && <span className="text-[13px] leading-snug text-caption">{action.note}</span>}
+            </span>
+          </Menu.Item>
+        ))}
+      </Menu.Content>
+    </Menu.Root>
   )
   const send = (
     <IconButton
@@ -212,44 +269,39 @@ export function Composer({
     </p>
   )
   /*
-   * Floating, it shares the free space with the reason for not sending, which
-   * takes its place when there is one. Not a live region: it would be read
-   * out on every focus. The field points at it instead, so it is heard with
-   * the field.
+   * The microphone (#553) took the place of the line that used to sit over the
+   * field: the child asked for an icon. It says how to start the device's own
+   * dictation and that STOA only receives the text; it starts nothing itself.
    */
-  const inline = dictationHint === 'inline'
-  /*
-   * Inline, the line keeps its room whether it shows or not, and only its
-   * words come and go. Taking the room on focus and giving it back on blur
-   * moved everything over the composer by a line in the middle of a click:
-   * pressing "Send again" took the focus off the empty field, the line went,
-   * the message moved, and the click landed on nothing.
-   */
-  const dictationLine = inline
-    ? platform && (
-        <p
-          id={dictationId}
-          data-composer-dictation={dictation ?? undefined}
-          data-composer-dictation-placement="inline"
-          className={cn(LINE_TEXT, 'pb-1')}
-          style={dictation ? undefined : { visibility: 'hidden' }}
-        >
-          {t(`composer.dictation.${platform}`)}
-        </p>
-      )
-    : dictation && (
-        <p
-          id={dictationId}
-          data-composer-dictation={dictation}
-          data-composer-dictation-placement="floating"
-          className={FLOATING_LINE}
-        >
-          {t(`composer.dictation.${dictation}`)}
-        </p>
-      )
-  const fieldDescribedBy =
-    [describedBy, blocked ? hintId : undefined, dictation ? dictationId : undefined].filter(Boolean).join(' ') ||
-    undefined
+  const micButton = platform && (
+    <IconButton
+      ref={mic}
+      label={t('composer.dictation.label')}
+      icon={Mic}
+      size={spec.attach}
+      glyph={spec.attachGlyph}
+      variant="plain"
+      aria-expanded={dictationOpen}
+      aria-controls={dictationOpen ? dictationId : undefined}
+      onClick={() => setDictationOpen((open) => !open)}
+      disabled={disabled}
+      data-composer-mic
+    />
+  )
+  const dictationBubble = platform && dictationOpen && (
+    <div
+      ref={bubble}
+      id={dictationId}
+      role="note"
+      aria-label={t('composer.dictation.label')}
+      data-composer-dictation={platform}
+      className="absolute bottom-full right-0 z-10 mb-2 flex max-w-[320px] flex-col gap-1 rounded-[12px] border border-[color:var(--float-border)] [background:linear-gradient(var(--surface),var(--surface)),var(--ground)] p-3 text-left shadow-[var(--shadow-float)]"
+    >
+      <p className="m-0 text-[15px] text-ink">{t(`composer.dictation.${platform}`)}</p>
+      <p className="m-0 text-[13px] text-caption">{t('composer.dictation.privacy')}</p>
+    </div>
+  )
+  const fieldDescribedBy = [describedBy, blocked ? hintId : undefined].filter(Boolean).join(' ') || undefined
   const fieldParts = (
     <>
       <label htmlFor={fieldId} className="sr-only">
@@ -265,26 +317,24 @@ export function Composer({
         disabled={disabled}
         aria-describedby={fieldDescribedBy}
         onChange={(event) => change(event.target.value)}
-        onFocus={() => setFocused(true)}
-        onBlur={() => setFocused(false)}
         onKeyDown={onKeyDown}
         onCompositionStart={onCompositionStart}
         onCompositionEnd={onCompositionEnd && ((event) => onCompositionEnd(event.currentTarget.value))}
         className={cn(
           'min-w-0 resize-none border-0 bg-transparent text-ink outline-none placeholder:text-caption',
-          variant === 'docked' ? 'flex-1 text-[16px] leading-[1.4]' : 'text-[17px] leading-[1.45]',
+          // One line: no scrollbar. Its arrows stood beside an empty field on
+          // Windows, a pixel taller than its box, and meant nothing (#553).
+          variant === 'docked'
+            ? 'flex-1 text-[16px] leading-[1.4] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden'
+            : 'text-[17px] leading-[1.45]',
         )}
         style={{ height: spec.textarea, padding: variant === 'docked' ? '6px 4px' : '2px 4px' }}
       />
     </>
   )
 
-  /*
-   * Inline, the line sits above the form in the host's own flow, so it covers
-   * nothing the host shows over the composer.
-   */
   if (variant === 'docked') {
-    const form = (
+    return (
       <form
         data-composer="docked"
         onSubmit={submit}
@@ -300,25 +350,16 @@ export function Composer({
         }}
       >
         {hint}
-        {!inline && dictationLine}
-        {attach}
-        {capture}
-        {phone}
+        {dictationBubble}
+        {add}
         {fieldParts}
+        {micButton}
         {send}
       </form>
     )
-    return inline ? (
-      <>
-        {dictationLine}
-        {form}
-      </>
-    ) : (
-      form
-    )
   }
 
-  const form = (
+  return (
     <form
       data-composer="full"
       onSubmit={submit}
@@ -331,24 +372,15 @@ export function Composer({
       }}
     >
       {hint}
-      {!inline && dictationLine}
+      {dictationBubble}
       {fieldParts}
       <div data-composer-footer className="flex items-center gap-1.5" style={{ height: COMPOSER.full.footer }}>
-        {attach}
-        {capture}
-        {phone}
+        {add}
         {footerStart}
         <div className="flex-1" />
+        {micButton}
         {send}
       </div>
     </form>
-  )
-  return inline ? (
-    <>
-      {dictationLine}
-      {form}
-    </>
-  ) : (
-    form
   )
 }
