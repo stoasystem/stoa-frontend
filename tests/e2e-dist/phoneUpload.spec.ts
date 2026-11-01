@@ -114,13 +114,15 @@ test('Ask shows the code as a QR, and adds the phone’s photo only once the stu
   const thread = panel.getByRole('log', { name: 'Messages' })
   await expect(thread.getByText(world.answerFor(first))).toBeVisible()
 
-  const button = panel.getByRole('button', { name: 'Send a photo from your phone' })
+  // In the + menu (#553).
+  const add = panel.getByRole('button', { name: 'Add a photo' })
   if (!ATTACHMENTS_WORK) {
-    await expect(button).toHaveCount(0)
+    await expect(add).toHaveCount(0)
     expect(backend.callsTo('POST', '/conversations/{conv_id}/upload-codes')).toHaveLength(0)
     return
   }
-  await button.click()
+  await add.click()
+  await panel.getByRole('menuitem', { name: 'Send a photo from your phone' }).click()
   const qr = panel.getByRole('img', { name: 'QR code to send a photo from your phone' })
   await expect(qr).toBeVisible()
   // What the phone's camera reads: the page's address, the code after its `#`.
