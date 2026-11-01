@@ -39,7 +39,7 @@ import {
   type StarMapRequest,
   type StarMapSource,
 } from '@/features/starmap/starMapSource'
-import type { StarMap } from '@/features/starmap/model/starMap'
+import type { Star, StarMap } from '@/features/starmap/model/starMap'
 import { nebulaLinks } from '@/features/starmap/model/links'
 import { layoutSky } from '@/features/starmap/layout/layout'
 import { KNOWLEDGE_MAP_KEY, KNOWLEDGE_MAP_STALE_MS, useKnowledgeMapQuery } from '@/hooks/practice/useKnowledgeMapQuery'
@@ -69,7 +69,7 @@ const LAYOUT_SEED = 116
  * scatters stars inside them. Running it here costs one pass over the sky and
  * makes real content look like what was signed off.
  */
-function placed(sky: KnowledgeMapResponse): KnowledgeMapResponse['stars'] {
+function placed(sky: KnowledgeMapResponse): Star[] {
   const starsPerNebula = new Map<string, number>()
   for (const star of sky.stars) {
     starsPerNebula.set(star.nebulaId, (starsPerNebula.get(star.nebulaId) ?? 0) + 1)
@@ -89,14 +89,38 @@ function placed(sky: KnowledgeMapResponse): KnowledgeMapResponse['stars'] {
     nebulaLinks({ stars: sky.stars as never, prerequisites: sky.prerequisites }),
     LAYOUT_SEED,
   )
-  return sky.stars.map((star) => ({ ...star, ...(layout.stars.get(star.unitId) ?? { x: star.x, y: star.y }) }))
+  return sky.stars.map((star) => ({ ...asStar(star, sky), ...(layout.stars.get(star.unitId) ?? { x: star.x, y: star.y }) }))
+}
+
+/**
+ * A star of the read model as the map reads it. In the gap between two
+ * deploys a backend from before ADR 0004 still says `locked`, and leaves out
+ * `unlitPrerequisiteIds` (stoa-backend#125): such a star is ready, with its
+ * unlit prerequisites worked out from the edges, so it opens like any other
+ * and nothing breaks.
+ */
+function asStar(star: KnowledgeMapResponse['stars'][number], sky: KnowledgeMapResponse): Star {
+  return { ...star, state: star.state === 'locked' ? 'ready' : star.state, unlitPrerequisiteIds: unlitPrerequisiteIdsOf(star, sky) }
+}
+
+/** A star's prerequisites not lit yet: as the backend sends them, else worked out from the edges (see `asStar`). */
+export function unlitPrerequisiteIdsOf(
+  star: KnowledgeMapResponse['stars'][number],
+  sky: Pick<KnowledgeMapResponse, 'stars' | 'prerequisites'>,
+): string[] {
+  if (star.unlitPrerequisiteIds) return star.unlitPrerequisiteIds
+  if (star.state === 'lit') return []
+  return sky.prerequisites
+    .filter((edge) => edge.to === star.unitId)
+    .map((edge) => edge.from)
+    .filter((unitId) => sky.stars.some((candidate) => candidate.unitId === unitId && candidate.state !== 'lit'))
 }
 
 type Placement = {
   galaxies: KnowledgeMapResponse['galaxies']
   nebulae: KnowledgeMapResponse['nebulae']
   prerequisites: KnowledgeMapResponse['prerequisites']
-  stars: KnowledgeMapResponse['stars']
+  stars: Star[]
   subjects: KnowledgeMapResponse['galaxies']
 }
 
@@ -139,10 +163,10 @@ function placement(sky: KnowledgeMapResponse): Placement {
  * the engine build its scene again, which would drop a drag in progress and
  * fade every name anew.
  */
-const detailed = new WeakMap<KnowledgeMapResponse['stars'], { details: StarDetails; failed: string | null; stars: StarMap['stars'] }>()
+const detailed = new WeakMap<Star[], { details: StarDetails; failed: string | null; stars: StarMap['stars'] }>()
 
 function withDetails(
-  placedStars: KnowledgeMapResponse['stars'],
+  placedStars: Star[],
   skeleton: boolean,
   details: StarDetails,
   failed: string | null,

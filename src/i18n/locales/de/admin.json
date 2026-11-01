@@ -313,12 +313,37 @@
     "surface": {
       "question": "Frage",
       "ai_answer": "KI-Antwort",
-      "teacher_reply": "Antwort der Lehrperson"
+      "teacher_reply": "Antwort der Lehrperson",
+      "image_upload": "Bild-Upload"
     },
     "events": {
       "reported": "Gemeldet",
       "updated": "Aktualisiert",
-      "note_added": "Notiz hinzugefügt"
+      "note_added": "Notiz hinzugefügt",
+      "image_blocked": "Bild blockiert",
+      "image_deleted": "Bild gelöscht"
+    },
+    "image": {
+      "title": "Blockiertes Bild",
+      "listLine": "Blockiertes Bild · {{categories}}",
+      "alt": "Das von der Moderation blockierte Bild",
+      "show": "Bild anzeigen",
+      "hide": "Bild unscharf stellen",
+      "loading": "Bild wird geladen...",
+      "failed": "Das Bild konnte nicht geladen werden.",
+      "retry": "Erneut versuchen",
+      "deleted": "Bild gelöscht",
+      "deletedOn": "Bild gelöscht am {{date}}",
+      "undrawable": "Dieses Bild kann hier nicht angezeigt werden.",
+      "hits": "Blockiert wegen",
+      "noHits": "Keine Treffer erfasst.",
+      "uploader": "Hochgeladen von",
+      "uploadedAt": "Hochgeladen",
+      "conversation": "Unterhaltung",
+      "role": {
+        "student": "Schüler/in",
+        "teacher": "Lehrperson"
+      }
     }
   },
   "teacherApplications": {
@@ -870,6 +895,7 @@
       "learning_profile_update": "Änderung am Lernprofil",
       "moderation_case_update": "Änderung an einem Moderationsfall",
       "subscription_request_update": "Änderung an einer Abonnementanfrage",
+      "teacher_help_dispatched": "Hilfeanfrage zugewiesen",
       "teacher_help_expired": "Lehrpersonenhilfe abgelaufen",
       "teacher_reply": "Antwort einer Lehrperson",
       "teacher_requested": "Lehrperson angefragt",

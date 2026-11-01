@@ -28,3 +28,16 @@ export async function getTeacherHelpRequest(conversationId: string) {
   return response.data
 }
 
+
+/**
+ * Takes back a request no teacher has taken yet (stoa-backend#86): it ends as
+ * `withdrawn` and the week's case is given back. 409 once a teacher has it or
+ * it has ended; 503 `teacher_help_withdrawal_unavailable` when trying again is
+ * safe.
+ */
+export async function withdrawTeacherHelpRequest(conversationId: string) {
+  const response = await httpClient.post<TeacherHelpRequest>(
+    apiPath`/teacher-help/conversations/${conversationId}/request/withdraw`,
+  )
+  return response.data
+}

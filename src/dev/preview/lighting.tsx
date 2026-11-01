@@ -84,7 +84,8 @@ export function demoStarMapOverride(map: StarMap, size: FixtureSize, completed: 
         },
       }
     }
-    if (star.unitId === DEMO_BRIDGE_STAR && star.state === 'locked' && bridgeOpens) return { ...star, state: 'ready' as const }
+    // Refraction stops waiting once the point it builds on is lit.
+    if (star.unitId === DEMO_BRIDGE_STAR && bridgeOpens) return { ...star, unlitPrerequisiteIds: [] }
     return star
   })
 
@@ -92,7 +93,7 @@ export function demoStarMapOverride(map: StarMap, size: FixtureSize, completed: 
   // per subject (#9 point 8), so another galaxy's recommendation is never touched.
   if (hasPoint && state === 'lit' && stars.some((star) => star.unitId === kp.unitId && star.recommendation)) {
     const ordered = orderedStars({ ...map, stars }).filter((star) => subjectOfNebula(map, star.nebulaId) === kp.subjectId)
-    const pick = ordered.find((star) => star.state === 'in_progress' && star.unitId !== kp.unitId) ?? ordered.find((star) => star.state === 'ready')
+    const pick = ordered.find((star) => star.state === 'in_progress' && star.unitId !== kp.unitId) ?? ordered.find((star) => star.state === 'ready' && star.unlitPrerequisiteIds.length === 0)
     stars = stars.map((star) =>
       star.unitId === kp.unitId ? { ...star, recommendation: null } : star.unitId === pick?.unitId ? { ...star, recommendation: { source: 'system' } } : star,
     )

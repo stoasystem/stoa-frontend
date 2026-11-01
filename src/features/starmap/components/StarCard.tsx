@@ -7,11 +7,13 @@
  */
 import { ChevronLeft } from 'lucide-react'
 import type { MouseEvent, RefObject } from 'react'
-import { useRef } from 'react'
+import { useId, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import type { JumpState } from '@/features/chapter/jump'
 import { skillPath } from '@/features/chapter/useChapter'
+import { starQuizPath } from '@/features/chapter/useChapter'
+import { formatRetryAt } from '@/features/chapter/useStarQuizRun'
 import { Button } from '@/components/base'
 import { ExtensionTag, SkillDot, SkillHints } from '@/features/starmap/components/SkillHints'
 import { StarGlyph } from '@/features/starmap/components/StarGlyph'
@@ -19,7 +21,7 @@ import { isQuestionType, prerequisiteHints } from '@/features/starmap/model/skil
 import { useStarMapSource } from '@/features/starmap/starMapSource'
 import { pathForTarget } from '@/features/starmap/view/layers'
 import type { ReviewReturnState } from '@/features/starmap/view/reviewReturn'
-import { subjectOfNebula, type Nebula, type Star, type StarMap } from '@/features/starmap/model/starMap'
+import { starLook, subjectOfNebula, type Nebula, type Star, type StarMap } from '@/features/starmap/model/starMap'
 import { cn } from '@/lib/utils'
 
 export type StarCardProps = {
@@ -35,8 +37,9 @@ export const STAR_TITLE_ID = 'starmap-star-title'
 
 /**
  * What a star's card says and where its main action leads: the chapter, by
- * the jump from `glyph` (#50 point 5), or nothing for a locked star or the
- * preview's placeholder stars.
+ * the jump from `glyph` (#50 point 5), or nothing for the preview's
+ * placeholder stars. A star with prerequisites not lit yet opens all the same
+ * (ADR 0004).
  */
 export function useStarCardAction(star: Star, demo: boolean, glyph: RefObject<HTMLElement | null>) {
   const { t } = useTranslation('starmap')
@@ -56,7 +59,7 @@ export function useStarCardAction(star: Star, demo: boolean, glyph: RefObject<HT
 
   const action =
     // In the design preview only the demo knowledge point has a chapter; a placeholder star has none.
-    star.state === 'locked' || (demo && star.chapter.lessonCount === 0)
+    demo && star.chapter.lessonCount === 0
       ? null
       : star.state === 'lit'
         ? t('star.open')
@@ -92,19 +95,17 @@ export function StarCardBack({ map, nebula }: { map: StarMap; nebula: Nebula }) 
   )
 }
 
-/** Everything a card says below the star's name: progress, markers, the next lesson, skills, what to light first, review. */
+/** Everything a card says below the star's name: progress, markers, the next lesson, skills, what to learn first, review. */
 export function StarCardDetails({ map, demo = false, star }: { map: StarMap; demo?: boolean; star: Star }) {
   const { t } = useTranslation('starmap')
   const here = useMapPath()
   const { lessonCount, lessonsDone, nextLesson } = star.chapter
   const percent = Math.round(Math.max(0, Math.min(1, star.progress)) * 100)
-  const prerequisites =
-    star.state === 'locked'
-      ? map.prerequisites
-          .filter((edge) => edge.to === star.unitId)
-          .map((edge) => map.stars.find((candidate) => candidate.unitId === edge.from))
-          .filter((candidate): candidate is Star => Boolean(candidate) && candidate!.state !== 'lit')
-      : []
+  // What to learn first (前置未点亮): a suggestion, in the order the curriculum
+  // states it; one the sky does not hold has nowhere to lead and is left out.
+  const prerequisites = star.unlitPrerequisiteIds
+    .map((unitId) => map.stars.find((candidate) => candidate.unitId === unitId))
+    .filter((candidate): candidate is Star => candidate !== undefined)
   const allLessonsDone = lessonCount > 0 && lessonsDone >= lessonCount
   // Small stars as question types (#501) are listed one per line, each with its hints.
   const questionTypes = star.skills.some((skill) => isQuestionType(skill, star.unitId))
@@ -136,6 +137,12 @@ export function StarCardDetails({ map, demo = false, star }: { map: StarMap; dem
         </div>
       )}
 
+      {star.state === 'lit' && star.litAtSource === 'quiz' && (
+        <p data-lit-by-quiz className="m-0 text-[13px] text-on-sky">
+          {t('star.quiz.litByQuiz')}
+        </p>
+      )}
+
       {(star.recommendation || star.reviewDue > 0 || star.unmetExercises > 0) && (
         <ul className="m-0 flex list-none flex-col gap-1 p-0 text-[13px] text-on-sky">
           {star.recommendation && <li>{t('marker.recommended')}</li>}
@@ -146,11 +153,12 @@ export function StarCardDetails({ map, demo = false, star }: { map: StarMap; dem
                 : t('star.unmetPartial', { count: star.unmetExercises })}
             </li>
           )}
+          {star.state === 'in_progress' && star.unmetExercises > 0 && allLessonsDone && <li data-star-quiz-also>{t('star.quiz.alsoTest')}</li>}
           {star.reviewDue > 0 && <li>{t('marker.reviewDue', { count: star.reviewDue })}</li>}
         </ul>
       )}
 
-      {nextLesson && star.state !== 'locked' && (
+      {nextLesson && (
         <p className="m-0 text-[13px] text-[color:var(--on-sky-text-body)]">
           {t('star.nextLesson', { title: nextLesson.title })}
         </p>
@@ -241,6 +249,8 @@ export function StarCardDetails({ map, demo = false, star }: { map: StarMap; dem
         </section>
       )}
 
+      {star.state !== 'lit' && !(demo && lessonCount === 0) && <StarQuizEntry star={star} />}
+
       {star.reviewDue > 0 && (
         <Button asChild lift variant="onSky" size="regular">
           <Link to={`/review/${encodeURIComponent(star.unitId)}`} state={reviewFrom}>
@@ -249,6 +259,37 @@ export function StarCardDetails({ map, demo = false, star }: { map: StarMap; dem
         </Button>
       )}
     </>
+  )
+}
+
+/**
+ * 「我会了，测一下」(#486): the star quiz, for every star not lit, whatever its
+ * lessons or prerequisites. After a lost one the backend says when it can be
+ * taken again (`starQuizRetryAt`); until then the button is there, off, with
+ * the time beside it.
+ */
+function StarQuizEntry({ star }: { star: Star }) {
+  const { t, i18n } = useTranslation('starmap')
+  const noteId = useId()
+  const retryAt = star.starQuizRetryAt ? Date.parse(star.starQuizRetryAt) : Number.NaN
+  if (star.starQuizRetryAt && retryAt > Date.now()) {
+    return (
+      <div className="flex flex-col items-start gap-1" data-star-quiz-cooling>
+        <Button variant="onSkyPlain" disabled aria-describedby={noteId}>
+          {t('star.quiz.take')}
+        </Button>
+        <p id={noteId} className="m-0 text-[13px] text-[color:var(--on-sky-text-body)]">
+          {t('star.quiz.cooling', { when: formatRetryAt(star.starQuizRetryAt, i18n.language) })}
+        </p>
+      </div>
+    )
+  }
+  return (
+    <Button asChild variant="onSkyPlain" className="self-start">
+      <Link to={starQuizPath(star.unitId)} data-star-quiz-take>
+        {t('star.quiz.take')}
+      </Link>
+    </Button>
   )
 }
 
@@ -261,6 +302,8 @@ export function StarCard({ map, demo = false, star, nebula, reducedMotion }: Sta
   return (
     <article
       aria-labelledby={STAR_TITLE_ID}
+      // Focusable from code: a star asked for from Ask opens with its card focused (#487).
+      tabIndex={-1}
       className="pointer-events-auto absolute right-12 top-1/2 flex w-[340px] -translate-y-1/2 flex-col gap-3 rounded-[16px] border border-[color:var(--sky-glass-border)] p-[18px] text-on-sky"
       style={{
         background: 'var(--sky-glass)',
@@ -274,7 +317,7 @@ export function StarCard({ map, demo = false, star, nebula, reducedMotion }: Sta
       <div className="flex items-center gap-4">
         <div ref={glyph} className="shrink-0">
           <StarGlyph
-            state={star.state}
+            state={starLook(star)}
             size={96}
             progress={star.progress}
             recommended={Boolean(star.recommendation)}

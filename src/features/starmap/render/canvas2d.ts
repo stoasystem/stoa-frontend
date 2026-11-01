@@ -8,7 +8,7 @@
  * differ star by star, and names placed clear of each other. Stars outside
  * the focus are never drawn one by one, and nothing is blurred per frame.
  */
-import { CHOSEN, DOT_CUT, dotBoxFor, GLYPH_LARGE, GLYPH_SMALL, HOVER, LOCKED_RING_ALPHA, PRESS, SMALL_CUT_BELOW, starPath, type DotCut, type GlyphCut } from '@/features/starmap/render/glyph'
+import { CHOSEN, DOT_CUT, dotBoxFor, GLYPH_LARGE, GLYPH_SMALL, HOVER, WAITING_RING_ALPHA, PRESS, SMALL_CUT_BELOW, starPath, type DotCut, type GlyphCut } from '@/features/starmap/render/glyph'
 import { aroundDisc, aroundDiscWide, belongsTo, boxHitsCircle, boxHitsSegment, keyStars, nearerStars, placeInsisting, placeLabel, type Box, type Circle, type Segment } from '@/features/starmap/render/labels'
 import { DRAG, panoramaDot, panoramaLook, ramp, reachFade, REVEAL, type Ramp } from '@/features/starmap/view/semanticZoom'
 import { createTileCache, nebulaStateKeys, tileKey, tileSizeFor, TILE_REACH, type TileCache } from '@/features/starmap/render/nebulaTiles'
@@ -21,7 +21,7 @@ import type { Viewport } from '@/features/starmap/view/camera'
 import {
   STATE_IN_PROGRESS,
   STATE_LIT,
-  STATE_LOCKED,
+  STATE_WAITING,
   STATE_READY,
   type NebulaNameBox,
   type RenderStats,
@@ -148,8 +148,8 @@ function drawStateGlyph(ctx: CanvasRenderingContext2D, cut: GlyphCut, state: num
     const g = cut.ready
     ring(ctx, g.ring, g.ringWidth, theme.text, g.ringAlpha)
     disc(ctx, g.core, theme.text, g.coreAlpha)
-  } else if (state === STATE_LOCKED) {
-    const g = cut.locked
+  } else if (state === STATE_WAITING) {
+    const g = cut.waiting
     ring(ctx, g.ring, g.ringWidth, theme.text, g.ringAlpha)
   }
 }
@@ -158,7 +158,7 @@ function extentOf(cut: GlyphCut, state: number): number {
   if (state === STATE_LIT) return cut.lit.halo + 2 * cut.lit.blur + 1
   if (state === STATE_IN_PROGRESS) return cut.inProgress.halo + 2 * cut.inProgress.blur + 1
   if (state === STATE_READY) return cut.ready.ring + cut.ready.ringWidth + 1
-  return cut.locked.ring + cut.locked.ringWidth + 1
+  return cut.waiting.ring + cut.waiting.ringWidth + 1
 }
 
 /** Largest on-screen box each cut is drawn at, CSS px, before breathing. */
@@ -169,8 +169,8 @@ const DOT: Record<number, { lit: boolean; alpha: number; radius: number; glow: b
   [STATE_LIT]: { lit: true, alpha: 1, radius: 1, glow: true },
   [STATE_IN_PROGRESS]: { lit: true, alpha: 0.9, radius: 0.95, glow: true },
   [STATE_READY]: { lit: false, alpha: 0.88, radius: 0.85, glow: false },
-  // 55% white keeps a locked star well past 3:1 (see LOCKED_RING_ALPHA).
-  [STATE_LOCKED]: { lit: false, alpha: LOCKED_RING_ALPHA, radius: 0.8, glow: false },
+  // 55% white keeps a waiting star well past 3:1 (see WAITING_RING_ALPHA).
+  [STATE_WAITING]: { lit: false, alpha: WAITING_RING_ALPHA, radius: 0.8, glow: false },
 }
 
 /**
@@ -182,7 +182,7 @@ export const DOT_ALPHA = {
   [STATE_LIT]: 1,
   [STATE_IN_PROGRESS]: 0.95,
   [STATE_READY]: 0.95,
-  [STATE_LOCKED]: 0.78,
+  [STATE_WAITING]: 0.78,
   review: 0.92,
 } as const
 
@@ -191,7 +191,7 @@ export function dotExtent(cut: DotCut, state: number): number {
   if (state === STATE_LIT) return Math.max(cut.lit.tip, cut.halo.radius + 2 * cut.halo.blur)
   if (state === STATE_IN_PROGRESS) return Math.max(cut.inProgress.ring + cut.inProgress.ringWidth / 2, cut.halo.radius + 2 * cut.halo.blur)
   if (state === STATE_READY) return cut.ready.ring + cut.ready.ringWidth / 2
-  return cut.locked.ring + cut.locked.ringWidth / 2
+  return cut.waiting.ring + cut.waiting.ringWidth / 2
 }
 
 /**
@@ -220,8 +220,8 @@ export function drawDotMark(ctx: CanvasRenderingContext2D, cut: DotCut, state: n
     ring(ctx, g.ring, g.ringWidth, theme.text, DOT_ALPHA[STATE_READY])
     disc(ctx, g.core, theme.text, DOT_ALPHA[STATE_READY])
   } else {
-    const g = cut.locked
-    ring(ctx, g.ring, g.ringWidth, theme.text, DOT_ALPHA[STATE_LOCKED])
+    const g = cut.waiting
+    ring(ctx, g.ring, g.ringWidth, theme.text, DOT_ALPHA[STATE_WAITING])
   }
 }
 
@@ -304,7 +304,7 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
 
   const buildSprites = (cut: GlyphCut, largestBox: number): Sprite[] => {
     const pixelsPerUnit = (largestBox * Math.max(2, dpr) * 1.14) / cut.box
-    return [STATE_LIT, STATE_IN_PROGRESS, STATE_READY, STATE_LOCKED].map((state) => {
+    return [STATE_LIT, STATE_IN_PROGRESS, STATE_READY, STATE_WAITING].map((state) => {
       const extent = extentOf(cut, state)
       const size = Math.max(4, Math.ceil(extent * 2 * pixelsPerUnit))
       const sprite = makeCanvas(size, size)
@@ -327,7 +327,7 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
    */
   const buildDots = (part: 'both' | 'glow' | 'core' = 'both'): HTMLCanvasElement[] => {
     const size = 64
-    return [STATE_LIT, STATE_IN_PROGRESS, STATE_READY, STATE_LOCKED].map((state) => {
+    return [STATE_LIT, STATE_IN_PROGRESS, STATE_READY, STATE_WAITING].map((state) => {
       const sprite = makeCanvas(size, size)
       const s = sprite.getContext('2d')
       if (s && theme) {
@@ -768,7 +768,7 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
         ctx.restore()
       }
 
-      const dotLooks = [STATE_LIT, STATE_IN_PROGRESS, STATE_READY, STATE_LOCKED].map((st) => panoramaDot(DOT[st].lit, look))
+      const dotLooks = [STATE_LIT, STATE_IN_PROGRESS, STATE_READY, STATE_WAITING].map((st) => panoramaDot(DOT[st].lit, look))
       // A dot's box: the engine's, grown toward the glyph box where the map is sparse enough to have room.
       const dotBox = dotBoxFor(frame.dotRadius, frame.glyphSize)
       // Stars in focus: dots on the whole map, glyphs zoomed in, crossfading between.

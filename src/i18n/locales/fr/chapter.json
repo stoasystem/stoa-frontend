@@ -6,6 +6,7 @@
     "continue": "Continuer : {{title}}",
     "empty": "Ce chapitre n’a pas encore de leçons.",
     "failed": "Le chapitre n’a pas pu être chargé.",
+    "firstLearn": "À apprendre d’abord",
     "lessonMeta_one": "{{minutes}} min · {{count}} exercice",
     "lessonMeta_many": "{{minutes}} min · {{count}} exercices",
     "lessonMeta_other": "{{minutes}} min · {{count}} exercices",
@@ -14,7 +15,6 @@
     "listLabel": "Leçons",
     "lit": "Ce point de savoir est allumé.",
     "loading": "Chargement du chapitre…",
-    "locked": "Ce point de savoir est encore verrouillé. Allume d’abord, sur la carte du ciel, les points sur lesquels il s’appuie.",
     "missing": "Ce chapitre est introuvable.",
     "progress": "Progression du chapitre",
     "unmet_one": "Encore {{count}} exercice à réussir avant que ce point s’allume.",
@@ -29,7 +29,6 @@
       "available": "Prête",
       "completed": "Terminée",
       "current": "À suivre",
-      "locked": "Verrouillée",
       "review": "À revoir"
     }
   },
@@ -93,10 +92,6 @@
     "noHint": "Il n’y a pas d’indice pour cet exercice.",
     "lessonOf": "Leçon {{lesson}} sur {{lessons}}",
     "loading": "Chargement de la leçon…",
-    "locked": {
-      "body": "Ce point de savoir s’appuie sur d’autres qui ne sont pas encore allumés. Allume-les d’abord sur la carte du ciel.",
-      "title": "Cette leçon est verrouillée"
-    },
     "missing": "Cette leçon est introuvable.",
     "next": "Question suivante",
     "notQuite": "Pas tout à fait",
@@ -113,7 +108,6 @@
       "credentialInvalid": "Le laissez-passer de ce quiz ne vaut pas pour cette leçon. Refais le quiz.",
       "expired": "Le quiz a duré trop longtemps et a expiré. Lances-en un nouveau.",
       "finished": "Ce quiz est déjà terminé. Lances-en un nouveau.",
-      "locked": "Ce point de savoir est encore verrouillé : allume d’abord, sur la carte du ciel, les points sur lesquels il s’appuie.",
       "notFound": "Ce quiz n’est plus ouvert. Lances-en un nouveau.",
       "notStarted": "Le quiz n’a pas pu démarrer. Vérifie ta connexion et réessaie.",
       "restart": "Recommencer le quiz",
@@ -136,5 +130,36 @@
     "toGo_one": "Encore {{count}} série.",
     "toGo_many": "Encore {{count}} séries.",
     "toGo_other": "Encore {{count}} séries."
+  },
+  "starQuiz": {
+    "label": "Test de l’étoile",
+    "heading": "Test de l’étoile : {{star}}",
+    "drawing": "Préparation du test de l’étoile…",
+    "backToStar": "Retour à {{star}} sur la carte du ciel",
+    "backToMap": "Retour à la carte du ciel",
+    "passed": {
+      "title": "Toute l’étoile est allumée",
+      "body": "Tu savais déjà : {{star}} brille maintenant sur ta carte du ciel.",
+      "toMap": "La voir sur la carte du ciel"
+    },
+    "failed": {
+      "title": "Pas cette fois",
+      "body": "Tu pourras refaire le test de l’étoile à partir de {{when}}. D’ici là, ses leçons te permettent de l’allumer.",
+      "bodyLater": "Tu pourras refaire le test de l’étoile demain. D’ici là, ses leçons te permettent de l’allumer.",
+      "toLessons": "Aller à ses leçons"
+    },
+    "trouble": {
+      "restart": "Recommencer le test de l’étoile",
+      "coolingUntil": "Tu pourras refaire ce test de l’étoile à partir de {{when}}.",
+      "unknownStar": "Ce point de savoir n’a pas de test de l’étoile.",
+      "alreadyLit": "Cette étoile est déjà allumée.",
+      "coolingDown": "Tu pourras refaire ce test de l’étoile demain.",
+      "unavailable": "Cette étoile n’a pas encore d’exercices pour un test.",
+      "notFound": "Ce test de l’étoile n’est plus ouvert.",
+      "finished": "Ce test de l’étoile est déjà terminé.",
+      "expired": "Le temps de ce test de l’étoile est écoulé : chacun reste ouvert 30 minutes.",
+      "outOfOrder": "Cette réponse concernait une autre question.",
+      "notStarted": "Le test de l’étoile n’a pas pu démarrer. Vérifie ta connexion et réessaie."
+    }
   }
 }

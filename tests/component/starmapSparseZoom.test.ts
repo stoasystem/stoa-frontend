@@ -42,7 +42,9 @@ function sparseSky(): StarMap {
       name: unitId,
       nebulaId,
       order,
-      state: order === 0 ? ('lit' as const) : ('locked' as const),
+      state: order === 0 ? ('lit' as const) : ('ready' as const),
+      // Production's first sky (#109): one lit point, the rest waiting on it.
+      unlitPrerequisiteIds: order === 0 ? [] : ['brueche-u1'],
       progress: 0,
       unmetExercises: 0,
       reviewDue: 0,

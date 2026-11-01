@@ -145,7 +145,7 @@
     ],
     "lessons": [
       {"lessonId": "demo-sine-cosine--seiten--1", "skill": "seiten", "exercises": 3, "title": {"en": "Sides of a right triangle", "de": "Seiten im rechtwinkligen Dreieck", "fr": "Les côtés du triangle rectangle", "it": "I lati del triangolo rettangolo"}},
-      {"lessonId": "demo-sine-cosine--rechnen--1", "skill": "rechnen", "exercises": 4, "title": {"en": "Calculating with sine and cosine · Level 1", "de": "Rechnen mit Sinus und Kosinus · Stufe 1", "fr": "Calculer avec sinus et cosinus · Niveau 1", "it": "Calcolare con seno e coseno · Livello 1"}},
+      {"lessonId": "demo-sine-cosine--rechnen--1", "skill": "rechnen", "exercises": 5, "title": {"en": "Calculating with sine and cosine · Level 1", "de": "Rechnen mit Sinus und Kosinus · Stufe 1", "fr": "Calculer avec sinus et cosinus · Niveau 1", "it": "Calcolare con seno e coseno · Livello 1"}},
       {"lessonId": "demo-sine-cosine--rechnen--2", "skill": "rechnen", "exercises": 3, "title": {"en": "Calculating with sine and cosine · Level 2", "de": "Rechnen mit Sinus und Kosinus · Stufe 2", "fr": "Calculer avec sinus et cosinus · Niveau 2", "it": "Calcolare con seno e coseno · Livello 2"}}
     ],
     "extensionLessons": [

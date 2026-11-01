@@ -41,7 +41,7 @@ it('keeps a subject the student does not take in the sky, with no student eviden
   expect(own.length).toBeGreaterThan(0)
   expect(map.subjects.find((s) => s.subjectId === 'chemistry')).toMatchObject({ enrolled: false, lit: 0, total: own.length })
   expect(map.summary).toMatchObject({ lit: 0, total: own.length })
-  expect(own.every((s) => (s.state === 'ready' || s.state === 'locked') && !s.recommendation)).toBe(true)
+  expect(own.every((s) => s.state === 'ready' && !s.recommendation)).toBe(true)
 })
 
 it('hands out the whole sky whichever galaxy is in focus, the same arrays every time (#119)', () => {

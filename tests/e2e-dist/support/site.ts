@@ -1,8 +1,10 @@
 import { readFile, stat } from 'node:fs/promises'
 import path from 'node:path'
 import type { Page } from '@playwright/test'
+import { contentSecurityPolicy } from '../../../scripts/content-security-policy.mjs'
 import { contentTypeFor } from '../../../scripts/publish-web-release.mjs'
-import { WEB_ORIGIN, workDir } from './origins'
+import { API_ORIGIN, WEB_ORIGIN, workDir } from './origins'
+import { S3_ORIGIN } from './uploads'
 
 const repoRoot = path.resolve(import.meta.dirname, '../../..')
 const siteDir = path.join(workDir(repoRoot), 'site')
@@ -12,8 +14,16 @@ const siteDir = path.join(workDir(repoRoot), 'site')
  * file that exists is returned as it is, with the publisher's content type;
  * a missing file is a 404 and a problem; any other path gets index.html, so
  * the app's router decides.
+ *
+ * Every page is served under the content security policy, enforced, with this
+ * suite's hosts in production's places (#533); a violation is a problem.
  */
 export async function serveSite(page: Page, problems: string[]) {
+  page.on('console', (message) => {
+    if (message.type() === 'error' && /Content Security Policy/.test(message.text())) {
+      problems.push(`CSP: ${message.text().slice(0, 300)}`)
+    }
+  })
   await page.route(`${WEB_ORIGIN}/**`, async (route) => {
     const { pathname } = new URL(route.request().url())
     const relative = decodeURIComponent(pathname).replace(/^\/+/, '') || 'index.html'
@@ -31,11 +41,14 @@ export async function serveSite(page: Page, problems: string[]) {
     await route.fulfill({
       status: 200,
       contentType: contentTypeFor(served),
-      headers: { 'cache-control': 'no-store' },
+      headers: { 'cache-control': 'no-store', 'content-security-policy': POLICY },
       body: await readFile(found ? file : path.join(siteDir, 'index.html')),
     })
   })
 }
+
+/** The policy production is served with, for this suite's hosts. */
+export const POLICY = contentSecurityPolicy({ apiOrigin: API_ORIGIN, uploadOrigin: S3_ORIGIN })
 
 async function isFile(file: string) {
   try {

@@ -3,7 +3,7 @@
  * there and it must not show the answer before the student commits to one.
  */
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { cleanup, render, screen, waitFor } from '@testing-library/react'
+import { act, cleanup, render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import type { ReactNode } from 'react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
@@ -84,7 +84,7 @@ function renderSession() {
   function Wrapper({ children }: { children: ReactNode }) {
     return <QueryClientProvider client={client}>{children}</QueryClientProvider>
   }
-  return render(<ReviewSession />, { wrapper: Wrapper })
+  return { ...render(<ReviewSession />, { wrapper: Wrapper }), client }
 }
 
 afterEach(() => {
@@ -92,6 +92,46 @@ afterEach(() => {
 })
 
 describe('a question that has come back', () => {
+  it('shows its figure and its options’ drawings (#504)', async () => {
+    const svg = (inner: string) => `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 60">${inner}</svg>`
+    mockedDue.mockResolvedValue({
+      items: [
+        card({
+          prompt: 'Welches Rechteck ist halb so breit?',
+          figure: svg('<title>Ein Rechteck, 4 cm breit</title><rect width="80" height="40"/>'),
+          options: ['A', 'B'],
+          optionFigures: [svg('<rect width="40" height="40"/>'), svg('<rect width="20" height="40"/>')],
+        }),
+        card({ challengeId: 'brueche-l1-c2' }),
+      ],
+      dueCount: 2,
+      generatedAt: '2026-03-02T09:00:00+00:00',
+    })
+    renderSession()
+
+    await screen.findByText('Welches Rechteck ist halb so breit?')
+    const [pictured, plain] = document.querySelectorAll<HTMLElement>('[data-review-card]')
+    // It names itself, so it keeps its own name.
+    expect(within(pictured).getByRole('img', { name: 'Ein Rechteck, 4 cm breit' })).toBeInTheDocument()
+    expect(pictured.querySelectorAll('[data-exercise-figure]')).toHaveLength(3)
+    expect(within(pictured).getByRole('radio', { name: 'B' }).closest('label')!.querySelector('[data-exercise-figure] svg')).not.toBeNull()
+    expect(plain.querySelector('[data-exercise-figure]')).toBeNull()
+  })
+
+  it('shows the figure in the new language once the cards are read again (#504)', async () => {
+    const cone = (word: string) => `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 40"><text x="5" y="25">${word}</text></svg>`
+    const due = (word: string) => ({ items: [card({ figure: cone(word) })], dueCount: 1, generatedAt: '2026-03-02T09:00:00+00:00' })
+    mockedDue.mockResolvedValue(due('Kegel'))
+    const { client } = renderSession()
+    await waitFor(() => expect(document.querySelector('[data-exercise-figure] text')).toHaveTextContent('Kegel'))
+
+    // What AppProviders does when the reader changes language; the backend
+    // then answers in the new one.
+    mockedDue.mockResolvedValue(due('Cône'))
+    await act(() => client.invalidateQueries())
+    await waitFor(() => expect(document.querySelector('[data-exercise-figure] text')).toHaveTextContent('Cône'))
+  })
+
   it('can be answered without leaving the review', async () => {
     mockedDue.mockResolvedValue({
       items: [card()],

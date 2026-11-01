@@ -122,7 +122,7 @@ export const REVEAL = {
   /** Tier 3 (the path walked). */
   linesWalked: [12, 18] as Ramp,
   /**
-   * Tier 4 (locked, dashed): only the lines of the star in focus (keyboard
+   * Tier 4 (waiting, dashed): only the lines of the star in focus (keyboard
    * focus, or chosen) and of a dragged star (#138 D1), fading in over this
    * range (px) -- never every star's.
    */
@@ -315,7 +315,7 @@ export const PANORAMA = {
    * full glyph at every zoom.
    */
   litDot: { radius: 0.75, alpha: 0.7, glow: 0 },
-  /** A ready or locked star's dot on the panorama: a little quieter too, so the cloud carries the picture. */
+  /** A ready or waiting star's dot on the panorama: a little quieter too, so the cloud carries the picture. */
   otherDot: { radius: 1, alpha: 0.95 },
   /**
    * Each nebula's cloud on the panorama: `base`, plus `lit` times its lit

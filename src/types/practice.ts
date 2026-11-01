@@ -75,7 +75,20 @@ export type PracticeRoadmap = {
   units: PracticeRoadmapUnit[]
 }
 
-export type PracticeChallenge = {
+/**
+ * The drawings an exercise may carry (stoa-backend#127, #504), on every
+ * student reply that hands one over: the lesson, the quiz, the review. Each is
+ * one `<svg>` the backend checked against its allowlist, in the reader's
+ * language; `ExerciseFigure` draws it.
+ */
+export type ExerciseFigures = {
+  /** Under the question. Absent or null when there is none. */
+  figure?: string | null
+  /** One per option, in the options' order; `""` (or null) where an option has none. */
+  optionFigures?: (string | null)[] | null
+}
+
+export type PracticeChallenge = ExerciseFigures & {
   /**
    * What `GET /practice/lessons/:id` actually calls it. It was declared as
    * `id` here, which is not a field the backend sends: every answer went to
@@ -200,6 +213,32 @@ export type LessonQuizAnswer = LessonQuizSession & {
   credential: string | null
   credentialExpiresAt: string | null
 }
+
+/**
+ * The star quiz (stoa-backend#165): one paper over a whole knowledge point, at
+ * least one exercise from each lesson, 6 to 10 in all, each asked once; a
+ * second wrong answer loses it. Passed, the whole star lights; lost, it can be
+ * taken again after `retryAt`. The paper, the count and the verdict are the
+ * backend's.
+ */
+export type StarQuizView = {
+  quizId: string
+  unitId: string
+  status: LessonQuizStatus
+  total: number
+  answered: number
+  mistakes: number
+  mistakesAllowed: number
+  /** The paper is good for 30 minutes. */
+  expiresAt: string
+  /** What it asks now, without its answer; null once it is over. */
+  exercise: PracticeExercise | null
+  /** When a lost quiz can be taken again; null otherwise. */
+  retryAt: string | null
+}
+
+/** One star quiz answer judged. Sent again, it gives the first result back (#113). */
+export type StarQuizAnswer = StarQuizView & { correct: boolean }
 
 export type PracticeLessonResult = {
   lessonId: string
@@ -414,7 +453,7 @@ export type PracticeChatLocationState = {
   prompt?: string
 }
 
-export type ReviewCard = {
+export type ReviewCard = ExerciseFigures & {
   challengeId: string
   lessonId: string
   subjectId: string
@@ -445,7 +484,7 @@ export type ReviewSummary = {
  * The field names are the star map model's own (`@/features/starmap/model/starMap`),
  * so the source maps it across without renaming. `prerequisites` and each star's
  * `skills` arrive empty until stoa-backend#56 and #58 land; the map draws no
- * locks and no skill rows while they are.
+ * skill rows while they are.
  */
 export type KnowledgeMapResponse = {
   subjectId: string
@@ -462,7 +501,16 @@ export type KnowledgeMapResponse = {
     name: string
     nebulaId: string
     order: number
+    /**
+     * Nothing is locked since stoa-backend#125 (ADR 0004); `locked` is only
+     * what a backend from before it still says, read as ready.
+     */
     state: 'lit' | 'in_progress' | 'ready' | 'locked'
+    /**
+     * The stated prerequisites not lit yet, in the order stated; empty for a
+     * lit star (stoa-backend#125). Missing only from a backend before it.
+     */
+    unlitPrerequisiteIds?: string[]
     progress: number
     unmetExercises: number
     reviewDue: number
@@ -488,8 +536,13 @@ export type KnowledgeMapResponse = {
     }
     /** When the point was first lit, ISO 8601 (stoa-backend#71). */
     litAt?: string | null
-    /** Seen happening, or written by the backfill (stoa-backend#71). Only `observed` is ever celebrated. */
-    litAtSource?: 'observed' | 'backfilled' | null
+    /**
+     * Seen happening, written by the backfill (stoa-backend#71), or lit by
+     * passing the star quiz (stoa-backend#165). The backfill's is never celebrated.
+     */
+    litAtSource?: 'observed' | 'backfilled' | 'quiz' | null
+    /** When a lost star quiz can be taken again; null when it can now (stoa-backend#165). */
+    starQuizRetryAt?: string | null
   }[]
   prerequisites: { from: string; to: string }[]
   summary: { lit: number; total: number; streakDays: number; score: number }

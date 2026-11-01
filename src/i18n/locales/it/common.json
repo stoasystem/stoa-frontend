@@ -24,11 +24,18 @@
     "tryAgain": "Riprova"
   },
   "composer": {
-    "attach": "Aggiungi una foto o un file",
+    "attach": "Scegli una foto o un file",
+    "capture": "Scatta una foto",
+    "phone": "Invia una foto dal telefono",
     "send": "Invia",
     "sendBlocked": {
       "empty": "Scrivi prima la tua domanda, poi invia.",
       "busy": "È ancora in invio. Riprova tra un attimo."
+    },
+    "dictation": {
+      "windows": "Preferisci parlare? Premi Win + H e di’ la tua domanda.",
+      "mac": "Preferisci parlare? Premi il tasto del microfono o la tua scorciatoia per dettare.",
+      "touch": "Preferisci parlare? Tocca il microfono sulla tastiera."
     }
   },
   "errorBoundary": {
@@ -175,22 +182,6 @@
         "summary": "La tua richiesta di aiuto a un/a docente è scaduta. L’aiuto di questa settimana ti è stato restituito.",
         "title": "Nessun/a docente disponibile"
       },
-      "helpRequested": {
-        "summary": "Un/a allievo/a chiede aiuto per una domanda di {{subject}}.",
-        "title": "Aiuto richiesto"
-      },
-      "moderationCreatedHigh": {
-        "summary": "È stato segnalato un caso di moderazione di gravità alta.",
-        "title": "Nuovo caso di moderazione"
-      },
-      "moderationCreatedLow": {
-        "summary": "È stato segnalato un caso di moderazione di gravità bassa.",
-        "title": "Nuovo caso di moderazione"
-      },
-      "moderationCreatedMedium": {
-        "summary": "È stato segnalato un caso di moderazione di gravità media.",
-        "title": "Nuovo caso di moderazione"
-      },
       "replyConversation": {
         "summary": "Il/la tuo/a docente ha risposto nella tua conversazione.",
         "title": "Il/la tuo/a docente ha risposto"
@@ -324,6 +315,9 @@
     "terms": {
       "title": "Termini di utilizzo"
     },
+    "phoneUpload": {
+      "title": "Invia una foto"
+    },
     "unauthorized": {
       "title": "Accesso richiesto"
     }
@@ -421,6 +415,9 @@
     "placeholder": {
       "body": "Questa schermata è in fase di rifacimento. Il link funziona già e resterà lo stesso.",
       "eyebrow": "Presto disponibile"
+    },
+    "starQuiz": {
+      "title": "Test della stella"
     },
     "unit": {
       "title": "Punto di conoscenza"

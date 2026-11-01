@@ -132,7 +132,7 @@ describe('the demo knowledge point’s chapter', () => {
       total: 4,
       nextLessonId: lessonIds[1],
     })
-    expect(result.current.chapter.lessons.map((lesson) => lesson.exerciseCount)).toEqual([3, 4, 3, 2])
+    expect(result.current.chapter.lessons.map((lesson) => lesson.exerciseCount)).toEqual([3, 5, 3, 2])
   })
 })
 

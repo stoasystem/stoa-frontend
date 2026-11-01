@@ -99,6 +99,45 @@ test('a message that failed retryably is sent again as the same message, and ans
   await expect(thread.getByText(world.answerFor(second))).toHaveCount(1)
 })
 
+test('an answer in sections shows its steps, and a step is asked about as that part of the answer', async ({ page, backend }) => {
+  const world = new StudentWorld(backend)
+  const question = 'How do I solve 3x + 5 = 20?'
+  world.sections.set(question, {
+    kind: 'answer',
+    steps: ['Subtract 5 on both sides.', 'Divide both sides by 3.'],
+    answer: 'x = 5',
+    hints: ['What undoes the + 5?'],
+    similarExercises: ['Solve 2x + 4 = 10.'],
+    knowledgePoints: [{ name: 'Linear equations', unitId: null }],
+    suggestTeacher: true,
+  })
+  world.install()
+  await signInAsStudent(page)
+
+  await page.getByRole('textbox', { name: 'Your question' }).fill(question)
+  const panel = page.getByRole('complementary', { name: 'Ask' })
+  await panel.getByRole('textbox', { name: 'Your question' }).press('Enter')
+  const thread = panel.getByRole('log', { name: 'Messages' })
+  const steps = thread.getByRole('list', { name: 'Steps' })
+  await expect(steps.getByRole('listitem')).toHaveCount(2)
+  await expect(thread.getByText('x = 5', { exact: true })).toBeVisible()
+  // The hint waits to be opened; the joined text is not shown beside the sections.
+  await expect(thread.getByText('What undoes the + 5?')).toHaveCount(0)
+  await expect(thread.getByText(world.answerFor(question))).toHaveCount(0)
+  await expect(thread.getByRole('button', { name: 'Ask a teacher' })).toBeVisible()
+
+  await steps.getByRole('button', { name: "I don't get this step (Step 2)" }).click()
+  await panel.getByRole('textbox', { name: 'Your question' }).press('Enter')
+
+  await expect.poll(() => backend.callsTo('POST', '/conversations/{conv_id}/messages/stream').length).toBe(1)
+  const answerId = [...world.conversations.values()][0].messages.find((message) => message.role === 'assistant')?.id
+  // The body is checked against the backend's OpenAPI document as it is sent.
+  expect(backend.callsTo('POST', '/conversations/{conv_id}/messages/stream')[0].body).toMatchObject({
+    content: "I don't get this step. Can you explain it another way?",
+    quote: { text: 'Divide both sides by 3.', source: { kind: 'message', id: answerId, part: { section: 'steps', index: 1 } } },
+  })
+})
+
 test('signing out ends the session here and on the backend', async ({ page, backend }) => {
   new StudentWorld(backend).install()
   await signInAsStudent(page)

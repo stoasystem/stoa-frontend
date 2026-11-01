@@ -271,9 +271,9 @@ describe('the student’s solid buttons take the edge (#125)', () => {
     expect(solids.filter((attributes) => !/\blift\b/.test(attributes))).toEqual([])
   })
 
-  it('counts the ten the canvas names and the small star’s way in (#501), and no fewer', () => {
+  it('counts the ten the canvas names, the small star’s way in (#501), the star quiz’s five (#486), and no fewer', () => {
     const total = STUDENT_FILES.reduce((sum, file) => sum + solidTags(read(file)).length, 0)
-    expect(total).toBe(11)
+    expect(total).toBe(16)
   })
 
   it('sees a solid button that was left flat (a negative control for the scan)', () => {

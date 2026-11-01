@@ -76,7 +76,7 @@ describe('the parallel DOM', () => {
     const star = (name: string) => within(nav).getByRole('link', { name: new RegExp(`^${name},`) })
     expect(star('Sine and cosine')).toHaveAccessibleName('Sine and cosine, In progress, 33% of lessons done, Suggested next')
     expect(star('Integers')).toHaveAccessibleName('Integers, Lit, 100% of lessons done, 4 cards due for review')
-    expect(star('Tangent')).toHaveAccessibleName('Tangent, Locked, 0% of lessons done')
+    expect(star('Tangent')).toHaveAccessibleName('Tangent, Ready to start, 0% of lessons done, Builds on stars not lit yet')
     expect(star('Terms and expressions')).toHaveAccessibleName('Terms and expressions, Ready to start, 0% of lessons done')
   })
 
@@ -248,11 +248,12 @@ describe('the star layer is HTML', () => {
     expect(screen.getByText('All lessons done: 2 exercises still to get right')).toBeInTheDocument()
   })
 
-  it('lists a locked star’s prerequisites instead of a chapter link, across galaxies too', () => {
+  it('lists what a star waits on, across galaxies too, and still opens it (ADR 0004)', () => {
     showMap({ layer: 'star', nebulaId: 'optics', unitId: 'demo-refraction' }, 10, sky10('physics'))
     const card = screen.getByRole('article', { name: 'Refraction' })
+    expect(within(card).getByRole('heading', { name: 'Best learned first' })).toBeInTheDocument()
     expect(within(card).getByRole('link', { name: 'Sine and cosine' })).toHaveAttribute('href', '/map/math/trigonometry/demo-sine-cosine')
-    expect(within(card).queryByRole('link', { name: /Start|Continue|Open chapter/ })).toBeNull()
+    expect(within(card).getByRole('link', { name: 'Start' })).toHaveAttribute('href', '/chapter/demo-refraction')
   })
 
   it('shows the review count', () => {

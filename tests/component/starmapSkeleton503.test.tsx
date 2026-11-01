@@ -349,7 +349,7 @@ function cardMap(over: Partial<StarMap['stars'][number]>): StarMap {
     subject: { subjectId: 'math', name: 'Mathematik' },
     subjects: [],
     nebulae: [{ topicId: 'weit', name: 'Weit', order: 1, subjectId: 'math' }],
-    stars: [{ ...star('far', 'weit'), ...over }],
+    stars: [{ ...star('far', 'weit'), state: 'ready', unlitPrerequisiteIds: [], ...over }],
     prerequisites: [],
     summary: { lit: 0, total: 1, streakDays: 0, score: 0 },
   }
@@ -444,7 +444,7 @@ describe('the chapter', () => {
     await waitFor(() => expect(result.current.status).toBe('ready'))
     if (result.current.status !== 'ready') return
     expect(getStars).toHaveBeenCalledWith({ subjectId: 'physics', around: 'licht' })
-    expect(result.current.chapter.star).toEqual({ state: 'in_progress', unmetExercises: 4 })
+    expect(result.current.chapter.star).toEqual({ state: 'in_progress', unmetExercises: 4, unlitPrerequisites: [] })
     expect(result.current.chapter.skills).toHaveLength(2)
     expect(result.current.chapter.practiceSets.map((set) => set.skillId)).toEqual(['licht--rechnen', 'licht--schliessen'])
   })
@@ -456,7 +456,7 @@ describe('the chapter', () => {
     await waitFor(() => expect(result.current.status).toBe('ready'))
     if (result.current.status !== 'ready') return
     // From the skeleton meanwhile; its small stars are not known yet.
-    expect(result.current.chapter.star).toEqual({ state: 'ready', unmetExercises: 0 })
+    expect(result.current.chapter.star).toEqual({ state: 'ready', unmetExercises: 0, unlitPrerequisites: [] })
     expect(result.current.chapter.skills).toEqual([])
   })
 })

@@ -24,7 +24,8 @@
     "keys": "Keys: arrows go to the nearest one that way, Tab follows the course, + and − zoom.",
     "label": "What the stars mean",
     "pointer": "Drag to move, scroll or pinch to zoom. Pick a star to see its chapter; press and drag it (on touch, hold it first) to see what it connects to.",
-    "reviewDue": "Due for review"
+    "reviewDue": "Due for review",
+    "waiting": "Builds on stars not lit yet"
   },
   "lighting": {
     "announce": "{{name}} is lit"
@@ -51,6 +52,12 @@
   "star": {
     "progress": "{{percent}}% of lessons done",
     "lessons": "{{done}} of {{total}} lessons done",
+    "quiz": {
+      "take": "I know this – test me",
+      "cooling": "You can take the test again from {{when}}.",
+      "litByQuiz": "Lit by passing the star quiz",
+      "alsoTest": "You can also test the whole star."
+    },
     "unmet_one": "All lessons done: {{count}} exercise still to get right",
     "unmet_other": "All lessons done: {{count}} exercises still to get right",
     "unmetPartial_one": "{{count}} exercise still to get right",
@@ -59,7 +66,7 @@
     "skills": "Skills",
     "skillLit": "{{name}}, lit",
     "skillDark": "{{name}}, not lit yet",
-    "prerequisites": "Light these first",
+    "prerequisites": "Best learned first",
     "start": "Start",
     "continue": "Continue",
     "open": "Open chapter",
@@ -81,8 +88,7 @@
   "state": {
     "lit": "Lit",
     "in_progress": "In progress",
-    "ready": "Ready to start",
-    "locked": "Locked"
+    "ready": "Ready to start"
   },
   "subjects": {
     "label": "Subjects"

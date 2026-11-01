@@ -9,8 +9,10 @@
  * their status, never a button). Opened from a star, the jump plays first.
  *
  * A lesson open to the student and not done yet also offers 「跳过这一课」
- * beside its row: the short quiz that tests out of it (`quiz.ts`). A locked
- * lesson offers none (#81).
+ * beside its row: the short quiz that tests out of it (`quiz.ts`); a lesson
+ * done offers none (#81). Nothing is locked (ADR 0004): a point some of whose
+ * prerequisites are not lit yet says which to learn first, each a link to its
+ * star, and opens like any other.
  *
  * Lit is the star map's word, not the lessons' (#342): every lesson done is
  * not a lit point when some were passed by a quiz, so the card says what the
@@ -121,16 +123,14 @@ function ChapterBody({ chapter }: { chapter: Chapter }) {
   const remaining = Math.max(0, chapter.total - chapter.done)
   const star = chapter.star
   const lit = star?.state === 'lit'
-  const standing =
-    star?.state === 'locked'
-      ? t('chapter.locked')
-      : lit
-        ? t('chapter.lit')
-        : star && star.unmetExercises > 0
-          ? t('chapter.unmet', { count: star.unmetExercises })
-          : remaining > 0
-            ? t('chapter.toGo', { count: remaining })
-            : t('chapter.allDone')
+  const standing = lit
+    ? t('chapter.lit')
+    : star && star.unmetExercises > 0
+      ? t('chapter.unmet', { count: star.unmetExercises })
+      : remaining > 0
+        ? t('chapter.toGo', { count: remaining })
+        : t('chapter.allDone')
+  const firstLearn = star?.unlitPrerequisites ?? []
 
   return (
     <>
@@ -144,7 +144,11 @@ function ChapterBody({ chapter }: { chapter: Chapter }) {
 
       <header className="flex items-center gap-4">
         <div className="shrink-0">
-          <StarGlyph state={lit ? 'lit' : star?.state === 'locked' ? 'locked' : chapter.done > 0 ? 'in_progress' : 'ready'} size={72} progress={chapter.total ? chapter.done / chapter.total : 0} />
+          <StarGlyph
+            state={lit ? 'lit' : chapter.done > 0 ? 'in_progress' : firstLearn.length > 0 ? 'waiting' : 'ready'}
+            size={72}
+            progress={chapter.total ? chapter.done / chapter.total : 0}
+          />
         </div>
         <div className="flex min-w-0 flex-col gap-1">
           <h1 className="m-0 text-on-sky" style={{ font: 'var(--t-title1)', letterSpacing: 'var(--t-title1-tracking)' }}>
@@ -175,6 +179,26 @@ function ChapterBody({ chapter }: { chapter: Chapter }) {
           {standing}
         </p>
       </div>
+
+      {firstLearn.length > 0 && (
+        <section aria-labelledby="chapter-first-learn" data-chapter-first-learn className="flex flex-col gap-1">
+          <h2 id="chapter-first-learn" className="m-0 text-[15px] font-semibold text-[color:var(--on-sky-text-body)]">
+            {t('chapter.firstLearn')}
+          </h2>
+          <ul className="m-0 flex list-none flex-col p-0">
+            {firstLearn.map((before) => (
+              <li key={before.unitId}>
+                <Link
+                  to={pathForTarget(before.subjectId, { layer: 'star', nebulaId: before.nebulaId, unitId: before.unitId })}
+                  className={plainOnSky}
+                >
+                  {before.name}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
 
       {primary && (
         <div>

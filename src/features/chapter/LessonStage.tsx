@@ -17,8 +17,8 @@
  * are drawn here exactly as they arrive. In a quiz there are no hints, no
  * skip, and Ask and 「问这段」 are off.
  */
-import { ChevronLeft, Heart, Lightbulb, Lock, Sparkles } from 'lucide-react'
-import { useEffect, useMemo, useRef, useState, type MutableRefObject, type ReactNode } from 'react'
+import { ChevronLeft, Heart, Lightbulb, Sparkles } from 'lucide-react'
+import { useEffect, useId, useMemo, useRef, useState, type MutableRefObject, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link, useSearchParams } from 'react-router-dom'
 import { Murmi } from '@/components/brand/Murmi'
@@ -28,10 +28,12 @@ import { MathRenderer } from '@/components/ui/MathRenderer'
 import { pathForTarget } from '@/features/starmap/view/layers'
 import type { AskPractice } from '@/features/ask/practiceContext'
 import { AnswerInput, bodyOnSky, FeedbackCard, glass } from '@/features/chapter/answerControls'
+import { ExerciseFigure } from '@/features/chapter/ExerciseFigure'
 import { StageWithAsk, STAGE_SIDE_QUERY } from '@/features/chapter/StageAsk'
 import { quizTroubleIsRestartable, quizTroubleKey } from '@/features/chapter/quiz'
 import { chapterPath, isOpenLesson, lessonAfter, QUIZ_MODE, useChapter, type Chapter } from '@/features/chapter/useChapter'
 import { useLessonRun, type LessonRun } from '@/features/chapter/useLessonRun'
+import { formatRetryAt, starQuizTroubleIsRestartable, starQuizTroubleKey, useStarQuizRun, type StarQuizRun } from '@/features/chapter/useStarQuizRun'
 import { StarGlyph } from '@/features/starmap/components/StarGlyph'
 import { usePrefersReducedMotion } from '@/features/starmap/motion/usePrefersReducedMotion'
 import { useLessonQuery } from '@/hooks/practice/useLessonQuery'
@@ -54,14 +56,14 @@ export function LessonStage({ unitId, lessonId }: { unitId: string | undefined; 
   // A lesson from another unit is not this chapter's: a link that pairs them
   // finds nothing, as a chapter not in the catalog does.
   const inUnit = lesson !== undefined && (!unitId || lesson.unitId === unitId)
-  // Whether the chapter says it is locked. Until the chapter is read the stage
-  // waits rather than flash an exercise it may take back; if the chapter
-  // cannot be read the stage opens, and the backend still decides.
+  // Whether the chapter says the lesson is open. Until the chapter is read the
+  // stage waits rather than flash a quiz it may turn into the lesson; if the
+  // chapter cannot be read the stage opens, and the backend still decides.
   const status = chapter?.lessons.find((item) => item.id === lesson?.id)?.status
   // Testing out of the lesson from the chapter: only where the chapter says the
   // lesson is open (#81). Until stoa-backend#83 checks it this is the only
   // gate, so a lesson done, or one the chapter could not be read for, opens
-  // as the lesson itself; a locked one gets its notice like any other way in.
+  // as the lesson itself. Nothing is locked (ADR 0004).
   // Decided once, when the chapter first says: passing the quiz turns the
   // lesson done, and that must not turn the quiz on screen into the lesson.
   // A reload starts the quiz again from the beginning; nothing of it is kept.
@@ -81,9 +83,7 @@ export function LessonStage({ unitId, lessonId }: { unitId: string | undefined; 
         ? 'missing'
         : chapterQuery.status === 'loading'
           ? 'loading'
-          : status === 'locked'
-            ? 'locked'
-            : null
+          : null
   // Keyed by lesson and mode: the next lesson, or the quiz, starts a fresh run.
   return (
     <AppLayout bleed surface="sky">
@@ -101,7 +101,6 @@ export function LessonStage({ unitId, lessonId }: { unitId: string | undefined; 
             unitId={unitId}
             kind={notice ?? 'missing'}
             retry={() => void lessonQuery.refetch()}
-            starPath={chapter ? starPathOf(chapter.subjectId, chapter.topicId, chapter.unitId) : undefined}
           />
         </div>
       )}
@@ -109,13 +108,9 @@ export function LessonStage({ unitId, lessonId }: { unitId: string | undefined; 
   )
 }
 
-type StageNoticeKind = 'loading' | 'failed' | 'missing' | 'locked'
+type StageNoticeKind = 'loading' | 'failed' | 'missing'
 
-/** The knowledge point's own address on the star map. */
-const starPathOf = (subjectId: string, topicId: string, unitId: string) =>
-  pathForTarget(subjectId, { layer: 'star', nebulaId: topicId, unitId })
-
-function StageNotice({ unitId, kind, retry, starPath }: { unitId?: string; kind: StageNoticeKind; retry: () => void; starPath?: string }) {
+function StageNotice({ unitId, kind, retry }: { unitId?: string; kind: StageNoticeKind; retry: () => void }) {
   const { t } = useTranslation('chapter')
   return (
     <>
@@ -142,21 +137,6 @@ function StageNotice({ unitId, kind, retry, starPath }: { unitId?: string; kind:
             {t('stage.retry')}
           </Button>
         </>
-      ) : kind === 'locked' ? (
-        <div data-stage-locked className="flex flex-col items-start gap-1">
-          <h1 className="m-0 inline-flex items-center gap-2 text-[22px] font-semibold text-on-sky">
-            <Lock size={20} strokeWidth={ICON.stroke} aria-hidden="true" />
-            {t('stage.locked.title')}
-          </h1>
-          <p className={cn('m-0 text-[15px]', bodyOnSky)}>{t('stage.locked.body')}</p>
-          {/* What it builds on is found on the map: back to the chapter only
-            * leads to the same locked lessons again (#342). */}
-          {starPath && (
-            <Link to={starPath} className={plainOnSky}>
-              {t('chapter.backToMap')}
-            </Link>
-          )}
-        </div>
       ) : (
         <>
           <Murmi mood="calm" size="var(--murmi-state)" />
@@ -210,7 +190,7 @@ function LessonRunStage({
         {run.finished ? (
           <LessonDone lesson={lesson} unitId={unitId} chapter={chapter} testedOut={run.passedQuiz} />
         ) : run.trouble?.inQuiz ? (
-          <QuizTrouble run={run} unitId={unitId} starPath={starPathOf(lesson.subjectId, lesson.topicId, unitId)} />
+          <QuizTrouble run={run} unitId={unitId} />
         ) : run.failed ? (
           <QuizFailed run={run} unitId={unitId} />
         ) : run.quizPending ? (
@@ -380,6 +360,7 @@ function Exercise({
   arrived: MutableRefObject<boolean>
 }) {
   const prompt = useRef<HTMLHeadingElement>(null)
+  const promptId = useId()
   const mode = run.quiz ? 'quiz' : 'lesson'
 
   // A new exercise, the quiz begun, or back from it: the keyboard and the
@@ -448,6 +429,7 @@ function Exercise({
               {challenge.topic && <p className={cn('m-0 text-[17px]', bodyOnSky)}>{challenge.topic}</p>}
               <h2
                 ref={prompt}
+                id={promptId}
                 tabIndex={-1}
                 data-stage-prompt
                 className="m-0 text-on-sky outline-none"
@@ -459,6 +441,7 @@ function Exercise({
               >
                 <MathRenderer>{challenge.prompt}</MathRenderer>
               </h2>
+              {challenge.figure && <ExerciseFigure svg={challenge.figure} labelledBy={promptId} className="mt-2" />}
             </div>
 
             <form
@@ -634,7 +617,7 @@ function ActionRow({ run, side }: { run: LessonRun; side: boolean }) {
  * the way on. Which troubles a fresh paper gets past is `quiz.ts`; the rest
  * end at the chapter.
  */
-function QuizTrouble({ run, unitId, starPath }: { run: LessonRun; unitId: string; starPath: string }) {
+function QuizTrouble({ run, unitId }: { run: LessonRun; unitId: string }) {
   const { t } = useTranslation('chapter')
   const heading = useRef<HTMLHeadingElement>(null)
   useEffect(() => heading.current?.focus(), [])
@@ -671,14 +654,8 @@ function QuizTrouble({ run, unitId, starPath }: { run: LessonRun; unitId: string
               </Link>
             </>
           ) : (
-            // A locked point is opened on the map: its chapter only leads back
-            // to the same locked lessons (#342).
             <Button asChild lift variant="onSky" size="large" style={{ minWidth: 200 }}>
-              {code === 'lesson_locked' ? (
-                <Link to={starPath}>{t('chapter.backToMap')}</Link>
-              ) : (
-                <Link to={chapterPath(unitId)}>{t('stage.done.backToChapter')}</Link>
-              )}
+              <Link to={chapterPath(unitId)}>{t('stage.done.backToChapter')}</Link>
             </Button>
           )}
         </div>
@@ -825,5 +802,185 @@ function LessonDone({
         </div>
       </section>
     </div>
+  )
+}
+
+/**
+ * `/star-quiz/:unitId`: the star quiz (#486), on the stage and in the manner
+ * of the lesson quiz -- two hearts, no hint, no Ask, no skip. The paper and
+ * every verdict are the backend's (`useStarQuizRun`). Passed, the whole star
+ * is lit and the map celebrates it; lost, it can be taken again after a day,
+ * and its lessons are the way on meanwhile.
+ */
+export function StarQuizStage({ unitId }: { unitId: string | undefined }) {
+  const { t } = useTranslation('chapter')
+  const chapterQuery = useChapter(unitId)
+  const chapter = chapterQuery.status === 'ready' ? chapterQuery.chapter : null
+  const run = useStarQuizRun(unitId)
+  const side = useMediaQuery(STAGE_SIDE_QUERY)
+  const arrived = useRef(true)
+  const starPath = chapter
+    ? pathForTarget(chapter.subjectId, { layer: 'star', nebulaId: chapter.topicId, unitId: chapter.unitId })
+    : '/'
+  const { challenge } = run
+
+  return (
+    <AppLayout bleed surface="sky">
+      <div className="flex min-h-0 flex-1 flex-col">
+        <StageWithAsk subjectId={chapter?.subjectId ?? ''} off={t('quiz.askOff')}>
+          <StarQuizStrip run={run} chapter={chapter} starPath={starPath} side={side} />
+          {run.finished ? (
+            <StarQuizPassed chapter={chapter} starPath={starPath} />
+          ) : run.starTrouble ? (
+            <StarQuizTroubleView run={run} unitId={unitId} starPath={starPath} />
+          ) : run.failed ? (
+            <StarQuizFailed run={run} unitId={unitId} />
+          ) : run.quizPending ? (
+            <div className="flex items-center gap-2 p-6">
+              <Murmi mood="thinking" size="var(--murmi-inline)" />
+              <p role="status" className={cn('m-0 text-[15px]', bodyOnSky)}>
+                {t('starQuiz.drawing')}
+              </p>
+            </div>
+          ) : challenge ? (
+            <Exercise run={run} challenge={challenge} chapter={chapter} side={side} arrived={arrived} />
+          ) : null}
+        </StageWithAsk>
+      </div>
+    </AppLayout>
+  )
+}
+
+/** The strip under the bar: back to the star, which star and which question, the hearts. */
+function StarQuizStrip({ run, chapter, starPath, side }: { run: StarQuizRun; chapter: Chapter | null; starPath: string; side: boolean }) {
+  const { t } = useTranslation('chapter')
+  const title = chapter?.title ?? ''
+  const where = [
+    side ? title : null,
+    t('starQuiz.label'),
+    run.count > 0 && run.quiz ? t('stage.questionOf', { question: Math.min(run.index + 1, run.count), questions: run.count }) : null,
+  ]
+    .filter(Boolean)
+    .join(' · ')
+  return (
+    <div
+      className="grid shrink-0 items-center gap-2 border-b border-white/10"
+      style={{ gridTemplateColumns: '1fr auto 1fr', padding: side ? '6px 20px' : '4px 8px' }}
+    >
+      <Link to={starPath} className={cn(plainOnSky, 'justify-self-start')} aria-label={t('starQuiz.backToStar', { star: title })}>
+        <ChevronLeft size={side ? 18 : 24} strokeWidth={ICON.stroke} aria-hidden="true" />
+        {side && <span className="max-w-[220px] truncate">{title}</span>}
+      </Link>
+      <div className="flex min-w-0 flex-col items-center">
+        <h1 className="sr-only">{t('starQuiz.heading', { star: title })}</h1>
+        <p className="m-0 truncate text-[13px] font-semibold text-[color:var(--on-sky-text-body)]">{where}</p>
+      </div>
+      <div className="justify-self-end">{run.quiz && <Hearts left={run.quiz.hearts} total={run.quiz.total} />}</div>
+    </div>
+  )
+}
+
+/** One end of the star quiz: Murmi, a title that takes the keyboard, a sentence, the way on. */
+function StarQuizEnd({
+  name,
+  mood,
+  title,
+  body,
+  children,
+}: {
+  name: string
+  mood: 'delighted' | 'calm' | 'thinking'
+  title: string
+  body: string
+  children: ReactNode
+}) {
+  const heading = useRef<HTMLHeadingElement>(null)
+  useEffect(() => heading.current?.focus(), [])
+  return (
+    <div className="relative flex min-h-0 flex-1 items-center justify-center overflow-y-auto p-6">
+      <section aria-labelledby={`star-quiz-${name}-title`} data-star-quiz-end={name} className="flex max-w-[520px] flex-col items-center gap-4 text-center">
+        <Murmi mood={mood} size="var(--murmi-state)" />
+        <h2
+          ref={heading}
+          id={`star-quiz-${name}-title`}
+          tabIndex={-1}
+          className="m-0 text-on-sky outline-none"
+          style={{ font: 'var(--t-title1)', letterSpacing: 'var(--t-title1-tracking)' }}
+        >
+          {title}
+        </h2>
+        <p role={mood === 'thinking' ? 'alert' : undefined} className={cn('m-0 text-[17px]', bodyOnSky)}>
+          {body}
+        </p>
+        <div className="flex flex-col items-center gap-2 pt-2 sm:flex-row sm:gap-5">{children}</div>
+      </section>
+    </div>
+  )
+}
+
+function StarQuizPassed({ chapter, starPath }: { chapter: Chapter | null; starPath: string }) {
+  const { t } = useTranslation('chapter')
+  return (
+    <StarQuizEnd name="passed" mood="delighted" title={t('starQuiz.passed.title')} body={t('starQuiz.passed.body', { star: chapter?.title ?? '' })}>
+      <Button asChild lift variant="onSky" size="large" style={{ minWidth: 200 }}>
+        <Link to={starPath}>{t('starQuiz.passed.toMap')}</Link>
+      </Button>
+    </StarQuizEnd>
+  )
+}
+
+function StarQuizFailed({ run, unitId }: { run: StarQuizRun; unitId: string | undefined }) {
+  const { t, i18n } = useTranslation('chapter')
+  const when = run.retryAt ? formatRetryAt(run.retryAt, i18n.language) : null
+  return (
+    <StarQuizEnd
+      name="failed"
+      mood="calm"
+      title={t('starQuiz.failed.title')}
+      body={when ? t('starQuiz.failed.body', { when }) : t('starQuiz.failed.bodyLater')}
+    >
+      {unitId && (
+        <Button asChild lift variant="onSky" size="large" style={{ minWidth: 200 }}>
+          <Link to={chapterPath(unitId)}>{t('starQuiz.failed.toLessons')}</Link>
+        </Button>
+      )}
+    </StarQuizEnd>
+  )
+}
+
+function StarQuizTroubleView({ run, unitId, starPath }: { run: StarQuizRun; unitId: string | undefined; starPath: string }) {
+  const { t, i18n } = useTranslation('chapter')
+  const trouble = run.starTrouble!
+  const when = trouble.retryAt ? formatRetryAt(trouble.retryAt, i18n.language) : null
+  const body =
+    trouble.code === 'star_quiz_cooling_down' && when
+      ? t('starQuiz.trouble.coolingUntil', { when })
+      : t(starQuizTroubleKey(trouble.code))
+  return (
+    <StarQuizEnd name="trouble" mood="thinking" title={t('stage.trouble.title')} body={body}>
+      {starQuizTroubleIsRestartable(trouble.code) ? (
+        <>
+          <Button lift variant="onSky" size="large" onClick={run.restartQuiz} style={{ minWidth: 200 }}>
+            {t('starQuiz.trouble.restart')}
+          </Button>
+          <Link to={starPath} className={plainOnSky}>
+            {t('starQuiz.backToMap')}
+          </Link>
+        </>
+      ) : trouble.code === 'star_quiz_cooling_down' && unitId ? (
+        <>
+          <Button asChild lift variant="onSky" size="large" style={{ minWidth: 200 }}>
+            <Link to={chapterPath(unitId)}>{t('starQuiz.failed.toLessons')}</Link>
+          </Button>
+          <Link to={starPath} className={plainOnSky}>
+            {t('starQuiz.backToMap')}
+          </Link>
+        </>
+      ) : (
+        <Button asChild lift variant="onSky" size="large" style={{ minWidth: 200 }}>
+          <Link to={starPath}>{t('starQuiz.backToMap')}</Link>
+        </Button>
+      )}
+    </StarQuizEnd>
   )
 }

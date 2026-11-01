@@ -8,6 +8,8 @@ import type {
   LessonQuizAnswer,
   LessonQuizKind,
   LessonQuizSession,
+  StarQuizAnswer,
+  StarQuizView,
   ReviewDueResponse,
   ReviewSummary,
   PracticeAnswerRequest,
@@ -70,12 +72,40 @@ export async function submitChallengeAnswer(challengeId: string, payload: Practi
  * Draw the short quiz that can complete a lesson (stoa-backend#92). The paper
  * is composed server-side and kept there; nothing of it is decided here.
  *
- * 409 `lesson_locked` / `lesson_quiz_unavailable`.
+ * 409 `lesson_quiz_unavailable`.
  */
 export async function startLessonQuiz(lessonId: string, kind: LessonQuizKind) {
   const response = await httpClient.post<LessonQuizSession>(
     apiPath`/practice/lessons/${lessonId}/quiz`,
     { kind },
+  )
+  return response.data
+}
+
+/**
+ * Open the star quiz of a knowledge point, or the paper still open for it
+ * (stoa-backend#165). No body: the backend draws the paper.
+ *
+ * 404 `star_quiz_unknown_star`; 409 `star_quiz_already_lit` /
+ * `star_quiz_cooling_down` (with `retryAt`) / `star_quiz_unavailable`.
+ */
+export async function startStarQuiz(unitId: string) {
+  const response = await httpClient.post<StarQuizView>(apiPath`/practice/knowledge-map/stars/${unitId}/quiz`)
+  return response.data
+}
+
+/**
+ * Hand one star quiz answer to the backend, which judges it. `exerciseId` is
+ * the exercise it answers, so the same answer sent again after a lost reply
+ * gets the first verdict back rather than being judged against the next one.
+ *
+ * 404 `star_quiz_not_found`; 409 `star_quiz_out_of_order` / `star_quiz_finished`
+ * / `star_quiz_expired` / `star_quiz_unavailable`.
+ */
+export async function answerStarQuiz(unitId: string, quizId: string, payload: { exerciseId: string; answer: unknown }) {
+  const response = await httpClient.post<StarQuizAnswer>(
+    apiPath`/practice/knowledge-map/stars/${unitId}/quiz/${quizId}/answer`,
+    payload,
   )
   return response.data
 }

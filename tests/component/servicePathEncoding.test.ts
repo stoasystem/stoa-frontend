@@ -57,11 +57,14 @@ beforeEach(() => {
       if (url === '/files/intents') {
         return { status: 200, data: { uploadId: currentId, maxBytes: 100, acceptedTypes: [], chunkBytes: 100 } }
       }
+      // A part's URL is S3's, which no id of ours is put into (#516).
+      if (url.includes('/parts/')) return { status: 200, data: { url: S3_PART_URL, method: 'PUT', headers: {} } }
       return { status: 200, data: {} }
     })
   }
   fetchMock.mockReset()
   fetchMock.mockImplementation(async (url: string) => {
+    if (url === S3_PART_URL) return new Response(null, { status: 200 })
     seen.push(`FETCH ${url.slice(apiBaseUrl.length)}`)
     return new Response(null, { status: 202 })
   })
@@ -73,6 +76,7 @@ afterEach(() => {
 })
 
 let currentId = PLAIN
+const S3_PART_URL = 'https://images.s3.eu-central-2.amazonaws.com/staging/part?X-Amz-Signature=x'
 
 type Case = {
   name: string
@@ -159,7 +163,7 @@ const cases: Record<string, Case[]> = {
         currentId = id
         return fileApi.uploadFile({ file: new File(['x'], 'x.txt', { type: 'text/plain' }) })
       },
-      requests: (id) => ['POST /files/intents', `PUT /files/${id}/chunks/1`, `POST /files/${id}/complete`],
+      requests: (id) => ['POST /files/intents', `POST /files/${id}/parts/1`, `POST /files/${id}/complete`],
     },
     { name: 'getUploadedFile', call: (id) => fileApi.getUploadedFile(id), requests: (id) => [`GET /files/attachments/${id}`] },
     { name: 'deleteUploadedFile', call: (id) => fileApi.deleteUploadedFile(id), requests: (id) => [`DELETE /files/attachments/${id}`] },

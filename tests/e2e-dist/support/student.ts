@@ -9,18 +9,28 @@ export const STUDENT = {
 }
 export const ACCESS_TOKEN = 'e2e-access-token'
 
-type Message = { id: string; conversationId: string; role: string; content: string; createdAt: string }
+type Message = {
+  id: string
+  conversationId: string
+  role: string
+  content: string
+  createdAt: string
+  structured?: Record<string, unknown>
+  /** `AttachmentSummary`s, as the backend lists a message's files. */
+  attachments?: unknown[]
+}
 type Command = {
   key: string
   conversationId: string
   question: string
   answer: string
+  structured?: Record<string, unknown>
   finished: boolean
   failed: boolean
   attempt: number
   reads: number
 }
-type Conversation = { id: string; subject: string; grade: string; createdAt: string; messages: Message[] }
+export type Conversation = { id: string; subject: string; grade: string; createdAt: string; messages: Message[] }
 
 /**
  * One student and the parts of the backend a student's session touches:
@@ -35,6 +45,8 @@ export class StudentWorld {
   autoFinishAfterReads: number | null = 2
   /** The next message accepted fails on its first attempt, as one the backend may answer if sent again. */
   failNextRetryably = false
+  /** The sections an answer to this question comes in (stoa-backend#132); others are text only. */
+  readonly sections = new Map<string, Record<string, unknown>>()
   private clock = Date.parse('2026-09-29T08:00:00Z')
   private nextConversation = 1
 
@@ -319,6 +331,7 @@ export class StudentWorld {
       conversationId: conversation.id,
       question,
       answer: this.answerFor(question),
+      structured: this.sections.get(question),
       finished: false,
       failed,
       attempt: 1,
@@ -337,6 +350,7 @@ export class StudentWorld {
       role: 'assistant',
       content: command.answer,
       createdAt: this.now(),
+      ...(command.structured ? { structured: command.structured } : {}),
     })
   }
 

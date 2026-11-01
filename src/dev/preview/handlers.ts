@@ -31,9 +31,10 @@ import {
   setDemoLanguage,
 } from '@/dev/preview/demoSource'
 import { starCountFrom } from '@/dev/preview/surfaces'
+import { DEMO_BRIDGE_STAR } from '@/dev/demo/data'
 import { isSupportedLanguage } from '@/i18n/languages'
 import { commandMessageIds } from '@/services/chat/commandMessageIds'
-import type { ChatMessage, ConversationSummary } from '@/types/chat'
+import type { ChatMessage, ConversationSummary, MessageQuote } from '@/types/chat'
 import type { NotificationPreferenceMatrix } from '@/types/notification'
 
 export type PreviewRequest = {
@@ -81,6 +82,8 @@ function notificationPreferences() {
   return {
     userId: demo().demoStudent.id,
     preferences: withDefaults(demoNotificationPreferences()),
+    // A teacher's switch; the demo student has no help requests offered to them.
+    dispatchEmail: true,
     supportedCategories: PREFERENCE_CATEGORIES,
     supportedChannels: PREFERENCE_CHANNELS,
     updatedAt: null as string | null,
@@ -207,6 +210,14 @@ const routes: Array<[method: string, pattern: string, handler: Handler]> = [
     askedForTeacher.set(request.conversationId, request)
     return request
   }],
+  // Taken back while it waits (#543); one the demo data holds, or none, answers 404.
+  ['POST', '/teacher-help/conversations/:id/request/withdraw', ({ params }) => {
+    const asked = askedForTeacher.get(params.id)
+    if (!asked) return null
+    const withdrawn = { ...asked, status: 'withdrawn' }
+    askedForTeacher.set(params.id, withdrawn)
+    return withdrawn
+  }],
   // A conversation never handed to a teacher answers 404, as the backend does.
   ['GET', '/teacher-help/conversations/:id/request', ({ params }) =>
     demoTeacherHelpRequests.find((request) => request.conversationId === params.id) ?? askedForTeacher.get(params.id) ?? null],
@@ -284,13 +295,29 @@ const REPLY: Record<string, (content: string) => string> = {
 }
 const replyTo = (content: string) => (REPLY[demoLanguage()] ?? REPLY.en)(content)
 
+/**
+ * A question with this in it is answered as one that names a star to go to
+ * (#487): the answer carries the physics star Refraction, another galaxy than
+ * the maths one the map opens on, so the card and the flight to it can be
+ * seen. No assistant reads the question; the marker stands in for the backend
+ * recognising the star (stoa-backend#124).
+ */
+export const DEMO_FIND_STAR = '#star'
+
 /** A question and its answer as the backend stores them, with the ids it derives from the command. */
-async function exchange(conversationId: string, idempotencyKey: string, content: string): Promise<ChatMessage[]> {
+async function exchange(
+  conversationId: string,
+  idempotencyKey: string,
+  content: string,
+  quote?: MessageQuote,
+): Promise<ChatMessage[]> {
   const { studentMessageId, assistantMessageId } = await commandMessageIds(conversationId, idempotencyKey)
   const askedAt = now()
+  const targetUnit = content.includes(DEMO_FIND_STAR) ? { unitId: DEMO_BRIDGE_STAR } : null
   return [
-    { id: studentMessageId, conversationId, role: 'student', content, createdAt: askedAt, status: 'completed' },
-    { id: assistantMessageId, conversationId, role: 'assistant', content: replyTo(content), createdAt: now(), status: 'completed' },
+    // Its quote kept, as the backend keeps it, so a step quoted from an answer (#506) reads back.
+    { id: studentMessageId, conversationId, role: 'student', content, createdAt: askedAt, status: 'completed', quote: quote ?? null, targetUnit: null },
+    { id: assistantMessageId, conversationId, role: 'assistant', content: replyTo(content), createdAt: now(), status: 'completed', targetUnit },
   ]
 }
 
@@ -317,8 +344,13 @@ export function failsThisTime(content: string, idempotencyKey: string): boolean 
  * (#183). The exchange is stored first, as the backend does, so reading the
  * conversation back afterwards (and after a reload) finds it.
  */
-export async function streamedAnswer(conversationId: string, content: string, idempotencyKey: string): Promise<string[]> {
-  const messages = await exchange(conversationId, idempotencyKey, content)
+export async function streamedAnswer(
+  conversationId: string,
+  content: string,
+  idempotencyKey: string,
+  quote?: MessageQuote,
+): Promise<string[]> {
+  const messages = await exchange(conversationId, idempotencyKey, content, quote)
   recordDemoExchange(conversationId, messages)
   const reply = messages[1]
   // Each word with the space after it; no lookbehind, which Safari before 16.4 cannot parse (#398).
@@ -326,7 +358,7 @@ export async function streamedAnswer(conversationId: string, content: string, id
   const events: (readonly [string, object])[] = [
     ['message_start', { messageId: reply.id, conversationId, role: 'assistant', createdAt: reply.createdAt }],
     ...words.map((delta) => ['message_delta', { messageId: reply.id, delta }] as const),
-    ['message_done', { messageId: reply.id, status: 'completed' }],
+    ['message_done', { messageId: reply.id, status: 'completed', targetUnit: reply.targetUnit ?? null }],
   ]
   return events.map(([type, data]) => `event: ${type}\ndata: ${JSON.stringify(data)}\n\n`)
 }

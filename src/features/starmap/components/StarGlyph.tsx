@@ -5,7 +5,7 @@
  */
 import { useId } from 'react'
 import { GLYPH_LARGE, GLYPH_SMALL, starPath } from '@/features/starmap/render/glyph'
-import type { LearningState } from '@/features/starmap/model/starMap'
+import type { StarLook } from '@/features/starmap/model/starMap'
 
 export function StarGlyph({
   state,
@@ -15,7 +15,8 @@ export function StarGlyph({
   reviewDue = false,
   breathe = false,
 }: {
-  state: LearningState
+  /** How the star is drawn: its learning state, or `waiting` (`starLook`). */
+  state: StarLook
   size: number
   progress?: number
   recommended?: boolean
@@ -71,7 +72,7 @@ export function StarGlyph({
       </>
     )
   } else {
-    const g = cut.locked
+    const g = cut.waiting
     body = <circle r={g.ring} fill="none" stroke={white} strokeOpacity={g.ringAlpha} strokeWidth={g.ringWidth} />
   }
 

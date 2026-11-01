@@ -80,7 +80,9 @@ export {
   type DemoChapter,
 } from '@/dev/demo/data/chapter'
 export {
+  DEMO_FIND_STAR_CONVERSATION_ID,
   DEMO_HELP_CONVERSATION_ID,
+  DEMO_SECTIONS_CONVERSATION_ID,
   DEMO_TEACHER_NAME,
   demoTeacherAvailability,
   demoTeacherHelpRequests,

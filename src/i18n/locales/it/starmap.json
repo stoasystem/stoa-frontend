@@ -24,7 +24,8 @@
     "keys": "Tastiera: frecce verso il più vicino da quel lato, Tab segue il corso, + e − per lo zoom.",
     "label": "Cosa significano le stelle",
     "pointer": "Trascina per spostarti, scorri o pizzica per lo zoom. Scegli una stella per vederne il capitolo; premila e trascinala (sul touch, prima tienila premuta) per vedere a cosa è collegata.",
-    "reviewDue": "Da ripassare"
+    "reviewDue": "Da ripassare",
+    "waiting": "Si basa su stelle non ancora accese"
   },
   "lighting": {
     "announce": "La stella {{name}} è accesa"
@@ -52,6 +53,12 @@
   "star": {
     "progress": "{{percent}}% delle lezioni svolte",
     "lessons": "{{done}} lezioni svolte su {{total}}",
+    "quiz": {
+      "take": "Lo so già – mettimi alla prova",
+      "cooling": "Potrai rifare il test da {{when}}.",
+      "litByQuiz": "Accesa superando il test della stella",
+      "alsoTest": "Puoi anche testare tutta la stella."
+    },
     "unmet_one": "Tutte le lezioni svolte: ancora {{count}} esercizio da risolvere correttamente",
     "unmet_many": "Tutte le lezioni svolte: ancora {{count}} esercizi da risolvere correttamente",
     "unmet_other": "Tutte le lezioni svolte: ancora {{count}} esercizi da risolvere correttamente",
@@ -62,7 +69,7 @@
     "skills": "Abilità",
     "skillLit": "{{name}}, accesa",
     "skillDark": "{{name}}, non ancora accesa",
-    "prerequisites": "Da accendere prima",
+    "prerequisites": "Da imparare prima",
     "start": "Inizia",
     "continue": "Continua",
     "open": "Apri il capitolo",
@@ -85,8 +92,7 @@
   "state": {
     "lit": "Accesa",
     "in_progress": "In corso",
-    "ready": "Pronta per iniziare",
-    "locked": "Bloccata"
+    "ready": "Pronta per iniziare"
   },
   "subjects": {
     "label": "Materie"

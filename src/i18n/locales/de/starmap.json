@@ -24,7 +24,8 @@
     "keys": "Tasten: Pfeile zum Nächsten in dieser Richtung, Tab folgt dem Kurs, + und − zoomen.",
     "label": "Was die Sterne bedeuten",
     "pointer": "Ziehen verschiebt, Scrollen oder Zwei-Finger-Zoom zoomt. Einen Stern wählen zeigt sein Kapitel; ihn gedrückt ziehen (am Touchscreen erst halten) zeigt, womit er zusammenhängt.",
-    "reviewDue": "Wiederholung fällig"
+    "reviewDue": "Wiederholung fällig",
+    "waiting": "Baut auf Sternen auf, die noch nicht leuchten"
   },
   "lighting": {
     "announce": "{{name}} leuchtet jetzt"
@@ -51,6 +52,12 @@
   "star": {
     "progress": "{{percent}} % der Lektionen erledigt",
     "lessons": "{{done}} von {{total}} Lektionen erledigt",
+    "quiz": {
+      "take": "Ich kann das – teste mich",
+      "cooling": "Ab {{when}} kannst du den Test wieder machen.",
+      "litByQuiz": "Durch den Sterntest zum Leuchten gebracht",
+      "alsoTest": "Du kannst auch den ganzen Stern testen."
+    },
     "unmet_one": "Alle Lektionen erledigt: noch {{count}} Aufgabe richtig zu lösen",
     "unmet_other": "Alle Lektionen erledigt: noch {{count}} Aufgaben richtig zu lösen",
     "unmetPartial_one": "Noch {{count}} Aufgabe richtig zu lösen",
@@ -59,7 +66,7 @@
     "skills": "Fähigkeiten",
     "skillLit": "{{name}}, leuchtet",
     "skillDark": "{{name}}, leuchtet noch nicht",
-    "prerequisites": "Zuerst zum Leuchten bringen",
+    "prerequisites": "Am besten zuerst lernen",
     "start": "Starten",
     "continue": "Weiter",
     "open": "Kapitel öffnen",
@@ -81,8 +88,7 @@
   "state": {
     "lit": "Leuchtet",
     "in_progress": "In Arbeit",
-    "ready": "Bereit zum Start",
-    "locked": "Gesperrt"
+    "ready": "Bereit zum Start"
   },
   "subjects": {
     "label": "Fächer"

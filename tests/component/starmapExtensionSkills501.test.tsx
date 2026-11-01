@@ -100,6 +100,7 @@ function star(over: Partial<Star> & Pick<Star, 'unitId' | 'name' | 'nebulaId'>):
     x: 0.5,
     y: 0.5,
     skills: [],
+    unlitPrerequisiteIds: [],
     chapter: { lessonCount: 5, lessonsDone: 2, nextLesson: null },
     ...over,
   }

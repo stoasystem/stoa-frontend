@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import {
   getNotificationPreferences,
+  updateDispatchEmail,
   updateNotificationPreferences,
 } from '@/services/notifications/notificationApi'
 import { notificationQueryKeys } from '@/services/notifications/notificationQueryKeys'
@@ -36,6 +37,22 @@ export function useUpdateNotificationPreferencesMutation() {
       return updateNotificationPreferences(change(current.preferences))
     },
     // The answer is the stored matrix; show that, not what was sent.
+    onSuccess: (saved) => {
+      queryClient.setQueryData(notificationQueryKeys.preferences(), saved)
+    },
+  })
+}
+
+/*
+ * A teacher's dispatch email switch (stoa-backend#141). It is written on its
+ * own, so the matrix is not read first; it still waits in the same line as a
+ * matrix write, so the two never cross.
+ */
+export function useUpdateDispatchEmailMutation() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    scope: { id: 'notification-preferences' },
+    mutationFn: updateDispatchEmail,
     onSuccess: (saved) => {
       queryClient.setQueryData(notificationQueryKeys.preferences(), saved)
     },

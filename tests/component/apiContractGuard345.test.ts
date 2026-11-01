@@ -11,6 +11,7 @@ import { describe, expect, it } from 'vitest'
 import {
   KNOWN_GAPS,
   MIN_CHECKED_CALLS,
+  OFF_API_CALLS,
   collectCalls,
   findMissing,
   loadBackendRoutes,
@@ -123,6 +124,14 @@ describe('what the gate refuses to skip', () => {
     expect(one('return httpClient.request(config)', file).unparsed).toEqual([])
     expect(one('return httpClient.request(config)').unparsed).toHaveLength(1)
   })
+
+  it('skips only the S3 part PUT it names, in its own file (#516)', () => {
+    const file = 'src/services/files/fileApi.ts'
+    const put = "await fetch(part.url, { method: 'PUT', body: chunk })"
+    expect(one(put, file)).toEqual({ calls: [], unparsed: [] })
+    expect(one(put).unparsed).toHaveLength(1)
+    expect(one("await fetch(other.url, { method: 'PUT' })", file).unparsed).toHaveLength(1)
+  })
 })
 
 describe('the comparison', () => {
@@ -161,11 +170,19 @@ describe('the services as they are', () => {
     'POST /auth/logout',
     'POST /analytics/events',
     'POST /monitoring/frontend-errors',
+    'POST /files/${uploadId}/parts/${partNumber}',
   ])('checks %s', (call) => {
     expect(seen).toContain(call)
   })
 
   it('keeps a reason on every known gap', () => {
     for (const gap of KNOWN_GAPS) expect(gap.reason).toBeTruthy()
+  })
+
+  it('names only off-API calls that are still there, each with where it goes', () => {
+    for (const entry of OFF_API_CALLS) {
+      expect(entry.reason).toBeTruthy()
+      expect(readFileSync(entry.file, 'utf8')).toContain(entry.text)
+    }
   })
 })

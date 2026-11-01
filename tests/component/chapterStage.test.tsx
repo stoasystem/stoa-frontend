@@ -134,8 +134,30 @@ function roadmap(): PracticeRoadmap {
   }
 }
 
-/** The knowledge point as the star map has it: lit or locked is said here, not by the lessons. */
-let star: { state: KnowledgeMapResponse['stars'][number]['state']; unmetExercises: number }
+/** The knowledge point as the star map has it: lit, and what it waits on, is said here, not by the lessons. */
+let star: {
+  state: KnowledgeMapResponse['stars'][number]['state']
+  unmetExercises: number
+  unlitPrerequisiteIds?: string[]
+}
+
+/** The point `u-5` builds on in the tests that say it waits: in the sky beside it, not lit. */
+const FRACTIONS: KnowledgeMapResponse['stars'][number] = {
+  unitId: 'u-1',
+  name: 'Fractions',
+  nebulaId: 'algebra',
+  order: 1,
+  state: 'ready',
+  unmetExercises: 0,
+  progress: 0,
+  reviewDue: 0,
+  recommendation: null,
+  x: 0,
+  y: 0,
+  skills: [],
+  chapter: { lessonCount: 2, lessonsDone: 0, nextLesson: null },
+  unlitPrerequisiteIds: [],
+}
 
 function knowledgeMap(): KnowledgeMapResponse {
   return {
@@ -157,6 +179,7 @@ function knowledgeMap(): KnowledgeMapResponse {
         skills: [],
         chapter: { lessonCount: 3, lessonsDone: completed.size, nextLesson: null },
       },
+      ...(star.unlitPrerequisiteIds?.includes(FRACTIONS.unitId) ? [FRACTIONS] : []),
     ],
     prerequisites: [],
     summary: { lit: star.state === 'lit' ? 1 : 0, total: 1, streakDays: 0, score: 0 },
@@ -617,7 +640,7 @@ describe('the practice stage', () => {
   })
 })
 
-describe('a lesson the chapter does not open', () => {
+describe('a lesson a backend from before ADR 0004 still calls locked', () => {
   const lockedRoadmap = () => {
     const served = roadmap()
     served.units[0].lessons = served.units[0].lessons.map((item) =>
@@ -626,19 +649,22 @@ describe('a lesson the chapter does not open', () => {
     return served
   }
 
-  it('says a locked lesson is locked, with the way back to its chapter, instead of the exercise', async () => {
+  it('opens it on the exercise, as every lesson opens', async () => {
     vi.mocked(getPracticeRoadmap).mockImplementation(async () => lockedRoadmap())
     open('/chapter/u-5/l-2')
 
-    expect(await screen.findByRole('heading', { level: 1, name: 'This lesson is locked' })).toBeInTheDocument()
-    expect(
-      screen.getByText('This knowledge point builds on others that are not lit yet. Light those on the star map first.'),
-    ).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: 'Back to the chapter' })).toHaveAttribute('href', '/chapter/u-5')
-    expect(screen.queryByRole('heading', { level: 2, name: '3x + 5 = 20' })).not.toBeInTheDocument()
-    expect(screen.queryByRole('complementary', { name: 'Ask' })).not.toBeInTheDocument()
-    // No test-out from a locked lesson (#96).
-    expect(screen.queryByRole('link', { name: /^Skip this lesson/ })).not.toBeInTheDocument()
+    expect(await screen.findByRole('heading', { level: 2, name: '3x + 5 = 20' })).toBeInTheDocument()
+    expect(screen.queryByText(/locked/i)).not.toBeInTheDocument()
+  })
+
+  it('reads it as open in the chapter: a row to open', async () => {
+    vi.mocked(getPracticeRoadmap).mockImplementation(async () => lockedRoadmap())
+    open('/chapter/u-5')
+
+    await screen.findByRole('heading', { level: 1, name: 'Linear equations' })
+    const rows = within(document.querySelector<HTMLElement>('[data-chapter-lessons]')!).getAllByRole('listitem')
+    expect(rows.map((row) => row.getAttribute('data-lesson-status'))).not.toContain('locked')
+    expect(document.querySelector('a[href="/chapter/u-5/l-2"]')).not.toBeNull()
   })
 
   it('shows no exercise while the chapter is still saying whether the lesson is open', async () => {
@@ -656,8 +682,7 @@ describe('a lesson the chapter does not open', () => {
     expect(screen.queryByRole('heading', { level: 2, name: '3x + 5 = 20' })).not.toBeInTheDocument()
 
     await act(async () => answer(lockedRoadmap()))
-    expect(await screen.findByRole('heading', { level: 1, name: 'This lesson is locked' })).toBeInTheDocument()
-    expect(screen.queryByRole('heading', { level: 2, name: '3x + 5 = 20' })).not.toBeInTheDocument()
+    expect(await screen.findByRole('heading', { level: 2, name: '3x + 5 = 20' })).toBeInTheDocument()
   })
 
   it('finds nothing for a lesson of another unit under this chapter', async () => {
@@ -1271,31 +1296,41 @@ describe('a chapter read again in the background (#417)', () => {
   })
 })
 
-describe('a knowledge point that is still locked (#342)', () => {
-  it('says so on the chapter, with no lesson to go on with', async () => {
+describe('a knowledge point that builds on points not lit yet (ADR 0004, #484)', () => {
+  it('says which to learn first on the chapter, each a link to its star, and keeps every lesson open', async () => {
+    star = { state: 'ready', unmetExercises: 9, unlitPrerequisiteIds: ['u-1'] }
+    open('/chapter/u-5')
+
+    const first = await screen.findByRole('region', { name: 'Best learned first' })
+    expect(within(first).getByRole('link', { name: 'Fractions' })).toHaveAttribute('href', '/map/math/algebra/u-1')
+    const rows = within(document.querySelector<HTMLElement>('[data-chapter-lessons]')!).getAllByRole('listitem')
+    expect(rows.map((row) => row.getAttribute('data-lesson-status'))).not.toContain('locked')
+    expect(screen.getByRole('link', { name: /^(Continue|Start):/ })).toBeInTheDocument()
+    expect(screen.getAllByRole('link', { name: /^Skip this lesson/ }).length).toBeGreaterThan(0)
+  })
+
+  it('opens a deep link on the exercise', async () => {
+    star = { state: 'ready', unmetExercises: 9, unlitPrerequisiteIds: ['u-1'] }
+    open('/chapter/u-5/l-2')
+
+    expect(await screen.findByRole('heading', { level: 2, name: '3x + 5 = 20' })).toBeInTheDocument()
+  })
+
+  it('opens a point a backend from before it still calls locked, and does not break', async () => {
     star = { state: 'locked', unmetExercises: 9 }
     open('/chapter/u-5')
 
-    expect(
-      await screen.findByText('This knowledge point is still locked. Light the ones it builds on first, on the star map.'),
-    ).toBeInTheDocument()
-    const rows = within(document.querySelector<HTMLElement>('[data-chapter-lessons]')!).getAllByRole('listitem')
-    expect(rows.map((row) => row.getAttribute('data-lesson-status'))).toEqual(['completed', 'locked', 'locked'])
-    expect(screen.queryByRole('link', { name: /^(Continue|Start):/ })).not.toBeInTheDocument()
-    expect(screen.queryByRole('link', { name: /^Skip this lesson/ })).not.toBeInTheDocument()
+    await screen.findByRole('heading', { level: 1, name: 'Linear equations' })
+    expect(screen.getByRole('link', { name: /^(Continue|Start):/ })).toBeInTheDocument()
+    expect(screen.queryByText(/locked/i)).not.toBeInTheDocument()
   })
 
-  it('opens a deep link on the reason and the way to the star map, not on the exercise', async () => {
-    star = { state: 'locked', unmetExercises: 9 }
-    open('/chapter/u-5/l-2')
+  it('says nothing to learn first once the point is lit', async () => {
+    star = { state: 'lit', unmetExercises: 0, unlitPrerequisiteIds: [] }
+    open('/chapter/u-5')
 
-    expect(await screen.findByRole('heading', { level: 1, name: 'This lesson is locked' })).toBeInTheDocument()
-    expect(
-      screen.getByText('This knowledge point builds on others that are not lit yet. Light those on the star map first.'),
-    ).toBeInTheDocument()
-    const notice = document.querySelector<HTMLElement>('[data-stage-locked]')!
-    expect(within(notice).getByRole('link', { name: 'Star map' })).toHaveAttribute('href', '/map/math/algebra/u-5')
-    expect(screen.queryByRole('heading', { level: 2, name: '3x + 5 = 20' })).not.toBeInTheDocument()
+    await screen.findByRole('heading', { level: 1, name: 'Linear equations' })
+    expect(screen.queryByRole('region', { name: 'Best learned first' })).not.toBeInTheDocument()
   })
 })
 
@@ -1353,5 +1388,47 @@ describe('a hint (#408)', () => {
 
     await waitFor(() => expect(region).toHaveTextContent('No hint right now. Try again in a moment.'))
     expect(document.querySelector('[data-stage-hint]')).toBe(region)
+  })
+})
+
+describe('figures (#504)', () => {
+  const svg = (inner: string) => `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 80">${inner}</svg>`
+  const CONE = svg('<polygon points="10,70 60,10 110,70" fill="#bbbbbb" stroke="#000000"/><text x="60" y="78">Kegel</text>')
+
+  it('shows the question’s figure under it and each option’s with its letter', async () => {
+    vi.mocked(getPracticeLesson).mockResolvedValue({
+      ...lesson,
+      challenges: [
+        challenge('ch-1', {
+          prompt: 'Welcher Körper ist ein Kegel?',
+          figure: CONE,
+          options: ['A', 'B', 'C'],
+          optionFigures: [svg('<rect width="40" height="40"/>'), svg('<circle cx="40" cy="40" r="30"/>'), ''],
+          correctAnswer: 'B',
+        }),
+        lesson.challenges[1],
+      ],
+    })
+    open('/chapter/u-5/l-2', { width: 375 })
+
+    const heading = await screen.findByRole('heading', { level: 2, name: 'Welcher Körper ist ein Kegel?' })
+    const figure = screen.getByRole('img', { name: 'Welcher Körper ist ein Kegel?' })
+    // Under the question, in the passage a quote is taken from.
+    expect(heading.compareDocumentPosition(figure) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    expect(figure.closest('[data-quote-source="exercise"]')).toBe(heading.closest('[data-quote-source="exercise"]'))
+    expect(figure.querySelector('svg text')).toHaveTextContent('Kegel')
+
+    const options = screen.getAllByRole('radio').map((radio) => radio.closest('label')!)
+    expect(options.map((label) => label.querySelectorAll('[data-exercise-figure] svg').length)).toEqual([1, 1, 0])
+
+    await userEvent.click(screen.getByRole('radio', { name: 'B' }))
+    await userEvent.click(screen.getByRole('button', { name: 'Check answer' }))
+    expect(submitChallengeAnswer).toHaveBeenCalledWith('ch-1', { answer: 'B' })
+  })
+
+  it('shows no figure for a question that has none', async () => {
+    open('/chapter/u-5/l-2')
+    await screen.findByRole('heading', { level: 2, name: '3x + 5 = 20' })
+    expect(document.querySelector('[data-exercise-figure]')).toBeNull()
   })
 })

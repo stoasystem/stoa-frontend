@@ -6,6 +6,7 @@
     "continue": "Continue: {{title}}",
     "empty": "This chapter has no lessons yet.",
     "failed": "The chapter could not be loaded.",
+    "firstLearn": "Best learned first",
     "lessonMeta_one": "{{minutes}} min · {{count}} exercise",
     "lessonMeta_other": "{{minutes}} min · {{count}} exercises",
     "lessonNumber": "Lesson {{number}}",
@@ -13,7 +14,6 @@
     "listLabel": "Lessons",
     "lit": "This knowledge point is lit.",
     "loading": "Loading the chapter…",
-    "locked": "This knowledge point is still locked. Light the ones it builds on first, on the star map.",
     "missing": "This chapter could not be found.",
     "progress": "Chapter progress",
     "unmet_one": "{{count}} more exercise to answer right before this point lights.",
@@ -26,7 +26,6 @@
       "available": "Ready",
       "completed": "Done",
       "current": "Up next",
-      "locked": "Locked",
       "review": "Review"
     }
   },
@@ -88,10 +87,6 @@
     "noHint": "There’s no hint for this exercise.",
     "lessonOf": "Lesson {{lesson}} of {{lessons}}",
     "loading": "Loading the lesson…",
-    "locked": {
-      "body": "This knowledge point builds on others that are not lit yet. Light those on the star map first.",
-      "title": "This lesson is locked"
-    },
     "missing": "This lesson could not be found.",
     "next": "Next question",
     "notQuite": "Not quite",
@@ -108,7 +103,6 @@
       "credentialInvalid": "The pass from that quiz does not work for this lesson. Take the quiz again.",
       "expired": "The quiz took too long and has expired. Start a new one.",
       "finished": "This quiz is already over. Start a new one.",
-      "locked": "This knowledge point is still locked: light the ones it builds on first, on the star map.",
       "notFound": "This quiz is no longer open. Start a new one.",
       "notStarted": "The quiz could not be started. Check your connection and try again.",
       "restart": "Start the quiz again",
@@ -130,5 +124,36 @@
     "setsDone": "{{done}} of {{total}} practice sets done",
     "toGo_one": "{{count}} practice set to go.",
     "toGo_other": "{{count}} practice sets to go."
+  },
+  "starQuiz": {
+    "label": "Star quiz",
+    "heading": "Star quiz: {{star}}",
+    "drawing": "Putting the star quiz together…",
+    "backToStar": "Back to {{star}} on the star map",
+    "backToMap": "Back to the star map",
+    "passed": {
+      "title": "The whole star is lit",
+      "body": "You knew it: {{star}} now shines on your star map.",
+      "toMap": "See it on the star map"
+    },
+    "failed": {
+      "title": "Not this time",
+      "body": "You can take the star quiz again from {{when}}. Until then, its lessons are the way to light it.",
+      "bodyLater": "You can take the star quiz again tomorrow. Until then, its lessons are the way to light it.",
+      "toLessons": "Go to its lessons"
+    },
+    "trouble": {
+      "restart": "Start the star quiz again",
+      "coolingUntil": "You can take this star quiz again from {{when}}.",
+      "unknownStar": "This knowledge point has no star quiz.",
+      "alreadyLit": "This star is lit already.",
+      "coolingDown": "You can take this star quiz again tomorrow.",
+      "unavailable": "This star has no exercises a quiz could ask yet.",
+      "notFound": "This star quiz is no longer open.",
+      "finished": "This star quiz is already over.",
+      "expired": "This star quiz ran out of time: each one is open for 30 minutes.",
+      "outOfOrder": "That answer was for a different question.",
+      "notStarted": "The star quiz could not be started. Check your connection and try again."
+    }
   }
 }

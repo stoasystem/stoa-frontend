@@ -12,6 +12,10 @@
         "title": "Données d'apprentissage",
         "body": "Les données d'apprentissage peuvent comprendre les questions récentes, les métadonnées de conversation, les points à travailler, les demandes d'appui enseignant, les résumés de rapport et les signaux de progrès utilisés pour soutenir l'élève et informer les parents."
       },
+      "voiceInput": {
+        "title": "Dicter au lieu de taper",
+        "body": "Les questions peuvent aussi être dictées, par exemple avec Win + H sous Windows, la touche micro ou le raccourci de dictée sur un Mac, ou le micro du clavier d'un téléphone. La voix est alors traitée par le système de l'appareil, et STOA ne reçoit que le texte. La reconnaissance vocale relève des règles de confidentialité du fournisseur du système d'exploitation ou du clavier (par exemple Microsoft, Apple ou Google). STOA n'enregistre lui-même aucune voix."
+      },
       "visibility": {
         "title": "Visibilité pour les parents et les enseignants",
         "body": "Les parents peuvent voir des résumés d'apprentissage, des rapports, des axes de travail et l'intervention d'un enseignant. Les enseignants voient le contexte nécessaire pour répondre à une demande d'aide."
@@ -23,6 +27,10 @@
       "thirdParties": {
         "title": "Prestataires",
         "body": "Les prestataires d'hébergement, d'authentification, d'analyse, de supervision et d'assistance peuvent traiter des données limitées dans le cadre d'accords appropriés."
+      },
+      "dataLocation": {
+        "title": "Où les données sont traitées",
+        "body": "STOA stocke les données en Suisse, dans des centres de données d'Amazon Web Services (AWS) à Zurich. Pour les explications de l'IA et le contrôle automatique des images téléversées, les requêtes sont traitées dans des centres de données d'AWS situés dans l'UE ; elles n'y sont ni conservées ni utilisées pour entraîner des modèles d'IA. Avant le téléversement, STOA supprime les données de localisation (EXIF) des photos. Les images sont conservées au maximum 365 jours et supprimées immédiatement à la suppression du compte. Les images bloquées par le contrôle ne sont visibles que par l'administration et sont supprimées 90 jours après leur traitement."
       }
     }
   },
