@@ -73,25 +73,22 @@ browser, goes up by intent, part URL, a PUT straight to S3 (answered in
 for) and `complete`, and the question carries it as `{ uploadId }`; a picture
 image moderation refuses (`422 upload_content_blocked`, stoa-backend#138) is
 said to be refused in the tray, and the question goes out without it (#512).
-While `ATTACHMENTS_WORK` is off the file goes into the chooser input directly
-and the test checks the button is absent; once it is on, the test opens the
-chooser from the button.
+The test opens the chooser from the button.
 
 `phoneUpload.spec.ts`: a photo from the phone by QR (#514). The phone's page,
 not signed in, takes the code from after the `#` and out of the address, spends
 it once on `redeem`, and sends the part to S3 and `complete` with the upload
 token only; no request carries the code or a session. An expired or used code
-(`404 upload_code_invalid`) is said, and nothing is sent. In Ask the button waits
-behind `ATTACHMENTS_WORK` like the paperclip: while it is off the test checks it
-is absent; once it is on, the QR is checked to encode the phone page's address
+(`404 upload_code_invalid`) is said, and nothing is sent. In Ask, from the +
+menu, the QR is checked to encode the phone page's address
 with the code after the `#`, a second, signed-out browser sends the photo, and
 the computer shows it and adds it only when the student says so.
 
 `teacherReplyImages.spec.ts`: a teacher's picture goes up the same way, as
 `help_reply_image`, and the reply carries it as `{ uploadId }`; the student
 sees it in Ask as a thumbnail the browser drew, read with their own token from
-`/files/attachments/{id}/content` (#513, stoa-backend#145). The button waits
-for the same switch, and the test handles it as `attachments.spec.ts` does.
+`/files/attachments/{id}/content` (#513, stoa-backend#145). The test opens
+the chooser from the button, as `attachments.spec.ts` does.
 `MockBackend` answers a file's bytes with `raw`.
 
 `moderationImage.spec.ts`: an administrator opens an `image_upload` case in the

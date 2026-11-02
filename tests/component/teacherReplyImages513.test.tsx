@@ -11,7 +11,6 @@
  *      are not a reply the backend takes.
  * T4 - the server would not take a picture the reply carried: nothing was
  *      sent, it says so, and the picture is to be chosen again.
- * T5 - the button waits for the same switch as the student's (#512).
  * T6 - the teacher sees the pictures in the reply afterwards, named as theirs.
  * T7 - the sentences are there in all four languages, formal, with ss.
  */
@@ -61,14 +60,6 @@ vi.mock('@/services/files/prepareImage', async (orig) => ({
   prepareImage: vi.fn(async (file: File) => file),
 }))
 vi.mock('sonner', () => ({ toast: { success: vi.fn(), error: vi.fn(), info: vi.fn() } }))
-// Off in the app until #512; the page tests turn it on.
-let attachmentsWork = false
-vi.mock('@/features/ask/attachmentsSwitch', () => ({
-  get ATTACHMENTS_WORK() {
-    return attachmentsWork
-  },
-}))
-
 const uploadMock = vi.mocked(uploadFile)
 const noteMock = vi.mocked(teacherApi.addTeacherHelpRequestNote)
 const detailMock = vi.mocked(teacherApi.getTeacherHelpRequestDetail)
@@ -121,7 +112,6 @@ function renderPage() {
 beforeEach(async () => {
   vi.clearAllMocks()
   sessionStorage.clear()
-  attachmentsWork = false
   uploadMock.mockReset()
   await i18n.changeLanguage('de')
 })
@@ -234,7 +224,6 @@ describe('T3: the reply waits for its pictures, and needs words', () => {
 
 describe('T4: the server would not take a picture', () => {
   it('says the reply was not sent, and the picture is to be chosen again', async () => {
-    attachmentsWork = true
     detailMock.mockResolvedValue(detail())
     noteMock.mockRejectedValue(new ApiError('gone', { status: 404, code: 'upload_not_found' }))
     uploadMock.mockResolvedValue(uploaded('up-1'))
@@ -256,7 +245,6 @@ describe('T4: the server would not take a picture', () => {
   })
 
   it('leaves the picture alone when the reply failed for another reason', async () => {
-    attachmentsWork = true
     detailMock.mockResolvedValue(detail())
     noteMock.mockRejectedValue(new ApiError('down', { status: 500 }))
     uploadMock.mockResolvedValue(uploaded('up-1'))
@@ -271,28 +259,6 @@ describe('T4: the server would not take a picture', () => {
 
     await waitFor(() => expect(toast.error).toHaveBeenCalledWith(de.toasts.replyFailed))
     expect(within(tray()).queryByRole('alert')).not.toBeInTheDocument()
-  })
-})
-
-describe('T5: the button waits for the switch', () => {
-  it('is not on the page while the switch is off; the chooser it would open is', async () => {
-    detailMock.mockResolvedValue(detail())
-    renderPage()
-
-    await screen.findByLabelText(de.reply.label)
-    expect(screen.queryByRole('button', { name: copy.add })).not.toBeInTheDocument()
-    expect(picker()).not.toBeNull()
-  })
-
-  it('opens the chooser once it is on', async () => {
-    attachmentsWork = true
-    detailMock.mockResolvedValue(detail())
-    renderPage()
-
-    const add = await screen.findByRole('button', { name: copy.add })
-    const click = vi.spyOn(picker(), 'click')
-    fireEvent.click(add)
-    expect(click).toHaveBeenCalledTimes(1)
   })
 })
 

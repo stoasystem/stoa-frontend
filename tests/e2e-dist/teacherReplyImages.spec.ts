@@ -1,5 +1,4 @@
 import type { Locator, Page } from '@playwright/test'
-import { ATTACHMENTS_WORK } from '../../src/features/ask/attachmentsSwitch'
 import { expect, test } from './support/fixtures'
 import { signInAsStudent } from './support/signIn'
 import { signInAt, StaffWorld, TEACHER } from './support/staff'
@@ -11,18 +10,9 @@ import { photo, UploadDesk } from './support/uploads'
  * stoa-backend#145): it goes up the way a student's does, as
  * `help_reply_image`, and the reply names it by its upload id. The student
  * then sees it in Ask, read through their own attachment route.
- *
- * The button waits behind `ATTACHMENTS_WORK`, as the student's paperclip does
- * (#512); while it is off the picture goes into the chooser the button would
- * open, which is in the page either way.
  */
 async function choosePicture(page: Page, form: Locator, file: { name: string; mimeType: string; buffer: Buffer }) {
   const button = form.getByRole('button', { name: 'Add picture' })
-  if (!ATTACHMENTS_WORK) {
-    await expect(button).toHaveCount(0)
-    await form.locator('input[data-teacher-reply-images]').setInputFiles(file)
-    return
-  }
   const chooser = page.waitForEvent('filechooser')
   await button.click()
   await (await chooser).setFiles(file)

@@ -50,13 +50,6 @@ vi.mock('@/services/files/prepareImage', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@/services/files/prepareImage')>()),
   prepareImage: vi.fn(async (file: File) => file),
 }))
-// Off in the app until #512; each test that needs the buttons turns it on.
-let attachmentsWork = false
-vi.mock('@/features/ask/attachmentsSwitch', () => ({
-  get ATTACHMENTS_WORK() {
-    return attachmentsWork
-  },
-}))
 vi.mock('@/services/teacherHelp/teacherHelpApi', () => ({
   getTeacherAvailability: vi.fn(async () => ({ online: false, availableTeachers: 0 })),
   getTeacherHelpRequest: vi.fn(async () => {
@@ -157,7 +150,6 @@ beforeEach(async () => {
 })
 
 afterEach(() => {
-  attachmentsWork = false
   window.matchMedia = originalMatchMedia
   sessionStorage.clear()
   vi.clearAllMocks()
@@ -321,8 +313,7 @@ describe('a question that carries a file', () => {
 /**
  * Taking a photo and choosing one are two entries (#509): `capture` makes a
  * phone open its camera, and takes the gallery away, so the chooser has none.
- * The buttons wait behind `ATTACHMENTS_WORK` (#512), which these turn on; the
- * Composer's own camera button is baseComponentSizes'.
+ * The Composer's own camera button is baseComponentSizes'.
  */
 describe('the camera and the chooser', () => {
   /** A phone (`coarse`) or a laptop, at the width the panel is opened at. */
@@ -333,7 +324,6 @@ describe('the camera and the chooser', () => {
   }
 
   it('on a phone, opens the camera from the camera and the chooser from the +', async () => {
-    attachmentsWork = true
     pointer(true)
     const ask = openAsk()
     await ask.findByText('Linear equations')
@@ -356,7 +346,6 @@ describe('the camera and the chooser', () => {
   })
 
   it('on a laptop, offers no camera: `capture` would open a second chooser there', async () => {
-    attachmentsWork = true
     pointer(false)
     const ask = openAsk()
     await ask.findByText('Linear equations')
@@ -365,14 +354,6 @@ describe('the camera and the chooser', () => {
     const menu = await screen.findByRole('menu')
     expect(within(menu).getByRole('menuitem', { name: 'Choose a photo or file' })).toBeInTheDocument()
     expect(within(menu).queryByRole('menuitem', { name: 'Take a photo' })).toBeNull()
-  })
-
-  it('shows no + while the switch is off (the negative control)', async () => {
-    pointer(true)
-    const ask = openAsk()
-    await ask.findByText('Linear equations')
-
-    expect(ask.queryByRole('button', { name: 'Add a photo' })).toBeNull()
   })
 
   it('opens the back camera for a photo, and only for a photo', async () => {

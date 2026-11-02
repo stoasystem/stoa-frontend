@@ -189,6 +189,14 @@ async function completeUpload(uploadId: string, partCount: number, signal?: Abor
  * `SendMessageRequest.attachmentIds`; #495, #507). Any other status is not
  * done, and is thrown. `signal` stops it wherever it is, when the file is
  * taken out of the tray.
+ *
+ * Measured against production on 2026-10-11, signed in as two accounts:
+ * intent, part and complete each answer 200, and complete gives that same
+ * `validated` answer however often it is called. The smoke run on production
+ * passed on 2026-10-30 (#512, its record in the issue): a large photo straight
+ * to S3 without the token, the model reading it, the attachment read back
+ * after a reload, a HEIC, moderation's refusal with the question still sent,
+ * and a PDF in two parts.
  */
 export async function uploadFile({
   file,

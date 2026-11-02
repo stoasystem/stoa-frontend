@@ -23,10 +23,6 @@ import {
   type AskPractice,
   type AskQuote,
 } from '@/features/ask/practiceContext'
-
-// The paperclip and the camera wait behind this switch; why, and who opens
-// it (#512), is written where it is set.
-import { ATTACHMENTS_WORK } from '@/features/ask/attachmentsSwitch'
 import { AttachmentTray } from '@/features/uploads/AttachmentTray'
 import { PhoneUploadCard } from '@/features/uploads/PhoneUploadCard'
 import { useAttachmentUploads } from '@/features/uploads/useAttachmentUploads'
@@ -485,9 +481,9 @@ export function AskPanel({
           value={draft}
           onChange={setDraft}
           onSubmit={submit}
-          onAttach={ATTACHMENTS_WORK ? () => picker.current?.click() : undefined}
-          onCapture={ATTACHMENTS_WORK && touch ? () => camera.current?.click() : undefined}
-          onPhone={ATTACHMENTS_WORK && !touch ? phoneCode.start : undefined}
+          onAttach={() => picker.current?.click()}
+          onCapture={touch ? () => camera.current?.click() : undefined}
+          onPhone={touch ? undefined : phoneCode.start}
           dictation
           label={t('ask.composerLabel')}
           placeholder={practice ? t('ask.practice.placeholder') : t('ask.placeholder')}

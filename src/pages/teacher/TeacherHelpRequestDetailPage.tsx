@@ -17,7 +17,6 @@ import { AiTeacherToolsPanel } from '@/components/teacher/AiTeacherToolsPanel'
 import { CurriculumRolloutPanel } from '@/components/practice/CurriculumRolloutPanel'
 import { Button } from '@/components/ui/button'
 import { useCurriculumCatalogQuery } from '@/hooks/practice/useCurriculumCatalogQuery'
-import { ATTACHMENTS_WORK } from '@/features/ask/attachmentsSwitch'
 import {
   isReplyImageRefusal,
   useAddTeacherHelpRequestNoteMutation,
@@ -207,14 +206,13 @@ export function TeacherHelpRequestDetailPage() {
                 {readFailed && (
                   <p role="status" className="text-sm text-muted-foreground">{tTeacher('detail.replyPaused')}</p>
                 )}
-                {/* Pictures go up the way a student's do, so they wait for the
-                    same switch: the pipeline's smoke run on production (#512). */}
+                {/* Pictures go up the way a student's do (#513). */}
                 <TeacherReplyComposer
                   key={requestId}
                   draftKey={requestId}
                   disabled={readFailed}
                   isSubmitting={addNote.isPending}
-                  allowImages={ATTACHMENTS_WORK}
+                  allowImages
                   onSubmit={(content, richContent, onSuccess, images) =>
                     requestId &&
                     addNote.mutate(
