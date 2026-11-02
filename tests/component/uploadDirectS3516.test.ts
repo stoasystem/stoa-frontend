@@ -15,7 +15,7 @@
 import { createHash } from 'node:crypto'
 import { act, renderHook, waitFor } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { useAttachmentUploads } from '@/features/uploads/useAttachmentUploads'
+import { useAttachments } from '@/features/uploads/useAttachments'
 import { ApiError, httpClient } from '@/services/api/httpClient'
 import { problemFor } from '@/services/files/attachmentProblems'
 import { PART_PUT_LIMIT_MS, UploadPartError, uploadFile } from '@/services/files/fileApi'
@@ -313,14 +313,14 @@ describe('a PUT that hangs', () => {
 describe('a file taken out of the tray while it goes up', () => {
   it('stops its PUT, and the upload is never completed', async () => {
     hangingS3()
-    const { result } = renderHook(() => useAttachmentUploads())
+    const { result } = renderHook(() => useAttachments())
 
-    act(() => result.current.add([new File(['notes'], 'notes.pdf', { type: 'application/pdf' })]))
+    act(() => result.current.view.add([new File(['notes'], 'notes.pdf', { type: 'application/pdf' })]))
     await waitFor(() => expect(s3).toHaveBeenCalledTimes(1))
     const putSignal = s3.mock.calls[0][1].signal!
     expect(putSignal.aborted).toBe(false)
 
-    act(() => result.current.remove(result.current.drafts[0].localId))
+    act(() => result.current.view.remove(result.current.view.drafts[0].localId))
 
     expect(putSignal.aborted).toBe(true)
     await new Promise((resolve) => setTimeout(resolve, 20))
@@ -329,11 +329,11 @@ describe('a file taken out of the tray while it goes up', () => {
   })
 
   it('goes up whole when it is left in (the negative control)', async () => {
-    const { result } = renderHook(() => useAttachmentUploads())
+    const { result } = renderHook(() => useAttachments())
 
-    act(() => result.current.add([new File(['notes'], 'notes.pdf', { type: 'application/pdf' })]))
+    act(() => result.current.view.add([new File(['notes'], 'notes.pdf', { type: 'application/pdf' })]))
 
-    await waitFor(() => expect(result.current.drafts[0]?.state).toBe('ready'))
+    await waitFor(() => expect(result.current.view.drafts[0]?.state).toBe('ready'))
     expect(sent).toContain('POST /files/up-1/complete')
   })
 })

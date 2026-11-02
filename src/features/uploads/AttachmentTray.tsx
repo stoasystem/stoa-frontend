@@ -2,7 +2,7 @@ import { FileText, Image as ImageGlyph, X } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { IconButton } from '@/components/base'
 import { ICON } from '@/components/base/sizes'
-import type { AttachmentDraft } from '@/features/uploads/useAttachmentUploads'
+import type { AttachmentDraft } from '@/features/uploads/useAttachments'
 import {
   ATTACHMENTS_PER_MESSAGE,
   DOCUMENT_MAX_BYTES,

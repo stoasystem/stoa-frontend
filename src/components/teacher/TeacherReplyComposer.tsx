@@ -3,9 +3,8 @@ import { Code2, ImagePlus, List, Pilcrow, Send, Sigma, X } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { RichTeacherReply } from '@/components/teacher/RichTeacherReply'
 import { Button } from '@/components/ui/button'
-import { AttachmentTray } from '@/features/uploads/AttachmentTray'
-import { useAttachmentUploads } from '@/features/uploads/useAttachmentUploads'
-import { IMAGE_ACCEPT_ATTRIBUTE } from '@/services/files/uploadLimits'
+import { Attachments } from '@/features/uploads/Attachments'
+import { useAttachments } from '@/features/uploads/useAttachments'
 import type { ReplyImageReference } from '@/types/file'
 import type { TeacherReplyBlock, TeacherReplyRichContent } from '@/types/teacher'
 
@@ -105,9 +104,8 @@ export function TeacherReplyComposer({
   const [value, setValue] = useState(initialDraft.value)
   const [blocks, setBlocks] = useState<TeacherReplyBlock[]>(initialDraft.blocks)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
-  const picker = useRef<HTMLInputElement>(null)
   const wasSubmitting = useRef(isSubmitting)
-  const uploads = useAttachmentUploads({ purpose: 'help_reply_image', imagesOnly: true })
+  const uploads = useAttachments({ purpose: 'help_reply_image', imagesOnly: true, camera: false, phone: false })
 
   useEffect(() => {
     writeDraft(draftKey, { mode, value, blocks })
@@ -130,8 +128,7 @@ export function TeacherReplyComposer({
   const locked = isSubmitting || disabled
   // A reply waits for its pictures, and still needs words: the backend takes
   // no reply made of pictures alone.
-  const canSubmit = previewBlocks.length > 0 && !locked && !problem && !uploads.uploading
-  const imagesWithoutText = uploads.readyReferences.length > 0 && previewBlocks.length === 0
+  const canSubmit = previewBlocks.length > 0 && !locked && !problem && !uploads.busy
 
   function addBlock() {
     const trimmed = value.trim()
@@ -150,7 +147,8 @@ export function TeacherReplyComposer({
     event.preventDefault()
     if (!canSubmit) return
     // A picture past its time is said, and the reply held, rather than refused.
-    if (uploads.expireStale()) return
+    const images = uploads.take()
+    if (!images) return
     const richContent: TeacherReplyRichContent = { version: 1, blocks: previewBlocks }
     onSubmit(
       plainTextFallback(richContent),
@@ -159,10 +157,10 @@ export function TeacherReplyComposer({
         setBlocks([])
         setValue('')
         setMode('paragraph')
-        uploads.clearSent()
+        images.sent()
         textareaRef.current?.focus()
       },
-      { references: uploads.readyReferences, onRefused: uploads.expireReady },
+      { references: images.references, onRefused: images.refused },
     )
   }
 
@@ -242,24 +240,10 @@ export function TeacherReplyComposer({
       )}
       {/* The chooser and the tray are here either way; what `allowImages`
           withholds is the button, as the student's paperclip is (#509). */}
-      <AttachmentTray copy="teacher" drafts={uploads.drafts} overflow={uploads.overflow} onRemove={uploads.remove} />
-      {imagesWithoutText && <p className="text-sm text-muted-foreground">{t('reply.attachments.needsText')}</p>}
-      <input
-        ref={picker}
-        type="file"
-        multiple
-        hidden
-        accept={IMAGE_ACCEPT_ATTRIBUTE}
-        data-teacher-reply-images
-        onChange={(event) => {
-          uploads.add(Array.from(event.target.files ?? []))
-          // The same picture can be chosen again after it was taken out.
-          event.target.value = ''
-        }}
-      />
+      <Attachments view={uploads.view} copy="teacher" needsText={previewBlocks.length === 0} />
       <div className="flex flex-wrap gap-2">
         {allowImages && (
-          <Button type="button" variant="outline" disabled={locked} onClick={() => picker.current?.click()}>
+          <Button type="button" variant="outline" disabled={locked} onClick={uploads.sources.pickFile}>
             <ImagePlus className="mr-2 h-4 w-4" aria-hidden="true" />
             {t('reply.attachments.add')}
           </Button>

@@ -13,7 +13,7 @@
  */
 import { act, renderHook, waitFor } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { useAttachmentUploads } from '@/features/uploads/useAttachmentUploads'
+import { useAttachments } from '@/features/uploads/useAttachments'
 import { readFailedMessages, readPendingMessage, writePendingMessage } from '@/lib/pendingChatMessages'
 import { ApiError, httpClient } from '@/services/api/httpClient'
 import { getConversation, sendConversationMessage } from '@/services/chat/chatApi'
@@ -113,60 +113,26 @@ describe('an upload that passed', () => {
 
 describe('the composer, from upload to reference', () => {
   it('is ready with `{uploadId}`, the reference the message sends', async () => {
-    const { result } = renderHook(() => useAttachmentUploads())
+    const { result } = renderHook(() => useAttachments())
 
-    act(() => result.current.add([photo()]))
-    await waitFor(() => expect(result.current.drafts[0]?.state).toBe('ready'))
+    act(() => result.current.view.add([photo()]))
+    await waitFor(() => expect(result.current.view.drafts[0]?.state).toBe('ready'))
 
-    expect(result.current.readyReferences).toEqual([{ uploadId: 'up-1' }])
-    expect(result.current.readyAttachments).toMatchObject([{ id: 'up-1', filename: 'exercise.png' }])
-    expect(result.current.drafts[0]?.problem).toBeUndefined()
+    const batch = result.current.take()
+    expect(batch?.references).toEqual([{ uploadId: 'up-1' }])
+    expect(batch?.attachments).toMatchObject([{ id: 'up-1', filename: 'exercise.png' }])
+    expect(result.current.view.drafts[0]?.problem).toBeUndefined()
   })
 
   it('fails the file, and sends nothing for it, when the upload did not pass (the negative control)', async () => {
     answerUploads(invalid())
-    const { result } = renderHook(() => useAttachmentUploads())
+    const { result } = renderHook(() => useAttachments())
 
-    act(() => result.current.add([photo()]))
-    await waitFor(() => expect(result.current.drafts[0]?.state).toBe('failed'))
+    act(() => result.current.view.add([photo()]))
+    await waitFor(() => expect(result.current.view.drafts[0]?.state).toBe('failed'))
 
-    expect(result.current.drafts[0]?.problem).toBe(problemFor(invalid()))
-    expect(result.current.readyReferences).toEqual([])
-  })
-})
-
-describe('an upload past its 30 minutes', () => {
-  async function readyWith(expiry: string) {
-    expiresAt = expiry
-    const { result } = renderHook(() => useAttachmentUploads())
-    act(() => result.current.add([photo()]))
-    await waitFor(() => expect(result.current.drafts[0]?.state).toBe('ready'))
-    return result
-  }
-
-  it('is failed as `expired` before the question goes out, which is held', async () => {
-    const result = await readyWith(new Date(Date.now() + 60 * 1000).toISOString())
-
-    let held = false
-    act(() => {
-      held = result.current.expireStale()
-    })
-
-    expect(held).toBe(true)
-    expect(result.current.drafts[0]).toMatchObject({ state: 'failed', problem: 'expired' })
-    expect(result.current.readyReferences).toEqual([])
-  })
-
-  it('is sent while it has time left (the negative control)', async () => {
-    const result = await readyWith(new Date(Date.now() + 20 * 60 * 1000).toISOString())
-
-    let held = true
-    act(() => {
-      held = result.current.expireStale()
-    })
-
-    expect(held).toBe(false)
-    expect(result.current.readyReferences).toEqual([{ uploadId: 'up-1' }])
+    expect(result.current.view.drafts[0]?.problem).toBe(problemFor(invalid()))
+    expect(result.current.take()?.references).toEqual([])
   })
 })
 

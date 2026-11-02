@@ -5,6 +5,7 @@ import {
   streamConversationMessage,
   type StreamMessagePayload,
 } from '@/services/chat/chatStreamApi'
+import { isUploadGone } from '@/features/uploads/uploadGone'
 import { trackEvent } from '@/services/analytics/analyticsClient'
 import { chatQueryKeys } from '@/services/chat/chatQueryKeys'
 import { toUserFacingError } from '@/lib/userFacingText'
@@ -71,13 +72,6 @@ function createLocalId(prefix: string) {
 }
 
 /**
- * The codes a message is refused with when an upload it carries is no longer
- * there to make an attachment of: past its 30 minutes, or gone. Sending it
- * again cannot help; choosing the file again can (#507).
- */
-const UPLOAD_GONE = new Set(['upload_expired', 'upload_not_found'])
-
-/**
  * The code a message is refused with once the student's messages for the day
  * are used up. The server counts the day in UTC, so until its date changes
  * the same message is refused again: it says so, and offers no "send again"
@@ -101,7 +95,9 @@ function errorCode(error: unknown) {
 
 function getErrorMessage(error: unknown) {
   const code = errorCode(error)
-  if (code && UPLOAD_GONE.has(code)) return i18n.t('chat:ask.attachments.errors.sendExpired')
+  // An upload it carried is no longer there: sending it again cannot help,
+  // choosing the file again can (#507).
+  if (isUploadGone(error)) return i18n.t('chat:ask.attachments.errors.sendExpired')
   if (code === DAILY_LIMIT) return i18n.t('chat:ask.thread.dailyLimit')
   return toUserFacingError(error, streamErrorFallback())
 }
