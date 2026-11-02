@@ -7,7 +7,7 @@
 import { describe, expect, it } from 'vitest'
 import { StarMapEngine } from '@/features/starmap/engine/starMapEngine'
 import { LEARNING_STATES, orderedStars, type LearningState, type StarMap } from '@/features/starmap/model/starMap'
-import { STATE_IN_PROGRESS, STATE_LIT, STATE_LOCKED, STATE_READY, type SceneData } from '@/features/starmap/render/types'
+import { STATE_IN_PROGRESS, STATE_LIT, STATE_WAITING, STATE_READY, type SceneData } from '@/features/starmap/render/types'
 import { fakeClock, recordingRenderer, skyMap, THEME } from './starmapHarness'
 
 /** The scene the engine hands its renderer for `map`. */
@@ -34,7 +34,7 @@ describe('drawing a learning state the front end does not know (#368)', () => {
   it('draws the four states it knows as themselves', () => {
     const map = withStates(skyMap(10, 'math'), [...LEARNING_STATES])
     const scene = sceneOf(map)
-    const expected = { lit: STATE_LIT, in_progress: STATE_IN_PROGRESS, ready: STATE_READY, locked: STATE_LOCKED }
+    const expected = { lit: STATE_LIT, in_progress: STATE_IN_PROGRESS, ready: STATE_READY, locked: STATE_WAITING }
     orderedStars(map).forEach((star, i) => expect(scene.state[i]).toBe(expected[star.state]))
   })
 

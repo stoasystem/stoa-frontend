@@ -18,9 +18,9 @@ import {
   shownSize,
 } from '@/services/files/prepareImage'
 
-vi.mock('heic-to', () => ({ heicTo: vi.fn() }))
+vi.mock('heic-to/csp', () => ({ heicTo: vi.fn() }))
 
-import { heicTo } from 'heic-to'
+import { heicTo } from 'heic-to/csp'
 
 const heicToMock = vi.mocked(heicTo) as unknown as ReturnType<typeof vi.fn>
 

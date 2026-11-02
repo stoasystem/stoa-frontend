@@ -8,13 +8,19 @@ import { Check, X } from 'lucide-react'
 import type { ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { MathRenderer } from '@/components/ui/MathRenderer'
+import { ExerciseFigure } from '@/features/chapter/ExerciseFigure'
 import { cn } from '@/lib/utils'
+import type { ExerciseFigures } from '@/types/practice'
 
 /** What is picked or typed. An order is a list; everything else is text. */
 export type AnswerValue = string | string[]
 
 /** As much of an exercise or a review card as answering it needs. */
-export type AnswerChallenge = { challengeId: string; type: string; options?: string[] | null }
+export type AnswerChallenge = Pick<ExerciseFigures, 'optionFigures'> & {
+  challengeId: string
+  type: string
+  options?: string[] | null
+}
 
 export const bodyOnSky = 'text-[color:var(--on-sky-text-body)]'
 
@@ -102,20 +108,48 @@ export function AnswerInput({
 
   if (challenge.type === 'multiple_choice' && options.length > 0) {
     const selected = Array.isArray(value) ? '' : value
+    const figures = options.map((_, index) => challenge.optionFigures?.[index] || '')
+    // Drawings side by side where they fit, one under another on a phone.
+    const pictured = figures.some(Boolean)
     // The choice is gold while it is a choice; once checked it says what it was.
     // A wrong one stayed gold with a tick, which reads as right (#180).
     return (
       <fieldset className="m-0 min-w-0 border-0 p-0">
         <legend className="sr-only">{t('stage.chooseAnswer')}</legend>
-        <div className="flex flex-col gap-2">
+        <div className={pictured ? 'grid grid-cols-[repeat(auto-fit,minmax(min(100%,13rem),1fr))] gap-2' : 'flex flex-col gap-2'}>
           {options.map((option, index) => {
             const chosen = selected === option
+            const figure = figures[index]
+            // Where the options are drawings, their text is the drawing's
+            // label ("A", "B", ...) and the answer is judged by it: a one-letter
+            // label is the badge, not the badge and the same letter again.
+            const letter = figure && /^\p{L}$/u.test(option.trim()) ? option.trim() : null
+            const row = (
+              <>
+                <span
+                  aria-hidden="true"
+                  className={cn(
+                    'inline-flex size-[30px] shrink-0 items-center justify-center rounded-full text-[13px] font-semibold',
+                    chosen && verdict !== 'wrong' ? 'bg-lit text-[color:var(--on-sky-button-text)]' : 'bg-white/10 text-[color:var(--on-sky-text-body)]',
+                  )}
+                >
+                  {letter ?? String.fromCharCode(65 + index)}
+                </span>
+                <span className={letter ? 'sr-only' : 'flex-1 text-[17px] font-medium text-on-sky'}>
+                  <MathRenderer>{option}</MathRenderer>
+                </span>
+                {letter && <span className="flex-1" />}
+                {chosen && verdict === 'right' && <Check size={20} strokeWidth={2} aria-hidden="true" className="text-lit" />}
+                {chosen && verdict === 'wrong' && <X size={20} strokeWidth={2} aria-hidden="true" className="text-[color:var(--red)]" />}
+              </>
+            )
             return (
               <label
                 key={option}
                 data-answer-option={chosen ? (verdict ?? 'chosen') : undefined}
                 className={cn(
-                  'relative flex cursor-pointer items-center gap-3.5 rounded-[14px] border px-[18px] py-3.5 backdrop-blur-[16px] has-[input:focus-visible]:outline-2 has-[input:focus-visible]:outline-offset-2 has-[input:focus-visible]:outline-ring',
+                  'relative flex cursor-pointer gap-3.5 rounded-[14px] border px-[18px] py-3.5 backdrop-blur-[16px] has-[input:focus-visible]:outline-2 has-[input:focus-visible]:outline-offset-2 has-[input:focus-visible]:outline-ring',
+                  figure ? 'min-w-0 flex-col' : 'items-center',
                   !chosen ? `${restingRule} bg-white/[0.06]` : verdict === 'wrong' ? 'border-[color:var(--red)] bg-white/[0.06]' : 'border-lit bg-lit/16',
                   disabled && 'cursor-default',
                 )}
@@ -129,20 +163,14 @@ export function AnswerInput({
                   onChange={() => onChange(option)}
                   className="sr-only"
                 />
-                <span
-                  aria-hidden="true"
-                  className={cn(
-                    'inline-flex size-[30px] shrink-0 items-center justify-center rounded-full text-[13px] font-semibold',
-                    chosen && verdict !== 'wrong' ? 'bg-lit text-[color:var(--on-sky-button-text)]' : 'bg-white/10 text-[color:var(--on-sky-text-body)]',
-                  )}
-                >
-                  {String.fromCharCode(65 + index)}
-                </span>
-                <span className="flex-1 text-[17px] font-medium text-on-sky">
-                  <MathRenderer>{option}</MathRenderer>
-                </span>
-                {chosen && verdict === 'right' && <Check size={20} strokeWidth={2} aria-hidden="true" className="text-lit" />}
-                {chosen && verdict === 'wrong' && <X size={20} strokeWidth={2} aria-hidden="true" className="text-[color:var(--red)]" />}
+                {figure ? (
+                  <>
+                    <span className="flex items-center gap-3.5">{row}</span>
+                    <ExerciseFigure svg={figure} />
+                  </>
+                ) : (
+                  row
+                )}
               </label>
             )
           })}

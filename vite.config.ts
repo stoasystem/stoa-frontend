@@ -35,6 +35,10 @@ const LATER_PAGES_ONLY = [
   '@radix-ui/react-primitive/',
   '@radix-ui/react-tabs/',
   'zustand/esm/middleware',
+  // The QR Ask shows for a photo from the phone (#514), imported when one is shown.
+  'uqr/',
+  // Cleans an exercise's figure (#504): the practice stage and the review only.
+  'dompurify/',
 ]
 
 /** A slash-separated module id's path below the outermost node_modules/. */

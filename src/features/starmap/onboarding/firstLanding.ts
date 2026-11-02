@@ -23,7 +23,7 @@ import type { LayerTarget } from '@/features/starmap/view/layers'
 
 /** Nothing lit, nothing in progress: the student has not started anything yet. */
 export function isNewcomer(map: Pick<StarMap, 'stars'>): boolean {
-  return map.stars.length > 0 && map.stars.every((star) => star.state === 'ready' || star.state === 'locked')
+  return map.stars.length > 0 && map.stars.every((star) => star.state === 'ready')
 }
 
 /** The recommended star of a galaxy (by default the one in focus), if it has one. */

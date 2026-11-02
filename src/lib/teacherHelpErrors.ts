@@ -33,3 +33,23 @@ export function teacherHelpErrorKey(error: unknown): string {
   const byStatus = error.status ? KEY_BY_STATUS[error.status] : undefined
   return byStatus ?? 'teacher.errors.generic'
 }
+
+const WITHDRAW_KEY_BY_CODE: Record<string, string> = {
+  teacher_help_already_accepted: 'ask.help.withdraw.errors.accepted',
+  teacher_help_request_closed: 'ask.help.withdraw.errors.closed',
+  teacher_help_request_not_found: 'ask.help.withdraw.errors.closed',
+}
+
+/**
+ * Translation key in the `chat` namespace for a withdrawal the server refused
+ * (#543): taken by a teacher, already over, or briefly unavailable (503
+ * `teacher_help_withdrawal_unavailable`, or the gateway's 502/504). A 409
+ * without a code it knows says the request could not be withdrawn.
+ */
+export function teacherHelpWithdrawErrorKey(error: unknown): string {
+  if (!(error instanceof ApiError)) return 'ask.help.withdraw.errors.generic'
+  const byCode = error.code ? WITHDRAW_KEY_BY_CODE[error.code] : undefined
+  if (byCode) return byCode
+  if (error.status === 502 || error.status === 503 || error.status === 504) return 'ask.help.withdraw.errors.unavailable'
+  return 'ask.help.withdraw.errors.generic'
+}

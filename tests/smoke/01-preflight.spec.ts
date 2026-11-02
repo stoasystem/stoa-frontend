@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test'
+import { contentSecurityPolicy, PRODUCTION_SOURCES } from '../../scripts/content-security-policy.mjs'
 import { SmokeApi, servedRelease } from './api'
 import { readStateFile, record } from './run'
 
@@ -69,6 +70,20 @@ test.describe('preflight', { tag: ['@preflight', '@readonly'] }, () => {
         description: 'STOA_SMOKE_EXPECT_RELEASE_ID is not set: the served release was recorded, not checked',
       })
     }
+  })
+
+  // CloudFront sends the policy (stoa-infra); this repository holds it (#533).
+  // Report-only until the reports are read and it is switched to enforced;
+  // either way it is the one in scripts/content-security-policy.mjs.
+  test('the page is sent with the content security policy', async ({ request, baseURL }, testInfo) => {
+    const response = await request.get(`${baseURL}/`)
+    const headers = response.headers()
+    const enforced = headers['content-security-policy'] ?? null
+    const reportOnly = headers['content-security-policy-report-only'] ?? null
+    await record(testInfo, 'preflight-content-security-policy', { baseURL, enforced, reportOnly })
+    expect(enforced ?? reportOnly, 'a Content-Security-Policy(-Report-Only) header').toBe(
+      contentSecurityPolicy(PRODUCTION_SOURCES),
+    )
   })
 
   test('the five functions were recorded for this run', async ({ baseURL }, testInfo) => {

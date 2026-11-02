@@ -108,6 +108,8 @@ export type FailedMessage = {
   /** The student's bubble, `failed`, carrying its retry. */
   student: ChatMessage & {
     retryPayload: Omit<PendingMessage, 'askedAt' | 'idempotencyKey' | 'unconfirmed'> & { idempotencyKey?: string }
+    /** The UTC day the daily limit refused it: not sent again before the next (#541). */
+    limitDay?: string
   }
   /** What stood in the answer's place, if anything. */
   answer?: ChatMessage

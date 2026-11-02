@@ -43,32 +43,49 @@ async function sha256Hex(chunk: Blob) {
 const mayAskAgain = (error: unknown) =>
   !(error instanceof ApiError) || error.status === undefined || error.status >= 500
 
+/** Where one part's bytes go: the URL the API signed and the headers it was signed with. */
+export type SignedPart = Pick<UploadPartUrlResponse, 'url' | 'headers'>
+
+/**
+ * Asks the API to sign one part's URL for its exact length and SHA-256: under
+ * the student's session for `/files` here, under the phone's upload token for
+ * `/upload-codes` (#514).
+ */
+export type PartSigner = (
+  partNumber: number,
+  part: { sizeBytes: number; checksumSha256: string },
+  signal?: AbortSignal,
+) => Promise<SignedPart>
+
 /**
  * A part's URL, asked for again once when the API could not answer. A refusal
  * -- `409 upload_chunk_conflict`, a 422 -- is the answer, and is thrown.
  */
 async function requestPartUrl(
-  uploadId: string,
+  sign: PartSigner,
   partNumber: number,
-  sizeBytes: number,
-  checksumSha256: string,
+  part: { sizeBytes: number; checksumSha256: string },
   signal?: AbortSignal,
 ) {
-  const ask = async () => {
+  try {
+    return await sign(partNumber, part, signal)
+  } catch (error) {
+    if (signal?.aborted || !mayAskAgain(error)) throw error
+    return sign(partNumber, part, signal)
+  }
+}
+
+/** A part of an upload this student's session opened, signed under that session. */
+const signFilePart =
+  (uploadId: string): PartSigner =>
+  async (partNumber, part, signal) => {
     const response = await httpClient.post<UploadPartUrlResponse>(
       apiPath`/files/${uploadId}/parts/${partNumber}`,
-      { sizeBytes, checksumSha256 },
+      part,
       { signal },
     )
     return response.data
   }
-  try {
-    return await ask()
-  } catch (error) {
-    if (signal?.aborted || !mayAskAgain(error)) throw error
-    return ask()
-  }
-}
 
 /** A part S3 would not take, on the URL signed for it and on a fresh one. */
 export class UploadPartError extends Error {
@@ -108,12 +125,12 @@ export const PART_PUT_LIMIT_MS = 120_000
  * URL is a 403), or one that failed or took too long to go, is asked for once
  * more and sent again. `signal` lets it go at once, when the file is taken out.
  */
-async function putPart(uploadId: string, partNumber: number, chunk: Blob, signal?: AbortSignal) {
+async function putPart(sign: PartSigner, partNumber: number, chunk: Blob, signal?: AbortSignal) {
   const checksumSha256 = await sha256Hex(chunk)
   let status: number | null = null
   for (let attempt = 1; attempt <= PART_ATTEMPTS; attempt += 1) {
     stopIfTakenOut(signal)
-    const part = await requestPartUrl(uploadId, partNumber, chunk.size, checksumSha256, signal)
+    const part = await requestPartUrl(sign, partNumber, { sizeBytes: chunk.size, checksumSha256 }, signal)
     const put = new AbortController()
     const letGo = () => put.abort()
     signal?.addEventListener('abort', letGo, { once: true })
@@ -139,6 +156,19 @@ async function putPart(uploadId: string, partNumber: number, chunk: Blob, signal
     }
   }
   throw new UploadPartError(partNumber, status)
+}
+
+/**
+ * Every part of `file`, in order, `chunkBytes` each, straight to S3; the
+ * number of parts sent, which `complete` is told.
+ */
+export async function putParts(file: Blob, chunkBytes: number, sign: PartSigner, signal?: AbortSignal) {
+  const partCount = Math.max(1, Math.ceil(file.size / chunkBytes))
+  for (let partNumber = 1; partNumber <= partCount; partNumber += 1) {
+    const start = (partNumber - 1) * chunkBytes
+    await putPart(sign, partNumber, file.slice(start, start + chunkBytes), signal)
+  }
+  return partCount
 }
 
 async function completeUpload(uploadId: string, partCount: number, signal?: AbortSignal) {
@@ -178,11 +208,7 @@ export async function uploadFile({
     throw new UploadRejectedError('unsupported_type', `${file.type || 'unknown'} is not accepted.`)
   }
 
-  const partCount = Math.max(1, Math.ceil(file.size / intent.chunkBytes))
-  for (let partNumber = 1; partNumber <= partCount; partNumber += 1) {
-    const start = (partNumber - 1) * intent.chunkBytes
-    await putPart(intent.uploadId, partNumber, file.slice(start, start + intent.chunkBytes), signal)
-  }
+  const partCount = await putParts(file, intent.chunkBytes, signFilePart(intent.uploadId), signal)
 
   // A file that does not pass is refused with a 422 and its code, not answered
   // with a status; anything but `validated` here is not done.

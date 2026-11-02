@@ -21,6 +21,7 @@ import { Link } from 'react-router-dom'
 import { Button } from '@/components/base'
 import { STAR_TITLE_ID, StarCardBack, StarCardDetails, useStarCardAction, type StarCardProps } from '@/features/starmap/components/StarCard'
 import { StarGlyph } from '@/features/starmap/components/StarGlyph'
+import { starLook } from '@/features/starmap/model/starMap'
 import { SHEET } from '@/features/starmap/view/semanticZoom'
 
 export type SheetState = 'collapsed' | 'expanded'
@@ -162,6 +163,8 @@ export function StarSheet({
     <article
       ref={sheet}
       aria-labelledby={STAR_TITLE_ID}
+      // Focusable from code: a star asked for from Ask opens with its sheet focused (#487).
+      tabIndex={-1}
       data-star-sheet={state}
       className="pointer-events-auto absolute inset-x-3 flex flex-col overflow-hidden rounded-[16px] border border-solid border-[color:var(--sky-glass-border)] text-on-sky"
       style={{
@@ -190,7 +193,7 @@ export function StarSheet({
         <div className="flex min-h-0 flex-1 items-center gap-2.5 px-3 pb-2">
           <div ref={glyph} className="shrink-0">
             <StarGlyph
-              state={star.state}
+              state={starLook(star)}
               size={36}
               progress={star.progress}
               recommended={Boolean(star.recommendation)}

@@ -10,15 +10,6 @@ import { chatQueryKeys } from '@/services/chat/chatQueryKeys'
 import type { Conversation, ConversationListResponse } from '@/types/chat'
 import type { TeacherHelpRequest } from '@/types/teacherHelp'
 
-/**
- * Help that has not ended: the thread is read again and help is not offered
- * again. That is every status still read again, so waiting_no_teacher and a
- * status this app does not know yet count as waiting (#397).
- */
-function isActiveHelp(help: TeacherHelpRequest | null): boolean {
-  return help !== null && teacherHelpPollInterval(help.status) !== false
-}
-
 /** The conversation's last message as read, which the list previews; undefined until it is read. */
 function lastMessageOf(conversation: Conversation | undefined): string | null | undefined {
   if (!conversation) return undefined
@@ -111,7 +102,6 @@ export function useAskConversation(conversationId: string | null) {
     conversation: conversationQuery.data ?? null,
     messages,
     help,
-    helpActive: isActiveHelp(help),
     ...streaming,
   }
 }

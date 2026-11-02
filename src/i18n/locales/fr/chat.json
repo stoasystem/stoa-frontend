@@ -90,7 +90,8 @@
       "stop": "Ne plus attendre",
       "starting": "La conversation démarre…",
       "startFailed": "La conversation n’a pas pu démarrer. Réessaie.",
-      "answerFailed": "L’explication n’a pas pu être préparée pour le moment. Réessaie ou demande à un enseignant."
+      "answerFailed": "L’explication n’a pas pu être préparée pour le moment. Réessaie ou demande à un enseignant.",
+      "dailyLimit": "Tu as utilisé tous tes messages pour aujourd’hui. Reviens demain, ou demande à un enseignant si tu as besoin d’aide maintenant."
     },
     "answer": {
       "steps": "Étapes",
@@ -146,10 +147,24 @@
         "waiting_no_teacher": "Ta demande reste ouverte. Dès qu’un enseignant sera disponible, il la prendra en charge et répondra dans cette conversation.",
         "assigned": "Sa réponse apparaîtra dans cette conversation.",
         "in_progress": "Ses réponses apparaissent dans cette conversation.",
-        "resolved": "Besoin de plus d’aide ? Redemande à un enseignant sous une réponse.",
-        "cancelled": "Besoin de plus d’aide ? Redemande à un enseignant sous une réponse.",
-        "withdrawn": "Finalement besoin d’aide ? Redemande à un enseignant sous une réponse.",
-        "expired": "Ta demande a expiré. Redemande à un enseignant sous une réponse."
+        "resolved": "Besoin de plus d’aide ? Ouvre une nouvelle conversation et demande à un enseignant.",
+        "cancelled": "Besoin de plus d’aide ? Ouvre une nouvelle conversation et demande à un enseignant.",
+        "withdrawn": "Finalement besoin d’aide ? Ouvre une nouvelle conversation et demande à un enseignant.",
+        "expired": "Ta demande a expiré. Ouvre une nouvelle conversation pour redemander à un enseignant."
+      },
+      "newConversation": "Nouvelle conversation",
+      "withdraw": {
+        "action": "Retirer la demande",
+        "confirm": "Retirer ta demande ? Tu récupères la demande de cette semaine, mais tu ne pourras plus demander à un enseignant dans cette conversation.",
+        "yes": "Retirer",
+        "withdrawing": "Retrait en cours…",
+        "keep": "Garder la demande",
+        "errors": {
+          "accepted": "Un enseignant a déjà pris ta demande, tu ne peux donc plus la retirer.",
+          "closed": "Cette demande est déjà terminée.",
+          "unavailable": "Le retrait est momentanément indisponible. Réessaie dans un instant.",
+          "generic": "La demande n’a pas pu être retirée. Réessaie."
+        }
       },
       "fallback": {
         "title": "Aide d’un enseignant demandée",
@@ -171,6 +186,10 @@
       "title": "L’étoile {{name}} est allumée",
       "body": "Tu as terminé son chapitre. L’étoile brille maintenant sur ta carte.",
       "link": "Voir sur la carte"
+    },
+    "target": {
+      "label": "{{name}} sur ta carte du ciel",
+      "show": "Voir le chemin sur la carte du ciel"
     },
     "reopen": {
       "open": "Ouvrir les questions",
@@ -194,6 +213,32 @@
         "blocked": "Cette image ne peut pas être envoyée. Choisis-en une autre ou décris l’exercice avec tes mots.",
         "failed": "Ce fichier n’a pas pu être ajouté. Réessaie."
       }
+    },
+    "phone": {
+      "label": "Photo depuis ton téléphone",
+      "close": "Fermer",
+      "title": "Scanne avec ton téléphone",
+      "qrLabel": "Code QR pour envoyer une photo depuis ton téléphone",
+      "qrFailed": "Le code QR ne peut pas s’afficher. Recharge la page et réessaie.",
+      "making": "Création du code…",
+      "unmade": {
+        "rateLimited": "Trop de codes en peu de temps. Attends un moment, puis réessaie.",
+        "failed": "Le code n’a pas pu être créé. Réessaie."
+      },
+      "waiting": "Vise le code avec l’appareil photo de ton téléphone, puis prends ou choisis une photo.",
+      "validFor": "Valable encore {{time}}",
+      "uploading": "Ton téléphone envoie la photo…",
+      "ready": "C’est bien ta photo ? Ajoute-la à ta question.",
+      "loadingPhoto": "Chargement de la photo…",
+      "photoFailed": "La photo ne peut pas s’afficher ici. Crée un nouveau code et renvoie-la.",
+      "photoAlt": "La photo de ton téléphone",
+      "photoName": "photo-telephone",
+      "add": "Ajouter la photo",
+      "notMine": "Pas la mienne",
+      "failed": "La photo n’est pas arrivée. Crée un nouveau code et réessaie.",
+      "expired": "Ce code a expiré. Crées-en un nouveau.",
+      "newCode": "Nouveau code",
+      "tryAgain": "Réessayer"
     },
     "teacherImages": {
       "label": "Images de l’enseignant·e",

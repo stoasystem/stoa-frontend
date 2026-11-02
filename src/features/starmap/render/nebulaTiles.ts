@@ -62,7 +62,7 @@ export function tileSizeFor(diameter: number, dpr: number, max: 256 | 512 = 256)
   return pixels <= 64 ? 64 : pixels <= 128 ? 128 : pixels <= 256 || max === 256 ? 256 : 512
 }
 
-/** State identity, not just lit fraction: ready → locked must repaint too. Computed on data change. */
+/** State identity, not just lit fraction: ready → waiting must repaint too. Computed on data change. */
 export function nebulaStateKeys(state: Uint8Array, nebula: Uint16Array, count: number): string[] {
   const keys = Array<string>(count).fill('')
   for (let i = 0; i < state.length; i += 1) keys[nebula[i]] += state[i]

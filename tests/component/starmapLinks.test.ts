@@ -14,7 +14,7 @@ import {
   linkTier,
   starLineLook,
   TIER_IN_PROGRESS,
-  TIER_LOCKED,
+  TIER_WAITING,
   TIER_RECOMMENDED,
   TIER_WALKED,
   UNFOCUSED_LINE,
@@ -26,7 +26,7 @@ import { nebulaLinks } from '@/features/starmap/model/links'
 import { orderedNebulae, orderedStars, type StarMap } from '@/features/starmap/model/starMap'
 import { createCanvas2DRenderer, withAlpha } from '@/features/starmap/render/canvas2d'
 import { drawLinks, LINE, LINK_INK, shortestDx, type LinkObstacles } from '@/features/starmap/render/links'
-import { STATE_IN_PROGRESS, STATE_LIT, STATE_LOCKED, STATE_READY, type LinkInk, type SceneData, type SceneFrame, type StarMapRenderer } from '@/features/starmap/render/types'
+import { STATE_IN_PROGRESS, STATE_LIT, STATE_WAITING, STATE_READY, type LinkInk, type SceneData, type SceneFrame, type StarMapRenderer } from '@/features/starmap/render/types'
 import type { LayerTarget } from '@/features/starmap/view/layers'
 import { lineReveal } from '@/features/starmap/view/semanticZoom'
 import { fakeCanvas, fakeClock, THEME, skyMap, type CanvasCounter } from './starmapHarness'
@@ -49,11 +49,11 @@ describe('four tiers, bright to dark', () => {
     expect(linkTier('lit', 'ready', false)).toBe(TIER_WALKED)
   })
 
-  it('a line into a locked star is tier 4, both ends locked included', () => {
-    expect(linkTier('locked', 'locked', false)).toBe(TIER_LOCKED)
-    expect(linkTier('lit', 'locked', false)).toBe(TIER_LOCKED)
-    expect(linkTier('in_progress', 'locked', false)).toBe(TIER_LOCKED)
-    expect(linkTier('ready', 'locked', false)).toBe(TIER_LOCKED)
+  it('a line into a waiting star is tier 4, both ends waiting included', () => {
+    expect(linkTier('waiting', 'waiting', false)).toBe(TIER_WAITING)
+    expect(linkTier('lit', 'waiting', false)).toBe(TIER_WAITING)
+    expect(linkTier('in_progress', 'waiting', false)).toBe(TIER_WAITING)
+    expect(linkTier('ready', 'waiting', false)).toBe(TIER_WAITING)
   })
 })
 
@@ -236,7 +236,7 @@ describe('a chosen nebula and a chosen star', () => {
     expect(into.length).toBeGreaterThan(0)
     for (const l of into) expect(scene.state[l.from]).toBe(STATE_LIT)
     expect(out.length).toBeGreaterThan(0)
-    for (const l of out) expect(scene.state[l.to]).toBe(STATE_LOCKED)
+    for (const l of out) expect(scene.state[l.to]).toBe(STATE_WAITING)
     s.engine.destroy()
   })
 })
@@ -371,7 +371,7 @@ describe('each tier in its own ink, through drawLinks (#121, #123)', () => {
       count: 5,
       mapX: Float32Array.from(mapX),
       mapY: Float32Array.from(mapY),
-      state: Uint8Array.from([STATE_LIT, STATE_READY, STATE_IN_PROGRESS, STATE_LIT, STATE_LOCKED]),
+      state: Uint8Array.from([STATE_LIT, STATE_READY, STATE_IN_PROGRESS, STATE_LIT, STATE_WAITING]),
       progress: new Float32Array(5),
       reviewDue: new Uint8Array(5),
       recommended: 1,
@@ -412,7 +412,7 @@ describe('each tier in its own ink, through drawLinks (#121, #123)', () => {
       showSkills: 0,
       crossfade: 0,
     } satisfies SceneFrame
-    const tierOf = new Map<number, LinkTier>([[1, TIER_RECOMMENDED], [2, TIER_IN_PROGRESS], [3, TIER_WALKED], [4, TIER_LOCKED]])
+    const tierOf = new Map<number, LinkTier>([[1, TIER_RECOMMENDED], [2, TIER_IN_PROGRESS], [3, TIER_WALKED], [4, TIER_WAITING]])
     return { scene, frame, tierOf }
   }
 
@@ -456,9 +456,9 @@ describe('each tier in its own ink, through drawLinks (#121, #123)', () => {
     return ctx.strokes.filter(({ to: [x, y] }) => Math.sign(Math.round(x - cx)) === ux && Math.sign(Math.round(y - cy)) === uy)
   }
 
-  const custom: LinkInk = { recommended: '#AA0001', inProgress: '#AA0002', walked: '#AA0003', locked: '#AA0004', bridge: '#AA0005' }
+  const custom: LinkInk = { recommended: '#AA0001', inProgress: '#AA0002', walked: '#AA0003', waiting: '#AA0004', bridge: '#AA0005' }
   const inkFor = (ink: LinkInk, tier: LinkTier) =>
-    ({ [TIER_RECOMMENDED]: ink.recommended, [TIER_IN_PROGRESS]: ink.inProgress, [TIER_WALKED]: ink.walked, [TIER_LOCKED]: ink.locked })[tier]
+    ({ [TIER_RECOMMENDED]: ink.recommended, [TIER_IN_PROGRESS]: ink.inProgress, [TIER_WALKED]: ink.walked, [TIER_WAITING]: ink.waiting })[tier]
 
   it.each([
     ['the default inks (LINK_INK)', undefined, LINK_INK],
@@ -475,7 +475,7 @@ describe('each tier in its own ink, through drawLinks (#121, #123)', () => {
       const line = strokes[strokes.length - 1]
       expect(line.style, `tier ${tier} ink`).toBe(inkFor(ink, tier))
       expect(line.width, `tier ${tier} width`).toBe(LINE.width[tier])
-      expect(line.dash, `tier ${tier} dash`).toEqual(tier === TIER_LOCKED ? [...LINE.dash] : [])
+      expect(line.dash, `tier ${tier} dash`).toEqual(tier === TIER_WAITING ? [...LINE.dash] : [])
       expect(line.alpha, `tier ${tier} strength`).toBe(1)
       if (tier === TIER_RECOMMENDED) {
         const glow = strokes[0]
@@ -492,10 +492,10 @@ describe('each tier in its own ink, through drawLinks (#121, #123)', () => {
       recommended: 'rgba(242, 197, 114, 0.95)',
       inProgress: 'rgba(255, 255, 255, 0.62)',
       walked: 'rgba(242, 197, 114, 0.36)',
-      locked: 'rgba(255, 255, 255, 0.32)',
+      waiting: 'rgba(255, 255, 255, 0.32)',
       bridge: 'rgba(170, 190, 255, 0.12)',
     })
-    expect(LINE.width).toEqual({ [TIER_RECOMMENDED]: 2.8, [TIER_IN_PROGRESS]: 2.2, [TIER_WALKED]: 1.6, [TIER_LOCKED]: 1.6 })
+    expect(LINE.width).toEqual({ [TIER_RECOMMENDED]: 2.8, [TIER_IN_PROGRESS]: 2.2, [TIER_WALKED]: 1.6, [TIER_WAITING]: 1.6 })
     expect([...LINE.dash]).toEqual([4, 4])
   })
 
@@ -524,12 +524,12 @@ describe('each tier in its own ink, through drawLinks (#121, #123)', () => {
     expect(rgbOf(drawn.get(TIER_WALKED)!.style)).toEqual(gold)
     expect(drawn.get(TIER_WALKED)!.dash).toEqual([])
     // Not walked: a line into a locked star is not gold, and is dashed.
-    expect(rgbOf(drawn.get(TIER_LOCKED)!.style)).not.toEqual(gold)
-    expect(drawn.get(TIER_LOCKED)!.dash).toEqual([...LINE.dash])
+    expect(rgbOf(drawn.get(TIER_WAITING)!.style)).not.toEqual(gold)
+    expect(drawn.get(TIER_WAITING)!.dash).toEqual([...LINE.dash])
     // The control: the two tiers are told apart by the dash as well as the
     // ink, so the rule still reads without colour (#121 is about relevance,
     // not decoration).
-    expect(drawn.get(TIER_WALKED)!.dash).not.toEqual(drawn.get(TIER_LOCKED)!.dash)
+    expect(drawn.get(TIER_WALKED)!.dash).not.toEqual(drawn.get(TIER_WAITING)!.dash)
   })
 })
 

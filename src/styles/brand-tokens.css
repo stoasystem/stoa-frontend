@@ -287,7 +287,7 @@
   /*
    * 3.20:1 on --sky, below 4.5. Only for labels of disabled, non-interactive
    * controls (WCAG 1.4.3 "inactive user interface components"). Never for
-   * anything clickable -- a locked planet node opens its prerequisites, so it
+   * anything clickable -- a waiting planet node opens its prerequisites, so it
    * does not qualify -- and never for text meant to be read (user 2026-09-28).
    */
   --on-sky-text-muted: rgba(255, 255, 255, 0.35);
@@ -306,9 +306,9 @@
    * relation is to the student now, not that it exists, so only what carries
    * that message at rest is held to 3:1 (WCAG 1.4.11): a line into the
    * recommended star, and an in-progress star's lines to its prerequisites.
-   * The path walked (both ends lit), the lines into locked stars (star layer
+   * The path walked (both ends lit), the lines into waiting stars (star layer
    * only, dashed) and the panorama's bridges are quiet on purpose; what they
-   * say is already in the stars' own states (and a locked star's card). Read by
+   * say is already in the stars' own states (and a waiting star's card). Read by
    * StarMapView into the canvas theme; drawn by render/links.ts.
    */
 
@@ -331,7 +331,7 @@
    * A knowledge point drawn as a dot, far out on the star map (#109). The
    * dot is the only thing most points ever are -- on a map of ten, eight of
    * them -- so each state carries its own ink here, and each is rated: a
-   * locked point opens its prerequisites when tapped, so it is a control
+   * waiting point opens its prerequisites when tapped, so it is a control
    * (WCAG 1.4.11), and the other three say which state a point is in. The rgb
    * is --lit or --on-sky-text; the alpha is DOT_ALPHA
    * (src/features/starmap/render/canvas2d.ts; a test keeps them equal).
@@ -339,14 +339,14 @@
   --starmap-dot-lit: rgba(242, 197, 114, 1);
   --starmap-dot-in-progress: rgba(242, 197, 114, 0.95);
   --starmap-dot-ready: rgba(255, 255, 255, 0.95);
-  --starmap-dot-locked: rgba(255, 255, 255, 0.78);
+  --starmap-dot-waiting: rgba(255, 255, 255, 0.78);
   --starmap-dot-review: rgba(255, 255, 255, 0.92);
 
   /*
    * The connection lines by tier (#121; render/links.ts keeps the same values
    * as its fallback and a test pins them equal). Brightness says how relevant
    * a relation is now, not that it exists: tiers 1 and 2 say "now" and are
-   * rated 3:1; the path walked, the lines into locked stars and the panorama's
+   * rated 3:1; the path walked, the lines into waiting stars and the panorama's
    * bridges are below it on purpose.
    *
    * The path walked is --lit, like --constellation-walked a chapter down
@@ -358,7 +358,7 @@
   --starmap-link-recommended: rgba(242, 197, 114, 0.95);
   --starmap-link-in-progress: rgba(255, 255, 255, 0.62);
   --starmap-link-walked: rgba(242, 197, 114, 0.36);
-  --starmap-link-locked: rgba(255, 255, 255, 0.32);
+  --starmap-link-waiting: rgba(255, 255, 255, 0.32);
   --starmap-bridge: rgba(170, 190, 255, 0.12);
   /*
    * A galaxy's name across its middle on the star map's panorama (#137):

@@ -3,6 +3,7 @@ import { memo, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Avatar, Button } from '@/components/base'
 import { ICON } from '@/components/base/sizes'
+import { AskTargetCard } from '@/features/ask/AskTargetCard'
 import { MathRenderer } from '@/components/ui/MathRenderer'
 import { AskAnswerSections, hasSections, quoteCaption, type AnswerStep } from '@/features/ask/AskAnswerSections'
 import { TeacherReplyImages } from '@/features/ask/TeacherReplyImages'
@@ -149,6 +150,8 @@ export const AskMessage = memo(function AskMessage({
         <MessageAttachments attachments={message.attachments} />
       </div>
       {message.status === 'stopped' && <span className="text-[12px] text-caption">{t('ask.thread.stopped')}</span>}
+      {/* The star the answer found (#487): one card, once the answer is whole. */}
+      {message.targetUnit && !streaming && !failed && <AskTargetCard unitId={message.targetUnit.unitId} />}
       {after}
     </div>
   )

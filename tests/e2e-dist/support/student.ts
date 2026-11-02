@@ -197,31 +197,43 @@ export class StudentWorld {
     })
   }
 
-  /** The star map read model (stoa-backend#59), as #48 wires it in. */
+  /**
+   * The star map read model (stoa-backend#59), as #48 wires it in: a skeleton
+   * of every star, and the few stars around one in full (#503).
+   */
   private installKnowledgeMap() {
-    this.backend.on('GET', '/practice/knowledge-map', () => ({
+    const reducing = {
+      unitId: 'reducing',
+      name: 'Reducing fractions',
+      nebulaId: 'fractions',
+      order: 0,
+      // A newcomer has started nothing (the first-sign-in onboarding, #490); anyone else is halfway.
+      state: this.newcomer ? 'ready' : 'in_progress',
+      progress: this.newcomer ? 0 : 0.5,
+      unmetExercises: 2,
+      reviewDue: 0,
+      recommendation: { source: 'system' },
+      x: 0.5,
+      y: 0.5,
+      skills: [],
+      chapter: this.newcomer ? { lessonCount: 2, lessonsDone: 0, nextLesson: null } : { lessonCount: 2, lessonsDone: 1, nextLesson: null },
+    }
+    this.backend.on('GET', '/practice/knowledge-map/stars', () => ({
       status: 200,
       body: {
         subjectId: 'math',
+        focus: 'reducing',
+        stars: [{ ...reducing, relation: 'focus', prerequisiteUnitIds: [], practiceSets: [] }],
+      },
+    }))
+    this.backend.on('GET', '/practice/knowledge-map', () => ({
+      status: 200,
+      body: {
+        view: 'skeleton',
+        subjectId: 'math',
         galaxies: [{ subjectId: 'math', name: 'Mathematics', lit: 0, total: 1, enrolled: true }],
         nebulae: [{ topicId: 'fractions', name: 'Fractions', order: 0, subjectId: 'math' }],
-        stars: [
-          {
-            unitId: 'reducing',
-            name: 'Reducing fractions',
-            nebulaId: 'fractions',
-            order: 0,
-            state: this.newcomer ? 'ready' : 'in_progress',
-            progress: this.newcomer ? 0 : 0.5,
-            unmetExercises: 2,
-            reviewDue: 0,
-            recommendation: { source: 'system' },
-            x: 0.5,
-            y: 0.5,
-            skills: [],
-            chapter: this.newcomer ? { lessonCount: 2, lessonsDone: 0, nextLesson: null } : { lessonCount: 2, lessonsDone: 1, nextLesson: null },
-          },
-        ],
+        stars: [reducing],
         prerequisites: [],
         summary: { lit: 0, total: 1, streakDays: 0, score: 0 },
       },

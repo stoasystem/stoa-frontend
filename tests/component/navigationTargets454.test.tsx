@@ -30,7 +30,7 @@ import {
   NOTIFICATION_TARGETS,
   notificationTargetPath,
 } from '@/components/notifications/notificationTargets'
-import { chapterPath, quizPath } from '@/features/chapter/useChapter'
+import { chapterPath, quizPath, skillPath } from '@/features/chapter/useChapter'
 import { StarCard } from '@/features/starmap/components/StarCard'
 import { pathForTarget } from '@/features/starmap/view/layers'
 import { reviewReturnPath } from '@/features/starmap/view/reviewReturn'
@@ -178,6 +178,7 @@ function builtTargets(): Built[] {
     add('chapterPath', id, chapterPath(id))
     add('chapterPath lesson', id, chapterPath(id, id))
     add('quizPath', id, quizPath(id, id))
+    add('skillPath', id, skillPath(id, id))
     add('reviewReturnPath', { star: `/map/${id}` }, reviewReturnPath({ star: `/map/${id}` }))
   }
 
@@ -393,7 +394,7 @@ describe('#454: the real redirects and links keep hostile ids on this site', () 
 
   it.each(HOSTILE_STRINGS.filter((id) => id !== ''))('opens the chapter and the review of a star whose id is %j, here', (unitId) => {
     const map = skyMap(1000, 'math')
-    const base = map.stars.find((candidate) => candidate.state !== 'locked')!
+    const base = map.stars[0]
     const star = { ...base, unitId, reviewDue: 2 }
     const nebula = map.nebulae.find((candidate) => candidate.topicId === star.nebulaId)!
     const view = render(

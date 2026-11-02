@@ -63,6 +63,15 @@ export type MessageQuote = {
   source: QuoteSource
 }
 
+/**
+ * The star an answer offers to take the student to (#487, stoa-backend#124):
+ * a unit of their star map, any subject's. At most one per answer, and only
+ * when the student said they want to go there; `null` on every other message.
+ */
+export type TargetUnit = {
+  unitId: string
+}
+
 /** A knowledge point an answer names; `unitId` is its star once the backend can match one. */
 export type KnowledgePoint = {
   name: string
@@ -96,6 +105,8 @@ export type ChatMessage = {
   attachments?: ChatAttachment[]
   /** The passage this message quotes; `null` on every message without one. */
   quote?: MessageQuote | null
+  /** On an answer: the star it offers to fly to (#487). */
+  targetUnit?: TargetUnit | null
   /**
    * An answer's sections; `null` on students' and teachers' messages and on
    * answers written before they were kept, which show `content` as it is.
@@ -170,6 +181,8 @@ export type StreamMessageDoneEvent = {
   type: 'message_done'
   messageId: string
   status: 'completed'
+  /** The same star the stored answer carries (#487). */
+  targetUnit?: TargetUnit | null
   /** The answer's sections (stoa-backend#132), there before the conversation is read back. */
   structured?: StructuredAnswer | null
 }

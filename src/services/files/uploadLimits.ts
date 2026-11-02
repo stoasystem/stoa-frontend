@@ -83,6 +83,14 @@ export const IMAGE_ACCEPT_ATTRIBUTE = Object.keys(PREPARED_IMAGE_TYPES)
  */
 export const CAMERA_ACCEPT_ATTRIBUTE = 'image/*'
 
+/**
+ * For a chooser that offers photos only: the phone's page a QR opens (#514),
+ * which sends nothing else.
+ */
+export const PHOTO_ACCEPT_ATTRIBUTE = Object.keys(PREPARED_IMAGE_TYPES)
+  .map((extension) => `.${extension}`)
+  .join(',')
+
 /** A photo the browser prepares before it goes up (#508). */
 export function isPreparedImage(filename: string) {
   return Object.prototype.hasOwnProperty.call(PREPARED_IMAGE_TYPES, extensionOf(filename))

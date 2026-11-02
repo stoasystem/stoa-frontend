@@ -25,15 +25,16 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { StarMapEngine } from '@/features/starmap/engine/starMapEngine'
 import { createCanvas2DRenderer, DOT_ALPHA, dotExtent, drawDotMark } from '@/features/starmap/render/canvas2d'
 import { CHOSEN, DOT_BOX, DOT_CUT, dotBoxFor, GLYPH_LARGE, GLYPH_SMALL, HOVER, PRESS } from '@/features/starmap/render/glyph'
-import { LOCKED_WEB, lockedWebHint } from '@/features/starmap/render/links'
-import { STATE_IN_PROGRESS, STATE_LIT, STATE_LOCKED, STATE_READY, type SceneFrame, type StarMapRenderer } from '@/features/starmap/render/types'
+import { starLook } from '@/features/starmap/model/starMap'
+import { WAITING_WEB, waitingWebHint } from '@/features/starmap/render/links'
+import { STATE_IN_PROGRESS, STATE_LIT, STATE_WAITING, STATE_READY, type SceneFrame, type StarMapRenderer } from '@/features/starmap/render/types'
 import { fakeCanvas, fakeClock, skyMap, THEME, type CanvasCounter } from './starmapHarness'
 
 afterEach(() => vi.unstubAllGlobals())
 beforeEach(() => vi.stubGlobal('Path2D', class {}))
 
-const STATES = [STATE_LIT, STATE_IN_PROGRESS, STATE_READY, STATE_LOCKED]
-const NAMES: Record<number, string> = { [STATE_LIT]: 'lit', [STATE_IN_PROGRESS]: 'in progress', [STATE_READY]: 'ready', [STATE_LOCKED]: 'locked' }
+const STATES = [STATE_LIT, STATE_IN_PROGRESS, STATE_READY, STATE_WAITING]
+const NAMES: Record<number, string> = { [STATE_LIT]: 'lit', [STATE_IN_PROGRESS]: 'in progress', [STATE_READY]: 'ready', [STATE_WAITING]: 'locked' }
 
 /** What one mark put on the canvas: filled paths, filled discs and stroked rings, with their radii. */
 type Mark = { star: boolean; discs: number[]; rings: { r: number; width: number }[]; glow: boolean }
@@ -107,7 +108,7 @@ describe('D1: every state is its own figure at dot scale', () => {
     expect(markOf(STATE_LIT, 'glow').glow).toBe(true)
     expect(markOf(STATE_IN_PROGRESS, 'glow').glow).toBe(true)
     expect(markOf(STATE_READY, 'glow').glow).toBe(false)
-    expect(markOf(STATE_LOCKED, 'glow').glow).toBe(false)
+    expect(markOf(STATE_WAITING, 'glow').glow).toBe(false)
     expect(markOf(STATE_LIT, 'core').glow).toBe(false)
   })
 
@@ -171,13 +172,13 @@ describe('D3: a locked point is out of the dust, and the recommended star still 
   it('the sky’s brightest dust grain is 1.3 px across at 58%; a locked dot is several times that', () => {
     // paintGalaxy (render/galaxy.ts): radius 0.2 + u^5 * 1.1, alpha 0.08 + u^3 * 0.5.
     const dustRadius = 0.2 + 1.1
-    const locked = (dotBoxFor(2.1, 40) / DOT_CUT.box) * dotExtent(DOT_CUT, STATE_LOCKED)
+    const locked = (dotBoxFor(2.1, 40) / DOT_CUT.box) * dotExtent(DOT_CUT, STATE_WAITING)
     expect(locked).toBeGreaterThan(dustRadius * 3)
   })
 
   it('a locked dot keeps 3:1 on the sky (it is a control, WCAG 1.4.11) and stays quieter than the rest', () => {
-    expect(contrast(over(WHITE, SKY, DOT_ALPHA[STATE_LOCKED]), SKY)).toBeGreaterThanOrEqual(3)
-    expect(DOT_ALPHA[STATE_LOCKED]).toBeLessThan(DOT_ALPHA[STATE_READY])
+    expect(contrast(over(WHITE, SKY, DOT_ALPHA[STATE_WAITING]), SKY)).toBeGreaterThanOrEqual(3)
+    expect(DOT_ALPHA[STATE_WAITING]).toBeLessThan(DOT_ALPHA[STATE_READY])
     expect(DOT_ALPHA[STATE_READY]).toBeLessThan(DOT_ALPHA[STATE_LIT])
     expect(DOT_ALPHA[STATE_IN_PROGRESS]).toBeLessThan(DOT_ALPHA[STATE_LIT])
   })
@@ -210,7 +211,7 @@ describe('D3: a locked point is out of the dust, and the recommended star still 
       ['--starmap-dot-lit', lit, DOT_ALPHA[STATE_LIT]],
       ['--starmap-dot-in-progress', lit, DOT_ALPHA[STATE_IN_PROGRESS]],
       ['--starmap-dot-ready', white, DOT_ALPHA[STATE_READY]],
-      ['--starmap-dot-locked', white, DOT_ALPHA[STATE_LOCKED]],
+      ['--starmap-dot-waiting', white, DOT_ALPHA[STATE_WAITING]],
       ['--starmap-dot-review', white, DOT_ALPHA.review],
     ]
     for (const [name, rgb, alpha] of pairs) {
@@ -266,10 +267,10 @@ describe('D4: the sixth state, due for review, is told apart far out too', () =>
 
 describe('D5: the locked web is hinted only where nothing else reaches it', () => {
   it('nothing while the bridges carry the panorama, nothing once the dots are gone', () => {
-    const at = (dotBlend: number, bridges: number) => lockedWebHint({ dotBlend, lineReveal: { bridges, tiers: [0, 0, 0, 0, 0] } })
+    const at = (dotBlend: number, bridges: number) => waitingWebHint({ dotBlend, lineReveal: { bridges, tiers: [0, 0, 0, 0, 0] } })
     expect(at(1, 1)).toBe(0)
     expect(at(0, 0)).toBe(0)
-    expect(at(1, 0)).toBe(LOCKED_WEB)
+    expect(at(1, 0)).toBe(WAITING_WEB)
     // Continuous and monotone as the dots give way to glyphs: nothing pops.
     let previous = at(0, 0)
     for (let d = 0; d <= 1.0001; d += 0.1) {
@@ -277,7 +278,7 @@ describe('D5: the locked web is hinted only where nothing else reaches it', () =
       expect(now).toBeGreaterThanOrEqual(previous - 1e-9)
       previous = now
     }
-    expect(LOCKED_WEB).toBeLessThan(1)
+    expect(WAITING_WEB).toBeLessThan(1)
   })
 
   it('on the real map it puts lines on the panorama that nothing drew before', () => {
@@ -286,11 +287,14 @@ describe('D5: the locked web is hinted only where nothing else reaches it', () =
     expect(frame.lineReveal.bridges).toBe(0) // A sparse map's farthest zoom is already past the bridges.
     expect(frame.dotBlend).toBe(1)
     expect(frame.focusStar).toBe(-1) // Nothing in focus: the only rule that drew tier 4 before.
-    const locked = s.map.prerequisites.filter(({ from, to }) => {
-      const stateOf = (id: string) => s.map.stars.find((star) => star.unitId === id)?.state
-      return stateOf(from) === 'locked' || stateOf(to) === 'locked'
+    const waiting = s.map.prerequisites.filter(({ from, to }) => {
+      const lookOf = (id: string) => {
+        const star = s.map.stars.find((candidate) => candidate.unitId === id)
+        return star && starLook(star)
+      }
+      return lookOf(from) === 'waiting' || lookOf(to) === 'waiting'
     })
-    expect(locked.length, 'the fixture has locked prerequisites to draw').toBeGreaterThan(0)
+    expect(waiting.length, 'the fixture has prerequisites into waiting stars to draw').toBeGreaterThan(0)
     const withWeb = s.real.stats.links!.lines
     // The same frame with the dots gone is the same frame without the hint.
     s.real.draw({ ...frame, dotBlend: 0 })
@@ -372,7 +376,7 @@ describe('a locked knowledge point at full glyph size', () => {
     // It was half the size and the dimmest mark on the map, while being the
     // state most points are in — so the sky read as empty at every zoom, not
     // only on the panorama.
-    expect(cut.locked.ring).toBeCloseTo(cut.ready.ring, 5)
+    expect(cut.waiting.ring).toBeCloseTo(cut.ready.ring, 5)
   })
 
   it.each([
@@ -380,6 +384,6 @@ describe('a locked knowledge point at full glyph size', () => {
     ['small', GLYPH_SMALL],
   ])('is still told apart from a ready one, by the core, on the %s cut', (_name, cut) => {
     expect(cut.ready.core).toBeGreaterThan(0)
-    expect('core' in cut.locked).toBe(false)
+    expect('core' in cut.waiting).toBe(false)
   })
 })

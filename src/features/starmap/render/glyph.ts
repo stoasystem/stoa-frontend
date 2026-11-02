@@ -13,8 +13,8 @@
  */
 
 /**
- * The board draws a locked star as a white ring at 28%, which is 2.5:1 on the
- * sky. A locked star opens its prerequisites when tapped, so it is a control
+ * The board draws a waiting star as a white ring at 28%, which is 2.5:1 on the
+ * sky. A waiting star opens its prerequisites when tapped, so it is a control
  * and its ring must reach 3:1 (WCAG 1.4.11): 55% gives 6.2:1 on the sky,
  * 5.1:1 on stacked nebula haze and 4.1:1 at a fully lit nebula's core
  * (checked in starmapContrast.test.ts).
@@ -23,16 +23,16 @@
  * the smallest and the dimmest mark on the map — while being the state most
  * points are in, which left the whole sky looking empty at every zoom, not
  * only on the panorama. What tells the two apart is the core: a ready star
- * has one, a locked star is hollow, the same as the dots say it far out.
+ * has one, a waiting star is hollow, the same as the dots say it far out.
  */
-export const LOCKED_RING_ALPHA = 0.55
+export const WAITING_RING_ALPHA = 0.55
 
 export type GlyphCut = {
   box: number
   lit: { halo: number; haloAlpha: number; blur: number; tip: number; waist: number; starAlpha: number; ring: number; ringWidth: number; ringAlpha: number; core: number }
   inProgress: { halo: number; haloAlpha: number; blur: number; tip: number; waist: number; starAlpha: number; ring: number; ringWidth: number; trackAlpha: number; core: number }
   ready: { ring: number; ringWidth: number; ringAlpha: number; core: number; coreAlpha: number }
-  locked: { ring: number; ringWidth: number; ringAlpha: number }
+  waiting: { ring: number; ringWidth: number; ringAlpha: number }
   recommended: { halo: number; haloAlpha: number; blur: number; ring: number; ringWidth: number; dash: readonly [number, number] }
   review: { offset: number; radius: number; outline: number }
 }
@@ -42,7 +42,7 @@ export const GLYPH_LARGE: GlyphCut = {
   lit: { halo: 46.2, haloAlpha: 0.26, blur: 6, tip: 44, waist: 15, starAlpha: 0.85, ring: 20.9, ringWidth: 1.6, ringAlpha: 0.55, core: 9.2 },
   inProgress: { halo: 52.8, haloAlpha: 0.3, blur: 6, tip: 31.9, waist: 10.8, starAlpha: 0.75, ring: 28.4, ringWidth: 3.5, trackAlpha: 0.16, core: 8.4 },
   ready: { ring: 17.6, ringWidth: 1.6, ringAlpha: 0.55, core: 4.4, coreAlpha: 0.75 },
-  locked: { ring: 17.6, ringWidth: 1.6, ringAlpha: LOCKED_RING_ALPHA },
+  waiting: { ring: 17.6, ringWidth: 1.6, ringAlpha: WAITING_RING_ALPHA },
   recommended: { halo: 44, haloAlpha: 0.14, blur: 6, ring: 34, ringWidth: 1.6, dash: [4.8, 6.4] },
   review: { offset: 21, radius: 5.5, outline: 2 },
 }
@@ -52,7 +52,7 @@ export const GLYPH_SMALL: GlyphCut = {
   lit: { halo: 10.6, haloAlpha: 0.26, blur: 2, tip: 10.1, waist: 3.4, starAlpha: 0.85, ring: 4.8, ringWidth: 0.8, ringAlpha: 0.55, core: 2.1 },
   inProgress: { halo: 12.1, haloAlpha: 0.3, blur: 2, tip: 7.3, waist: 2.5, starAlpha: 0.75, ring: 7.8, ringWidth: 1.5, trackAlpha: 0.16, core: 1.9 },
   ready: { ring: 4, ringWidth: 0.8, ringAlpha: 0.55, core: 1, coreAlpha: 0.75 },
-  locked: { ring: 4, ringWidth: 0.8, ringAlpha: LOCKED_RING_ALPHA },
+  waiting: { ring: 4, ringWidth: 0.8, ringAlpha: WAITING_RING_ALPHA },
   recommended: { halo: 10.1, haloAlpha: 0.14, blur: 2, ring: 8.6, ringWidth: 0.8, dash: [2.1, 2.8] },
   review: { offset: 5.6, radius: 1.8, outline: 0.8 },
 }
@@ -75,7 +75,7 @@ export type DotCut = {
   lit: { tip: number; waist: number; core: number }
   inProgress: { tip: number; waist: number; ring: number; ringWidth: number; core: number }
   ready: { ring: number; ringWidth: number; core: number }
-  locked: { ring: number; ringWidth: number }
+  waiting: { ring: number; ringWidth: number }
   /** The soft glow under a lit or in-progress dot. */
   halo: { radius: number; blur: number; alpha: number }
   review: { offset: number; radius: number; outline: number }
@@ -86,7 +86,7 @@ export const DOT_CUT: DotCut = {
   lit: { tip: 7.7, waist: 2.7, core: 2 },
   inProgress: { tip: 5.6, waist: 1.9, ring: 7.2, ringWidth: 1.3, core: 1.7 },
   ready: { ring: 6.1, ringWidth: 1.35, core: 2.3 },
-  locked: { ring: 6.5, ringWidth: 1.35 },
+  waiting: { ring: 6.5, ringWidth: 1.35 },
   halo: { radius: 4, blur: 2.2, alpha: 0.3 },
   review: { offset: 7.2, radius: 2, outline: 0.9 },
 }

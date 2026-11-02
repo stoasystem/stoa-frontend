@@ -43,7 +43,9 @@ export function StarMapRoute({ relations = false, longNames = false }: { relatio
   const subjectId = params.subjectId ?? defaultSubject(lastSubject, defaults.subjects)
   const map = useStarMap(subjectId, fixtureSizeFrom(search, DEMO_STAR_COUNT),
     relations, longNames)
-  const { demo, status = 'success', retry } = useStarMapSource()
+  const { demo, status = 'success', retry, focus, arrive } = useStarMapSource()
+  // Back on the map, a sky that went stale while the student practised is read again (#503).
+  useEffect(() => arrive?.(), [arrive])
   useEffect(() => {
     if (map.subjects.some((s) => s.subjectId === map.subject.subjectId) && lastSubject !== map.subject.subjectId) {
       remember(ownerId, map.subject.subjectId)
@@ -58,6 +60,13 @@ export function StarMapRoute({ relations = false, longNames = false }: { relatio
   // its recommended star with Murmi beside it, and after the first lighting sees the galaxy (plan A).
   const first = useFirstLanding(map, stage.target, ownerId)
   const firstReveal = useFirstReveal(map, first.target, stage.reveal)
+  // A star picked -- by a tap, a link, a hint, a card from Ask -- loads its small stars if it has none yet;
+  // with none picked, the stars around where the student last practised in the galaxy in focus (#503).
+  const pickedStar = routeTarget.layer === 'star' ? routeTarget.unitId : null
+  const focusSubject = routeTarget.layer === 'map' ? map.subject.subjectId : subjectOfNebula(map, routeTarget.nebulaId)
+  useEffect(() => {
+    focus?.({ subjectId: focusSubject, unitId: pickedStar })
+  }, [focusSubject, pickedStar, focus])
 
   // Sign-in timing, handed over from ChatPage / LearnPage (#45): a student
   // lands on the map now, so its first drawn frame ends the wait. The mark is

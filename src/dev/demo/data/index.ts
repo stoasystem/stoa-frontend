@@ -80,6 +80,7 @@ export {
   type DemoChapter,
 } from '@/dev/demo/data/chapter'
 export {
+  DEMO_FIND_STAR_CONVERSATION_ID,
   DEMO_HELP_CONVERSATION_ID,
   DEMO_SECTIONS_CONVERSATION_ID,
   DEMO_TEACHER_NAME,
@@ -90,6 +91,8 @@ export { DEMO_STUDENT_ID } from '@/dev/demo/data/student'
 export {
   DEMO_BRIDGE_STAR,
   DEMO_KNOWLEDGE_POINT,
+  demoPracticeSets,
+  demoSkillsAfter,
   demoSky,
   demoStarKind,
   localize,

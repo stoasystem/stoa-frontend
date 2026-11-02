@@ -13,7 +13,7 @@
  * they keep the language they show, the stored key only picks the next load's.
  */
 import { QueryClientProvider } from '@tanstack/react-query'
-import { act, fireEvent, render, renderHook, screen, waitFor } from '@testing-library/react'
+import { act, cleanup, fireEvent, render, renderHook, screen, waitFor } from '@testing-library/react'
 import { http, HttpResponse } from 'msw'
 import type { ReactNode } from 'react'
 import { Toaster } from 'sonner'
@@ -161,6 +161,21 @@ function localeAnswer(locale: string) {
 }
 
 describe('saving the choice to the account', () => {
+  // A toast that closes (on its own, or on Try again) is removed by a timer of
+  // sonner's that unmounting does not clear. Left to the clock, it could fire
+  // after this file's environment was gone: React then read `window` and the
+  // run failed with an unhandled error, though every test passed. The timers
+  // are run here, while there is still a window, and none may be left behind.
+  beforeEach(() => {
+    vi.useFakeTimers({ shouldAdvanceTime: true, toFake: ['setTimeout', 'clearTimeout'] })
+  })
+  afterEach(() => {
+    cleanup()
+    vi.runOnlyPendingTimers()
+    expect(vi.getTimerCount()).toBe(0)
+    vi.useRealTimers()
+  })
+
   it('sends one write at a time, in order, so the last choice is the one stored', async () => {
     signIn()
     let stored = 'en'

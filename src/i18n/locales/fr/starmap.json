@@ -41,7 +41,8 @@
     "keys": "Clavier : flèches vers le plus proche dans ce sens, Tab suit le cours, + et − zooment.",
     "label": "Ce que signifient les étoiles",
     "pointer": "Fais glisser pour te déplacer, fais défiler ou pince pour zoomer. Choisis une étoile pour voir son chapitre ; appuie dessus et fais-la glisser (en tactile, maintiens-la d’abord) pour voir ses liens.",
-    "reviewDue": "À réviser"
+    "reviewDue": "À réviser",
+    "waiting": "S’appuie sur des étoiles pas encore allumées"
   },
   "lighting": {
     "announce": "L’étoile {{name}} est allumée"
@@ -69,6 +70,12 @@
   "star": {
     "progress": "{{percent}} % des leçons faites",
     "lessons": "{{done}} leçons faites sur {{total}}",
+    "quiz": {
+      "take": "Je sais déjà – teste-moi",
+      "cooling": "Tu pourras refaire le test à partir de {{when}}.",
+      "litByQuiz": "Allumée en réussissant le test de l’étoile",
+      "alsoTest": "Tu peux aussi tester toute l’étoile."
+    },
     "unmet_one": "Toutes les leçons sont faites : encore {{count}} exercice à réussir",
     "unmet_many": "Toutes les leçons sont faites : encore {{count}} exercices à réussir",
     "unmet_other": "Toutes les leçons sont faites : encore {{count}} exercices à réussir",
@@ -79,7 +86,7 @@
     "skills": "Compétences",
     "skillLit": "{{name}}, allumée",
     "skillDark": "{{name}}, pas encore allumée",
-    "prerequisites": "À allumer d’abord",
+    "prerequisites": "À apprendre d’abord",
     "start": "Commencer",
     "continue": "Continuer",
     "open": "Ouvrir le chapitre",
@@ -88,13 +95,21 @@
     "review_many": "Réviser {{count}} exercices",
     "review_other": "Réviser {{count}} exercices",
     "reviewSoon": "Bientôt disponible",
-    "sheetDetails": "Affiche ou masque les détails de cette étoile"
+    "sheetDetails": "Affiche ou masque les détails de cette étoile",
+    "extension": "Approfondissement",
+    "extensionNote": "Approfondissement : un bonus si tu le fais. Il ne compte pas pour allumer l’étoile.",
+    "lightFirst": "À allumer d’abord :",
+    "earlierStages": "Termine d’abord les niveaux précédents de cette étoile.",
+    "stillOpen": "Tu peux quand même t’y exercer dès maintenant.",
+    "practise": "S’exercer : {{name}}",
+    "skillsLoading": "Chargement des petites étoiles de cette étoile…",
+    "skillsFailed": "Les petites étoiles de cette étoile n’ont pas pu être chargées.",
+    "skillsRetry": "Réessayer"
   },
   "state": {
     "lit": "Allumée",
     "in_progress": "En cours",
-    "ready": "Prête à commencer",
-    "locked": "Verrouillée"
+    "ready": "Prête à commencer"
   },
   "subjects": {
     "label": "Matières"

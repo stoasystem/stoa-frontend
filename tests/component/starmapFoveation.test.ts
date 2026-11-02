@@ -197,9 +197,10 @@ describe('the Canvas 2D renderer: sprites for the focus, tiles for the rest', ()
     expect(renderer.stats.frames).toBeGreaterThan(100)
     expect(renderer.stats.tilePaints).toBe(nebulaCount)
 
-    // Ready → locked keeps the lit fraction but changes the tile's actual dots.
-    const ready = map500.stars.find((s) => s.state === 'ready')!
-    const shuffled: StarMap = { ...map500, stars: map500.stars.map((s) => (s === ready ? { ...s, state: 'locked' as const } : s)) }
+    // Ready → waiting keeps the lit fraction but changes the tile's actual dots.
+    const ready = map500.stars.find((s) => s.state === 'ready' && s.unlitPrerequisiteIds.length === 0)!
+    const waitingOn = map500.stars.find((s) => s.state !== 'lit' && s !== ready)!.unitId
+    const shuffled: StarMap = { ...map500, stars: map500.stars.map((s) => (s === ready ? { ...s, unlitPrerequisiteIds: [waitingOn] } : s)) }
     engine.setData(shuffled, { layer: 'map' })
     clock.advance(20)
     expect(renderer.stats.tilePaints).toBe(nebulaCount + 1)

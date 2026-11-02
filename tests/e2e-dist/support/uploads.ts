@@ -36,8 +36,7 @@ export class UploadDesk {
     const b = this.backend
     b.on('POST', '/files/intents', ({ body }) => {
       const { contentType } = body as { contentType: string }
-      const uploadId = `e2e-upload-${this.next++}`
-      this.uploads.set(uploadId, { uploadId, contentType, parts: new Map() })
+      const uploadId = this.open(contentType)
       return {
         status: 200,
         body: {
@@ -55,18 +54,7 @@ export class UploadDesk {
       const upload = this.uploads.get(uploadId)
       if (!upload) return notFound()
       const { checksumSha256 } = body as { checksumSha256: string }
-      upload.parts.set(Number(part), checksumSha256)
-      return {
-        status: 200,
-        body: {
-          uploadId,
-          partNumber: Number(part),
-          url: `${S3_ORIGIN}/staging/${uploadId}/${part}?X-Amz-Signature=e2e`,
-          method: 'PUT',
-          headers: { 'x-amz-checksum-sha256': Buffer.from(checksumSha256, 'hex').toString('base64') },
-          expiresAt: new Date(Date.now() + 300 * 1000).toISOString(),
-        },
-      }
+      return { status: 200, body: { uploadId, ...this.signPart(uploadId, Number(part), checksumSha256) } }
     })
     b.on('POST', '/files/{upload_id}/complete', ({ pathname, body }) => {
       const uploadId = pathname.split('/')[2]
@@ -86,6 +74,35 @@ export class UploadDesk {
       return { status: 200, body: { uploadId, status: 'validated', attachment: null } }
     })
 
+    await this.answerS3(page)
+  }
+
+  /** A new upload, waiting for its parts; its id. */
+  open(contentType: string) {
+    const uploadId = `e2e-upload-${this.next++}`
+    this.uploads.set(uploadId, { uploadId, contentType, parts: new Map() })
+    return uploadId
+  }
+
+  /** The URL one part goes to, signed for its SHA-256, as a parts route answers it. */
+  signPart(uploadId: string, partNumber: number, checksumSha256: string) {
+    this.uploads.get(uploadId)?.parts.set(partNumber, checksumSha256)
+    return {
+      partNumber,
+      url: `${S3_ORIGIN}/staging/${uploadId}/${partNumber}?X-Amz-Signature=e2e`,
+      method: 'PUT',
+      headers: { 'x-amz-checksum-sha256': Buffer.from(checksumSha256, 'hex').toString('base64') },
+      expiresAt: new Date(Date.now() + 300 * 1000).toISOString(),
+    }
+  }
+
+  /** Whether every part of the upload reached S3. */
+  arrived(uploadId: string, partCount: number) {
+    return this.uploads.has(uploadId) && this.puts.filter((put) => put.uploadId === uploadId).length >= partCount
+  }
+
+  /** S3, for `page`: a part is taken only on the URL signed for its bytes. */
+  async answerS3(page: Page) {
     await page.route(`${S3_ORIGIN}/**`, async (route) => {
       const request = route.request()
       const cors = {

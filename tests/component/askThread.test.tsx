@@ -291,8 +291,10 @@ describe('the teacher status card', () => {
     await advance(5_100)
     await waitFor(() => expect(card).toHaveAttribute('data-help-status', 'resolved'))
     expect(within(card).getByText('Resolved')).toBeInTheDocument()
-    // Ended: a new request can be made under the answer again.
-    expect(ask.getByRole('button', { name: 'Ask a teacher' })).toBeInTheDocument()
+    // Ended: the conversation has had its request, so none is offered under the
+    // answer; the card points to a new conversation instead (#544).
+    expect(ask.queryByRole('button', { name: 'Ask a teacher' })).not.toBeInTheDocument()
+    expect(within(card).getByRole('button', { name: 'New conversation' })).toBeInTheDocument()
   })
 
   // #397: the server says waiting_no_teacher when no teacher could be offered

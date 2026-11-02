@@ -30,6 +30,8 @@ import {
   saveDemoNotificationPreferences,
   setDemoLanguage,
 } from '@/dev/preview/demoSource'
+import { starCountFrom } from '@/dev/preview/surfaces'
+import { DEMO_BRIDGE_STAR } from '@/dev/demo/data'
 import { isSupportedLanguage } from '@/i18n/languages'
 import { commandMessageIds } from '@/services/chat/commandMessageIds'
 import type { ChatMessage, ConversationSummary, MessageQuote } from '@/types/chat'
@@ -56,6 +58,8 @@ const refuse = (status: number, code: string, message: string): Refusal => ({ [R
 const isRefusal = (data: unknown): data is Refusal => typeof data === 'object' && data !== null && REFUSAL in data
 
 const now = () => new Date().toISOString()
+/** The page's star count (`?points=`), which sizes the sky the demo backend answers with. */
+const pageStarCount = () => starCountFrom(new URLSearchParams(window.location.search).get('points'))
 
 /*
  * The notification preferences as the backend keeps them
@@ -208,12 +212,27 @@ const routes: Array<[method: string, pattern: string, handler: Handler]> = [
     askedForTeacher.set(request.conversationId, request)
     return request
   }],
+  // Taken back while it waits (#543); one the demo data holds, or none, answers 404.
+  ['POST', '/teacher-help/conversations/:id/request/withdraw', ({ params }) => {
+    const asked = askedForTeacher.get(params.id)
+    if (!asked) return null
+    const withdrawn = { ...asked, status: 'withdrawn' }
+    askedForTeacher.set(params.id, withdrawn)
+    return withdrawn
+  }],
   // A conversation never handed to a teacher answers 404, as the backend does.
   ['GET', '/teacher-help/conversations/:id/request', ({ params }) =>
     demoTeacherHelpRequests.find((request) => request.conversationId === params.id) ?? askedForTeacher.get(params.id) ?? null],
 
   // Chapter and practice stage
   ['GET', '/practice/curriculum/catalog', () => demo().demoChapter.catalog],
+  // The sky beside the chapter (#501): what the map says of the demo knowledge point and its
+  // small stars, at the page's star count. Loaded when asked: nothing of the app before interception.
+  ['GET', '/practice/knowledge-map', async ({ query }) =>
+    (await import('@/dev/preview/lighting')).demoKnowledgeMap(pageStarCount(), query.get('view') === 'skeleton' ? 'skeleton' : 'full')],
+  // The stars around one in full (#503).
+  ['GET', '/practice/knowledge-map/stars', async ({ query }) =>
+    (await import('@/dev/preview/lighting')).demoKnowledgeStars(pageStarCount(), query.get('around'))],
   ['GET', '/practice/:subjectId/:topicId/roadmap', ({ params }) => {
     const { roadmap } = demoChapterNow()
     return params.subjectId === roadmap.subjectId && params.topicId === roadmap.topicId ? roadmap : null
@@ -278,6 +297,15 @@ const REPLY: Record<string, (content: string) => string> = {
 }
 const replyTo = (content: string) => (REPLY[demoLanguage()] ?? REPLY.en)(content)
 
+/**
+ * A question with this in it is answered as one that names a star to go to
+ * (#487): the answer carries the physics star Refraction, another galaxy than
+ * the maths one the map opens on, so the card and the flight to it can be
+ * seen. No assistant reads the question; the marker stands in for the backend
+ * recognising the star (stoa-backend#124).
+ */
+export const DEMO_FIND_STAR = '#star'
+
 /** A question and its answer as the backend stores them, with the ids it derives from the command. */
 async function exchange(
   conversationId: string,
@@ -287,10 +315,11 @@ async function exchange(
 ): Promise<ChatMessage[]> {
   const { studentMessageId, assistantMessageId } = await commandMessageIds(conversationId, idempotencyKey)
   const askedAt = now()
+  const targetUnit = content.includes(DEMO_FIND_STAR) ? { unitId: DEMO_BRIDGE_STAR } : null
   return [
     // Its quote kept, as the backend keeps it, so a step quoted from an answer (#506) reads back.
-    { id: studentMessageId, conversationId, role: 'student', content, createdAt: askedAt, status: 'completed', quote: quote ?? null },
-    { id: assistantMessageId, conversationId, role: 'assistant', content: replyTo(content), createdAt: now(), status: 'completed' },
+    { id: studentMessageId, conversationId, role: 'student', content, createdAt: askedAt, status: 'completed', quote: quote ?? null, targetUnit: null },
+    { id: assistantMessageId, conversationId, role: 'assistant', content: replyTo(content), createdAt: now(), status: 'completed', targetUnit },
   ]
 }
 
@@ -331,7 +360,7 @@ export async function streamedAnswer(
   const events: (readonly [string, object])[] = [
     ['message_start', { messageId: reply.id, conversationId, role: 'assistant', createdAt: reply.createdAt }],
     ...words.map((delta) => ['message_delta', { messageId: reply.id, delta }] as const),
-    ['message_done', { messageId: reply.id, status: 'completed' }],
+    ['message_done', { messageId: reply.id, status: 'completed', targetUnit: reply.targetUnit ?? null }],
   ]
   return events.map(([type, data]) => `event: ${type}\ndata: ${JSON.stringify(data)}\n\n`)
 }

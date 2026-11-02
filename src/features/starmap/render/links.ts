@@ -28,7 +28,7 @@
  * drawn. With `wrap`, every shape is also drawn one band to the left and
  * right, where the other copies are.
  */
-import { LEARNING_STATES } from '@/features/starmap/model/starMap'
+import { STAR_LOOKS } from '@/features/starmap/model/starMap'
 import { linkWeight } from '@/features/starmap/model/links'
 import {
   BRIDGE_FOCUSED,
@@ -36,7 +36,7 @@ import {
   galaxyHintLook,
   linkTier,
   starLineLook,
-  TIER_LOCKED,
+  TIER_WAITING,
   TIER_RECOMMENDED,
   type LinkTier,
   type LinkView,
@@ -57,7 +57,7 @@ export const LINK_INK: LinkInk = {
   recommended: 'rgba(242, 197, 114, 0.95)',
   inProgress: 'rgba(255, 255, 255, 0.62)',
   walked: 'rgba(242, 197, 114, 0.36)',
-  locked: 'rgba(255, 255, 255, 0.32)',
+  waiting: 'rgba(255, 255, 255, 0.32)',
   bridge: 'rgba(170, 190, 255, 0.12)',
 }
 
@@ -74,23 +74,23 @@ export const LINE = {
 } as const
 
 /**
- * The locked web far out (#109, #138 D1). Two rules decide whether a
- * prerequisite into a locked star is drawn, and on a map of a dozen points
+ * The waiting web far out (#109, #138 D1). Two rules decide whether a
+ * prerequisite into a waiting star is drawn, and on a map of a dozen points
  * neither reaches it: the panorama's bridges have already faded out
  * (`REVEAL.linesNear`, by glyph size, and a sparse map's glyphs are large at
  * its farthest zoom), while tier 4 waits for a star to be in focus. The
  * points are then drawn with nothing between them at all, though most of
- * them are locked. Wherever the stars are still dots and the bridges are
+ * them are waiting. Wherever the stars are still dots and the bridges are
  * gone, tier 4 keeps this much of its ink -- a dashed hint of the web, in
  * tier 4's own ink and dashes -- and hands back to the focus rule as the
  * dots give way to glyphs.
  */
-export const LOCKED_WEB = 0.75
+export const WAITING_WEB = 0.75
 
-/** How much of tier 4's ink the locked web keeps this frame: nothing while the bridges carry the panorama. */
-export function lockedWebHint(frame: Pick<SceneFrame, 'dotBlend' | 'lineReveal'>): number {
+/** How much of tier 4's ink the waiting web keeps this frame: nothing while the bridges carry the panorama. */
+export function waitingWebHint(frame: Pick<SceneFrame, 'dotBlend' | 'lineReveal'>): number {
   const gap = Math.max(0, Math.min(1, frame.dotBlend)) * (1 - Math.max(0, Math.min(1, frame.lineReveal.bridges)))
-  return LOCKED_WEB * gap
+  return WAITING_WEB * gap
 }
 
 /** A bridge between nebulae: trimmed this far into each cloud (share of radius), its width, and its soft passes. */
@@ -365,7 +365,7 @@ function prepare(scene: SceneData): Prepared {
       to,
       fromNebula: scene.nebula[from],
       toNebula: scene.nebula[to],
-      tier: linkTier(LEARNING_STATES[scene.state[from]], LEARNING_STATES[scene.state[to]], recommended.has(to)),
+      tier: linkTier(STAR_LOOKS[scene.state[from]], STAR_LOOKS[scene.state[to]], recommended.has(to)),
     }
     const [ga, gb] = [galaxyOf[line.fromNebula] ?? -1, galaxyOf[line.toNebula] ?? -1]
     if (ga >= 0 && gb >= 0 && ga !== gb) line.crossSubject = true
@@ -407,7 +407,7 @@ function fade(color: string, alpha: number): string {
 }
 
 const inkOf = (ink: LinkInk, tier: LinkTier) =>
-  tier === TIER_RECOMMENDED ? ink.recommended : tier === 2 ? ink.inProgress : tier === 3 ? ink.walked : ink.locked
+  tier === TIER_RECOMMENDED ? ink.recommended : tier === 2 ? ink.inProgress : tier === 3 ? ink.walked : ink.waiting
 
 /**
  * Draw every connection line of this frame. Shapes names must avoid go into
@@ -583,12 +583,12 @@ export function drawLinks(
     /** Other nebulae a drawn line from the chosen one leads to: the strongest line to each, and (focused) where it runs. */
     const leadsTo = new Map<number, { strength: number; along: { x: number; y: number; ux: number; uy: number; d: number } | null }>()
     const ends: [number, number][] = []
-    const web = lockedWebHint(frame)
+    const web = waitingWebHint(frame)
     for (const line of data.lines) {
       const look = starLineLook(line, view)
       const { reach, lit } = look
-      // The locked web far out: tier 4 where neither the bridges nor the focus rule reach it.
-      const strength = line.tier === TIER_LOCKED ? Math.max(look.strength, web) : look.strength
+      // The waiting web far out: tier 4 where neither the bridges nor the focus rule reach it.
+      const strength = line.tier === TIER_WAITING ? Math.max(look.strength, web) : look.strength
       if (strength <= 0.001) continue
       // Anchored on the dragged star, else the focused star, else on the end in the chosen nebula;
       // a line between two other nebulae is drawn from both ends, each fading out.
@@ -646,7 +646,7 @@ export function drawLinks(
             ctx.lineTo(x1, y1)
             ctx.stroke()
           }
-          ctx.setLineDash(line.tier === TIER_LOCKED ? [...LINE.dash] : [])
+          ctx.setLineDash(line.tier === TIER_WAITING ? [...LINE.dash] : [])
           ctx.strokeStyle = stroke
           ctx.globalAlpha = Math.min(1, strength)
           ctx.lineWidth = lineWidth
@@ -668,11 +668,11 @@ export function drawLinks(
           }
           seen = true
           // Names keep clear of what carries the message now; the faint path
-          // walked may run under them. The locked web is the exception (#125):
+          // walked may run under them. The waiting web is the exception (#125):
           // far out it is the whole picture, and a name struck through by one
           // of its dashes reads as a mistake, so while it is lit it keeps
           // names clear like any other line that is carrying the message.
-          if (strength >= 0.5 && (line.tier <= 2 || reach > 0 || (line.tier === TIER_LOCKED && web > 0))) {
+          if (strength >= 0.5 && (line.tier <= 2 || reach > 0 || (line.tier === TIER_WAITING && web > 0))) {
             obstacles.segments.push({ x0, y0, x1, y1 })
           }
         }
