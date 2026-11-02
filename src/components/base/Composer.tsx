@@ -29,11 +29,6 @@ export interface ComposerProps {
    * where there is no camera to open.
    */
   onPhone?: () => void
-  /**
-   * The phone's way is there but cannot be used yet (no conversation to send
-   * the photo into, #554): the menu shows it, off, with the reason.
-   */
-  phoneLater?: boolean
   /** Full composer only: between + and send, e.g. the subject picker. */
   footerStart?: ReactNode
   disabled?: boolean
@@ -58,7 +53,7 @@ export interface ComposerProps {
 const LINE_TEXT = 'm-0 text-center text-[13px] text-[color:var(--on-sky-text-body,var(--secondary))]'
 const FLOATING_LINE = cn('pointer-events-none absolute inset-x-0 bottom-full mb-1.5', LINE_TEXT)
 
-type AddAction = { key: 'capture' | 'attach' | 'phone'; icon: LucideIcon; label: string; note?: string; run?: () => void }
+type AddAction = { key: 'capture' | 'attach' | 'phone'; icon: LucideIcon; label: string; run: () => void }
 
 /** Why send would not go out yet. Pressing it says which, rather than doing nothing. */
 type SendBlocked = 'empty' | 'busy'
@@ -90,7 +85,6 @@ export function Composer({
   onAttach,
   onCapture,
   onPhone,
-  phoneLater = false,
   footerStart,
   disabled = false,
   describedBy,
@@ -175,15 +169,12 @@ export function Composer({
    * One + for every way to add a picture (#553): a child pressing it expects
    * the choice, and found a file dialog with no word of the phone. A phone or
    * tablet takes a photo or chooses one; a computer chooses one or has the
-   * phone take it. A way that cannot be used yet stays in the list with its
-   * reason, reachable and read out, rather than going missing.
+   * phone take it, a new question as much as one already asked (#554).
    */
   const actions = [
     onCapture && { key: 'capture', icon: Camera, label: t('composer.capture'), run: onCapture },
     onAttach && { key: 'attach', icon: ImageGlyph, label: t('composer.attach'), run: onAttach },
-    onPhone
-      ? { key: 'phone', icon: Smartphone, label: t('composer.phone'), run: onPhone }
-      : phoneLater && { key: 'phone', icon: Smartphone, label: t('composer.phone'), note: t('composer.phoneLater') },
+    onPhone && { key: 'phone', icon: Smartphone, label: t('composer.phone'), run: onPhone },
   ].filter(Boolean) as AddAction[]
   const add = actions.length > 0 && (
     <Menu.Root modal={false}>
@@ -212,25 +203,11 @@ export function Composer({
           <Menu.Item
             key={action.key}
             data-composer-action={action.key}
-            aria-disabled={action.run ? undefined : true}
-            onSelect={(event) => {
-              if (!action.run) {
-                // Off: the menu stays, and its reason stays on screen.
-                event.preventDefault()
-                return
-              }
-              action.run()
-            }}
-            className={cn(
-              'flex min-h-11 cursor-pointer select-none items-start gap-2.5 rounded-[8px] px-2.5 py-2 text-[15px] focus:bg-fill',
-              !action.run && 'cursor-default text-caption',
-            )}
+            onSelect={action.run}
+            className="flex min-h-11 cursor-pointer select-none items-center gap-2.5 rounded-[8px] px-2.5 py-2 text-[15px] focus:bg-fill"
           >
-            <action.icon size={18} strokeWidth={1.8} aria-hidden="true" className="mt-0.5 shrink-0" />
-            <span className="flex min-w-0 flex-col gap-0.5">
-              <span>{action.label}</span>
-              {action.note && <span className="text-[13px] leading-snug text-caption">{action.note}</span>}
-            </span>
+            <action.icon size={18} strokeWidth={1.8} aria-hidden="true" className="shrink-0" />
+            <span className="min-w-0">{action.label}</span>
           </Menu.Item>
         ))}
       </Menu.Content>

@@ -6,8 +6,6 @@
  *
  *   - the + opens a menu of the ways to add a picture, by pointer and by
  *     keyboard, Esc giving the keyboard back to the +;
- *   - the phone's way, when it cannot be used yet, stays in the menu, off,
- *     with its reason, reachable and read out;
  *   - the one-line field draws no scrollbar;
  *   - the words are in all four languages.
  */
@@ -61,16 +59,6 @@ describe('the + menu', () => {
     expect(onAttach).toHaveBeenCalledTimes(1)
   })
 
-  it('keeps the phone’s way, off and with its reason, until it can be used', async () => {
-    await i18n.changeLanguage('en')
-    await userEvent.click(show({ onAttach: vi.fn(), phoneLater: true }))
-    const item = screen.getByRole('menuitem', { name: /^Send a photo from your phone/ })
-    expect(item).toHaveAttribute('aria-disabled', 'true')
-    expect(item).toHaveTextContent('Send your question first, then you can add a photo from your phone.')
-    await userEvent.click(item)
-    expect(screen.getByRole('menu')).toBeInTheDocument()
-  })
-
   it('is not there with no way to add a picture', () => {
     render(
       <I18nextProvider i18n={i18n}>
@@ -104,11 +92,11 @@ describe('the one-line field', () => {
 })
 
 describe('the words', () => {
-  it('name the + and say why the phone waits, in all four languages, each its own', () => {
+  it('name the + in all four languages, each its own', () => {
     const english = i18n.getFixedT('en', 'common')
     for (const locale of ['de', 'fr', 'it'] as const) {
       const t = i18n.getFixedT(locale, 'common')
-      for (const key of ['composer.add', 'composer.phoneLater']) {
+      for (const key of ['composer.add']) {
         expect(t(key), `${locale} ${key}`).not.toBe(key)
         expect(t(key), `${locale} ${key}`).not.toBe(english(key))
       }

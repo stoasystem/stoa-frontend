@@ -28,7 +28,6 @@
     "attach": "Choose a photo or file",
     "capture": "Take a photo",
     "phone": "Send a photo from your phone",
-    "phoneLater": "Send your question first, then you can add a photo from your phone.",
     "send": "Send",
     "sendBlocked": {
       "empty": "Write your question first, then send.",

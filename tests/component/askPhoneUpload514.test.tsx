@@ -89,6 +89,8 @@ const streamMock = vi.mocked(streamConversationMessage)
 
 const CODE_ID = 'a1'.repeat(16)
 const CODE = `${CODE_ID}.${'s'.repeat(43)}`
+/** The upload the code reserved (stoa-backend#191): the same UUID, with dashes. */
+const UPLOAD_ID = 'a1a1a1a1-a1a1-a1a1-a1a1-a1a1a1a1a1a1'
 
 const minutesFromNow = (minutes: number) => new Date(Date.now() + minutes * 60 * 1000).toISOString()
 
@@ -160,7 +162,7 @@ beforeEach(async () => {
   vi.mocked(getConversation).mockResolvedValue(conversation())
   vi.mocked(getGenerationProgress).mockResolvedValue({ status: 'completed', steps: [] } as never)
   streamMock.mockResolvedValue('streamed')
-  createMock.mockResolvedValue({ codeId: CODE_ID, code: CODE, expiresAt: minutesFromNow(10) })
+  createMock.mockResolvedValue({ codeId: CODE_ID, code: CODE, expiresAt: minutesFromNow(10), uploadId: UPLOAD_ID })
   readMock.mockResolvedValue({ codeId: CODE_ID, status: 'waiting', expiresAt: minutesFromNow(10), redeemedAt: null, uploadId: null })
   photoMock.mockResolvedValue(new Blob([new Uint8Array(3000)], { type: 'image/jpeg' }))
   URL.createObjectURL = vi.fn(() => 'blob:phone-photo')
@@ -223,17 +225,13 @@ describe('the phone entry in Ask', () => {
     expect(within(menu).queryByRole('menuitem', { name: new RegExp(`^${PHONE}`) })).toBeNull()
   })
 
-  it('is there, off and with its reason, before there is a conversation for the code to belong to (#554)', async () => {
+  it('is offered for a new question too: the code belongs to no conversation (#554)', async () => {
     const ask = openAsk(null)
     await ask.findByRole('textbox', { name: 'Your question' })
-    const menu = await openAdd(ask)
-    const item = within(menu).getByRole('menuitem', { name: new RegExp(`^${PHONE}`) })
-    expect(item).toHaveAttribute('aria-disabled', 'true')
-    expect(item).toHaveTextContent('Send your question first, then you can add a photo from your phone.')
-    await userEvent.click(item)
-    // Nothing is made, and the menu stays with its reason on screen.
-    expect(createMock).not.toHaveBeenCalled()
-    expect(screen.getByRole('menu')).toBeInTheDocument()
+    await choosePhone(ask)
+    expect(await ask.findByRole('img', { name: 'QR code to send a photo from your phone' })).toBeInTheDocument()
+    expect(createMock).toHaveBeenCalledWith()
+    await waitFor(() => expect(readMock).toHaveBeenCalledWith(UPLOAD_ID, expect.anything()))
   })
 })
 
@@ -244,10 +242,10 @@ describe('the QR', () => {
     await choosePhone(ask)
 
     const qr = await ask.findByRole('img', { name: 'QR code to send a photo from your phone' })
-    expect(createMock).toHaveBeenCalledWith('c1')
+    expect(createMock).toHaveBeenCalledWith()
     expect(qr.querySelector('path')?.getAttribute('d')).toBe(qrPath(`${window.location.origin}/upload#${CODE}`))
     expect(ask.getByText(/^Works for (10:00|9:5\d) more$/)).toBeInTheDocument()
-    await waitFor(() => expect(readMock).toHaveBeenCalledWith('c1', CODE_ID, expect.anything()))
+    await waitFor(() => expect(readMock).toHaveBeenCalledWith(UPLOAD_ID, expect.anything()))
   })
 
   it('says so when the QR cannot be drawn, rather than showing an empty square', async () => {
@@ -279,7 +277,7 @@ describe('the QR', () => {
   })
 
   it('takes the QR down once the code’s own time is up, before the server says so', async () => {
-    createMock.mockResolvedValue({ codeId: CODE_ID, code: CODE, expiresAt: minutesFromNow(-0.01) })
+    createMock.mockResolvedValue({ codeId: CODE_ID, code: CODE, expiresAt: minutesFromNow(-0.01), uploadId: UPLOAD_ID })
     readMock.mockResolvedValue({ codeId: CODE_ID, status: 'waiting', expiresAt: minutesFromNow(-0.01), redeemedAt: null, uploadId: null })
     const ask = openAsk()
     await ask.findByText('Linear equations')
@@ -327,7 +325,7 @@ describe('the photo the phone sent', () => {
     await choosePhone(ask)
 
     expect(await ask.findByRole('img', { name: 'The photo from your phone' })).toHaveAttribute('src', 'blob:phone-photo')
-    expect(photoMock).toHaveBeenCalledWith('c1', CODE_ID, expect.anything())
+    expect(photoMock).toHaveBeenCalledWith(UPLOAD_ID, expect.anything())
     expect(ask.getByText('Is this your photo? Add it to your question.')).toBeInTheDocument()
     expect(ask.queryByRole('list', { name: 'Attached files' })).toBeNull()
 

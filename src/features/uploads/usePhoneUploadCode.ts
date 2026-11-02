@@ -45,8 +45,8 @@ export type PhoneCodeView =
 
 type Made = 'making' | UploadCode | { problem: 'rateLimited' | 'failed' }
 
-/** One card's code, for the conversation it was made in. */
-type Session = { conversationId: string; made: Made; id: number }
+/** One card's code, and the conversation open in Ask when it was made (none for a new question). */
+type Session = { conversationId: string | null; made: Made; id: number }
 
 let sessions = 0
 
@@ -68,25 +68,27 @@ function useNow(ticking: boolean) {
 }
 
 /**
- * The computer's side of a photo sent by QR (#514), for the conversation open
- * in Ask. A code belongs to the conversation it was made in, so opening
- * another one closes the card; `start` makes a fresh code, also to replace one
- * that ran out.
+ * The computer's side of a photo sent by QR (#514). The code is made for no
+ * conversation (#554), so a new question can have one too, and the photo goes
+ * with whichever question it is added to. The card belongs to the question it
+ * was opened for: opening another conversation closes it, while sending a new
+ * question's first message -- which only gives that question its conversation
+ * -- does not. `start` makes a fresh code, also to replace one that ran out.
  */
 export function usePhoneUploadCode(conversationId: string | null) {
   const [session, setSession] = useState<Session | null>(null)
-  const current = session && session.conversationId === conversationId ? session : null
+  const current =
+    session && (session.conversationId === conversationId || session.conversationId === null) ? session : null
   const code = isCode(current?.made) ? current.made : null
 
   const start = useCallback(() => {
-    if (!conversationId) return
     sessions += 1
     const id = sessions
     // A reply for a card since closed or renewed is dropped.
     const settle = (made: Made) =>
       setSession((now) => (now?.id === id ? { ...now, made } : now))
     setSession({ conversationId, made: 'making', id })
-    createUploadCode(conversationId).then(settle, (error: unknown) =>
+    createUploadCode().then(settle, (error: unknown) =>
       settle({ problem: phoneUploadProblemFor(error) === 'rateLimited' ? 'rateLimited' : 'failed' }),
     )
   }, [conversationId])
@@ -94,9 +96,9 @@ export function usePhoneUploadCode(conversationId: string | null) {
   const close = useCallback(() => setSession(null), [])
 
   const status = useQuery({
-    queryKey: chatQueryKeys.uploadCode(conversationId ?? '', code?.codeId ?? ''),
-    queryFn: ({ signal }) => readUploadCode(conversationId ?? '', code?.codeId ?? '', signal),
-    enabled: Boolean(conversationId && code),
+    queryKey: chatQueryKeys.uploadCode(code?.uploadId ?? ''),
+    queryFn: ({ signal }) => readUploadCode(code?.uploadId ?? '', signal),
+    enabled: Boolean(code),
     refetchInterval: (query) => (stillGoing(query.state.data?.status) ? UPLOAD_CODE_POLL_MS : false),
     refetchIntervalInBackground: true,
     // Each card asks afresh; a code is never shown from a cache.
@@ -106,9 +108,9 @@ export function usePhoneUploadCode(conversationId: string | null) {
   const ready = state?.status === 'ready' && state.uploadId ? state.uploadId : null
 
   const photo = useQuery({
-    queryKey: chatQueryKeys.uploadCodePhoto(conversationId ?? '', code?.codeId ?? ''),
-    queryFn: ({ signal }) => readUploadCodePhoto(conversationId ?? '', code?.codeId ?? '', signal),
-    enabled: Boolean(conversationId && code && ready),
+    queryKey: chatQueryKeys.uploadCodePhoto(code?.uploadId ?? ''),
+    queryFn: ({ signal }) => readUploadCodePhoto(code?.uploadId ?? '', signal),
+    enabled: Boolean(code && ready),
     // The photo does not change once it has passed.
     staleTime: 'static',
     gcTime: 0,

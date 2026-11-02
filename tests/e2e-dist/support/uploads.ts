@@ -78,8 +78,9 @@ export class UploadDesk {
   }
 
   /** A new upload, waiting for its parts; its id. */
-  open(contentType: string) {
-    const uploadId = `e2e-upload-${this.next++}`
+  /** Opens an upload; `reserved` is the id a phone code set aside for it (stoa-backend#191). */
+  open(contentType: string, reserved?: string) {
+    const uploadId = reserved ?? `e2e-upload-${this.next++}`
     this.uploads.set(uploadId, { uploadId, contentType, parts: new Map() })
     return uploadId
   }

@@ -13,8 +13,8 @@ export const codeRefused = (): Reply => ({
 /**
  * A photo sent from the phone by QR (#514), answered as stoa-backend#146 does.
  *
- * The computer, signed in, makes one code for a conversation and reads how far
- * the phone has got. The phone, with no session, spends the code once on
+ * The computer, signed in, makes one code for no conversation (stoa-backend#191)
+ * and reads how far the phone has got by the upload the code reserved. The phone, with no session, spends the code once on
  * `redeem` and is handed an upload token; the parts and the completion are
  * taken with that token only. A second redemption, or the code where the token
  * belongs, is `404 upload_code_invalid`, as the backend answers every refused
@@ -25,6 +25,8 @@ export class PhoneUploadDesk {
   readonly codeId = 'e2e0c0de'.repeat(4)
   readonly code = `${this.codeId}.${'s'.repeat(43)}`
   readonly token = `${this.codeId}.${'t'.repeat(43)}`
+  /** The upload the code reserves: its own UUID, with dashes. */
+  readonly reservedUploadId = 'e2e0c0de-e2e0-c0de-e2e0-c0dee2e0c0de'
   redeemedAt: string | null = null
   uploadId: string | null = null
   completed = false
@@ -45,11 +47,16 @@ export class PhoneUploadDesk {
 
   install() {
     const b = this.backend
-    b.on('POST', '/conversations/{conv_id}/upload-codes', () => ({
+    b.on('POST', '/upload-codes', () => ({
       status: 200,
-      body: { codeId: this.codeId, code: this.code, expiresAt: new Date(Date.now() + 10 * 60 * 1000).toISOString() },
+      body: {
+        codeId: this.codeId,
+        code: this.code,
+        expiresAt: new Date(Date.now() + 10 * 60 * 1000).toISOString(),
+        uploadId: this.reservedUploadId,
+      },
     }))
-    b.on('GET', '/conversations/{conv_id}/upload-codes/{code_id}', () => ({
+    b.on('GET', '/files/{upload_id}/phone-code', () => ({
       status: 200,
       body: {
         codeId: this.codeId,
@@ -64,7 +71,7 @@ export class PhoneUploadDesk {
       const { code, contentType } = body as { code: string; contentType: string }
       if (code !== this.code || this.redeemedAt) return codeRefused()
       this.redeemedAt = new Date().toISOString()
-      this.uploadId = this.desk.open(contentType)
+      this.uploadId = this.desk.open(contentType, this.reservedUploadId)
       return {
         status: 200,
         body: {
@@ -91,7 +98,7 @@ export class PhoneUploadDesk {
       return { status: 200, body: { status: 'validated' } }
     })
     // The photo for the computer to show before it is added: the JPEG the phone sent.
-    b.on('GET', '/conversations/{conv_id}/upload-codes/{code_id}/content', ({ headers }) => {
+    b.on('GET', '/files/{upload_id}/phone-code/content', ({ headers }) => {
       this.previews.push({ authorization: headers.authorization })
       const sent = this.desk.puts.find((put) => put.uploadId === this.uploadId)
       if (!this.completed || !sent) {
