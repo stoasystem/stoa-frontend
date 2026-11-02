@@ -20,7 +20,7 @@ export type PendingMessage = {
   practiceContext?: PracticeContextRef
   quote?: MessageQuote
   /**
-   * Sent by `sendDetached` with no conversation on screen, and not yet known
+   * Sent by Ask's question module (`useAskQuestion`) with no conversation on screen, and not yet known
    * to have reached the server: a tab that no longer has that request sends it
    * again with the same key, which the server takes as the same message (#263).
    */

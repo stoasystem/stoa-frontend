@@ -11,13 +11,15 @@ export function useCreateConversationMutation(
      * has gone meanwhile -- unlike a callback passed to `mutate`.
      */
     onCreated?: (conversation: Conversation, payload: CreateConversationRequest) => void
+    /** What makes it: `POST /conversations`, unless a test puts its own in (#562). */
+    create?: (payload: CreateConversationRequest) => Promise<Conversation>
   } = {},
 ) {
   const queryClient = useQueryClient()
-  const { onCreated } = options
+  const { onCreated, create = createConversation } = options
 
   return useMutation({
-    mutationFn: (payload: CreateConversationRequest) => createConversation(payload),
+    mutationFn: (payload: CreateConversationRequest) => create(payload),
     onSuccess: (conversation, payload) => {
       onCreated?.(conversation, payload)
       trackEvent('chat_conversation_created', {

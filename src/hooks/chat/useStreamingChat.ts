@@ -314,7 +314,7 @@ export function useStreamingChat(conversationId: string | null) {
    * answered; false when it failed, was stopped or was overtaken.
    *
    * `sending` is a send of it still on its way from elsewhere in the tab
-   * (`sendDetached`): until it is done, not finding the message on the server
+   * (`useAskQuestion`): until it is done, not finding the message on the server
    * means not stored yet.
    */
   const runAttempt = useCallback(
@@ -608,7 +608,7 @@ export function useStreamingChat(conversationId: string | null) {
     stoppedByUserRef.current = false
     // A message sent before the page was reloaded is still one command on the
     // server; wait for it instead of losing it.
-    // One sent with no conversation on screen (`sendDetached`) and not known to
+    // One sent with no conversation on screen (`useAskQuestion`) and not known to
     // have arrived is waited for while its request is still going, and sent
     // again with the same key once this tab no longer has that request.
     const pending = conversationId ? readPending(conversationId) : null

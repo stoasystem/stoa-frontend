@@ -3,7 +3,8 @@
  * a file, which that request cannot carry -- and the quote itself (#263):
  *
  * - the held question goes out once the conversation exists, whether or not
- *   Ask is still open, and after a reload if its request was lost;
+ *   Ask is still open, and after a reload if its request was lost (what it
+ *   carries, and under which key, is the question module's: `askQuestion562`);
  * - it goes into the conversation made for it, never one the student opened
  *   meanwhile;
  * - a quote belongs to the exercise, or the conversation, it was taken from,
@@ -133,11 +134,10 @@ describe('a question held back from POST /conversations', () => {
     await waitFor(() => expect(streamConversationMessage).toHaveBeenCalledTimes(1))
     const [call] = vi.mocked(streamConversationMessage).mock.calls[0]
     expect(call.conversationId).toBe('new-1')
-    expect(call.payload.content).toBe('Why subtract 3 first?')
-    expect(call.payload.quote).toEqual({ text: '2x + 3 = 7', source: { kind: 'challenge', id: 'ch-1' } })
-    expect(call.payload.practiceContext).toEqual(practiceOn('ch-1').context)
     // Kept as the conversation's pending message, so opening it shows it waiting.
     expect(readPendingMessage('new-1')?.content).toBe('Why subtract 3 first?')
+    // The passage went with it, and leaves the composer.
+    expect(useAskQuoteStore.getState().quote).toBeNull()
     // A closed Ask stays closed.
     expect(screen.queryByRole('complementary', { name: 'Ask' })).toBeNull()
   })
