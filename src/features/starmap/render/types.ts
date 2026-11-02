@@ -46,6 +46,10 @@ export type StarMapTheme = {
   links?: LinkInk
   /** A galaxy's name on the panorama (#137), the `--starmap-galaxy-name` sky token; `GALAXY_NAME_INK` (render/galaxyNames.ts) when absent. */
   galaxyName?: string
+  /** The violet rim round a glowing star, `--starmap-rim`; `STAR_INK.rim` (render/glyph.ts) when absent. */
+  rim?: string
+  /** The cool tint of a ready star, `--starmap-ice`; `STAR_INK.ice` when absent. */
+  ice?: string
 }
 
 /** What stays the same from frame to frame: the map's data, in arrays. */

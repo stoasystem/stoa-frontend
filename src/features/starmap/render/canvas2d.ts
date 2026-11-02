@@ -8,7 +8,7 @@
  * differ star by star, and names placed clear of each other. Stars outside
  * the focus are never drawn one by one, and nothing is blurred per frame.
  */
-import { CHOSEN, CORE_SOLID, DOT_CUT, dotBoxFor, GLOW_STOPS, GLYPH_LARGE, GLYPH_SMALL, glintPath, HOVER, RAY_STOPS, WAITING_RING_ALPHA, PRESS, SMALL_CUT_BELOW, starPath, type DotCut, type GlyphCut, type StarLight } from '@/features/starmap/render/glyph'
+import { CHOSEN, DOT_CUT, dotBoxFor, GLOW_STOPS, GLYPH_LARGE, GLYPH_SMALL, HOVER, LINE_GLOW, ORB_TURN, RAY_STOPS, rayPath, STAR_INK, WAITING_RING_ALPHA, PRESS, SMALL_CUT_BELOW, type DotCut, type GlyphCut, type StarLight } from '@/features/starmap/render/glyph'
 import { aroundDisc, aroundDiscWide, belongsTo, boxHitsCircle, boxHitsSegment, keyStars, nearerStars, placeInsisting, placeLabel, type Box, type Circle, type Segment } from '@/features/starmap/render/labels'
 import { DRAG, panoramaDot, panoramaLook, ramp, reachFade, REVEAL, type Ramp } from '@/features/starmap/view/semanticZoom'
 import { createTileCache, nebulaStateKeys, tileKey, tileSizeFor, TILE_REACH, type TileCache } from '@/features/starmap/render/nebulaTiles'
@@ -122,37 +122,51 @@ function ring(ctx: CanvasRenderingContext2D, r: number, width: number, color: st
   ctx.stroke()
 }
 
-function disc(ctx: CanvasRenderingContext2D, r: number, color: string, alpha = 1) {
-  ctx.fillStyle = withAlpha(color, alpha)
+/** A ring drawn as light: a wide faint pass under the fine line (`LINE_GLOW`). */
+function glowRing(ctx: CanvasRenderingContext2D, r: number, width: number, color: string, alpha: number) {
+  ring(ctx, r, width * LINE_GLOW.wide, color, alpha * LINE_GLOW.alpha)
+  ring(ctx, r, width, color, alpha)
+}
+
+/** A glow that thins to nothing at `r`: `LoginNebula`'s curve, from `alpha` at the centre. */
+function softGlow(ctx: CanvasRenderingContext2D, r: number, color: string, alpha: number) {
+  if (r <= 0 || alpha <= 0) return
+  const glow = ctx.createRadialGradient(0, 0, 0, 0, 0, r)
+  for (const [at, a] of GLOW_STOPS) glow.addColorStop(at, withAlpha(color, alpha * a))
+  ctx.fillStyle = glow
   ctx.beginPath()
   ctx.arc(0, 0, r, 0, Math.PI * 2)
   ctx.fill()
 }
 
-/**
- * A glowing star, as `LoginNebula` and the flare draw theirs: a glow that
- * thins to nothing, four rays white at the centre and fading to their tips,
- * the glint's short rays between them, and a core with a soft edge.
- */
+/** An orb: `inner` at the centre, `outer` by `ORB_TURN` of the radius, nothing at the edge. */
+function orb(ctx: CanvasRenderingContext2D, r: number, inner: string, outer: string, alpha: number) {
+  const fill = ctx.createRadialGradient(0, 0, 0, 0, 0, r)
+  fill.addColorStop(0, withAlpha(inner, alpha))
+  fill.addColorStop(ORB_TURN, withAlpha(outer, alpha * 0.9))
+  fill.addColorStop(1, withAlpha(outer, 0))
+  ctx.fillStyle = fill
+  ctx.beginPath()
+  ctx.arc(0, 0, r, 0, Math.PI * 2)
+  ctx.fill()
+}
+
+/** Four rays (`rayPath`), white at the centre and fading out in the star's colour to their tips. */
+function rays(ctx: CanvasRenderingContext2D, tip: number, width: number, theme: StarMapTheme, alpha: number, diagonal = false) {
+  if (tip <= 0 || alpha <= 0) return
+  const fill = ctx.createRadialGradient(0, 0, 0, 0, 0, tip)
+  for (const [at, ink, a] of RAY_STOPS) fill.addColorStop(at, withAlpha(ink === 'core' ? theme.litCore : theme.lit, a * alpha))
+  ctx.fillStyle = fill
+  ctx.fill(new Path2D(rayPath(tip, width, diagonal)))
+}
+
+/** A warm soft star: the violet rim, its glow, the glint and the cross of rays, and the orb. */
 function starLight(ctx: CanvasRenderingContext2D, g: StarLight, theme: StarMapTheme) {
-  const glow = ctx.createRadialGradient(0, 0, 0, 0, 0, g.glow)
-  for (const [at, alpha] of GLOW_STOPS) glow.addColorStop(at, withAlpha(theme.lit, g.glowAlpha * alpha))
-  ctx.fillStyle = glow
-  ctx.beginPath()
-  ctx.arc(0, 0, g.glow, 0, Math.PI * 2)
-  ctx.fill()
-
-  rayStar(ctx, glintPath(g.glint, g.glintWaist), g.glint, theme, g.glintAlpha)
-  rayStar(ctx, starPath(g.tip, g.waist), g.tip, theme, g.starAlpha)
-
-  const core = ctx.createRadialGradient(0, 0, 0, 0, 0, g.core)
-  core.addColorStop(0, withAlpha(theme.litCore, 1))
-  core.addColorStop(CORE_SOLID, withAlpha(theme.litCore, 1))
-  core.addColorStop(1, withAlpha(theme.litCore, 0))
-  ctx.fillStyle = core
-  ctx.beginPath()
-  ctx.arc(0, 0, g.core, 0, Math.PI * 2)
-  ctx.fill()
+  softGlow(ctx, g.rim, theme.rim ?? STAR_INK.rim, g.rimAlpha)
+  softGlow(ctx, g.glow, theme.lit, g.glowAlpha)
+  rays(ctx, g.glint, g.glintWidth, theme, g.glintAlpha, true)
+  rays(ctx, g.tip, g.rayWidth, theme, g.rayAlpha)
+  orb(ctx, g.orb, theme.litCore, theme.lit, 0.95)
 }
 
 function drawStateGlyph(ctx: CanvasRenderingContext2D, cut: GlyphCut, state: number, theme: StarMapTheme) {
@@ -161,22 +175,26 @@ function drawStateGlyph(ctx: CanvasRenderingContext2D, cut: GlyphCut, state: num
   } else if (state === STATE_IN_PROGRESS) {
     const g = cut.inProgress
     starLight(ctx, g, theme)
+    // The track only: the progress arc over it is drawn live, as light.
     ring(ctx, g.ring, g.ringWidth, theme.text, g.trackAlpha)
   } else if (state === STATE_READY) {
     const g = cut.ready
-    ring(ctx, g.ring, g.ringWidth, theme.text, g.ringAlpha)
-    disc(ctx, g.core, theme.text, g.coreAlpha)
+    const ice = theme.ice ?? STAR_INK.ice
+    softGlow(ctx, g.rim, ice, g.rimAlpha)
+    softGlow(ctx, g.glow, ice, g.glowAlpha)
+    orb(ctx, g.orb, theme.text, ice, g.orbAlpha)
   } else if (state === STATE_WAITING) {
     const g = cut.waiting
-    ring(ctx, g.ring, g.ringWidth, theme.text, g.ringAlpha)
+    glowRing(ctx, g.ring, g.ringWidth, theme.text, g.ringAlpha)
   }
 }
 
 function extentOf(cut: GlyphCut, state: number): number {
-  if (state === STATE_LIT) return Math.max(cut.lit.glow, cut.lit.tip) + 1
-  if (state === STATE_IN_PROGRESS) return Math.max(cut.inProgress.glow, cut.inProgress.ring + cut.inProgress.ringWidth) + 1
-  if (state === STATE_READY) return cut.ready.ring + cut.ready.ringWidth + 1
-  return cut.waiting.ring + cut.waiting.ringWidth + 1
+  const glowReach = (ring: number, width: number) => ring + (width * LINE_GLOW.wide) / 2
+  if (state === STATE_LIT) return Math.max(cut.lit.rim, cut.lit.tip) + 1
+  if (state === STATE_IN_PROGRESS) return Math.max(cut.inProgress.rim, glowReach(cut.inProgress.ring, cut.inProgress.ringWidth)) + 1
+  if (state === STATE_READY) return Math.max(cut.ready.rim, cut.ready.orb) + 1
+  return glowReach(cut.waiting.ring, cut.waiting.ringWidth) + 1
 }
 
 /** Largest on-screen box each cut is drawn at, CSS px, before breathing. */
@@ -206,60 +224,40 @@ export const DOT_ALPHA = {
 
 /** How far a state's dot mark reaches from its centre, `DotCut` box units. */
 export function dotExtent(cut: DotCut, state: number): number {
-  if (state === STATE_LIT) return Math.max(cut.lit.tip, cut.halo.radius + 2 * cut.halo.blur)
-  if (state === STATE_IN_PROGRESS) return Math.max(cut.inProgress.ring + cut.inProgress.ringWidth / 2, cut.halo.radius + 2 * cut.halo.blur)
-  if (state === STATE_READY) return cut.ready.ring + cut.ready.ringWidth / 2
+  if (state === STATE_LIT) return Math.max(cut.lit.tip, cut.halo.rim)
+  if (state === STATE_IN_PROGRESS) return Math.max(cut.inProgress.ring + cut.inProgress.ringWidth / 2, cut.halo.rim)
+  if (state === STATE_READY) return cut.ready.orb
   return cut.waiting.ring + cut.waiting.ringWidth / 2
 }
 
 /**
  * One dot's mark, in `DotCut` box units around the origin. `part` splits the
  * glow from the figure so the panorama can fade the glow out on its own
- * (#137 A2). Each state is its own figure: a filled star, a filled star
- * inside a ring, a ring with a core, a bare ring.
+ * (#137 A2). Each state is its own figure: an orb with rays, an orb inside a
+ * ring, a bare orb, a bare ring.
  */
 export function drawDotMark(ctx: CanvasRenderingContext2D, cut: DotCut, state: number, theme: StarMapTheme, part: 'both' | 'glow' | 'core' = 'both') {
   const glowing = state === STATE_LIT || state === STATE_IN_PROGRESS
   if (glowing && part !== 'core') {
-    // The glyph's glow, small: thinning to nothing rather than a blurred disc's edge.
-    const r = cut.halo.radius + 2 * cut.halo.blur
-    const glow = ctx.createRadialGradient(0, 0, 0, 0, 0, r)
-    for (const [at, alpha] of GLOW_STOPS) glow.addColorStop(at, withAlpha(theme.lit, cut.halo.alpha * alpha))
-    ctx.fillStyle = glow
-    ctx.beginPath()
-    ctx.arc(0, 0, r, 0, Math.PI * 2)
-    ctx.fill()
+    softGlow(ctx, cut.halo.rim, theme.rim ?? STAR_INK.rim, cut.halo.rimAlpha)
+    softGlow(ctx, cut.halo.radius, theme.lit, cut.halo.alpha)
   }
   if (part === 'glow') return
-  // A glowing dot is the glyph's star at a few px: slim rays white-hot at the
-  // centre and fading to their tips, and a core, so it reads as light and not
-  // a gold diamond. The rings are fine lines, not tubes.
   if (state === STATE_LIT) {
     const g = cut.lit
-    rayStar(ctx, glintPath(g.glint, g.glintWaist), g.glint, theme, DOT_ALPHA[STATE_LIT] * g.glintAlpha)
-    rayStar(ctx, starPath(g.tip, g.waist), g.tip, theme, DOT_ALPHA[STATE_LIT])
-    disc(ctx, g.core, theme.litCore)
+    rays(ctx, g.glint, g.glintWidth, theme, DOT_ALPHA[STATE_LIT] * g.glintAlpha, true)
+    rays(ctx, g.tip, g.rayWidth, theme, DOT_ALPHA[STATE_LIT])
+    orb(ctx, g.orb, theme.litCore, theme.lit, DOT_ALPHA[STATE_LIT])
   } else if (state === STATE_IN_PROGRESS) {
     const g = cut.inProgress
-    rayStar(ctx, starPath(g.tip, g.waist), g.tip, theme, DOT_ALPHA[STATE_IN_PROGRESS])
+    orb(ctx, g.orb, theme.litCore, theme.lit, DOT_ALPHA[STATE_IN_PROGRESS])
     ring(ctx, g.ring, g.ringWidth, theme.lit, DOT_ALPHA[STATE_IN_PROGRESS] * g.ringAlpha)
-    disc(ctx, g.core, theme.litCore)
   } else if (state === STATE_READY) {
-    const g = cut.ready
-    ring(ctx, g.ring, g.ringWidth, theme.text, DOT_ALPHA[STATE_READY])
-    disc(ctx, g.core, theme.text, DOT_ALPHA[STATE_READY])
+    orb(ctx, cut.ready.orb, theme.text, theme.ice ?? STAR_INK.ice, DOT_ALPHA[STATE_READY])
   } else {
     const g = cut.waiting
     ring(ctx, g.ring, g.ringWidth, theme.text, DOT_ALPHA[STATE_WAITING])
   }
-}
-
-/** A star's rays filled the way the glyph's are: the core's white, then gold, thinning to the tips. */
-function rayStar(ctx: CanvasRenderingContext2D, path: string, reach: number, theme: StarMapTheme, alpha: number) {
-  const fill = ctx.createRadialGradient(0, 0, 0, 0, 0, reach)
-  for (const [at, ink, a] of RAY_STOPS) fill.addColorStop(at, withAlpha(ink === 'core' ? theme.litCore : theme.lit, a * alpha))
-  ctx.fillStyle = fill
-  ctx.fill(new Path2D(path))
 }
 
 /*
@@ -784,17 +782,19 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
       /** How far star `i` is lifted by the pointer, 0..1. */
       const lifted = (i: number) => hoverFades.get(i) ?? 0
       const lift = (i: number) => 1 + (HOVER.scale - 1) * lifted(i)
-      /** A ring around a star, in screen px. */
-      const starRing = (i: number, radius: number, width: number, colour: string, alpha: number, dash?: readonly number[]) => {
+      /** A ring of light around a star, in screen px: a wide faint pass under the fine line, whole or from `from` to `to`. */
+      const starRing = (i: number, radius: number, width: number, colour: string, alpha: number, from = 0, to = Math.PI * 2) => {
         if (alpha < 0.01) return
         ctx.save()
-        ctx.globalAlpha = Math.min(1, alpha)
         ctx.strokeStyle = colour
-        ctx.lineWidth = width
-        if (dash) ctx.setLineDash([...dash])
-        ctx.beginPath()
-        ctx.arc(x[i], y[i], radius, 0, Math.PI * 2)
-        ctx.stroke()
+        ctx.lineCap = 'round'
+        for (const [wide, strength] of [[LINE_GLOW.wide, LINE_GLOW.alpha], [1, 1]] as const) {
+          ctx.globalAlpha = Math.min(1, alpha * strength)
+          ctx.lineWidth = width * wide
+          ctx.beginPath()
+          ctx.arc(x[i], y[i], radius, from, to)
+          ctx.stroke()
+        }
         ctx.restore()
       }
 
@@ -861,11 +861,18 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
         const r = radiusOf(i)
         if (up > 0.01) {
           const ring = HOVER.ring
-          starRing(i, r * ring.gap + ring.pad, ring.width, colours.text, ring.alpha * up * focus * a)
+          starRing(i, r * ring.gap + ring.pad, ring.width, colours.ice ?? STAR_INK.ice, ring.alpha * up * focus * a)
         }
         if (i === frame.focusStar) {
+          // A lock-on: four arcs of gold light, and a faint ring inside them.
           const ring = CHOSEN.ring
-          starRing(i, r * ring.gap + ring.pad, ring.width, colours.lit, ring.alpha * a, ring.dash)
+          const radius = r * ring.gap + ring.pad
+          const span = (Math.PI * 2) / CHOSEN.arcs
+          for (let k = 0; k < CHOSEN.arcs; k += 1) {
+            const from = CHOSEN.turn + k * span + CHOSEN.gap / 2
+            starRing(i, radius, ring.width, colours.lit, ring.alpha * a, from, from + span - CHOSEN.gap)
+          }
+          starRing(i, radius * CHOSEN.inner.at, CHOSEN.inner.width, colours.lit, CHOSEN.inner.alpha * a)
         }
         stats.starDraws += 1
       }
@@ -888,12 +895,18 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
         const grow = (breath && breath.index === i ? breath.scale : 1) * grown(i)
         const fade = a * show * kept(i)
         if (glyphs > 0.01 && inProgress && scene.progress[i] > 0) {
-          ctx.globalAlpha = fade
+          // The progress arc, as light: a wide faint pass under the fine one.
+          ctx.save()
           ctx.strokeStyle = colours.lit
-          ctx.lineWidth = geom(box, (c) => c.inProgress.ringWidth) * grow
-          ctx.beginPath()
-          ctx.arc(px, py, geom(box, (c) => c.inProgress.ring) * grow, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * Math.min(1, scene.progress[i]))
-          ctx.stroke()
+          ctx.lineCap = 'round'
+          for (const [wide, strength] of [[LINE_GLOW.wide, LINE_GLOW.alpha], [1, 0.9]] as const) {
+            ctx.globalAlpha = fade * strength
+            ctx.lineWidth = geom(box, (c) => c.inProgress.ringWidth) * grow * wide
+            ctx.beginPath()
+            ctx.arc(px, py, geom(box, (c) => c.inProgress.ring) * grow, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * Math.min(1, scene.progress[i]))
+            ctx.stroke()
+          }
+          ctx.restore()
         }
         if (beacon) {
           ctx.globalAlpha = fade
@@ -901,7 +914,7 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
           ctx.translate(px, py)
           halo(ctx, geom(box, (c) => c.recommended.halo) * grow, geom(box, (c) => c.recommended.blur) * grow, colours.lit, GLYPH_LARGE.recommended.haloAlpha)
           ctx.setLineDash([geom(box, (c) => c.recommended.dash[0]) * grow, geom(box, (c) => c.recommended.dash[1]) * grow])
-          ring(ctx, geom(box, (c) => c.recommended.ring) * grow, geom(box, (c) => c.recommended.ringWidth) * grow, colours.lit, 1)
+          glowRing(ctx, geom(box, (c) => c.recommended.ring) * grow, geom(box, (c) => c.recommended.ringWidth) * grow, colours.lit, 0.9)
           ctx.restore()
         }
         if (glyphs > 0.01 && review) {

@@ -4,40 +4,84 @@
  * point glyph"; see `render/glyph.ts`.
  */
 import { useId } from 'react'
-import { CORE_SOLID, GLOW_STOPS, GLYPH_LARGE, GLYPH_SMALL, glintPath, RAY_STOPS, starPath, type StarLight } from '@/features/starmap/render/glyph'
+import { GLOW_STOPS, GLYPH_LARGE, GLYPH_SMALL, LINE_GLOW, ORB_TURN, RAY_STOPS, rayPath, type StarLight } from '@/features/starmap/render/glyph'
 import type { StarLook } from '@/features/starmap/model/starMap'
 
-/** A glowing star: the canvas's `starLight`, with its gradients as SVG defs. */
-function StarLightGlyph({ g, id }: { g: StarLight; id: string }) {
-  const lit = 'var(--lit)'
-  const core = 'var(--lit-core)'
-  const rays = (key: string, reach: number, alpha: number) => (
-    <radialGradient id={`${id}-${key}`} gradientUnits="userSpaceOnUse" cx={0} cy={0} r={reach}>
-      {RAY_STOPS.map(([at, ink, a]) => (
-        <stop key={at} offset={at} style={{ stopColor: ink === 'core' ? core : lit }} stopOpacity={a * alpha} />
-      ))}
-    </radialGradient>
-  )
+const LIT = 'var(--lit)'
+const CORE = 'var(--lit-core)'
+const WHITE = 'var(--on-sky-text)'
+const RIM = 'var(--starmap-rim)'
+const ICE = 'var(--starmap-ice)'
+
+/** A glow that thins to nothing: the canvas's `softGlow` as an SVG gradient. */
+function Glow({ id, r, color, alpha, className }: { id: string; r: number; color: string; alpha: number; className?: string }) {
+  if (r <= 0 || alpha <= 0) return null
   return (
     <>
       <defs>
-        <radialGradient id={`${id}-glow`}>
+        <radialGradient id={id}>
           {GLOW_STOPS.map(([at, a]) => (
-            <stop key={at} offset={at} style={{ stopColor: lit }} stopOpacity={a * g.glowAlpha} />
+            <stop key={at} offset={at} style={{ stopColor: color }} stopOpacity={a * alpha} />
           ))}
         </radialGradient>
-        {rays('rays', g.tip, g.starAlpha)}
-        {rays('glint', g.glint, g.glintAlpha)}
-        <radialGradient id={`${id}-core`}>
-          <stop offset={0} style={{ stopColor: core }} />
-          <stop offset={CORE_SOLID} style={{ stopColor: core }} />
-          <stop offset={1} style={{ stopColor: core }} stopOpacity={0} />
+      </defs>
+      <circle className={className} r={r} fill={`url(#${id})`} />
+    </>
+  )
+}
+
+/** An orb: `inner` at the centre, `outer` by `ORB_TURN`, nothing at the edge. */
+function Orb({ id, r, inner, outer, alpha }: { id: string; r: number; inner: string; outer: string; alpha: number }) {
+  return (
+    <>
+      <defs>
+        <radialGradient id={id}>
+          <stop offset={0} style={{ stopColor: inner }} stopOpacity={alpha} />
+          <stop offset={ORB_TURN} style={{ stopColor: outer }} stopOpacity={alpha * 0.9} />
+          <stop offset={1} style={{ stopColor: outer }} stopOpacity={0} />
         </radialGradient>
       </defs>
-      <circle className="starmap-halo" r={g.glow} fill={`url(#${id}-glow)`} />
-      <path d={glintPath(g.glint, g.glintWaist)} fill={`url(#${id}-glint)`} />
-      <path className="starmap-star" d={starPath(g.tip, g.waist)} fill={`url(#${id}-rays)`} />
-      <circle r={g.core} fill={`url(#${id}-core)`} />
+      <circle r={r} fill={`url(#${id})`} />
+    </>
+  )
+}
+
+/** Four rays, white at the centre and fading out to their tips. */
+function Rays({ id, tip, width, alpha, diagonal = false, className }: { id: string; tip: number; width: number; alpha: number; diagonal?: boolean; className?: string }) {
+  if (tip <= 0 || alpha <= 0) return null
+  return (
+    <>
+      <defs>
+        <radialGradient id={id} gradientUnits="userSpaceOnUse" cx={0} cy={0} r={tip}>
+          {RAY_STOPS.map(([at, ink, a]) => (
+            <stop key={at} offset={at} style={{ stopColor: ink === 'core' ? CORE : LIT }} stopOpacity={a * alpha} />
+          ))}
+        </radialGradient>
+      </defs>
+      <path className={className} d={rayPath(tip, width, diagonal)} fill={`url(#${id})`} />
+    </>
+  )
+}
+
+/** A ring drawn as light: a wide faint pass under the fine line. */
+function GlowRing({ r, width, color, alpha, dash, transform }: { r: number; width: number; color: string; alpha: number; dash?: string; transform?: string }) {
+  return (
+    <>
+      <circle r={r} fill="none" stroke={color} strokeOpacity={alpha * LINE_GLOW.alpha} strokeWidth={width * LINE_GLOW.wide} strokeDasharray={dash} strokeLinecap="round" transform={transform} />
+      <circle r={r} fill="none" stroke={color} strokeOpacity={alpha} strokeWidth={width} strokeDasharray={dash} strokeLinecap="round" transform={transform} />
+    </>
+  )
+}
+
+/** A warm soft star: the canvas's `starLight`. */
+function StarLightGlyph({ g, id }: { g: StarLight; id: string }) {
+  return (
+    <>
+      <Glow id={`${id}-rim`} r={g.rim} color={RIM} alpha={g.rimAlpha} />
+      <Glow id={`${id}-glow`} r={g.glow} color={LIT} alpha={g.glowAlpha} className="starmap-halo" />
+      <Rays id={`${id}-glint`} tip={g.glint} width={g.glintWidth} alpha={g.glintAlpha} diagonal />
+      <Rays id={`${id}-rays`} tip={g.tip} width={g.rayWidth} alpha={g.rayAlpha} className="starmap-star" />
+      <Orb id={`${id}-orb`} r={g.orb} inner={CORE} outer={LIT} alpha={0.95} />
     </>
   )
 }
@@ -63,8 +107,6 @@ export function StarGlyph({
   const cut = size >= 30 ? GLYPH_LARGE : GLYPH_SMALL
   const half = cut.box / 2
   const blurId = `${id}-blur`
-  const lit = 'var(--lit)'
-  const white = 'var(--on-sky-text)'
 
   let body
   if (state === 'lit') {
@@ -75,14 +117,13 @@ export function StarGlyph({
     body = (
       <>
         <StarLightGlyph g={g} id={id} />
-        <circle r={g.ring} fill="none" stroke={white} strokeOpacity={g.trackAlpha} strokeWidth={g.ringWidth} />
-        <circle
+        <circle r={g.ring} fill="none" stroke={WHITE} strokeOpacity={g.trackAlpha} strokeWidth={g.ringWidth} />
+        <GlowRing
           r={g.ring}
-          fill="none"
-          stroke={lit}
-          strokeWidth={g.ringWidth}
-          strokeLinecap="round"
-          strokeDasharray={`${circumference * Math.min(1, Math.max(0, progress))} ${circumference}`}
+          width={g.ringWidth}
+          color={LIT}
+          alpha={0.9}
+          dash={`${circumference * Math.min(1, Math.max(0, progress))} ${circumference}`}
           transform="rotate(-90)"
         />
       </>
@@ -91,13 +132,14 @@ export function StarGlyph({
     const g = cut.ready
     body = (
       <>
-        <circle r={g.ring} fill="none" stroke={white} strokeOpacity={g.ringAlpha} strokeWidth={g.ringWidth} />
-        <circle r={g.core} fill={white} fillOpacity={g.coreAlpha} />
+        <Glow id={`${id}-rim`} r={g.rim} color={ICE} alpha={g.rimAlpha} />
+        <Glow id={`${id}-glow`} r={g.glow} color={ICE} alpha={g.glowAlpha} />
+        <Orb id={`${id}-orb`} r={g.orb} inner={WHITE} outer={ICE} alpha={g.orbAlpha} />
       </>
     )
   } else {
     const g = cut.waiting
-    body = <circle r={g.ring} fill="none" stroke={white} strokeOpacity={g.ringAlpha} strokeWidth={g.ringWidth} />
+    body = <GlowRing r={g.ring} width={g.ringWidth} color={WHITE} alpha={g.ringAlpha} />
   }
 
   const r = cut.recommended
@@ -121,15 +163,15 @@ export function StarGlyph({
       </defs>
       {recommended && (
         <>
-          <circle r={r.halo} fill={lit} fillOpacity={r.haloAlpha} filter={`url(#${blurId})`} />
-          <circle r={r.ring} fill="none" stroke={lit} strokeWidth={r.ringWidth} strokeDasharray={r.dash.join(' ')} />
+          <circle r={r.halo} fill={LIT} fillOpacity={r.haloAlpha} filter={`url(#${blurId})`} />
+          <GlowRing r={r.ring} width={r.ringWidth} color={LIT} alpha={0.9} dash={r.dash.join(' ')} />
         </>
       )}
       {body}
       {reviewDue && (
         <>
           <circle cx={pip} cy={-pip} r={review.radius + review.outline} fill="var(--sky)" />
-          <circle cx={pip} cy={-pip} r={review.radius} fill={white} />
+          <circle cx={pip} cy={-pip} r={review.radius} fill={WHITE} />
         </>
       )}
     </svg>

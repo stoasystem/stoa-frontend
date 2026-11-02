@@ -66,6 +66,8 @@ export const LINE = {
   width: { 1: 2.8, 2: 2.2, 3: 1.6, 4: 1.6 } as Record<LinkTier, number>,
   /** Tier 1's warm halo under the line. */
   glow: { width: 10, alpha: 0.24 },
+  /** The other solid tiers are light too (the soft stars, render/glyph.ts): a pass `wide` times the line's width at `alpha` under it. */
+  soft: { wide: 3.2, alpha: 0.16 },
   /** Tier 4: dashed. */
   dash: [4, 4] as readonly number[],
   /** A line leaving the chosen nebula fades out over this share of its radius on screen, at least `fadeMin` px. */
@@ -641,6 +643,15 @@ export function drawLinks(
             ctx.strokeStyle = faded ? stroke : fade(color, 1)
             ctx.globalAlpha = strength * LINE.glow.alpha
             ctx.lineWidth = LINE.glow.width
+            ctx.beginPath()
+            ctx.moveTo(x0, y0)
+            ctx.lineTo(x1, y1)
+            ctx.stroke()
+          } else if (line.tier !== TIER_WAITING) {
+            ctx.setLineDash([])
+            ctx.strokeStyle = stroke
+            ctx.globalAlpha = Math.min(1, strength) * LINE.soft.alpha
+            ctx.lineWidth = lineWidth * LINE.soft.wide
             ctx.beginPath()
             ctx.moveTo(x0, y0)
             ctx.lineTo(x1, y1)
