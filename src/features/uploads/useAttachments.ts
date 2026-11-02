@@ -311,6 +311,17 @@ export function useAttachments({
   )
 
   /**
+   * Every file out of the tray, those still going up stopped. For a teacher's
+   * reply moving to another request (#564): files chosen for one request's
+   * reply must not go out with another's.
+   */
+  const reset = useCallback(() => {
+    setOverflow(false)
+    letGo([...inFlight.current.keys()])
+    write([])
+  }, [letGo, write])
+
+  /**
    * An upload is one a message may carry for 30 minutes from its intent,
    * validated or not, and is refused as `upload_expired` after. Before a
    * message goes out, a file that is past that, or nearly, is failed as
@@ -397,6 +408,8 @@ export function useAttachments({
     view,
     sources,
     take,
+    /** Empties the tray and stops what is still going up: the reply's, on another request (#564). */
+    reset,
     /** A file is still going up: a message sent now would wait for it (the composer's `busy`). */
     busy: drafts.some((draft) => draft.state === 'uploading'),
   }

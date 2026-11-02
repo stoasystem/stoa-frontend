@@ -119,11 +119,15 @@ export function useTeacherReply(
   { adapter = serverTeacherReplyAdapter }: { adapter?: TeacherReplyAdapter } = {},
 ): TeacherReply {
   const queryClient = useQueryClient()
-  // The draft is the request's: another request reads its own.
-  const [held, setHeld] = useState(() => ({ requestId, draft: readDraft(requestId) }))
-  if (held.requestId !== requestId) setHeld({ requestId, draft: readDraft(requestId) })
-  const { mode, value, blocks } = held.draft
   const uploads = useAttachments({ purpose: 'help_reply_image', imagesOnly: true, camera: false, phone: false })
+  // The draft is the request's: another request reads its own, and the
+  // pictures chosen for this one do not go out with another's.
+  const [held, setHeld] = useState(() => ({ requestId, draft: readDraft(requestId) }))
+  if (held.requestId !== requestId) {
+    setHeld({ requestId, draft: readDraft(requestId) })
+    uploads.reset()
+  }
+  const { mode, value, blocks } = held.draft
 
   const mutation = useMutation({
     mutationFn: ({ requestId: id, body }: { requestId: string; body: TeacherReplyBody }) => adapter.addNote(id, body),

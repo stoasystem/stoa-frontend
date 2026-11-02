@@ -143,6 +143,26 @@ describe('the draft', () => {
     expect(JSON.parse(sessionStorage.getItem(DRAFT_KEY) ?? '{}').value).toBe('für r1')
   })
 
+  it('takes no picture to another request: the tray empties, and what is still going up is stopped', async () => {
+    let signal: AbortSignal | undefined
+    uploadMock.mockResolvedValueOnce(uploaded('up-1'))
+    uploadMock.mockImplementationOnce(({ signal: given }) => {
+      signal = given
+      return new Promise(() => {})
+    })
+    const reply = setup()
+    await choosePicture(reply.reply)
+    act(() => reply.reply().attachments.view.add([photo()]))
+    await waitFor(() => expect(signal).toBeDefined())
+
+    reply.rerender('r2')
+    expect(reply.reply().attachments.view.drafts).toEqual([])
+    expect(signal?.aborted).toBe(true)
+    reply.type('Für r2')
+    await reply.send()
+    expect(reply.server.sent[0]).toMatchObject({ requestId: 'r2', body: { attachmentIds: [] } })
+  })
+
   it('drops what it cannot render and keeps the rest (#371)', () => {
     sessionStorage.setItem(
       DRAFT_KEY,

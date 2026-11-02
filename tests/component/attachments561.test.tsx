@@ -640,3 +640,18 @@ describe('an upload that is gone', () => {
     expect(isUploadGone(new Error('upload_expired'))).toBe(false)
   })
 })
+
+describe('reset', () => {
+  it('empties the tray and stops what is still going up (#564)', async () => {
+    const tray = renderAttachments()
+    await tray.choose([photo('a.png'), photo('b.png')])
+    await tray.pending[0].pass()
+    expect(states()).toEqual(['ready', 'uploading'])
+
+    act(() => tray.hook().reset())
+
+    expect(rows()).toEqual([])
+    expect(tray.pending[1].signal.aborted).toBe(true)
+    expect(tray.take()?.references).toEqual([])
+  })
+})
