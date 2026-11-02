@@ -4,13 +4,8 @@ import { useTranslation } from 'react-i18next'
 import { Button, Pill, type PillTone } from '@/components/base'
 import { ICON, ROW } from '@/components/base/sizes'
 import { cn } from '@/lib/utils'
-import {
-  isEndedHelpRequest,
-  isWithdrawableHelpRequest,
-  type TeacherHelpRequest,
-  type TeacherHelpStatus,
-  type TeacherSupportStanding,
-} from '@/types/teacherHelp'
+import type { HelpWithdraw } from '@/features/ask/teacherHelp/useTeacherHelp'
+import { isEndedHelpRequest, type TeacherHelpRequest, type TeacherHelpStatus, type TeacherSupportStanding } from '@/types/teacherHelp'
 
 /*
  * Motion and states, "Status pills": Pending navy tint, Assigned gold,
@@ -67,14 +62,14 @@ export function TeacherHelpStatusCard({
   request: TeacherHelpRequest
   /** `false` while no teacher is online: said plainly, with no time (#12 point 7). */
   teachersOnline: boolean | undefined
-  /** Taking the request back; offered only while its status allows it. */
-  withdraw?: { onWithdraw: () => void; withdrawing: boolean; error?: string | null }
+  /** Taking the request back (`useTeacherHelp`); offered only while it is withdrawable. */
+  withdraw?: HelpWithdraw & { onWithdraw: () => void }
   /** Back to the list, where a new conversation starts; offered once the request is over. */
   onNewConversation?: () => void
 }) {
   const { t } = useTranslation('chat')
   const status = KNOWN_STATUSES.has(request.status) ? request.status : null
-  const withdrawable = withdraw !== undefined && isWithdrawableHelpRequest(status ?? undefined)
+  const withdrawable = withdraw?.withdrawable === true
   const ended = isEndedHelpRequest(status ?? undefined)
   const [confirming, setConfirming] = useState(false)
   const confirmId = useId()
@@ -151,9 +146,9 @@ export function TeacherHelpStatusCard({
             </Button>
           </div>
         ))}
-      {withdraw?.error && (
+      {withdraw?.errorKey && (
         <p role="alert" className="text-[13px] leading-[1.4] text-red">
-          {withdraw.error}
+          {t(withdraw.errorKey)}
         </p>
       )}
       {ended && onNewConversation && (
@@ -182,7 +177,8 @@ export function TeacherHelpAction({
   teachersOnline,
   support,
   suggested = false,
-  error,
+  blockedKey,
+  errorKey,
 }: {
   onRequest: () => void
   requesting: boolean
@@ -195,17 +191,15 @@ export function TeacherHelpAction({
   support?: TeacherSupportStanding | null
   /** The answer above suggests a teacher (`structured.suggestTeacher`). */
   suggested?: boolean
-  error?: string | null
+  /** Why it cannot be pressed (`chat` key), in the words a refusal would have used. */
+  blockedKey?: string | null
+  /** Why the last request was refused (`chat` key). */
+  errorKey?: string | null
 }) {
   const { t } = useTranslation('chat')
-  const blocked = support?.canRequest === false
+  const blocked = Boolean(blockedKey)
   const noteId = useId()
-  // Why it cannot be pressed, in the words a refusal would have used.
-  const blockedNote = !blocked
-    ? null
-    : support.blockedReason === 'teacher_support_not_included'
-      ? t('teacher.errors.planDenied')
-      : t('teacher.errors.allowanceExhausted')
+  const blockedNote = blockedKey ? t(blockedKey) : null
 
   return (
     <div
@@ -239,9 +233,9 @@ export function TeacherHelpAction({
       {!blocked && teachersOnline === false && (
         <p className="text-[13px] leading-[1.4] text-caption">{t('ask.help.offline')}</p>
       )}
-      {error && (
+      {errorKey && (
         <p role="alert" className="text-[13px] leading-[1.4] text-red">
-          {error}
+          {t(errorKey)}
         </p>
       )}
     </div>

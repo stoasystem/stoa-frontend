@@ -1,4 +1,3 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { ChevronLeft, X } from 'lucide-react'
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type HTMLAttributes } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -12,7 +11,8 @@ import { hasSections, quoteCaption, sectionsSpokenText, type AnswerStep } from '
 import { AskLitCard } from '@/features/ask/AskLitCard'
 import { AskMessage } from '@/features/ask/AskMessage'
 import { ASK_PANEL } from '@/features/ask/askLayout'
-import { TeacherHelpAction, TeacherHelpStatusCard } from '@/features/ask/TeacherHelp'
+import { TeacherHelpAction, TeacherHelpStatusCard } from '@/features/ask/teacherHelp/TeacherHelp'
+import { useTeacherHelp } from '@/features/ask/teacherHelp/useTeacherHelp'
 import type { AskController } from '@/features/ask/useAskController'
 import { useAskConversation } from '@/features/ask/useAskConversation'
 import {
@@ -41,19 +41,14 @@ import { useRecommendationsQuery } from '@/hooks/learning/useWeakTopicsQuery'
 import { useStudentProfileQuery } from '@/hooks/student/useStudentProfileQuery'
 import { conversationGrade } from '@/lib/conversationGrade'
 import { rememberPendingMessage } from '@/lib/pendingChatMessages'
-import { teacherHelpErrorKey, teacherHelpWithdrawErrorKey } from '@/lib/teacherHelpErrors'
 import { toUserFacingError } from '@/lib/userFacingText'
 import { cn } from '@/lib/utils'
-import { trackEvent } from '@/services/analytics/analyticsClient'
 import { ApiError } from '@/services/api/httpClient'
-import { chatQueryKeys } from '@/services/chat/chatQueryKeys'
-import { createTeacherHelpRequest, withdrawTeacherHelpRequest } from '@/services/teacherHelp/teacherHelpApi'
 import { sendDetached } from '@/services/chat/detachedSend'
 import { useAuthStore } from '@/store/authStore'
 import { litMomentsFor, useLitMoments, type LitMoment } from '@/store/litMomentsStore'
 import { learningSubjectOptions } from '@/types/learningProfile'
 import { QUOTE_MAX_LENGTH, type ChatMessage, type PracticeContextRef } from '@/types/chat'
-import type { TeacherSupportStanding } from '@/types/teacherHelp'
 
 export type AskLayout = 'panel' | 'sheet'
 
@@ -377,8 +372,6 @@ export function AskPanel({
           conversationId={conversationId}
           ask={ask}
           layout={layout}
-          teachersOnline={teachersOnline}
-          teacherSupport={availability?.teacherSupport ?? null}
           onAskAboutStep={askAboutStep}
           onNewConversation={() => select(null)}
         />
@@ -552,63 +545,21 @@ function AskThread({
   conversationId,
   ask,
   layout,
-  teachersOnline,
-  teacherSupport,
   onAskAboutStep,
   onNewConversation,
 }: {
   conversationId: string
   ask: ReturnType<typeof useAskConversation>
   layout: AskLayout
-  teachersOnline: boolean | undefined
-  /** This week's allowance, or `null` when it could not be read: then none is shown. */
-  teacherSupport: TeacherSupportStanding | null
   onAskAboutStep: (step: AnswerStep) => void
   /** Back to the list, where the next question starts a new conversation. */
   onNewConversation: () => void
 }) {
   const { t } = useTranslation('chat')
-  const queryClient = useQueryClient()
   const scroller = useRef<HTMLDivElement>(null)
-  const [helpError, setHelpError] = useState<string | null>(null)
-  const [withdrawError, setWithdrawError] = useState<string | null>(null)
-  const { messages, help, isStreaming, retryMessage, conversationQuery } = ask
-
-  const requestHelp = useMutation({
-    mutationFn: () => createTeacherHelpRequest({ conversationId }),
-    onSuccess: (request) => {
-      setHelpError(null)
-      trackEvent('teacher_help_requested', {
-        requestId: request.requestId,
-        conversationId: request.conversationId,
-        status: request.status,
-      })
-      // The card shows the request as the server reports it, read back from
-      // the server: not the answer to this POST, and never a guess.
-      void queryClient.invalidateQueries({ queryKey: chatQueryKeys.teacherHelpRequest(conversationId) })
-      // One of the week's requests is gone: said now, not at the next minute's read (#506).
-      void queryClient.invalidateQueries({ queryKey: chatQueryKeys.teacherAvailability() })
-    },
-    onError: (error) => {
-      trackEvent('teacher_help_request_failed', { reason: teacherHelpErrorKey(error) })
-      setHelpError(t(teacherHelpErrorKey(error)))
-      // A refusal for the allowance or the plan may be news to the reading on screen.
-      void queryClient.invalidateQueries({ queryKey: chatQueryKeys.teacherAvailability() })
-    },
-  })
-
-  // Taking the request back (#543). Like asking, what the card then shows is
-  // read back from the server, and so is the week's allowance, given back.
-  // A refusal reads both again too: a 409 means the request has moved on.
-  const withdrawHelp = useMutation({
-    mutationFn: () => withdrawTeacherHelpRequest(conversationId),
-    onSuccess: () => setWithdrawError(null),
-    onError: (error) => setWithdrawError(t(teacherHelpWithdrawErrorKey(error))),
-    onSettled: () => {
-      void queryClient.invalidateQueries({ queryKey: chatQueryKeys.teacherHelpRequest(conversationId) })
-      void queryClient.invalidateQueries({ queryKey: chatQueryKeys.teacherAvailability() })
-    },
-  })
+  const { messages, isStreaming, retryMessage, conversationQuery } = ask
+  const help = useTeacherHelp({ conversationId, messages, isStreaming })
+  const { view, request, withdraw } = help
 
   const ownerId = useAuthStore((state) => state.user?.id)
   // Only the moments of this conversation's subject that lit while it was open, or before it began (#267).
@@ -618,29 +569,29 @@ function AskThread({
     startedAt: messages[0]?.createdAt,
   })
   const entries = threadEntries(messages, moments)
-  const offer = helpOffer(messages)
-  const suggested = offer?.suggested ?? false
-  // A conversation has one request: once asked, help is not offered here
-  // again, open or over -- asking again would hand back the same request
-  // (#544). The card says where to ask next.
-  const offerHelp = !help && !isStreaming && !requestHelp.isPending
   // The same element from one render to the next, so the answer it sits under
   // is not drawn again at every key typed in the composer (#416).
-  const { mutate: request, isPending: requesting } = requestHelp
+  // Built from what it shows, not from the view: a new message is a new view.
+  const offer = view.kind === 'offer' || view.kind === 'asking' ? view.offer : null
+  const requesting = view.kind === 'asking'
+  const offered = offer !== null
+  const { teachersOnline, support, suggested, blockedKey, errorKey } = offer ?? {}
   const helpAction = useMemo(
     () =>
-      offerHelp || requesting ? (
+      offered ? (
         <TeacherHelpAction
           onRequest={() => request()}
           requesting={requesting}
           teachersOnline={teachersOnline}
-          support={teacherSupport}
+          support={support ?? null}
           suggested={suggested}
-          error={helpError}
+          blockedKey={blockedKey}
+          errorKey={errorKey}
         />
       ) : undefined,
-    [helpError, offerHelp, request, requesting, suggested, teacherSupport, teachersOnline],
+    [blockedKey, errorKey, offered, request, requesting, suggested, support, teachersOnline],
   )
+  const card = 'card' in view ? view.card : null
 
   // Keep the latest message in view as the thread grows -- unless the student
   // has scrolled up to read something earlier.
@@ -654,21 +605,17 @@ function AskThread({
     if (node) atBottom.current = node.scrollHeight - node.scrollTop - node.clientHeight < STICK_TO_BOTTOM_PX
   }
   const announcement = useFinishedReplyAnnouncement(messages, conversationQuery.isSuccess, {
-    teacher: help?.teacherName?.trim() || t('ask.thread.teacherFallback'),
+    teacher: help.teacherName?.trim() || t('ask.thread.teacherFallback'),
   })
 
   return (
     <>
-      {help && (
+      {card && (
         <div className="shrink-0" style={{ padding: layout === 'sheet' ? '10px 14px 0' : '12px 18px 0' }}>
           <TeacherHelpStatusCard
-            request={help}
-            teachersOnline={teachersOnline}
-            withdraw={{
-              onWithdraw: () => withdrawHelp.mutate(),
-              withdrawing: withdrawHelp.isPending,
-              error: withdrawError,
-            }}
+            request={card.request}
+            teachersOnline={card.teachersOnline}
+            withdraw={{ ...card.withdraw, onWithdraw: () => withdraw() }}
             onNewConversation={onNewConversation}
           />
         </div>
@@ -703,10 +650,10 @@ function AskThread({
           <AskMessage
             key={entry.message.id}
             message={entry.message}
-            teacherName={help?.teacherName}
+            teacherName={help.teacherName}
             onRetry={refusedForToday(entry.message) ? undefined : retryMessage}
             onAskAboutStep={onAskAboutStep}
-            after={entry.message.id === offer?.id ? helpAction : undefined}
+            after={entry.message.id === offer?.underMessageId ? helpAction : undefined}
           />
         ))}
       </div>
@@ -778,22 +725,6 @@ export function threadEntries(messages: readonly ChatMessage[], moments: readonl
   }
   while (next < lit.length) entries.push({ kind: 'lit', moment: lit[next++] })
   return entries
-}
-
-/**
- * Where "Ask a teacher" sits: under the latest answer the assistant finished,
- * always there and quiet (#12 point 2), and nowhere while it is writing or its
- * latest answer failed. When that answer suggests a teacher it is offered
- * plainly (#506); an answer from before the sections cannot say so.
- */
-export function helpOffer(messages: readonly ChatMessage[]): { id: string; suggested: boolean } | null {
-  for (let index = messages.length - 1; index >= 0; index -= 1) {
-    const message = messages[index]
-    if (message.role !== 'assistant') continue
-    if (message.status === 'streaming' || message.status === 'failed') return null
-    return { id: message.id, suggested: message.structured?.suggestTeacher === true }
-  }
-  return null
 }
 
 type RefusedConversation = {

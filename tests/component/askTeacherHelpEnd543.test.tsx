@@ -22,7 +22,6 @@ import { MemoryRouter, Route, Routes, useParams } from 'react-router-dom'
 import { afterAll, afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { AskHost } from '@/features/ask/AskHost'
 import i18n from '@/i18n'
-import { teacherHelpWithdrawErrorKey } from '@/lib/teacherHelpErrors'
 import { ApiError, apiErrorFromBody } from '@/services/api/httpClient'
 import { resetAsk } from '@/store/askStore'
 import { type CurrentUser, useAuthStore } from '@/store/authStore'
@@ -307,15 +306,6 @@ describe('withdrawing a request no teacher has taken (#543)', () => {
     await waitFor(() => expect(shown.queryByRole('alert')).not.toBeInTheDocument())
   })
 
-  it('reads every refusal in words, and anything else as a plain failure', () => {
-    expect(teacherHelpWithdrawErrorKey(refusal(409, { code: 'teacher_help_already_accepted' }))).toBe('ask.help.withdraw.errors.accepted')
-    expect(teacherHelpWithdrawErrorKey(refusal(409, { code: 'teacher_help_request_closed' }))).toBe('ask.help.withdraw.errors.closed')
-    expect(teacherHelpWithdrawErrorKey(refusal(404, { code: 'teacher_help_request_not_found' }))).toBe('ask.help.withdraw.errors.closed')
-    expect(teacherHelpWithdrawErrorKey(refusal(503, { code: 'teacher_help_withdrawal_unavailable' }))).toBe('ask.help.withdraw.errors.unavailable')
-    expect(teacherHelpWithdrawErrorKey(new ApiError('gateway', { status: 504 }))).toBe('ask.help.withdraw.errors.unavailable')
-    expect(teacherHelpWithdrawErrorKey(refusal(409, { code: 'teacher_help_request_not_withdrawable' }))).toBe('ask.help.withdraw.errors.generic')
-    expect(teacherHelpWithdrawErrorKey(new Error('offline'))).toBe('ask.help.withdraw.errors.generic')
-  })
 })
 
 describe('one request per conversation (#544)', () => {

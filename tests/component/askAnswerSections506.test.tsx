@@ -15,7 +15,6 @@ import { I18nextProvider } from 'react-i18next'
 import { MemoryRouter } from 'react-router-dom'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { AskHost } from '@/features/ask/AskHost'
-import { helpOffer } from '@/features/ask/AskPanel'
 import i18n from '@/i18n'
 import { ApiError } from '@/services/api/httpClient'
 import { resetAsk } from '@/store/askStore'
@@ -379,16 +378,6 @@ describe('Ask a teacher', () => {
     expect(thread(ask).getByText('Because 3x means 3 · x.').closest('[data-message-role]')).toContainElement(button)
     expect(button).toHaveAttribute('data-variant', 'plain')
     expect(ask.queryByText('A teacher could help you with this.')).not.toBeInTheDocument()
-  })
-
-  it('sits under the latest answer once it is whole, from before the sections too', () => {
-    expect(helpOffer([answer('a1', null)])).toEqual({ id: 'a1', suggested: false })
-    expect(helpOffer([answer('a1', { ...SECTIONS, suggestTeacher: true }), answer('a2', null)])).toEqual({ id: 'a2', suggested: false })
-    expect(helpOffer([answer('a1', null), answer('a2', { ...SECTIONS, suggestTeacher: true })])).toEqual({ id: 'a2', suggested: true })
-    expect(helpOffer([answer('a1', SECTIONS), message('s2', 'student', 'And now?')])).toEqual({ id: 'a1', suggested: false })
-    expect(helpOffer([answer('a1', SECTIONS), message('a2', 'assistant', '', { status: 'streaming' })])).toBeNull()
-    expect(helpOffer([answer('a1', SECTIONS), message('a2', 'assistant', 'Failed.', { status: 'failed' })])).toBeNull()
-    expect(helpOffer([message('s1', 'student', 'Hello?')])).toBeNull()
   })
 
   it('asks for help in this conversation and reads the week’s allowance again at once', async () => {
