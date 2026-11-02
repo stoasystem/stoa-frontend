@@ -8,12 +8,14 @@ import type { UploadCode, UploadCodeRedemption, UploadCodeState } from '@/types/
  * A photo from the phone into Ask on the computer, by QR (#514; the backend's
  * stoa-backend#146).
  *
- * The computer, signed in, makes a one-time code for the conversation open in
- * Ask and shows it as a QR. The phone, signed in or not, presents the code once
- * to `redeem` and is handed an upload token; that token, never the code again,
- * signs each part and the completion. The photo is an ordinary upload of the
- * student's, bound to that conversation; once it has passed, the computer shows
- * it and the student chooses to add it to the question.
+ * The computer, signed in, makes a one-time code and shows it as a QR. The
+ * code is made for no conversation (stoa-backend#191, #554): a student about to
+ * ask a new question photographs it first, and the photo goes with whichever
+ * question it is added to, like a file chosen on the computer. The phone,
+ * signed in or not, presents the code once to `redeem` and is handed an upload
+ * token; that token, never the code again, signs each part and the completion.
+ * The computer follows the code by the upload it reserved; once the photo has
+ * passed, the computer shows it and the student chooses to add it.
  *
  * Both secrets travel in request bodies only. On the phone the code arrives
  * after the `#` of the QR's address, which no request carries (`phoneUploadUrl`).
@@ -30,16 +32,14 @@ export function phoneUploadUrl(code: string, origin = window.location.origin) {
 
 // ---- the computer ----------------------------------------------------------
 
-export async function createUploadCode(conversationId: string) {
-  const response = await httpClient.post<UploadCode>(apiPath`/conversations/${conversationId}/upload-codes`)
+export async function createUploadCode() {
+  const response = await httpClient.post<UploadCode>('/upload-codes')
   return response.data
 }
 
-export async function readUploadCode(conversationId: string, codeId: string, signal?: AbortSignal) {
-  const response = await httpClient.get<UploadCodeState>(
-    apiPath`/conversations/${conversationId}/upload-codes/${codeId}`,
-    { signal },
-  )
+/** How far the phone has got, by the upload the code reserved. */
+export async function readUploadCode(uploadId: string, signal?: AbortSignal) {
+  const response = await httpClient.get<UploadCodeState>(apiPath`/files/${uploadId}/phone-code`, { signal })
   return response.data
 }
 
@@ -49,11 +49,11 @@ export async function readUploadCode(conversationId: string, codeId: string, sig
  * upload is never added unseen (stoa-backend#171, audit item M1). The route
  * wants the session's token, so it is read as a blob, not put in an `<img>`.
  */
-export async function readUploadCodePhoto(conversationId: string, codeId: string, signal?: AbortSignal) {
-  const response = await httpClient.get<Blob>(
-    apiPath`/conversations/${conversationId}/upload-codes/${codeId}/content`,
-    { responseType: 'blob', signal },
-  )
+export async function readUploadCodePhoto(uploadId: string, signal?: AbortSignal) {
+  const response = await httpClient.get<Blob>(apiPath`/files/${uploadId}/phone-code/content`, {
+    responseType: 'blob',
+    signal,
+  })
   return response.data
 }
 

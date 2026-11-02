@@ -85,6 +85,8 @@ export type UploadCode = {
   codeId: string
   code: string
   expiresAt: string
+  /** The upload the phone will open, reserved with the code (stoa-backend#191): how the computer follows it. */
+  uploadId: string
 }
 
 /** `UploadCodeStatus`: how far the phone has got. */

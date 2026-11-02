@@ -105,20 +105,17 @@ test('Ask shows the code as a QR, and adds the phone’s photo only once the stu
   phone.install()
   await signInAsStudent(page)
 
-  // A code belongs to a conversation: the first question starts one.
+  // A new question: there is no conversation yet, and the phone's way is there all the same (#554).
+  await page.goto('/ask')
   const panel = page.getByRole('complementary', { name: 'Ask' })
   const field = panel.getByRole('textbox', { name: 'Your question' })
-  const first = 'What is the area of a circle with radius 2?'
-  await page.getByRole('textbox', { name: 'Your question' }).fill(first)
-  await field.press('Enter')
-  const thread = panel.getByRole('log', { name: 'Messages' })
-  await expect(thread.getByText(world.answerFor(first))).toBeVisible()
+  await expect(field).toBeVisible()
 
   // In the + menu (#553).
   const add = panel.getByRole('button', { name: 'Add a photo' })
   if (!ATTACHMENTS_WORK) {
     await expect(add).toHaveCount(0)
-    expect(backend.callsTo('POST', '/conversations/{conv_id}/upload-codes')).toHaveLength(0)
+    expect(backend.callsTo('POST', '/upload-codes')).toHaveLength(0)
     return
   }
   await add.click()
@@ -146,9 +143,11 @@ test('Ask shows the code as a QR, and adds the phone’s photo only once the stu
   await panel.getByRole('button', { name: 'Add photo' }).click()
   await expect(panel.getByRole('list', { name: 'Attached files' }).getByText('phone-photo.jpg')).toBeVisible()
 
+  // The photo goes out with the question's first message, which starts its conversation.
   const question = 'Is my working on this right?'
   await field.fill(question)
   await field.press('Enter')
+  const thread = panel.getByRole('log', { name: 'Messages' })
   await expect(thread.getByText(world.answerFor(question))).toBeVisible()
   const [sent] = backend.callsTo('POST', '/conversations/{conv_id}/messages/stream')
   expect(sent.body).toMatchObject({ content: question, attachmentIds: [{ uploadId: phone.uploadId }] })

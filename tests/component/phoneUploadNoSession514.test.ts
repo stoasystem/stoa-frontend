@@ -65,7 +65,7 @@ beforeEach(() => {
       note(request)
       return HttpResponse.json({ status: 'validated' })
     }),
-    http.get(`${API}/conversations/c1/upload-codes/code-1`, ({ request }) => {
+    http.get(`${API}/files/up-1/phone-code`, ({ request }) => {
       note(request)
       return HttpResponse.json({ codeId: 'code-1', status: 'waiting', expiresAt: '2026-10-30T10:10:00Z' })
     }),
@@ -95,8 +95,8 @@ describe('a photo sent from the phone', () => {
   })
 
   it('still sends the session with the computer’s own calls', async () => {
-    await readUploadCode('c1', 'code-1')
-    expect(carried['/conversations/c1/upload-codes/code-1']).toBe('Bearer token-p')
+    await readUploadCode('up-1')
+    expect(carried['/files/up-1/phone-code']).toBe('Bearer token-p')
   })
 
   it('reads the gateway’s 429, which has no code, as "wait"', async () => {
