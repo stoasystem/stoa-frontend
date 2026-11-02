@@ -1,6 +1,7 @@
 import { ApiError } from '@/services/api/httpClient'
 import { ImagePreparationError } from '@/services/files/prepareImage'
 import { UploadRejectedError } from '@/services/files/fileApi'
+import { UPLOAD_GONE_CODES } from '@/features/uploads/uploadGone'
 
 /**
  * What went wrong with a file, in the few words a student can act on.
@@ -37,8 +38,8 @@ const BY_CODE: Readonly<Record<string, AttachmentProblem>> = {
   // there is no appeal, and sending it again is refused as `upload_not_found`
   // -- so the sentence offers another picture or words, never "try again".
   upload_content_blocked: 'blocked',
-  upload_not_found: 'expired',
-  upload_expired: 'expired',
+  // Past its 30 minutes, already sent, or gone: chosen again (#507).
+  ...Object.fromEntries(UPLOAD_GONE_CODES.map((code) => [code, 'expired' as const])),
   upload_chunk_conflict: 'expired',
   attachment_in_use: 'expired',
   storage_quota_exceeded: 'quota',

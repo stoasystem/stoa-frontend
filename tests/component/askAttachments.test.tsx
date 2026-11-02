@@ -10,9 +10,13 @@
  * `uploadToMessage507.test.ts`), and a
  * file that cannot be sent is refused in words the student can act on, never in
  * the server's own English.
+ *
+ * What a file goes through between chosen and sent -- prepared, refused,
+ * failed, past its time, taken out -- is the attachments module's
+ * (attachments561); these hold Ask's wiring to it, and its sentences.
  */
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { fireEvent, render, screen, waitFor, within } from '@testing-library/react'
+import { render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { I18nextProvider } from 'react-i18next'
 import { MemoryRouter } from 'react-router-dom'
@@ -64,10 +68,10 @@ vi.mock('@/services/learning/memoryApi', () => ({
   getMyMemorySummary: vi.fn(async () => ({ recommendations: [], weakTopics: [] })),
 }))
 
-import { getConversation } from '@/services/chat/chatApi'
+import { createConversation, getConversation, getConversations } from '@/services/chat/chatApi'
 import { getGenerationProgress, streamConversationMessage } from '@/services/chat/chatStreamApi'
 import { uploadFile } from '@/services/files/fileApi'
-import { ImagePreparationError, prepareImage } from '@/services/files/prepareImage'
+import { prepareImage } from '@/services/files/prepareImage'
 
 const getConversationMock = vi.mocked(getConversation)
 const streamMock = vi.mocked(streamConversationMessage)
@@ -103,21 +107,21 @@ function emulateWidth(width: number) {
 }
 
 /** The panel as a student opens it, in whatever language i18n is in. */
-function renderAsk() {
+function renderAsk(conversationId: string | null = 'c1') {
   const client = new QueryClient({ defaultOptions: { queries: { retry: false } } })
   render(
     <I18nextProvider i18n={i18n}>
       <QueryClientProvider client={client}>
-        <MemoryRouter initialEntries={['/ask/c1']}>
-          <AskHost route={{ conversationId: 'c1' }} />
+        <MemoryRouter initialEntries={[conversationId ? `/ask/${conversationId}` : '/ask']}>
+          <AskHost route={{ conversationId }} />
         </MemoryRouter>
       </QueryClientProvider>
     </I18nextProvider>,
   )
 }
 
-function openAsk() {
-  renderAsk()
+function openAsk(conversationId: string | null = 'c1') {
+  renderAsk(conversationId)
   return within(screen.getByRole('complementary', { name: 'Ask' }))
 }
 
@@ -172,6 +176,27 @@ describe('a question that carries a file', () => {
     const payload = streamMock.mock.calls[0][0].payload
     expect(payload.attachmentIds).toEqual([{ uploadId: 'up-1' }])
     expect(payload.content).toBe('What did I do wrong?')
+    // Gone with the question: the next one does not carry it again.
+    expect(ask.queryByRole('list', { name: 'Attached files' })).toBeNull()
+  })
+
+  it('starts a new conversation with it, and the tray lets it go once it is sent there (#263)', async () => {
+    vi.mocked(getConversations).mockResolvedValue({ items: [] } as never)
+    vi.mocked(createConversation).mockResolvedValue(conversation() as never)
+    uploadMock.mockResolvedValue(uploaded('up-1', 'exercise.png'))
+    const ask = openAsk(null)
+    const box = await ask.findByRole('textbox', { name: 'Your question' })
+
+    await userEvent.upload(picker(), photo())
+    await ask.findByText('exercise.png')
+    await waitFor(() => expect(ask.queryByText('Adding…')).toBeNull())
+    await userEvent.type(box, 'What did I do wrong?{Enter}')
+
+    await waitFor(() => expect(streamMock).toHaveBeenCalledTimes(1))
+    // A question carrying a file starts the conversation empty and goes into it.
+    expect(vi.mocked(createConversation).mock.calls[0][0]).not.toHaveProperty('initialMessage')
+    expect(streamMock.mock.calls[0][0].payload.attachmentIds).toEqual([{ uploadId: 'up-1' }])
+    await waitFor(() => expect(screen.queryByRole('list', { name: 'Attached files' })).toBeNull())
   })
 
   it('holds the question when a file waited past its upload’s 30 minutes, and says to choose it again (#507)', async () => {
@@ -186,82 +211,6 @@ describe('a question that carries a file', () => {
     expect(await ask.findByText('This file took too long. Choose it again.')).toBeInTheDocument()
     expect(streamMock).not.toHaveBeenCalled()
     expect(ask.getByRole('textbox', { name: 'Your question' })).toHaveValue('Here it is')
-  })
-
-  it('takes an iPhone’s HEIC and sends the JPEG made of it (#508)', async () => {
-    uploadMock.mockResolvedValue(uploaded('up-1', 'IMG_0001.jpg'))
-    prepareMock.mockResolvedValueOnce(new File([new Uint8Array(4096)], 'IMG_0001.jpg', { type: 'image/jpeg' }))
-    const ask = openAsk()
-    await ask.findByText('Linear equations')
-
-    expect(picker().accept.split(',')).toEqual(expect.arrayContaining(['.heic', '.heif', '.jpg', '.png']))
-    await userEvent.upload(picker(), new File([new Uint8Array(2048)], 'IMG_0001.HEIC', { type: 'image/heic' }))
-
-    await waitFor(() => expect(uploadMock).toHaveBeenCalledTimes(1))
-    expect(uploadMock.mock.calls[0][0].file).toMatchObject({ name: 'IMG_0001.jpg', type: 'image/jpeg' })
-    expect(await ask.findByText('IMG_0001.jpg')).toBeInTheDocument()
-  })
-
-  it('prepares photos chosen together one at a time, so a phone holds one in memory', async () => {
-    uploadMock.mockImplementation(async ({ file }) => uploaded(`up-${file.name}`, file.name))
-    const finish: Array<() => void> = []
-    prepareMock.mockImplementation(
-      (file: File) => new Promise<File>((resolve) => finish.push(() => resolve(file))),
-    )
-    const ask = openAsk()
-    await ask.findByText('Linear equations')
-
-    await userEvent.upload(picker(), [photo('a.png'), photo('b.png'), photo('c.png')])
-    await waitFor(() => expect(prepareMock).toHaveBeenCalledTimes(1))
-    await new Promise((resolve) => setTimeout(resolve, 20))
-    expect(prepareMock).toHaveBeenCalledTimes(1)
-
-    finish[0]()
-    await waitFor(() => expect(prepareMock).toHaveBeenCalledTimes(2))
-    expect(prepareMock.mock.calls[1][0].name).toBe('b.png')
-    finish[1]()
-    await waitFor(() => expect(prepareMock).toHaveBeenCalledTimes(3))
-    finish[2]()
-    await waitFor(() => expect(uploadMock).toHaveBeenCalledTimes(3))
-  })
-
-  it('goes on to the next photo when one cannot be prepared', async () => {
-    uploadMock.mockImplementation(async ({ file }) => uploaded(`up-${file.name}`, file.name))
-    prepareMock.mockRejectedValueOnce(new ImagePreparationError('a.png could not be opened.'))
-    const ask = openAsk()
-    await ask.findByText('Linear equations')
-
-    await userEvent.upload(picker(), [photo('a.png'), photo('b.png')])
-
-    await waitFor(() => expect(uploadMock).toHaveBeenCalledTimes(1))
-    expect(uploadMock.mock.calls[0][0].file.name).toBe('b.png')
-  })
-
-  it('does not call a photo that came out of shrinking over the limit "too big" (#508)', async () => {
-    const over = new File([new Uint8Array(8)], 'exercise.jpg', { type: 'image/jpeg' })
-    Object.defineProperty(over, 'size', { value: 10 * 1024 * 1024 + 1 })
-    prepareMock.mockResolvedValueOnce(over)
-    const ask = openAsk()
-    await ask.findByText('Linear equations')
-
-    await userEvent.upload(picker(), photo())
-
-    expect(await ask.findByText('This file could not be added. Try again.')).toBeInTheDocument()
-    expect(ask.queryByText(/Photos may be up to/)).toBeNull()
-    expect(uploadMock).not.toHaveBeenCalled()
-  })
-
-  it('sends a document as it is, unprepared (the negative control)', async () => {
-    uploadMock.mockResolvedValue({ ...uploaded('up-1', 'notes.pdf'), mimeType: 'application/pdf', sizeBytes: 3 })
-    const ask = openAsk()
-    await ask.findByText('Linear equations')
-
-    const pdf = new File(['pdf'], 'notes.pdf', { type: 'application/pdf' })
-    await userEvent.upload(picker(), pdf)
-
-    await waitFor(() => expect(uploadMock).toHaveBeenCalledTimes(1))
-    expect(prepareMock).not.toHaveBeenCalled()
-    expect(uploadMock.mock.calls[0][0].file).toBe(pdf)
   })
 
   it('sends no ids at all when nothing was attached (the negative control)', async () => {
@@ -391,77 +340,6 @@ describe('the camera and the chooser', () => {
 })
 
 describe('a file that cannot be sent', () => {
-  it('refuses a kind the backend would refuse, before any request leaves', async () => {
-    const ask = openAsk()
-    await ask.findByText('Linear equations')
-
-    // Past the chooser's own `accept` filter, as "All files" or a drag would be.
-    fireEvent.change(picker(), {
-      target: { files: [new File(['x'], 'notes.key', { type: 'application/octet-stream' })] },
-    })
-
-    expect(await ask.findByText(/This kind of file cannot be sent/)).toBeInTheDocument()
-    expect(uploadMock).not.toHaveBeenCalled()
-  })
-
-  it('refuses a photo over the 30 MB the browser will open, before it is opened', async () => {
-    const ask = openAsk()
-    await ask.findByText('Linear equations')
-
-    const big = photo('scan.png', 1)
-    Object.defineProperty(big, 'size', { value: 30 * 1024 * 1024 + 1 })
-    await userEvent.upload(picker(), big)
-
-    expect(await ask.findByText(/Photos may be up to 30 MB/)).toBeInTheDocument()
-    expect(prepareMock).not.toHaveBeenCalled()
-    expect(uploadMock).not.toHaveBeenCalled()
-  })
-
-  it('lets a photo over the backend’s 10 MB through, since it is shrunk first (#508)', async () => {
-    uploadMock.mockResolvedValue(uploaded('up-1', 'scan.jpg'))
-    prepareMock.mockResolvedValueOnce(new File([new Uint8Array(4096)], 'scan.jpg', { type: 'image/jpeg' }))
-    const ask = openAsk()
-    await ask.findByText('Linear equations')
-
-    const large = photo('scan.png', 1)
-    Object.defineProperty(large, 'size', { value: 30 * 1024 * 1024 })
-    await userEvent.upload(picker(), large)
-
-    await waitFor(() => expect(uploadMock).toHaveBeenCalledTimes(1))
-    expect(prepareMock.mock.calls[0][0]).toBe(large)
-    expect(uploadMock.mock.calls[0][0].file).toMatchObject({ name: 'scan.jpg', type: 'image/jpeg', size: 4096 })
-    expect(ask.queryByText(/Photos may be up to/)).toBeNull()
-  })
-
-  it('says so in the student’s words when the browser cannot open a photo (#508)', async () => {
-    prepareMock.mockRejectedValueOnce(new ImagePreparationError('exercise.png could not be opened.'))
-    const ask = openAsk()
-    await ask.findByText('Linear equations')
-
-    await userEvent.upload(picker(), photo())
-
-    expect(await ask.findByText('This photo could not be opened. Try another one, or a screenshot.')).toBeInTheDocument()
-    expect(uploadMock).not.toHaveBeenCalled()
-  })
-
-  it('turns the upload API’s code into our own sentence, and never shows its English', async () => {
-    uploadMock.mockRejectedValue(
-      new ApiError('This file is too large. Choose a smaller file.', {
-        status: 422,
-        code: 'upload_too_large',
-        detail: { code: 'upload_too_large', message: 'This file is too large. Choose a smaller file.' },
-      }),
-    )
-    const ask = openAsk()
-    await ask.findByText('Linear equations')
-
-    await userEvent.upload(picker(), photo('huge.png'))
-
-    expect(await ask.findByText(/Photos may be up to 30 MB, other files up to 50 MB/)).toBeInTheDocument()
-    // The server's own prose is written for whoever wrote the request.
-    expect(ask.queryByText('This file is too large. Choose a smaller file.')).toBeNull()
-  })
-
   /**
    * Image moderation (stoa-backend#138) answers `complete` with
    * `422 upload_content_blocked`. There is no appeal (#512): the sentence says
@@ -509,33 +387,4 @@ describe('a file that cannot be sent', () => {
     expect(streamMock.mock.calls[0][0].payload.attachmentIds).toBeUndefined()
   })
 
-  it('leaves a failed file on screen when the question goes out without it', async () => {
-    uploadMock.mockRejectedValue(new ApiError('nope', { status: 503, code: 'upload_service_unavailable' }))
-    const ask = openAsk()
-    await ask.findByText('Linear equations')
-
-    await userEvent.upload(picker(), photo())
-    await ask.findByText(/Files cannot be added right now/)
-
-    await userEvent.type(ask.getByRole('textbox', { name: 'Your question' }), 'Ask anyway{Enter}')
-    await waitFor(() => expect(streamMock).toHaveBeenCalledTimes(1))
-
-    expect(streamMock.mock.calls[0][0].payload.attachmentIds).toBeUndefined()
-    expect(ask.getByText(/Files cannot be added right now/)).toBeInTheDocument()
-  })
-
-  it('takes a file back out again', async () => {
-    uploadMock.mockResolvedValue(uploaded('up-1', 'exercise.png'))
-    const ask = openAsk()
-    await ask.findByText('Linear equations')
-
-    await userEvent.upload(picker(), photo())
-    await ask.findByText('exercise.png')
-    await userEvent.click(ask.getByRole('button', { name: 'Remove exercise.png' }))
-    await waitFor(() => expect(ask.queryByText('exercise.png')).toBeNull())
-
-    await userEvent.type(ask.getByRole('textbox', { name: 'Your question' }), 'Never mind{Enter}')
-    await waitFor(() => expect(streamMock).toHaveBeenCalledTimes(1))
-    expect(streamMock.mock.calls[0][0].payload.attachmentIds).toBeUndefined()
-  })
 })

@@ -4,15 +4,16 @@
  * T1 - a picture goes up as soon as it is chosen, as `help_reply_image`, and
  *      the reply names it as `{uploadId}`; a reply without one sends no
  *      `attachmentIds` at all.
- * T2 - only photos go: anything else is refused before it goes, in the
- *      teacher's own words (Sie), never the server's; a picture moderation
- *      turns down is said as one.
  * T3 - the reply waits for its pictures, and still needs words: pictures alone
  *      are not a reply the backend takes.
  * T4 - the server would not take a picture the reply carried: nothing was
  *      sent, it says so, and the picture is to be chosen again.
  * T6 - the teacher sees the pictures in the reply afterwards, named as theirs.
  * T7 - the sentences are there in all four languages, formal, with ss.
+ *
+ * What a picture goes through on its way -- photos only, refused before it
+ * goes, a server's code said in the teacher's words -- is the attachments
+ * module's (attachments561); these hold the reply box's wiring to it.
  */
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { fireEvent, render, screen, waitFor, within } from '@testing-library/react'
@@ -158,27 +159,6 @@ describe('T1: a picture goes with the reply', () => {
     expect(post.mock.calls[0]?.[1]).toEqual({ content: 'Hallo', richContent: undefined, attachmentIds: [{ uploadId: 'up-1' }] })
     expect(post.mock.calls[1]?.[1]).not.toHaveProperty('attachmentIds')
     post.mockRestore()
-  })
-})
-
-describe('T2: only photos, said in the teacher\'s words', () => {
-  it('refuses a document before anything goes up', async () => {
-    renderComposer()
-
-    await userEvent.upload(picker(), new File(['%PDF'], 'blatt.pdf', { type: 'application/pdf' }), { applyAccept: false })
-
-    expect(uploadMock).not.toHaveBeenCalled()
-    expect(within(tray()).getByRole('alert')).toHaveTextContent(copy.errors.unsupported)
-    expect(picker()).toHaveAttribute('accept', expect.not.stringContaining('.pdf'))
-  })
-
-  it('says a picture moderation turned down is one that cannot be sent', async () => {
-    uploadMock.mockRejectedValue(new ApiError('blocked', { status: 422, code: 'upload_content_blocked' }))
-    renderComposer()
-
-    await userEvent.upload(picker(), photo())
-
-    expect(await within(tray()).findByRole('alert')).toHaveTextContent(copy.errors.blocked)
   })
 })
 
