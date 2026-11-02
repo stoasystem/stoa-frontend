@@ -470,8 +470,9 @@ describe('each tier in its own ink, through drawLinks (#121, #123)', () => {
     expect(stats.lines).toBe(4)
     for (const [to, tier] of tierOf) {
       const strokes = strokesTo(ctx, frame, to)
-      // Tier 1 has its warm glow under the line; every tier, one line.
-      expect(strokes, `tier ${tier}`).toHaveLength(tier === TIER_RECOMMENDED ? 2 : 1)
+      // Tier 1 has its warm glow under the line, the other solid tiers their
+      // soft light (LINE.soft), the dashed tier nothing; every tier, one line.
+      expect(strokes, `tier ${tier}`).toHaveLength(tier === TIER_WAITING ? 1 : 2)
       const line = strokes[strokes.length - 1]
       expect(line.style, `tier ${tier} ink`).toBe(inkFor(ink, tier))
       expect(line.width, `tier ${tier} width`).toBe(LINE.width[tier])
@@ -483,6 +484,12 @@ describe('each tier in its own ink, through drawLinks (#121, #123)', () => {
         expect(glow.alpha).toBeCloseTo(LINE.glow.alpha)
         expect(glow.dash).toEqual([])
         expect(String(glow.style).replace(/\s/g, '')).toBe(withAlpha(inkFor(ink, tier), 1).replace(/\s/g, ''))
+      } else if (tier !== TIER_WAITING) {
+        const soft = strokes[0]
+        expect(soft.width).toBeCloseTo(LINE.width[tier] * LINE.soft.wide)
+        expect(soft.alpha).toBeCloseTo(LINE.soft.alpha)
+        expect(soft.dash).toEqual([])
+        expect(soft.style).toBe(inkFor(ink, tier))
       }
     }
   })

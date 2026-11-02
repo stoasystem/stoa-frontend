@@ -341,6 +341,13 @@
   --starmap-dot-ready: rgba(255, 255, 255, 0.95);
   --starmap-dot-waiting: rgba(255, 255, 255, 0.78);
   --starmap-dot-review: rgba(255, 255, 255, 0.92);
+  /*
+   * The soft light round a star (render/glyph.ts): the violet rim far out
+   * past a lit or in-progress star's glow, and the cool tint a ready star's
+   * orb fades to. Light only, never what a state is told by, so not rated.
+   */
+  --starmap-rim: rgb(168, 150, 255);
+  --starmap-ice: rgb(196, 220, 255);
 
   /*
    * The connection lines by tier (#121; render/links.ts keeps the same values
