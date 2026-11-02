@@ -18,11 +18,12 @@ import {
   keepFailedMessage,
   readFailedMessages,
   readPendingMessage,
+  sendingFor,
+  toStreamPayload,
   writePendingMessage,
   type FailedMessage,
   type PendingMessage,
 } from '@/lib/pendingChatMessages'
-import { detachedSendFor } from '@/services/chat/detachedSend'
 import { isSameSession, storedRefreshToken } from '@/services/auth/sessionRefresh'
 import { currentSessionToken, useAuthStore } from '@/store/authStore'
 
@@ -313,7 +314,7 @@ export function useStreamingChat(conversationId: string | null) {
    * answered; false when it failed, was stopped or was overtaken.
    *
    * `sending` is a send of it still on its way from elsewhere in the tab
-   * (`sendDetached`): until it is done, not finding the message on the server
+   * (`useAskQuestion`): until it is done, not finding the message on the server
    * means not stored yet.
    */
   const runAttempt = useCallback(
@@ -447,15 +448,7 @@ export function useStreamingChat(conversationId: string | null) {
           try {
             const request = streamConversationMessage({
               conversationId,
-              // Spread, not `undefined`: a question asked away from the stage
-              // sends a body without these keys at all (#56).
-              payload: {
-                content: pending.content,
-                attachmentIds: pending.attachmentIds,
-                idempotencyKey: pending.idempotencyKey,
-                ...(pending.practiceContext ? { practiceContext: pending.practiceContext } : {}),
-                ...(pending.quote ? { quote: pending.quote } : {}),
-              },
+              payload: toStreamPayload(pending),
               signal: requestController.signal,
               onEvent: (event) => {
                 if (requestController.signal.aborted || !owns()) return
@@ -485,14 +478,10 @@ export function useStreamingChat(conversationId: string | null) {
         // Read now: the updaters below run when React renders, after the refs
         // have been cleared for the next attempt.
         const settledAssistantId = activeAssistantMessageIdRef.current ?? assistantMessageId
-        const sameMessageRetry = (sameMessage: boolean): RetryPayload => ({
-          content: pending.content,
-          attachmentIds: pending.attachmentIds,
-          attachments: pending.attachments,
-          ...(pending.practiceContext ? { practiceContext: pending.practiceContext } : {}),
-          ...(pending.quote ? { quote: pending.quote } : {}),
-          ...(sameMessage ? { idempotencyKey: pending.idempotencyKey } : {}),
-        })
+        const sameMessageRetry = (sameMessage: boolean): RetryPayload => {
+          const { idempotencyKey, ...body } = toStreamPayload(pending)
+          return { ...body, attachments: pending.attachments, ...(sameMessage ? { idempotencyKey } : {}) }
+        }
         const studentBubble = (): LocalChatMessage => ({
           id: studentMessageId,
           conversationId,
@@ -619,12 +608,12 @@ export function useStreamingChat(conversationId: string | null) {
     stoppedByUserRef.current = false
     // A message sent before the page was reloaded is still one command on the
     // server; wait for it instead of losing it.
-    // One sent with no conversation on screen (`sendDetached`) and not known to
+    // One sent with no conversation on screen (`useAskQuestion`) and not known to
     // have arrived is waited for while its request is still going, and sent
     // again with the same key once this tab no longer has that request.
     const pending = conversationId ? readPending(conversationId) : null
     if (pending) {
-      const sending = detachedSendFor(pending.idempotencyKey)
+      const sending = sendingFor(pending.idempotencyKey)
       void runAttempt(pending, { send: Boolean(pending.unconfirmed) && !sending, sending })
     }
     return () => {

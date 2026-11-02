@@ -1,5 +1,6 @@
 import type { ChatAttachment, ChatMessage, MessageQuote, PracticeContextRef } from '@/types/chat'
 import type { AttachmentReference } from '@/types/file'
+import type { StreamMessagePayload } from '@/services/chat/chatStreamApi'
 
 /**
  * One message on its way: what was asked, and the idempotency key that makes
@@ -19,7 +20,7 @@ export type PendingMessage = {
   practiceContext?: PracticeContextRef
   quote?: MessageQuote
   /**
-   * Sent by `sendDetached` with no conversation on screen, and not yet known
+   * Sent by Ask's question module (`useAskQuestion`) with no conversation on screen, and not yet known
    * to have reached the server: a tab that no longer has that request sends it
    * again with the same key, which the server takes as the same message (#263).
    */
@@ -78,6 +79,42 @@ export function writePendingMessage(conversationId: string, pending: PendingMess
   } catch {
     // Without storage a reload loses the wait, not the message.
   }
+}
+
+/**
+ * The body a pending message goes out with: the same command carries the same
+ * fields however often it is sent. Spread, not `undefined`: a question asked
+ * away from the stage, or about no passage, sends a body without these keys at
+ * all (#56, #327 K3).
+ */
+export function toStreamPayload(pending: PendingMessage): StreamMessagePayload {
+  return {
+    content: pending.content,
+    attachmentIds: pending.attachmentIds,
+    idempotencyKey: pending.idempotencyKey,
+    ...(pending.practiceContext ? { practiceContext: pending.practiceContext } : {}),
+    ...(pending.quote ? { quote: pending.quote } : {}),
+  }
+}
+
+/**
+ * The sends still on their way in this tab, by idempotency key: the
+ * conversation, opened meanwhile, waits for their answer instead of sending
+ * the same message a second time. In memory only: a reload has no request
+ * left, and sends again what is still unconfirmed.
+ */
+const inFlight = new Map<string, Promise<void>>()
+
+/** Keep `sending` as the send of this message on its way, until it settles. */
+export function trackSending(idempotencyKey: string, sending: Promise<void>): Promise<void> {
+  const tracked = sending.finally(() => inFlight.delete(idempotencyKey))
+  inFlight.set(idempotencyKey, tracked)
+  return tracked
+}
+
+/** The send of this message still on its way in this tab, if there is one. */
+export function sendingFor(idempotencyKey: string): Promise<void> | undefined {
+  return inFlight.get(idempotencyKey)
 }
 
 /**

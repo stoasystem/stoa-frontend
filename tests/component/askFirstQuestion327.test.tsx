@@ -1,8 +1,9 @@
 /**
- * The first question of a new Ask conversation (#327): sent again with the
- * exercise it was asked beside (K3), and after a refusal asked again in the
- * conversation the refusal names rather than in a new empty one (K4) -- that
- * question only; any other starts a conversation of its own (#370).
+ * The first question of a new Ask conversation (#327), as the panel shows it:
+ * sent again with the exercise it was asked beside (K3), and after a refusal
+ * asked again in the conversation the refusal names (K4), while another
+ * question opens a conversation of its own (#370). Which question goes where,
+ * and under which key, is the question module's: `askQuestion562` (#562).
  */
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { act, render, screen, waitFor, within } from '@testing-library/react'
@@ -12,7 +13,7 @@ import { I18nextProvider } from 'react-i18next'
 import { MemoryRouter } from 'react-router-dom'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { StageWithAsk } from '@/features/chapter/StageAsk'
-import { makeQuote, useAskQuoteStore } from '@/features/ask/practiceContext'
+import { useAskQuoteStore } from '@/features/ask/practiceContext'
 import i18n from '@/i18n'
 import { readPendingMessage } from '@/lib/pendingChatMessages'
 import { ApiError } from '@/services/api/httpClient'
@@ -156,18 +157,6 @@ describe('K4: a first question refused after its conversation was made', () => {
     await panel.findByRole('textbox')
     expect(screen.queryByText(shown)).toBeNull()
   })
-
-  it('starts a new conversation when the refusal names none', async () => {
-    vi.mocked(createConversation).mockRejectedValueOnce(refusal()).mockResolvedValueOnce(conversation('new-2') as never)
-    mount(<Stage />)
-    const panel = await ask('Why subtract 3 first?')
-    await waitFor(() => expect(panel.getByRole('textbox')).toHaveValue('Why subtract 3 first?'))
-
-    await userEvent.click(panel.getByRole('textbox'))
-    await userEvent.keyboard('{Enter}')
-
-    await waitFor(() => expect(createConversation).toHaveBeenCalledTimes(2))
-  })
 })
 
 describe('#370: only the refused question goes into the conversation made for it', () => {
@@ -193,39 +182,5 @@ describe('#370: only the refused question goes into the conversation made for it
     expect(await panel.findByRole('heading', { name: 'Why not divide first?' })).toBeInTheDocument()
     expect(panel.queryByRole('heading', { name: 'Why subtract 3 first?' })).toBeNull()
     expect(sentTo()).not.toContain('made-1')
-  })
-
-  it('starts a new conversation for the same words asked beside another exercise', async () => {
-    const view = mount(<Stage />)
-    const panel = await ask('Why subtract 3 first?')
-    await waitFor(() => expect(panel.getByRole('textbox')).toHaveValue('Why subtract 3 first?'))
-
-    // The same panel, now beside the next exercise.
-    view.rerender(<Stage challengeId="ch-2" />)
-    await userEvent.click(panel.getByRole('textbox'))
-    await userEvent.keyboard('{Enter}')
-
-    await waitFor(() => expect(createConversation).toHaveBeenCalledTimes(2))
-    expect(vi.mocked(createConversation).mock.calls[1][0]).toMatchObject({ initialMessage: 'Why subtract 3 first?', practiceContext: { ...practice, challengeId: 'ch-2' } })
-    expect(sentTo()).not.toContain('made-1')
-  })
-
-  it('starts a new conversation for the same words asked about a passage', async () => {
-    mount(<Stage />)
-    const panel = await ask('Why subtract 3 first?')
-    await waitFor(() => expect(panel.getByRole('textbox')).toHaveValue('Why subtract 3 first?'))
-
-    act(() => useAskQuoteStore.getState().setQuote(makeQuote('2x + 3 = 7', { kind: 'challenge', id: 'ch-1' })))
-    await userEvent.click(panel.getByRole('textbox'))
-    await userEvent.keyboard('{Enter}')
-
-    // A quote does not go out with `POST /conversations`: the new one starts
-    // empty and the question is sent into it.
-    await waitFor(() => expect(streamConversationMessage).toHaveBeenCalledTimes(1))
-    expect(createConversation).toHaveBeenCalledTimes(2)
-    expect(vi.mocked(createConversation).mock.calls[1][0]).not.toHaveProperty('initialMessage')
-    const [call] = vi.mocked(streamConversationMessage).mock.calls[0]
-    expect(call.conversationId).toBe('new-2')
-    expect(call.payload.idempotencyKey).toBe('held-new-2')
   })
 })
