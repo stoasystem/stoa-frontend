@@ -1,6 +1,5 @@
 import type { Page } from '@playwright/test'
 import { encode } from 'uqr'
-import { ATTACHMENTS_WORK } from '../../src/features/ask/attachmentsSwitch'
 import { expect, test } from './support/fixtures'
 import type { MockBackend } from './support/backend'
 import { codeRefused, PhoneUploadDesk } from './support/phoneUploads'
@@ -11,10 +10,8 @@ import { photo, UploadDesk } from './support/uploads'
 
 /**
  * A photo from the phone into Ask on the computer, by QR, through the built
- * app (#514; stoa-backend#146). The phone's page needs no sign-in and runs
- * whatever `ATTACHMENTS_WORK` says; the button in Ask waits behind the switch
- * like the paperclip, so the computer's half checks it is absent while the
- * switch is off and runs whole once it is on.
+ * app (#514; stoa-backend#146). The phone's page needs no sign-in; the
+ * computer's half starts from the entry in Ask's + menu.
  */
 
 const SENT = 'Done! Go back to your computer: your photo is waiting there for you to add it.'
@@ -113,11 +110,6 @@ test('Ask shows the code as a QR, and adds the phone’s photo only once the stu
 
   // In the + menu (#553).
   const add = panel.getByRole('button', { name: 'Add a photo' })
-  if (!ATTACHMENTS_WORK) {
-    await expect(add).toHaveCount(0)
-    expect(backend.callsTo('POST', '/upload-codes')).toHaveLength(0)
-    return
-  }
   await add.click()
   await panel.getByRole('menuitem', { name: 'Send a photo from your phone' }).click()
   const qr = panel.getByRole('img', { name: 'QR code to send a photo from your phone' })

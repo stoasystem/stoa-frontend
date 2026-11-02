@@ -58,12 +58,6 @@ vi.mock('uqr', async (importOriginal) => {
     },
   }
 })
-let attachmentsWork = true
-vi.mock('@/features/ask/attachmentsSwitch', () => ({
-  get ATTACHMENTS_WORK() {
-    return attachmentsWork
-  },
-}))
 vi.mock('@/services/teacherHelp/teacherHelpApi', () => ({
   getTeacherAvailability: vi.fn(async () => ({ online: false, availableTeachers: 0 })),
   getTeacherHelpRequest: vi.fn(async () => {
@@ -151,7 +145,6 @@ const originalRevokeObjectURL = URL.revokeObjectURL
 beforeEach(async () => {
   await i18n.changeLanguage('en')
   emulate('computer')
-  attachmentsWork = true
   encoderFails = false
   useAuthStore.setState({
     user: { id: 'u-1', name: 'Lina Meier', email: 'lina@example.com', role: 'student' } as CurrentUser,
@@ -208,13 +201,6 @@ describe('the phone entry in Ask', () => {
     await ask.findByText('Linear equations')
     const menu = await openAdd(ask)
     expect(within(menu).getByRole('menuitem', { name: PHONE })).not.toHaveAttribute('aria-disabled')
-  })
-
-  it('waits behind the attachments switch, as the + does', async () => {
-    attachmentsWork = false
-    const ask = openAsk()
-    await ask.findByText('Linear equations')
-    expect(ask.queryByRole('button', { name: ADD })).toBeNull()
   })
 
   it('is not offered on a phone, where the camera is right there', async () => {

@@ -1,26 +1,17 @@
 import { createHash } from 'node:crypto'
 import type { Locator, Page } from '@playwright/test'
-import { ATTACHMENTS_WORK } from '../../src/features/ask/attachmentsSwitch'
 import { expect, test } from './support/fixtures'
 import { signInAsStudent } from './support/signIn'
 import { StudentWorld } from './support/student'
 import { photo, UploadDesk } from './support/uploads'
 
 /**
- * A photo sent with a question, through the built app (#512). The + waits
- * behind `ATTACHMENTS_WORK` until a smoke run on production has sent one;
- * while it is off, the file goes into the chooser its menu would open, which
- * is in the page either way. Once it is on, the + opens its menu (#553) and
- * the menu's "Choose" opens the chooser: the same test then covers the
- * switch's wiring too.
+ * A photo sent with a question, through the built app (#512). The + opens its
+ * menu (#553) and the menu's "Choose" opens the chooser, so the test covers
+ * the button's wiring too.
  */
 async function choosePhoto(page: Page, panel: Locator, file: { name: string; mimeType: string; buffer: Buffer }) {
   const add = panel.getByRole('button', { name: 'Add a photo' })
-  if (!ATTACHMENTS_WORK) {
-    await expect(add).toHaveCount(0)
-    await panel.locator('input[type=file]:not([data-ask-camera])').setInputFiles(file)
-    return
-  }
   await add.click()
   const chooser = page.waitForEvent('filechooser')
   await panel.getByRole('menuitem', { name: 'Choose a photo or file' }).click()

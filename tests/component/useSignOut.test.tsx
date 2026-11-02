@@ -6,7 +6,6 @@ import { MemoryRouter, useLocation, useNavigate } from 'react-router-dom'
 import { AxiosError } from 'axios'
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 import { queryClient } from '@/app/query/queryClient'
-import { UPLOAD_HANDOFF_STORAGE_KEY } from '@/features/uploads/utils/uploadHandoff'
 import { useSignOut } from '@/hooks/auth/useSignOut'
 import { useCreateConversationMutation } from '@/hooks/chat/useCreateConversationMutation'
 import { TAB_TOKEN_KEY } from '@/lib/tabAccount'
@@ -19,6 +18,9 @@ import { TAB_REFRESH_KEY } from '@/services/auth/sessionRefresh'
 import { logger } from '@/services/logging/logger'
 import { type CurrentUser, TOKEN_KEY, useAuthStore } from '@/store/authStore'
 import { mswServer } from '../mswServer'
+
+// The upload hand-off's key: nothing writes it any more, sign-out still clears it.
+const UPLOAD_HANDOFF_STORAGE_KEY = 'stoa.pendingLearningAssistantUpload'
 
 // Each test wraps the store's own action, never an earlier test's spy.
 const storeClearAuth = useAuthStore.getState().clearAuth
