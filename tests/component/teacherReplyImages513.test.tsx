@@ -4,8 +4,7 @@
  * T1 - a picture goes up as soon as it is chosen, as `help_reply_image`, and
  *      the reply names it as `{uploadId}`; a reply without one sends no
  *      `attachmentIds` at all.
- * T3 - the reply waits for its pictures, and still needs words: pictures alone
- *      are not a reply the backend takes.
+ * T3 - pictures alone are not a reply the backend takes, and the tray says so.
  * T4 - the server would not take a picture the reply carried: nothing was
  *      sent, it says so, and the picture is to be chosen again.
  * T6 - the teacher sees the pictures in the reply afterwards, named as theirs.
@@ -13,7 +12,9 @@
  *
  * What a picture goes through on its way -- photos only, refused before it
  * goes, a server's code said in the teacher's words -- is the attachments
- * module's (attachments561); these hold the reply box's wiring to it.
+ * module's (attachments561); when a reply waits for its pictures and how it
+ * settles them is the reply module's (teacherReply564). These hold the reply
+ * box's and the page's wiring to them.
  */
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { fireEvent, render, screen, waitFor, within } from '@testing-library/react'
@@ -23,7 +24,6 @@ import { I18nextProvider } from 'react-i18next'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { toast } from 'sonner'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { TeacherReplyComposer } from '@/components/teacher/TeacherReplyComposer'
 import { TeacherRequestTimeline } from '@/components/teacher/TeacherRequestTimeline'
 import i18n from '@/i18n'
 import de from '@/i18n/locales/de/teacher.json'
@@ -73,20 +73,6 @@ function uploaded(uploadId: string, filename = 'tafel.png', expiresAt = new Date
   return { uploadId, expiresAt, filename, mimeType: 'image/png', sizeBytes: 2048 }
 }
 
-function renderComposer({ allowImages = true }: { allowImages?: boolean } = {}) {
-  const onSubmit = vi.fn()
-  render(
-    <I18nextProvider i18n={i18n}>
-      <TeacherReplyComposer isSubmitting={false} draftKey="r1" onSubmit={onSubmit} allowImages={allowImages} />
-    </I18nextProvider>,
-  )
-  return {
-    onSubmit,
-    send: () => screen.getByRole('button', { name: de.reply.send }),
-    type: (text: string) => fireEvent.change(screen.getByLabelText(de.reply.label), { target: { value: text } }),
-  }
-}
-
 const picker = () => document.querySelector<HTMLInputElement>('input[data-teacher-reply-images]')!
 const tray = () => screen.getByRole('list', { name: copy.label })
 
@@ -97,7 +83,9 @@ function detail() {
   } as never
 }
 
-function renderPage() {
+/** The request page, its reply box open; `type` and `send` write and send a reply. */
+async function renderPage() {
+  detailMock.mockResolvedValue(detail())
   const client = new QueryClient({ defaultOptions: { queries: { retry: false } } })
   render(
     <I18nextProvider i18n={i18n}>
@@ -108,6 +96,11 @@ function renderPage() {
       </QueryClientProvider>
     </I18nextProvider>,
   )
+  await screen.findByLabelText(de.reply.label)
+  return {
+    type: (text: string) => fireEvent.change(screen.getByLabelText(de.reply.label), { target: { value: text } }),
+    send: () => screen.getByRole('button', { name: de.reply.send }),
+  }
 }
 
 beforeEach(async () => {
@@ -120,32 +113,24 @@ beforeEach(async () => {
 describe('T1: a picture goes with the reply', () => {
   it('goes up as the reply picture as soon as it is chosen, and the reply names its upload', async () => {
     uploadMock.mockResolvedValue(uploaded('up-1'))
-    const composer = renderComposer()
+    noteMock.mockResolvedValue({ id: 'n1' } as never)
+    const page = await renderPage()
 
+    const opened = vi.spyOn(picker(), 'click')
+    await userEvent.click(screen.getByRole('button', { name: copy.add }))
+    expect(opened).toHaveBeenCalledOnce()
     await userEvent.upload(picker(), photo())
     await waitFor(() => expect(uploadMock).toHaveBeenCalledTimes(1))
     expect(uploadMock.mock.calls[0]?.[0]).toMatchObject({ purpose: 'help_reply_image' })
     expect(within(tray()).getByText('tafel.png')).toBeInTheDocument()
 
-    composer.type('Schau dir die Skizze an.')
-    await waitFor(() => expect(composer.send()).toBeEnabled())
-    fireEvent.click(composer.send())
+    page.type('Schau dir die Skizze an.')
+    await waitFor(() => expect(page.send()).toBeEnabled())
+    fireEvent.click(page.send())
 
-    expect(composer.onSubmit).toHaveBeenCalledTimes(1)
-    expect(composer.onSubmit.mock.calls[0]?.[3].references).toEqual([{ uploadId: 'up-1' }])
-  })
-
-  it('leaves the tray once the reply is sent', async () => {
-    uploadMock.mockResolvedValue(uploaded('up-1'))
-    const composer = renderComposer()
-    composer.onSubmit.mockImplementation((_content, _rich, onSuccess: () => void) => onSuccess())
-
-    await userEvent.upload(picker(), photo())
-    composer.type('Schau dir die Skizze an.')
-    await waitFor(() => expect(composer.send()).toBeEnabled())
-    fireEvent.click(composer.send())
-
-    expect(screen.queryByRole('list', { name: copy.label })).not.toBeInTheDocument()
+    await waitFor(() => expect(noteMock).toHaveBeenCalledTimes(1))
+    expect(noteMock.mock.calls[0]?.[0]).toMatchObject({ requestId: 'r1', attachmentIds: [{ uploadId: 'up-1' }] })
+    await waitFor(() => expect(screen.queryByRole('list', { name: copy.label })).not.toBeInTheDocument())
   })
 
   it('sends the pictures from the page, and a reply without any sends no attachmentIds', async () => {
@@ -162,83 +147,35 @@ describe('T1: a picture goes with the reply', () => {
   })
 })
 
-describe('T3: the reply waits for its pictures, and needs words', () => {
-  it('cannot be sent while a picture is still going up', async () => {
-    let finish: (value: ReturnType<typeof uploaded>) => void = () => undefined
-    uploadMock.mockReturnValue(new Promise((resolve) => { finish = resolve }))
-    const composer = renderComposer()
-    composer.type('Schau dir die Skizze an.')
-
-    await userEvent.upload(picker(), photo())
-    expect(composer.send()).toBeDisabled()
-
-    finish(uploaded('up-1'))
-    await waitFor(() => expect(composer.send()).toBeEnabled())
-  })
-
+describe('T3: the reply needs words', () => {
   it('says that a picture alone is not a reply yet', async () => {
     uploadMock.mockResolvedValue(uploaded('up-1'))
-    const composer = renderComposer()
+    const page = await renderPage()
 
     await userEvent.upload(picker(), photo())
 
     expect(await screen.findByText(copy.needsText)).toBeInTheDocument()
-    expect(composer.send()).toBeDisabled()
-    composer.type('Schau dir die Skizze an.')
+    expect(page.send()).toBeDisabled()
+    page.type('Schau dir die Skizze an.')
     expect(screen.queryByText(copy.needsText)).not.toBeInTheDocument()
-  })
-
-  it('holds a reply whose picture is past its time, and says to choose it again', async () => {
-    uploadMock.mockResolvedValue(uploaded('up-1', 'tafel.png', new Date(Date.now() + 30 * 1000).toISOString()))
-    const composer = renderComposer()
-    await userEvent.upload(picker(), photo())
-    composer.type('Schau dir die Skizze an.')
-    await waitFor(() => expect(composer.send()).toBeEnabled())
-
-    fireEvent.click(composer.send())
-
-    expect(composer.onSubmit).not.toHaveBeenCalled()
-    expect(within(tray()).getByRole('alert')).toHaveTextContent(copy.errors.expired)
   })
 })
 
 describe('T4: the server would not take a picture', () => {
   it('says the reply was not sent, and the picture is to be chosen again', async () => {
-    detailMock.mockResolvedValue(detail())
     noteMock.mockRejectedValue(new ApiError('gone', { status: 404, code: 'upload_not_found' }))
     uploadMock.mockResolvedValue(uploaded('up-1'))
-    renderPage()
+    const page = await renderPage()
 
-    await screen.findByLabelText(de.reply.label)
     await userEvent.upload(picker(), photo())
-    fireEvent.change(await screen.findByLabelText(de.reply.label), { target: { value: 'Schau dir die Skizze an.' } })
-    const send = screen.getByRole('button', { name: de.reply.send })
-    await waitFor(() => expect(send).toBeEnabled())
-    fireEvent.click(send)
+    page.type('Schau dir die Skizze an.')
+    await waitFor(() => expect(page.send()).toBeEnabled())
+    fireEvent.click(page.send())
 
-    await waitFor(() => expect(noteMock).toHaveBeenCalledTimes(1))
-    expect(noteMock.mock.calls[0]?.[0]).toMatchObject({ requestId: 'r1', attachmentIds: [{ uploadId: 'up-1' }] })
     await waitFor(() => expect(toast.error).toHaveBeenCalledWith(de.toasts.replyImagesExpired))
-    expect(within(tray()).getByRole('alert')).toHaveTextContent(copy.errors.expired)
+    await waitFor(() => expect(within(tray()).getByRole('alert')).toHaveTextContent(copy.errors.expired))
     // The words stay: only the picture is chosen again.
     expect(screen.getByLabelText(de.reply.label)).toHaveValue('Schau dir die Skizze an.')
-  })
-
-  it('leaves the picture alone when the reply failed for another reason', async () => {
-    detailMock.mockResolvedValue(detail())
-    noteMock.mockRejectedValue(new ApiError('down', { status: 500 }))
-    uploadMock.mockResolvedValue(uploaded('up-1'))
-    renderPage()
-
-    await screen.findByLabelText(de.reply.label)
-    await userEvent.upload(picker(), photo())
-    fireEvent.change(await screen.findByLabelText(de.reply.label), { target: { value: 'Schau dir die Skizze an.' } })
-    const send = screen.getByRole('button', { name: de.reply.send })
-    await waitFor(() => expect(send).toBeEnabled())
-    fireEvent.click(send)
-
-    await waitFor(() => expect(toast.error).toHaveBeenCalledWith(de.toasts.replyFailed))
-    expect(within(tray()).queryByRole('alert')).not.toBeInTheDocument()
   })
 })
 

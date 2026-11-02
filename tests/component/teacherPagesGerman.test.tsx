@@ -13,7 +13,8 @@ import { I18nextProvider } from 'react-i18next'
 import { beforeEach, describe, expect, it } from 'vitest'
 import { PracticeRequestContextCard } from '@/components/teacher/PracticeRequestContextCard'
 import { TeacherAvailabilitySummary } from '@/components/teacher/TeacherAvailabilitySummary'
-import { TeacherReplyComposer } from '@/components/teacher/TeacherReplyComposer'
+import { TeacherReplyComposer } from '@/features/teacherReply/TeacherReplyComposer'
+import { useTeacherReply } from '@/features/teacherReply/useTeacherReply'
 import { TeacherSubjectSelector } from '@/components/teacher/TeacherSubjectSelector'
 import i18n from '@/i18n'
 import deTeacher from '@/i18n/locales/de/teacher.json'
@@ -24,6 +25,10 @@ function wrap(children: ReactNode) {
       <QueryClientProvider client={new QueryClient()}>{children}</QueryClientProvider>
     </I18nextProvider>
   )
+}
+
+function ReplyBox() {
+  return <TeacherReplyComposer reply={useTeacherReply(undefined)} />
 }
 
 beforeEach(async () => {
@@ -54,7 +59,7 @@ describe('the teacher pages in German', () => {
   })
 
   it('labels the reply composer in German', () => {
-    render(wrap(<TeacherReplyComposer isSubmitting={false} onSubmit={() => undefined} />))
+    render(wrap(<ReplyBox />))
     expect(screen.getByLabelText('Antwort der Lehrperson')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Formel' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Antwort senden' })).toBeInTheDocument()

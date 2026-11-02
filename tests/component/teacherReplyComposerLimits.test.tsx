@@ -1,40 +1,37 @@
 /**
  * #332: the teacher's reply composer.
  *
- * T3 - the server's limits (stoa-backend teacher_reply_service: 20 blocks,
- *      2000 characters a text block, 500 a formula, 4000 in all, its secret
- *      markers) are checked before sending, and a 422 says which one it was.
+ * What the reply may be -- the server's limits, its secret markers, a stored
+ * draft read block by block (#371), a refusal read by its code first (#388) --
+ * is the reply module's, held through `useTeacherReply` in teacherReply564 and
+ * through its rules in replyRules564. These hold the composer's wiring to it:
+ *
+ * T3 - a reply that may not go says why, on the field, and sends nothing.
  * T4 - queued blocks are shown and can be removed.
  * T8 - line breaks survive into the timeline; a list block is one item a line.
  * T9 - focus is not dropped after an action, the resolution note says it is
  *      required in text, and the difficulty buttons are a named group.
- *
- * #371: a stored draft is read block by block, and a refusal is read by its
- *       code first, a block too long told apart from a reply too long.
- * #388: the server sends no refusal code yet, so none is read; the message
- *       decides.
  */
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { act, fireEvent, render, renderHook, screen, waitFor, within } from '@testing-library/react'
+import { act, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import type { ReactNode } from 'react'
 import { I18nextProvider } from 'react-i18next'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
-import { toast } from 'sonner'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { AiTeacherToolsPanel } from '@/components/teacher/AiTeacherToolsPanel'
 import { RichTeacherReply } from '@/components/teacher/RichTeacherReply'
-import { TeacherReplyComposer } from '@/components/teacher/TeacherReplyComposer'
-import { useAddTeacherHelpRequestNoteMutation } from '@/hooks/teacher/useAddTeacherHelpRequestNoteMutation'
+import { TeacherReplyComposer } from '@/features/teacherReply/TeacherReplyComposer'
+import type { TeacherReplyAdapter } from '@/features/teacherReply/teacherReplyAdapter'
+import { useTeacherReply } from '@/features/teacherReply/useTeacherReply'
 import i18n from '@/i18n'
 import de from '@/i18n/locales/de/teacher.json'
 import en from '@/i18n/locales/en/teacher.json'
 import fr from '@/i18n/locales/fr/teacher.json'
 import italian from '@/i18n/locales/it/teacher.json'
 import { TeacherHelpRequestDetailPage } from '@/pages/teacher/TeacherHelpRequestDetailPage'
-import { ApiError } from '@/services/api/httpClient'
 import * as teacherApi from '@/services/teacher/teacherApi'
-import type { TeacherReplyBlock } from '@/types/teacher'
+import type { TeacherHelpRequestNote, TeacherReplyBlock } from '@/types/teacher'
 import type { TeacherHelpStatus } from '@/types/teacherHelp'
 
 vi.mock('@/layouts/DashboardLayout', () => ({
@@ -56,18 +53,28 @@ const REPLY = de.reply.label
 const SEND = de.reply.send
 const ADD = de.reply.addBlock
 
-function renderComposer({ draft, isSubmitting = false }: { draft?: TeacherReplyBlock[]; isSubmitting?: boolean } = {}) {
+function Composer({ adapter }: { adapter: TeacherReplyAdapter }) {
+  const reply = useTeacherReply('r1', { adapter })
+  return <TeacherReplyComposer reply={reply} />
+}
+
+/** The composer over an in-memory server that answers once `answer()` is called. */
+function renderComposer({ draft }: { draft?: TeacherReplyBlock[] } = {}) {
   if (draft) sessionStorage.setItem('stoa.teacherReplyDraft.r1', JSON.stringify({ mode: 'paragraph', value: '', blocks: draft }))
-  const onSubmit = vi.fn()
-  const ui = (submitting: boolean) => (
-    <I18nextProvider i18n={i18n}>
-      <TeacherReplyComposer isSubmitting={submitting} draftKey="r1" onSubmit={onSubmit} />
-    </I18nextProvider>
+  let answer: () => void = () => undefined
+  const addNote = vi.fn<TeacherReplyAdapter['addNote']>(
+    () => new Promise<TeacherHelpRequestNote>((resolve) => (answer = () => resolve({ id: 'n1' } as TeacherHelpRequestNote))),
   )
-  const view = render(ui(isSubmitting))
+  render(
+    <I18nextProvider i18n={i18n}>
+      <QueryClientProvider client={new QueryClient()}>
+        <Composer adapter={{ addNote }} />
+      </QueryClientProvider>
+    </I18nextProvider>,
+  )
   return {
-    onSubmit,
-    setSubmitting: (submitting: boolean) => view.rerender(ui(submitting)),
+    addNote,
+    answer: () => act(async () => answer()),
     reply: () => screen.getByLabelText(REPLY),
     send: () => screen.getByRole('button', { name: SEND }),
     type: (text: string) => fireEvent.change(screen.getByLabelText(REPLY), { target: { value: text } }),
@@ -103,8 +110,8 @@ beforeEach(async () => {
   await i18n.changeLanguage('de')
 })
 
-describe('T3: the server limits, checked before sending', () => {
-  it('takes a text block of 2000 characters and refuses one of 2001', () => {
+describe('T3: a reply that may not go', () => {
+  it('says why on the field, and neither queues nor sends it', () => {
     const composer = renderComposer()
     composer.type('a'.repeat(2000))
     expect(composer.send()).toBeEnabled()
@@ -117,172 +124,20 @@ describe('T3: the server limits, checked before sending', () => {
     expect(composer.reply()).toHaveAccessibleDescription(message('reply.unsafe.blockTooLong', { length: 2001, max: 2000 }))
   })
 
-  it('takes a formula of 500 characters and refuses one of 501', async () => {
+  it('says a reason without numbers in its own words', () => {
     const composer = renderComposer()
-    await userEvent.click(screen.getByRole('button', { name: de.reply.modes.formula }))
-    composer.type('x'.repeat(500))
-    expect(composer.send()).toBeEnabled()
-
-    composer.type('x'.repeat(501))
-    expect(screen.getByText(message('reply.unsafe.blockTooLong', { length: 501, max: 500 }))).toBeInTheDocument()
-    expect(composer.send()).toBeDisabled()
-  })
-
-  it('counts characters as the server does, one per emoji', () => {
-    const composer = renderComposer()
-    composer.type('😀'.repeat(2000))
-    expect(composer.send()).toBeEnabled()
-  })
-
-  it('sends 20 blocks but not a 21st', () => {
-    const composer = renderComposer({ draft: Array.from({ length: 20 }, (_, index) => paragraph(`Schritt ${index + 1}`)) })
-    expect(composer.send()).toBeEnabled()
-
-    composer.type('Noch einer')
-    expect(screen.getByText(message('reply.unsafe.tooManyBlocks', { max: 20 }))).toBeInTheDocument()
-    expect(composer.send()).toBeDisabled()
-    expect(screen.getByRole('button', { name: ADD })).toBeDisabled()
-  })
-
-  it('refuses more than 4000 characters in all, line breaks between blocks counted', () => {
-    // 2 × 2000 + one line break = 4001.
-    const composer = renderComposer({ draft: [paragraph('a'.repeat(2000))] })
-    composer.type('b'.repeat(1999))
-    expect(composer.send()).toBeEnabled()
-
-    composer.type('b'.repeat(2000))
-    expect(screen.getByText(message('reply.unsafe.tooLong', { length: 4001, max: 4000 }))).toBeInTheDocument()
-    expect(composer.send()).toBeDisabled()
-  })
-
-  it.each([
-    ['an S3 address', 'Siehe s3://bucket/datei'],
-    ['an amazonaws link', 'https://bucket.amazonaws.com/x'],
-    ['a password', 'password=geheim'],
-    ['a cookie', 'cookie=abc'],
-    ['a secret key name', 'SecretAccessKey: x'],
-    ['an AWS access key', 'Schlüssel AKIAABCDEFGHIJKLMNOP hier'],
-  ])('refuses %s, as the server does', (_, text) => {
-    const composer = renderComposer()
-    composer.type(text)
+    composer.type('Siehe s3://bucket/datei')
     expect(screen.getByText(de.reply.unsafe.privateMarkers)).toBeInTheDocument()
     expect(composer.send()).toBeDisabled()
   })
-
-  it('lets a lower-case lookalike of an access key through, as the server does', () => {
-    const composer = renderComposer()
-    composer.type('akiaabcdefghijklmnop')
-    expect(composer.send()).toBeEnabled()
-  })
-
-  it('still lets maths through (#268)', () => {
-    const composer = renderComposer()
-    composer.type('0 < a < 1 und set one = 1')
-    expect(composer.send()).toBeEnabled()
-  })
 })
 
-describe('T3: a reply the server refuses says why', () => {
-  function wrapper({ children }: { children: ReactNode }) {
-    return <QueryClientProvider client={new QueryClient()}>{children}</QueryClientProvider>
-  }
-
-  it.each([
-    ['teacher reply contains unsafe raw HTML', 'html'],
-    ['teacher reply contains private markers', 'privateMarkers'],
-    ['teacher reply contains private credentials', 'privateMarkers'],
-    ['rich_content blocks must contain 1 to 20 blocks', 'tooManyBlocks'],
-    ['text exceeds 2000 characters', 'blockTooLong'],
-    ['latex exceeds 500 characters', 'blockTooLong'],
-    ['teacher reply fallback exceeds 4000 characters', 'tooLong'],
-    ['content exceeds 4000 characters', 'tooLong'],
-  ])('"%s"', async (sentence, reason) => {
-    await refuse(new ApiError(sentence, { status: 422, detail: sentence }))
-    expect(toast.error).toHaveBeenCalledWith(refusedBecause(reason))
-  })
-
-  it('keeps the general message for a refusal it does not know', async () => {
-    vi.mocked(teacherApi.addTeacherHelpRequestNote).mockRejectedValue(new ApiError('something else', { status: 422 }))
-    const { result } = renderHook(() => useAddTeacherHelpRequestNoteMutation(), { wrapper })
-    act(() => result.current.mutate({ requestId: 'r1', content: 'x' } as never))
-    await waitFor(() => expect(toast.error).toHaveBeenCalledWith(de.toasts.replyRefused))
-  })
-
-  async function refuse(error: ApiError) {
-    vi.mocked(teacherApi.addTeacherHelpRequestNote).mockRejectedValue(error)
-    const { result } = renderHook(() => useAddTeacherHelpRequestNoteMutation(), { wrapper })
-    act(() => result.current.mutate({ requestId: 'r1', content: 'x' } as never))
-    await waitFor(() => expect(toast.error).toHaveBeenCalled())
-  }
-
-  const refusedBecause = (reason: string) =>
-    de.toasts.replyRefusedBecause[reason as keyof typeof de.toasts.replyRefusedBecause]
-
-  // #388: stoa-backend sends no code for a refused reply, so the codes #371
-  // guessed say nothing; the message still decides.
-  it.each([
-    'teacher_reply_unsafe_html',
-    'teacher_reply_private_markers',
-    'teacher_reply_private_credentials',
-    'teacher_reply_too_many_blocks',
-    'teacher_reply_block_too_long',
-    'teacher_reply_too_long',
-  ])('does not read the guessed code %s', async (code) => {
-    await refuse(new ApiError('reworded by the server', { status: 422, code }))
-    expect(toast.error).toHaveBeenCalledWith(de.toasts.replyRefused)
-  })
-
-  it('reads the message, not a code the server does not send', async () => {
-    await refuse(new ApiError('teacher reply fallback exceeds 4000 characters', { status: 422, code: 'teacher_reply_block_too_long' }))
-    expect(toast.error).toHaveBeenCalledWith(de.toasts.replyRefusedBecause.tooLong)
-  })
-
-  it('falls back to the message for a code it does not know', async () => {
-    await refuse(new ApiError('text exceeds 2000 characters', { status: 422, code: 'something_new' }))
-    expect(toast.error).toHaveBeenCalledWith(de.toasts.replyRefusedBecause.blockTooLong)
-  })
-
-  it('keeps the general message for an unknown code with an unknown message', async () => {
-    await refuse(new ApiError('something else', { status: 422, code: 'constructor' }))
-    expect(toast.error).toHaveBeenCalledWith(de.toasts.replyRefused)
-  })
-})
-
-describe('#371: a stored draft is read block by block', () => {
-  function storeDraft(blocks: unknown[]) {
-    sessionStorage.setItem('stoa.teacherReplyDraft.r1', JSON.stringify({ mode: 'paragraph', value: '', blocks }))
-  }
-
-  it('drops the blocks it cannot render and keeps the rest', () => {
-    storeDraft([
-      { type: 'paragraph' },
-      { type: 'formula', text: 'x = 1' },
-      { type: 'paragraph', text: 42 },
-      { type: 'video', text: 'unbekannt' },
-      { text: 'ohne Typ' },
-      { type: 'paragraph', text: '   ' },
-      null,
-      'Erster Schritt',
-      paragraph('bleibt'),
-      { type: 'formula', latex: '2x = 4' },
-      { type: 'quote', text: 'Zitat', extra: true },
-    ])
-    const composer = renderComposer()
-
-    const queued = screen.getByRole('list', { name: message('reply.queued', { count: 3 }) })
-    expect(within(queued).getByText('bleibt')).toBeInTheDocument()
-    expect(within(queued).getByText('2x = 4')).toBeInTheDocument()
-    expect(within(queued).getByText('Zitat')).toBeInTheDocument()
-    expect(composer.send()).toBeEnabled()
-    expect(JSON.parse(sessionStorage.getItem('stoa.teacherReplyDraft.r1') ?? '{}').blocks).toEqual([
-      paragraph('bleibt'),
-      { type: 'formula', latex: '2x = 4' },
-      { type: 'quote', text: 'Zitat' },
-    ])
-  })
-
-  it('keeps the request page up for a draft with a block missing its text', async () => {
-    storeDraft([{ type: 'paragraph' }, { type: 'formula' }])
+describe('#371: a stored draft', () => {
+  it('with a block missing its text keeps the request page up', async () => {
+    sessionStorage.setItem(
+      'stoa.teacherReplyDraft.r1',
+      JSON.stringify({ mode: 'paragraph', value: '', blocks: [{ type: 'paragraph' }, { type: 'formula' }] }),
+    )
     vi.mocked(teacherApi.getTeacherHelpRequestDetail).mockResolvedValue(detail('in_progress'))
     renderDetail()
 
@@ -310,13 +165,12 @@ describe('T4: queued blocks', () => {
     expect(within(left).getByText('Zweiter Schritt')).toBeInTheDocument()
 
     await userEvent.click(composer.send())
-    expect(composer.onSubmit.mock.calls[0]?.[1]).toEqual({ version: 1, blocks: [paragraph('Zweiter Schritt')] })
+    expect(composer.addNote.mock.calls[0]?.[1].richContent).toEqual({ version: 1, blocks: [paragraph('Zweiter Schritt')] })
   })
 
-  it('removing one also leaves the stored draft', async () => {
+  it('come back from the stored draft', () => {
     renderComposer({ draft: [paragraph('weg'), paragraph('bleibt')] })
-    await userEvent.click(screen.getByRole('button', { name: message('reply.removeBlock', { number: 1 }) }))
-    expect(JSON.parse(sessionStorage.getItem('stoa.teacherReplyDraft.r1') ?? '{}').blocks).toEqual([paragraph('bleibt')])
+    expect(screen.getByRole('list', { name: message('reply.queued', { count: 2 }) })).toBeInTheDocument()
   })
 })
 
@@ -338,12 +192,11 @@ describe('T8: line breaks and lists', () => {
     expect(within(list).getAllByRole('listitem').map((item) => item.textContent)).toEqual(['Kürzen', 'Ausklammern', 'Prüfen'])
   })
 
-  it('sends a list typed with its own bullets as plain items', async () => {
-    const composer = renderComposer()
-    await userEvent.click(screen.getByRole('button', { name: de.reply.modes.unordered_list }))
-    composer.type('- Kürzen\n* Ausklammern\n\n1. Prüfen\n')
-    await userEvent.click(composer.send())
-    expect(composer.onSubmit.mock.calls[0]?.[1].blocks).toEqual([{ type: 'unordered_list', text: 'Kürzen\nAusklammern\nPrüfen' }])
+  it('offers the list mode, pressed once chosen', async () => {
+    renderComposer()
+    const list = screen.getByRole('button', { name: de.reply.modes.unordered_list })
+    await userEvent.click(list)
+    expect(list).toHaveAttribute('aria-pressed', 'true')
   })
 })
 
@@ -358,27 +211,27 @@ describe('T9: focus and labels', () => {
     expect(composer.reply()).toHaveFocus()
   })
 
-  it('keeps the reply focusable while it is sent, and focuses it again once sent', () => {
+  it('keeps the reply focusable while it is sent, and focuses it again once sent', async () => {
     const composer = renderComposer()
     composer.type('Hallo')
     composer.reply().focus()
-    composer.setSubmitting(true)
+    fireEvent.submit(composer.reply().closest('form')!)
+    await waitFor(() => expect(composer.reply()).toHaveAttribute('readonly'))
     expect(composer.reply()).toBeEnabled()
-    expect(composer.reply()).toHaveAttribute('readonly')
     expect(composer.reply()).toHaveFocus()
 
     // The disabled send button let go of the focus.
     act(() => (document.activeElement as HTMLElement).blur())
-    composer.setSubmitting(false)
-    expect(composer.reply()).toHaveFocus()
+    await composer.answer()
+    await waitFor(() => expect(composer.reply()).toHaveFocus())
   })
 
   it('focuses the emptied reply once a reply is sent', async () => {
     const composer = renderComposer()
-    composer.onSubmit.mockImplementation((_content, _rich, onSuccess: () => void) => onSuccess())
     composer.type('Hallo')
     await userEvent.click(composer.send())
-    expect(composer.reply()).toHaveValue('')
+    await composer.answer()
+    await waitFor(() => expect(composer.reply()).toHaveValue(''))
     expect(composer.reply()).toHaveFocus()
   })
 

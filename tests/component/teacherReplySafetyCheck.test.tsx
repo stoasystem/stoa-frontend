@@ -1,82 +1,71 @@
 /**
  * The reply composer refused ordinary maths as HTML (#268): "0 < a < 1" hit
  * the "<a" tag check and "set one = 1" the "on…=" handler check, so a teacher
- * could not send the answer. Only what a browser would read as a tag is
- * refused now, in text and formula blocks alike.
+ * could not send the answer. Which text is HTML is the reply rules' now
+ * (replyRules564); these hold that the composer lets maths go out, in text
+ * and formula blocks alike, and says so when markup is refused.
  */
-import { fireEvent, render, screen } from '@testing-library/react'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { I18nextProvider } from 'react-i18next'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { TeacherReplyComposer } from '@/components/teacher/TeacherReplyComposer'
+import { TeacherReplyComposer } from '@/features/teacherReply/TeacherReplyComposer'
+import type { TeacherReplyAdapter } from '@/features/teacherReply/teacherReplyAdapter'
+import { useTeacherReply } from '@/features/teacherReply/useTeacherReply'
 import i18n from '@/i18n'
+import type { TeacherHelpRequestNote } from '@/types/teacher'
+
+vi.mock('sonner', () => ({ toast: { success: vi.fn(), error: vi.fn(), info: vi.fn() } }))
 
 const REFUSED = 'HTML-Code ist in Antworten nicht erlaubt.'
 
 beforeEach(async () => {
+  sessionStorage.clear()
   await i18n.changeLanguage('de')
 })
 
+function Composer({ adapter }: { adapter: TeacherReplyAdapter }) {
+  return <TeacherReplyComposer reply={useTeacherReply('r1', { adapter })} />
+}
+
 async function compose(text: string, mode: 'paragraph' | 'formula' = 'paragraph') {
-  const onSubmit = vi.fn()
+  const addNote = vi.fn<TeacherReplyAdapter['addNote']>(async () => ({ id: 'n1' }) as TeacherHelpRequestNote)
   render(
     <I18nextProvider i18n={i18n}>
-      <TeacherReplyComposer isSubmitting={false} onSubmit={onSubmit} />
+      <QueryClientProvider client={new QueryClient()}>
+        <Composer adapter={{ addNote }} />
+      </QueryClientProvider>
     </I18nextProvider>,
   )
   if (mode === 'formula') await userEvent.click(screen.getByRole('button', { name: 'Formel' }))
   fireEvent.change(screen.getByLabelText('Antwort der Lehrperson'), { target: { value: text } })
-  return { onSubmit, send: screen.getByRole('button', { name: 'Antwort senden' }) }
+  return { addNote, send: screen.getByRole('button', { name: 'Antwort senden' }) }
 }
 
 describe('the reply composer lets maths and plain text through', () => {
   it.each([
     ['an inequality', '0 < a < 1', 'paragraph'],
-    ['an inequality without spaces', '0<a<1', 'paragraph'],
-    ['"<a" before a word (#283–#311 review)', 'Für 0<a und a<1 gilt das', 'paragraph'],
-    ['"<a" at the end', 'Dann ist b<a', 'paragraph'],
-    ['"<a" at the end of a line', 'Es gilt x<a\nund 0<y', 'paragraph'],
-    ['a chain of comparisons', 'a<b>c und x <= y', 'paragraph'],
     ['"one =" in a sentence', 'Set one = 1 first, once = 2 after', 'paragraph'],
     ['an inequality in a formula block', '0 < a < 1', 'formula'],
-    ['LaTeX with angle brackets', String.raw`\left< a, b \right> < \frac{1}{a}`, 'formula'],
-    ['LaTeX with "one ="', String.raw`\text{one} = 1,\ 0 < a \leq 1`, 'formula'],
   ] as const)('%s', async (_, text, mode) => {
-    const { onSubmit, send } = await compose(text, mode)
+    const { addNote, send } = await compose(text, mode)
     expect(screen.queryByText(REFUSED)).not.toBeInTheDocument()
     expect(send).toBeEnabled()
     await userEvent.click(send)
-    expect(onSubmit).toHaveBeenCalledOnce()
+    await waitFor(() => expect(addNote).toHaveBeenCalledOnce())
+    const block = addNote.mock.calls[0]?.[1].richContent.blocks[0]
+    expect(block).toEqual(mode === 'formula' ? { type: 'formula', latex: text } : { type: 'paragraph', text })
   })
 })
 
 describe('the reply composer still refuses HTML', () => {
   it.each([
-    ['a script tag', '<script>alert(1)</script>'],
-    ['a script tag in capitals', 'Hallo <SCRIPT SRC=//x.ch/a.js></SCRIPT>'],
-    ['an image with an error handler', '<img src=x onerror=alert(1)>'],
-    ['a link', '<a href="https://example.com">hier</a>'],
-    ['a link split across lines', '<a\nhref=javascript:alert(1)>x</a>'],
-    ['a self-closing svg with a load handler', '<svg/onload=alert(1)>'],
-    ['a handler on a tag not on the list', '<details open ontoggle=alert(1)>'],
-    ['a handler behind a quoted ">"', '<div title=">" onclick=alert(1)>x</div>'],
-  ])('%s', async (_, text) => {
-    const { send } = await compose(text)
+    ['a script tag', '<script>alert(1)</script>', 'paragraph'],
+    ['a tag in a formula block', 'x = 1 <img src=x onerror=alert(1)>', 'formula'],
+  ] as const)('%s', async (_, text, mode) => {
+    const { send } = await compose(text, mode)
     expect(screen.getByText(REFUSED)).toBeInTheDocument()
     expect(send).toBeDisabled()
-  })
-
-  it('refuses a tag in a formula block too', async () => {
-    const { send } = await compose('x = 1 <img src=x onerror=alert(1)>', 'formula')
-    expect(screen.getByText(REFUSED)).toBeInTheDocument()
-    expect(send).toBeDisabled()
-  })
-
-  it('checks a long reply without stalling', async () => {
-    const started = performance.now()
-    await compose(`<div ${'a=b/ c= '.repeat(1000)}x`)
-    // Not HTML; at 8000 characters it is over the block limit instead (#332).
-    expect(screen.queryByText(REFUSED)).not.toBeInTheDocument()
-    expect(performance.now() - started).toBeLessThan(1000)
   })
 })

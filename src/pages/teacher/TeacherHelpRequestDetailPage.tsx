@@ -9,18 +9,15 @@ import { PageHeader } from '@/components/common/PageHeader'
 import { SectionHeader } from '@/components/common/SectionHeader'
 import { HelpRequestDetailCard } from '@/components/teacher/HelpRequestDetailCard'
 import { PracticeRequestContextCard } from '@/components/teacher/PracticeRequestContextCard'
-import { TeacherReplyComposer } from '@/components/teacher/TeacherReplyComposer'
 import { TeacherDashboardSkeleton } from '@/components/teacher/TeacherDashboardSkeleton'
 import { TeacherRequestTimeline } from '@/components/teacher/TeacherRequestTimeline'
 import { TeacherAssistanceSummaryCard } from '@/components/teacher/TeacherAssistanceSummaryCard'
 import { AiTeacherToolsPanel } from '@/components/teacher/AiTeacherToolsPanel'
 import { CurriculumRolloutPanel } from '@/components/practice/CurriculumRolloutPanel'
 import { Button } from '@/components/ui/button'
+import { TeacherReplyComposer } from '@/features/teacherReply/TeacherReplyComposer'
+import { useTeacherReply } from '@/features/teacherReply/useTeacherReply'
 import { useCurriculumCatalogQuery } from '@/hooks/practice/useCurriculumCatalogQuery'
-import {
-  isReplyImageRefusal,
-  useAddTeacherHelpRequestNoteMutation,
-} from '@/hooks/teacher/useAddTeacherHelpRequestNoteMutation'
 import { useTeacherHelpRequestDetailQuery } from '@/hooks/teacher/useTeacherHelpRequestDetailQuery'
 import { useTeacherAssistanceSummaryQuery } from '@/hooks/teacher/useTeacherAssistanceSummaryQuery'
 import { useUpdateTeacherHelpRequestMutation } from '@/hooks/teacher/useUpdateTeacherHelpRequestMutation'
@@ -48,7 +45,7 @@ export function TeacherHelpRequestDetailPage() {
   const [refocus, setRefocus] = useState<{ failed: boolean } | null>(null)
   const requestQuery = useTeacherHelpRequestDetailQuery(requestId)
   const updateStatus = useUpdateTeacherHelpRequestMutation()
-  const addNote = useAddTeacherHelpRequestNoteMutation()
+  const reply = useTeacherReply(requestId)
   const assistanceQuery = useTeacherAssistanceSummaryQuery(requestQuery.data?.requestId)
   // Read once the request has said its subject: read before, it was the whole
   // catalog with its previews, and then again for the subject (#416).
@@ -74,7 +71,7 @@ export function TeacherHelpRequestDetailPage() {
   const canAct = !isHelpRequestOutOfReach(requestQuery.error)
   const readFailed = requestQuery.isError && canAct
   const statusActions = canAct ? teacherStatusActions(requestQuery.data?.status) : []
-  const changedElsewhere = isHelpRequestConflict(updateStatus.error) || isHelpRequestConflict(addNote.error)
+  const changedElsewhere = isHelpRequestConflict(updateStatus.error) || reply.conflict
 
   return (
     <DashboardLayout>
@@ -207,20 +204,7 @@ export function TeacherHelpRequestDetailPage() {
                   <p role="status" className="text-sm text-muted-foreground">{tTeacher('detail.replyPaused')}</p>
                 )}
                 {/* Pictures go up the way a student's do (#513). */}
-                <TeacherReplyComposer
-                  key={requestId}
-                  draftKey={requestId}
-                  disabled={readFailed}
-                  isSubmitting={addNote.isPending}
-                  allowImages
-                  onSubmit={(content, richContent, onSuccess, images) =>
-                    requestId &&
-                    addNote.mutate(
-                      { requestId, content, richContent, attachmentIds: images.references },
-                      { onSuccess, onError: (error) => isReplyImageRefusal(error) && images.onRefused() },
-                    )
-                  }
-                />
+                <TeacherReplyComposer reply={reply} disabled={readFailed} />
               </>
             )}
             <TeacherRequestTimeline requestId={requestQuery.data.requestId} notes={requestQuery.data.notes ?? []} />
