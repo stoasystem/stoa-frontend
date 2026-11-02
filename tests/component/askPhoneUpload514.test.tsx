@@ -9,6 +9,8 @@
  * audit item M1). The question then carries it as `{uploadId}` like any upload.
  *
  * This drives the real panel; only the services at the edge are answered.
+ * Where the phone is offered, and what the tray does with the photo once it is
+ * added, is the attachments module's (attachments561).
  */
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { render, screen, waitFor, within } from '@testing-library/react'
@@ -201,14 +203,6 @@ describe('the phone entry in Ask', () => {
     await ask.findByText('Linear equations')
     const menu = await openAdd(ask)
     expect(within(menu).getByRole('menuitem', { name: PHONE })).not.toHaveAttribute('aria-disabled')
-  })
-
-  it('is not offered on a phone, where the camera is right there', async () => {
-    emulate('phone')
-    const ask = openAsk()
-    await ask.findByText('Linear equations')
-    const menu = await openAdd(ask)
-    expect(within(menu).queryByRole('menuitem', { name: new RegExp(`^${PHONE}`) })).toBeNull()
   })
 
   it('is offered for a new question too: the code belongs to no conversation (#554)', async () => {

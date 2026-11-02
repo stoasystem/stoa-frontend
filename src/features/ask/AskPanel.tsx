@@ -23,15 +23,11 @@ import {
   type AskPractice,
   type AskQuote,
 } from '@/features/ask/practiceContext'
-import { AttachmentTray } from '@/features/uploads/AttachmentTray'
-import { PhoneUploadCard } from '@/features/uploads/PhoneUploadCard'
-import { useAttachmentUploads } from '@/features/uploads/useAttachmentUploads'
-import { usePhoneUploadCode } from '@/features/uploads/usePhoneUploadCode'
-import { ACCEPT_ATTRIBUTE, CAMERA_ACCEPT_ATTRIBUTE } from '@/services/files/uploadLimits'
+import { Attachments } from '@/features/uploads/Attachments'
+import { useAttachments, type AttachmentBatch } from '@/features/uploads/useAttachments'
 import { useConversationsQuery } from '@/hooks/chat/useConversationsQuery'
 import { useCreateConversationMutation } from '@/hooks/chat/useCreateConversationMutation'
 import { refusedForToday } from '@/hooks/chat/useStreamingChat'
-import { TOUCH_QUERY, useMediaQuery } from '@/hooks/layout/useMediaQuery'
 import { useTeacherAvailabilityQuery } from '@/hooks/chat/useTeacherAvailabilityQuery'
 import { useRecommendationsQuery } from '@/hooks/learning/useWeakTopicsQuery'
 import { useStudentProfileQuery } from '@/hooks/student/useStudentProfileQuery'
@@ -174,30 +170,22 @@ export function AskPanel({
     },
     [conversationId, readDraft, setDraft, setQuote, t],
   )
-  // The files chosen for the next question, uploaded as they are picked (#125).
-  const attachments = useAttachmentUploads()
-  const picker = useRef<HTMLInputElement>(null)
-  // Taking a photo and choosing one are two entries (#509): with `capture` a
-  // phone opens the camera and offers no gallery, without it the gallery and
-  // files. Only where the camera opens is there a camera to show.
-  const camera = useRef<HTMLInputElement>(null)
-  const touch = useMediaQuery(TOUCH_QUERY)
-  const { clearSent } = attachments
-  // A photo taken on the phone, by a QR the computer shows (#514). The code
-  // is made for a conversation, so it is offered once one is open; on a phone
-  // the camera is right there instead.
-  const phoneCode = usePhoneUploadCode(conversationId)
+  // The files chosen for the next question, uploaded as they are picked
+  // (#125): from the chooser, the camera (#509) or a phone by QR (#514).
+  const attachments = useAttachments({ camera: true, phone: conversationId })
 
   // The exercise on screen goes out with every question asked beside it: the
   // backend reads the exercise, the chapter and the learning state from the
   // three ids itself (#56). Away from the stage the key is absent altogether.
   const practiceField = practice ? { practiceContext: practice.context } : {}
 
-  function startConversation(content: string, quote?: AskQuote | null) {
+  function startConversation(content: string, quote?: AskQuote | null, taken?: AttachmentBatch) {
     if (creatingRef.current || createConversation.isPending) return
-    // A file that waited past its upload's 30 minutes says so in the tray.
-    if (attachments.expireStale()) return
-    const attachmentIds = attachments.readyReferences
+    // A file still going up, or one that waited past its upload's 30 minutes,
+    // holds the question; the tray says which.
+    const files = taken ?? attachments.take()
+    if (!files) return
+    const attachmentIds = files.references
     const carried = attachmentIds.length > 0
     const grade = conversationGrade(profile?.grade)
     const askedAt = new Date().toISOString()
@@ -206,7 +194,7 @@ export function AskPanel({
     // the conversation is being made cannot leave it there to be sent twice.
     // It comes back only if the conversation could not be made.
     setDraft('')
-    const readyAttachments = attachments.readyAttachments
+    const readyAttachments = files.attachments
     const practiceContext = practice?.context
     // Sent into a conversation as a message of its own -- into that
     // conversation only, and whether or not Ask is still open by then (#263).
@@ -221,7 +209,7 @@ export function AskPanel({
       })
       // Gone with the question -- unless another was chosen meanwhile.
       if (quote && useAskQuoteStore.getState().quote === quote) clearQuote()
-      clearSent()
+      files.sent()
     }
     // Opened only in the panel that asked, and only if the student is still
     // on the list: a closed Ask stays closed, and a conversation the student
@@ -288,21 +276,21 @@ export function AskPanel({
     const content = value.trim()
     if (!content) return
     // Pressing send while a file is still going up is held by the composer's
-    // `busy`, which says so; this is the second lock, so a question can never
-    // leave without the file it was written for.
-    if (attachments.uploading) return
-    // A file that waited past its upload's 30 minutes is chosen again first.
-    if (attachments.expireStale()) return
+    // `busy`, which says so; `take()` is the second lock, so a question can
+    // never leave without the file it was written for. A file that waited past
+    // its upload's 30 minutes is chosen again first.
+    const files = attachments.take()
+    if (!files) return
     if (!conversationId) {
-      startConversation(content, quote)
+      startConversation(content, quote, files)
       return
     }
     if (isStreaming) return
-    const attachmentIds = attachments.readyReferences
-    const carried = attachments.readyAttachments
+    const attachmentIds = files.references
+    const carried = files.attachments
     setDraft('')
     clearQuote()
-    clearSent()
+    files.sent()
     void sendStreamingMessage({
       content,
       ...practiceField,
@@ -441,53 +429,18 @@ export function AskPanel({
           </p>
         )}
         {quote && <PendingQuote quote={quote} onRemove={clearQuote} />}
-        {phoneCode.view && (
-          <PhoneUploadCard
-            view={phoneCode.view}
-            onAdd={(upload) => {
-              attachments.adopt(upload)
-              phoneCode.close()
-            }}
-            onRenew={phoneCode.start}
-            onClose={phoneCode.close}
-          />
-        )}
-        <AttachmentTray drafts={attachments.drafts} overflow={attachments.overflow} onRemove={attachments.remove} />
-        <input
-          ref={picker}
-          type="file"
-          multiple
-          accept={ACCEPT_ATTRIBUTE}
-          className="hidden"
-          onChange={(event) => {
-            attachments.add(Array.from(event.target.files ?? []))
-            // Cleared, so choosing the same file twice in a row still fires.
-            event.target.value = ''
-          }}
-        />
-        <input
-          ref={camera}
-          type="file"
-          accept={CAMERA_ACCEPT_ATTRIBUTE}
-          capture="environment"
-          data-ask-camera
-          className="hidden"
-          onChange={(event) => {
-            attachments.add(Array.from(event.target.files ?? []))
-            event.target.value = ''
-          }}
-        />
+        <Attachments view={attachments.view} />
         <Composer
           value={draft}
           onChange={setDraft}
           onSubmit={submit}
-          onAttach={() => picker.current?.click()}
-          onCapture={touch ? () => camera.current?.click() : undefined}
-          onPhone={touch ? undefined : phoneCode.start}
+          onAttach={attachments.sources.pickFile}
+          onCapture={attachments.sources.takePhoto}
+          onPhone={attachments.sources.usePhone}
           dictation
           label={t('ask.composerLabel')}
           placeholder={practice ? t('ask.practice.placeholder') : t('ask.placeholder')}
-          busy={isStreaming || createConversation.isPending || attachments.uploading}
+          busy={isStreaming || createConversation.isPending || attachments.busy}
           describedBy={profile && !conversationGrade(profile.grade) ? 'ask-grade-missing' : undefined}
         />
       </div>
