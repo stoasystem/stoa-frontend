@@ -19,7 +19,6 @@ import { http, HttpResponse } from 'msw'
 import { MemoryRouter } from 'react-router-dom'
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 import { queryClient } from '@/app/query/queryClient'
-import { UPLOAD_HANDOFF_STORAGE_KEY } from '@/features/uploads/utils/uploadHandoff'
 import { readCurrentAccount } from '@/hooks/auth/accountRead'
 import { useLoginMutation } from '@/hooks/auth/useLoginMutation'
 import { PENDING_MESSAGE_KEY_PREFIX } from '@/lib/pendingChatMessages'
@@ -29,6 +28,9 @@ import { storedRefreshToken } from '@/services/auth/sessionRefresh'
 import { CHECKOUT_OPERATION_STORAGE_KEY } from '@/services/billing/billingApi'
 import { currentSessionToken, useAuthStore } from '@/store/authStore'
 import { mswServer } from '../mswServer'
+
+// The upload hand-off's key: nothing writes it any more, a change of account still clears it.
+const UPLOAD_HANDOFF_STORAGE_KEY = 'stoa.pendingLearningAssistantUpload'
 
 const accountA = { id: 'a', email: 'a@test.stoaedu.ch', name: 'Ada', role: 'parent' }
 const accountB = { id: 'b', email: 'b@test.stoaedu.ch', name: 'Bea', role: 'parent' }

@@ -2,7 +2,6 @@ import { useCallback, useRef, useState } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
 import { clearAskQuote } from '@/features/ask/practiceContext'
-import { clearUploadHandoff } from '@/features/uploads/utils/uploadHandoff'
 import { clearPendingMessages } from '@/lib/pendingChatMessages'
 import { forgetTestRolesHolding } from '@/lib/testRoles'
 import { rotateAnalyticsSession } from '@/services/analytics/analyticsClient'
@@ -13,6 +12,19 @@ import { forgetCheckoutOperation } from '@/services/billing/billingApi'
 import { logger } from '@/services/logging/logger'
 import { resetAsk } from '@/store/askStore'
 import { currentSessionToken, trackPendingLogout, useAuthStore } from '@/store/authStore'
+
+// The upload hand-off that carried an attachment into the assistant went with
+// the online classroom (2026-10-09); nothing writes this key any more. Sign-out
+// still clears it, because a tab that stored it before the deletion would
+// otherwise keep it for the next account on this device: it would open the
+// next student's chat with this person's prompt and attachments already in the
+// composer.
+const UPLOAD_HANDOFF_STORAGE_KEY = 'stoa.pendingLearningAssistantUpload'
+
+function clearUploadHandoff() {
+  if (typeof window === 'undefined') return
+  window.sessionStorage.removeItem(UPLOAD_HANDOFF_STORAGE_KEY)
+}
 
 function logOutcome(outcome: LogoutOutcome) {
   if (outcome.kind === 'ok') {
@@ -89,8 +101,7 @@ export function useSignOut() {
     // written back; a mutation still in flight is stopped by the client's own
     // guard.
     queryClient.clear()
-    // Left in the tab, the upload hand-off opens the next student's chat with
-    // this person's prompt and attachments already in the composer.
+    // An upload hand-off left from before 2026-10-09 (above).
     clearUploadHandoff()
     // Likewise Ask: a half-typed question, the open conversation, and any
     // question still waiting for its answer (#49).

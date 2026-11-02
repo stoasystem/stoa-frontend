@@ -7,7 +7,7 @@
  * the edge be answered, so what is asserted is what would leave the browser:
  * the file goes up before the question does, the question carries `{uploadId}`
  * (#507; `uploadFile` itself, against the real `complete` answer, is
- * `uploadHandoff507.test.ts`), and a
+ * `uploadToMessage507.test.ts`), and a
  * file that cannot be sent is refused in words the student can act on, never in
  * the server's own English.
  */
