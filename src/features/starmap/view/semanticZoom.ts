@@ -72,6 +72,8 @@ export const ZOOM = {
    * all its stars within this share of the band between the page's controls...
    */
   wholeNebulaFill: 0.9,
+  /** The first reveal: the star just lit and the next one within this share of the band, room left for Murmi. */
+  revealFill: 0.55,
   /**
    * ...with its glyphs within this range (px): never closer than choosing the
    * nebula, and never so far out that stars turn to dots, where in progress

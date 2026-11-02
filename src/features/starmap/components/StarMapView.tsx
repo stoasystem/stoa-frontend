@@ -355,7 +355,10 @@ export function StarMapView({ map, demo = false, target, onNavigate, land, onFir
   }, [map])
 
   useEffect(() => {
-    engineRef.current?.setTarget(target)
+    const engine = engineRef.current
+    // Asked to fly out (the first reveal): letting a choice go would leave the camera where it is.
+    if (target.layer === 'map' && target.fly) engine?.expectTarget(target, 'fly')
+    engine?.setTarget(target)
   }, [target])
 
   /**

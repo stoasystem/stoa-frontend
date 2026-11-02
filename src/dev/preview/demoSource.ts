@@ -71,6 +71,8 @@ function restore(): ServerState {
 }
 
 let server: ServerState = restore()
+/** Whether this tab's demo backend already had a record when the page loaded. */
+const restored = demoServerStorage()?.getItem(SERVER_KEY) != null
 const completed = new Set<string>(server.completed)
 const listeners = new Set<() => void>()
 let version = 0
@@ -91,6 +93,18 @@ export function resetDemoServer() {
   server = opening()
   completed.clear()
   for (const id of server.completed) completed.add(id)
+  changed()
+}
+
+/**
+ * A student who has not started anything (`&newcomer=1`): no lesson done.
+ * Only for a tab whose demo backend has no record yet (or `again`, with
+ * `&fresh=1`), so a reload keeps the lessons done since.
+ */
+export function startAsNewcomer(again = false) {
+  if (restored && !again) return
+  server = { ...opening(), completed: [] }
+  completed.clear()
   changed()
 }
 
