@@ -54,12 +54,12 @@ const PAGES = [
   'src/pages/parent/ChildReportPage.tsx',
 ]
 
-// Not a page: a map from a refusal code to the phrase the student is shown. It
-// told a student that teacher support "is not part of the current plan" and
-// that "a parent can add it from the plan page" - a price, a plan, and a page
-// that was withdrawn, on a live chat screen. It is reached from a page, so it
-// is read the same way.
-const COPY_MAPS = ['src/lib/teacherHelpErrors.ts']
+// Not a page: the teacher help module's map from a refusal code to the phrase
+// the student is shown (#558). It told a student that teacher support "is not
+// part of the current plan" and that "a parent can add it from the plan page"
+// - a price, a plan, and a page that was withdrawn, on a live chat screen. It
+// is reached from a page, so it is read the same way.
+const COPY_MAPS = ['src/features/ask/teacherHelp/useTeacherHelp.ts']
 
 /** Strip block and line comments, so a withdrawn key does not count. */
 function withoutComments(source: string): string {

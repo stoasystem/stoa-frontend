@@ -2,7 +2,7 @@ import { render } from '@testing-library/react'
 import { I18nextProvider } from 'react-i18next'
 import { afterAll, describe, expect, it } from 'vitest'
 import i18n from '@/i18n'
-import { TeacherHelpStatusCard } from '@/features/ask/TeacherHelp'
+import { TeacherHelpStatusCard } from '@/features/ask/teacherHelp/TeacherHelp'
 import type { TeacherHelpStatus } from '@/types/teacherHelp'
 
 // #265: a request nobody took in time, or one the student withdrew, pinned

@@ -1,8 +1,9 @@
 /**
  * #405: what Ask reads, counted at the API. The list of conversations stays
  * mounted while a conversation is open and nothing else reads it again, so it
- * follows the open conversation: a change of its last message or of its help
- * status, as read, reads the list again -- once. An answer reads the
+ * follows the open conversation: a change of its last message, or of its help
+ * status as the teacher help module reads it (#558), reads the list again --
+ * once. An answer reads the
  * conversation once, not twice: the list's key is a prefix of the
  * conversation's, and invalidating both read the conversation a second time.
  */
@@ -10,6 +11,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { act, renderHook } from '@testing-library/react'
 import type { ReactNode } from 'react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { useTeacherHelp } from '@/features/ask/teacherHelp/useTeacherHelp'
 import { useAskConversation } from '@/features/ask/useAskConversation'
 import { useConversationsQuery } from '@/hooks/chat/useConversationsQuery'
 import { ApiError } from '@/services/api/httpClient'
@@ -33,17 +35,19 @@ vi.mock('@/services/chat/chatStreamApi', () => ({
 }))
 vi.mock('@/services/teacherHelp/teacherHelpApi', () => ({
   getTeacherHelpRequest: vi.fn(),
+  getTeacherAvailability: vi.fn(),
 }))
 
 import { getConversation, getConversations } from '@/services/chat/chatApi'
 import { getGenerationProgress, streamConversationMessage } from '@/services/chat/chatStreamApi'
-import { getTeacherHelpRequest } from '@/services/teacherHelp/teacherHelpApi'
+import { getTeacherAvailability, getTeacherHelpRequest } from '@/services/teacherHelp/teacherHelpApi'
 
 const listMock = vi.mocked(getConversations)
 const conversationMock = vi.mocked(getConversation)
 const streamMock = vi.mocked(streamConversationMessage)
 const progressMock = vi.mocked(getGenerationProgress)
 const helpMock = vi.mocked(getTeacherHelpRequest)
+const availabilityMock = vi.mocked(getTeacherAvailability)
 
 const NEVER_ESCALATED = new ApiError('This conversation was never escalated to a teacher', { status: 404 })
 
@@ -61,7 +65,7 @@ function help(status: TeacherHelpRequest['status']): TeacherHelpRequest {
 
 const asked = [message('s-1', 'student', 'Wie loese ich 2x = 8?'), message('a-1', 'assistant', 'x = 4')]
 
-/** AskPanel as far as reading goes: the list mounted beside the open conversation. */
+/** AskPanel as far as reading goes: the list mounted beside the open conversation, and its teacher help. */
 function openAsk(conversationId: string) {
   const client = new QueryClient({ defaultOptions: { queries: { retry: false } } })
   const wrapper = ({ children }: { children: ReactNode }) => (
@@ -70,7 +74,9 @@ function openAsk(conversationId: string) {
   return renderHook(
     ({ id }) => {
       useConversationsQuery()
-      return useAskConversation(id)
+      const ask = useAskConversation(id)
+      useTeacherHelp({ conversationId: id, messages: ask.messages, isStreaming: ask.isStreaming })
+      return ask
     },
     { wrapper, initialProps: { id: conversationId } },
   )
@@ -93,6 +99,7 @@ beforeEach(() => {
     items: ['c1', 'c2'].map((id) => ({ id, title: 'Linear equations', subject: 'math', grade: '8', updatedAt: '2026-10-20T10:00:00.000Z' })),
   })
   progressMock.mockResolvedValue({ conversationId: 'c1', steps: [], updatedAt: '2026-10-20T10:00:00.000Z' })
+  availabilityMock.mockResolvedValue({ online: true, availableTeachers: 1, teacherSupport: null })
 })
 
 afterEach(() => {
