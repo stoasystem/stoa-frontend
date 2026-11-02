@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { RichTeacherReply } from '@/components/teacher/RichTeacherReply'
 import { Button } from '@/components/ui/button'
 import { Attachments } from '@/features/uploads/Attachments'
+import { blockFromInput, plainTextFallback, replyProblem, storedBlock } from '@/features/teacherReply/replyRules'
 import { useAttachments } from '@/features/uploads/useAttachments'
 import type { ReplyImageReference } from '@/types/file'
 import type { TeacherReplyBlock, TeacherReplyRichContent } from '@/types/teacher'
@@ -41,20 +42,6 @@ function readDraft(draftKey: string | undefined): ComposerDraft {
   }
 }
 
-const textBlockTypes = new Set<string>(['paragraph', 'heading', 'ordered_list', 'unordered_list', 'quote', 'code'])
-
-/*
- * A stored block as the composer would have queued it, or nothing. Storage
- * from an older version, or one edited by hand, may hold a block without its
- * text; rendered, that threw and took the whole request page down (#371).
- */
-function storedBlock(value: unknown): TeacherReplyBlock[] {
-  if (typeof value !== 'object' || value === null) return []
-  const { type, text, latex } = value as Record<string, unknown>
-  if (type === 'formula') return typeof latex === 'string' && latex.trim() ? [{ type, latex }] : []
-  if (typeof type !== 'string' || !textBlockTypes.has(type) || typeof text !== 'string' || !text.trim()) return []
-  return [{ type: type as Exclude<TeacherReplyBlock['type'], 'formula'>, text }]
-}
 
 function writeDraft(draftKey: string | undefined, draft: ComposerDraft) {
   if (!draftKey) return
@@ -235,7 +222,7 @@ export function TeacherReplyComposer({
       />
       {problem && (
         <p id="teacher-reply-problem" className="text-sm text-destructive">
-          {t(`reply.unsafe.${problem.key}`, problem.values)}
+          {t(`reply.unsafe.${problem.reason}`, problem.values)}
         </p>
       )}
       {/* The chooser and the tray are here either way; what `allowImages`
@@ -265,136 +252,3 @@ export function TeacherReplyComposer({
   )
 }
 
-function blockFromInput(mode: ComposerMode, value: string): TeacherReplyBlock {
-  if (mode === 'formula') return { type: 'formula', latex: value }
-  // One item per line; bullets or numbers the teacher typed are the list's own (#332).
-  if (mode === 'unordered_list' || mode === 'ordered_list') {
-    const items = value
-      .split('\n')
-      .map((line) => line.trim().replace(/^(?:[-*•]|\d+[.)])\s+/, ''))
-      .filter(Boolean)
-    return { type: mode, text: items.join('\n') }
-  }
-  return { type: mode, text: value }
-}
-
-/*
- * What stoa-backend's teacher_reply_service refuses with a 422 (#332): at most
- * 20 blocks, 2000 characters in a text block, 500 in a formula, 4000 in all
- * (the blocks joined by line breaks). Python counts code points, so do we.
- */
-const REPLY_LIMITS = { blocks: 20, textBlock: 2000, formula: 500, total: 4000 } as const
-
-type ReplyProblem = {
-  key: 'html' | 'privateMarkers' | 'blockTooLong' | 'tooManyBlocks' | 'tooLong'
-  values?: Record<string, number>
-}
-
-const characters = (text: string) => [...text].length
-
-/** Why a reply may not be sent, as the key of its message; null when it may. */
-function replyProblem(blocks: TeacherReplyBlock[]): ReplyProblem | null {
-  const unsafe = unsafeReplyReason(blocks)
-  if (unsafe) return { key: unsafe }
-  for (const block of blocks) {
-    const max = block.type === 'formula' ? REPLY_LIMITS.formula : REPLY_LIMITS.textBlock
-    const length = characters(block.type === 'formula' ? block.latex : block.text)
-    if (length > max) return { key: 'blockTooLong', values: { length, max } }
-  }
-  if (blocks.length > REPLY_LIMITS.blocks) return { key: 'tooManyBlocks', values: { max: REPLY_LIMITS.blocks } }
-  const length = characters(plainTextFallback({ version: 1, blocks }))
-  if (length > REPLY_LIMITS.total) return { key: 'tooLong', values: { length, max: REPLY_LIMITS.total } }
-  return null
-}
-
-function plainTextFallback(content: TeacherReplyRichContent) {
-  return content.blocks
-    .map((block) => (block.type === 'formula' ? block.latex : block.text))
-    .join('\n')
-    .trim()
-}
-
-function unsafeReplyReason(blocks: TeacherReplyBlock[]): 'html' | 'privateMarkers' | null {
-  const text = blocks
-    .map((block) => (block.type === 'formula' ? block.latex : block.text))
-    .join('\n')
-  const serialized = text.toLowerCase()
-  if (!serialized) return null
-  if (looksLikeUnsafeHtml(serialized)) return 'html'
-  // The backend's markers (_SECRET_MARKERS) and its AWS access key pattern (#332).
-  const privateMarkers = [
-    'weekly-reports/',
-    'private/',
-    's3://',
-    'https://s3',
-    'amazonaws.com',
-    'x-amz-signature',
-    'presignedurl',
-    'presigned_url',
-    'access_token',
-    'id_token',
-    'refresh_token',
-    'aws_secret_access_key',
-    'secretaccesskey',
-    'password=',
-    'cookie=',
-  ]
-  return privateMarkers.some((marker) => serialized.includes(marker)) || AWS_ACCESS_KEY.test(text)
-    ? 'privateMarkers'
-    : null
-}
-
-/*
- * Only what a browser would read as a whole tag counts: "<" straight before
- * the tag name, and the tag closed by ">" (#268). "0 < a < 1", "0<a<1",
- * "wenn 0<a und a<1" and "set one = 1" are maths and plain text, not HTML;
- * "<a href=...>" and "<script>" are markup. Replies are rendered as text nodes,
- * so this guards against pasted markup; it is not the escaping itself.
- */
-const AWS_ACCESS_KEY = /\b(?:AKIA|ASIA)[A-Z0-9]{16}\b/
-
-const UNSAFE_TAG =
-  /<\/?(script|iframe|frame|frameset|embed|object|applet|style|link|meta|base|html|body|img|svg|math|video|audio|form|input|button|a)(?:[\s/][^<>]*)?>/
-
-function looksLikeUnsafeHtml(lowercased: string) {
-  return UNSAFE_TAG.test(lowercased) || hasTagWithEventHandler(lowercased)
-}
-
-const isSpace = (char: string) => /\s/.test(char)
-
-/*
- * An "on…=" handler on any tag. Walks each tag's attributes the way the HTML
- * tokenizer does, so a quoted ">" cannot hide a handler behind it. A scanner,
- * not a regex: walking attributes with a regex backtracks exponentially.
- */
-function hasTagWithEventHandler(text: string) {
-  let at = 0
-  while ((at = text.indexOf('<', at)) !== -1) {
-    at += 1
-    if (!/[a-z]/.test(text[at] ?? '')) continue
-    while (at < text.length && !isSpace(text[at]) && text[at] !== '/' && text[at] !== '>') at += 1
-    while (at < text.length && text[at] !== '>') {
-      if (isSpace(text[at]) || text[at] === '/') {
-        at += 1
-        continue
-      }
-      const nameStart = at
-      at += 1 // a leading "=" belongs to the name
-      while (at < text.length && !isSpace(text[at]) && !'/>='.includes(text[at])) at += 1
-      const name = text.slice(nameStart, at)
-      while (at < text.length && isSpace(text[at])) at += 1
-      if (text[at] !== '=') continue
-      if (/^on[a-z]+$/.test(name)) return true
-      at += 1
-      while (at < text.length && isSpace(text[at])) at += 1
-      const quote = text[at]
-      if (quote === '"' || quote === "'") {
-        const close = text.indexOf(quote, at + 1)
-        at = close === -1 ? text.length : close + 1
-      } else {
-        while (at < text.length && !isSpace(text[at]) && text[at] !== '>') at += 1
-      }
-    }
-  }
-  return false
-}
