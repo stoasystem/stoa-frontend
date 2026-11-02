@@ -176,6 +176,19 @@ afterEach(() => {
 })
 
 const PHONE = 'Send a photo from your phone'
+const ADD = 'Add a photo'
+
+/** The + menu's ways to add a picture (#553); the menu sits in a portal, outside Ask's panel. */
+async function openAdd(ask: ReturnType<typeof within>) {
+  await userEvent.click(ask.getByRole('button', { name: ADD }))
+  return screen.findByRole('menu')
+}
+
+/** Opens the + menu and asks for the phone's QR. */
+async function choosePhone(ask: ReturnType<typeof within>) {
+  const menu = await openAdd(ask)
+  await userEvent.click(within(menu).getByRole('menuitem', { name: new RegExp(`^${PHONE}`) }))
+}
 
 function ready(redeemedAt = new Date().toISOString()) {
   readMock.mockResolvedValue({
@@ -188,30 +201,39 @@ function ready(redeemedAt = new Date().toISOString()) {
 }
 
 describe('the phone entry in Ask', () => {
-  it('is offered on a computer with a conversation open', async () => {
+  it('is offered in the + menu on a computer with a conversation open (#553)', async () => {
     const ask = openAsk()
     await ask.findByText('Linear equations')
-    expect(ask.getByRole('button', { name: PHONE })).toBeInTheDocument()
+    const menu = await openAdd(ask)
+    expect(within(menu).getByRole('menuitem', { name: PHONE })).not.toHaveAttribute('aria-disabled')
   })
 
-  it('waits behind the attachments switch, as the paperclip does', async () => {
+  it('waits behind the attachments switch, as the + does', async () => {
     attachmentsWork = false
     const ask = openAsk()
     await ask.findByText('Linear equations')
-    expect(ask.queryByRole('button', { name: PHONE })).toBeNull()
+    expect(ask.queryByRole('button', { name: ADD })).toBeNull()
   })
 
   it('is not offered on a phone, where the camera is right there', async () => {
     emulate('phone')
     const ask = openAsk()
     await ask.findByText('Linear equations')
-    expect(ask.queryByRole('button', { name: PHONE })).toBeNull()
+    const menu = await openAdd(ask)
+    expect(within(menu).queryByRole('menuitem', { name: new RegExp(`^${PHONE}`) })).toBeNull()
   })
 
-  it('is not offered before there is a conversation for the code to belong to', async () => {
+  it('is there, off and with its reason, before there is a conversation for the code to belong to (#554)', async () => {
     const ask = openAsk(null)
     await ask.findByRole('textbox', { name: 'Your question' })
-    expect(ask.queryByRole('button', { name: PHONE })).toBeNull()
+    const menu = await openAdd(ask)
+    const item = within(menu).getByRole('menuitem', { name: new RegExp(`^${PHONE}`) })
+    expect(item).toHaveAttribute('aria-disabled', 'true')
+    expect(item).toHaveTextContent('Send your question first, then you can add a photo from your phone.')
+    await userEvent.click(item)
+    // Nothing is made, and the menu stays with its reason on screen.
+    expect(createMock).not.toHaveBeenCalled()
+    expect(screen.getByRole('menu')).toBeInTheDocument()
   })
 })
 
@@ -219,7 +241,7 @@ describe('the QR', () => {
   it('carries the code after the # of the phone page’s address, with the time it has left', async () => {
     const ask = openAsk()
     await ask.findByText('Linear equations')
-    await userEvent.click(ask.getByRole('button', { name: PHONE }))
+    await choosePhone(ask)
 
     const qr = await ask.findByRole('img', { name: 'QR code to send a photo from your phone' })
     expect(createMock).toHaveBeenCalledWith('c1')
@@ -232,7 +254,7 @@ describe('the QR', () => {
     encoderFails = true
     const ask = openAsk()
     await ask.findByText('Linear equations')
-    await userEvent.click(ask.getByRole('button', { name: PHONE }))
+    await choosePhone(ask)
 
     expect(await ask.findByText('The QR code could not be shown. Reload the page and try again.')).toBeInTheDocument()
     expect(ask.queryByRole('img', { name: 'QR code to send a photo from your phone' })).toBeNull()
@@ -247,8 +269,8 @@ describe('the QR', () => {
     await i18n.changeLanguage(language)
     readMock.mockResolvedValue({ codeId: CODE_ID, status: 'expired', expiresAt: minutesFromNow(-1), redeemedAt: null, uploadId: null })
     openAsk()
-    const button = await screen.findByRole('button', { name: i18n.t('composer.phone', { ns: 'common' }) })
-    await userEvent.click(button)
+    await userEvent.click(await screen.findByRole('button', { name: i18n.t('composer.add', { ns: 'common' }) }))
+    await userEvent.click(within(await screen.findByRole('menu')).getByRole('menuitem', { name: i18n.t('composer.phone', { ns: 'common' }) }))
 
     expect(await screen.findByText(sentence)).toBeInTheDocument()
     expect(screen.queryByRole('img', { name: i18n.t('ask.phone.qrLabel', { ns: 'chat' }) })).toBeNull()
@@ -261,7 +283,7 @@ describe('the QR', () => {
     readMock.mockResolvedValue({ codeId: CODE_ID, status: 'waiting', expiresAt: minutesFromNow(-0.01), redeemedAt: null, uploadId: null })
     const ask = openAsk()
     await ask.findByText('Linear equations')
-    await userEvent.click(ask.getByRole('button', { name: PHONE }))
+    await choosePhone(ask)
 
     expect(await ask.findByText('This code has expired. Make a new one.')).toBeInTheDocument()
     expect(ask.queryByRole('img', { name: 'QR code to send a photo from your phone' })).toBeNull()
@@ -271,7 +293,7 @@ describe('the QR', () => {
     readMock.mockResolvedValue({ codeId: CODE_ID, status: 'uploading', expiresAt: minutesFromNow(9), redeemedAt: new Date().toISOString(), uploadId: null })
     const ask = openAsk()
     await ask.findByText('Linear equations')
-    await userEvent.click(ask.getByRole('button', { name: PHONE }))
+    await choosePhone(ask)
 
     expect(await ask.findByText('Your phone is sending the photo…')).toBeInTheDocument()
     expect(ask.queryByRole('img', { name: 'QR code to send a photo from your phone' })).toBeNull()
@@ -281,7 +303,7 @@ describe('the QR', () => {
     readMock.mockResolvedValue({ codeId: CODE_ID, status: 'failed', expiresAt: minutesFromNow(9), redeemedAt: new Date().toISOString(), uploadId: null })
     const ask = openAsk()
     await ask.findByText('Linear equations')
-    await userEvent.click(ask.getByRole('button', { name: PHONE }))
+    await choosePhone(ask)
 
     expect(await ask.findByText('The photo did not arrive. Make a new code and try again.')).toBeInTheDocument()
   })
@@ -290,7 +312,7 @@ describe('the QR', () => {
     createMock.mockRejectedValue(apiErrorFromBody({ message: 'Too Many Requests' }, { status: 429, fallback: 'x' }))
     const ask = openAsk()
     await ask.findByText('Linear equations')
-    await userEvent.click(ask.getByRole('button', { name: PHONE }))
+    await choosePhone(ask)
 
     expect(await ask.findByText('Too many codes in a short time. Wait a moment, then try again.')).toBeInTheDocument()
     expect(readMock).not.toHaveBeenCalled()
@@ -302,7 +324,7 @@ describe('the photo the phone sent', () => {
     ready()
     const ask = openAsk()
     await ask.findByText('Linear equations')
-    await userEvent.click(ask.getByRole('button', { name: PHONE }))
+    await choosePhone(ask)
 
     expect(await ask.findByRole('img', { name: 'The photo from your phone' })).toHaveAttribute('src', 'blob:phone-photo')
     expect(photoMock).toHaveBeenCalledWith('c1', CODE_ID, expect.anything())
@@ -322,7 +344,7 @@ describe('the photo the phone sent', () => {
     ready()
     const ask = openAsk()
     await ask.findByText('Linear equations')
-    await userEvent.click(ask.getByRole('button', { name: PHONE }))
+    await choosePhone(ask)
     await ask.findByRole('img', { name: 'The photo from your phone' })
 
     await userEvent.click(ask.getByRole('button', { name: 'Not mine' }))
@@ -339,7 +361,7 @@ describe('the photo the phone sent', () => {
     photoMock.mockRejectedValue(new ApiError('not found', { status: 404, code: 'upload_not_found' }))
     const ask = openAsk()
     await ask.findByText('Linear equations')
-    await userEvent.click(ask.getByRole('button', { name: PHONE }))
+    await choosePhone(ask)
 
     expect(await ask.findByText('The photo cannot be shown here. Make a new code and send it again.')).toBeInTheDocument()
     expect(ask.queryByRole('button', { name: 'Add photo' })).toBeNull()
@@ -350,7 +372,7 @@ describe('the photo the phone sent', () => {
     photoMock.mockResolvedValue(new Blob(['<svg onload="alert(1)"/>'], { type: 'image/svg+xml' }))
     const ask = openAsk()
     await ask.findByText('Linear equations')
-    await userEvent.click(ask.getByRole('button', { name: PHONE }))
+    await choosePhone(ask)
 
     expect(await ask.findByText('The photo cannot be shown here. Make a new code and send it again.')).toBeInTheDocument()
     expect(ask.queryByRole('img', { name: 'The photo from your phone' })).toBeNull()
@@ -362,7 +384,7 @@ describe('the photo the phone sent', () => {
     ready(minutesFromNow(-29))
     const ask = openAsk()
     await ask.findByText('Linear equations')
-    await userEvent.click(ask.getByRole('button', { name: PHONE }))
+    await choosePhone(ask)
     await userEvent.click(await ask.findByRole('button', { name: 'Add photo' }))
 
     await userEvent.type(ask.getByRole('textbox', { name: 'Your question' }), 'Is this right?{Enter}')

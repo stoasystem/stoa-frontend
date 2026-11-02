@@ -139,7 +139,7 @@ export function AskHost({
                 }}
                 onCompositionEnd={onDockedCompositionEnd}
                 onSubmit={(value) => controller.openWithDraft(value)}
-                dictationHint="floating"
+                dictation
                 label={t('ask.composerLabel')}
                 placeholder={wide ? t('ask.dockedPlaceholder') : t('ask.dockedPlaceholderPhone')}
               />
