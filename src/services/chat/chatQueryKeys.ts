@@ -10,6 +10,4 @@ export const chatQueryKeys = {
   /** How far the phone has got with a QR's code (#514), by the upload it reserved (#554). */
   uploadCode: (uploadId: string) => [...chatQueryKeys.all, 'upload-code', uploadId] as const,
   uploadCodePhoto: (uploadId: string) => [...chatQueryKeys.uploadCode(uploadId), 'photo'] as const,
-  attachmentContent: (attachmentId: string) =>
-    [...chatQueryKeys.all, 'attachment-content', attachmentId] as const,
 }

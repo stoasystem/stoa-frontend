@@ -25,7 +25,7 @@ export function isHelpRequestOutOfReach(error: unknown): boolean {
   return error instanceof ApiError && (error.status === 403 || error.status === 404)
 }
 
-/** The app's one retry, but not for a read out of reach: the request, or a file in it. */
+/** The app's one retry, but not for a read of the request out of reach. */
 export function retryUnlessOutOfReach(failureCount: number, error: unknown): boolean {
   return !isHelpRequestOutOfReach(error) && failureCount < 1
 }

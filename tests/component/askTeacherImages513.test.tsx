@@ -1,20 +1,20 @@
 /**
  * #513: the student sees the pictures a teacher replied with (stoa-backend#145).
  *
- * S1 - a teacher's picture is a thumbnail read with the student's token from
- *      the student's own attachment route, named for a screen reader with the
- *      teacher's name, and opens larger.
- * S2 - one removed, one the student may not read (403/404), or one that came
- *      back as anything but PNG or JPEG is a placeholder, not an error, and is
- *      not asked for again; any other failure offers to load it again.
+ * How a teacher's picture shows, fails, and is read once is the attachment
+ * viewer's (#563, `attachmentPictures563.test.tsx`); the student's route it is
+ * read from is pinned in `teacherHelpAttachmentApi510.test.ts`. Left here:
+ *
  * S3 - the conversation as the backend sends it names the files `attachmentId`
  *      / `mediaType`; a teacher's message keeps them.
  * S4 - the student's own files are still only named: nothing is read for them.
  * S5 - the sentences are there in all four languages.
+ * S6 - the wiring: a picture that failed to go up is a placeholder and is not
+ *      read; one uploaded is read through the student's own attachments, and
+ *      named with the teacher's name.
  */
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { render, screen, waitFor, within } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
 import { I18nextProvider } from 'react-i18next'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { AskMessage } from '@/features/ask/AskMessage'
@@ -23,7 +23,7 @@ import de from '@/i18n/locales/de/chat.json'
 import en from '@/i18n/locales/en/chat.json'
 import fr from '@/i18n/locales/fr/chat.json'
 import italian from '@/i18n/locales/it/chat.json'
-import { ApiError, httpClient } from '@/services/api/httpClient'
+import { httpClient } from '@/services/api/httpClient'
 import { getConversation } from '@/services/chat/chatApi'
 import { getAttachmentContent } from '@/services/files/fileApi'
 import type { ChatAttachment, ChatMessage } from '@/types/chat'
@@ -80,81 +80,29 @@ beforeEach(async () => {
   await i18n.changeLanguage('de')
 })
 
-describe('S1: a teacher\'s picture', () => {
-  it('is a thumbnail read from the student\'s attachment, named with the teacher', async () => {
+describe('S6: the wiring', () => {
+  it('reads an uploaded picture through the student\'s own attachments, and not one that failed', async () => {
+    contentMock.mockResolvedValue(new Blob(['png'], { type: 'image/png' }))
+    renderMessage(message('teacher', [
+      picture({ id: 'att-gone', filename: 'weg.png', status: 'failed' }),
+      picture(),
+    ]))
+
+    expect(await screen.findByRole('button', { name: fill(copy.open, { name: 'skizze.png' }) })).toBeInTheDocument()
+    expect(screen.getByText(copy.unavailable).parentElement).toHaveAttribute('title', 'weg.png')
+    expect(contentMock).toHaveBeenCalledTimes(1)
+    expect(contentMock).toHaveBeenCalledWith('att-1')
+  })
+
+  it('names the thumbnail with the teacher\'s name', async () => {
     contentMock.mockResolvedValue(new Blob(['png'], { type: 'image/png' }))
     renderMessage(message('teacher', [picture()]))
 
     const open = await screen.findByRole('button', { name: fill(copy.open, { name: 'skizze.png' }) })
-    const thumbnail = within(open).getByRole('img')
-    expect(thumbnail).toHaveAttribute('alt', fill(copy.alt, { teacher: 'Frau Keller', name: 'skizze.png' }))
-    expect(thumbnail).toHaveAttribute('src', 'blob:test/1')
-    expect(contentMock).toHaveBeenCalledWith('att-1')
-    expect(screen.getByRole('list', { name: copy.label })).toBeInTheDocument()
-  })
-
-  it('opens larger', async () => {
-    contentMock.mockResolvedValue(new Blob(['png'], { type: 'image/png' }))
-    renderMessage(message('teacher', [picture()]))
-
-    await userEvent.click(await screen.findByRole('button', { name: fill(copy.open, { name: 'skizze.png' }) }))
-
-    const dialog = await screen.findByRole('dialog')
-    expect(within(dialog).getByRole('heading', { name: 'skizze.png' })).toBeInTheDocument()
-    expect(within(dialog).getByRole('img')).toHaveAttribute('src', 'blob:test/1')
-  })
-
-  it('reads the student\'s own route, as a blob', async () => {
-    const get = vi.spyOn(httpClient, 'get').mockResolvedValue({ data: new Blob(['png']) } as never)
-    const real = await vi.importActual<typeof import('@/services/files/fileApi')>('@/services/files/fileApi')
-
-    await real.getAttachmentContent('att-1')
-
-    expect(get).toHaveBeenCalledWith('/files/attachments/att-1/content', { responseType: 'blob' })
-    get.mockRestore()
-  })
-})
-
-describe('S2: a picture that cannot be shown', () => {
-  it('is a placeholder when it was removed, and nothing is read', async () => {
-    renderMessage(message('teacher', [picture({ status: 'failed' })]))
-
-    expect(screen.getByText(copy.unavailable)).toBeInTheDocument()
-    expect(contentMock).not.toHaveBeenCalled()
-  })
-
-  it.each([403, 404])('is a placeholder when the read is refused with %i', async (status) => {
-    contentMock.mockRejectedValue(new ApiError('no', { status }))
-    renderMessage(message('teacher', [picture()]))
-
-    expect(await screen.findByText(copy.unavailable)).toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: fill(copy.retryNamed, { name: 'skizze.png' }) })).not.toBeInTheDocument()
-  })
-
-  it('is a placeholder when what came back is not a picture the browser draws', async () => {
-    contentMock.mockResolvedValue(new Blob(['<svg/>'], { type: 'image/svg+xml' }))
-    renderMessage(message('teacher', [picture()]))
-
-    expect(await screen.findByText(copy.unavailable)).toBeInTheDocument()
-    expect(URL.createObjectURL).not.toHaveBeenCalled()
-  })
-
-  it('offers to load it again after any other failure', async () => {
-    contentMock.mockRejectedValue(new ApiError('down', { status: 500 }))
-    renderMessage(message('teacher', [picture()]))
-
-    // After the one retry the app gives any read.
-    expect(await screen.findByText(copy.failed, undefined, { timeout: 4_000 })).toBeInTheDocument()
-    expect(contentMock).toHaveBeenCalledTimes(2)
-
-    contentMock.mockResolvedValue(new Blob(['png'], { type: 'image/png' }))
-    // Its name starts with what it says on it (WCAG 2.5.3, label in name).
-    const retry = screen.getByRole('button', { name: fill(copy.retryNamed, { name: 'skizze.png' }) })
-    expect(retry.getAttribute('aria-label')?.startsWith(retry.textContent ?? '')).toBe(true)
-    await userEvent.click(retry)
-
-    expect(await screen.findByRole('button', { name: fill(copy.open, { name: 'skizze.png' }) })).toBeInTheDocument()
-    expect(contentMock).toHaveBeenCalledTimes(3)
+    expect(within(open).getByRole('img')).toHaveAttribute(
+      'alt',
+      fill(copy.alt, { teacher: 'Frau Keller', name: 'skizze.png' }),
+    )
   })
 })
 
