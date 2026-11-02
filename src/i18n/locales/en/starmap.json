@@ -74,7 +74,16 @@
     "review_one": "Review {{count}} exercise",
     "review_other": "Review {{count}} exercises",
     "reviewSoon": "Coming soon",
-    "sheetDetails": "Shows or hides this star's details"
+    "sheetDetails": "Shows or hides this star's details",
+    "extension": "Extension",
+    "extensionNote": "Extension: a bonus when you do it. It does not count towards lighting the star.",
+    "lightFirst": "Light first:",
+    "earlierStages": "Finish the earlier stages of this star first.",
+    "stillOpen": "You can practise it now all the same.",
+    "practise": "Practise {{name}}",
+    "skillsLoading": "Loading this star’s small stars…",
+    "skillsFailed": "This star’s small stars could not be loaded.",
+    "skillsRetry": "Try again"
   },
   "state": {
     "lit": "Lit",

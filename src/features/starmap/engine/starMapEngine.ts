@@ -484,6 +484,7 @@ export class StarMapEngine {
       nebula: new Uint16Array(count),
       names: this.stars.map((star) => star.name),
       skills: this.stars.map((star) => star.skills.map((skill) => skill.lit)),
+      skillExtension: this.stars.map((star) => star.skills.map((skill) => skill.extension === true)),
       nebulae: nebulae.map((nebula) => {
         const disc = this.discs.get(nebula.topicId)!
         const members = map.stars.filter((star) => star.nebulaId === nebula.topicId)

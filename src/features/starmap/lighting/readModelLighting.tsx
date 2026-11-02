@@ -28,14 +28,14 @@ import {
 } from '@/features/starmap/lighting/lightingEvents'
 import { logger } from '@/services/logging'
 import { acknowledgeLitUnits } from '@/services/practice/practiceApi'
-import { practiceQueryKeys } from '@/services/practice/practiceQueryKeys'
+import { KNOWLEDGE_MAP_KEY } from '@/hooks/practice/useKnowledgeMapQuery'
 import type { KnowledgeMapResponse } from '@/types/practice'
 
 /** The most unit ids one acknowledgement may carry; over this the backend answers 422. */
 export const ACKNOWLEDGE_LIMIT = 50
 
 /** The sky's query: the whole sky under one key, as `readModelSource.tsx` asks for it. */
-const SKY_KEY = practiceQueryKeys.knowledgeMap('')
+const SKY_KEY = KNOWLEDGE_MAP_KEY
 
 /**
  * The moments waiting in a sky response: the points it lists as

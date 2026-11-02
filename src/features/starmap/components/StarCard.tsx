@@ -11,10 +11,14 @@ import { useId, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import type { JumpState } from '@/features/chapter/jump'
+import { skillPath } from '@/features/chapter/useChapter'
 import { starQuizPath } from '@/features/chapter/useChapter'
 import { formatRetryAt } from '@/features/chapter/useStarQuizRun'
 import { Button } from '@/components/base'
+import { ExtensionTag, SkillDot, SkillHints } from '@/features/starmap/components/SkillHints'
 import { StarGlyph } from '@/features/starmap/components/StarGlyph'
+import { isQuestionType, prerequisiteHints } from '@/features/starmap/model/skillPractice'
+import { useStarMapSource } from '@/features/starmap/starMapSource'
 import { pathForTarget } from '@/features/starmap/view/layers'
 import type { ReviewReturnState } from '@/features/starmap/view/reviewReturn'
 import { starLook, subjectOfNebula, type Nebula, type Star, type StarMap } from '@/features/starmap/model/starMap'
@@ -103,6 +107,9 @@ export function StarCardDetails({ map, demo = false, star }: { map: StarMap; dem
     .map((unitId) => map.stars.find((candidate) => candidate.unitId === unitId))
     .filter((candidate): candidate is Star => candidate !== undefined)
   const allLessonsDone = lessonCount > 0 && lessonsDone >= lessonCount
+  // Small stars as question types (#501) are listed one per line, each with its hints.
+  const questionTypes = star.skills.some((skill) => isQuestionType(skill, star.unitId))
+  const { retrySkills } = useStarMapSource()
   // The review's way back is to this star, not to the whole sky (#411).
   const reviewFrom: ReviewReturnState = {
     star: here(pathForTarget(subjectOfNebula(map, star.nebulaId), { layer: 'star', nebulaId: star.nebulaId, unitId: star.unitId })),
@@ -157,23 +164,68 @@ export function StarCardDetails({ map, demo = false, star }: { map: StarMap; dem
         </p>
       )}
 
+      {/* A skeleton's star whose small stars are on their way, not a star without any (#503). */}
+      {star.skillsKnown === false && !star.skillsFailed && (
+        <p data-skills-loading role="status" className="m-0 text-[13px] text-[color:var(--on-sky-text-caption)]">
+          {t('star.skillsLoading')}
+        </p>
+      )}
+      {star.skillsFailed && (
+        <div data-skills-failed className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[13px] text-[color:var(--on-sky-text-body)]">
+          <p role="alert" className="m-0">{t('star.skillsFailed')}</p>
+          <button
+            type="button"
+            onClick={retrySkills}
+            className="inline-flex min-h-11 items-center bg-transparent p-0 font-semibold text-[color:var(--on-sky-plain)] underline decoration-white/40 underline-offset-2 hover:opacity-70 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+          >
+            {t('star.skillsRetry')}
+          </button>
+        </div>
+      )}
+
       {star.skills.length > 0 && (
         <section aria-labelledby="starmap-star-skills" className="flex flex-col gap-1.5">
           <h2 id="starmap-star-skills" className="m-0 text-[13px] font-semibold text-[color:var(--on-sky-text-body)]">
             {t('star.skills')}
           </h2>
-          <ul className="m-0 flex list-none flex-wrap gap-x-3 gap-y-1.5 p-0">
+          <ul className={cn('m-0 flex list-none gap-y-1.5 p-0', questionTypes ? 'flex-col' : 'flex-wrap gap-x-3')}>
             {star.skills.map((skill) => (
-              <li key={skill.skillId} className="inline-flex items-center gap-1.5 text-[13px] text-on-sky">
-                <span
-                  aria-hidden="true"
-                  className={cn('inline-block size-2 rounded-full', skill.lit ? 'bg-lit' : 'border border-solid border-white/55')}
+              <li key={skill.skillId} data-skill={skill.skillId} className="flex flex-col gap-0.5 text-[13px] text-on-sky">
+                <span className="inline-flex flex-wrap items-center gap-1.5">
+                  <SkillDot skill={skill} />
+                  <span className="sr-only">{t(skill.lit ? 'star.skillLit' : 'star.skillDark', { name: skill.name })}</span>
+                  {/* A question type is a way into practice (#501); a ZAP skill is a name. */}
+                  {isQuestionType(skill, star.unitId) && !(demo && lessonCount === 0) ? (
+                    <Link
+                      to={skillPath(star.unitId, skill.skillId)}
+                      aria-label={t('star.practise', { name: skill.name })}
+                      className="inline-flex min-h-8 items-center font-semibold text-on-sky underline decoration-white/30 underline-offset-2 hover:opacity-70 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+                    >
+                      {skill.name}
+                    </Link>
+                  ) : (
+                    <span aria-hidden="true">{skill.name}</span>
+                  )}
+                  {skill.extension && <ExtensionTag />}
+                </span>
+                <SkillHints
+                  className="pl-3.5"
+                  hints={prerequisiteHints(skill, star.unitId, map)}
+                  to={(target) =>
+                    target.nebulaId
+                      ? here(pathForTarget(subjectOfNebula(map, target.nebulaId), { layer: 'star', nebulaId: target.nebulaId, unitId: target.unitId }))
+                      : null
+                  }
                 />
-                <span className="sr-only">{t(skill.lit ? 'star.skillLit' : 'star.skillDark', { name: skill.name })}</span>
-                <span aria-hidden="true">{skill.name}</span>
               </li>
             ))}
           </ul>
+          {star.skills.some((skill) => skill.extension) && (
+            <p data-skill-legend className="m-0 inline-flex items-center gap-1.5 text-[12px] text-[color:var(--on-sky-text-caption)]">
+              <SkillDot skill={{ lit: false, extension: true }} />
+              {t('star.extensionNote')}
+            </p>
+          )}
         </section>
       )}
 

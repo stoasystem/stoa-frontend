@@ -97,6 +97,8 @@ export type SceneData = {
   names: readonly string[]
   /** Each star's skills, lit or not (#9 point 10; `[]` until stoa-backend#58). */
   skills: readonly (readonly boolean[])[]
+  /** Beside `skills`: which are extension small stars (#501). Absent: none is. */
+  skillExtension?: readonly (readonly boolean[])[]
   nebulae: readonly {
     topicId: string
     name: string

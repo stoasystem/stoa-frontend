@@ -10,7 +10,7 @@
  * come from the star map's demo sky (`DEMO_KNOWLEDGE_POINT`), so the star and
  * its chapter cannot disagree.
  */
-import { DEMO_KNOWLEDGE_POINT, demoSky, localize, type Localized } from '@/dev/demo/sky/demoSky'
+import { DEMO_KNOWLEDGE_POINT, demoPracticeSets, demoSky, localize, type Localized } from '@/dev/demo/sky/demoSky'
 import type { LearningState } from '@/features/starmap/model/starMap'
 import type { SupportedLanguage } from '@/i18n/languages'
 import type {
@@ -93,7 +93,7 @@ const COSINE = L(
   "Coseno: il lato che tocca l'angolo, diviso per l'ipotenusa.",
 )
 
-/** Exercises per lesson, in the lessons' order. */
+/** Exercises per practice set, in the order of `demoPracticeSets()`: the core, then the extension. */
 const EXERCISES: ExerciseSpec[][] = [
   [
     {
@@ -270,6 +270,54 @@ const EXERCISES: ExerciseSpec[][] = [
       explanation: L('$20 \\cdot 0.5 = 10$', '$20 \\cdot 0{,}5 = 10$', '$20 \\cdot 0{,}5 = 10$', '$20 \\cdot 0{,}5 = 10$'),
     },
   ],
+  // The extension practice set (#501): reasoning about what the core practised.
+  [
+    {
+      type: 'multiple_choice',
+      prompt: L(
+        'Why can $\\sin\\alpha$ never be greater than 1 in a right triangle?',
+        'Warum ist $\\sin\\alpha$ im rechtwinkligen Dreieck nie grösser als 1?',
+        'Pourquoi $\\sin\\alpha$ ne peut-il jamais dépasser 1 dans un triangle rectangle ?',
+        'Perché $\\sin\\alpha$ non può mai superare 1 in un triangolo rettangolo?',
+      ),
+      options: [
+        L(
+          'The opposite side is never longer than the hypotenuse.',
+          'Die Gegenkathete ist nie länger als die Hypotenuse.',
+          "Le côté opposé n'est jamais plus long que l'hypoténuse.",
+          "Il cateto opposto non è mai più lungo dell'ipotenusa.",
+        ),
+        L('The angle $\\alpha$ is less than 90°.', 'Der Winkel $\\alpha$ ist kleiner als 90°.', "L'angle $\\alpha$ est inférieur à 90°.", "L'angolo $\\alpha$ è minore di 90°."),
+        L('The hypotenuse is always 1.', 'Die Hypotenuse ist immer 1.', "L'hypoténuse vaut toujours 1.", "L'ipotenusa vale sempre 1."),
+      ],
+      answer: 0,
+      hint: SOHCAHTOA,
+      explanation: L(
+        'A ratio of a part to something at least as long is at most 1.',
+        'Ein Teil geteilt durch etwas, das mindestens so lang ist, ergibt höchstens 1.',
+        "Une longueur divisée par une longueur au moins aussi grande donne au plus 1.",
+        'Una lunghezza divisa per una almeno altrettanto lunga dà al massimo 1.',
+      ),
+    },
+    {
+      type: 'multiple_choice',
+      prompt: L(
+        'Which statement holds for every angle $\\alpha$ of a right triangle?',
+        'Welche Aussage gilt für jeden Winkel $\\alpha$ eines rechtwinkligen Dreiecks?',
+        "Quelle affirmation est vraie pour tout angle $\\alpha$ d'un triangle rectangle ?",
+        'Quale affermazione vale per ogni angolo $\\alpha$ di un triangolo rettangolo?',
+      ),
+      options: [all('$\\sin^2\\alpha + \\cos^2\\alpha = 1$'), all('$\\sin\\alpha + \\cos\\alpha = 1$'), all('$\\sin\\alpha = \\cos\\alpha$')],
+      answer: 0,
+      hint: PYTHAGORAS,
+      explanation: L(
+        'Divide $a^2 + b^2 = c^2$ by $c^2$.',
+        'Teile $a^2 + b^2 = c^2$ durch $c^2$.',
+        'Divise $a^2 + b^2 = c^2$ par $c^2$.',
+        'Dividi $a^2 + b^2 = c^2$ per $c^2$.',
+      ),
+    },
+  ],
 ]
 
 const RIGHT = L('Right.', 'Richtig.', 'Juste.', 'Giusto.')
@@ -283,7 +331,9 @@ const NOT_YET = L(
 const { unitId, subjectId, topicId, gradeLevel } = DEMO_KNOWLEDGE_POINT
 const ESTIMATED_MINUTES = 10
 
-const challengeId = (lesson: number, exercise: number) => `${DEMO_KNOWLEDGE_POINT.lessons[lesson].lessonId}-e${exercise + 1}`
+const PRACTICE_SETS = demoPracticeSets()
+
+const challengeId = (lesson: number, exercise: number) => `${PRACTICE_SETS[lesson].lessonId}-e${exercise + 1}`
 
 function challengeOf(spec: ExerciseSpec, lesson: number, exercise: number, language: SupportedLanguage): PracticeChallenge {
   const options = spec.options?.map((option) => localize(option, language))
@@ -295,7 +345,7 @@ function challengeOf(spec: ExerciseSpec, lesson: number, exercise: number, langu
         : localize(spec.answer, language)
   return {
     challengeId: challengeId(lesson, exercise),
-    lessonId: DEMO_KNOWLEDGE_POINT.lessons[lesson].lessonId,
+    lessonId: PRACTICE_SETS[lesson].lessonId,
     unitId,
     subjectId,
     gradeLevel,
@@ -321,7 +371,7 @@ export const DEMO_COMPLETED_LESSONS: readonly string[] = DEMO_KNOWLEDGE_POINT.le
   .map((lesson) => lesson.lessonId)
 
 export function demoLessons(language: SupportedLanguage = 'en', completed: readonly string[] = DEMO_COMPLETED_LESSONS): PracticeLesson[] {
-  return DEMO_KNOWLEDGE_POINT.lessons.map((lesson, index) => ({
+  return PRACTICE_SETS.map((lesson, index) => ({
     id: lesson.lessonId,
     unitId,
     subjectId,
@@ -359,7 +409,7 @@ export function demoCatalog(language: SupportedLanguage = 'en'): CurriculumCatal
     units: [
       { id: unitId, subjectId, gradeLevel, topicId, title: localize(DEMO_KNOWLEDGE_POINT.name, language), description: '', rolloutState: 'active', order: 1 },
     ],
-    lessons: DEMO_KNOWLEDGE_POINT.lessons.map((lesson, index) => ({
+    lessons: PRACTICE_SETS.map((lesson, index) => ({
       id: lesson.lessonId,
       subjectId,
       gradeLevel,
@@ -384,7 +434,7 @@ export function demoCatalog(language: SupportedLanguage = 'en'): CurriculumCatal
  * completed, the first other one current, the rest open.
  */
 export function demoRoadmap(completed: readonly string[] = DEMO_COMPLETED_LESSONS, language: SupportedLanguage = 'en'): PracticeRoadmap {
-  const lessons = DEMO_KNOWLEDGE_POINT.lessons
+  const lessons = PRACTICE_SETS
   const current = lessons.find((lesson) => !completed.includes(lesson.lessonId))?.lessonId
   const progress = lessons.filter((lesson) => completed.includes(lesson.lessonId)).length / lessons.length
   return {
@@ -417,7 +467,7 @@ export function demoRoadmap(completed: readonly string[] = DEMO_COMPLETED_LESSON
   }
 }
 
-/** The demo knowledge point's learning state after `completed`: lit once every lesson is done. */
+/** The demo knowledge point's learning state after `completed`: lit once every core lesson is done (#501). */
 export function demoKnowledgePointState(completed: readonly string[] = DEMO_COMPLETED_LESSONS): LearningState {
   const done = DEMO_KNOWLEDGE_POINT.lessons.filter((lesson) => completed.includes(lesson.lessonId)).length
   return done === DEMO_KNOWLEDGE_POINT.lessons.length ? 'lit' : done > 0 ? 'in_progress' : 'ready'
@@ -462,7 +512,7 @@ export function demoHint(id: string, language: SupportedLanguage = 'en'): Practi
 
 /** `POST /practice/lessons/:id/complete` for a demo lesson. Null for any other id. */
 export function demoLessonResult(lessonId: string, correctCount?: number): PracticeLessonResult | null {
-  const index = DEMO_KNOWLEDGE_POINT.lessons.findIndex((lesson) => lesson.lessonId === lessonId)
+  const index = PRACTICE_SETS.findIndex((lesson) => lesson.lessonId === lessonId)
   if (index < 0) return null
   const totalCount = EXERCISES[index].length
   return {
