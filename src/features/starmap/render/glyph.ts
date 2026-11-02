@@ -1,8 +1,18 @@
 /*
  * The star glyph, measured off the canvas board "Knowledge point glyph":
- * layers, not a disc -- halo, lens star, hairline ring, core. Two cuts:
- * `large` from the 120 box, `small` from the 18 box (small glyphs are drawn
- * bolder, and at map scale only the star and halo survive).
+ * layers, not a disc. Two cuts: `large` from the 120 box, `small` from the
+ * 18 box (small glyphs are drawn bolder, and at map scale only the star and
+ * glow survive).
+ *
+ * A lit star is drawn the way the sign-in page's nebula (`LoginNebula`) and
+ * the lighting flare draw theirs: light, not a sticker. Its glow is a radial
+ * gradient that thins to nothing, not a blurred disc with an edge; its four
+ * rays are white-hot at the centre and fade out toward their tips; a fainter
+ * cross of short rays sits between them, the flare's glint at rest; and the
+ * core is a point of light with a soft edge. The hairline ring the board drew
+ * round a lit star is gone: with a flat fill inside it, it read as a badge,
+ * and a bare star is what says "lit" on the dots and the legend already. An
+ * in-progress star keeps its ring, which is its progress.
  *
  * The board's fifth glyph, "Next", is the recommendation marker now (#9
  * point 8): a dashed ring and faint halo laid over whatever state the star is
@@ -27,10 +37,50 @@
  */
 export const WAITING_RING_ALPHA = 0.55
 
+/**
+ * A glowing star: `glow` is the radius its light fades out at (from
+ * `glowAlpha` at the centre), `tip` and `waist` the four rays, `glint` and
+ * `glintWaist` the short diagonal ones between them at `glintAlpha`, and
+ * `core` the white-hot point.
+ */
+export type StarLight = {
+  glow: number
+  glowAlpha: number
+  tip: number
+  waist: number
+  starAlpha: number
+  glint: number
+  glintWaist: number
+  glintAlpha: number
+  core: number
+}
+
+/**
+ * How light falls off along a ray and across the glow, as [offset, alpha]
+ * stops: the same curve as `LoginNebula`'s glow (0.45, 0.14 at 0.4, none at
+ * the edge), scaled to a fill's own alpha.
+ */
+export const GLOW_STOPS: readonly (readonly [number, number])[] = [
+  [0, 1],
+  [0.4, 0.31],
+  [1, 0],
+]
+
+/** A ray's fill from the centre out: the core's white, then gold, thinning to the tip. */
+export const RAY_STOPS: readonly (readonly [number, 'core' | 'lit', number])[] = [
+  [0, 'core', 1],
+  [0.22, 'lit', 1],
+  [0.6, 'lit', 0.7],
+  [1, 'lit', 0.08],
+]
+
+/** The core's soft edge: solid to `solid` of its radius, then out to nothing. */
+export const CORE_SOLID = 0.45
+
 export type GlyphCut = {
   box: number
-  lit: { halo: number; haloAlpha: number; blur: number; tip: number; waist: number; starAlpha: number; ring: number; ringWidth: number; ringAlpha: number; core: number }
-  inProgress: { halo: number; haloAlpha: number; blur: number; tip: number; waist: number; starAlpha: number; ring: number; ringWidth: number; trackAlpha: number; core: number }
+  lit: StarLight
+  inProgress: StarLight & { ring: number; ringWidth: number; trackAlpha: number }
   ready: { ring: number; ringWidth: number; ringAlpha: number; core: number; coreAlpha: number }
   waiting: { ring: number; ringWidth: number; ringAlpha: number }
   recommended: { halo: number; haloAlpha: number; blur: number; ring: number; ringWidth: number; dash: readonly [number, number] }
@@ -39,8 +89,8 @@ export type GlyphCut = {
 
 export const GLYPH_LARGE: GlyphCut = {
   box: 120,
-  lit: { halo: 46.2, haloAlpha: 0.26, blur: 6, tip: 44, waist: 15, starAlpha: 0.85, ring: 20.9, ringWidth: 1.6, ringAlpha: 0.55, core: 9.2 },
-  inProgress: { halo: 52.8, haloAlpha: 0.3, blur: 6, tip: 31.9, waist: 10.8, starAlpha: 0.75, ring: 28.4, ringWidth: 3.5, trackAlpha: 0.16, core: 8.4 },
+  lit: { glow: 52, glowAlpha: 0.42, tip: 48, waist: 6.5, starAlpha: 1, glint: 26, glintWaist: 2.6, glintAlpha: 0.75, core: 10 },
+  inProgress: { glow: 46, glowAlpha: 0.36, tip: 33, waist: 5, starAlpha: 0.95, glint: 18, glintWaist: 2, glintAlpha: 0.65, core: 8.4, ring: 28.4, ringWidth: 3.5, trackAlpha: 0.16 },
   ready: { ring: 17.6, ringWidth: 1.6, ringAlpha: 0.55, core: 4.4, coreAlpha: 0.75 },
   waiting: { ring: 17.6, ringWidth: 1.6, ringAlpha: WAITING_RING_ALPHA },
   recommended: { halo: 44, haloAlpha: 0.14, blur: 6, ring: 34, ringWidth: 1.6, dash: [4.8, 6.4] },
@@ -49,8 +99,8 @@ export const GLYPH_LARGE: GlyphCut = {
 
 export const GLYPH_SMALL: GlyphCut = {
   box: 18,
-  lit: { halo: 10.6, haloAlpha: 0.26, blur: 2, tip: 10.1, waist: 3.4, starAlpha: 0.85, ring: 4.8, ringWidth: 0.8, ringAlpha: 0.55, core: 2.1 },
-  inProgress: { halo: 12.1, haloAlpha: 0.3, blur: 2, tip: 7.3, waist: 2.5, starAlpha: 0.75, ring: 7.8, ringWidth: 1.5, trackAlpha: 0.16, core: 1.9 },
+  lit: { glow: 11.5, glowAlpha: 0.42, tip: 10.6, waist: 2, starAlpha: 1, glint: 5.4, glintWaist: 0.8, glintAlpha: 0.7, core: 2.4 },
+  inProgress: { glow: 10.5, glowAlpha: 0.36, tip: 7.3, waist: 1.5, starAlpha: 0.95, glint: 3.8, glintWaist: 0.6, glintAlpha: 0.6, core: 1.9, ring: 7.8, ringWidth: 1.5, trackAlpha: 0.16 },
   ready: { ring: 4, ringWidth: 0.8, ringAlpha: 0.55, core: 1, coreAlpha: 0.75 },
   waiting: { ring: 4, ringWidth: 0.8, ringAlpha: WAITING_RING_ALPHA },
   recommended: { halo: 10.1, haloAlpha: 0.14, blur: 2, ring: 8.6, ringWidth: 0.8, dash: [2.1, 2.8] },
@@ -72,7 +122,7 @@ export const SMALL_CUT_BELOW = 30
  */
 export type DotCut = {
   box: number
-  lit: { tip: number; waist: number; core: number }
+  lit: { tip: number; waist: number; core: number; glint: number; glintWaist: number; glintAlpha: number }
   inProgress: { tip: number; waist: number; ring: number; ringWidth: number; core: number }
   ready: { ring: number; ringWidth: number; core: number }
   waiting: { ring: number; ringWidth: number }
@@ -83,11 +133,11 @@ export type DotCut = {
 
 export const DOT_CUT: DotCut = {
   box: 18,
-  lit: { tip: 7.7, waist: 2.7, core: 2 },
-  inProgress: { tip: 5.6, waist: 1.9, ring: 7.2, ringWidth: 1.3, core: 1.7 },
+  lit: { tip: 8.6, waist: 1.3, core: 1.6, glint: 4.6, glintWaist: 0.6, glintAlpha: 0.7 },
+  inProgress: { tip: 5.8, waist: 1.05, ring: 7.2, ringWidth: 1.3, core: 1.5 },
   ready: { ring: 6.1, ringWidth: 1.35, core: 2.3 },
   waiting: { ring: 6.5, ringWidth: 1.35 },
-  halo: { radius: 4, blur: 2.2, alpha: 0.3 },
+  halo: { radius: 4, blur: 2.2, alpha: 0.42 },
   review: { offset: 7.2, radius: 2, outline: 0.9 },
 }
 
@@ -137,6 +187,20 @@ export function starPath(tip: number, waist: number, cx = 0, cy = 0): string {
     `Q${f(cx + waist)} ${f(cy + waist)} ${f(cx)} ${f(cy + tip)}`,
     `Q${f(cx - waist)} ${f(cy + waist)} ${f(cx - tip)} ${f(cy)}`,
     `Q${f(cx - waist)} ${f(cy - waist)} ${f(cx)} ${f(cy - tip)}`,
+    'Z',
+  ].join(' ')
+}
+
+/** The glint: the lens star turned an eighth, its points on the diagonals. */
+export function glintPath(tip: number, waist: number): string {
+  const f = (n: number) => n.toFixed(2)
+  const d = tip / Math.SQRT2
+  return [
+    `M${f(d)} ${f(-d)}`,
+    `Q${f(waist * Math.SQRT2)} 0 ${f(d)} ${f(d)}`,
+    `Q0 ${f(waist * Math.SQRT2)} ${f(-d)} ${f(d)}`,
+    `Q${f(-waist * Math.SQRT2)} 0 ${f(-d)} ${f(-d)}`,
+    `Q0 ${f(-waist * Math.SQRT2)} ${f(d)} ${f(-d)}`,
     'Z',
   ].join(' ')
 }
