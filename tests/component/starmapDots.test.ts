@@ -36,16 +36,27 @@ beforeEach(() => vi.stubGlobal('Path2D', class {}))
 const STATES = [STATE_LIT, STATE_IN_PROGRESS, STATE_READY, STATE_WAITING]
 const NAMES: Record<number, string> = { [STATE_LIT]: 'lit', [STATE_IN_PROGRESS]: 'in progress', [STATE_READY]: 'ready', [STATE_WAITING]: 'locked' }
 
-/** What one mark put on the canvas: filled paths, filled discs and stroked rings, with their radii. */
+/**
+ * What one mark put on the canvas: filled paths, filled discs and stroked
+ * rings, with their radii. A disc filled with a gradient is the glow; a star
+ * filled with one is still the star (its rays fade to their tips).
+ */
 type Mark = { star: boolean; discs: number[]; rings: { r: number; width: number }[]; glow: boolean }
 
 function markOf(state: number, part: 'both' | 'glow' | 'core' = 'both'): Mark {
   const mark: Mark = { star: false, discs: [], rings: [], glow: false }
   let radius = 0
   let lineWidth = 0
+  let fillStyle: unknown = ''
+  const gradients = new Set<unknown>()
   const ctx = {
     globalAlpha: 1,
-    fillStyle: '',
+    get fillStyle() {
+      return fillStyle
+    },
+    set fillStyle(value: unknown) {
+      fillStyle = value
+    },
     strokeStyle: '',
     get lineWidth() {
       return lineWidth
@@ -54,8 +65,9 @@ function markOf(state: number, part: 'both' | 'glow' | 'core' = 'both'): Mark {
       lineWidth = value
     },
     createRadialGradient: () => {
-      mark.glow = true
-      return { addColorStop() {} }
+      const gradient = { addColorStop() {} }
+      gradients.add(gradient)
+      return gradient
     },
     beginPath: () => undefined,
     arc: (_x: number, _y: number, r: number) => {
@@ -63,19 +75,12 @@ function markOf(state: number, part: 'both' | 'glow' | 'core' = 'both'): Mark {
     },
     fill: (path?: unknown) => {
       if (path) mark.star = true
-      else if (!mark.glow || radius !== 0) mark.discs.push(radius)
+      else if (gradients.has(fillStyle)) mark.glow = true
+      else mark.discs.push(radius)
     },
     stroke: () => mark.rings.push({ r: radius, width: lineWidth }),
   } as unknown as CanvasRenderingContext2D
-  // The halo fills the whole gradient disc; count it as the glow, not a core.
-  const before = { ...mark }
-  void before
   drawDotMark(ctx, DOT_CUT, state, THEME, part)
-  // The halo's own fill carries the gradient: drop the largest disc when it glowed.
-  if (mark.glow && part !== 'core' && mark.discs.length > 0) {
-    const widest = Math.max(...mark.discs)
-    mark.discs.splice(mark.discs.indexOf(widest), 1)
-  }
   return mark
 }
 

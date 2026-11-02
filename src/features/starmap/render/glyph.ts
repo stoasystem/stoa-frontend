@@ -123,7 +123,7 @@ export const SMALL_CUT_BELOW = 30
 export type DotCut = {
   box: number
   lit: { tip: number; waist: number; core: number; glint: number; glintWaist: number; glintAlpha: number }
-  inProgress: { tip: number; waist: number; ring: number; ringWidth: number; core: number }
+  inProgress: { tip: number; waist: number; ring: number; ringWidth: number; ringAlpha: number; core: number }
   ready: { ring: number; ringWidth: number; core: number }
   waiting: { ring: number; ringWidth: number }
   /** The soft glow under a lit or in-progress dot. */
@@ -133,10 +133,10 @@ export type DotCut = {
 
 export const DOT_CUT: DotCut = {
   box: 18,
-  lit: { tip: 8.6, waist: 1.3, core: 1.6, glint: 4.6, glintWaist: 0.6, glintAlpha: 0.7 },
-  inProgress: { tip: 5.8, waist: 1.05, ring: 7.2, ringWidth: 1.3, core: 1.5 },
-  ready: { ring: 6.1, ringWidth: 1.35, core: 2.3 },
-  waiting: { ring: 6.5, ringWidth: 1.35 },
+  lit: { tip: 8.6, waist: 1.15, core: 1.3, glint: 4.8, glintWaist: 0.55, glintAlpha: 0.8 },
+  inProgress: { tip: 5.6, waist: 0.95, ring: 7.4, ringWidth: 1, ringAlpha: 0.8, core: 1.2 },
+  ready: { ring: 6.3, ringWidth: 1.1, core: 1.9 },
+  waiting: { ring: 6.5, ringWidth: 1.1 },
   halo: { radius: 4, blur: 2.2, alpha: 0.42 },
   review: { offset: 7.2, radius: 2, outline: 0.9 },
 }
