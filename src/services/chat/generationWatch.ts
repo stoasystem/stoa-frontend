@@ -55,6 +55,7 @@ export function watchGeneration({
   signal,
   onSteps,
   requestDone = false,
+  read = getGenerationProgress,
 }: {
   conversationId: string
   idempotencyKey: string
@@ -62,6 +63,8 @@ export function watchGeneration({
   signal: AbortSignal
   onSteps: (steps: string[]) => void
   requestDone?: boolean
+  /** How the command is read: `GET /conversations/:id/generation`, unless Ask has another server behind it (#571). */
+  read?: typeof getGenerationProgress
 }) {
   let settled = requestDone
   const startedAt = Date.now()
@@ -78,7 +81,7 @@ export function watchGeneration({
       // already there, so the command is read before the wait is given up (#402).
       const overdue = Date.now() - startedAt > GENERATION_WAIT_LIMIT_MS
       try {
-        const state = await getGenerationProgress(conversationId, signal, idempotencyKey)
+        const state = await read(conversationId, signal, idempotencyKey)
         failures = 0
         if (state.steps.length > 0 && (state.status != null || state.updatedAt >= askedAt)) {
           onSteps(state.steps)

@@ -1,9 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
-import {
-  getMyMemorySummary,
-  type MemoryRecommendation,
-  type MemorySummaryResponse,
-} from '@/services/learning/memoryApi'
+import { useAskServer } from '@/features/ask/server/askServer'
+import type { MemoryRecommendation, MemorySummaryResponse } from '@/services/learning/memoryApi'
 import type { WeakTopic } from '@/types/dashboard'
 
 export const memoryQueryKeys = {
@@ -20,6 +17,7 @@ const MAX_RECOMMENDATIONS = 3
 const URGENT_REPEAT_COUNT = 4
 
 function useMemorySummaryQuery(subject?: string) {
+  const { getMyMemorySummary } = useAskServer().memory
   return useQuery<MemorySummaryResponse>({
     queryKey: memoryQueryKeys.summary(subject),
     queryFn: () => getMyMemorySummary(subject),

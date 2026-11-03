@@ -1,10 +1,11 @@
 import { useQuery } from '@tanstack/react-query'
-import { getConversations } from '@/services/chat/chatApi'
+import { useAskServer } from '@/features/ask/server/askServer'
 import { chatQueryKeys } from '@/services/chat/chatQueryKeys'
 
 export function useConversationsQuery() {
+  const { getConversations } = useAskServer().conversations
   return useQuery({
     queryKey: chatQueryKeys.conversations(),
-    queryFn: getConversations,
+    queryFn: () => getConversations(),
   })
 }

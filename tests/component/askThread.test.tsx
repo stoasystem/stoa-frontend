@@ -12,56 +12,31 @@ import { I18nextProvider } from 'react-i18next'
 import { MemoryRouter } from 'react-router-dom'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { AskHost } from '@/features/ask/AskHost'
+import { AskServerProvider } from '@/features/ask/server/askServer'
 import i18n from '@/i18n'
-import { ApiError } from '@/services/api/httpClient'
 import { resetAsk, useAskStore } from '@/store/askStore'
 import { type CurrentUser, useAuthStore } from '@/store/authStore'
 import type { ChatMessage, Conversation } from '@/types/chat'
 import type { TeacherHelpRequest } from '@/types/teacherHelp'
+import { createFakeAskServer, type FakeAskServer } from '../fakes/askServer'
 
-vi.mock('@/services/analytics/analyticsClient', () => ({ trackEvent: vi.fn() }))
-vi.mock('@/services/chat/commandMessageIds', () => ({
-  commandMessageIds: vi.fn(async (conversationId: string, key: string) => ({
-    studentMessageId: `student:${conversationId}:${key}`,
-    assistantMessageId: `assistant:${conversationId}:${key}`,
-  })),
-}))
-vi.mock('@/services/chat/chatApi', () => ({
-  getConversations: vi.fn(),
-  getConversation: vi.fn(),
-  createConversation: vi.fn(),
-}))
-vi.mock('@/services/chat/chatStreamApi', () => ({
-  streamConversationMessage: vi.fn(),
-  getGenerationProgress: vi.fn(),
-}))
-vi.mock('@/services/teacherHelp/teacherHelpApi', () => ({
-  getTeacherAvailability: vi.fn(),
-  getTeacherHelpRequest: vi.fn(),
-  createTeacherHelpRequest: vi.fn(),
-}))
-vi.mock('@/services/student/studentApi', () => ({
-  getStudentProfile: vi.fn(async () => ({ grade: '8', primarySubjects: ['math'] })),
-}))
-vi.mock('@/services/learning/memoryApi', () => ({
-  getMyMemorySummary: vi.fn(async () => ({ recommendations: [], weakTopics: [] })),
-}))
+/** The server behind Ask, in memory: each test seeds what it reads (#571). */
+let server: FakeAskServer
+let getConversationMock: FakeAskServer['conversations']['getConversation']
+let streamMock: FakeAskServer['stream']['streamConversationMessage']
+let progressMock: FakeAskServer['stream']['getGenerationProgress']
+let helpStatusMock: FakeAskServer['teacherHelp']['getTeacherHelpRequest']
+let requestHelpMock: FakeAskServer['teacherHelp']['createTeacherHelpRequest']
 
-import { getConversation, getConversations } from '@/services/chat/chatApi'
-import { getGenerationProgress, streamConversationMessage } from '@/services/chat/chatStreamApi'
-import {
-  createTeacherHelpRequest,
-  getTeacherAvailability,
-  getTeacherHelpRequest,
-} from '@/services/teacherHelp/teacherHelpApi'
+/** What conversation c1 reads back from now on. */
+function readBack(messages: ChatMessage[]) {
+  server.seed({ conversations: [conversation(messages)] })
+}
 
-const getConversationMock = vi.mocked(getConversation)
-const streamMock = vi.mocked(streamConversationMessage)
-const progressMock = vi.mocked(getGenerationProgress)
-const helpStatusMock = vi.mocked(getTeacherHelpRequest)
-const requestHelpMock = vi.mocked(createTeacherHelpRequest)
-
-const NEVER_ESCALATED = new ApiError('This conversation was never escalated to a teacher', { status: 404 })
+/** The conversation's request for a teacher, as the server reports it from now on. */
+function helpIs(request: TeacherHelpRequest) {
+  server.seed({ helpRequests: [request] })
+}
 
 function message(id: string, role: ChatMessage['role'], content: string): ChatMessage {
   return { id, conversationId: 'c1', role, content, createdAt: '2026-09-28T10:00:00.000Z', status: 'completed' }
@@ -104,7 +79,9 @@ function openAsk() {
     <I18nextProvider i18n={i18n}>
       <QueryClientProvider client={client}>
         <MemoryRouter initialEntries={['/ask/c1']}>
-          <AskHost route={{ conversationId: 'c1' }} />
+          <AskServerProvider value={server}>
+            <AskHost route={{ conversationId: 'c1' }} />
+          </AskServerProvider>
         </MemoryRouter>
       </QueryClientProvider>
     </I18nextProvider>,
@@ -139,9 +116,13 @@ beforeEach(async () => {
     isAuthenticated: true,
   })
   resetAsk()
-  vi.mocked(getConversations).mockResolvedValue({ items: [] })
-  vi.mocked(getTeacherAvailability).mockResolvedValue({ online: true, availableTeachers: 2 })
-  helpStatusMock.mockRejectedValue(NEVER_ESCALATED)
+  // No conversations listed, teachers online, and c1 never escalated: the fake's own defaults.
+  server = createFakeAskServer()
+  getConversationMock = server.conversations.getConversation
+  streamMock = server.stream.streamConversationMessage
+  progressMock = server.stream.getGenerationProgress
+  helpStatusMock = server.teacherHelp.getTeacherHelpRequest
+  requestHelpMock = server.teacherHelp.createTeacherHelpRequest
 })
 
 afterEach(() => {
@@ -153,20 +134,9 @@ afterEach(() => {
 
 describe('sending a message', () => {
   it('shows the answer once the command ends, after the request only stored the message (202)', async () => {
-    let answered = false
-    getConversationMock.mockImplementation(async () =>
-      conversation(
-        answered
-          ? [message('s1', 'student', 'Is x = 5?'), message('a1', 'assistant', 'Yes: 3 · 5 + 5 = 20.')]
-          : [],
-      ),
-    )
-    streamMock.mockResolvedValue('accepted')
-    progressMock.mockImplementation(async () =>
-      answered
-        ? { conversationId: 'c1', steps: [], updatedAt: new Date().toISOString(), status: 'completed' }
-        : { conversationId: 'c1', steps: ['Checking your steps'], updatedAt: '2099-01-01T00:00:00.000Z', status: 'ai_running' },
-    )
+    readBack([])
+    // Only stored: the command runs, with its steps, until the server has the answer.
+    server.answerWith({ outcome: 'accepted', steps: ['Checking your steps'] })
     const ask = openAsk()
     await ask.findByText('Linear equations')
 
@@ -179,7 +149,9 @@ describe('sending a message', () => {
     expect(announcer()).toBeEmptyDOMElement()
     expect(streamMock.mock.calls[0][0].payload).toMatchObject({ content: 'Is x = 5?' })
 
-    answered = true
+    readBack([message('s1', 'student', 'Is x = 5?'), message('a1', 'assistant', 'Yes: 3 · 5 + 5 = 20.')])
+    const { idempotencyKey } = streamMock.mock.calls[0][0].payload
+    server.seed({ generations: [{ conversationId: 'c1', idempotencyKey, status: 'completed' }] })
     await advance(3000)
     expect(await thread(ask).findByText('Yes: 3 · 5 + 5 = 20.')).toBeInTheDocument()
     // Read out once, whole, when it is finished.
@@ -194,26 +166,15 @@ describe('sending a message', () => {
       'stoa_pending_chat_message:c1',
       JSON.stringify({ idempotencyKey: 'k-1', content: 'What is a prime?', askedAt: '2026-09-28T10:00:00.000Z' }),
     )
-    let answered = false
-    getConversationMock.mockImplementation(async () =>
-      conversation(
-        answered
-          ? [message('s1', 'student', 'What is a prime?'), message('a1', 'assistant', 'A number with exactly two divisors.')]
-          : [],
-      ),
-    )
-    progressMock.mockImplementation(async () => ({
-      conversationId: 'c1',
-      steps: [],
-      updatedAt: new Date().toISOString(),
-      status: answered ? 'completed' : 'ai_running',
-    }))
+    readBack([])
+    server.seed({ generations: [{ conversationId: 'c1', idempotencyKey: 'k-1', status: 'ai_running' }] })
     const ask = openAsk()
 
     expect(await ask.findByText('What is a prime?')).toBeInTheDocument()
     expect(ask.getByText('Thinking…')).toBeInTheDocument()
 
-    answered = true
+    readBack([message('s1', 'student', 'What is a prime?'), message('a1', 'assistant', 'A number with exactly two divisors.')])
+    server.seed({ generations: [{ conversationId: 'c1', idempotencyKey: 'k-1', status: 'completed' }] })
     await advance(1100)
     expect(await thread(ask).findByText('A number with exactly two divisors.')).toBeInTheDocument()
     expect(streamMock).not.toHaveBeenCalled()
@@ -221,10 +182,9 @@ describe('sending a message', () => {
   })
 
   it('offers to send a failed message again, as the same message', async () => {
-    getConversationMock.mockResolvedValue(conversation([]))
-    streamMock.mockRejectedValueOnce(new TypeError('Failed to fetch')).mockResolvedValue('streamed')
-    // The server never stored it: the same key is a first send.
-    progressMock.mockRejectedValue(new ApiError('not found', { status: 404, code: 'message_command_not_found' }))
+    readBack([])
+    // The server never stored it, so it holds no command under its key: the same key is a first send.
+    server.refuseNextWith(new TypeError('Failed to fetch'))
     const ask = openAsk()
     await ask.findByText('Linear equations')
 
@@ -243,12 +203,10 @@ describe('sending a message', () => {
 
 describe('the teacher status card', () => {
   it('shows the request as the server reports it, not as the request answered', async () => {
-    getConversationMock.mockResolvedValue(
-      conversation([message('s1', 'student', 'Is x = 5?'), message('a1', 'assistant', 'Yes.')]),
-    )
+    readBack([message('s1', 'student', 'Is x = 5?'), message('a1', 'assistant', 'Yes.')])
     // The POST answers one thing; the card must show what the server says when read.
-    requestHelpMock.mockImplementation(async () => {
-      helpStatusMock.mockResolvedValue(help('pending'))
+    requestHelpMock.mockImplementationOnce(async () => {
+      helpIs(help('pending'))
       return help('in_progress', 'Posted Name')
     })
     const ask = openAsk()
@@ -269,25 +227,23 @@ describe('the teacher status card', () => {
   })
 
   it('moves on when the server does, pending → assigned → in progress → resolved', async () => {
-    getConversationMock.mockResolvedValue(
-      conversation([message('s1', 'student', 'Is x = 5?'), message('a1', 'assistant', 'Yes.')]),
-    )
-    helpStatusMock.mockResolvedValue(help('pending'))
+    readBack([message('s1', 'student', 'Is x = 5?'), message('a1', 'assistant', 'Yes.')])
+    helpIs(help('pending'))
     const ask = openAsk()
     const card = await ask.findByRole('region', { name: 'Teacher support' })
     expect(card).toHaveAttribute('data-help-status', 'pending')
 
-    helpStatusMock.mockResolvedValue(help('assigned', 'Ms Bergmann'))
+    helpIs(help('assigned', 'Ms Bergmann'))
     await advance(15_100)
     await waitFor(() => expect(card).toHaveAttribute('data-help-status', 'assigned'))
     expect(within(card).getByText('Ms Bergmann will join this conversation')).toBeInTheDocument()
 
-    helpStatusMock.mockResolvedValue(help('in_progress', 'Ms Bergmann'))
+    helpIs(help('in_progress', 'Ms Bergmann'))
     await advance(5_100)
     await waitFor(() => expect(card).toHaveAttribute('data-help-status', 'in_progress'))
     expect(within(card).getByText('Ms Bergmann is helping you')).toBeInTheDocument()
 
-    helpStatusMock.mockResolvedValue(help('resolved', 'Ms Bergmann'))
+    helpIs(help('resolved', 'Ms Bergmann'))
     await advance(5_100)
     await waitFor(() => expect(card).toHaveAttribute('data-help-status', 'resolved'))
     expect(within(card).getByText('Resolved')).toBeInTheDocument()
@@ -301,11 +257,9 @@ describe('the teacher status card', () => {
   // the request, both in answer to it and when it is read. It is still open:
   // read again every 15 s like pending, and not offered again.
   it('waits while no teacher is free, and moves on when one takes the request', async () => {
-    getConversationMock.mockResolvedValue(
-      conversation([message('s1', 'student', 'Is x = 5?'), message('a1', 'assistant', 'Yes.')]),
-    )
-    requestHelpMock.mockImplementation(async () => {
-      helpStatusMock.mockResolvedValue(help('waiting_no_teacher'))
+    readBack([message('s1', 'student', 'Is x = 5?'), message('a1', 'assistant', 'Yes.')])
+    requestHelpMock.mockImplementationOnce(async () => {
+      helpIs(help('waiting_no_teacher'))
       return help('waiting_no_teacher')
     })
     const ask = openAsk()
@@ -335,7 +289,7 @@ describe('the teacher status card', () => {
     await waitFor(() => expect(getConversationMock.mock.calls.length).toBe(conversationReads + 1))
     expect(ask.queryByRole('button', { name: 'Ask a teacher' })).not.toBeInTheDocument()
 
-    helpStatusMock.mockResolvedValue(help('assigned', 'Ms Bergmann'))
+    helpIs(help('assigned', 'Ms Bergmann'))
     await advance(15_100)
     await waitFor(() => expect(card).toHaveAttribute('data-help-status', 'assigned'))
     expect(within(card).getByText('Ms Bergmann will join this conversation')).toBeInTheDocument()
@@ -344,10 +298,8 @@ describe('the teacher status card', () => {
   // #397: a status this app does not know yet is read as waiting -- general
   // words on the card, read again, and help not offered on top of it.
   it('treats a status it does not know yet as waiting', async () => {
-    getConversationMock.mockResolvedValue(
-      conversation([message('s1', 'student', 'Is x = 5?'), message('a1', 'assistant', 'Yes.')]),
-    )
-    helpStatusMock.mockResolvedValue(help('reassigning' as never))
+    readBack([message('s1', 'student', 'Is x = 5?'), message('a1', 'assistant', 'Yes.')])
+    helpIs(help('reassigning' as never))
     const ask = openAsk()
     await ask.findByText('Yes.')
 
@@ -376,14 +328,12 @@ describe('the teacher status card', () => {
     ['resolved', 'Teacher support has ended'],
     ['cancelled', 'Teacher support was cancelled'],
   ] as const)('shows a request already %s when the conversation is opened again', async (status, title) => {
-    getConversationMock.mockResolvedValue(
-      conversation([
-        message('s1', 'student', 'Is x = 5?'),
-        message('a1', 'assistant', 'Yes.'),
-        message('t1', 'teacher', 'All clear now.'),
-      ]),
-    )
-    helpStatusMock.mockResolvedValue(help(status, 'Ms Bergmann'))
+    readBack([
+      message('s1', 'student', 'Is x = 5?'),
+      message('a1', 'assistant', 'Yes.'),
+      message('t1', 'teacher', 'All clear now.'),
+    ])
+    helpIs(help(status, 'Ms Bergmann'))
     const ask = openAsk()
 
     const card = await ask.findByRole('region', { name: 'Teacher support' })
@@ -394,10 +344,8 @@ describe('the teacher status card', () => {
   })
 
   it('says a request can still be sent while no teacher is online, without a time', async () => {
-    vi.mocked(getTeacherAvailability).mockResolvedValue({ online: false, availableTeachers: 0, nextWindow: '16:00' })
-    getConversationMock.mockResolvedValue(
-      conversation([message('s1', 'student', 'Is x = 5?'), message('a1', 'assistant', 'Yes.')]),
-    )
+    server.availability = { online: false, availableTeachers: 0, nextWindow: '16:00' }
+    readBack([message('s1', 'student', 'Is x = 5?'), message('a1', 'assistant', 'Yes.')])
     const ask = openAsk()
 
     expect(
@@ -410,20 +358,17 @@ describe('the teacher status card', () => {
 
 describe('a teacher in the conversation', () => {
   it('appears in the thread, with their name, while help is in progress', async () => {
-    helpStatusMock.mockResolvedValue(help('in_progress', 'Ms Bergmann'))
-    let replied = false
-    getConversationMock.mockImplementation(async () =>
-      conversation([
-        message('s1', 'student', 'Is x = 5?'),
-        message('a1', 'assistant', 'Yes.'),
-        ...(replied ? [message('t1', 'teacher', 'Well done - now try 4x − 7 = −19.')] : []),
-      ]),
-    )
+    helpIs(help('in_progress', 'Ms Bergmann'))
+    readBack([message('s1', 'student', 'Is x = 5?'), message('a1', 'assistant', 'Yes.')])
     const ask = openAsk()
     await ask.findByText('Yes.')
     expect(ask.queryByText(/now try 4x/)).not.toBeInTheDocument()
 
-    replied = true
+    readBack([
+      message('s1', 'student', 'Is x = 5?'),
+      message('a1', 'assistant', 'Yes.'),
+      message('t1', 'teacher', 'Well done - now try 4x − 7 = −19.'),
+    ])
     await advance(5_100)
 
     const reply = await thread(ask).findByText('Well done - now try 4x − 7 = −19.')
@@ -435,9 +380,7 @@ describe('a teacher in the conversation', () => {
   })
 
   it('is not polled for while no help is open', async () => {
-    getConversationMock.mockResolvedValue(
-      conversation([message('s1', 'student', 'Is x = 5?'), message('a1', 'assistant', 'Yes.')]),
-    )
+    readBack([message('s1', 'student', 'Is x = 5?'), message('a1', 'assistant', 'Yes.')])
     const ask = openAsk()
     await ask.findByText('Yes.')
     const reads = getConversationMock.mock.calls.length
@@ -450,22 +393,19 @@ describe('a teacher in the conversation', () => {
 
 describe('reading the conversation again', () => {
   it('keeps a reply the teacher sent just before resolving the request', async () => {
-    helpStatusMock.mockResolvedValue(help('in_progress', 'Ms Bergmann'))
-    let replied = false
-    getConversationMock.mockImplementation(async () =>
-      conversation([
-        message('s1', 'student', 'Is x = 5?'),
-        message('a1', 'assistant', 'Yes.'),
-        ...(replied ? [message('t1', 'teacher', 'All clear now - good luck!')] : []),
-      ]),
-    )
+    helpIs(help('in_progress', 'Ms Bergmann'))
+    readBack([message('s1', 'student', 'Is x = 5?'), message('a1', 'assistant', 'Yes.')])
     const ask = openAsk()
     await ask.findByText('Yes.')
 
     // Within one poll window the teacher replies and then resolves.
     await advance(3_000)
-    replied = true
-    helpStatusMock.mockResolvedValue(help('resolved', 'Ms Bergmann'))
+    readBack([
+      message('s1', 'student', 'Is x = 5?'),
+      message('a1', 'assistant', 'Yes.'),
+      message('t1', 'teacher', 'All clear now - good luck!'),
+    ])
+    helpIs(help('resolved', 'Ms Bergmann'))
     await advance(2_500)
 
     await waitFor(() =>
@@ -475,8 +415,8 @@ describe('reading the conversation again', () => {
   })
 
   it('stops once Ask is closed', async () => {
-    helpStatusMock.mockResolvedValue(help('in_progress', 'Ms Bergmann'))
-    getConversationMock.mockResolvedValue(conversation([message('a1', 'assistant', 'Yes.')]))
+    helpIs(help('in_progress', 'Ms Bergmann'))
+    readBack([message('a1', 'assistant', 'Yes.')])
     // Opened from the planet, so closing it takes it away rather than leaving the page.
     useAskStore.setState({ ownerId: 'u-1', open: true, conversationId: 'c1' })
     const client = new QueryClient({ defaultOptions: { queries: { retry: false } } })
@@ -484,7 +424,9 @@ describe('reading the conversation again', () => {
       <I18nextProvider i18n={i18n}>
         <QueryClientProvider client={client}>
           <MemoryRouter>
-            <AskHost />
+            <AskServerProvider value={server}>
+              <AskHost />
+            </AskServerProvider>
           </MemoryRouter>
         </QueryClientProvider>
       </I18nextProvider>,
@@ -523,22 +465,16 @@ describe('the scroll position', () => {
     } }
   }
 
-  async function replyArrives(ask: ReturnType<typeof openAsk>, content: string, state: { replied: boolean }) {
-    state.replied = true
+  async function replyArrives(ask: ReturnType<typeof openAsk>, content: string, state: { reply: () => void }) {
+    state.reply()
     await advance(5_100)
     await thread(ask).findByText(content)
   }
 
   function setUp() {
-    helpStatusMock.mockResolvedValue(help('in_progress', 'Ms Bergmann'))
-    const state = { replied: false }
-    getConversationMock.mockImplementation(async () =>
-      conversation([
-        message('a1', 'assistant', 'Yes.'),
-        ...(state.replied ? [message('t1', 'teacher', 'A new reply')] : []),
-      ]),
-    )
-    return state
+    helpIs(help('in_progress', 'Ms Bergmann'))
+    readBack([message('a1', 'assistant', 'Yes.')])
+    return { reply: () => readBack([message('a1', 'assistant', 'Yes.'), message('t1', 'teacher', 'A new reply')]) }
   }
 
   it('follows a new message while the student reads the latest', async () => {
@@ -573,8 +509,7 @@ describe('the scroll position', () => {
  */
 describe('the practice context and the quote', () => {
   it('sends neither key from a question asked away from the stage', async () => {
-    getConversationMock.mockResolvedValue(conversation([]))
-    streamMock.mockResolvedValue('streamed')
+    readBack([])
     const ask = openAsk()
     await ask.findByText('Linear equations')
 
@@ -594,16 +529,14 @@ describe('the practice context and the quote', () => {
   })
 
   it('draws the quote block on the student message that carried it, and on no other', async () => {
-    getConversationMock.mockResolvedValue(
-      conversation([
+    readBack([
         { ...message('s1', 'student', 'Why subtract 5?'), quote: null },
         {
           ...message('s2', 'student', 'And what does this line mean?'),
           quote: { text: '3x + 5 = 20', source: { kind: 'challenge', id: 'gleichungen-l3-c1' } },
         },
         { ...message('a1', 'assistant', 'It keeps the equation balanced.'), quote: null },
-      ]),
-    )
+    ])
     const ask = openAsk()
     const log = thread(ask)
     await log.findByText('And what does this line mean?')

@@ -16,15 +16,15 @@ import { MemoryRouter } from 'react-router-dom'
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 import { MathRenderer } from '@/components/ui/MathRenderer'
 import { AskHost } from '@/features/ask/AskHost'
+import { AskServerProvider } from '@/features/ask/server/askServer'
 import { useAskController } from '@/features/ask/useAskController'
 import { StageWithAsk } from '@/features/chapter/StageAsk'
 import i18n from '@/i18n'
-import { ApiError } from '@/services/api/httpClient'
-import { getConversation } from '@/services/chat/chatApi'
 import { chatQueryKeys } from '@/services/chat/chatQueryKeys'
 import { resetAsk, useAskStore } from '@/store/askStore'
 import { type CurrentUser, useAuthStore } from '@/store/authStore'
 import type { ChatMessage } from '@/types/chat'
+import { createFakeAskServer, type FakeAskServer } from '../fakes/askServer'
 
 /** How often a formula's text was drawn: a message draws its text once each time it is drawn. */
 const drawn = vi.hoisted(() => ({ count: 0 }))
@@ -40,29 +40,8 @@ vi.mock('@/components/ui/MathRenderer', async (importOriginal) => {
     },
   }
 })
-vi.mock('@/services/analytics/analyticsClient', () => ({ trackEvent: vi.fn() }))
-vi.mock('@/services/chat/chatApi', () => ({
-  getConversations: vi.fn(async () => ({ items: [] })),
-  getConversation: vi.fn(),
-  createConversation: vi.fn(),
-}))
-vi.mock('@/services/chat/chatStreamApi', () => ({
-  streamConversationMessage: vi.fn(),
-  getGenerationProgress: vi.fn(),
-}))
-vi.mock('@/services/teacherHelp/teacherHelpApi', () => ({
-  getTeacherAvailability: vi.fn(async () => ({ online: true, availableTeachers: 2 })),
-  getTeacherHelpRequest: vi.fn(async () => {
-    throw new ApiError('never escalated', { status: 404 })
-  }),
-  createTeacherHelpRequest: vi.fn(),
-}))
-vi.mock('@/services/student/studentApi', () => ({
-  getStudentProfile: vi.fn(async () => ({ grade: '8', primarySubjects: ['math'] })),
-}))
-vi.mock('@/services/learning/memoryApi', () => ({
-  getMyMemorySummary: vi.fn(async () => ({ recommendations: [], weakTopics: [] })),
-}))
+/** The server behind Ask, in memory (#571): teachers online, c1 never escalated. */
+let server: FakeAskServer
 
 function message(id: string, role: ChatMessage['role'], content: string): ChatMessage {
   return { id, conversationId: 'c1', role, content, createdAt: '2026-10-20T10:00:00.000Z', status: 'completed' }
@@ -96,7 +75,9 @@ function show(node: ReactNode, width: number) {
   render(
     <I18nextProvider i18n={i18n}>
       <QueryClientProvider client={client}>
-        <MemoryRouter initialEntries={['/planet/math']}>{node}</MemoryRouter>
+        <MemoryRouter initialEntries={['/planet/math']}>
+          <AskServerProvider value={server}>{node}</AskServerProvider>
+        </MemoryRouter>
       </QueryClientProvider>
     </I18nextProvider>,
   )
@@ -135,14 +116,15 @@ beforeEach(async () => {
     isAuthenticated: true,
   })
   resetAsk()
-  vi.mocked(getConversation).mockResolvedValue({
+  server = createFakeAskServer()
+  server.seed({ conversations: [{
     id: 'c1',
     title: 'Sinus',
     subject: 'math',
     grade: '8',
     updatedAt: '2026-10-20T10:00:00.000Z',
     messages: MESSAGES,
-  })
+  }] })
 })
 
 afterEach(() => {
@@ -214,14 +196,14 @@ describe('Ask leaves the messages alone (#416)', () => {
     const client = show(<AskHost />, 1280)
     await settled()
 
-    vi.mocked(getConversation).mockResolvedValue({
+    server.seed({ conversations: [{
       id: 'c1',
       title: 'Sinus',
       subject: 'math',
       grade: '8',
       updatedAt: '2026-10-20T10:01:00.000Z',
       messages: [...MESSAGES.slice(0, 2), { ...MESSAGES[2], content: 'Genau, wie bei $a^2 + b^2 = c^2$ im Dreieck.' }],
-    })
+    }] })
     await act(() => client.invalidateQueries({ queryKey: chatQueryKeys.conversation('c1'), exact: true }))
 
     await within(surface()).findByText(/im Dreieck/)

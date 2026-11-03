@@ -17,35 +17,21 @@ import { I18nextProvider } from 'react-i18next'
 import { MemoryRouter, Route, Routes, useLocation, useParams } from 'react-router-dom'
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 import { AskHost } from '@/features/ask/AskHost'
+import { AskServerProvider } from '@/features/ask/server/askServer'
 import { StarMapRoute } from '@/features/starmap/StarMapRoute'
 import { subjectOfNebula, type Star } from '@/features/starmap/model/starMap'
 import { emptyStarMap, StarMapSourceContext, type StarMapSource } from '@/features/starmap/starMapSource'
 import { pathForTarget } from '@/features/starmap/view/layers'
 import { DemoStarMapSource, readDemoStarMap } from '@/dev/demo/sky/source'
 import i18n from '@/i18n'
-import { ApiError } from '@/services/api/httpClient'
+import { commandMessageIds } from '@/services/chat/commandMessageIds'
 import { askFor, resetAsk, useAskStore } from '@/store/askStore'
 import { useAuthStore } from '@/store/authStore'
 import type { ChatMessage, ChatStreamEvent, TargetUnit } from '@/types/chat'
+import { createFakeAskServer, type FakeAskServer } from '../fakes/askServer'
 
-vi.mock('@/services/analytics/analyticsClient', () => ({ trackEvent: vi.fn(), rotateAnalyticsSession: vi.fn() }))
-vi.mock('@/services/chat/commandMessageIds', () => ({
-  commandMessageIds: vi.fn(async (c: string, k: string) => ({ studentMessageId: `s:${c}:${k}`, assistantMessageId: `a:${c}:${k}` })),
-}))
-vi.mock('@/services/chat/chatApi', () => ({ getConversations: vi.fn(async () => ({ items: [] })), getConversation: vi.fn(), createConversation: vi.fn() }))
-vi.mock('@/services/chat/chatStreamApi', () => ({ streamConversationMessage: vi.fn(), getGenerationProgress: vi.fn() }))
-vi.mock('@/services/teacherHelp/teacherHelpApi', () => ({
-  getTeacherAvailability: vi.fn(async () => ({ online: false, availableTeachers: 0 })),
-  getTeacherHelpRequest: vi.fn(async () => {
-    throw new ApiError('x', { status: 404 })
-  }),
-  createTeacherHelpRequest: vi.fn(),
-}))
-vi.mock('@/services/student/studentApi', () => ({ getStudentProfile: vi.fn(async () => ({ grade: '8', primarySubjects: ['math'] })) }))
-vi.mock('@/services/learning/memoryApi', () => ({ getMyMemorySummary: vi.fn(async () => ({ recommendations: [], weakTopics: [] })) }))
-
-import { getConversation } from '@/services/chat/chatApi'
-import { getGenerationProgress, streamConversationMessage } from '@/services/chat/chatStreamApi'
+/** The server behind Ask, in memory (#571): no teacher online, c-1 never escalated. */
+let server: FakeAskServer
 
 /** The demo sky as the map route reads it (1000 stars, the route's default). */
 const sky = () =>
@@ -72,7 +58,7 @@ function conversationWith(messages: ChatMessage[]) {
 }
 
 function readBack(messages: ChatMessage[]) {
-  vi.mocked(getConversation).mockResolvedValue(conversationWith(messages) as never)
+  server.seed({ conversations: [conversationWith(messages)] })
 }
 
 /** A question about a star, answered with it. */
@@ -118,17 +104,19 @@ function mount(at = '/ask/c-1', source: (app: ReactNode) => ReactNode = (app) =>
   return render(
     <I18nextProvider i18n={i18n}>
       <QueryClientProvider client={client}>
-        {source(
-          <MemoryRouter initialEntries={[at]}>
-            <Routes>
-              <Route path="/ask/:conversationId" element={<AskRoute />} />
-              <Route path="/map/:subjectId" element={map} />
-              <Route path="/map/:subjectId/:topicId" element={map} />
-              <Route path="/map/:subjectId/:topicId/:unitId" element={map} />
-            </Routes>
-            <Where />
-          </MemoryRouter>,
-        )}
+        <AskServerProvider value={server}>
+          {source(
+            <MemoryRouter initialEntries={[at]}>
+              <Routes>
+                <Route path="/ask/:conversationId" element={<AskRoute />} />
+                <Route path="/map/:subjectId" element={map} />
+                <Route path="/map/:subjectId/:topicId" element={map} />
+                <Route path="/map/:subjectId/:topicId/:unitId" element={map} />
+              </Routes>
+              <Where />
+            </MemoryRouter>,
+          )}
+        </AskServerProvider>
       </QueryClientProvider>
     </I18nextProvider>,
   )
@@ -160,6 +148,8 @@ beforeEach(async () => {
   // jsdom has no 2D canvas; the map draws nothing but keeps its DOM.
   vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue(null)
   useAuthStore.setState({ user: { id: 'student-a', role: 'student' } as never })
+  server = createFakeAskServer()
+  server.availability = { online: false, availableTeachers: 0 }
 })
 
 afterEach(() => {
@@ -248,36 +238,34 @@ describe('the card under an answer that found a star (#487)', () => {
     // The answer streams and ends with the star. The conversation is read back
     // only once the test says so: first the streamed copy, then the server's.
     let finish!: () => void
-    vi.mocked(streamConversationMessage).mockImplementation(({ onEvent }) => {
-      const events: ChatStreamEvent[] = [
-        { type: 'message_start', messageId: 'a-1', role: 'assistant', createdAt: '2026-10-29T09:00:00Z' },
-        { type: 'message_delta', messageId: 'a-1', delta: 'Off to Numbers 5.' },
-        { type: 'message_done', messageId: 'a-1', status: 'completed', targetUnit: { unitId: NUMBERS.unitId } },
-      ]
-      for (const event of events) onEvent(event)
-      return new Promise((resolve) => (finish = () => resolve('streamed')))
-    })
-    vi.mocked(getGenerationProgress).mockReturnValue(new Promise(() => {}))
+    const events: ChatStreamEvent[] = [
+      { type: 'message_start', messageId: 'a-1', role: 'assistant', createdAt: '2026-10-29T09:00:00Z' },
+      { type: 'message_delta', messageId: 'a-1', delta: 'Off to Numbers 5.' },
+      { type: 'message_done', messageId: 'a-1', status: 'completed', targetUnit: { unitId: NUMBERS.unitId } },
+    ]
+    // Streamed whole, and the request held open until the test lets it end.
+    server.answerWith({ events, until: new Promise<void>((resolve) => (finish = resolve)) })
     mount()
 
     const field = await screen.findByRole('textbox', { name: i18n.t('chat:ask.composerLabel') })
     await userEvent.type(field, 'I want to practise numbers 5{Enter}')
 
-    await waitFor(() => expect(streamConversationMessage).toHaveBeenCalled())
+    await waitFor(() => expect(server.stream.streamConversationMessage).toHaveBeenCalled())
     const log = await screen.findByRole('log')
     await within(log).findByText('Off to Numbers 5.')
     await waitFor(() => expect(cards()).toHaveLength(1))
     expect(within(cards()[0]).getByText(NUMBERS.name)).toBeInTheDocument()
 
     // Read back: the server holds the same answer under the same id.
-    const reads = vi.mocked(getConversation).mock.calls.length
-    const studentId = vi.mocked(streamConversationMessage).mock.calls[0][0].payload.idempotencyKey
+    const reads = server.conversations.getConversation.mock.calls.length
+    const key = server.stream.streamConversationMessage.mock.calls[0][0].payload.idempotencyKey
+    const { studentMessageId } = await commandMessageIds('c-1', key)
     readBack([
-      message(`s:c-1:${studentId}`, 'student', 'I want to practise numbers 5'),
+      message(studentMessageId, 'student', 'I want to practise numbers 5'),
       message('a-1', 'assistant', 'Off to Numbers 5.', { unitId: NUMBERS.unitId }),
     ])
     await act(async () => finish())
-    await waitFor(() => expect(vi.mocked(getConversation).mock.calls.length).toBeGreaterThan(reads))
+    await waitFor(() => expect(server.conversations.getConversation.mock.calls.length).toBeGreaterThan(reads))
     await waitFor(() => expect(within(log).getAllByText('Off to Numbers 5.')).toHaveLength(1))
     expect(cards()).toHaveLength(1)
   })
@@ -318,9 +306,11 @@ describe('the card under an answer that found a star (#487)', () => {
     render(
       <QueryClientProvider client={client}>
         <MemoryRouter initialEntries={['/map/math']}>
-          <AskHost>
-            <TakesFocusOnClose />
-          </AskHost>
+          <AskServerProvider value={server}>
+            <AskHost>
+              <TakesFocusOnClose />
+            </AskHost>
+          </AskServerProvider>
         </MemoryRouter>
       </QueryClientProvider>,
     )

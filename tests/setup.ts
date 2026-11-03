@@ -34,6 +34,15 @@ vi.mock('@/lib/env', () => ({
   showCheckoutPreview: false,
 }))
 
+// Analytics says nothing in a test (#571): `trackEvent` is a silent `vi.fn`,
+// the rest of the module is its own. A test that looks at what is tracked reads
+// the mock (`vi.mocked(trackEvent)`); one that sends real events, to see their
+// session or ids, takes the mock away with `vi.unmock`.
+vi.mock('@/services/analytics/analyticsClient', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@/services/analytics/analyticsClient')>()),
+  trackEvent: vi.fn(),
+}))
+
 // Every language in full, as when all four shipped inside the app: a test
 // switches with a bare changeLanguage and reads the next line in the new
 // language. The app itself ships English and loads the rest when a tab is

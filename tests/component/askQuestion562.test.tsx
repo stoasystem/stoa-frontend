@@ -18,6 +18,7 @@ import type { ReactNode } from 'react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { makeQuote } from '@/features/ask/practiceContext'
 import type { AskQuestionAdapter } from '@/features/ask/question/askQuestionAdapter'
+import { AskServerProvider, serverAskServer, type AskServer } from '@/features/ask/server/askServer'
 import { useAskQuestion, type AskedQuestion, type AskOutcome } from '@/features/ask/question/useAskQuestion'
 import { clearPendingMessages, readPendingMessage, sendingFor } from '@/lib/pendingChatMessages'
 import { ApiError } from '@/services/api/httpClient'
@@ -64,17 +65,40 @@ function memoryServer() {
       return 'accepted'
     }),
   }
-  return server satisfies AskQuestionAdapter
+  return server
+}
+
+type MemoryServer = ReturnType<typeof memoryServer>
+
+/** The server behind Ask, with this one answering the two requests a question makes (#571). */
+function behindAsk(server: MemoryServer): AskServer {
+  const asking: AskQuestionAdapter = {
+    conversations: { createConversation: server.createConversation },
+    stream: {
+      streamConversationMessage: ({ conversationId, payload }) =>
+        server.sendMessage(conversationId, payload) as ReturnType<AskServer['stream']['streamConversationMessage']>,
+    },
+  }
+  return {
+    ...serverAskServer,
+    conversations: { ...serverAskServer.conversations, ...asking.conversations },
+    stream: { ...serverAskServer.stream, ...asking.stream },
+  }
 }
 
 type Props = { subject: string; grade: string; conversationId: string | null; isStreaming: boolean }
 
-function mount(server: AskQuestionAdapter, initial: Partial<Props> = {}) {
+function mount(server: MemoryServer, initial: Partial<Props> = {}) {
   const client = new QueryClient({ defaultOptions: { queries: { retry: false }, mutations: { retry: false } } })
   const sendStreamingMessage = vi.fn(async () => true)
-  const wrapper = ({ children }: { children: ReactNode }) => <QueryClientProvider client={client}>{children}</QueryClientProvider>
+  const value = behindAsk(server)
+  const wrapper = ({ children }: { children: ReactNode }) => (
+    <QueryClientProvider client={client}>
+      <AskServerProvider value={value}>{children}</AskServerProvider>
+    </QueryClientProvider>
+  )
   const view = renderHook(
-    (props: Props) => useAskQuestion({ ...props, sendStreamingMessage, adapter: server }),
+    (props: Props) => useAskQuestion({ ...props, sendStreamingMessage }),
     { wrapper, initialProps: { subject: 'math', grade: '8', conversationId: null, isStreaming: false, ...initial } },
   )
   const ask = async (question: Partial<AskedQuestion> & { content: string }) => {

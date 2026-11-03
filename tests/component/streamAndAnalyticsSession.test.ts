@@ -25,6 +25,8 @@ vi.mock('@/lib/env', () => ({
   isDevelopment: false,
   allowDemoFallback: false,
 }))
+// These send real events: not the silent trackEvent tests/setup.ts puts in (#571).
+vi.unmock('@/services/analytics/analyticsClient')
 
 const STREAM = 'https://api.test/conversations/c1/messages/stream'
 const TAB_REFRESH = 'stoa_tab_refresh_token'
