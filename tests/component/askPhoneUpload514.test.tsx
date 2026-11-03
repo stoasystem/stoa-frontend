@@ -20,28 +20,14 @@ import { MemoryRouter } from 'react-router-dom'
 import { encode } from 'uqr'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { AskHost } from '@/features/ask/AskHost'
+import { AskServerProvider } from '@/features/ask/server/askServer'
 import i18n from '@/i18n'
 import { ApiError, apiErrorFromBody } from '@/services/api/httpClient'
 import { resetAsk } from '@/store/askStore'
 import { type CurrentUser, useAuthStore } from '@/store/authStore'
 import type { Conversation } from '@/types/chat'
+import { createFakeAskServer, type FakeAskServer } from '../fakes/askServer'
 
-vi.mock('@/services/analytics/analyticsClient', () => ({ trackEvent: vi.fn() }))
-vi.mock('@/services/chat/commandMessageIds', () => ({
-  commandMessageIds: vi.fn(async (conversationId: string, key: string) => ({
-    studentMessageId: `student:${conversationId}:${key}`,
-    assistantMessageId: `assistant:${conversationId}:${key}`,
-  })),
-}))
-vi.mock('@/services/chat/chatApi', () => ({
-  getConversations: vi.fn(),
-  getConversation: vi.fn(),
-  createConversation: vi.fn(),
-}))
-vi.mock('@/services/chat/chatStreamApi', () => ({
-  streamConversationMessage: vi.fn(),
-  getGenerationProgress: vi.fn(),
-}))
 vi.mock('@/services/files/uploadCodeApi', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@/services/files/uploadCodeApi')>()),
   createUploadCode: vi.fn(),
@@ -60,28 +46,16 @@ vi.mock('uqr', async (importOriginal) => {
     },
   }
 })
-vi.mock('@/services/teacherHelp/teacherHelpApi', () => ({
-  getTeacherAvailability: vi.fn(async () => ({ online: false, availableTeachers: 0 })),
-  getTeacherHelpRequest: vi.fn(async () => {
-    throw new ApiError('never escalated', { status: 404 })
-  }),
-  createTeacherHelpRequest: vi.fn(),
-}))
-vi.mock('@/services/student/studentApi', () => ({
-  getStudentProfile: vi.fn(async () => ({ grade: '8', primarySubjects: ['math'] })),
-}))
-vi.mock('@/services/learning/memoryApi', () => ({
-  getMyMemorySummary: vi.fn(async () => ({ recommendations: [], weakTopics: [] })),
-}))
 
-import { getConversation } from '@/services/chat/chatApi'
-import { getGenerationProgress, streamConversationMessage } from '@/services/chat/chatStreamApi'
 import { createUploadCode, readUploadCode, readUploadCodePhoto } from '@/services/files/uploadCodeApi'
 
 const createMock = vi.mocked(createUploadCode)
 const readMock = vi.mocked(readUploadCode)
 const photoMock = vi.mocked(readUploadCodePhoto)
-const streamMock = vi.mocked(streamConversationMessage)
+
+/** The server behind Ask, in memory (#571): c1, a message answered as it is sent, and no teacher online. */
+let server: FakeAskServer
+let streamMock: FakeAskServer['stream']['streamConversationMessage']
 
 const CODE_ID = 'a1'.repeat(16)
 const CODE = `${CODE_ID}.${'s'.repeat(43)}`
@@ -121,7 +95,9 @@ function openAsk(conversationId: string | null = 'c1') {
     <I18nextProvider i18n={i18n}>
       <QueryClientProvider client={client}>
         <MemoryRouter initialEntries={[conversationId ? `/ask/${conversationId}` : '/ask']}>
-          <AskHost route={{ conversationId }} />
+          <AskServerProvider value={server}>
+            <AskHost route={{ conversationId }} />
+          </AskServerProvider>
         </MemoryRouter>
       </QueryClientProvider>
     </I18nextProvider>,
@@ -154,9 +130,11 @@ beforeEach(async () => {
     isAuthenticated: true,
   })
   resetAsk()
-  vi.mocked(getConversation).mockResolvedValue(conversation())
-  vi.mocked(getGenerationProgress).mockResolvedValue({ status: 'completed', steps: [] } as never)
-  streamMock.mockResolvedValue('streamed')
+  // Nothing listed, and c1 never escalated: the fake's own defaults.
+  server = createFakeAskServer()
+  server.availability = { online: false, availableTeachers: 0 }
+  server.seed({ conversations: [conversation()] })
+  streamMock = server.stream.streamConversationMessage
   createMock.mockResolvedValue({ codeId: CODE_ID, code: CODE, expiresAt: minutesFromNow(10), uploadId: UPLOAD_ID })
   readMock.mockResolvedValue({ codeId: CODE_ID, status: 'waiting', expiresAt: minutesFromNow(10), redeemedAt: null, uploadId: null })
   photoMock.mockResolvedValue(new Blob([new Uint8Array(3000)], { type: 'image/jpeg' }))

@@ -16,21 +16,15 @@ import { I18nextProvider } from 'react-i18next'
 import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { AskHost } from '@/features/ask/AskHost'
+import { AskServerProvider } from '@/features/ask/server/askServer'
 import { useSignOut } from '@/hooks/auth/useSignOut'
 import { AppLayout } from '@/layouts/AppLayout'
 import i18n from '@/i18n'
 import { ApiError } from '@/services/api/httpClient'
 import { ASK_STORAGE_KEY, readPersistedAsk, resetAsk, useAskStore } from '@/store/askStore'
 import { type CurrentUser, useAuthStore } from '@/store/authStore'
-import { createConversation, getConversations } from '@/services/chat/chatApi'
-import { getGenerationProgress, streamConversationMessage } from '@/services/chat/chatStreamApi'
+import { createFakeAskServer, type FakeAskServer } from '../fakes/askServer'
 
-// `rotateAnalyticsSession` is called on sign-out (#34). A mock without it
-// throws past the assertions, so 26 green tests still failed the run.
-vi.mock('@/services/analytics/analyticsClient', () => ({
-  trackEvent: vi.fn(),
-  rotateAnalyticsSession: vi.fn(),
-}))
 vi.mock('@/services/auth/authApi', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@/services/auth/authApi')>()),
   logout: vi.fn(async () => ({ kind: 'ok' })),
@@ -45,39 +39,9 @@ vi.mock('@/hooks/notifications/useNotificationsQuery', () => ({
 vi.mock('@/hooks/notifications/useRealtimeNotifications', () => ({
   useRealtimeNotifications: () => ({ status: 'disabled' }),
 }))
-vi.mock('@/services/chat/chatApi', () => ({
-  getConversations: vi.fn(async () => ({
-    items: [
-      { id: 'c1', title: 'Linear equations', subject: 'math', grade: '8', updatedAt: '2026-09-20T10:00:00.000Z' },
-    ],
-  })),
-  getConversation: vi.fn(async (id: string) => ({
-    id,
-    title: 'Linear equations',
-    subject: 'math',
-    grade: '8',
-    updatedAt: '2026-09-20T10:00:00.000Z',
-    messages: [],
-  })),
-  createConversation: vi.fn(),
-}))
-vi.mock('@/services/chat/chatStreamApi', () => ({
-  streamConversationMessage: vi.fn(),
-  getGenerationProgress: vi.fn(),
-}))
-vi.mock('@/services/teacherHelp/teacherHelpApi', () => ({
-  getTeacherAvailability: vi.fn(async () => ({ online: true, availableTeachers: 2 })),
-  getTeacherHelpRequest: vi.fn(async () => {
-    throw new ApiError('never escalated', { status: 404 })
-  }),
-  createTeacherHelpRequest: vi.fn(),
-}))
-vi.mock('@/services/student/studentApi', () => ({
-  getStudentProfile: vi.fn(async () => ({ grade: '8', primarySubjects: ['math'] })),
-}))
-vi.mock('@/services/learning/memoryApi', () => ({
-  getMyMemorySummary: vi.fn(async () => ({ recommendations: [], weakTopics: [] })),
-}))
+
+/** The server behind Ask, in memory (#571): c1 listed, with no messages yet, and teachers online. */
+let server: FakeAskServer
 
 function emulateWidth(width: number, { reducedMotion = false } = {}) {
   window.matchMedia = ((query: string) => {
@@ -136,18 +100,20 @@ function show({
     <I18nextProvider i18n={i18n}>
       <QueryClientProvider client={client}>
         <MemoryRouter initialEntries={[at]}>
-          <Routes>
-            <Route
-              path="*"
-              element={
-                <>
-                  {shell ? <AppLayout bleed>{host}</AppLayout> : host}
-                  <Where />
-                  <SignOut />
-                </>
-              }
-            />
-          </Routes>
+          <AskServerProvider value={server}>
+            <Routes>
+              <Route
+                path="*"
+                element={
+                  <>
+                    {shell ? <AppLayout bleed>{host}</AppLayout> : host}
+                    <Where />
+                    <SignOut />
+                  </>
+                }
+              />
+            </Routes>
+          </AskServerProvider>
         </MemoryRouter>
       </QueryClientProvider>
     </I18nextProvider>,
@@ -168,6 +134,10 @@ beforeEach(async () => {
     isAuthenticated: true,
   })
   resetAsk()
+  // Never escalated: the fake's own default.
+  server = createFakeAskServer()
+  const c1 = { id: 'c1', title: 'Linear equations', subject: 'math', grade: '8', updatedAt: '2026-09-20T10:00:00.000Z' }
+  server.seed({ conversations: [{ ...c1, messages: [] }], list: [c1] })
 })
 
 afterEach(() => {
@@ -495,47 +465,35 @@ describe('reduced motion', () => {
 })
 
 describe('the first question of a new conversation', () => {
-  const created = (id: string) => ({
-    id,
-    title: 'What is a prime?',
-    subject: 'math',
-    grade: '8',
-    updatedAt: '2026-09-28T10:00:00.000Z',
-    messages: [],
-  })
-
   beforeEach(() => {
-    vi.mocked(getConversations).mockResolvedValue({ items: [] })
-    vi.mocked(getGenerationProgress).mockResolvedValue({
-      conversationId: 'c-new',
-      steps: [],
-      updatedAt: new Date().toISOString(),
-      status: 'ai_running',
+    // Nothing listed; the conversation made is c-new, its first question still being answered.
+    server.seed({
+      list: [],
+      newConversationIds: ['c-new'],
+      generations: [{ conversationId: 'c-new', idempotencyKey: 'initial-c-new', status: 'ai_running' }],
     })
   })
 
   it('goes out with the conversation, and its answer is waited for rather than sent again', async () => {
-    vi.mocked(createConversation).mockResolvedValue(created('c-new'))
     show({ width: 1280 })
     await userEvent.type(dockedField(), 'What is a prime?')
     const panel = within(surface()!)
 
     await userEvent.type(panel.getByRole('textbox', { name: 'Your question' }), '{Enter}')
 
-    expect(createConversation).toHaveBeenCalledTimes(1)
-    expect(vi.mocked(createConversation).mock.calls[0][0]).toMatchObject({ subject: 'math', initialMessage: 'What is a prime?' })
+    expect(server.conversations.createConversation).toHaveBeenCalledTimes(1)
+    expect(server.conversations.createConversation.mock.calls[0][0]).toMatchObject({ subject: 'math', initialMessage: 'What is a prime?' })
     expect(await panel.findByText('What is a prime?', { selector: 'div' })).toBeInTheDocument()
     expect(JSON.parse(sessionStorage.getItem('stoa_pending_chat_message:c-new') ?? '{}')).toMatchObject({
       idempotencyKey: 'initial-c-new',
       content: 'What is a prime?',
     })
-    await vi.waitFor(() => expect(getGenerationProgress).toHaveBeenCalled(), { timeout: 3000 })
-    expect(vi.mocked(getGenerationProgress).mock.calls[0][2]).toBe('initial-c-new')
-    expect(streamConversationMessage).not.toHaveBeenCalled()
+    await vi.waitFor(() => expect(server.stream.getGenerationProgress).toHaveBeenCalled(), { timeout: 3000 })
+    expect(server.stream.getGenerationProgress.mock.calls[0][2]).toBe('initial-c-new')
+    expect(server.stream.streamConversationMessage).not.toHaveBeenCalled()
   })
 
   it('starts one conversation when sent twice in the same moment', async () => {
-    vi.mocked(createConversation).mockResolvedValue(created('c-new'))
     show({ width: 1280 })
     await userEvent.type(dockedField(), 'What is a prime?')
     const field = within(surface()!).getByRole('textbox', { name: 'Your question' })
@@ -545,22 +503,21 @@ describe('the first question of a new conversation', () => {
       fireEvent.keyDown(field, { key: 'Enter' })
     })
 
-    await vi.waitFor(() => expect(createConversation).toHaveBeenCalled())
-    expect(createConversation).toHaveBeenCalledTimes(1)
+    await vi.waitFor(() => expect(server.conversations.createConversation).toHaveBeenCalled())
+    expect(server.conversations.createConversation).toHaveBeenCalledTimes(1)
   })
 
   it('is not sent later when Ask is closed before the conversation exists', async () => {
-    let finish: (value: ReturnType<typeof created>) => void = () => {}
-    vi.mocked(createConversation).mockImplementation(() => new Promise((resolve) => (finish = resolve)))
+    const finish = server.holdNext('createConversation')
     show({ width: 1280 })
     await userEvent.type(dockedField(), 'What is a prime?')
     await userEvent.type(within(surface()!).getByRole('textbox', { name: 'Your question' }), '{Enter}')
 
     await userEvent.click(within(surface()!).getByRole('button', { name: 'Close' }))
-    await act(async () => finish(created('c-new')))
+    await act(async () => finish())
 
     // It went out once, with the conversation; the answer waits for when it is opened.
-    expect(streamConversationMessage).not.toHaveBeenCalled()
+    expect(server.stream.streamConversationMessage).not.toHaveBeenCalled()
     expect(surface()).toBeNull()
     // And it is not left in the composer to be sent a second time.
     expect(dockedField()).toHaveValue('')
@@ -572,8 +529,8 @@ describe('the first question of a new conversation', () => {
 
 describe('a new conversation that cannot be made', () => {
   it('gives the question back to the composer', async () => {
-    vi.mocked(getConversations).mockResolvedValue({ items: [] })
-    vi.mocked(createConversation).mockRejectedValue(new ApiError('busy', { status: 503 }))
+    server.seed({ list: [] })
+    server.refuseNextWith(new ApiError('busy', { status: 503 }), 'createConversation')
     show({ width: 1280 })
     await userEvent.type(dockedField(), 'What is a prime?')
     const field = within(surface()!).getByRole('textbox', { name: 'Your question' })
@@ -581,7 +538,7 @@ describe('a new conversation that cannot be made', () => {
     await userEvent.type(field, '{Enter}')
 
     await vi.waitFor(() => expect(field).toHaveValue('What is a prime?'))
-    expect(createConversation).toHaveBeenCalledTimes(1)
+    expect(server.conversations.createConversation).toHaveBeenCalledTimes(1)
   })
 })
 
