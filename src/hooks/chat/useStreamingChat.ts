@@ -1,10 +1,8 @@
 import i18n from '@/i18n'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
-import {
-  streamConversationMessage,
-  type StreamMessagePayload,
-} from '@/services/chat/chatStreamApi'
+import type { StreamMessagePayload } from '@/services/chat/chatStreamApi'
+import { useAskServer } from '@/features/ask/server/askServer'
 import { isUploadGone } from '@/features/uploads/uploadGone'
 import { trackEvent } from '@/services/analytics/analyticsClient'
 import { chatQueryKeys } from '@/services/chat/chatQueryKeys'
@@ -201,6 +199,8 @@ function stillFailed<T extends ChatMessage & { retryPayload?: unknown; failedAns
 
 export function useStreamingChat(conversationId: string | null) {
   const queryClient = useQueryClient()
+  // The send request and the reading of its command: the server behind Ask (#571).
+  const { streamConversationMessage, getGenerationProgress } = useAskServer().stream
   const [localMessages, setLocalMessages] = useState<LocalChatMessage[]>(() =>
     localFailedMessages(conversationId),
   )
@@ -410,6 +410,7 @@ export function useStreamingChat(conversationId: string | null) {
           askedAt: pending.askedAt,
           signal: pollController.signal,
           requestDone: !send && !sending,
+          read: getGenerationProgress,
           onSteps: (steps) => {
             if (!owns()) return
             const writingId = activeAssistantMessageIdRef.current ?? assistantMessageId
@@ -595,7 +596,7 @@ export function useStreamingChat(conversationId: string | null) {
         }
       }
     },
-    [conversationId, handleStreamEvent, invalidateConversation, queryClient],
+    [conversationId, getGenerationProgress, handleStreamEvent, invalidateConversation, queryClient, streamConversationMessage],
   )
 
   useEffect(() => {

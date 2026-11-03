@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { createConversation } from '@/services/chat/chatApi'
+import { useAskServer } from '@/features/ask/server/askServer'
 import { chatQueryKeys } from '@/services/chat/chatQueryKeys'
 import { trackEvent } from '@/services/analytics/analyticsClient'
 import type { Conversation, ConversationListResponse, CreateConversationRequest } from '@/types/chat'
@@ -11,15 +11,15 @@ export function useCreateConversationMutation(
      * has gone meanwhile -- unlike a callback passed to `mutate`.
      */
     onCreated?: (conversation: Conversation, payload: CreateConversationRequest) => void
-    /** What makes it: `POST /conversations`, unless a test puts its own in (#562). */
-    create?: (payload: CreateConversationRequest) => Promise<Conversation>
   } = {},
 ) {
   const queryClient = useQueryClient()
-  const { onCreated, create = createConversation } = options
+  const { onCreated } = options
+  // What makes it: `POST /conversations`, unless a test puts its own server in (#571).
+  const { createConversation } = useAskServer().conversations
 
   return useMutation({
-    mutationFn: (payload: CreateConversationRequest) => create(payload),
+    mutationFn: (payload: CreateConversationRequest) => createConversation(payload),
     onSuccess: (conversation, payload) => {
       onCreated?.(conversation, payload)
       trackEvent('chat_conversation_created', {

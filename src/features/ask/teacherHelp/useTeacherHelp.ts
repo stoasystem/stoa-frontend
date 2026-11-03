@@ -27,16 +27,12 @@
  */
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { useAskServer, type AskServer } from '@/features/ask/server/askServer'
 import { useConversationQuery } from '@/hooks/chat/useConversationQuery'
 import { useTeacherAvailabilityQuery } from '@/hooks/chat/useTeacherAvailabilityQuery'
 import { trackEvent } from '@/services/analytics/analyticsClient'
 import { ApiError } from '@/services/api/httpClient'
 import { chatQueryKeys } from '@/services/chat/chatQueryKeys'
-import {
-  createTeacherHelpRequest,
-  getTeacherHelpRequest,
-  withdrawTeacherHelpRequest,
-} from '@/services/teacherHelp/teacherHelpApi'
 import type { ChatMessage } from '@/types/chat'
 import {
   isEndedHelpRequest,
@@ -184,6 +180,15 @@ function cardKind(status: string): 'waiting' | 'assigned' | 'withTeacher' | 'end
   return 'waiting'
 }
 
+/**
+ * The requests this module makes (#571): the teacher help group of the server
+ * behind Ask, but for availability, which `useTeacherAvailabilityQuery` reads.
+ */
+export type TeacherHelpServer = Pick<
+  AskServer['teacherHelp'],
+  'getTeacherHelpRequest' | 'createTeacherHelpRequest' | 'withdrawTeacherHelpRequest'
+>
+
 export function useTeacherHelp({
   conversationId,
   messages,
@@ -194,6 +199,8 @@ export function useTeacherHelp({
   isStreaming: boolean
 }): TeacherHelp {
   const queryClient = useQueryClient()
+  const server: TeacherHelpServer = useAskServer().teacherHelp
+  const { getTeacherHelpRequest, createTeacherHelpRequest, withdrawTeacherHelpRequest } = server
   const [requestError, setRequestError] = useState<string | null>(null)
   const [withdrawError, setWithdrawError] = useState<string | null>(null)
 

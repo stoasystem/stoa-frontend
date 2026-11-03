@@ -1,7 +1,8 @@
 import { useRef } from 'react'
 import { quoteField, type AskPractice, type AskQuote } from '@/features/ask/practiceContext'
-import { serverAskQuestionAdapter, type AskQuestionAdapter } from '@/features/ask/question/askQuestionAdapter'
+import type { AskQuestionAdapter } from '@/features/ask/question/askQuestionAdapter'
 import { heldQuestionKey, initialQuestionKey } from '@/features/ask/question/questionKeys'
+import { useAskServer } from '@/features/ask/server/askServer'
 import type { AttachmentBatch } from '@/features/uploads/useAttachments'
 import { useCreateConversationMutation } from '@/hooks/chat/useCreateConversationMutation'
 import {
@@ -89,7 +90,6 @@ export function useAskQuestion({
   conversationId,
   sendStreamingMessage,
   isStreaming,
-  adapter = serverAskQuestionAdapter,
 }: {
   /** The subject a new conversation is about. */
   subject: string
@@ -100,8 +100,9 @@ export function useAskQuestion({
   sendStreamingMessage: SendInConversation
   /** An answer is being written in the open conversation. */
   isStreaming: boolean
-  adapter?: AskQuestionAdapter
 }): AskQuestion {
+  // The server behind Ask (#571): only the two requests a question makes.
+  const server: AskQuestionAdapter = useAskServer()
   // The question `POST /conversations` is carrying now: when it was asked, and
   // in which session.
   const askingRef = useRef<{ askedAt: string; owns: () => boolean } | null>(null)
@@ -111,7 +112,6 @@ export function useAskQuestion({
   // message waiting for its answer, which the conversation picks up when it
   // opens (after a reload too).
   const createConversation = useCreateConversationMutation({
-    create: adapter.createConversation,
     onCreated: (created, payload) => {
       if (!payload.initialMessage) return
       const asking = askingRef.current
@@ -146,7 +146,13 @@ export function useAskQuestion({
     // Before it is written down, and so before it is sent: both happen now.
     if (!owns()) return false
     writePendingMessage(id, { ...pending, unconfirmed: true })
-    const sent = adapter.sendMessage(id, toStreamPayload(pending)).then(
+    const request = server.stream.streamConversationMessage({
+      conversationId: id,
+      payload: toStreamPayload(pending),
+      // Nothing on screen waits on its events: the conversation, when opened, reads its command.
+      onEvent: () => {},
+    })
+    const sent = request.then(
       () => {
         // The server has it: from here on it is waited for, never sent again.
         // Unless the conversation has settled it, or signing out cleared it.
