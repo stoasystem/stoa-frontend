@@ -1,10 +1,19 @@
 import { useQuery } from '@tanstack/react-query'
 import { useCallback, useEffect, useState } from 'react'
 import { drawnType } from '@/features/uploads/drawnImage'
-import { chatQueryKeys } from '@/services/chat/chatQueryKeys'
 import { phoneUploadProblemFor } from '@/services/files/attachmentProblems'
 import { createUploadCode, readUploadCode, readUploadCodePhoto } from '@/services/files/uploadCodeApi'
 import type { UploadCode, UploadCodeStatus } from '@/types/file'
+
+/**
+ * How far the phone has got with a QR's code (#514), by the upload it reserved
+ * (#554), and the photo once it has passed. Not under `['chat']` (#572): the
+ * code belongs to no conversation, and nothing invalidates these by prefix.
+ */
+const uploadCodeKeys = {
+  status: (uploadId: string) => ['upload-code', uploadId] as const,
+  photo: (uploadId: string) => [...uploadCodeKeys.status(uploadId), 'photo'] as const,
+}
 
 /** How often the computer asks how far the phone has got. */
 export const UPLOAD_CODE_POLL_MS = 2000
@@ -96,7 +105,7 @@ export function usePhoneUploadCode(conversationId: string | null) {
   const close = useCallback(() => setSession(null), [])
 
   const status = useQuery({
-    queryKey: chatQueryKeys.uploadCode(code?.uploadId ?? ''),
+    queryKey: uploadCodeKeys.status(code?.uploadId ?? ''),
     queryFn: ({ signal }) => readUploadCode(code?.uploadId ?? '', signal),
     enabled: Boolean(code),
     refetchInterval: (query) => (stillGoing(query.state.data?.status) ? UPLOAD_CODE_POLL_MS : false),
@@ -108,7 +117,7 @@ export function usePhoneUploadCode(conversationId: string | null) {
   const ready = state?.status === 'ready' && state.uploadId ? state.uploadId : null
 
   const photo = useQuery({
-    queryKey: chatQueryKeys.uploadCodePhoto(code?.uploadId ?? ''),
+    queryKey: uploadCodeKeys.photo(code?.uploadId ?? ''),
     queryFn: ({ signal }) => readUploadCodePhoto(code?.uploadId ?? '', signal),
     enabled: Boolean(code && ready),
     // The photo does not change once it has passed.
