@@ -106,6 +106,34 @@ describe('answerWith', () => {
     // Past the answers given: streamed, with nothing on the stream.
     expect(await send(server, 'k-3')).toBe('streamed')
   })
+
+  it('leaves the command where it was told, seeds what the answer leaves, and refuses after all that', async () => {
+    const server = createFakeAskServer()
+    server.seed({ conversations: [conversation('c1')] })
+    const unavailable = new Error('Request failed with status code 503')
+    let hang!: () => void
+    server.answerWith(
+      { refuse: unavailable, status: 'failed', retryable: true },
+      { until: new Promise<void>((resolve) => (hang = resolve)), status: 'completed' },
+      { leaves: { conversations: [conversation('c1', 'Is x = 5?')] } },
+    )
+
+    // Refused, its command read back as failed and to be sent again.
+    await expect(send(server, 'k-1')).rejects.toBe(unavailable)
+    expect(await server.stream.getGenerationProgress('c1', undefined, 'k-1')).toMatchObject({ status: 'failed', retryable: true })
+
+    // Ended while the request still hangs.
+    const hanging = send(server, 'k-2')
+    await Promise.resolve()
+    expect((await server.stream.getGenerationProgress('c1', undefined, 'k-2')).status).toBe('completed')
+    hang()
+    expect(await hanging).toBe('streamed')
+
+    // The conversation reads the answer back once the request is through, not before.
+    expect((await server.conversations.getConversation('c1')).messages[0].content).toBe('Why subtract 3 first?')
+    expect(await send(server, 'k-3')).toBe('streamed')
+    expect((await server.conversations.getConversation('c1')).messages[0].content).toBe('Is x = 5?')
+  })
 })
 
 describe('refuseNextWith', () => {

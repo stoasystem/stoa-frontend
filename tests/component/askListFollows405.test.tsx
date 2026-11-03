@@ -11,45 +11,29 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { act, renderHook } from '@testing-library/react'
 import type { ReactNode } from 'react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { AskServerProvider } from '@/features/ask/server/askServer'
 import { useTeacherHelp } from '@/features/ask/teacherHelp/useTeacherHelp'
 import { useAskConversation } from '@/features/ask/useAskConversation'
 import { useConversationsQuery } from '@/hooks/chat/useConversationsQuery'
-import { ApiError } from '@/services/api/httpClient'
 import type { ChatMessage, Conversation } from '@/types/chat'
 import type { TeacherHelpRequest } from '@/types/teacherHelp'
+import { createFakeAskServer, type FakeAskServer } from '../fakes/askServer'
 
-vi.mock('@/services/analytics/analyticsClient', () => ({ trackEvent: vi.fn() }))
-vi.mock('@/services/chat/commandMessageIds', () => ({
-  commandMessageIds: vi.fn(async (conversationId: string, key: string) => ({
-    studentMessageId: `student:${conversationId}:${key}`,
-    assistantMessageId: `assistant:${conversationId}:${key}`,
-  })),
-}))
-vi.mock('@/services/chat/chatApi', () => ({
-  getConversations: vi.fn(),
-  getConversation: vi.fn(),
-}))
-vi.mock('@/services/chat/chatStreamApi', () => ({
-  streamConversationMessage: vi.fn(),
-  getGenerationProgress: vi.fn(),
-}))
-vi.mock('@/services/teacherHelp/teacherHelpApi', () => ({
-  getTeacherHelpRequest: vi.fn(),
-  getTeacherAvailability: vi.fn(),
-}))
+/** The server behind Ask, in memory (#571): each test seeds the conversation and its help. */
+let server: FakeAskServer
+let listMock: FakeAskServer['conversations']['getConversations']
+let conversationMock: FakeAskServer['conversations']['getConversation']
+let helpMock: FakeAskServer['teacherHelp']['getTeacherHelpRequest']
 
-import { getConversation, getConversations } from '@/services/chat/chatApi'
-import { getGenerationProgress, streamConversationMessage } from '@/services/chat/chatStreamApi'
-import { getTeacherAvailability, getTeacherHelpRequest } from '@/services/teacherHelp/teacherHelpApi'
+/** What the conversations read back from now on. */
+function readBack(...conversations: Conversation[]) {
+  server.seed({ conversations })
+}
 
-const listMock = vi.mocked(getConversations)
-const conversationMock = vi.mocked(getConversation)
-const streamMock = vi.mocked(streamConversationMessage)
-const progressMock = vi.mocked(getGenerationProgress)
-const helpMock = vi.mocked(getTeacherHelpRequest)
-const availabilityMock = vi.mocked(getTeacherAvailability)
-
-const NEVER_ESCALATED = new ApiError('This conversation was never escalated to a teacher', { status: 404 })
+/** The conversation's request for a teacher, as the server reports it from now on. */
+function helpIs(request: TeacherHelpRequest) {
+  server.seed({ helpRequests: [request] })
+}
 
 function message(id: string, role: ChatMessage['role'], content: string, conversationId = 'c1'): ChatMessage {
   return { id, conversationId, role, content, createdAt: '2026-10-20T10:00:00.000Z', status: 'completed' }
@@ -69,7 +53,9 @@ const asked = [message('s-1', 'student', 'Wie loese ich 2x = 8?'), message('a-1'
 function openAsk(conversationId: string) {
   const client = new QueryClient({ defaultOptions: { queries: { retry: false } } })
   const wrapper = ({ children }: { children: ReactNode }) => (
-    <QueryClientProvider client={client}>{children}</QueryClientProvider>
+    <QueryClientProvider client={client}>
+      <AskServerProvider value={server}>{children}</AskServerProvider>
+    </QueryClientProvider>
   )
   return renderHook(
     ({ id }) => {
@@ -93,13 +79,16 @@ async function advance(ms: number) {
 
 beforeEach(() => {
   vi.useFakeTimers()
+  // No conversation escalated unless a test says so: the fake's own default.
+  server = createFakeAskServer()
+  ;({ getConversations: listMock, getConversation: conversationMock } = server.conversations)
+  helpMock = server.teacherHelp.getTeacherHelpRequest
   // The list as the conversations are first read: a first read the list is
   // behind on reads it again of its own (#452, askListFirstRead452).
-  listMock.mockResolvedValue({
-    items: ['c1', 'c2'].map((id) => ({ id, title: 'Linear equations', subject: 'math', grade: '8', updatedAt: '2026-10-20T10:00:00.000Z' })),
+  server.seed({
+    list: ['c1', 'c2'].map((id) => ({ id, title: 'Linear equations', subject: 'math', grade: '8', updatedAt: '2026-10-20T10:00:00.000Z' })),
   })
-  progressMock.mockResolvedValue({ conversationId: 'c1', steps: [], updatedAt: '2026-10-20T10:00:00.000Z' })
-  availabilityMock.mockResolvedValue({ online: true, availableTeachers: 1, teacherSupport: null })
+  server.availability = { online: true, availableTeachers: 1, teacherSupport: null }
 })
 
 afterEach(() => {
@@ -110,10 +99,8 @@ afterEach(() => {
 
 describe('the list follows the open conversation', () => {
   it('is read again when a poll brings a teacher reply, and only then', async () => {
-    helpMock.mockResolvedValue(help('in_progress'))
-    let replied = false
-    conversationMock.mockImplementation(async () => conversation(replied ? [...asked, message('t-1', 'teacher', 'Teile beide Seiten durch 2.')] : asked),
-    )
+    helpIs(help('in_progress'))
+    readBack(conversation(asked))
     openAsk('c1')
     await advance(0)
     expect(listMock).toHaveBeenCalledTimes(1)
@@ -124,7 +111,7 @@ describe('the list follows the open conversation', () => {
     expect(conversationMock).toHaveBeenCalledTimes(2)
     expect(listMock).toHaveBeenCalledTimes(1)
 
-    replied = true
+    readBack(conversation([...asked, message('t-1', 'teacher', 'Teile beide Seiten durch 2.')]))
     await advance(5_000)
     expect(conversationMock).toHaveBeenCalledTimes(3)
     expect(listMock).toHaveBeenCalledTimes(2)
@@ -134,23 +121,20 @@ describe('the list follows the open conversation', () => {
   })
 
   it('is read again when the help status changes', async () => {
-    helpMock.mockResolvedValue(help('pending'))
-    conversationMock.mockResolvedValue(conversation(asked))
+    helpIs(help('pending'))
+    readBack(conversation(asked))
     openAsk('c1')
     await advance(0)
     expect(listMock).toHaveBeenCalledTimes(1)
 
-    helpMock.mockResolvedValue(help('assigned'))
+    helpIs(help('assigned'))
     await advance(15_000)
     expect(helpMock).toHaveBeenCalledTimes(2)
     expect(listMock).toHaveBeenCalledTimes(2)
   })
 
   it('is not read again for the first reading of a conversation', async () => {
-    helpMock.mockRejectedValue(NEVER_ESCALATED)
-    conversationMock.mockImplementation(async (id) =>
-      conversation(id === 'c1' ? asked : [message('s-9', 'student', 'Was ist eine Primzahl?', id)], id),
-    )
+    readBack(conversation(asked), conversation([message('s-9', 'student', 'Was ist eine Primzahl?', 'c2')], 'c2'))
     const { rerender } = openAsk('c1')
     await advance(0)
 
@@ -163,18 +147,12 @@ describe('the list follows the open conversation', () => {
 
 describe('an answer', () => {
   it('reads the conversation once, and the list once', async () => {
-    helpMock.mockRejectedValue(NEVER_ESCALATED)
-    let answered = false
-    conversationMock.mockImplementation(async () =>
-      conversation(
-        answered
-          ? [...asked, message('s-2', 'student', 'Und 3x = 9?'), message('a-2', 'assistant', 'x = 3')]
-          : asked,
-      ),
-    )
-    streamMock.mockImplementation(async () => {
-      answered = true
-      return 'streamed'
+    readBack(conversation(asked))
+    // Answered on the request, the answer written into the conversation.
+    server.answerWith({
+      leaves: {
+        conversations: [conversation([...asked, message('s-2', 'student', 'Und 3x = 9?'), message('a-2', 'assistant', 'x = 3')])],
+      },
     })
     const { result } = openAsk('c1')
     await advance(0)

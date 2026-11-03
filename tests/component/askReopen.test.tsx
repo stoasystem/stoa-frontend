@@ -14,46 +14,17 @@ import { MemoryRouter } from 'react-router-dom'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { AskHost } from '@/features/ask/AskHost'
 import { ASK_REOPEN } from '@/features/ask/askLayout'
+import { AskServerProvider } from '@/features/ask/server/askServer'
 import i18n from '@/i18n'
-import { ApiError } from '@/services/api/httpClient'
 import { resetAsk } from '@/store/askStore'
 import { type CurrentUser, useAuthStore } from '@/store/authStore'
+import { createFakeAskServer, type FakeAskServer } from '../fakes/askServer'
 
-vi.mock('@/services/analytics/analyticsClient', () => ({ trackEvent: vi.fn() }))
-vi.mock('@/services/chat/chatApi', () => ({
-  getConversations: vi.fn(async () => ({
-    items: [
-      { id: 'c1', title: 'Linear equations', subject: 'math', grade: '8', updatedAt: '2026-10-11T10:00:00.000Z' },
-      { id: 'c2', title: 'Fractions', subject: 'math', grade: '8', updatedAt: '2026-10-10T10:00:00.000Z' },
-    ],
-  })),
-  getConversation: vi.fn(async (id: string) => ({
-    id,
-    title: id === 'c2' ? 'Fractions' : 'Linear equations',
-    subject: 'math',
-    grade: '8',
-    updatedAt: '2026-10-11T10:00:00.000Z',
-    messages: [],
-  })),
-  createConversation: vi.fn(),
-}))
-vi.mock('@/services/chat/chatStreamApi', () => ({
-  streamConversationMessage: vi.fn(),
-  getGenerationProgress: vi.fn(),
-}))
-vi.mock('@/services/teacherHelp/teacherHelpApi', () => ({
-  getTeacherAvailability: vi.fn(async () => ({ online: false, availableTeachers: 0 })),
-  getTeacherHelpRequest: vi.fn(async () => {
-    throw new ApiError('never escalated', { status: 404 })
-  }),
-  createTeacherHelpRequest: vi.fn(),
-}))
-vi.mock('@/services/student/studentApi', () => ({
-  getStudentProfile: vi.fn(async () => ({ grade: '8', primarySubjects: ['math'] })),
-}))
-vi.mock('@/services/learning/memoryApi', () => ({
-  getMyMemorySummary: vi.fn(async () => ({ recommendations: [], weakTopics: [] })),
-}))
+const UPDATED = '2026-10-11T10:00:00.000Z'
+const summary = (id: string, title: string, updatedAt = UPDATED) => ({ id, title, subject: 'math', grade: '8', updatedAt })
+
+/** The server behind Ask, in memory (#571): two conversations listed, and no teacher online. */
+let server: FakeAskServer
 
 function emulateWidth(width: number) {
   window.matchMedia = ((query: string) => {
@@ -78,9 +49,11 @@ function planet(width = 1280) {
     <I18nextProvider i18n={i18n}>
       <QueryClientProvider client={client}>
         <MemoryRouter initialEntries={['/planet/math']}>
-          <AskHost>
-            <button type="button">Rotate the planet</button>
-          </AskHost>
+          <AskServerProvider value={server}>
+            <AskHost>
+              <button type="button">Rotate the planet</button>
+            </AskHost>
+          </AskServerProvider>
         </MemoryRouter>
       </QueryClientProvider>
     </I18nextProvider>,
@@ -101,6 +74,16 @@ beforeEach(async () => {
     isAuthenticated: true,
   })
   resetAsk()
+  // c2 never escalated, as c1: the fake's own default.
+  server = createFakeAskServer()
+  server.availability = { online: false, availableTeachers: 0 }
+  server.seed({
+    conversations: [
+      { ...summary('c1', 'Linear equations'), messages: [] },
+      { ...summary('c2', 'Fractions'), messages: [] },
+    ],
+    list: [summary('c1', 'Linear equations'), summary('c2', 'Fractions', '2026-10-10T10:00:00.000Z')],
+  })
 })
 
 afterEach(() => {

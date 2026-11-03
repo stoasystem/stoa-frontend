@@ -14,43 +14,14 @@ import { I18nextProvider } from 'react-i18next'
 import { MemoryRouter, Route, Routes, useParams } from 'react-router-dom'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { AskHost } from '@/features/ask/AskHost'
+import { AskServerProvider } from '@/features/ask/server/askServer'
 import i18n from '@/i18n'
-import { ApiError } from '@/services/api/httpClient'
-import { createConversation, getConversation, getConversations } from '@/services/chat/chatApi'
-import { getGenerationProgress } from '@/services/chat/chatStreamApi'
 import { resetAsk, useAskStore } from '@/store/askStore'
 import { type CurrentUser, useAuthStore } from '@/store/authStore'
+import { createFakeAskServer, type FakeAskServer } from '../fakes/askServer'
 
-vi.mock('@/services/analytics/analyticsClient', () => ({ trackEvent: vi.fn() }))
-vi.mock('@/services/chat/chatApi', () => ({
-  getConversations: vi.fn(),
-  getConversation: vi.fn(async (id: string) => ({
-    id,
-    title: id === 'c2' ? 'Fractions' : 'Linear equations',
-    subject: 'math',
-    grade: '8',
-    updatedAt: '2026-10-20T10:00:00.000Z',
-    messages: [],
-  })),
-  createConversation: vi.fn(),
-}))
-vi.mock('@/services/chat/chatStreamApi', () => ({
-  streamConversationMessage: vi.fn(),
-  getGenerationProgress: vi.fn(),
-}))
-vi.mock('@/services/teacherHelp/teacherHelpApi', () => ({
-  getTeacherAvailability: vi.fn(async () => ({ online: true, availableTeachers: 2 })),
-  getTeacherHelpRequest: vi.fn(async () => {
-    throw new ApiError('never escalated', { status: 404 })
-  }),
-  createTeacherHelpRequest: vi.fn(),
-}))
-vi.mock('@/services/student/studentApi', () => ({
-  getStudentProfile: vi.fn(async () => ({ grade: '8', primarySubjects: ['math'] })),
-}))
-vi.mock('@/services/learning/memoryApi', () => ({
-  getMyMemorySummary: vi.fn(async () => ({ recommendations: [], weakTopics: [] })),
-}))
+/** The server behind Ask, in memory (#571): c1 and c2 listed, c9 not, and teachers online. */
+let server: FakeAskServer
 
 const summary = (id: string, title: string) => ({
   id,
@@ -59,8 +30,6 @@ const summary = (id: string, title: string) => ({
   grade: '8',
   updatedAt: '2026-10-20T10:00:00.000Z',
 })
-
-const created = (id: string) => ({ ...summary(id, 'What is a prime?'), messages: [] })
 
 function emulateWidth(width: number) {
   window.matchMedia = ((query: string) => {
@@ -92,10 +61,12 @@ function show({ width = 1280, conversationId = null, direct = false }: { width?:
     <I18nextProvider i18n={i18n}>
       <QueryClientProvider client={client}>
         <MemoryRouter initialEntries={[direct ? '/ask' : '/planet/math']}>
-          <Routes>
-            <Route path="/ask/:conversationId?" element={<DirectAsk />} />
-            <Route path="*" element={<AskHost />} />
-          </Routes>
+          <AskServerProvider value={server}>
+            <Routes>
+              <Route path="/ask/:conversationId?" element={<DirectAsk />} />
+              <Route path="*" element={<AskHost />} />
+            </Routes>
+          </AskServerProvider>
         </MemoryRouter>
       </QueryClientProvider>
     </I18nextProvider>,
@@ -123,26 +94,28 @@ beforeEach(async () => {
     isAuthenticated: true,
   })
   resetAsk()
-  vi.mocked(getConversations).mockResolvedValue({
-    items: [summary('c1', 'Linear equations'), summary('c2', 'Fractions')],
+  server = createFakeAskServer()
+  server.seed({
+    conversations: [
+      { ...summary('c1', 'Linear equations'), messages: [] },
+      { ...summary('c2', 'Fractions'), messages: [] },
+      { ...summary('c9', 'Linear equations'), messages: [] },
+    ],
+    list: [summary('c1', 'Linear equations'), summary('c2', 'Fractions')],
+    newConversationIds: ['c-new'],
   })
   // The first question goes out with the conversation, and Ask then watches
   // its generation. Running for ever, that watch outlived the file and, ending
   // after jsdom was gone, threw "window is not defined" (PR #537's CI run
-  // 41083798606); finished, it ends within the test that asked.
-  vi.mocked(getGenerationProgress).mockResolvedValue({
-    conversationId: 'c-new',
-    steps: [],
-    updatedAt: new Date().toISOString(),
-    status: 'completed',
-  })
+  // 41083798606); finished, it ends within the test that asked. The fake ends
+  // the first question's command on its own.
 })
 
 afterEach(async () => {
   // A conversation started here is watched until its answer is done; let that
   // watch end inside the file, before jsdom goes.
-  if (vi.mocked(createConversation).mock.calls.length > 0) {
-    await vi.waitFor(() => expect(getGenerationProgress).toHaveBeenCalled(), { timeout: 3000 })
+  if (server.conversations.createConversation.mock.calls.length > 0) {
+    await vi.waitFor(() => expect(server.stream.getGenerationProgress).toHaveBeenCalled(), { timeout: 3000 })
     await act(async () => {})
   }
   window.matchMedia = originalMatchMedia
@@ -179,8 +152,7 @@ describe.each([
 
 describe('the title the keyboard lands on, before the conversation is read (#452)', () => {
   it('names the conversation as the list does, not “Ask”', async () => {
-    let read: (value: ReturnType<typeof created>) => void = () => {}
-    vi.mocked(getConversation).mockImplementationOnce(() => new Promise((resolve) => (read = resolve)))
+    const read = server.holdNext('getConversation')
     show()
     await panel().findByRole('button', { name: /Fractions/ })
 
@@ -189,7 +161,7 @@ describe('the title the keyboard lands on, before the conversation is read (#452
     expect(panel().getByRole('heading', { level: 2, name: 'Fractions' })).toHaveFocus()
     expect(panel().getByText('Mathematics')).toBeInTheDocument()
 
-    await act(async () => read({ ...summary('c2', 'Fractions'), messages: [] }))
+    await act(async () => read())
     expect(panel().getByRole('heading', { level: 2, name: 'Fractions' })).toHaveFocus()
   })
 })
@@ -205,7 +177,7 @@ describe('the way back to a list without that row', () => {
   })
 
   it('goes to the title when there is no list to go back to', async () => {
-    vi.mocked(getConversations).mockResolvedValue({ items: [] })
+    server.seed({ list: [] })
     show({ conversationId: 'c9' })
     await panel().findByRole('heading', { level: 2, name: 'Linear equations' })
 
@@ -230,7 +202,6 @@ describe('Ask at /ask', () => {
 
 describe('a question sent from the list', () => {
   it('leaves the cursor in the composer when its conversation opens', async () => {
-    vi.mocked(createConversation).mockResolvedValue(created('c-new'))
     show()
     const field = panel().getByRole('textbox', { name: 'Your question' })
 
@@ -241,8 +212,7 @@ describe('a question sent from the list', () => {
   })
 
   it('says the conversation is being started in a region that was there before it', async () => {
-    let finish: (value: ReturnType<typeof created>) => void = () => {}
-    vi.mocked(createConversation).mockImplementation(() => new Promise((resolve) => (finish = resolve)))
+    const finish = server.holdNext('createConversation')
     show()
     const region = document.querySelector<HTMLElement>('[data-ask-starting]')
     expect(region).toHaveAttribute('role', 'status')
@@ -252,6 +222,6 @@ describe('a question sent from the list', () => {
 
     expect(document.querySelector('[data-ask-starting]')).toBe(region)
     expect(region).toHaveTextContent('Starting the conversation…')
-    await act(async () => finish(created('c-new')))
+    await act(async () => finish())
   })
 })

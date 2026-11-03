@@ -13,20 +13,16 @@ import { MemoryRouter } from 'react-router-dom'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import i18n from '@/i18n'
 import { AskPanel } from '@/features/ask/AskPanel'
+import { AskServerProvider } from '@/features/ask/server/askServer'
 import { useAskController } from '@/features/ask/useAskController'
 import { resetAsk, useAskStore } from '@/store/askStore'
 import { useAuthStore } from '@/store/authStore'
 import { litMomentsFor, useLitMomentsStore, type LitMoment } from '@/store/litMomentsStore'
+import type { StudentProfile } from '@/types/student'
+import { createFakeAskServer, type FakeAskServer } from '../fakes/askServer'
 
-vi.mock('@/services/student/studentApi', () => ({ getStudentProfile: vi.fn(async () => ({ grade: 'grade_9' })) }))
-vi.mock('@/services/chat/chatApi', () => ({
-  getConversations: vi.fn(async () => ({ items: [] })),
-  getConversation: vi.fn(),
-  createConversation: vi.fn(),
-}))
-vi.mock('@/services/analytics/analyticsClient', () => ({ trackEvent: vi.fn(), rotateAnalyticsSession: vi.fn() }))
-
-import { getConversation } from '@/services/chat/chatApi'
+/** The server behind Ask, in memory (#571): each test seeds the conversation it opens. */
+let server: FakeAskServer
 
 const LIT_AT = '2026-10-18T09:00:00.000Z'
 const moment = (conversationId: string | null, subjectId = 'math'): LitMoment => ({
@@ -55,14 +51,16 @@ function Host() {
 }
 
 async function openConversation(data: ReturnType<typeof conversation>, moments: LitMoment[]) {
-  vi.mocked(getConversation).mockResolvedValue(data as never)
+  server.seed({ conversations: [data as never] })
   useLitMomentsStore.setState({ byOwner: { 'student-a': moments } })
   useAskStore.getState().select('student-a', data.id)
   const client = new QueryClient({ defaultOptions: { queries: { retry: false } } })
   render(
     <QueryClientProvider client={client}>
       <MemoryRouter>
-        <Host />
+        <AskServerProvider value={server}>
+          <Host />
+        </AskServerProvider>
       </MemoryRouter>
     </QueryClientProvider>,
   )
@@ -73,6 +71,9 @@ const card = () => screen.queryByRole('region', { name: i18n.t('chat:ask.lit.lab
 
 beforeEach(async () => {
   await i18n.changeLanguage('en')
+  // Nothing listed: the fake's own default, for a student in year 9.
+  server = createFakeAskServer()
+  server.profile = { grade: 'grade_9' } as StudentProfile
   useAuthStore.setState({ user: { id: 'student-a' } as never })
 })
 afterEach(() => {
