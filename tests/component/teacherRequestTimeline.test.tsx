@@ -22,7 +22,7 @@ const servedNote = {
 
 describe('teacher request timeline', () => {
   it('names the author of a reply as the backend serves it', () => {
-    render(<TeacherRequestTimeline notes={[servedNote]} />)
+    render(<TeacherRequestTimeline requestId="r1" notes={[servedNote]} />)
 
     expect(screen.getByText('teacher@test.stoaedu.ch')).toBeInTheDocument()
     expect(screen.getByText('Probier jetzt 15 : 5.')).toBeInTheDocument()

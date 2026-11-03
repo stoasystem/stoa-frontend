@@ -41,10 +41,60 @@ export const MIME_BY_EXTENSION: Readonly<Record<string, readonly string[]>> = {
 /** The images, which carry the smaller limit. */
 export const IMAGE_EXTENSIONS = ['jpg', 'jpeg', 'png'] as const
 
+/**
+ * The photos the browser turns into a JPEG of its own before anything goes up
+ * (#508): the backend's images, and an iPhone's HEIC, which the backend never
+ * sees. The media types each may declare; a browser that names none leaves it
+ * to the decoder.
+ */
+export const PREPARED_IMAGE_TYPES: Readonly<Record<string, readonly string[]>> = {
+  jpg: ['image/jpeg'],
+  jpeg: ['image/jpeg'],
+  png: ['image/png'],
+  heic: ['image/heic', 'image/heif', 'image/heic-sequence', 'image/heif-sequence'],
+  heif: ['image/heif', 'image/heic', 'image/heif-sequence', 'image/heic-sequence'],
+}
+
+/**
+ * A photo as chosen, before it is shrunk. What goes up is a JPEG of at most
+ * 1568 px a side, far under `IMAGE_MAX_BYTES`; this only keeps the browser
+ * from decoding a file no phone or screenshot comes near.
+ */
+export const IMAGE_SOURCE_MAX_BYTES = 30 * 1024 * 1024
+
 /** For the file chooser's `accept`, so the picker offers only what can be sent. */
-export const ACCEPT_ATTRIBUTE = Object.keys(MIME_BY_EXTENSION)
+export const ACCEPT_ATTRIBUTE = [...new Set([...Object.keys(MIME_BY_EXTENSION), ...Object.keys(PREPARED_IMAGE_TYPES)])]
   .map((extension) => `.${extension}`)
   .join(',')
+
+/**
+ * For a chooser that takes photos only: a teacher's reply carries JPEG and PNG,
+ * nothing else (`help_reply_image`, stoa-backend#145), and a HEIC becomes one.
+ */
+export const IMAGE_ACCEPT_ATTRIBUTE = Object.keys(PREPARED_IMAGE_TYPES)
+  .map((extension) => `.${extension}`)
+  .join(',')
+
+/**
+ * For the camera's `accept` (#509). With `capture`, a phone opens the camera
+ * for an image type; what it takes is a JPEG (a HEIC on some iPhones), which
+ * `PREPARED_IMAGE_TYPES` covers. Anything else `rejectionFor` refuses as it
+ * would from the chooser.
+ */
+export const CAMERA_ACCEPT_ATTRIBUTE = 'image/*'
+
+/**
+ * For a chooser that offers photos only: the phone's page a QR opens (#514),
+ * which sends nothing else.
+ */
+export const PHOTO_ACCEPT_ATTRIBUTE = Object.keys(PREPARED_IMAGE_TYPES)
+  .map((extension) => `.${extension}`)
+  .join(',')
+
+/** A photo the browser prepares before it goes up (#508). */
+export function isPreparedImage(filename: string) {
+  return Object.prototype.hasOwnProperty.call(PREPARED_IMAGE_TYPES, extensionOf(filename))
+}
 
 export function extensionOf(filename: string) {
   return filename.includes('.') ? filename.split('.').pop()!.toLowerCase() : ''
@@ -57,8 +107,28 @@ export function maxBytesFor(filename: string) {
     : DOCUMENT_MAX_BYTES
 }
 
-/** Why this file cannot go out, before anything is sent; `null` when it can. */
+/**
+ * Why this file cannot go out, before anything is sent; `null` when it can. A
+ * photo is held against what the browser can prepare; what it prepares is held
+ * against the backend's own limits again before it goes up.
+ */
 export function rejectionFor(file: File): 'unsupported' | 'tooLarge' | 'empty' | null {
+  if (isPreparedImage(file.name)) {
+    if (file.type && !PREPARED_IMAGE_TYPES[extensionOf(file.name)].includes(file.type)) return 'unsupported'
+    if (file.size <= 0) return 'empty'
+    if (file.size > IMAGE_SOURCE_MAX_BYTES) return 'tooLarge'
+    return null
+  }
+  return uploadRejectionFor(file)
+}
+
+/** As `rejectionFor`, for a purpose that takes photos only: any other file is `unsupported`. */
+export function imageRejectionFor(file: File): 'unsupported' | 'tooLarge' | 'empty' | null {
+  return isPreparedImage(file.name) ? rejectionFor(file) : 'unsupported'
+}
+
+/** Why the backend would refuse this file as it is, by its own table; `null` when it would not. */
+export function uploadRejectionFor(file: File): 'unsupported' | 'tooLarge' | 'empty' | null {
   const allowed = MIME_BY_EXTENSION[extensionOf(file.name)]
   if (!allowed) return 'unsupported'
   // `create_upload_intent` refuses a type that does not match the extension.

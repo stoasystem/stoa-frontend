@@ -53,10 +53,33 @@ export type AdminPlatformStats = {
   teacher_sla: AdminTeacherSlaStats
 }
 
-export type ModerationSurface = 'question' | 'ai_answer' | 'teacher_reply'
+// `image_upload` is the system's own case: an image moderation refused (#538).
+export type ModerationSurface = 'question' | 'ai_answer' | 'teacher_reply' | 'image_upload'
 export type ModerationReason = 'incorrect_answer' | 'unsafe_content' | 'abuse' | 'privacy' | 'other'
 export type ModerationSeverity = 'low' | 'medium' | 'high'
 export type ModerationCaseStatus = 'open' | 'in_review' | 'actioned' | 'dismissed' | 'closed'
+
+/** One label that refused the image, and the blocked category it fell under. */
+export type ModerationImageHit = {
+  label: string
+  category: string
+  /** Rekognition's own scale, 0 to 100. */
+  confidence: number
+}
+
+/** What an `image_upload` case is about. The image itself is read on its own. */
+export type ModerationImageContext = {
+  upload_id: string
+  conversation_id?: string | null
+  uploaded_at?: string | null
+  uploader_id: string
+  uploader_role: string
+  media_type: string
+  size_bytes: number
+  hits: ModerationImageHit[]
+  image_status: 'stored' | 'deleted'
+  image_deleted_at?: string | null
+}
 
 export type ModerationCase = {
   case_id: string
@@ -64,7 +87,8 @@ export type ModerationCase = {
   reason: ModerationReason
   severity: ModerationSeverity
   surface: ModerationSurface
-  question_id: string
+  // None for an `image_upload` case: no question was asked.
+  question_id?: string | null
   student_id?: string | null
   reporter_id: string
   reporter_role: string
@@ -84,6 +108,7 @@ export type ModerationCase = {
     teacher_response_preview?: string | null
     has_image?: boolean
   } | null
+  image_context?: ModerationImageContext | null
   history?: {
     event_id: string
     event_type: string
@@ -165,6 +190,19 @@ export async function getModerationCases(filters: ModerationCaseListFilters = {}
 
 export async function getModerationCase(caseId: string) {
   const response = await httpClient.get<ModerationCase>(apiPath`/admin/moderation/cases/${caseId}`)
+  return response.data
+}
+
+/**
+ * The image an `image_upload` case refused, for an admin to look at (#538). The
+ * route wants the admin's token, so the page cannot hand its address to an
+ * `<img>`: the bytes come back as a Blob for an object URL. 404 when the image
+ * was deleted, or the case never had one.
+ */
+export async function getModerationCaseImage(caseId: string) {
+  const response = await httpClient.get<Blob>(apiPath`/admin/moderation/cases/${caseId}/image`, {
+    responseType: 'blob',
+  })
   return response.data
 }
 

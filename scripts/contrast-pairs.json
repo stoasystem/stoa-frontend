@@ -344,7 +344,7 @@
       "kind": "text",
       "use": "muted text on the sky",
       "gate": false,
-      "why": "inactive text only: labels of disabled, non-interactive controls, which WCAG 1.4.3 exempts; never for anything clickable (a tappable locked node is not exempt) or text meant to be read (user 2026-09-28, #17, #18)"
+      "why": "inactive text only: labels of disabled, non-interactive controls, which WCAG 1.4.3 exempts; never for anything clickable (a tappable waiting node is not exempt) or text meant to be read (user 2026-09-28, #17, #18)"
     },
     {
       "theme": "dark",
@@ -447,12 +447,12 @@
     },
     {
       "theme": "dark",
-      "fg": "--starmap-link-locked",
+      "fg": "--starmap-link-waiting",
       "bg": "--sky",
       "kind": "ui",
-      "use": "star map line into a locked star, tier 4, dashed: only the lines of the star in focus (keyboard focus or chosen) or being dragged (#121, #138 D1); a relation across subjects at 70% of its tier's ink as a faint direction at the nebula band (#138 D2)",
+      "use": "star map line into a waiting star, tier 4, dashed: only the lines of the star in focus (keyboard focus or chosen) or being dragged (#121, #138 D1); a relation across subjects at 70% of its tier's ink as a faint direction at the nebula band (#138 D2)",
       "gate": false,
-      "why": "Darkest tier by design (#121), and since #138 D1 never drawn for every star: only around the one star in focus or in the hand (a locked star's card lists its missing prerequisites as links). Nothing on it can be done yet. Dashed, so about a third inked. Across subjects (#138 D2) the faint direction is never the only cue: the screen's edge names where it leads (\"↘ Optics · Physics\") in --on-sky-text-body on a patch of --sky, gated text above."
+      "why": "Darkest tier by design (#121), and since #138 D1 never drawn for every star: only around the one star in focus or in the hand (a waiting star's card lists its missing prerequisites as links). Nothing on it can be done yet. Dashed, so about a third inked. Across subjects (#138 D2) the faint direction is never the only cue: the screen's edge names where it leads (\"↘ Optics · Physics\") in --on-sky-text-body on a patch of --sky, gated text above."
     },
     {
       "theme": "dark",
@@ -560,10 +560,10 @@
     },
     {
       "theme": "dark",
-      "fg": "--starmap-dot-locked",
+      "fg": "--starmap-dot-waiting",
       "bg": "--sky",
       "kind": "ui",
-      "use": "star map knowledge point drawn as a dot, locked (#109): a locked point opens its prerequisites when tapped, so it is a control (WCAG 1.4.11)",
+      "use": "star map knowledge point drawn as a dot, waiting on its prerequisites (#109, ADR 0004): a waiting point opens its prerequisites when tapped, so it is a control (WCAG 1.4.11)",
       "why": "The dot is what most knowledge points ever are -- on a map of ten, eight of them -- so each state's ink carries which state the point is in and is rated here, not left as decoration. Over nebula haze it is checked in starmapContrast.test.ts."
     },
     {

@@ -16,10 +16,11 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import i18n from '@/i18n'
 
 const adminEvents = vi.hoisted(() => ({ items: [] as unknown[] }))
+const bellEvents = vi.hoisted(() => ({ items: [] as unknown[] }))
 
 vi.mock('@/hooks/notifications/useNotificationsQuery', () => ({
   useAdminNotificationsQuery: () => ({ data: adminEvents, isLoading: false, isError: false }),
-  useNotificationsQuery: () => ({ data: { items: [] }, isLoading: false, isError: false }),
+  useNotificationsQuery: () => ({ data: bellEvents, isLoading: false, isError: false }),
   useUnreadNotificationCountQuery: () => ({ data: 0 }),
   useMarkNotificationReadMutation: () => ({ mutate: vi.fn() }),
   useArchiveNotificationMutation: () => ({ mutate: vi.fn() }),
@@ -41,6 +42,7 @@ const EVENT_TYPES = [
   'teacher_takeover',
   'teacher_reply',
   'teacher_help_expired',
+  'teacher_help_dispatched',
   'moderation_case_update',
   'subscription_request_update',
   'learning_profile_update',
@@ -84,16 +86,19 @@ function adminEvent(fields: Record<string, unknown>) {
 beforeEach(async () => {
   await i18n.changeLanguage('de')
   adminEvents.items = []
+  bellEvents.items = []
 })
 
 describe("the system page's operational notifications in German", () => {
-  it('reads a new moderation case, which the backend sends in English, in German', () => {
+  // The backend renders it in the admin's language when the list is read
+  // (stoa-backend#161, #518); the labels around it are the app's.
+  it('reads a new moderation case in German, as the backend rendered it', () => {
     adminEvents.items = [
       adminEvent({
         eventType: 'moderation_case_update',
         targetType: 'moderation_case',
-        title: 'New moderation case',
-        summary: 'medium moderation case reported.',
+        title: 'Neuer Moderationsfall',
+        summary: 'Ein Moderationsfall mit mittlerem Schweregrad wurde gemeldet.',
       }),
     ]
     render(wrap(<AdminOperationalNotificationsCard />))
@@ -119,6 +124,21 @@ describe("the system page's operational notifications in German", () => {
     expect(screen.queryByText(/failed|subscription/)).toBeNull()
   })
 
+  // stoa-backend#141 (#511): named, not filed under "other".
+  it('names a help request assigned to a teacher in German', () => {
+    adminEvents.items = [
+      adminEvent({
+        eventType: 'teacher_help_dispatched',
+        targetType: 'question',
+        title: 'Neue Hilfeanfrage für Sie',
+        summary: 'Fach: Mathematik. Bitte nehmen Sie die Anfrage innerhalb von 10 Minuten an.',
+      }),
+    ]
+    render(wrap(<AdminOperationalNotificationsCard />))
+    expect(screen.getByText(/^Hilfeanfrage zugewiesen · /)).toBeInTheDocument()
+    expect(screen.queryByText(/Anderes Ereignis|teacher_help_dispatched/)).toBeNull()
+  })
+
   it('shows a type or status it does not know as a translated "other", never the id', () => {
     adminEvents.items = [
       adminEvent({ eventType: 'brand_new_event', targetType: 'brand_new_target', status: 'queued', title: 'T', summary: 'S' }),
@@ -140,10 +160,31 @@ describe('the operational labels exist in all four languages', () => {
     for (const type of EVENT_TYPES) expect(labels.eventTypes[type], `${lng} ${type}`).toBeTruthy()
     for (const target of TARGET_TYPES) expect(labels.targetTypes[target], `${lng} ${target}`).toBeTruthy()
     for (const status of STATUSES) expect(common.notifications.itemStatus[status], `${lng} ${status}`).toBeTruthy()
-    for (const severity of ['Low', 'Medium', 'High']) {
-      const copy = common.notifications.events[`moderationCreated${severity}`]
-      expect(copy?.title && copy?.summary, `${lng} ${severity}`).toBeTruthy()
-    }
+  })
+})
+
+// stoa-backend#161 (#518): the backend renders a help request sent to every
+// teacher in the reader's language; the bell shows it as it came.
+describe("a German teacher's bell", () => {
+  it('shows a help request in German, as the backend rendered it', async () => {
+    useAuthStore.setState({ user: { id: 't', email: 't@test.stoaedu.ch', name: 'T', role: 'teacher' } as never })
+    bellEvents.items = [
+      adminEvent({
+        eventId: 'e-help',
+        recipientRole: 'teacher',
+        eventType: 'teacher_requested',
+        targetType: 'question',
+        title: 'Hilfe angefragt',
+        summary: 'Eine Schülerin oder ein Schüler bittet um Hilfe bei einer Frage in Mathematik.',
+        metadata: { subject: 'math' },
+      }),
+    ]
+    render(wrap(<NotificationCenter />))
+    await userEvent.click(screen.getByRole('button', { name: /^Mitteilungen/ }))
+
+    expect(screen.getByText('Hilfe angefragt')).toBeInTheDocument()
+    expect(screen.getByText('Eine Schülerin oder ein Schüler bittet um Hilfe bei einer Frage in Mathematik.')).toBeInTheDocument()
+    expect(screen.queryByText(/requested|math/)).toBeNull()
   })
 })
 

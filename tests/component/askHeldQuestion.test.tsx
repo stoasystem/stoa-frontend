@@ -3,7 +3,8 @@
  * a file, which that request cannot carry -- and the quote itself (#263):
  *
  * - the held question goes out once the conversation exists, whether or not
- *   Ask is still open, and after a reload if its request was lost;
+ *   Ask is still open, and after a reload if its request was lost (what it
+ *   carries, and under which key, is the question module's: `askQuestion562`);
  * - it goes into the conversation made for it, never one the student opened
  *   meanwhile;
  * - a quote belongs to the exercise, or the conversation, it was taken from,
@@ -133,11 +134,10 @@ describe('a question held back from POST /conversations', () => {
     await waitFor(() => expect(streamConversationMessage).toHaveBeenCalledTimes(1))
     const [call] = vi.mocked(streamConversationMessage).mock.calls[0]
     expect(call.conversationId).toBe('new-1')
-    expect(call.payload.content).toBe('Why subtract 3 first?')
-    expect(call.payload.quote).toEqual({ text: '2x + 3 = 7', source: { kind: 'challenge', id: 'ch-1' } })
-    expect(call.payload.practiceContext).toEqual(practiceOn('ch-1').context)
     // Kept as the conversation's pending message, so opening it shows it waiting.
     expect(readPendingMessage('new-1')?.content).toBe('Why subtract 3 first?')
+    // The passage went with it, and leaves the composer.
+    expect(useAskQuoteStore.getState().quote).toBeNull()
     // A closed Ask stays closed.
     expect(screen.queryByRole('complementary', { name: 'Ask' })).toBeNull()
   })
@@ -239,5 +239,32 @@ describe('a quote chosen beside an exercise', () => {
     await userEvent.type(panel.getByRole('textbox'), 'And then?{Enter}')
     await waitFor(() => expect(streamConversationMessage).toHaveBeenCalledTimes(1))
     expect(vi.mocked(streamConversationMessage).mock.calls[0][0].payload).not.toHaveProperty('quote')
+  })
+})
+
+describe('Ask beside an exercise says how to dictate, behind a microphone (#515, #553)', () => {
+  it('in the docked composer under the stage on a phone', async () => {
+    vi.mocked(getConversations).mockResolvedValue({ items: [] } as never)
+    const mac = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Safari/605.1.15'
+    Object.defineProperty(window.navigator, 'userAgent', { value: mac, configurable: true })
+    // Narrow: Ask starts closed and the composer is docked under the exercise.
+    window.matchMedia = ((query: string) => ({
+      matches: false,
+      media: query,
+      onchange: null,
+      addEventListener() {},
+      removeEventListener() {},
+      addListener() {},
+      removeListener() {},
+      dispatchEvent: () => false,
+    })) as never
+    try {
+      const { container } = mount(<Stage />)
+      const docked = within(container.querySelector<HTMLElement>('[data-ask-docked]')!)
+      await userEvent.click(docked.getByRole('button', { name: 'Ask by voice' }))
+      expect(container.querySelector('[data-composer-dictation]')).toHaveAttribute('data-composer-dictation', 'mac')
+    } finally {
+      Reflect.deleteProperty(window.navigator, 'userAgent')
+    }
   })
 })

@@ -1,4 +1,4 @@
-import { render, screen, within } from '@testing-library/react'
+import { render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { describe, expect, it, vi } from 'vitest'
 import { ConstellationPath } from '@/features/chapter/ConstellationPath'
@@ -27,7 +27,7 @@ const LESSONS: ChapterLesson[] = [
   lesson('l3', 'available', 3),
   lesson('l4', 'available', 4),
   lesson('l5', 'review', 5),
-  lesson('l6', 'locked', 6),
+  lesson('l6', 'available', 6),
 ]
 
 function draw(lessons = LESSONS, nextLessonId: string | null = 'l3') {
@@ -50,7 +50,7 @@ describe('the constellation a chapter is drawn as', () => {
       'available',
       'available',
       'review',
-      'locked',
+      'available',
     ])
   })
 
@@ -83,22 +83,12 @@ describe('the constellation a chapter is drawn as', () => {
     expect(container.querySelectorAll('[data-constellation-pulse]')).toHaveLength(1)
   })
 
-  it('tells a locked lesson apart without colour alone', () => {
-    // Shape as well as hue: a reader who cannot separate the colours still
-    // sees a padlock rather than a number.
-    const { container } = draw()
-
-    const locked = container.querySelector('[data-lesson-status="locked"]')!
-    expect(within(locked as HTMLElement).queryByRole('link')).toBeNull()
-    expect(locked.querySelector('svg')).not.toBeNull()
-  })
-
-  it('does not let a locked lesson be opened', () => {
+  it('opens every lesson: nothing is locked (ADR 0004)', () => {
     const { container } = draw()
 
     const links = [...container.querySelectorAll('a')].map((a) => a.getAttribute('href'))
-    expect(links).not.toContain('/chapter/u-1/l6')
-    expect(links).toContain('/chapter/u-1/l3')
+    for (const id of ['l1', 'l2', 'l3', 'l4', 'l5', 'l6']) expect(links).toContain(`/chapter/u-1/${id}`)
+    expect(container.querySelector('svg.lucide-lock')).toBeNull()
   })
 
   it('marks the lesson to go on with as the current step', () => {
@@ -108,7 +98,7 @@ describe('the constellation a chapter is drawn as', () => {
     expect(current?.getAttribute('href')).toBe('/chapter/u-1/l3')
   })
 
-  it('offers testing out of an open lesson, never of a locked or finished one', () => {
+  it('offers testing out of an open lesson, never of a finished one', () => {
     const { container } = draw()
 
     const testOuts = [...container.querySelectorAll('[data-test-out]')].map((a) => a.getAttribute('href'))
@@ -116,6 +106,7 @@ describe('the constellation a chapter is drawn as', () => {
       '/chapter/u-1/l3?mode=quiz',
       '/chapter/u-1/l4?mode=quiz',
       '/chapter/u-1/l5?mode=quiz',
+      '/chapter/u-1/l6?mode=quiz',
     ])
   })
 
@@ -154,7 +145,7 @@ describe('the constellation a chapter is drawn as', () => {
     const width = (state: string) =>
       (container.querySelector(`[data-node-state="${state}"]`) as HTMLElement).style.borderWidth
 
-    for (const state of ['ready', 'review', 'locked']) {
+    for (const state of ['ready', 'review']) {
       expect(width(state), `${state} has no ring`).toBe('var(--constellation-ring)')
     }
     expect(width('done')).toBe('')

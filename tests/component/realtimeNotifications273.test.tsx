@@ -195,3 +195,72 @@ describe('a redelivered event (#273 item 2)', () => {
     ])
   })
 })
+
+/*
+ * #518: "New moderation case" and "Teacher help requested" go to a whole role,
+ * and their push carries the English the backend stored; only a read of the
+ * list renders them in the reader's language (stoa-backend#161). Their push
+ * reads the lists again instead of putting that English in the bell.
+ */
+describe('a push for a notification sent to a whole role (#518)', () => {
+  const listed: NotificationEvent = {
+    eventId: 'e-1',
+    recipientRole: 'admin',
+    eventType: 'system_notice',
+    targetType: 'system_status',
+    targetId: 's-1',
+    title: 'Systemhinweis',
+    summary: 'Alles in Ordnung.',
+    status: 'read',
+    createdAt: '2026-10-29T07:00:00Z',
+    metadata: {},
+  }
+
+  function setUp() {
+    const client = new QueryClient()
+    client.setQueryData<NotificationListResponse>(notificationQueryKeys.list(), { items: [listed], count: 1 })
+    client.setQueryData<NotificationListResponse>(notificationQueryKeys.adminList(), { items: [listed], count: 1 })
+    client.setQueryData<number>(notificationQueryKeys.unreadCount(), 0)
+    return client
+  }
+
+  it.each([
+    ['moderation_case_update', 'moderation_case', 'New moderation case', 'A medium-severity moderation case was reported.'],
+    ['teacher_requested', 'question', 'Teacher help requested', 'A student requested help with a Mathematics question.'],
+  ])('reads the lists again for %s on a %s, and shows none of its English', (eventType, targetType, title, summary) => {
+    const client = setUp()
+    const event = parseRealtimeNotificationMessage(
+      JSON.stringify({ eventId: 'e-role', recipientId: null, recipientRole: 'admin', eventType, targetType, title, summary }),
+    )!
+
+    mergeRealtimeNotification(client, event, { id: 'u-1', role: 'admin' } as never)
+
+    for (const key of [notificationQueryKeys.list(), notificationQueryKeys.adminList(), notificationQueryKeys.unreadCount()]) {
+      expect(client.getQueryState(key)?.isInvalidated, key.join('/')).toBe(true)
+    }
+    expect(client.getQueryData<NotificationListResponse>(notificationQueryKeys.list())!.items).toEqual([listed])
+    expect(client.getQueryData<NotificationListResponse>(notificationQueryKeys.adminList())!.items).toEqual([listed])
+    expect(client.getQueryData<number>(notificationQueryKeys.unreadCount())).toBe(0)
+  })
+
+  it('still merges a moderation update sent to one person, which is stored as it reads', () => {
+    const client = setUp()
+    const event = parseRealtimeNotificationMessage(
+      JSON.stringify({
+        eventId: 'e-own',
+        recipientId: 'u-1',
+        recipientRole: 'admin',
+        eventType: 'moderation_case_update',
+        targetType: 'moderation_case',
+        title: 'Moderation case updated',
+        summary: 'Moderation case status is open.',
+      }),
+    )!
+
+    mergeRealtimeNotification(client, event, { id: 'u-1', role: 'admin' } as never)
+
+    const ids = client.getQueryData<NotificationListResponse>(notificationQueryKeys.list())!.items.map((item) => item.eventId)
+    expect(ids).toEqual(['e-own', 'e-1'])
+    expect(client.getQueryState(notificationQueryKeys.list())?.isInvalidated).toBe(false)
+  })
+})

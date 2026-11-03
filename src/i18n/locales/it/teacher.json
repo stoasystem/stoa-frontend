@@ -64,7 +64,18 @@
     "reportContext": "Invia il contesto di questa richiesta alla moderazione interna.",
     "noNotes": "Ancora nessuna nota dell’insegnante.",
     "replyPaused": "Al momento non è possibile aggiornare la richiesta. La tua bozza resta salvata: potrai inviarla appena la connessione torna.",
-    "openAutomation": "Assegna esercizi a {{name}} nell’automazione dell’apprendimento"
+    "openAutomation": "Assegna esercizi a {{name}} nell’automazione dell’apprendimento",
+    "attachments": {
+      "label": "Allegati",
+      "alt": "Immagine della persona che apprende: {{name}}",
+      "open": "Ingrandire l’immagine: {{name}}",
+      "loading": "Caricamento dell’immagine …",
+      "unavailable": "Immagine non disponibile",
+      "failed": "Impossibile caricare l’immagine.",
+      "retry": "Riprovare",
+      "retryNamed": "Riprovare: {{name}}",
+      "altTeacher": "Immagine del docente: {{name}}"
+    }
   },
   "profile": {
     "eyebrow": "Account insegnante",
@@ -97,6 +108,17 @@
       "busy": "Al momento occupato",
       "unavailable": "Non accetta studenti",
       "paused": "In pausa"
+    },
+    "notifications": {
+      "title": "Impostazioni delle notifiche",
+      "description": "Una richiesta di aiuto assegnata a te compare sempre nelle tue notifiche.",
+      "dispatchEmail": {
+        "title": "E-mail per le nuove richieste di aiuto",
+        "body": "Un’e-mail ogni volta che ti viene assegnata una richiesta di aiuto, con la materia e un link. Non contiene mai ciò che lo studente ha scritto."
+      },
+      "loading": "Caricamento delle impostazioni delle notifiche…",
+      "unavailable": "Non è stato possibile caricare le impostazioni delle notifiche.",
+      "saveFailed": "Non è stato possibile salvare l’impostazione. Riprova."
     }
   },
   "requests": {
@@ -212,7 +234,27 @@
       "tooManyBlocks": "Una risposta può avere al massimo {{max}} blocchi. Unisci alcuni blocchi o rimuovine uno.",
       "tooLong": "La risposta è troppo lunga: {{length}} caratteri su un massimo di {{max}} in totale. Accorciala."
     },
-    "removeBlock": "Rimuovi il blocco {{number}}"
+    "removeBlock": "Rimuovi il blocco {{number}}",
+    "attachments": {
+      "add": "Aggiungi immagine",
+      "label": "Immagini allegate",
+      "remove": "Rimuovi {{name}}",
+      "uploading": "Aggiunta in corso…",
+      "uploadingFile": "Aggiunta di {{name}} in corso…",
+      "needsText": "Aggiunga qualche parola: un’immagine da sola non si può ancora inviare.",
+      "errors": {
+        "tooMany": "Una risposta porta al massimo {{count}} immagini.",
+        "tooLarge": "Questa immagine è troppo grande. Le foto possono arrivare a {{imageLimit}}.",
+        "unsupported": "Si possono inviare solo foto: JPEG, PNG o HEIC.",
+        "empty": "Questo file è vuoto. Ne scelga un altro.",
+        "expired": "Questa immagine ha impiegato troppo tempo. La scelga di nuovo.",
+        "quota": "Al momento non c’è spazio per le immagini.",
+        "unavailable": "Al momento non si possono aggiungere immagini. Riprovi tra un attimo.",
+        "unreadable": "Questa foto non si può aprire. Provi con un’altra o con uno screenshot.",
+        "blocked": "Questa immagine non si può inviare. Ne scelga un’altra oppure la descriva a parole.",
+        "failed": "Non è stato possibile aggiungere questa immagine. Riprovi."
+      }
+    }
   },
   "practiceContext": {
     "source": "Fonte: {{source}}",
@@ -359,6 +401,7 @@
       "tooManyBlocks": "La tua risposta non è stata accettata: ha troppi blocchi. Uniscine alcuni.",
       "blockTooLong": "La tua risposta non è stata accettata: uno dei suoi blocchi è troppo lungo. Accorcia o dividi quel blocco.",
       "tooLong": "La tua risposta non è stata accettata: nel complesso è troppo lunga. Accorciala o dividila."
-    }
+    },
+    "replyImagesExpired": "La risposta non è stata inviata: un’immagine non era più valida. La scelga di nuovo e poi invii ancora."
   }
 }

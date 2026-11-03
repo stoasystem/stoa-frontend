@@ -47,11 +47,12 @@ import { LEARNING_STATES, nebulaCounts, orderedNebulae, orderedStars, subjectOfN
 import { usePrefersReducedMotion } from '@/features/starmap/motion/usePrefersReducedMotion'
 import { createRenderer } from '@/features/starmap/render/createRenderer'
 import { GALAXY_NAME_INK } from '@/features/starmap/render/galaxyNames'
+import { STAR_INK } from '@/features/starmap/render/glyph'
 import { LINK_INK } from '@/features/starmap/render/links'
 import type { StarMapRenderer, StarMapTheme } from '@/features/starmap/render/types'
 import { nebulaDiscs } from '@/features/starmap/view/geometry'
 import { arrowDirection, courseNebulae, nearestInDirection } from '@/features/starmap/view/keyboardOrder'
-import { isWide, nebulaFocusSpot, NEBULA_FOCUS_HEIGHT, outerTarget, pathForTarget, sheetBand, starHintSpot, starLinkSize, type LayerTarget } from '@/features/starmap/view/layers'
+import { isWide, nebulaFocusSpot, NEBULA_FOCUS_HEIGHT, outerTarget, pathForTarget, sheetBand, starHintSpot, starLinkSize, type LayerTarget, type StarCardFocus } from '@/features/starmap/view/layers'
 import { CHOICE, SHEET, ZOOM } from '@/features/starmap/view/semanticZoom'
 import { ringNeighbour, SKY_WRAP } from '@/features/starmap/view/sky'
 import { cn } from '@/lib/utils'
@@ -83,11 +84,13 @@ function readTheme(element: Element): StarMapTheme {
     textCaption: read('--on-sky-text-caption', THEME_FALLBACK.textCaption),
     fontFamily: read('--font-system', THEME_FALLBACK.fontFamily),
     galaxyName: read('--starmap-galaxy-name', GALAXY_NAME_INK),
+    rim: read('--starmap-rim', STAR_INK.rim),
+    ice: read('--starmap-ice', STAR_INK.ice),
     links: {
       recommended: read('--starmap-link-recommended', LINK_INK.recommended),
       inProgress: read('--starmap-link-in-progress', LINK_INK.inProgress),
       walked: read('--starmap-link-walked', LINK_INK.walked),
-      locked: read('--starmap-link-locked', LINK_INK.locked),
+      waiting: read('--starmap-link-waiting', LINK_INK.waiting),
       bridge: read('--starmap-bridge', LINK_INK.bridge),
     },
   }
@@ -169,6 +172,10 @@ function LegendKey({ t }: { t: UseTranslationResponse<'starmap', undefined>['t']
           </li>
         ))}
         <li className="inline-flex items-center gap-1.5 text-[13px] text-[color:var(--on-sky-text-body)]">
+          <StarGlyph state="waiting" size={18} />
+          {t('legend.waiting')}
+        </li>
+        <li className="inline-flex items-center gap-1.5 text-[13px] text-[color:var(--on-sky-text-body)]">
           <StarGlyph state="ready" size={18} recommended />
           {t('marker.recommended')}
         </li>
@@ -198,7 +205,7 @@ export function StarMapView({ map, demo = false, target, onNavigate, land, onFir
   const { t, i18n } = useTranslation('starmap')
   // The map's own links keep the query (`?points=`, the dev switches), as its
   // navigation does: a switch must hand the engine the same sky (#123).
-  const { search } = useLocation()
+  const { search, state: arrival, key: arrivalKey } = useLocation()
   const here = (path: string) => path + search
   const reducedMotion = usePrefersReducedMotion()
   const stageRef = useRef<HTMLDivElement>(null)
@@ -351,7 +358,10 @@ export function StarMapView({ map, demo = false, target, onNavigate, land, onFir
   }, [map])
 
   useEffect(() => {
-    engineRef.current?.setTarget(target)
+    const engine = engineRef.current
+    // Asked to fly out (the first reveal): letting a choice go would leave the camera where it is.
+    if (target.layer === 'map' && target.fly) engine?.expectTarget(target, 'fly')
+    engine?.setTarget(target)
   }, [target])
 
   /**
@@ -640,6 +650,23 @@ export function StarMapView({ map, demo = false, target, onNavigate, land, onFir
   const parallelDomGone = useDeferredValue(target.layer === 'star')
   const currentNebula = target.layer === 'map' ? undefined : nebulae.find((n) => n.topicId === target.nebulaId)
   const currentStar = target.layer === 'star' ? stars.find((s) => s.unitId === target.unitId) : undefined
+  // Sent to a star from Ask (#487): its card takes the focus as it opens. The
+  // card may be swapped once the stage has its size (the phone's sheet for the
+  // wide card); the new one takes the focus over, if the old one still held it
+  // when it went (the focus then fell to the page, or the stage caught it).
+  const arrived = useRef<{ key: string; card: HTMLElement } | null>(null)
+  useEffect(() => {
+    const asked = (arrival as Partial<StarCardFocus> | null)?.focusStarCard
+    const card = cardRef.current?.querySelector<HTMLElement>('article')
+    if (!currentStar || asked !== currentStar.unitId || !card) return
+    const before = arrived.current
+    if (before?.key === arrivalKey) {
+      const dropped = document.activeElement === document.body || document.activeElement === stageRef.current
+      if (before.card === card || before.card.isConnected || !dropped) return
+    }
+    arrived.current = { key: arrivalKey, card }
+    card.focus({ preventScroll: true })
+  })
   const numberFormat = useMemo(() => new Intl.NumberFormat(formattingLocale(i18n.language)), [i18n.language])
   const mapPath = here(pathForTarget(subjectId, { layer: 'map' }))
   const subjects = map.subjects

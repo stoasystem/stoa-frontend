@@ -24,27 +24,39 @@ import path from 'node:path'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { StarMapEngine } from '@/features/starmap/engine/starMapEngine'
 import { createCanvas2DRenderer, DOT_ALPHA, dotExtent, drawDotMark } from '@/features/starmap/render/canvas2d'
-import { CHOSEN, DOT_BOX, DOT_CUT, dotBoxFor, GLYPH_LARGE, GLYPH_SMALL, HOVER, PRESS } from '@/features/starmap/render/glyph'
-import { LOCKED_WEB, lockedWebHint } from '@/features/starmap/render/links'
-import { STATE_IN_PROGRESS, STATE_LIT, STATE_LOCKED, STATE_READY, type SceneFrame, type StarMapRenderer } from '@/features/starmap/render/types'
+import { CHOSEN, DOT_BOX, DOT_CUT, dotBoxFor, GLYPH_LARGE, GLYPH_SMALL, HOVER, PRESS, STAR_INK } from '@/features/starmap/render/glyph'
+import { starLook } from '@/features/starmap/model/starMap'
+import { WAITING_WEB, waitingWebHint } from '@/features/starmap/render/links'
+import { STATE_IN_PROGRESS, STATE_LIT, STATE_WAITING, STATE_READY, type SceneFrame, type StarMapRenderer } from '@/features/starmap/render/types'
 import { fakeCanvas, fakeClock, skyMap, THEME, type CanvasCounter } from './starmapHarness'
 
 afterEach(() => vi.unstubAllGlobals())
 beforeEach(() => vi.stubGlobal('Path2D', class {}))
 
-const STATES = [STATE_LIT, STATE_IN_PROGRESS, STATE_READY, STATE_LOCKED]
-const NAMES: Record<number, string> = { [STATE_LIT]: 'lit', [STATE_IN_PROGRESS]: 'in progress', [STATE_READY]: 'ready', [STATE_LOCKED]: 'locked' }
+const STATES = [STATE_LIT, STATE_IN_PROGRESS, STATE_READY, STATE_WAITING]
+const NAMES: Record<number, string> = { [STATE_LIT]: 'lit', [STATE_IN_PROGRESS]: 'in progress', [STATE_READY]: 'ready', [STATE_WAITING]: 'locked' }
 
-/** What one mark put on the canvas: filled paths, filled discs and stroked rings, with their radii. */
-type Mark = { star: boolean; discs: number[]; rings: { r: number; width: number }[]; glow: boolean }
+/**
+ * What one mark put on the canvas: filled paths (the rays), solid discs,
+ * discs of light (filled with a gradient: an orb or a glow) and stroked
+ * rings, with their radii.
+ */
+type Mark = { star: boolean; discs: number[]; lights: number[]; rings: { r: number; width: number }[] }
 
 function markOf(state: number, part: 'both' | 'glow' | 'core' = 'both'): Mark {
-  const mark: Mark = { star: false, discs: [], rings: [], glow: false }
+  const mark: Mark = { star: false, discs: [], lights: [], rings: [] }
   let radius = 0
   let lineWidth = 0
+  let fillStyle: unknown = ''
+  const gradients = new Set<unknown>()
   const ctx = {
     globalAlpha: 1,
-    fillStyle: '',
+    get fillStyle() {
+      return fillStyle
+    },
+    set fillStyle(value: unknown) {
+      fillStyle = value
+    },
     strokeStyle: '',
     get lineWidth() {
       return lineWidth
@@ -53,8 +65,9 @@ function markOf(state: number, part: 'both' | 'glow' | 'core' = 'both'): Mark {
       lineWidth = value
     },
     createRadialGradient: () => {
-      mark.glow = true
-      return { addColorStop() {} }
+      const gradient = { addColorStop() {} }
+      gradients.add(gradient)
+      return gradient
     },
     beginPath: () => undefined,
     arc: (_x: number, _y: number, r: number) => {
@@ -62,19 +75,12 @@ function markOf(state: number, part: 'both' | 'glow' | 'core' = 'both'): Mark {
     },
     fill: (path?: unknown) => {
       if (path) mark.star = true
-      else if (!mark.glow || radius !== 0) mark.discs.push(radius)
+      else if (gradients.has(fillStyle)) mark.lights.push(radius)
+      else mark.discs.push(radius)
     },
     stroke: () => mark.rings.push({ r: radius, width: lineWidth }),
   } as unknown as CanvasRenderingContext2D
-  // The halo fills the whole gradient disc; count it as the glow, not a core.
-  const before = { ...mark }
-  void before
   drawDotMark(ctx, DOT_CUT, state, THEME, part)
-  // The halo's own fill carries the gradient: drop the largest disc when it glowed.
-  if (mark.glow && part !== 'core' && mark.discs.length > 0) {
-    const widest = Math.max(...mark.discs)
-    mark.discs.splice(mark.discs.indexOf(widest), 1)
-  }
   return mark
 }
 
@@ -82,44 +88,52 @@ describe('D1: every state is its own figure at dot scale', () => {
   it('each state draws a mark, and no two states draw the same one', () => {
     const marks = STATES.map((state) => markOf(state, 'core'))
     for (const [i, mark] of marks.entries()) {
-      expect(mark.star || mark.discs.length > 0 || mark.rings.length > 0, `${NAMES[STATES[i]]} draws nothing`).toBe(true)
+      expect(mark.star || mark.lights.length > 0 || mark.rings.length > 0, `${NAMES[STATES[i]]} draws nothing`).toBe(true)
     }
-    const signature = (m: Mark) => `${m.star ? 'star' : '-'}/${m.discs.length > 0 ? 'core' : '-'}/${m.rings.length > 0 ? 'ring' : '-'}`
+    const signature = (m: Mark) => `${m.star ? 'rays' : '-'}/${m.lights.length > 0 ? 'orb' : '-'}/${m.rings.length > 0 ? 'ring' : '-'}`
     const signatures = marks.map(signature)
     expect(new Set(signatures).size, `figures: ${signatures.join(', ')}`).toBe(STATES.length)
   })
 
-  it('the figures are the legend’s: a star, a star in a ring, a ring with a core, a bare ring', () => {
+  it('the figures are the legend’s: an orb with rays, an orb in a ring, a bare orb, a bare ring', () => {
     const [lit, inProgress, ready, locked] = STATES.map((state) => markOf(state, 'core'))
     expect(lit.star).toBe(true)
+    expect(lit.lights).toHaveLength(1)
     expect(lit.rings).toHaveLength(0)
-    expect(inProgress.star).toBe(true)
+    expect(inProgress.star).toBe(false)
+    expect(inProgress.lights).toHaveLength(1)
     expect(inProgress.rings).toHaveLength(1)
     expect(ready.star).toBe(false)
-    expect(ready.rings).toHaveLength(1)
-    expect(ready.discs).toHaveLength(1)
+    expect(ready.lights).toHaveLength(1)
+    expect(ready.rings).toHaveLength(0)
     expect(locked.star).toBe(false)
+    expect(locked.lights).toHaveLength(0)
     expect(locked.rings).toHaveLength(1)
-    expect(locked.discs).toHaveLength(0)
   })
 
   it('only a lit or in-progress dot glows, and the glow can be faded on its own (#137 A2)', () => {
-    expect(markOf(STATE_LIT, 'glow').glow).toBe(true)
-    expect(markOf(STATE_IN_PROGRESS, 'glow').glow).toBe(true)
-    expect(markOf(STATE_READY, 'glow').glow).toBe(false)
-    expect(markOf(STATE_LOCKED, 'glow').glow).toBe(false)
-    expect(markOf(STATE_LIT, 'core').glow).toBe(false)
+    expect(markOf(STATE_LIT, 'glow').lights.length).toBeGreaterThan(0)
+    expect(markOf(STATE_IN_PROGRESS, 'glow').lights.length).toBeGreaterThan(0)
+    expect(markOf(STATE_READY, 'glow').lights).toHaveLength(0)
+    expect(markOf(STATE_WAITING, 'glow').lights).toHaveLength(0)
+    // Without its glow a lit dot keeps only its own orb, no light wider than it.
+    expect(Math.max(...markOf(STATE_LIT, 'core').lights)).toBeLessThanOrEqual(DOT_CUT.lit.orb)
   })
 
-  it('every state fills its box: none is left a speck beside the others', () => {
+  it('every state stays in its box, and only the hollow one is small', () => {
     const extents = STATES.map((state) => dotExtent(DOT_CUT, state))
     const half = DOT_CUT.box / 2
     for (const [i, extent] of extents.entries()) {
-      expect(extent, `${NAMES[STATES[i]]} reaches ${extent} of ${half}`).toBeGreaterThanOrEqual(half * 0.6)
-      expect(extent).toBeLessThanOrEqual(half)
+      expect(extent, `${NAMES[STATES[i]]} reaches ${extent} of ${half}`).toBeLessThanOrEqual(half)
     }
-    // The widest state is no more than half again the narrowest: presence is not what tells them apart.
-    expect(Math.max(...extents) / Math.min(...extents)).toBeLessThanOrEqual(1.5)
+    // The filled lights reach well into their box; the waiting ring is a
+    // faint far star (the sky should not read as rings), but not a speck:
+    // D3 keeps it clear of the dust.
+    for (const state of [STATE_LIT, STATE_IN_PROGRESS, STATE_READY]) {
+      expect(dotExtent(DOT_CUT, state), NAMES[state]).toBeGreaterThanOrEqual(half * 0.6)
+    }
+    expect(dotExtent(DOT_CUT, STATE_WAITING)).toBeGreaterThanOrEqual(half * 0.35)
+    expect(dotExtent(DOT_CUT, STATE_WAITING)).toBeLessThan(Math.min(...[STATE_LIT, STATE_IN_PROGRESS, STATE_READY].map((st) => dotExtent(DOT_CUT, st))))
   })
 })
 
@@ -168,16 +182,22 @@ const SKY = [0x0a, 0x10, 0x20]
 const WHITE = [255, 255, 255]
 
 describe('D3: a locked point is out of the dust, and the recommended star still leads', () => {
-  it('the sky’s brightest dust grain is 1.3 px across at 58%; a locked dot is several times that', () => {
+  it('the sky’s brightest dust grain is 1.3 px across at 58%; a locked dot is twice that, and hollow', () => {
     // paintGalaxy (render/galaxy.ts): radius 0.2 + u^5 * 1.1, alpha 0.08 + u^3 * 0.5.
+    // A grain is a filled dot; a locked point is a ring, so its figure tells
+    // it from the dust as well as its size. It was held to three times the
+    // grain; at that size a nebula of locked points read as a page of rings,
+    // not a sky.
     const dustRadius = 0.2 + 1.1
-    const locked = (dotBoxFor(2.1, 40) / DOT_CUT.box) * dotExtent(DOT_CUT, STATE_LOCKED)
-    expect(locked).toBeGreaterThan(dustRadius * 3)
+    const locked = (dotBoxFor(2.1, 40) / DOT_CUT.box) * dotExtent(DOT_CUT, STATE_WAITING)
+    expect(locked).toBeGreaterThan(dustRadius * 2)
+    expect(markOf(STATE_WAITING, 'core').rings).toHaveLength(1)
+    expect(markOf(STATE_WAITING, 'core').lights).toHaveLength(0)
   })
 
   it('a locked dot keeps 3:1 on the sky (it is a control, WCAG 1.4.11) and stays quieter than the rest', () => {
-    expect(contrast(over(WHITE, SKY, DOT_ALPHA[STATE_LOCKED]), SKY)).toBeGreaterThanOrEqual(3)
-    expect(DOT_ALPHA[STATE_LOCKED]).toBeLessThan(DOT_ALPHA[STATE_READY])
+    expect(contrast(over(WHITE, SKY, DOT_ALPHA[STATE_WAITING]), SKY)).toBeGreaterThanOrEqual(3)
+    expect(DOT_ALPHA[STATE_WAITING]).toBeLessThan(DOT_ALPHA[STATE_READY])
     expect(DOT_ALPHA[STATE_READY]).toBeLessThan(DOT_ALPHA[STATE_LIT])
     expect(DOT_ALPHA[STATE_IN_PROGRESS]).toBeLessThan(DOT_ALPHA[STATE_LIT])
   })
@@ -210,7 +230,7 @@ describe('D3: a locked point is out of the dust, and the recommended star still 
       ['--starmap-dot-lit', lit, DOT_ALPHA[STATE_LIT]],
       ['--starmap-dot-in-progress', lit, DOT_ALPHA[STATE_IN_PROGRESS]],
       ['--starmap-dot-ready', white, DOT_ALPHA[STATE_READY]],
-      ['--starmap-dot-locked', white, DOT_ALPHA[STATE_LOCKED]],
+      ['--starmap-dot-waiting', white, DOT_ALPHA[STATE_WAITING]],
       ['--starmap-dot-review', white, DOT_ALPHA.review],
     ]
     for (const [name, rgb, alpha] of pairs) {
@@ -266,10 +286,10 @@ describe('D4: the sixth state, due for review, is told apart far out too', () =>
 
 describe('D5: the locked web is hinted only where nothing else reaches it', () => {
   it('nothing while the bridges carry the panorama, nothing once the dots are gone', () => {
-    const at = (dotBlend: number, bridges: number) => lockedWebHint({ dotBlend, lineReveal: { bridges, tiers: [0, 0, 0, 0, 0] } })
+    const at = (dotBlend: number, bridges: number) => waitingWebHint({ dotBlend, lineReveal: { bridges, tiers: [0, 0, 0, 0, 0] } })
     expect(at(1, 1)).toBe(0)
     expect(at(0, 0)).toBe(0)
-    expect(at(1, 0)).toBe(LOCKED_WEB)
+    expect(at(1, 0)).toBe(WAITING_WEB)
     // Continuous and monotone as the dots give way to glyphs: nothing pops.
     let previous = at(0, 0)
     for (let d = 0; d <= 1.0001; d += 0.1) {
@@ -277,7 +297,7 @@ describe('D5: the locked web is hinted only where nothing else reaches it', () =
       expect(now).toBeGreaterThanOrEqual(previous - 1e-9)
       previous = now
     }
-    expect(LOCKED_WEB).toBeLessThan(1)
+    expect(WAITING_WEB).toBeLessThan(1)
   })
 
   it('on the real map it puts lines on the panorama that nothing drew before', () => {
@@ -286,11 +306,14 @@ describe('D5: the locked web is hinted only where nothing else reaches it', () =
     expect(frame.lineReveal.bridges).toBe(0) // A sparse map's farthest zoom is already past the bridges.
     expect(frame.dotBlend).toBe(1)
     expect(frame.focusStar).toBe(-1) // Nothing in focus: the only rule that drew tier 4 before.
-    const locked = s.map.prerequisites.filter(({ from, to }) => {
-      const stateOf = (id: string) => s.map.stars.find((star) => star.unitId === id)?.state
-      return stateOf(from) === 'locked' || stateOf(to) === 'locked'
+    const waiting = s.map.prerequisites.filter(({ from, to }) => {
+      const lookOf = (id: string) => {
+        const star = s.map.stars.find((candidate) => candidate.unitId === id)
+        return star && starLook(star)
+      }
+      return lookOf(from) === 'waiting' || lookOf(to) === 'waiting'
     })
-    expect(locked.length, 'the fixture has locked prerequisites to draw').toBeGreaterThan(0)
+    expect(waiting.length, 'the fixture has prerequisites into waiting stars to draw').toBeGreaterThan(0)
     const withWeb = s.real.stats.links!.lines
     // The same frame with the dots gone is the same frame without the hint.
     s.real.draw({ ...frame, dotBlend: 0 })
@@ -368,18 +391,30 @@ describe('a locked knowledge point at full glyph size', () => {
   it.each([
     ['large', GLYPH_LARGE],
     ['small', GLYPH_SMALL],
-  ])('is as big as a ready one on the %s cut', (_name, cut) => {
-    // It was half the size and the dimmest mark on the map, while being the
-    // state most points are in — so the sky read as empty at every zoom, not
-    // only on the panorama.
-    expect(cut.locked.ring).toBeCloseTo(cut.ready.ring, 5)
+  ])('reaches about as far as a ready one on the %s cut', (_name, cut) => {
+    // It was once half the size and the dimmest mark on the map, while being
+    // the state most points are in, so the sky read as empty at every zoom.
+    const reach = cut.waiting.ring + cut.waiting.ringWidth / 2
+    expect(reach / cut.ready.orb).toBeGreaterThanOrEqual(0.85)
+    expect(reach / cut.ready.orb).toBeLessThanOrEqual(1.15)
   })
 
   it.each([
     ['large', GLYPH_LARGE],
     ['small', GLYPH_SMALL],
-  ])('is still told apart from a ready one, by the core, on the %s cut', (_name, cut) => {
-    expect(cut.ready.core).toBeGreaterThan(0)
-    expect('core' in cut.locked).toBe(false)
+  ])('is still told apart from a ready one, hollow against filled light, on the %s cut', (_name, cut) => {
+    expect(cut.ready.orb).toBeGreaterThan(0)
+    expect('orb' in cut.waiting).toBe(false)
+  })
+})
+
+describe('the soft light round a star', () => {
+  it('falls back to exactly the sky tokens --starmap-rim and --starmap-ice', () => {
+    const css = readFileSync(path.resolve(__dirname, '../../src/styles/brand-tokens.css'), 'utf8')
+    const sky = css.slice(css.indexOf('[data-surface="sky"] {'))
+    for (const [name, fallback] of [['--starmap-rim', STAR_INK.rim], ['--starmap-ice', STAR_INK.ice]] as const) {
+      const match = new RegExp(`${name}:\\s*([^;]+);`).exec(sky)
+      expect(match?.[1].trim(), name).toBe(fallback)
+    }
   })
 })

@@ -9,18 +9,28 @@ export const STUDENT = {
 }
 export const ACCESS_TOKEN = 'e2e-access-token'
 
-type Message = { id: string; conversationId: string; role: string; content: string; createdAt: string }
+type Message = {
+  id: string
+  conversationId: string
+  role: string
+  content: string
+  createdAt: string
+  structured?: Record<string, unknown>
+  /** `AttachmentSummary`s, as the backend lists a message's files. */
+  attachments?: unknown[]
+}
 type Command = {
   key: string
   conversationId: string
   question: string
   answer: string
+  structured?: Record<string, unknown>
   finished: boolean
   failed: boolean
   attempt: number
   reads: number
 }
-type Conversation = { id: string; subject: string; grade: string; createdAt: string; messages: Message[] }
+export type Conversation = { id: string; subject: string; grade: string; createdAt: string; messages: Message[] }
 
 /**
  * One student and the parts of the backend a student's session touches:
@@ -35,6 +45,15 @@ export class StudentWorld {
   autoFinishAfterReads: number | null = 2
   /** The next message accepted fails on its first attempt, as one the backend may answer if sent again. */
   failNextRetryably = false
+  /**
+   * A student who has not started anything (nothing lit, nothing in progress)
+   * gets the first landing (#467): the map opens on the recommended star's
+   * nebula with Murmi beside it. Off by default: the other specs are about a
+   * student's session, not the onboarding, and open on the galaxy.
+   */
+  newcomer = false
+  /** The sections an answer to this question comes in (stoa-backend#132); others are text only. */
+  readonly sections = new Map<string, Record<string, unknown>>()
   private clock = Date.parse('2026-09-29T08:00:00Z')
   private nextConversation = 1
 
@@ -178,31 +197,43 @@ export class StudentWorld {
     })
   }
 
-  /** The star map read model (stoa-backend#59), as #48 wires it in. */
+  /**
+   * The star map read model (stoa-backend#59), as #48 wires it in: a skeleton
+   * of every star, and the few stars around one in full (#503).
+   */
   private installKnowledgeMap() {
-    this.backend.on('GET', '/practice/knowledge-map', () => ({
+    const reducing = {
+      unitId: 'reducing',
+      name: 'Reducing fractions',
+      nebulaId: 'fractions',
+      order: 0,
+      // A newcomer has started nothing (the first-sign-in onboarding, #490); anyone else is halfway.
+      state: this.newcomer ? 'ready' : 'in_progress',
+      progress: this.newcomer ? 0 : 0.5,
+      unmetExercises: 2,
+      reviewDue: 0,
+      recommendation: { source: 'system' },
+      x: 0.5,
+      y: 0.5,
+      skills: [],
+      chapter: this.newcomer ? { lessonCount: 2, lessonsDone: 0, nextLesson: null } : { lessonCount: 2, lessonsDone: 1, nextLesson: null },
+    }
+    this.backend.on('GET', '/practice/knowledge-map/stars', () => ({
       status: 200,
       body: {
         subjectId: 'math',
+        focus: 'reducing',
+        stars: [{ ...reducing, relation: 'focus', prerequisiteUnitIds: [], practiceSets: [] }],
+      },
+    }))
+    this.backend.on('GET', '/practice/knowledge-map', () => ({
+      status: 200,
+      body: {
+        view: 'skeleton',
+        subjectId: 'math',
         galaxies: [{ subjectId: 'math', name: 'Mathematics', lit: 0, total: 1, enrolled: true }],
         nebulae: [{ topicId: 'fractions', name: 'Fractions', order: 0, subjectId: 'math' }],
-        stars: [
-          {
-            unitId: 'reducing',
-            name: 'Reducing fractions',
-            nebulaId: 'fractions',
-            order: 0,
-            state: 'ready',
-            progress: 0,
-            unmetExercises: 2,
-            reviewDue: 0,
-            recommendation: { source: 'system' },
-            x: 0.5,
-            y: 0.5,
-            skills: [],
-            chapter: { lessonCount: 1, lessonsDone: 0, nextLesson: null },
-          },
-        ],
+        stars: [reducing],
         prerequisites: [],
         summary: { lit: 0, total: 1, streakDays: 0, score: 0 },
       },
@@ -308,6 +339,7 @@ export class StudentWorld {
       conversationId: conversation.id,
       question,
       answer: this.answerFor(question),
+      structured: this.sections.get(question),
       finished: false,
       failed,
       attempt: 1,
@@ -326,6 +358,7 @@ export class StudentWorld {
       role: 'assistant',
       content: command.answer,
       createdAt: this.now(),
+      ...(command.structured ? { structured: command.structured } : {}),
     })
   }
 

@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import { isHelpRequestOutOfReach } from '@/lib/teacherHelpRequestConflict'
+import { isHelpRequestOutOfReach, retryUnlessOutOfReach } from '@/lib/teacherHelpRequestConflict'
 import { getTeacherHelpRequestDetail } from '@/services/teacher/teacherApi'
 import { teacherQueryKeys } from '@/services/teacher/teacherQueryKeys'
 
@@ -14,8 +14,7 @@ export function useTeacherHelpRequestDetailQuery(requestId: string | undefined) 
     queryKey: teacherQueryKeys.helpRequestDetail(requestId ?? ''),
     queryFn: () => getTeacherHelpRequestDetail(requestId ?? ''),
     enabled: Boolean(requestId),
-    // The app's one retry, but not for a request out of reach.
-    retry: (failureCount, error) => !isHelpRequestOutOfReach(error) && failureCount < 1,
+    retry: retryUnlessOutOfReach,
     refetchInterval: (query) => {
       if (isHelpRequestOutOfReach(query.state.error)) return false
       const status = query.state.data?.status

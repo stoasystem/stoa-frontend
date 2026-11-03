@@ -70,6 +70,8 @@ async function start() {
         onChange={setValue}
         onSubmit={() => setValue('')}
         onAttach={() => {}}
+        onCapture={() => {}}
+        dictation
         footerStart={
           variant === 'full' ? (
             <button type="button" className="h-8 rounded-full border-0 bg-transparent px-3 text-[14px] font-medium text-caption">

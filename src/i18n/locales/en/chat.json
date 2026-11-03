@@ -90,7 +90,22 @@
       "stop": "Stop waiting",
       "starting": "Starting the conversation…",
       "startFailed": "The conversation could not be started. Try again.",
-      "answerFailed": "The explanation could not be prepared right now. Please try again or ask a teacher."
+      "answerFailed": "The explanation could not be prepared right now. Please try again or ask a teacher.",
+      "dailyLimit": "You have used all your messages for today. Come back tomorrow, or ask a teacher if you need help now."
+    },
+    "answer": {
+      "steps": "Steps",
+      "answer": "Answer",
+      "stepUnclear": "I don't get this step",
+      "stepNumber": "Step {{n}}",
+      "stepQuestion": "I don't get this step. Can you explain it another way?",
+      "hints": "Hints",
+      "showHint": "Show a hint",
+      "nextHint": "Another hint",
+      "practice": "Practice",
+      "showExercise": "One more to practise",
+      "nextExercise": "Another one",
+      "related": "Related topics"
     },
     "presence": {
       "online_one": "{{count}} teacher online",
@@ -100,7 +115,10 @@
     "help": {
       "request": "Ask a teacher",
       "requesting": "Asking a teacher…",
+      "suggested": "A teacher could help you with this.",
       "offline": "Teachers are not online right now. When they are back, they will reply here.",
+      "remaining_one": "{{count}} teacher request left this week",
+      "remaining_other": "{{count}} teacher requests left this week",
       "cardLabel": "Teacher support",
       "status": {
         "pending": "Waiting",
@@ -127,10 +145,24 @@
         "waiting_no_teacher": "Your request stays open. As soon as a teacher is free, they will take it and reply in this conversation.",
         "assigned": "Their reply will appear in this conversation.",
         "in_progress": "Their replies appear in this conversation.",
-        "resolved": "Need more help? Ask a teacher again under any answer.",
-        "cancelled": "Need more help? Ask a teacher again under any answer.",
-        "withdrawn": "Need help after all? Ask a teacher again under any answer.",
-        "expired": "Your request has closed. Ask a teacher again under any answer."
+        "resolved": "Need more help? Start a new conversation and ask a teacher there.",
+        "cancelled": "Need more help? Start a new conversation and ask a teacher there.",
+        "withdrawn": "Need help after all? Start a new conversation and ask a teacher there.",
+        "expired": "Your request has closed. Start a new conversation to ask a teacher again."
+      },
+      "newConversation": "New conversation",
+      "withdraw": {
+        "action": "Withdraw request",
+        "confirm": "Withdraw your request? You get this week’s request back, but you cannot ask a teacher again in this conversation.",
+        "yes": "Withdraw",
+        "withdrawing": "Withdrawing…",
+        "keep": "Keep request",
+        "errors": {
+          "accepted": "A teacher has already taken your request, so it can no longer be withdrawn.",
+          "closed": "This request has already ended.",
+          "unavailable": "Withdrawing is briefly unavailable. Please try again in a moment.",
+          "generic": "The request could not be withdrawn. Please try again."
+        }
       },
       "fallback": {
         "title": "Teacher support requested",
@@ -153,6 +185,10 @@
       "body": "You finished its chapter. The star now shines on your map.",
       "link": "See it on the map"
     },
+    "target": {
+      "label": "{{name}} on your star map",
+      "show": "See the way on the star map"
+    },
     "reopen": {
       "open": "Open Ask",
       "resume": "Back to your conversation"
@@ -168,10 +204,49 @@
         "unsupported": "This kind of file cannot be sent. Photos, PDF, Word, PowerPoint, Excel and text files can.",
         "empty": "This file is empty. Choose another one.",
         "expired": "This file took too long. Choose it again.",
+        "sendExpired": "A file you added took too long to go out. Choose it again, then ask again.",
         "quota": "There is no room left for files. Remove an older one first.",
         "unavailable": "Files cannot be added right now. Try again in a moment.",
+        "unreadable": "This photo could not be opened. Try another one, or a screenshot.",
+        "blocked": "This picture cannot be sent. Choose a different one, or describe the question in words.",
         "failed": "This file could not be added. Try again."
       }
+    },
+    "phone": {
+      "label": "Photo from your phone",
+      "close": "Close",
+      "title": "Scan with your phone",
+      "qrLabel": "QR code to send a photo from your phone",
+      "qrFailed": "The QR code could not be shown. Reload the page and try again.",
+      "making": "Making a code…",
+      "unmade": {
+        "rateLimited": "Too many codes in a short time. Wait a moment, then try again.",
+        "failed": "The code could not be made. Try again."
+      },
+      "waiting": "Point your phone's camera at the code, then take or choose a photo there.",
+      "validFor": "Works for {{time}} more",
+      "uploading": "Your phone is sending the photo…",
+      "ready": "Is this your photo? Add it to your question.",
+      "loadingPhoto": "Loading the photo…",
+      "photoFailed": "The photo cannot be shown here. Make a new code and send it again.",
+      "photoAlt": "The photo from your phone",
+      "photoName": "phone-photo",
+      "add": "Add photo",
+      "notMine": "Not mine",
+      "failed": "The photo did not arrive. Make a new code and try again.",
+      "expired": "This code has expired. Make a new one.",
+      "newCode": "New code",
+      "tryAgain": "Try again"
+    },
+    "teacherImages": {
+      "label": "Pictures from the teacher",
+      "alt": "Picture from {{teacher}}: {{name}}",
+      "open": "Enlarge picture: {{name}}",
+      "loading": "Loading picture…",
+      "unavailable": "Picture not available",
+      "failed": "The picture could not be loaded.",
+      "retry": "Load again",
+      "retryNamed": "Load again: {{name}}"
     }
   }
 }

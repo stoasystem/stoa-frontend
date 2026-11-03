@@ -24,6 +24,7 @@ npm run dev -- --host 127.0.0.1 --port 5173
 - `lang`：`de` / `en` / `fr` / `it`；不给时按浏览器语言。界面文字和演示内容（章节、对话、通知、星名）同一种语言；在 /me 或账号菜单改语言后，后续请求也按新语言作答。
 - `signedIn=0`：以未登录访客打开（`login` 默认如此）。
 - `longNames=1`：星云用四语里最长的名字（经预览自己的星图覆盖，`withLongNebulaNames`）；全景只画悬停的那团星云名，放大后（#134 按星云屏上大小淡入）才看得到。
+- `newcomer=1`：新生的天空（`src/dev/demo/sky/newcomer.ts`）：零点亮、零进行中，所有星都可开始（ADR 0004）；每个在修学科按 #474 推荐外缘里课程顺序上的第一颗，数学是「Integers」（占位星，没有章节）。用来看首次落点（方案 A，`docs/research/user-onboarding-design.md`）。演示知识点跟着页面里完成的课时走：做完它的课时就点亮，推荐随之移动。`map-newcomer` 界面自带这个参数。
 - `fresh=1`：清掉演示后端在本标签页里记住的状态（已完成课时、点亮与确认、Ask 里新建的对话和发出的消息，见下文「演示后端的状态」），回到 #116 的开场状态。
 
 页面里一旦移动过，地址栏就始终写回 `path`；登出后写回 `signedIn=0`，在页面里改过语言后写回 `lang`。所以刷新总是回到离开时的那一页、那个登录状态和语言。
@@ -34,12 +35,19 @@ npm run dev -- --host 127.0.0.1 --port 5173
 | `map` / `map-nebula` / `map-star` | `/map/math`、`/map/math/trigonometry`、`/map/math/trigonometry/demo-sine-cosine` | 可看；#134 起这三个是「什么都没选 / 选了三角函数 / 选了演示知识点」，打开时缩放分别是全景、星形 28 px、34 px，之后可以无级缩放；演示知识点的星卡片「Continue」进入章节 |
 | `map-focus-optics` / `map-focus-star` | `/map/physics`（键盘聚焦「光学」）、`/map/math/trigonometry`（聚焦演示知识点） | 可看：聚焦时点亮的连线（#121） |
 | `map-optics` / `map-refraction` | `/map/physics/optics`、`/map/physics/optics/demo-refraction` | 可看：跨学科前置（#121） |
-| `chapter` | `/chapter/demo-sine-cosine` | 可看：3 个课时，开场时第 1 课已完成 |
-| `lesson` | `/chapter/demo-sine-cosine/demo-sine-cosine-2` | 可看：4 道题（单选 ×2、填空、排序），能答错、重试、答对、完成课时 |
+| `chapter` | `/chapter/demo-sine-cosine` | 可看：3 个核心课时加 1 个拓展练习集，开场时第 1 课已完成 |
+| `lesson` | `/chapter/demo-sine-cosine/demo-sine-cosine--rechnen--1` | 可看：5 道题（单选 ×2、填空、排序、选项是图的单选），能答错、重试、答对、完成课时；第 1 题带题干图（图上「Hypotenuse」随界面语言变），第 5 题三个选项都是图（#504） |
+| `skill` | `/chapter/demo-sine-cosine?skill=demo-sine-cosine--rechnen` | 可看：一颗分两个 Stufe 的小星（#501），当前该做的那组高亮 |
+| `skill-extension` | `/chapter/demo-sine-cosine?skill=demo-sine-cosine--begruenden` | 可看：拓展小星，带「先完成本星前面的阶段」和「先点亮：X」提示，练习照样能进 |
 | `ask` / `ask-conversation` | `/ask`、`/ask/demo-ask-sine` | 可看；桌面为侧栏，手机为全屏 sheet；`demo-ask-sine` 带一位进行中的老师；能发消息（答复为固定文字）、请老师 |
+| `ask-find-star` | `/ask/demo-ask-light` | 可看：找星（#487）。物理对话里最后一条回答带目标知识点（数学的演示知识点），回答下有一张「在星图上看路径」卡片；点了收起 Ask、星图飞到那颗星并打开星卡。在任何对话里发一句带 `#star` 的问题，演示后端的回答就带上物理的「折射」（`DEMO_FIND_STAR`，另一个星系），流式与重新读取都能看到卡片 |
+| `ask-sections` | `/ask/demo-ask-fractions` | 可看：回答分板块（#506）——步骤各带「这一步没懂」、答案直接显示，提示与类似练习逐条点开，知识点为标签；回答建议找老师，下面的「找老师」是醒目版并带本周剩余次数（不建议时是一行低调的按钮，见 `demo-ask-light`） |
 | `me` | `/me` | 可看 |
 | `account-menu` | `/me` 并自动打开头像菜单 | 可看，能退出（回到登录页） |
+| `map-newcomer` | `/` → `/map/math/numbers` | 可看：新生首次落点。没有点亮、没有进行中，打开 `/` 时不看全景，落到推荐星（演示知识点）所在星云的整团视野，Murmi 气泡在星旁边（窄于 560 px 时停靠在底部控件上方）。起点「Integers」是占位星，所以气泡里没有「Start this star」；「Look around first」或 Esc 收起气泡、镜头不动；截图等气泡出现（`[data-first-landing] [data-shown]`）后再拍 |
 | `lighting` | `/map/math/trigonometry/demo-sine-cosine` | 可看：打开前把演示知识点的课时全部记为完成、点亮尚未确认；打开这颗星的地址，落在它所在星云的整团视野（地址换成星云的，#140），在这颗星上播放一次点亮动画（#51）；截图等动画结束（`data-lighting="done"`）后再拍 |
+
+演示知识点按知识库的形状组织（#501，stoa-backend#127）：三颗小星是题型 `demo-sine-cosine--<题型>`，练习集 id 是 `<小星>--<阶段>`；「Begründen und Beweisen」是拓展小星，做完只点亮它自己，星只按三个核心课时点亮。演示后端也答 `GET /practice/knowledge-map`（按页面的 `points`；`view=skeleton` 时不带小星）和 `GET /practice/knowledge-map/stars`（#503，一颗星和它周边的星，带小星与练习集），章节和小星页从后者读小星的点亮、提示和练习集归属。星图本身仍走演示数据源，不经这两个接口。
 
 ## 拦截：怎么做到零后端请求
 

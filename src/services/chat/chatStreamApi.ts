@@ -6,11 +6,12 @@ import { currentSessionToken } from '@/store/authStore'
 import { allowDemoFallback, apiBaseUrl } from '@/lib/env'
 import { activeLanguage } from '@/i18n/languages'
 import type { ChatStreamEvent, MessageQuote, PracticeContextRef } from '@/types/chat'
+import type { AttachmentReference } from '@/types/file'
 
 export type StreamMessagePayload = {
   content: string
-  /** The saved attachments this question carries, by id (see `wireBody`). */
-  attachmentIds?: string[]
+  /** The files this question carries (see `wireBody`). */
+  attachmentIds?: AttachmentReference[]
   // The backend requires this to make a retry safe; without it the request is
   // rejected before the message is ever read.
   idempotencyKey: string
@@ -34,15 +35,13 @@ export type StreamOutcome = 'streamed' | 'accepted'
  * `SendMessageRequest.attachmentIds` is a list of references, not of ids:
  * each entry is `{attachmentId}` or `{uploadId}`, exactly one of the two, and
  * the backend answers 422 for anything else (openapi.json, AttachmentReference;
- * stoa-backend/src/stoa/models/attachment.py). The app has only saved
- * attachments to send -- `/files/.../complete` gives their ids -- so the
- * reference is made here, at the one place that writes the wire body, rather
- * than being carried through the hooks.
+ * stoa-backend/src/stoa/models/attachment.py). A file chosen in the composer is
+ * a validated upload, which `/files/.../complete` leaves without an attachment:
+ * the message carrying `{uploadId}` is what makes one (#507). The references
+ * are carried as they are; an empty list is no key at all.
  */
 function wireBody({ attachmentIds, ...rest }: StreamMessagePayload) {
-  return attachmentIds && attachmentIds.length > 0
-    ? { ...rest, attachmentIds: attachmentIds.map((attachmentId) => ({ attachmentId })) }
-    : rest
+  return attachmentIds && attachmentIds.length > 0 ? { ...rest, attachmentIds } : rest
 }
 
 export async function streamConversationMessage({

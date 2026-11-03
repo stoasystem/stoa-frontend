@@ -19,6 +19,10 @@ import { useLocation, useNavigate, useParams, useSearchParams } from 'react-rout
 import { StarMapView } from '@/features/starmap/components/StarMapView'
 import { LightingOverlay } from '@/features/starmap/lighting/LightingOverlay'
 import { useLightingStage } from '@/features/starmap/lighting/useLightingStage'
+import { FirstLandingBubble } from '@/features/starmap/onboarding/FirstLandingBubble'
+import { FirstSubjectQuestion } from '@/features/starmap/onboarding/FirstSubjectQuestion'
+import { useFirstLanding } from '@/features/starmap/onboarding/useFirstLanding'
+import { useFirstReveal } from '@/features/starmap/onboarding/useFirstReveal'
 import { DEFAULT_SUBJECT_ID, DEMO_STAR_COUNT, fixtureSizeFrom, foveationFrom, useStarMap } from '@/features/starmap/useStarMap'
 import { pathForTarget, resolveTarget, type LayerTarget } from '@/features/starmap/view/layers'
 import { markLoginFirstScreenReady } from '@/lib/loginTiming'
@@ -39,7 +43,9 @@ export function StarMapRoute({ relations = false, longNames = false }: { relatio
   const subjectId = params.subjectId ?? defaultSubject(lastSubject, defaults.subjects)
   const map = useStarMap(subjectId, fixtureSizeFrom(search, DEMO_STAR_COUNT),
     relations, longNames)
-  const { demo, status = 'success', retry } = useStarMapSource()
+  const { demo, status = 'success', retry, focus, arrive } = useStarMapSource()
+  // Back on the map, a sky that went stale while the student practised is read again (#503).
+  useEffect(() => arrive?.(), [arrive])
   useEffect(() => {
     if (map.subjects.some((s) => s.subjectId === map.subject.subjectId) && lastSubject !== map.subject.subjectId) {
       remember(ownerId, map.subject.subjectId)
@@ -50,6 +56,17 @@ export function StarMapRoute({ relations = false, longNames = false }: { relatio
   // A point waiting for its lighting moment is drawn in progress until it, and its star's route
   // (or a tap on it) opens on its nebula (#140, #145).
   const stage = useLightingStage(map, routeTarget)
+  // A student who has not started anything is asked which subject school is on (plan B), lands on
+  // its recommended star with Murmi beside it, and after the first lighting sees the galaxy (plan A).
+  const first = useFirstLanding(map, stage.target, ownerId)
+  const firstReveal = useFirstReveal(map, first.target, stage.reveal)
+  // A star picked -- by a tap, a link, a hint, a card from Ask -- loads its small stars if it has none yet;
+  // with none picked, the stars around where the student last practised in the galaxy in focus (#503).
+  const pickedStar = routeTarget.layer === 'star' ? routeTarget.unitId : null
+  const focusSubject = routeTarget.layer === 'map' ? map.subject.subjectId : subjectOfNebula(map, routeTarget.nebulaId)
+  useEffect(() => {
+    focus?.({ subjectId: focusSubject, unitId: pickedStar })
+  }, [focusSubject, pickedStar, focus])
 
   // Sign-in timing, handed over from ChatPage / LearnPage (#45): a student
   // lands on the map now, so its first drawn frame ends the wait. The mark is
@@ -77,8 +94,20 @@ export function StarMapRoute({ relations = false, longNames = false }: { relatio
   if (map.subjects.length === 0) return <EmptyStarMap onShown={onFirstFrame} />
 
   return (
-    <StarMapView demo={demo} map={stage.map} target={stage.target} onNavigate={onNavigate} land={stage.land} onFirstFrame={onFirstFrame} onCentreGalaxy={onCentreGalaxy} foveate={search.has('foveation') ? foveationFrom(search) : false}
-      overlay={(locate, watch) => <LightingOverlay map={map} locate={locate} watch={watch} onReveal={stage.reveal} />} />
+    <StarMapView demo={demo} map={stage.map} target={firstReveal.target ?? first.target} onNavigate={onNavigate} land={stage.land} onFirstFrame={onFirstFrame} onCentreGalaxy={onCentreGalaxy} foveate={search.has('foveation') ? foveationFrom(search) : false}
+      overlay={(locate, watch) => (
+        <>
+          <LightingOverlay map={map} locate={locate} watch={watch} onReveal={firstReveal.onReveal} />
+          {first.asking && <FirstSubjectQuestion subjects={first.asking} onChoose={first.choose} />}
+          {first.star && (
+            // In the design preview only the demo knowledge point has a chapter, as on the star's card.
+            <FirstLandingBubble star={first.star} startable={!(demo && first.star.chapter.lessonCount === 0)} locate={locate} watch={watch} onDismiss={first.dismiss} />
+          )}
+          {firstReveal.star && firstReveal.next && (
+            <FirstLandingBubble key={firstReveal.star.unitId} star={firstReveal.star} next={firstReveal.next} locate={locate} watch={watch} onDismiss={firstReveal.dismiss} />
+          )}
+        </>
+      )} />
   )
 }
 

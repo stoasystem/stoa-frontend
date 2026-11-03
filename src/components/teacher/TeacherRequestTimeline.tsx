@@ -1,9 +1,17 @@
 import { useTranslation } from 'react-i18next'
 import { formattingLocale } from '@/i18n/languages'
+import { HelpRequestAttachments } from '@/components/teacher/HelpRequestAttachments'
 import { RichTeacherReply } from '@/components/teacher/RichTeacherReply'
 import type { TeacherHelpRequestNote } from '@/types/teacher'
 
-export function TeacherRequestTimeline({ notes }: { notes: TeacherHelpRequestNote[] }) {
+export function TeacherRequestTimeline({
+  requestId,
+  notes,
+}: {
+  /** Whose request: a reply's pictures are read through it (stoa-backend#145). */
+  requestId: string
+  notes: TeacherHelpRequestNote[]
+}) {
   const { t, i18n } = useTranslation('teacher')
 
   if (notes.length === 0) {
@@ -24,6 +32,7 @@ export function TeacherRequestTimeline({ notes }: { notes: TeacherHelpRequestNot
           </div>
           <div className="mt-3">
             <RichTeacherReply content={note.richContent} fallback={note.note} />
+            <HelpRequestAttachments requestId={requestId} attachments={note.attachments} byTeacher />
           </div>
         </article>
       ))}

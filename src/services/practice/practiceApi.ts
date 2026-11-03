@@ -8,6 +8,8 @@ import type {
   LessonQuizAnswer,
   LessonQuizKind,
   LessonQuizSession,
+  StarQuizAnswer,
+  StarQuizView,
   ReviewDueResponse,
   ReviewSummary,
   PracticeAnswerRequest,
@@ -25,6 +27,7 @@ import type {
   PracticeTeacherHelpResponse,
   CurriculumCatalog,
   CurriculumProgressSummary,
+  KnowledgeMapNeighbourhood,
   KnowledgeMapResponse,
 } from '@/types/practice'
 
@@ -69,12 +72,40 @@ export async function submitChallengeAnswer(challengeId: string, payload: Practi
  * Draw the short quiz that can complete a lesson (stoa-backend#92). The paper
  * is composed server-side and kept there; nothing of it is decided here.
  *
- * 409 `lesson_locked` / `lesson_quiz_unavailable`.
+ * 409 `lesson_quiz_unavailable`.
  */
 export async function startLessonQuiz(lessonId: string, kind: LessonQuizKind) {
   const response = await httpClient.post<LessonQuizSession>(
     apiPath`/practice/lessons/${lessonId}/quiz`,
     { kind },
+  )
+  return response.data
+}
+
+/**
+ * Open the star quiz of a knowledge point, or the paper still open for it
+ * (stoa-backend#165). No body: the backend draws the paper.
+ *
+ * 404 `star_quiz_unknown_star`; 409 `star_quiz_already_lit` /
+ * `star_quiz_cooling_down` (with `retryAt`) / `star_quiz_unavailable`.
+ */
+export async function startStarQuiz(unitId: string) {
+  const response = await httpClient.post<StarQuizView>(apiPath`/practice/knowledge-map/stars/${unitId}/quiz`)
+  return response.data
+}
+
+/**
+ * Hand one star quiz answer to the backend, which judges it. `exerciseId` is
+ * the exercise it answers, so the same answer sent again after a lost reply
+ * gets the first verdict back rather than being judged against the next one.
+ *
+ * 404 `star_quiz_not_found`; 409 `star_quiz_out_of_order` / `star_quiz_finished`
+ * / `star_quiz_expired` / `star_quiz_unavailable`.
+ */
+export async function answerStarQuiz(unitId: string, quizId: string, payload: { exerciseId: string; answer: unknown }) {
+  const response = await httpClient.post<StarQuizAnswer>(
+    apiPath`/practice/knowledge-map/stars/${unitId}/quiz/${quizId}/answer`,
+    payload,
   )
   return response.data
 }
@@ -225,10 +256,26 @@ export function normalizeCurriculumSubjectId(subjectId?: string) {
   return aliases[normalized] ?? normalized
 }
 
-/** The star map read model (stoa-backend#59). `subjectId` is the galaxy in focus. */
-export async function getKnowledgeMap(subjectId?: string) {
+/**
+ * The star map read model (stoa-backend#59). `subjectId` is the galaxy in
+ * focus. As a skeleton (#503): every star, none of its small stars; a backend
+ * before stoa-backend#127 ignores `view` and sends the sky in full.
+ */
+export async function getKnowledgeMap(subjectId?: string, view: 'full' | 'skeleton' = 'skeleton') {
   const response = await httpClient.get<KnowledgeMapResponse>('/practice/knowledge-map', {
-    params: subjectId ? { subjectId } : undefined,
+    params: { ...(subjectId ? { subjectId } : {}), view },
+  })
+  return response.data
+}
+
+/**
+ * The few stars around `around` in full (#503); without it, around where the
+ * student last practised. `subjectId` is the galaxy to look in: the backend
+ * finds `around` only there, and without it takes the first subject.
+ */
+export async function getKnowledgeMapStars({ subjectId, around }: { subjectId?: string; around?: string } = {}) {
+  const response = await httpClient.get<KnowledgeMapNeighbourhood>('/practice/knowledge-map/stars', {
+    params: { ...(subjectId ? { subjectId } : {}), ...(around ? { around } : {}) },
   })
   return response.data
 }

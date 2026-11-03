@@ -1,4 +1,6 @@
 import type { ChatAttachment, ChatMessage, MessageQuote, PracticeContextRef } from '@/types/chat'
+import type { AttachmentReference } from '@/types/file'
+import type { StreamMessagePayload } from '@/services/chat/chatStreamApi'
 
 /**
  * One message on its way: what was asked, and the idempotency key that makes
@@ -11,14 +13,14 @@ import type { ChatAttachment, ChatMessage, MessageQuote, PracticeContextRef } fr
 export type PendingMessage = {
   idempotencyKey: string
   content: string
-  attachmentIds?: string[]
+  attachmentIds?: AttachmentReference[]
   attachments?: ChatAttachment[]
   askedAt: string
   /** Sent again as it was: the same command carries the same fields (#56). */
   practiceContext?: PracticeContextRef
   quote?: MessageQuote
   /**
-   * Sent by `sendDetached` with no conversation on screen, and not yet known
+   * Sent by Ask's question module (`useAskQuestion`) with no conversation on screen, and not yet known
    * to have reached the server: a tab that no longer has that request sends it
    * again with the same key, which the server takes as the same message (#263).
    */
@@ -27,6 +29,24 @@ export type PendingMessage = {
 
 export const PENDING_MESSAGE_KEY_PREFIX = 'stoa_pending_chat_message:'
 const pendingKey = (conversationId: string) => `${PENDING_MESSAGE_KEY_PREFIX}${conversationId}`
+
+/**
+ * The references kept with a message, as `AttachmentReference` allows them:
+ * exactly one of `uploadId` and `attachmentId`. Anything else -- a bare id kept
+ * before references were sent (#507) -- is left out rather than sent for the
+ * backend to refuse the whole message over.
+ */
+function attachmentReferences(value: unknown): AttachmentReference[] | undefined {
+  if (!Array.isArray(value)) return undefined
+  const references = value.flatMap((entry): AttachmentReference[] => {
+    if (typeof entry !== 'object' || entry === null) return []
+    const { uploadId, attachmentId } = entry as Record<string, unknown>
+    if (typeof uploadId === 'string' && attachmentId === undefined) return [{ uploadId }]
+    if (typeof attachmentId === 'string' && uploadId === undefined) return [{ attachmentId }]
+    return []
+  })
+  return references.length > 0 ? references : undefined
+}
 
 export function readPendingMessage(conversationId: string): PendingMessage | null {
   try {
@@ -37,7 +57,7 @@ export function readPendingMessage(conversationId: string): PendingMessage | nul
     return {
       idempotencyKey: value.idempotencyKey,
       content: value.content,
-      attachmentIds: value.attachmentIds,
+      attachmentIds: attachmentReferences(value.attachmentIds),
       attachments: value.attachments,
       askedAt: typeof value.askedAt === 'string' ? value.askedAt : new Date(0).toISOString(),
       ...(value.practiceContext ? { practiceContext: value.practiceContext } : {}),
@@ -59,6 +79,42 @@ export function writePendingMessage(conversationId: string, pending: PendingMess
   } catch {
     // Without storage a reload loses the wait, not the message.
   }
+}
+
+/**
+ * The body a pending message goes out with: the same command carries the same
+ * fields however often it is sent. Spread, not `undefined`: a question asked
+ * away from the stage, or about no passage, sends a body without these keys at
+ * all (#56, #327 K3).
+ */
+export function toStreamPayload(pending: PendingMessage): StreamMessagePayload {
+  return {
+    content: pending.content,
+    attachmentIds: pending.attachmentIds,
+    idempotencyKey: pending.idempotencyKey,
+    ...(pending.practiceContext ? { practiceContext: pending.practiceContext } : {}),
+    ...(pending.quote ? { quote: pending.quote } : {}),
+  }
+}
+
+/**
+ * The sends still on their way in this tab, by idempotency key: the
+ * conversation, opened meanwhile, waits for their answer instead of sending
+ * the same message a second time. In memory only: a reload has no request
+ * left, and sends again what is still unconfirmed.
+ */
+const inFlight = new Map<string, Promise<void>>()
+
+/** Keep `sending` as the send of this message on its way, until it settles. */
+export function trackSending(idempotencyKey: string, sending: Promise<void>): Promise<void> {
+  const tracked = sending.finally(() => inFlight.delete(idempotencyKey))
+  inFlight.set(idempotencyKey, tracked)
+  return tracked
+}
+
+/** The send of this message still on its way in this tab, if there is one. */
+export function sendingFor(idempotencyKey: string): Promise<void> | undefined {
+  return inFlight.get(idempotencyKey)
 }
 
 /**
@@ -89,6 +145,8 @@ export type FailedMessage = {
   /** The student's bubble, `failed`, carrying its retry. */
   student: ChatMessage & {
     retryPayload: Omit<PendingMessage, 'askedAt' | 'idempotencyKey' | 'unconfirmed'> & { idempotencyKey?: string }
+    /** The UTC day the daily limit refused it: not sent again before the next (#541). */
+    limitDay?: string
   }
   /** What stood in the answer's place, if anything. */
   answer?: ChatMessage
@@ -103,14 +161,27 @@ function readStoredFailed(conversationId: string): StoredFailedMessage[] {
   try {
     const value: unknown = JSON.parse(sessionStorage.getItem(failedKey(conversationId)) ?? '[]')
     if (!Array.isArray(value)) return []
-    return value.filter(
-      (entry): entry is StoredFailedMessage =>
-        typeof entry === 'object' &&
-        entry !== null &&
-        typeof (entry as StoredFailedMessage).owner === 'string' &&
-        typeof (entry as StoredFailedMessage).student?.id === 'string' &&
-        typeof (entry as StoredFailedMessage).student?.retryPayload?.content === 'string',
-    )
+    return value
+      .filter(
+        (entry): entry is StoredFailedMessage =>
+          typeof entry === 'object' &&
+          entry !== null &&
+          typeof (entry as StoredFailedMessage).owner === 'string' &&
+          typeof (entry as StoredFailedMessage).student?.id === 'string' &&
+          typeof (entry as StoredFailedMessage).student?.retryPayload?.content === 'string',
+      )
+      .map((entry) => {
+        // Sent again as kept: only references the backend takes (#507).
+        const { attachmentIds, ...retryPayload } = entry.student.retryPayload
+        const references = attachmentReferences(attachmentIds)
+        return {
+          ...entry,
+          student: {
+            ...entry.student,
+            retryPayload: references ? { ...retryPayload, attachmentIds: references } : retryPayload,
+          },
+        }
+      })
   } catch {
     return []
   }

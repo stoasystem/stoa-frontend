@@ -315,12 +315,37 @@
     "surface": {
       "question": "Question",
       "ai_answer": "Réponse de l’IA",
-      "teacher_reply": "Réponse de l’enseignant"
+      "teacher_reply": "Réponse de l’enseignant",
+      "image_upload": "Envoi d'image"
     },
     "events": {
       "reported": "Signalé",
       "updated": "Mis à jour",
-      "note_added": "Note ajoutée"
+      "note_added": "Note ajoutée",
+      "image_blocked": "Image bloquée",
+      "image_deleted": "Image supprimée"
+    },
+    "image": {
+      "title": "Image bloquée",
+      "listLine": "Image bloquée · {{categories}}",
+      "alt": "L'image bloquée par la modération",
+      "show": "Afficher l'image",
+      "hide": "Flouter l'image",
+      "loading": "Chargement de l'image...",
+      "failed": "Impossible de charger l'image.",
+      "retry": "Réessayer",
+      "deleted": "Image supprimée",
+      "deletedOn": "Image supprimée le {{date}}",
+      "undrawable": "Cette image ne peut pas être affichée ici.",
+      "hits": "Bloquée pour",
+      "noHits": "Aucune détection enregistrée.",
+      "uploader": "Envoyée par",
+      "uploadedAt": "Envoyée le",
+      "conversation": "Conversation",
+      "role": {
+        "student": "élève",
+        "teacher": "enseignant"
+      }
     }
   },
   "teacherApplications": {
@@ -884,6 +909,7 @@
       "learning_profile_update": "Mise à jour du profil d’apprentissage",
       "moderation_case_update": "Mise à jour d’un cas de modération",
       "subscription_request_update": "Mise à jour d’une demande d’abonnement",
+      "teacher_help_dispatched": "Demande d’aide attribuée",
       "teacher_help_expired": "Aide enseignante expirée",
       "teacher_reply": "Réponse d’un enseignant",
       "teacher_requested": "Enseignant demandé",

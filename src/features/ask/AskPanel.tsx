@@ -1,65 +1,42 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { ChevronLeft, X } from 'lucide-react'
-import { useEffect, useLayoutEffect, useMemo, useRef, useState, type HTMLAttributes } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type HTMLAttributes } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 import { Button, Composer, IconButton, PresenceDot } from '@/components/base'
 import { conversationDisplayTitle, subjectDisplayLabel } from '@/components/chat/conversationTitle'
+import { MathRenderer } from '@/components/ui/MathRenderer'
 import { GRADE_SECTION_ID } from '@/features/account/GradeGroup'
 import { AskConversationList, AskEmptyState } from '@/features/ask/AskConversationList'
+import { hasSections, quoteCaption, sectionsSpokenText, type AnswerStep } from '@/features/ask/AskAnswerSections'
 import { AskLitCard } from '@/features/ask/AskLitCard'
 import { AskMessage } from '@/features/ask/AskMessage'
 import { ASK_PANEL } from '@/features/ask/askLayout'
-import { TeacherHelpAction, TeacherHelpStatusCard } from '@/features/ask/TeacherHelp'
+import { TeacherHelpAction, TeacherHelpStatusCard } from '@/features/ask/teacherHelp/TeacherHelp'
+import { useTeacherHelp } from '@/features/ask/teacherHelp/useTeacherHelp'
 import type { AskController } from '@/features/ask/useAskController'
 import { useAskConversation } from '@/features/ask/useAskConversation'
+import { useAskQuestion } from '@/features/ask/question/useAskQuestion'
 import {
+  makeQuote,
   quoteBelongs,
-  quoteField,
   useAskQuoteStore,
   type AskPractice,
   type AskQuote,
 } from '@/features/ask/practiceContext'
-
-/**
- * The paperclip stays off until the upload pipeline hands back an attachment.
- *
- * Measured against production on 2026-10-11, signed in as two different
- * accounts: `POST /files/intents` answers 200, `PUT /files/{id}/chunks/1`
- * answers 200, and `POST /files/{id}/complete` answers 200 with
- * `{"status":"validated","attachment":null}` -- every time, however often it
- * is called. `GET /files/attachments` answers 503 `upload_service_unavailable`.
- * So an upload completes and never becomes an attachment, and `uploadFile`
- * throws on exactly that case.
- *
- * The picker, the tray, the limits and their tests are all here and tested;
- * what is withheld is the button, because a paperclip that cannot finish is
- * worse than no paperclip. Flip this to `true` once a complete answers with an
- * attachment on production.
- */
-const ATTACHMENTS_WORK = false
-import { AttachmentTray } from '@/features/uploads/AttachmentTray'
-import { useAttachmentUploads } from '@/features/uploads/useAttachmentUploads'
-import { ACCEPT_ATTRIBUTE } from '@/services/files/uploadLimits'
+import { Attachments } from '@/features/uploads/Attachments'
+import { useAttachments, type AttachmentBatch } from '@/features/uploads/useAttachments'
 import { useConversationsQuery } from '@/hooks/chat/useConversationsQuery'
-import { useCreateConversationMutation } from '@/hooks/chat/useCreateConversationMutation'
+import { refusedForToday } from '@/hooks/chat/useStreamingChat'
 import { useTeacherAvailabilityQuery } from '@/hooks/chat/useTeacherAvailabilityQuery'
 import { useRecommendationsQuery } from '@/hooks/learning/useWeakTopicsQuery'
 import { useStudentProfileQuery } from '@/hooks/student/useStudentProfileQuery'
 import { conversationGrade } from '@/lib/conversationGrade'
-import { rememberPendingMessage } from '@/lib/pendingChatMessages'
-import { teacherHelpErrorKey } from '@/lib/teacherHelpErrors'
 import { toUserFacingError } from '@/lib/userFacingText'
 import { cn } from '@/lib/utils'
-import { trackEvent } from '@/services/analytics/analyticsClient'
-import { ApiError } from '@/services/api/httpClient'
-import { chatQueryKeys } from '@/services/chat/chatQueryKeys'
-import { createTeacherHelpRequest } from '@/services/teacherHelp/teacherHelpApi'
-import { sendDetached } from '@/services/chat/detachedSend'
 import { useAuthStore } from '@/store/authStore'
 import { litMomentsFor, useLitMoments, type LitMoment } from '@/store/litMomentsStore'
 import { learningSubjectOptions } from '@/types/learningProfile'
-import { QUOTE_MAX_LENGTH, type ChatMessage, type PracticeContextRef } from '@/types/chat'
+import { QUOTE_MAX_LENGTH, type ChatMessage } from '@/types/chat'
 
 export type AskLayout = 'panel' | 'sheet'
 
@@ -100,35 +77,19 @@ export function AskPanel({
   const availability = useTeacherAvailabilityQuery().data
   const teachersOnline = availability?.online
   const profile = useStudentProfileQuery().data
-  // The first question goes out with the conversation itself
-  // (`POST /conversations` with `initialMessage`), so it is sent exactly when
-  // the student sends it: never later, and not lost if Ask closes or the page
-  // reloads before the conversation opens. Its answer comes on the command the
-  // backend keys `initial-<id>`; it is remembered as a message waiting for its
-  // answer, which the conversation picks up when it opens (after a reload too).
-  const createConversation = useCreateConversationMutation({
-    onCreated: (created, payload) => {
-      if (!payload.initialMessage) return
-      rememberPendingMessage(created.id, {
-        idempotencyKey: `initial-${created.id}`,
-        content: payload.initialMessage,
-        askedAt: askedAtRef.current ?? new Date().toISOString(),
-        // The same fields the server took it with, or sending it again under
-        // the same key is refused as a different message (#327 K3).
-        ...(payload.practiceContext ? { practiceContext: payload.practiceContext } : {}),
-      })
-    },
-  })
-  // Two sends in one tick would start two conversations.
-  const creatingRef = useRef(false)
-  const askedAtRef = useRef<string | null>(null)
-  // The conversation a refused first question left behind (#327 K4): asking
-  // that question again goes into it, not into another empty one.
-  const refusedRef = useRef<RefusedConversation | null>(null)
   const ask = useAskConversation(conversationId)
   const { sendStreamingMessage, isStreaming, conversation } = ask
   const phone = layout === 'sheet'
   const subject = subjectFor(subjectId, profile?.primarySubjects?.[0])
+  // Where the question goes -- the open conversation, a new one, or the one a
+  // refusal left behind -- and under which key, is the question module's (#562).
+  const question = useAskQuestion({
+    subject,
+    grade: conversationGrade(profile?.grade),
+    conversationId,
+    sendStreamingMessage,
+    isStreaming,
+  })
 
   // Whether this panel is still on screen when the conversation comes back,
   // and still on the list rather than in a conversation the student opened
@@ -177,128 +138,64 @@ export function AskPanel({
       ? chosenQuote
       : null
   const clearQuote = () => setQuote(null)
-  // The files chosen for the next question, uploaded as they are picked (#125).
-  const attachments = useAttachmentUploads()
-  const picker = useRef<HTMLInputElement>(null)
-  const { clearSent } = attachments
+  // "I don't get this step" (#506): the step goes out as a quote of that part
+  // of the answer, with a question the student can change or send as it is.
+  const composerArea = useRef<HTMLDivElement>(null)
+  const { readDraft } = controller
+  const askAboutStep = useCallback(
+    ({ messageId, index, text }: AnswerStep) => {
+      setQuote(makeQuote(text, { kind: 'message', id: messageId, part: { section: 'steps', index } }, conversationId))
+      if (!readDraft().trim()) setDraft(t('ask.answer.stepQuestion'))
+      composerArea.current?.querySelector('textarea')?.focus()
+    },
+    [conversationId, readDraft, setDraft, setQuote, t],
+  )
+  // The files chosen for the next question, uploaded as they are picked
+  // (#125): from the chooser, the camera (#509) or a phone by QR (#514).
+  const attachments = useAttachments({ camera: true, phone: conversationId })
 
-  // The exercise on screen goes out with every question asked beside it: the
-  // backend reads the exercise, the chapter and the learning state from the
-  // three ids itself (#56). Away from the stage the key is absent altogether.
-  const practiceField = practice ? { practiceContext: practice.context } : {}
-
-  function startConversation(content: string, quote?: AskQuote | null) {
-    if (creatingRef.current || createConversation.isPending) return
-    const attachmentIds = attachments.readyIds
-    const carried = attachmentIds.length > 0
-    const grade = conversationGrade(profile?.grade)
-    const askedAt = new Date().toISOString()
-    askedAtRef.current = askedAt
+  function send(content: string, files: AttachmentBatch) {
     // Sent is sent: the question leaves the composer now, so closing Ask while
     // the conversation is being made cannot leave it there to be sent twice.
-    // It comes back only if the conversation could not be made.
+    // It comes back only if it could not go out.
     setDraft('')
-    const readyAttachments = attachments.readyAttachments
-    const practiceContext = practice?.context
-    // Sent into a conversation as a message of its own -- into that
-    // conversation only, and whether or not Ask is still open by then (#263).
-    const sendInto = (id: string, idempotencyKey: string) => {
-      sendDetached(id, {
-        idempotencyKey,
-        content,
-        askedAt,
-        ...(attachmentIds.length > 0 ? { attachmentIds, attachments: readyAttachments } : {}),
-        ...(practiceContext ? { practiceContext } : {}),
-        ...(quote ? { quote: quoteField(quote) } : {}),
-      })
+    // Into the open conversation it goes at once, and so does the passage.
+    if (conversationId) clearQuote()
+    void question.ask({ content, quote, files, practice }).then((outcome) => {
+      if (outcome.kind === 'failed') {
+        // Unless the student has started another question meanwhile.
+        if (!controller.readDraft()) setDraft(content)
+        return
+      }
       // Gone with the question -- unless another was chosen meanwhile.
       if (quote && useAskQuoteStore.getState().quote === quote) clearQuote()
-      clearSent()
-    }
-    // Opened only in the panel that asked, and only if the student is still
-    // on the list: a closed Ask stays closed, and a conversation the student
-    // opened meanwhile stays open.
-    const open = (id: string) => {
-      if (mounted.current && openConversation.current === null) select(id)
-    }
-
-    // The refused question asked again as it was goes into the conversation
-    // made for it, under the key the server named for it. Any other question
-    // starts a conversation of its own, as usual: in the refused one it would
-    // sit under the refused question's title (#370).
-    const refused = refusedRef.current
-    if (
-      refused &&
-      refused.subject === subject &&
-      refused.grade === grade &&
-      refused.content === content &&
-      !quote &&
-      !carried &&
-      sameContext(refused.practiceContext, practiceContext)
-    ) {
-      refusedRef.current = null
-      createConversation.reset()
-      sendInto(refused.id, `initial-${refused.id}`)
-      open(refused.id)
-      return
-    }
-
-    creatingRef.current = true
-    // `POST /conversations` takes neither a quote nor a file, so a question
-    // carrying either starts the conversation empty and is sent into it as a
-    // message of its own (#263).
-    const held = quote || carried
-    createConversation
-      .mutateAsync({
-        subject,
-        grade,
-        ...(held ? {} : { initialMessage: content }),
-        ...practiceField,
-      })
-      .then(
-        (created) => {
-          if (held) sendInto(created.id, `held-${created.id}`)
-          open(created.id)
-        },
-        (error: unknown) => {
-          // The conversation was made and only its first question refused:
-          // the refusal names it (#327 K4).
-          const made = refusedConversationId(error)
-          if (made && !held) {
-            refusedRef.current = { id: made, subject, grade, content, practiceContext }
-          }
-          // Unless the student has started another question meanwhile.
-          if (!controller.readDraft()) setDraft(content)
-        },
-      )
-      .finally(() => {
-        creatingRef.current = false
-      })
+      // Opened only in the panel that asked, and only if the student is still
+      // on the list: a closed Ask stays closed, and a conversation the student
+      // opened meanwhile stays open.
+      if (mounted.current && openConversation.current === null) select(outcome.conversationId)
+    })
   }
 
   function submit(value: string) {
     const content = value.trim()
     if (!content) return
     // Pressing send while a file is still going up is held by the composer's
-    // `busy`, which says so; this is the second lock, so a question can never
-    // leave without the file it was written for.
-    if (attachments.uploading) return
-    if (!conversationId) {
-      startConversation(content, quote)
-      return
-    }
-    if (isStreaming) return
-    const attachmentIds = attachments.readyIds
-    const carried = attachments.readyAttachments
-    setDraft('')
-    clearQuote()
-    clearSent()
-    void sendStreamingMessage({
-      content,
-      ...practiceField,
-      ...(quote ? { quote: quoteField(quote) } : {}),
-      ...(attachmentIds.length > 0 ? { attachmentIds, attachments: carried } : {}),
-    })
+    // `busy`, which says so; `take()` is the second lock, so a question can
+    // never leave without the file it was written for. A file that waited past
+    // its upload's 30 minutes is chosen again first.
+    const files = attachments.take()
+    if (!files) return
+    if (!question.canAsk()) return
+    send(content, files)
+  }
+
+  function askRecommended(recommended: string) {
+    if (!question.canAsk()) return
+    // A file still going up, or one that waited past its upload's 30 minutes,
+    // holds the question; the tray says which.
+    const files = attachments.take()
+    if (!files) return
+    send(recommended, files)
   }
 
   // Named as the list names it until it is read itself, so the title the
@@ -358,7 +255,8 @@ export function AskPanel({
           conversationId={conversationId}
           ask={ask}
           layout={layout}
-          teachersOnline={teachersOnline}
+          onAskAboutStep={askAboutStep}
+          onNewConversation={() => select(null)}
         />
       ) : (
         <div ref={listArea} className="flex min-h-0 flex-1 flex-col overflow-y-auto" style={{ padding: phone ? '8px 6px' : '10px 8px' }}>
@@ -388,27 +286,27 @@ export function AskPanel({
           ) : (conversationsQuery.data?.items.length ?? 0) === 0 ? (
             <RecommendedEmptyState
               subject={subject}
-              onAsk={(question) => startConversation(question, quote)}
-              disabled={createConversation.isPending}
+              onAsk={askRecommended}
+              disabled={question.starting}
             />
           ) : (
             <AskConversationList conversations={conversationsQuery.data?.items ?? []} onSelect={(id) => select(id)} />
           )}
           {/* Here before it has anything to say, so what it says is read (#408). */}
           <div role="status" data-ask-starting>
-            {createConversation.isPending && (
+            {question.starting && (
               <p className="px-3 py-2 text-[13px] text-caption">{t('ask.thread.starting')}</p>
             )}
           </div>
-          {createConversation.isError && (
+          {question.startError && (
             <p role="alert" className="px-3 py-2 text-[13px] text-red">
-              {toUserFacingError(createConversation.error, t('ask.thread.startFailed'))}
+              {toUserFacingError(question.startError, t('ask.thread.startFailed'))}
             </p>
           )}
         </div>
       )}
 
-      <div className="shrink-0" style={{ padding: phone ? '0 12px 34px' : '0 14px 16px' }}>
+      <div ref={composerArea} className="shrink-0" style={{ padding: phone ? '0 12px 34px' : '0 14px 16px' }}>
         {isStreaming && (
           <div className="flex justify-end pb-1">
             <Button variant="plain" size="small" onClick={ask.stopStreaming}>
@@ -430,27 +328,18 @@ export function AskPanel({
           </p>
         )}
         {quote && <PendingQuote quote={quote} onRemove={clearQuote} />}
-        <AttachmentTray drafts={attachments.drafts} overflow={attachments.overflow} onRemove={attachments.remove} />
-        <input
-          ref={picker}
-          type="file"
-          multiple
-          accept={ACCEPT_ATTRIBUTE}
-          className="hidden"
-          onChange={(event) => {
-            attachments.add(Array.from(event.target.files ?? []))
-            // Cleared, so choosing the same file twice in a row still fires.
-            event.target.value = ''
-          }}
-        />
+        <Attachments view={attachments.view} />
         <Composer
           value={draft}
           onChange={setDraft}
           onSubmit={submit}
-          onAttach={ATTACHMENTS_WORK ? () => picker.current?.click() : undefined}
+          onAttach={attachments.sources.pickFile}
+          onCapture={attachments.sources.takePhoto}
+          onPhone={attachments.sources.usePhone}
+          dictation
           label={t('ask.composerLabel')}
           placeholder={practice ? t('ask.practice.placeholder') : t('ask.placeholder')}
-          busy={isStreaming || createConversation.isPending || attachments.uploading}
+          busy={isStreaming || question.starting || attachments.busy}
           describedBy={profile && !conversationGrade(profile.grade) ? 'ask-grade-missing' : undefined}
         />
       </div>
@@ -470,8 +359,11 @@ function PendingQuote({ quote, onRemove }: { quote: AskQuote; onRemove: () => vo
       className="mb-1.5 flex items-start gap-2 rounded-[12px] border border-[color:var(--card-border)] bg-surface px-3 py-2"
     >
       <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-        <span className="text-[12px] font-semibold text-caption">{t('ask.quote.title')}</span>
-        <span className="truncate text-[13px] text-ink">{quote.text}</span>
+        <span className="text-[12px] font-semibold text-caption">{quoteCaption(quote, t)}</span>
+        {/* A step of an answer carries its formulas: drawn, as on the bubble it came from (#506). */}
+        <span className="truncate text-[13px] text-ink">
+          <MathRenderer plain>{quote.text}</MathRenderer>
+        </span>
         {quote.truncated && (
           <span role="status" className="text-[12px] text-caption">
             {t('ask.quote.truncated', { count: QUOTE_MAX_LENGTH })}
@@ -501,37 +393,21 @@ function AskThread({
   conversationId,
   ask,
   layout,
-  teachersOnline,
+  onAskAboutStep,
+  onNewConversation,
 }: {
   conversationId: string
   ask: ReturnType<typeof useAskConversation>
   layout: AskLayout
-  teachersOnline: boolean | undefined
+  onAskAboutStep: (step: AnswerStep) => void
+  /** Back to the list, where the next question starts a new conversation. */
+  onNewConversation: () => void
 }) {
   const { t } = useTranslation('chat')
-  const queryClient = useQueryClient()
   const scroller = useRef<HTMLDivElement>(null)
-  const [helpError, setHelpError] = useState<string | null>(null)
-  const { messages, help, helpActive, isStreaming, retryMessage, conversationQuery } = ask
-
-  const requestHelp = useMutation({
-    mutationFn: () => createTeacherHelpRequest({ conversationId }),
-    onSuccess: (request) => {
-      setHelpError(null)
-      trackEvent('teacher_help_requested', {
-        requestId: request.requestId,
-        conversationId: request.conversationId,
-        status: request.status,
-      })
-      // The card shows the request as the server reports it, read back from
-      // the server: not the answer to this POST, and never a guess.
-      void queryClient.invalidateQueries({ queryKey: chatQueryKeys.teacherHelpRequest(conversationId) })
-    },
-    onError: (error) => {
-      trackEvent('teacher_help_request_failed', { reason: teacherHelpErrorKey(error) })
-      setHelpError(t(teacherHelpErrorKey(error)))
-    },
-  })
+  const { messages, isStreaming, retryMessage, conversationQuery } = ask
+  const help = useTeacherHelp({ conversationId, messages, isStreaming })
+  const { view, request, withdraw } = help
 
   const ownerId = useAuthStore((state) => state.user?.id)
   // Only the moments of this conversation's subject that lit while it was open, or before it began (#267).
@@ -541,23 +417,29 @@ function AskThread({
     startedAt: messages[0]?.createdAt,
   })
   const entries = threadEntries(messages, moments)
-  const lastAnswerId = latestAnswerId(messages)
-  const offerHelp = !helpActive && !isStreaming && !requestHelp.isPending
   // The same element from one render to the next, so the answer it sits under
   // is not drawn again at every key typed in the composer (#416).
-  const { mutate: request, isPending: requesting } = requestHelp
+  // Built from what it shows, not from the view: a new message is a new view.
+  const offer = view.kind === 'offer' || view.kind === 'asking' ? view.offer : null
+  const requesting = view.kind === 'asking'
+  const offered = offer !== null
+  const { teachersOnline, support, suggested, blockedKey, errorKey } = offer ?? {}
   const helpAction = useMemo(
     () =>
-      offerHelp || requesting ? (
+      offered ? (
         <TeacherHelpAction
           onRequest={() => request()}
           requesting={requesting}
           teachersOnline={teachersOnline}
-          error={helpError}
+          support={support ?? null}
+          suggested={suggested}
+          blockedKey={blockedKey}
+          errorKey={errorKey}
         />
       ) : undefined,
-    [helpError, offerHelp, request, requesting, teachersOnline],
+    [blockedKey, errorKey, offered, request, requesting, suggested, support, teachersOnline],
   )
+  const card = 'card' in view ? view.card : null
 
   // Keep the latest message in view as the thread grows -- unless the student
   // has scrolled up to read something earlier.
@@ -571,14 +453,19 @@ function AskThread({
     if (node) atBottom.current = node.scrollHeight - node.scrollTop - node.clientHeight < STICK_TO_BOTTOM_PX
   }
   const announcement = useFinishedReplyAnnouncement(messages, conversationQuery.isSuccess, {
-    teacher: help?.teacherName?.trim() || t('ask.thread.teacherFallback'),
+    teacher: help.teacherName?.trim() || t('ask.thread.teacherFallback'),
   })
 
   return (
     <>
-      {help && (
+      {card && (
         <div className="shrink-0" style={{ padding: layout === 'sheet' ? '10px 14px 0' : '12px 18px 0' }}>
-          <TeacherHelpStatusCard request={help} teachersOnline={teachersOnline} />
+          <TeacherHelpStatusCard
+            request={card.request}
+            teachersOnline={card.teachersOnline}
+            withdraw={{ ...card.withdraw, onWithdraw: () => withdraw() }}
+            onNewConversation={onNewConversation}
+          />
         </div>
       )}
       <div
@@ -611,9 +498,10 @@ function AskThread({
           <AskMessage
             key={entry.message.id}
             message={entry.message}
-            teacherName={help?.teacherName}
-            onRetry={retryMessage}
-            after={entry.message.id === lastAnswerId ? helpAction : undefined}
+            teacherName={help.teacherName}
+            onRetry={refusedForToday(entry.message) ? undefined : retryMessage}
+            onAskAboutStep={onAskAboutStep}
+            after={entry.message.id === offer?.underMessageId ? helpAction : undefined}
           />
         ))}
       </div>
@@ -654,8 +542,17 @@ function useFinishedReplyAnnouncement(
     const fresh = finished.filter((message) => !known.has(message.id))
     for (const message of fresh) known.add(message.id)
     const latest = fresh[fresh.length - 1]
-    // A teacher's reply says who it is from; an answer is the assistant's.
-    if (latest) setAnnouncement(latest.role === 'teacher' ? `${names.teacher}: ${latest.content}` : latest.content)
+    // A teacher's reply says who it is from; an answer is the assistant's, read
+    // as it is shown: in sections, its steps and answer, not the hint (#506).
+    if (latest) {
+      setAnnouncement(
+        latest.role === 'teacher'
+          ? `${names.teacher}: ${latest.content}`
+          : hasSections(latest.structured)
+            ? sectionsSpokenText(latest.structured)
+            : latest.content,
+      )
+    }
   }, [loaded, messages, names.teacher])
   return announcement
 }
@@ -676,42 +573,4 @@ export function threadEntries(messages: readonly ChatMessage[], moments: readonl
   }
   while (next < lit.length) entries.push({ kind: 'lit', moment: lit[next++] })
   return entries
-}
-
-/** The latest answer the assistant finished: the request for a teacher sits under it. */
-function latestAnswerId(messages: readonly ChatMessage[]) {
-  for (let index = messages.length - 1; index >= 0; index -= 1) {
-    const message = messages[index]
-    if (message.role === 'assistant') {
-      return message.status === 'streaming' || message.status === 'failed' ? null : message.id
-    }
-  }
-  return null
-}
-
-type RefusedConversation = {
-  id: string
-  subject: string
-  grade: string
-  content: string
-  practiceContext?: PracticeContextRef
-}
-
-/**
- * The conversation `POST /conversations` made before refusing its first
- * question: the backend names it in the refusal's detail, so the question can
- * be asked again in it (stoa-backend `_naming_the_conversation`).
- */
-function refusedConversationId(error: unknown): string | null {
-  if (!(error instanceof ApiError)) return null
-  const detail = error.detail
-  if (typeof detail !== 'object' || detail === null) return null
-  const id = (detail as { conversationId?: unknown }).conversationId
-  return typeof id === 'string' && id ? id : null
-}
-
-function sameContext(a?: PracticeContextRef, b?: PracticeContextRef) {
-  return (
-    a?.unitId === b?.unitId && a?.lessonId === b?.lessonId && a?.challengeId === b?.challengeId
-  )
 }

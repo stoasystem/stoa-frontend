@@ -12,11 +12,11 @@ import type { Rgb } from '@/features/starmap/view/semanticZoom'
 
 export type RendererKind = 'canvas2d' | 'webgl'
 
-/** Learning states as small integers, in `LEARNING_STATES` order. */
+/** How stars are drawn, as small integers in `STAR_LOOKS` order. */
 export const STATE_LIT = 0
 export const STATE_IN_PROGRESS = 1
 export const STATE_READY = 2
-export const STATE_LOCKED = 3
+export const STATE_WAITING = 3
 
 /** The connection lines' inks (#121), from the `--starmap-link-*` and `--starmap-bridge` sky tokens. */
 export type LinkInk = {
@@ -26,8 +26,8 @@ export type LinkInk = {
   inProgress: string
   /** Tier 3: both ends lit, the path walked. */
   walked: string
-  /** Tier 4: into a locked star (star layer only, dashed). */
-  locked: string
+  /** Tier 4: into a waiting star (star layer only, dashed). */
+  waiting: string
   /** The panorama's soft bridges between nebulae, and the glow between galaxies. */
   bridge: string
 }
@@ -46,6 +46,10 @@ export type StarMapTheme = {
   links?: LinkInk
   /** A galaxy's name on the panorama (#137), the `--starmap-galaxy-name` sky token; `GALAXY_NAME_INK` (render/galaxyNames.ts) when absent. */
   galaxyName?: string
+  /** The violet rim round a glowing star, `--starmap-rim`; `STAR_INK.rim` (render/glyph.ts) when absent. */
+  rim?: string
+  /** The cool tint of a ready star, `--starmap-ice`; `STAR_INK.ice` when absent. */
+  ice?: string
 }
 
 /** What stays the same from frame to frame: the map's data, in arrays. */
@@ -97,6 +101,8 @@ export type SceneData = {
   names: readonly string[]
   /** Each star's skills, lit or not (#9 point 10; `[]` until stoa-backend#58). */
   skills: readonly (readonly boolean[])[]
+  /** Beside `skills`: which are extension small stars (#501). Absent: none is. */
+  skillExtension?: readonly (readonly boolean[])[]
   nebulae: readonly {
     topicId: string
     name: string

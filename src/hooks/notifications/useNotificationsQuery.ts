@@ -34,7 +34,7 @@ function useFallbackPoll() {
 export function useNotificationsQuery(enabled = true) {
   return useQuery({
     queryKey: notificationQueryKeys.list(),
-    queryFn: getNotifications,
+    queryFn: ({ signal }) => getNotifications({ signal }),
     staleTime: 30_000,
     enabled,
     retry: false,
@@ -53,7 +53,7 @@ export function useUnreadNotificationCountQuery() {
   const fullPage = items !== undefined && items.length >= NOTIFICATION_PAGE_SIZE
   const separate = useQuery({
     queryKey: notificationQueryKeys.unreadCount(),
-    queryFn: getUnreadNotificationCount,
+    queryFn: ({ signal }) => getUnreadNotificationCount({ signal }),
     staleTime: 30_000,
     enabled: fullPage,
     retry: false,
@@ -66,7 +66,7 @@ export function useUnreadNotificationCountQuery() {
 export function useAdminNotificationsQuery() {
   return useQuery({
     queryKey: notificationQueryKeys.adminList(),
-    queryFn: getAdminNotifications,
+    queryFn: ({ signal }) => getAdminNotifications({ signal }),
     staleTime: 30_000,
     ...useFallbackPoll(),
   })

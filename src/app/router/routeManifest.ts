@@ -167,6 +167,9 @@ export const UNAUTHORIZED_PATH = '/unauthorized'
 
 export const ASK_PATH = '/ask'
 
+/** The page a QR in Ask opens on the phone; the code follows its `#` (#514). */
+export const PHONE_UPLOAD_PATH = '/upload'
+
 export const roleHomePaths: Record<AppNavArea, string> = {
   student: '/',
   parent: '/parent',
@@ -229,6 +232,7 @@ const SupportPage = lazyPage('SupportPage', () => import('@/pages/support/Suppor
 const UnauthorizedPage = lazyPage('UnauthorizedPage', () => import('@/pages/error/UnauthorizedPage'))
 const ForbiddenPage = lazyPage('ForbiddenPage', () => import('@/pages/error/ForbiddenPage'))
 const NotFoundPage = lazyPage('NotFoundPage', () => import('@/pages/not-found/NotFoundPage'))
+const PhoneUploadPage = lazyPage('PhoneUploadPage', () => import('@/pages/upload/PhoneUploadPage'))
 
 // Student: the planet redesign (#13), whose map is a star map since #72.
 const MapHomePage = lazyPage('MapHomePage', () => import('@/pages/map/MapPages'))
@@ -236,6 +240,7 @@ const MapHomePage = lazyPage('MapHomePage', () => import('@/pages/map/MapPages')
 const MapPage = lazyPage('MapPage', () => import('@/pages/map/MapPages'))
 const ChapterPage = lazyPage('ChapterPage', () => import('@/pages/chapter/ChapterPages'))
 const LessonStagePage = lazyPage('LessonStagePage', () => import('@/pages/chapter/ChapterPages'))
+const StarQuizPage = lazyPage('StarQuizPage', () => import('@/pages/chapter/ChapterPages'))
 const AskPage = lazyPage('AskPage', () => import('@/pages/ask/AskPage'))
 const MePage = lazyPage('MePage', () => import('@/pages/me/MePage'))
 const StudentAssignmentsPage = lazyPage('StudentAssignmentsPage', () => import('@/pages/learning/StudentAssignmentsPage'))
@@ -324,6 +329,8 @@ export const pageRoutes: readonly PageRoute[] = [
   { path: '/onboarding', access: PUBLIC, page: OnboardingPage, titleKey: 'routes.onboarding.title', meta: { module: 'Onboarding', status: 'demo', purpose: 'Role onboarding guide.' } },
   // No `nav`: every role reaches Help from the avatar menu (#13 point 4, #46).
   { path: '/support', access: PUBLIC, page: SupportPage, titleKey: 'routes.support.title', meta: { module: 'Support', status: 'core', purpose: 'Support request entry.' } },
+  // Public: the phone a QR in Ask opens is not signed in; the code after the `#` is the credential (#514).
+  { path: PHONE_UPLOAD_PATH, access: PUBLIC, page: PhoneUploadPage, titleKey: 'routes.phoneUpload.title', meta: { module: 'Uploads', status: 'core', purpose: 'A phone sends one photo into Ask on the computer, by the QR shown there.' } },
   { path: UNAUTHORIZED_PATH, access: PUBLIC, page: UnauthorizedPage, titleKey: 'routes.unauthorized.title', meta: { module: 'Errors', status: 'core', purpose: 'Sign-in required.' } },
   { path: FORBIDDEN_PATH, access: PUBLIC, page: ForbiddenPage, titleKey: 'routes.forbidden.title', meta: { module: 'Errors', status: 'core', purpose: 'Where a guard sends a role the route is not for.' } },
   // The catch-all is a page a visitor really lands on, so it is named like one.
@@ -348,6 +355,7 @@ export const pageRoutes: readonly PageRoute[] = [
   { path: '/map/:subjectId/:topicId/:unitId', access: STUDENT, page: MapPage, titleKey: 'studentRoutes.unit.title', meta: { module: 'Star map', status: 'demo', purpose: 'A star (unit, knowledge point) of a nebula.' } },
   { path: '/chapter/:unitId', access: STUDENT, page: ChapterPage, titleKey: 'studentRoutes.chapter.title', meta: { module: 'Chapter', status: 'core', purpose: 'The chapter of a knowledge point: its lessons in order, with progress.' } },
   { path: '/chapter/:unitId/:lessonId', access: STUDENT, page: LessonStagePage, titleKey: 'studentRoutes.lesson.title', meta: { module: 'Chapter', status: 'core', purpose: 'The practice stage of a lesson, with Ask beside it.' } },
+  { path: '/star-quiz/:unitId', access: STUDENT, page: StarQuizPage, titleKey: 'studentRoutes.starQuiz.title', meta: { module: 'Chapter', status: 'core', purpose: 'The star quiz: a whole knowledge point tested in one paper, to light it without its lessons.' } },
   {
     path: ASK_PATH,
     access: STUDENT,
@@ -512,6 +520,16 @@ export function askPathFor(conversationId: unknown): string {
 export function moderationPathFor(caseId: unknown): string {
   const id = typeof caseId === 'string' ? caseId.trim() : ''
   return CONVERSATION_ID.test(id) ? `/admin/moderation?case=${encodeURIComponent(id)}` : '/admin/moderation'
+}
+
+/**
+ * A teacher's help request, `/teacher/requests/<id>`, or their request queue
+ * when there is no id. The dispatch email links the same address
+ * (stoa-backend#141).
+ */
+export function teacherRequestPathFor(requestId: unknown): string {
+  const id = typeof requestId === 'string' ? requestId.trim() : ''
+  return CONVERSATION_ID.test(id) ? `/teacher/requests/${id}` : '/teacher'
 }
 
 /*

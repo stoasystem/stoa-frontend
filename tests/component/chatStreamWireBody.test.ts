@@ -5,9 +5,9 @@
  * or `{uploadId}`, exactly one of the two -- not a list of ids
  * (stoa-backend/docs/api/openapi.json, AttachmentReference;
  * src/stoa/models/attachment.py enforces the "exactly one"). A list of strings
- * is a 422 before the message is ever read, which is what the app would have
- * sent: the hooks carry ids, so the reference is made here, and a test watches
- * the body rather than trusting the type.
+ * is a 422 before the message is ever read. A file chosen in the composer is
+ * a validated upload, sent as `{uploadId}`: `complete` makes no attachment, the
+ * message does (#507). A test watches the body rather than trusting the type.
  */
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { streamConversationMessage } from '@/services/chat/chatStreamApi'
@@ -32,14 +32,18 @@ afterEach(() => {
 })
 
 describe('the attachments on a message, on the wire', () => {
-  it('sends each id as the reference object the backend requires', async () => {
+  it('sends each reference as the object the backend requires, uploads by `uploadId`', async () => {
     await streamConversationMessage({
       conversationId: 'c1',
-      payload: { content: 'What did I do wrong?', idempotencyKey: 'k1', attachmentIds: ['att-1', 'att-2'] },
+      payload: {
+        content: 'What did I do wrong?',
+        idempotencyKey: 'k1',
+        attachmentIds: [{ uploadId: 'up-1' }, { attachmentId: 'att-2' }],
+      },
       onEvent: () => {},
     })
 
-    expect(sentBody().attachmentIds).toEqual([{ attachmentId: 'att-1' }, { attachmentId: 'att-2' }])
+    expect(sentBody().attachmentIds).toEqual([{ uploadId: 'up-1' }, { attachmentId: 'att-2' }])
   })
 
   it('leaves the key out altogether when the question carries no file', async () => {

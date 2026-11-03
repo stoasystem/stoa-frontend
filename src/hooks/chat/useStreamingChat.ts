@@ -5,10 +5,12 @@ import {
   streamConversationMessage,
   type StreamMessagePayload,
 } from '@/services/chat/chatStreamApi'
+import { isUploadGone } from '@/features/uploads/uploadGone'
 import { trackEvent } from '@/services/analytics/analyticsClient'
 import { chatQueryKeys } from '@/services/chat/chatQueryKeys'
 import { toUserFacingError } from '@/lib/userFacingText'
 import type { ChatAttachment, ChatMessage, ChatStreamEvent, Conversation } from '@/types/chat'
+import type { AttachmentReference } from '@/types/file'
 import { commandMessageIds } from '@/services/chat/commandMessageIds'
 import { watchGeneration, type GenerationOutcome } from '@/services/chat/generationWatch'
 import {
@@ -16,11 +18,12 @@ import {
   keepFailedMessage,
   readFailedMessages,
   readPendingMessage,
+  sendingFor,
+  toStreamPayload,
   writePendingMessage,
   type FailedMessage,
   type PendingMessage,
 } from '@/lib/pendingChatMessages'
-import { detachedSendFor } from '@/services/chat/detachedSend'
 import { isSameSession, storedRefreshToken } from '@/services/auth/sessionRefresh'
 import { currentSessionToken, useAuthStore } from '@/store/authStore'
 
@@ -32,6 +35,8 @@ type LocalChatMessage = ChatMessage & {
   retryPayload?: RetryPayload
   /** On a failed student bubble: the bubble that stood for its answer. */
   failedAnswerId?: string
+  /** On a failed student bubble: the day the daily limit refused it (#541). */
+  limitDay?: string
 }
 
 /**
@@ -67,8 +72,60 @@ function createLocalId(prefix: string) {
   return `${prefix}-${Date.now()}-${Math.random().toString(16).slice(2)}`
 }
 
+/**
+ * The code a message is refused with once the student's messages for the day
+ * are used up. The server counts the day in UTC, so until its date changes
+ * the same message is refused again: it says so, and offers no "send again"
+ * (#541). The refusal is not kept under its key, so the next day the same
+ * message goes out as itself.
+ */
+const DAILY_LIMIT = 'message_daily_limit'
+
+/** Today as the server counts the daily limit: its UTC date. */
+const limitDay = () => new Date().toISOString().slice(0, 10)
+
+/** A failed message the daily limit refused today, which sending again would only have refused again. */
+export function refusedForToday(message: ChatMessage): boolean {
+  return (message as LocalChatMessage).limitDay === limitDay()
+}
+
+function errorCode(error: unknown) {
+  const code = error && typeof error === 'object' && 'code' in error ? (error as { code?: unknown }).code : undefined
+  return typeof code === 'string' ? code : undefined
+}
+
 function getErrorMessage(error: unknown) {
+  const code = errorCode(error)
+  // An upload it carried is no longer there: sending it again cannot help,
+  // choosing the file again can (#507).
+  if (isUploadGone(error)) return i18n.t('chat:ask.attachments.errors.sendExpired')
+  if (code === DAILY_LIMIT) return i18n.t('chat:ask.thread.dailyLimit')
   return toUserFacingError(error, streamErrorFallback())
+}
+
+/**
+ * A failed message sent again as a new one, with the files the server saved
+ * from it. Once the server has taken a message its uploads are consumed --
+ * the attachments are made of them -- and `{uploadId}` is refused as
+ * `upload_not_found` from then on, so the retry names the attachments the
+ * server's copy of the message carries, in the order they were sent. A
+ * message the server never took still has its uploads, and keeps them (#507).
+ */
+function withSavedAttachments(
+  payload: SendStreamingMessagePayload,
+  saved: ChatMessage | undefined,
+): SendStreamingMessagePayload {
+  const references = payload.attachmentIds
+  const attachments = saved?.attachments
+  if (!references?.length || !attachments || attachments.length !== references.length) return payload
+  return {
+    ...payload,
+    attachmentIds: references.map(
+      (reference, index): AttachmentReference =>
+        'uploadId' in reference ? { attachmentId: attachments[index].id } : reference,
+    ),
+    attachments,
+  }
 }
 
 /**
@@ -220,6 +277,11 @@ export function useStreamingChat(conversationId: string | null) {
             ? {
                 ...message,
                 status: event.status,
+                // The star the answer offers (#487), on screen before the conversation is read back.
+                targetUnit: event.targetUnit ?? null,
+                // The sections come with the end of the answer (stoa-backend#132),
+                // so it is laid out in them before the conversation is read back.
+                ...(event.structured !== undefined ? { structured: event.structured } : {}),
               }
             : message,
         ),
@@ -252,7 +314,7 @@ export function useStreamingChat(conversationId: string | null) {
    * answered; false when it failed, was stopped or was overtaken.
    *
    * `sending` is a send of it still on its way from elsewhere in the tab
-   * (`sendDetached`): until it is done, not finding the message on the server
+   * (`useAskQuestion`): until it is done, not finding the message on the server
    * means not stored yet.
    */
   const runAttempt = useCallback(
@@ -386,15 +448,7 @@ export function useStreamingChat(conversationId: string | null) {
           try {
             const request = streamConversationMessage({
               conversationId,
-              // Spread, not `undefined`: a question asked away from the stage
-              // sends a body without these keys at all (#56).
-              payload: {
-                content: pending.content,
-                attachmentIds: pending.attachmentIds,
-                idempotencyKey: pending.idempotencyKey,
-                ...(pending.practiceContext ? { practiceContext: pending.practiceContext } : {}),
-                ...(pending.quote ? { quote: pending.quote } : {}),
-              },
+              payload: toStreamPayload(pending),
               signal: requestController.signal,
               onEvent: (event) => {
                 if (requestController.signal.aborted || !owns()) return
@@ -424,14 +478,10 @@ export function useStreamingChat(conversationId: string | null) {
         // Read now: the updaters below run when React renders, after the refs
         // have been cleared for the next attempt.
         const settledAssistantId = activeAssistantMessageIdRef.current ?? assistantMessageId
-        const sameMessageRetry = (sameMessage: boolean): RetryPayload => ({
-          content: pending.content,
-          attachmentIds: pending.attachmentIds,
-          attachments: pending.attachments,
-          ...(pending.practiceContext ? { practiceContext: pending.practiceContext } : {}),
-          ...(pending.quote ? { quote: pending.quote } : {}),
-          ...(sameMessage ? { idempotencyKey: pending.idempotencyKey } : {}),
-        })
+        const sameMessageRetry = (sameMessage: boolean): RetryPayload => {
+          const { idempotencyKey, ...body } = toStreamPayload(pending)
+          return { ...body, attachments: pending.attachments, ...(sameMessage ? { idempotencyKey } : {}) }
+        }
         const studentBubble = (): LocalChatMessage => ({
           id: studentMessageId,
           conversationId,
@@ -495,6 +545,7 @@ export function useStreamingChat(conversationId: string | null) {
         }
 
         const retryPayload = sameMessageRetry(outcome.kind !== 'failed' || outcome.retryable)
+        const limited = errorCode(requestError) === DAILY_LIMIT ? { limitDay: limitDay() } : {}
         // What the answer's place showed when it failed: the steps written so
         // far, or the failure in words.
         const shown = localMessagesRef.current.find((message) => message.id === settledAssistantId)
@@ -512,8 +563,12 @@ export function useStreamingChat(conversationId: string | null) {
           status: 'failed',
           retryPayload,
           failedAnswerId: settledAssistantId,
+          ...limited,
         }
-        keepFailedMessage(conversationId, owner, { student: { ...studentBubble(), status: 'failed', retryPayload }, answer: failedAnswer })
+        keepFailedMessage(conversationId, owner, {
+          student: { ...studentBubble(), status: 'failed', retryPayload, ...limited },
+          answer: failedAnswer,
+        })
         setLocalMessages((messages) =>
           messages.map((message) => {
             if (message.id === studentMessageId) return { ...message, ...student }
@@ -553,12 +608,12 @@ export function useStreamingChat(conversationId: string | null) {
     stoppedByUserRef.current = false
     // A message sent before the page was reloaded is still one command on the
     // server; wait for it instead of losing it.
-    // One sent with no conversation on screen (`sendDetached`) and not known to
+    // One sent with no conversation on screen (`useAskQuestion`) and not known to
     // have arrived is waited for while its request is still going, and sent
     // again with the same key once this tab no longer has that request.
     const pending = conversationId ? readPending(conversationId) : null
     if (pending) {
-      const sending = detachedSendFor(pending.idempotencyKey)
+      const sending = sendingFor(pending.idempotencyKey)
       void runAttempt(pending, { send: Boolean(pending.unconfirmed) && !sending, sending })
     }
     return () => {
@@ -623,9 +678,16 @@ export function useStreamingChat(conversationId: string | null) {
       if (!message?.retryPayload || busyRef.current) return
 
       const { idempotencyKey, ...payload } = message.retryPayload
-      void sendStreamingMessage(payload, idempotencyKey, message)
+      // The same command sends the same body; a new one names what the
+      // server saved of the first, if it saved anything.
+      const saved = idempotencyKey
+        ? undefined
+        : queryClient
+            .getQueryData<Conversation>(chatQueryKeys.conversation(conversationId ?? ''))
+            ?.messages.find((server) => server.id === message.id && server.role === 'student')
+      void sendStreamingMessage(withSavedAttachments(payload, saved), idempotencyKey, message)
     },
-    [localMessages, sendStreamingMessage],
+    [conversationId, localMessages, queryClient, sendStreamingMessage],
   )
 
   return {

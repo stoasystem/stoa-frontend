@@ -64,7 +64,18 @@
     "reportContext": "Send this request context to the internal moderation queue.",
     "noNotes": "No teacher notes yet.",
     "replyPaused": "This request could not be refreshed just now. Your draft is kept; you can send it once the connection is back.",
-    "openAutomation": "Assign practice to {{name}} in learning automation"
+    "openAutomation": "Assign practice to {{name}} in learning automation",
+    "attachments": {
+      "label": "Attachments",
+      "alt": "Image from the student: {{name}}",
+      "open": "Enlarge image: {{name}}",
+      "loading": "Loading image …",
+      "unavailable": "Image not available",
+      "failed": "The image could not be loaded.",
+      "retry": "Try again",
+      "retryNamed": "Try again: {{name}}",
+      "altTeacher": "Teacher’s picture: {{name}}"
+    }
   },
   "profile": {
     "eyebrow": "Teacher account",
@@ -97,6 +108,17 @@
       "busy": "Currently busy",
       "unavailable": "Not accepting students",
       "paused": "Paused"
+    },
+    "notifications": {
+      "title": "Notification settings",
+      "description": "A help request assigned to you always appears in your notifications.",
+      "dispatchEmail": {
+        "title": "Email for new help requests",
+        "body": "An email each time a help request is assigned to you, with the subject and a link. It never contains what the student wrote."
+      },
+      "loading": "Loading notification settings…",
+      "unavailable": "Notification settings could not be loaded.",
+      "saveFailed": "The setting could not be saved. Please try again."
     }
   },
   "requests": {
@@ -210,7 +232,27 @@
       "tooManyBlocks": "A reply has at most {{max}} blocks. Please merge blocks or remove one.",
       "tooLong": "The reply is too long: {{length}} of at most {{max}} characters in total. Please shorten it."
     },
-    "removeBlock": "Remove block {{number}}"
+    "removeBlock": "Remove block {{number}}",
+    "attachments": {
+      "add": "Add picture",
+      "label": "Attached pictures",
+      "remove": "Remove {{name}}",
+      "uploading": "Adding…",
+      "uploadingFile": "Adding {{name}}…",
+      "needsText": "Add a few words: a picture on its own cannot be sent yet.",
+      "errors": {
+        "tooMany": "A reply carries up to {{count}} pictures.",
+        "tooLarge": "This picture is too big. Photos may be up to {{imageLimit}}.",
+        "unsupported": "Only photos can be sent: JPEG, PNG or HEIC.",
+        "empty": "This file is empty. Please choose another one.",
+        "expired": "This picture took too long. Please choose it again.",
+        "quota": "There is no room for pictures right now.",
+        "unavailable": "Pictures cannot be added right now. Please try again in a moment.",
+        "unreadable": "This photo could not be opened. Please try another one, or a screenshot.",
+        "blocked": "This picture cannot be sent. Please choose a different one, or describe it in words.",
+        "failed": "This picture could not be added. Please try again."
+      }
+    }
   },
   "practiceContext": {
     "source": "Source: {{source}}",
@@ -356,6 +398,7 @@
       "tooManyBlocks": "Your reply was not accepted: it has too many blocks. Please merge some.",
       "blockTooLong": "Your reply was not accepted: one of its blocks is too long. Please shorten or split that block.",
       "tooLong": "Your reply was not accepted: it is too long in total. Please shorten or split it."
-    }
+    },
+    "replyImagesExpired": "The reply was not sent: a picture was no longer valid. Please choose it again, then send once more."
   }
 }

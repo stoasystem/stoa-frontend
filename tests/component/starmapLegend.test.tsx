@@ -118,7 +118,8 @@ describe('the phone’s "?" (#146 C15)', () => {
       await user.click(button)
       const dialog = screen.getByRole('dialog', { name: bundle.help.open })
       // The same words as the wide screen's legend: states, markers, pointer, keys.
-      for (const state of ['lit', 'in_progress', 'ready', 'locked'] as const) expect(within(dialog).getByText(bundle.state[state])).toBeTruthy()
+      for (const state of ['lit', 'in_progress', 'ready'] as const) expect(within(dialog).getByText(bundle.state[state])).toBeTruthy()
+      expect(within(dialog).getByText(bundle.legend.waiting)).toBeTruthy()
       expect(within(dialog).getByText(bundle.marker.recommended)).toBeTruthy()
       expect(within(dialog).getByText(bundle.legend.reviewDue)).toBeTruthy()
       expect(within(dialog).getByText(bundle.legend.label)).toBeTruthy()

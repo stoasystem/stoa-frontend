@@ -1,7 +1,10 @@
 import { CircleAlert, Sparkles } from 'lucide-react'
+import type { ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { MathRenderer } from '@/components/ui/MathRenderer'
+import { settleTruncatedMarkdown } from '@/lib/truncatedMarkdown'
 import type { TeacherAssistanceSummary } from '@/types/teacher'
 
 type Props = {
@@ -15,6 +18,11 @@ type Props = {
  * not: `studentContextSummary`, `questionSummary`, `aiAnswerSummary`,
  * `suggestedFocus` and `weakTopics` are written by the backend
  * (teacher_assistance_service.py) and arrive in whatever language it used.
+ *
+ * `aiAnswerSummary` is the start of the assistant's latest answer, its own
+ * Markdown cut at 360 characters (stoa-backend#181): drawn as Ask draws it,
+ * once a formula or emphasis the cut left half open is taken out (#545).
+ * `questionSummary` is the student's own words, shown as they are.
  */
 export function TeacherAssistanceSummaryCard({ summary, isLoading, isError }: Props) {
   const { t } = useTranslation('teacher')
@@ -53,7 +61,13 @@ export function TeacherAssistanceSummaryCard({ summary, isLoading, isError }: Pr
               <SummaryBlock title={t('assistance.suggestedFocus')} value={summary.suggestedFocus} />
             </div>
             <SummaryBlock title={t('assistance.question')} value={summary.questionSummary || t('assistance.noQuestion')} />
-            <SummaryBlock title={t('assistance.assistantAnswer')} value={summary.aiAnswerSummary || t('assistance.noAnswer')} />
+            <SummaryBlock title={t('assistance.assistantAnswer')}>
+              {summary.aiAnswerSummary ? (
+                <MathRenderer>{settleTruncatedMarkdown(summary.aiAnswerSummary)}</MathRenderer>
+              ) : (
+                t('assistance.noAnswer')
+              )}
+            </SummaryBlock>
             <div className="flex flex-wrap gap-2">
               {summary.weakTopics.length === 0 && (
                 <Badge variant="outline">{t('assistance.noWeakTopics')}</Badge>
@@ -69,11 +83,11 @@ export function TeacherAssistanceSummaryCard({ summary, isLoading, isError }: Pr
   )
 }
 
-function SummaryBlock({ title, value }: { title: string; value: string }) {
+function SummaryBlock({ title, value, children }: { title: string; value?: string; children?: ReactNode }) {
   return (
     <div className="rounded-md border border-border/70 p-3">
       <p className="text-xs font-medium uppercase tracking-normal text-muted-foreground">{title}</p>
-      <p className="mt-2 text-sm leading-6">{value}</p>
+      <p className="mt-2 break-words text-sm leading-6">{children ?? value}</p>
     </div>
   )
 }

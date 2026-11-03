@@ -21,28 +21,29 @@ import { useMemo, type ReactNode } from 'react'
 import {
   LightingEventSourceContext,
   emptyLightingEventSource,
+  isCelebrated,
   useLightingEventSource,
   type LightingEventSource,
   type LitEvent,
 } from '@/features/starmap/lighting/lightingEvents'
 import { logger } from '@/services/logging'
 import { acknowledgeLitUnits } from '@/services/practice/practiceApi'
-import { practiceQueryKeys } from '@/services/practice/practiceQueryKeys'
+import { KNOWLEDGE_MAP_KEY } from '@/hooks/practice/useKnowledgeMapQuery'
 import type { KnowledgeMapResponse } from '@/types/practice'
 
 /** The most unit ids one acknowledgement may carry; over this the backend answers 422. */
 export const ACKNOWLEDGE_LIMIT = 50
 
 /** The sky's query: the whole sky under one key, as `readModelSource.tsx` asks for it. */
-const SKY_KEY = practiceQueryKeys.knowledgeMap('')
+const SKY_KEY = KNOWLEDGE_MAP_KEY
 
 /**
  * The moments waiting in a sky response: the points it lists as
  * unacknowledged, in the order it listed them.
  *
- * The backend lists only observed lightings; this keeps to observed ones
- * again, so the backfill's can never be celebrated whatever reaches the
- * browser. A listed id with no star in the response, or no `litAt`, is
+ * The backend lists only lightings seen happening or won by a star quiz;
+ * this keeps to those again (`isCelebrated`), so the backfill's can never be
+ * celebrated whatever reaches the browser. A listed id with no star in the response, or no `litAt`, is
  * dropped: there is nothing to celebrate and nowhere to celebrate it.
  *
  * `recommended` is left out. stoa-backend#71 does not say whether a point was
@@ -54,7 +55,7 @@ export function litEventsOf(sky: KnowledgeMapResponse | undefined): LitEvent[] {
   const stars = new Map(sky.stars.map((star) => [star.unitId, star]))
   return sky.unacknowledgedLit.flatMap((unitId) => {
     const star = stars.get(unitId)
-    if (!star?.litAt || star.litAtSource !== 'observed') return []
+    if (!star?.litAt || !star.litAtSource || !isCelebrated({ litAtSource: star.litAtSource })) return []
     return [{ unitId, litAt: star.litAt, litAtSource: star.litAtSource }]
   })
 }

@@ -3,6 +3,7 @@ import type { TFunction } from 'i18next'
 import { useTranslation } from 'react-i18next'
 import { useSearchParams } from 'react-router-dom'
 import { Check, CheckCircle2, Clock, Flag, MessageSquare, UserCheck } from 'lucide-react'
+import { blockedImageLine, ModerationImageCase } from '@/components/admin/ModerationImageCase'
 import { PageContainer } from '@/components/common/PageContainer'
 import { PageHeader } from '@/components/common/PageHeader'
 import { Badge } from '@/components/ui/badge'
@@ -276,7 +277,7 @@ function ModerationCaseDetail({
             {failure}
           </p>
         )}
-        <ModerationContext item={item} />
+        {item.surface === 'image_upload' ? <ModerationImageCase item={item} /> : <ModerationContext item={item} />}
         <div className="grid gap-4 md:grid-cols-[1fr_1fr]">
           <div className="rounded-md border p-4">
             <div className="flex items-center gap-2">
@@ -472,7 +473,9 @@ function ModerationQueueItem({
         {surfaceLabel(item.surface, t)} - {reasonLabel(item.reason, t)}
       </p>
       <p className="mt-2 line-clamp-2 text-sm text-muted-foreground">
-        {item.question_context?.content_preview ?? item.report_note ?? t('moderation.noPreview')}
+        {item.surface === 'image_upload'
+          ? blockedImageLine(item, t)
+          : (item.question_context?.content_preview ?? item.report_note ?? t('moderation.noPreview'))}
       </p>
     </button>
   )

@@ -253,6 +253,37 @@ describe('Ask from the planet', () => {
   })
 })
 
+describe('Ask says how to dictate, behind a microphone (#515, #553)', () => {
+  const WINDOWS = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36'
+  const dictation = () => document.querySelector('[data-composer-dictation]')
+
+  beforeEach(() => {
+    Object.defineProperty(window.navigator, 'userAgent', { value: WINDOWS, configurable: true })
+  })
+  afterEach(() => {
+    Reflect.deleteProperty(window.navigator, 'userAgent')
+  })
+
+  it('in the docked composer below the planet', async () => {
+    show({ width: 1280 })
+    const form = dockedField().closest('form')!
+    await userEvent.click(within(form as HTMLElement).getByRole('button', { name: 'Ask by voice' }))
+    expect(dictation()).toHaveAttribute('data-composer-dictation', 'windows')
+    expect(dictation()!.closest('form')).toBe(form)
+  })
+
+  it("in Ask's own composer, with no line over it any more", async () => {
+    show({ width: 1280, direct: null })
+    const panel = screen.getByRole('complementary', { name: 'Ask' })
+    const field = within(panel).getByRole('textbox', { name: 'Your question' })
+    await userEvent.click(field)
+    expect(dictation()).toBeNull()
+    await userEvent.click(within(panel).getByRole('button', { name: 'Ask by voice' }))
+    expect(dictation()).toHaveAttribute('data-composer-dictation', 'windows')
+    expect(dictation()!.closest('form')).toBe(field.closest('form'))
+  })
+})
+
 describe('Ask opened directly at /ask or /ask/:id', () => {
   it('is a full-screen sheet on a phone, which is the page rather than a modal over it', () => {
     show({ width: 375, direct: 'c1' })

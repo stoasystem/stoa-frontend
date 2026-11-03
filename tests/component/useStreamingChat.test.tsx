@@ -272,6 +272,138 @@ describe('where the message stands', () => {
     expect(keys[1]).not.toBe(keys[0])
   })
 
+  /**
+   * #507: the server consumes a message's uploads when it takes the message,
+   * and refuses `{uploadId}` after that. A retry under a new key names the
+   * attachments the server saved from the first; one under the same key sends
+   * the same body, or it would be an idempotency conflict.
+   */
+  describe('a message that carried a file', () => {
+    const sendWithFile = (result: { current: ReturnType<typeof useStreamingChat> }) => {
+      act(() => {
+        void result.current.sendStreamingMessage({
+          content: 'Was ist hier falsch?',
+          attachmentIds: [{ uploadId: 'up-1' }],
+          attachments: [
+            { id: 'up-1', filename: 'a.jpg', mimeType: 'image/jpeg', sizeBytes: 9, status: 'uploaded', createdAt: future() },
+          ],
+        })
+      })
+    }
+    const serverCopy = (key: string) => ({
+      id: 'c1',
+      title: 't',
+      subject: 'math',
+      grade: '8',
+      updatedAt: future(),
+      messages: [
+        {
+          id: `student:c1:${key}`,
+          conversationId: 'c1',
+          role: 'student' as const,
+          content: 'Was ist hier falsch?',
+          createdAt: future(),
+          attachments: [
+            { id: 'att-9', filename: 'a.jpg', mimeType: 'image/jpeg', sizeBytes: 9, status: 'uploaded' as const, createdAt: future() },
+          ],
+        },
+      ],
+    })
+
+    it('is sent again as a new one with the attachments the server saved, not the consumed upload', async () => {
+      mockedStream.mockRejectedValueOnce(new Error('Request failed with status code 503'))
+      mockedProgress.mockResolvedValue(state({ status: 'failed', failureCategory: 'incomplete_output', retryable: false }))
+      const { result, client } = render()
+
+      sendWithFile(result)
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(3000)
+      })
+      await waitFor(() => expect(result.current.isStreaming).toBe(false))
+      const key = mockedStream.mock.calls[0][0].payload.idempotencyKey
+      client.setQueryData(chatQueryKeys.conversation('c1'), serverCopy(key))
+      const failed = result.current.localMessages.find((message) => message.status === 'failed' && message.role === 'student')
+
+      mockedStream.mockResolvedValueOnce('streamed')
+      await act(async () => {
+        result.current.retryMessage!(failed!.id)
+        await vi.advanceTimersByTimeAsync(100)
+      })
+
+      const retry = mockedStream.mock.calls[1][0].payload
+      expect(retry.idempotencyKey).not.toBe(key)
+      expect(retry.attachmentIds).toEqual([{ attachmentId: 'att-9' }])
+    })
+
+    it('keeps its upload when the server never took it (the negative control)', async () => {
+      mockedStream.mockRejectedValueOnce(new Error('Request failed with status code 503'))
+      mockedProgress.mockResolvedValue(state({ status: 'failed', failureCategory: 'incomplete_output', retryable: false }))
+      const { result } = render()
+
+      sendWithFile(result)
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(3000)
+      })
+      await waitFor(() => expect(result.current.isStreaming).toBe(false))
+      const failed = result.current.localMessages.find((message) => message.status === 'failed' && message.role === 'student')
+
+      mockedStream.mockResolvedValueOnce('streamed')
+      await act(async () => {
+        result.current.retryMessage!(failed!.id)
+        await vi.advanceTimersByTimeAsync(100)
+      })
+
+      expect(mockedStream.mock.calls[1][0].payload.attachmentIds).toEqual([{ uploadId: 'up-1' }])
+    })
+
+    it('sends the same body under the same key, saved copy or not', async () => {
+      mockedStream.mockRejectedValueOnce(new Error('Request failed with status code 503'))
+      mockedProgress.mockResolvedValue(state({ status: 'failed', failureCategory: 'deadline_exceeded', retryable: true }))
+      const { result, client } = render()
+
+      sendWithFile(result)
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(3000)
+      })
+      await waitFor(() => expect(result.current.isStreaming).toBe(false))
+      const key = mockedStream.mock.calls[0][0].payload.idempotencyKey
+      client.setQueryData(chatQueryKeys.conversation('c1'), serverCopy(key))
+      const failed = result.current.localMessages.find((message) => message.status === 'failed' && message.role === 'student')
+
+      mockedStream.mockResolvedValueOnce('streamed')
+      await act(async () => {
+        result.current.retryMessage!(failed!.id)
+        await vi.advanceTimersByTimeAsync(100)
+      })
+
+      const retry = mockedStream.mock.calls[1][0].payload
+      expect(retry.idempotencyKey).toBe(key)
+      expect(retry.attachmentIds).toEqual([{ uploadId: 'up-1' }])
+    })
+
+    it('says to choose the file again when its upload is gone, in the reader’s language', async () => {
+      await i18n.changeLanguage('de')
+      try {
+        mockedStream.mockRejectedValueOnce(new ApiError('Upload expired.', { status: 422, code: 'upload_expired' }))
+        mockedProgress.mockRejectedValue(notFound())
+        const { result } = render()
+
+        sendWithFile(result)
+        await act(async () => {
+          await vi.advanceTimersByTimeAsync(3000)
+        })
+        await waitFor(() => expect(result.current.isStreaming).toBe(false))
+
+        const answer = result.current.localMessages.find((message) => message.status === 'failed' && message.role === 'assistant')
+        expect(answer?.content).toBe(
+          'Eine angehängte Datei hat zu lange gebraucht. Wähl sie noch einmal aus und frag dann noch einmal.',
+        )
+      } finally {
+        await i18n.changeLanguage('en')
+      }
+    })
+  })
+
   it('treats a message the server never stored as safe to send again', async () => {
     mockedStream.mockRejectedValueOnce(new Error('Request failed with status code 429'))
     mockedProgress.mockRejectedValue(notFound())
@@ -449,6 +581,7 @@ function render() {
   const { result } = renderHook(() => useStreamingChat('c1'), { wrapper: Wrapper })
   return {
     result,
+    client,
     invalidated: () => invalidate.mock.calls.length > 0,
     invalidatedConversation: () =>
       invalidate.mock.calls.some(([filters]) => JSON.stringify(filters?.queryKey) === JSON.stringify(chatQueryKeys.conversation('c1'))),

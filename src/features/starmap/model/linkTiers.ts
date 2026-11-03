@@ -11,7 +11,8 @@
  *   2 in progress  an in-progress star to its prerequisites: medium;
  *   3 walked       both ends lit (or a lit star to a ready one): very faint,
  *                  the path already walked;
- *   4 locked       a line into a locked star (both ends locked is the common
+ *   4 waiting      a line into a waiting star, one whose prerequisites are not
+ *                  all lit (both ends waiting is the common
  *                  case): darkest, dashed, only when zoomed far in.
  *
  * By zoom (#134: crossfaded by how far in the map is, no longer switched by
@@ -24,7 +25,7 @@
  *             galaxies, only a faint glow at the edges of the dark between
  *             them. The bridges fade out as tiers 1-2 fade in.
  *   closer    every star's lines on screen, tiers 1-2 first, then 3 (the
- *             path walked); tier 4 (locked) only for the star in focus
+ *             path walked); tier 4 (waiting) only for the star in focus
  *             (#138 D1); a line to another nebula is drawn from its star
  *             towards the other end and fades out with distance, keeping
  *             only its direction -- one across subjects is kept at least
@@ -36,23 +37,23 @@
  *   dragged   (#136) while a star is dragged, every line of it lit and drawn
  *             to the other end, whatever its tier; every other line dimmed.
  */
-import type { LearningState } from '@/features/starmap/model/starMap'
+import type { StarLook } from '@/features/starmap/model/starMap'
 import { REVEAL } from '@/features/starmap/view/semanticZoom'
 
 export const TIER_RECOMMENDED = 1
 export const TIER_IN_PROGRESS = 2
 export const TIER_WALKED = 3
-export const TIER_LOCKED = 4
-export type LinkTier = typeof TIER_RECOMMENDED | typeof TIER_IN_PROGRESS | typeof TIER_WALKED | typeof TIER_LOCKED
+export const TIER_WAITING = 4
+export type LinkTier = typeof TIER_RECOMMENDED | typeof TIER_IN_PROGRESS | typeof TIER_WALKED | typeof TIER_WAITING
 
 /**
  * The tier of the prerequisite `from -> to`. `toRecommended`: `to` carries
  * the recommendation marker (the line leads to it).
  */
-export function linkTier(from: LearningState, to: LearningState, toRecommended: boolean): LinkTier {
+export function linkTier(from: StarLook, to: StarLook, toRecommended: boolean): LinkTier {
   if (toRecommended) return TIER_RECOMMENDED
   if (to === 'in_progress') return TIER_IN_PROGRESS
-  if (to === 'locked' || from === 'locked') return TIER_LOCKED
+  if (to === 'waiting' || from === 'waiting') return TIER_WAITING
   // lit -> lit, lit -> ready (a ready star's prerequisites are all lit).
   return TIER_WALKED
 }
@@ -106,8 +107,8 @@ export function starLineLook(line: StarLine, view: LinkView): { strength: number
   const star = Math.max(0, Math.min(1, view.star))
   // By zoom: this tier's share; with a star in focus, only its own lines stay lit.
   const share = (t: number) => Math.max(0, Math.min(1, view.tiers[t] ?? 0))
-  // Tier 4 (locked) only for the star in focus (#138 D1): never every star's dashes.
-  let tier = line.tier === TIER_LOCKED ? (focused ? share(TIER_LOCKED) : 0) : share(line.tier)
+  // Tier 4 (waiting) only for the star in focus (#138 D1): never every star's dashes.
+  let tier = line.tier === TIER_WAITING ? (focused ? share(TIER_WAITING) : 0) : share(line.tier)
   // Across subjects, whatever its tier, at least a faint direction (#138 D2).
   if (line.crossSubject) tier = Math.max(tier, CROSS_SUBJECT_LINE * share(TIER_RECOMMENDED))
   const atZoom = view.focusStar >= 0 && !focused ? tier * UNFOCUSED_LINE : tier

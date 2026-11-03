@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
+import { isUploadGone } from '@/features/uploads/uploadGone'
 import i18n from '@/i18n'
 import { isHelpRequestConflict } from '@/lib/teacherHelpRequestConflict'
 import { trackEvent } from '@/services/analytics/analyticsClient'
@@ -33,10 +34,18 @@ export function useAddTeacherHelpRequestNoteMutation() {
   })
 }
 
+/**
+ * The server would not take a picture the reply carried, and so took none of
+ * it (stoa-backend#145): the upload was already sent, or past its time.
+ */
+export const isReplyImageRefusal = isUploadGone
+
 // The teacher has to know whether to rewrite the reply or look at the request
 // again: a 409 means the request moved on, a 422 that the server refused the
-// reply's content (#271), and what in it (#332).
+// reply's content (#271), and what in it (#332). A refused picture is chosen
+// again (#513).
 function replyFailureKey(error: unknown) {
+  if (isReplyImageRefusal(error)) return 'teacher:toasts.replyImagesExpired'
   if (isHelpRequestConflict(error)) return 'teacher:toasts.replyConflict'
   if (error instanceof ApiError && error.status === 422) {
     const reason = refusalReason(error)

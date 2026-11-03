@@ -64,7 +64,18 @@
     "reportContext": "Envoyer le contexte de cette demande à la modération interne.",
     "noNotes": "Aucune note d’enseignant pour l’instant.",
     "replyPaused": "Impossible d’actualiser la demande pour le moment. Votre brouillon est conservé ; vous pourrez l’envoyer dès que la connexion sera rétablie.",
-    "openAutomation": "Attribuer des exercices à {{name}} dans l’automatisation de l’apprentissage"
+    "openAutomation": "Attribuer des exercices à {{name}} dans l’automatisation de l’apprentissage",
+    "attachments": {
+      "label": "Pièces jointes",
+      "alt": "Image envoyée par l’élève : {{name}}",
+      "open": "Agrandir l’image : {{name}}",
+      "loading": "Chargement de l’image …",
+      "unavailable": "Image non disponible",
+      "failed": "Impossible de charger l’image.",
+      "retry": "Réessayer",
+      "retryNamed": "Réessayer : {{name}}",
+      "altTeacher": "Image de l’enseignant·e : {{name}}"
+    }
   },
   "profile": {
     "eyebrow": "Compte enseignant",
@@ -97,6 +108,17 @@
       "busy": "Actuellement occupé",
       "unavailable": "N’accepte pas d’élèves",
       "paused": "En pause"
+    },
+    "notifications": {
+      "title": "Paramètres de notification",
+      "description": "Une demande d’aide qui vous est attribuée apparaît toujours dans vos notifications.",
+      "dispatchEmail": {
+        "title": "E-mail pour les nouvelles demandes d’aide",
+        "body": "Un e-mail chaque fois qu’une demande d’aide vous est attribuée, avec la matière et un lien. Il ne contient jamais ce que l’élève a écrit."
+      },
+      "loading": "Chargement des paramètres de notification…",
+      "unavailable": "Impossible de charger les paramètres de notification.",
+      "saveFailed": "Le réglage n’a pas pu être enregistré. Veuillez réessayer."
     }
   },
   "requests": {
@@ -212,7 +234,27 @@
       "tooManyBlocks": "Une réponse compte au maximum {{max}} blocs. Veuillez regrouper des blocs ou en supprimer un.",
       "tooLong": "La réponse est trop longue : {{length}} caractères sur {{max}} au maximum au total. Veuillez la raccourcir."
     },
-    "removeBlock": "Supprimer le bloc {{number}}"
+    "removeBlock": "Supprimer le bloc {{number}}",
+    "attachments": {
+      "add": "Ajouter une image",
+      "label": "Images jointes",
+      "remove": "Retirer {{name}}",
+      "uploading": "Ajout en cours…",
+      "uploadingFile": "Ajout de {{name}} en cours…",
+      "needsText": "Ajoutez quelques mots : une image seule ne peut pas encore être envoyée.",
+      "errors": {
+        "tooMany": "Une réponse comporte au maximum {{count}} images.",
+        "tooLarge": "Cette image est trop lourde. Les photos peuvent aller jusqu’à {{imageLimit}}.",
+        "unsupported": "Seules des photos peuvent être envoyées : JPEG, PNG ou HEIC.",
+        "empty": "Ce fichier est vide. Veuillez en choisir un autre.",
+        "expired": "Cette image a pris trop de temps. Veuillez la choisir à nouveau.",
+        "quota": "Il n’y a pas de place pour des images en ce moment.",
+        "unavailable": "Impossible d’ajouter des images pour le moment. Veuillez réessayer dans un instant.",
+        "unreadable": "Impossible d’ouvrir cette photo. Veuillez en essayer une autre ou une capture d’écran.",
+        "blocked": "Cette image ne peut pas être envoyée. Veuillez en choisir une autre ou la décrire avec des mots.",
+        "failed": "Cette image n’a pas pu être ajoutée. Veuillez réessayer."
+      }
+    }
   },
   "practiceContext": {
     "source": "Source : {{source}}",
@@ -359,6 +401,7 @@
       "tooManyBlocks": "Votre réponse n’a pas été acceptée : elle compte trop de blocs. Veuillez en regrouper.",
       "blockTooLong": "Votre réponse n’a pas été acceptée : l’un de ses blocs est trop long. Veuillez raccourcir ou diviser ce bloc.",
       "tooLong": "Votre réponse n’a pas été acceptée : elle est trop longue au total. Veuillez la raccourcir ou la diviser."
-    }
+    },
+    "replyImagesExpired": "La réponse n’a pas été envoyée : une image n’était plus valable. Veuillez la choisir à nouveau, puis renvoyer."
   }
 }

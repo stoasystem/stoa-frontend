@@ -1,13 +1,14 @@
 /*
  * Ask's demo conversations (#116): three learning sessions, one of them with
  * a human-help request a teacher is working on, so the status card above the
- * thread and a teacher's message both show. In the shapes Ask reads
+ * thread and a teacher's message both show; another answered in sections
+ * (#506), with "Ask a teacher" under it. In the shapes Ask reads
  * (`GET /conversations`, `GET /conversations/:id`, the teacher-help status and
  * availability).
  */
-import { localize, type Localized } from '@/dev/demo/sky/demoSky'
+import { DEMO_KNOWLEDGE_POINT, localize, type Localized } from '@/dev/demo/sky/demoSky'
 import type { SupportedLanguage } from '@/i18n/languages'
-import type { ChatMessage, ChatRole, Conversation, ConversationListResponse } from '@/types/chat'
+import type { ChatMessage, ChatRole, Conversation, ConversationListResponse, StructuredAnswer } from '@/types/chat'
 import type { TeacherAvailability, TeacherHelpRequest } from '@/types/teacherHelp'
 
 const L = (en: string, de: string, fr: string, it: string): Localized => ({ en, de, fr, it })
@@ -19,7 +20,79 @@ type Spec = {
   subject: string
   grade: string
   title: Localized
-  messages: { role: ChatRole; at: string; content: Localized }[]
+  /** `targetUnit`: on an answer, the star it offers to fly to (#487). */
+  messages: { role: ChatRole; at: string; content: Localized; structured?: Record<SupportedLanguage, StructuredAnswer>; targetUnit?: string }[]
+}
+
+/** An answer in its sections, in one language; `content` is the joined text the backend keeps beside it. */
+function sections(
+  steps: string[],
+  answer: string,
+  hints: string[],
+  similarExercises: string[],
+  knowledgePoints: string[],
+): StructuredAnswer {
+  return {
+    kind: 'answer',
+    steps,
+    answer,
+    hints,
+    similarExercises,
+    knowledgePoints: knowledgePoints.map((name) => ({ name, unitId: null })),
+    suggestTeacher: true,
+  }
+}
+
+/** The joined text: numbered steps, the answer and the first hint, as stoa-backend writes it. */
+function joined({ steps = [], answer = '', hints = [] }: StructuredAnswer): string {
+  return [steps.map((step, index) => `${index + 1}. ${step}`).join('\n'), answer, hints[0] ?? ''].filter(Boolean).join('\n\n')
+}
+
+const FRACTION_SECTIONS: Record<SupportedLanguage, StructuredAnswer> = {
+  en: sections(
+    [
+      'Find a number both 3 and 4 go into: 12.',
+      'Rewrite both fractions over 12: $\\frac{1}{3} = \\frac{4}{12}$ and $\\frac{1}{4} = \\frac{3}{12}$.',
+      'Add the numerators and keep the denominator: $\\frac{4}{12} + \\frac{3}{12}$.',
+    ],
+    '$\\frac{1}{3} + \\frac{1}{4} = \\frac{7}{12}$',
+    ['Count in threes and in fours: which number do you reach in both?', 'Multiply top and bottom by the same number, and the fraction keeps its value.'],
+    ['Add $\\frac{1}{2}$ and $\\frac{1}{5}$.', 'Add $\\frac{2}{3}$ and $\\frac{1}{6}$.'],
+    ['Fractions', 'Common denominator'],
+  ),
+  de: sections(
+    [
+      'Such eine Zahl, in der 3 und 4 aufgehen: 12.',
+      'Schreib beide Brüche mit Nenner 12: $\\frac{1}{3} = \\frac{4}{12}$ und $\\frac{1}{4} = \\frac{3}{12}$.',
+      'Addiere die Zähler, der Nenner bleibt: $\\frac{4}{12} + \\frac{3}{12}$.',
+    ],
+    '$\\frac{1}{3} + \\frac{1}{4} = \\frac{7}{12}$',
+    ['Zähl in Dreier- und in Viererschritten: Welche Zahl erreichst du bei beiden?', 'Multiplizierst du Zähler und Nenner mit derselben Zahl, bleibt der Bruch gleich gross.'],
+    ['Addiere $\\frac{1}{2}$ und $\\frac{1}{5}$.', 'Addiere $\\frac{2}{3}$ und $\\frac{1}{6}$.'],
+    ['Brüche', 'Gemeinsamer Nenner'],
+  ),
+  fr: sections(
+    [
+      'Cherche un nombre divisible par 3 et par 4 : 12.',
+      'Écris les deux fractions sur 12 : $\\frac{1}{3} = \\frac{4}{12}$ et $\\frac{1}{4} = \\frac{3}{12}$.',
+      'Additionne les numérateurs, le dénominateur reste : $\\frac{4}{12} + \\frac{3}{12}$.',
+    ],
+    '$\\frac{1}{3} + \\frac{1}{4} = \\frac{7}{12}$',
+    ['Compte de 3 en 3 et de 4 en 4 : quel nombre atteins-tu les deux fois ?', 'Si tu multiplies le haut et le bas par le même nombre, la fraction garde sa valeur.'],
+    ['Additionne $\\frac{1}{2}$ et $\\frac{1}{5}$.', 'Additionne $\\frac{2}{3}$ et $\\frac{1}{6}$.'],
+    ['Fractions', 'Dénominateur commun'],
+  ),
+  it: sections(
+    [
+      'Cerca un numero divisibile sia per 3 sia per 4: 12.',
+      'Scrivi le due frazioni con denominatore 12: $\\frac{1}{3} = \\frac{4}{12}$ e $\\frac{1}{4} = \\frac{3}{12}$.',
+      'Somma i numeratori, il denominatore resta: $\\frac{4}{12} + \\frac{3}{12}$.',
+    ],
+    '$\\frac{1}{3} + \\frac{1}{4} = \\frac{7}{12}$',
+    ['Conta di 3 in 3 e di 4 in 4: quale numero raggiungi in entrambi i casi?', 'Se moltiplichi sopra e sotto per lo stesso numero, la frazione non cambia valore.'],
+    ['Somma $\\frac{1}{2}$ e $\\frac{1}{5}$.', 'Somma $\\frac{2}{3}$ e $\\frac{1}{6}$.'],
+    ['Frazioni', 'Denominatore comune'],
+  ),
 }
 
 const SINE: Spec = {
@@ -122,6 +195,28 @@ const LIGHT: Spec = {
         "La luce cambia direzione passando dall'acqua all'aria: viene rifratta. L'occhio segue la luce in linea retta, perciò la parte sott'acqua sembra spostata. In ottica si chiama rifrazione e si basa su seno e coseno.",
       ),
     },
+    // Finding a star (#487): the student names one to practise, in maths, from a physics conversation.
+    {
+      role: 'student',
+      at: '2026-09-30T17:22:00.000Z',
+      content: L(
+        'Then I want to practise sine and cosine first.',
+        'Dann will ich zuerst Sinus und Kosinus üben.',
+        "Alors je veux d'abord m'entraîner sur le sinus et le cosinus.",
+        'Allora voglio prima esercitarmi su seno e coseno.',
+      ),
+    },
+    {
+      role: 'assistant',
+      at: '2026-09-30T17:22:15.000Z',
+      targetUnit: DEMO_KNOWLEDGE_POINT.unitId,
+      content: L(
+        'Good plan: refraction builds on them. Sine and cosine is a star in your maths galaxy; the card below takes you there.',
+        'Guter Plan: Die Brechung baut darauf auf. Sinus und Kosinus ist ein Stern in deiner Mathe-Galaxie; die Karte unten bringt dich hin.',
+        "Bonne idée : la réfraction s'appuie dessus. Sinus et cosinus est une étoile de ta galaxie des maths ; la carte ci-dessous t'y emmène.",
+        "Ottima idea: la rifrazione si basa su questo. Seno e coseno è una stella della tua galassia di matematica; la scheda qui sotto ti ci porta.",
+      ),
+    },
   ],
 }
 
@@ -140,11 +235,12 @@ const FRACTIONS: Spec = {
       role: 'assistant',
       at: '2026-09-28T09:10:12.000Z',
       content: L(
-        'Find a common denominator, here 12. Then $\\frac{1}{3} + \\frac{1}{4} = \\frac{4}{12} + \\frac{3}{12} = \\frac{7}{12}$.',
-        'Such einen gemeinsamen Nenner, hier 12. Dann ist $\\frac{1}{3} + \\frac{1}{4} = \\frac{4}{12} + \\frac{3}{12} = \\frac{7}{12}$.',
-        'Cherche un dénominateur commun, ici 12. Alors $\\frac{1}{3} + \\frac{1}{4} = \\frac{4}{12} + \\frac{3}{12} = \\frac{7}{12}$.',
-        'Trova un denominatore comune, qui 12. Allora $\\frac{1}{3} + \\frac{1}{4} = \\frac{4}{12} + \\frac{3}{12} = \\frac{7}{12}$.',
+        joined(FRACTION_SECTIONS.en),
+        joined(FRACTION_SECTIONS.de),
+        joined(FRACTION_SECTIONS.fr),
+        joined(FRACTION_SECTIONS.it),
       ),
+      structured: FRACTION_SECTIONS,
     },
   ],
 }
@@ -154,6 +250,12 @@ const SPECS = [SINE, LIGHT, FRACTIONS]
 
 /** The conversation with a human-help request in progress. */
 export const DEMO_HELP_CONVERSATION_ID = SINE.id
+
+/** The conversation whose last answer found a star to fly to (#487). */
+export const DEMO_FIND_STAR_CONVERSATION_ID = LIGHT.id
+
+/** The conversation whose answer is laid out in sections (#506). */
+export const DEMO_SECTIONS_CONVERSATION_ID = FRACTIONS.id
 
 const messageStatus = (role: ChatRole): ChatMessage['status'] => (role === 'student' ? 'sent' : 'completed')
 
@@ -166,6 +268,8 @@ export function demoConversationsFor(language: SupportedLanguage): Conversation[
       content: localize(message.content, language),
       createdAt: message.at,
       status: messageStatus(message.role),
+      targetUnit: message.targetUnit ? { unitId: message.targetUnit } : null,
+      ...(message.structured ? { structured: message.structured[language] } : {}),
     }))
     const last = messages[messages.length - 1]
     return {
@@ -206,4 +310,9 @@ export const demoTeacherHelpRequests: TeacherHelpRequest[] = [
   },
 ]
 
-export const demoTeacherAvailability: TeacherAvailability = { online: true, availableTeachers: 2 }
+export const demoTeacherAvailability: TeacherAvailability = {
+  online: true,
+  availableTeachers: 2,
+  // Two of the week's three requests left (stoa-backend#144), said under "Ask a teacher" (#506).
+  teacherSupport: { canRequest: true, remainingCases: 2, weeklyCases: 3, blockedReason: null, resetsAt: null },
+}

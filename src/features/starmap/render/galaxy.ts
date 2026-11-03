@@ -55,7 +55,7 @@ export function galaxyHazeAlpha(look: number): number {
 /**
  * The brightest the sky's light can stack to wherever star names, lines and
  * full glyphs are drawn: a galaxy's haze under a fully lit nebula's core,
- * zoomed in. `starmapContrast` checks names, lines and a locked star against
+ * zoomed in. `starmapContrast` checks names, lines and a waiting star against
  * white at this alpha, an upper bound of the real light. The panorama's
  * brighter clouds (`PANORAMA.nebulaGlow`) have given way before any of those
  * appear (`starmapPanoramaLight` checks the order); far out only dots, the

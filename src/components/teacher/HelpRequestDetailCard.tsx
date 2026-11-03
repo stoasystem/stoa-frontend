@@ -1,12 +1,13 @@
 import { useTranslation } from 'react-i18next'
 import { formattingLocale } from '@/i18n/languages'
+import { HelpRequestAttachments } from '@/components/teacher/HelpRequestAttachments'
 import { HelpRequestStatusBadge } from '@/components/teacher/HelpRequestStatusBadge'
 import { ModerationReportDialog } from '@/components/moderation/ModerationReportDialog'
 import { TeacherSlaBadge } from '@/components/teacher/TeacherSlaBadge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { MathRenderer } from '@/components/ui/MathRenderer'
 import { getSubjectLabel } from '@/lib/displayLabels'
-import type { ChatMessage } from '@/types/chat'
-import type { TeacherHelpRequestDetail } from '@/types/teacher'
+import type { TeacherHelpMessage, TeacherHelpRequestDetail } from '@/types/teacher'
 import { isOpenHelpRequest } from '@/types/teacherHelp'
 
 export function HelpRequestDetailCard({ request }: { request: TeacherHelpRequestDetail }) {
@@ -67,8 +68,21 @@ export function HelpRequestDetailCard({ request }: { request: TeacherHelpRequest
             <p className="text-xs uppercase text-muted-foreground">
               {t(`detail.roles.${message.role}`, { defaultValue: message.role })}
             </p>
-            {/* Served by the backend, in whatever language it wrote it. */}
-            <p className="mt-2 text-sm leading-6">{message.content}</p>
+            {/* Served by the backend, in whatever language it wrote it. The
+              * assistant's answer is Markdown with formulas, drawn as Ask
+              * draws it for the student, line breaks kept (#545). */}
+            {message.role === 'assistant' ? (
+              <p data-assistant-answer className="mt-2 whitespace-pre-wrap break-words text-sm leading-6">
+                <MathRenderer>{message.content}</MathRenderer>
+              </p>
+            ) : (
+              <p className="mt-2 text-sm leading-6">{message.content}</p>
+            )}
+            <HelpRequestAttachments
+              requestId={request.requestId}
+              attachments={message.attachments}
+              byTeacher={message.role === 'teacher'}
+            />
             {(message.role === 'student' || message.role === 'assistant') && (
               <div className="mt-2 border-t pt-2">
                 <ModerationReportDialog
@@ -95,7 +109,7 @@ export function HelpRequestDetailCard({ request }: { request: TeacherHelpRequest
  * the student's conversation (same text, same time), and returns both; the
  * note keeps the formatting, so the message copy is the one left out (#271).
  */
-function conversationMessages(request: TeacherHelpRequestDetail): ChatMessage[] {
+function conversationMessages(request: TeacherHelpRequestDetail): TeacherHelpMessage[] {
   const noted = new Set((request.notes ?? []).map((note) => replyKey(note.createdAt, note.note)))
   return request.messages.filter(
     (message) => message.role !== 'teacher' || !noted.has(replyKey(message.createdAt, message.content)),

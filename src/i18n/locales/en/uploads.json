@@ -6,5 +6,26 @@
     "uploaded": "File ready",
     "failed": "Failed",
     "rejected": "Rejected"
+  },
+  "phone": {
+    "title": "Send a photo to your computer",
+    "intro": "Take a photo of your exercise or choose one. It goes straight to your question on the computer.",
+    "noCode": "This link has no code. Scan the QR code on your computer again.",
+    "take": "Take a photo",
+    "choose": "Choose a photo",
+    "sending": "Sending your photo…",
+    "sent": "Done! Go back to your computer: your photo is waiting there for you to add it.",
+    "retry": "Try again",
+    "stops": {
+      "codeInvalid": "This code has expired or has already been used. Make a new one on your computer.",
+      "rateLimited": "Too many tries right now. Wait a moment, then try again.",
+      "blocked": "This picture can't be sent. Make a new code on your computer and choose a different picture, or describe your question in words.",
+      "tooLarge": "This photo is too big. It can be up to {{limit}}. Choose another one.",
+      "unsupported": "Only photos can be sent from here. Choose a photo.",
+      "empty": "This photo is empty. Choose another one.",
+      "unreadable": "This photo could not be opened. Try another one, or a screenshot.",
+      "retry": "That didn't work. Check your connection and try again.",
+      "newCode": "That didn't work. Make a new code on your computer and try again."
+    }
   }
 }

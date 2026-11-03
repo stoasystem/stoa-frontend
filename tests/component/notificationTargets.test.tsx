@@ -11,7 +11,11 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { isAdmitted } from '@/app/router/AppRoutes'
 import { askPathFor, navAreaForRole, pageRoutes } from '@/app/router/routeManifest'
 import { NotificationCenter } from '@/components/notifications/NotificationCenter'
-import { NOTIFICATION_TARGETS, notificationTargetPath } from '@/components/notifications/notificationTargets'
+import {
+  NOTIFICATION_EVENT_TARGETS,
+  NOTIFICATION_TARGETS,
+  notificationTargetPath,
+} from '@/components/notifications/notificationTargets'
 import { type CurrentUser, useAuthStore } from '@/store/authStore'
 import type { NotificationEvent } from '@/types/notification'
 import type { UserRole } from '@/types/user'
@@ -130,6 +134,40 @@ describe('a notification in the bell', () => {
     expect(search).toBe('?case=m-1')
   })
 
+  // stoa-backend#141: the offer names the help request itself, which the
+  // dispatch email links to as well (#511).
+  it('opens the help request offered to a teacher', async () => {
+    renderBell('teacher', [
+      event({
+        eventId: 'e-8',
+        recipientRole: 'teacher',
+        eventType: 'teacher_help_dispatched',
+        targetType: 'question',
+        targetId: 'req-42',
+        title: 'Neue Hilfeanfrage für Sie',
+        summary: 'Fach: Mathematik. Bitte nehmen Sie die Anfrage innerhalb von 10 Minuten an.',
+      }),
+    ])
+    await openBell()
+
+    // The backend wrote it in the teacher's language; it is shown as sent.
+    await userEvent.click(screen.getByRole('button', { name: /Neue Hilfeanfrage für Sie/ }))
+
+    expect(pathname).toBe('/teacher/requests/req-42')
+    expect(markRead).toHaveBeenCalledWith('e-8')
+  })
+
+  it("still opens a teacher's queue for a question, which is not a help request", async () => {
+    renderBell('teacher', [
+      event({ recipientRole: 'teacher', eventType: 'teacher_requested', targetType: 'question', targetId: 'q-3', title: 'Help wanted' }),
+    ])
+    await openBell()
+
+    await userEvent.click(screen.getByRole('button', { name: /Help wanted/ }))
+
+    expect(pathname).toBe('/teacher')
+  })
+
   it('is only marked read when there is no page for it, and stays open', async () => {
     renderBell('parent', [event({ eventId: 'e-3', targetType: 'subscription_request', title: 'Subscription updated' })])
     await openBell()
@@ -182,9 +220,17 @@ function routeFor(path: string) {
 
 describe('every notification target', () => {
   it.each(ALL_ROLES)('is a page that admits a %s', (role) => {
-    const targets = Object.keys(NOTIFICATION_TARGETS[navAreaForRole(role)]).map((targetType) =>
-      notificationTargetPath({ targetType, targetId: 'id-1' }, role),
-    )
+    const area = navAreaForRole(role)
+    const targets = [
+      ...Object.keys(NOTIFICATION_TARGETS[area]).map((targetType) =>
+        notificationTargetPath({ targetType, targetId: 'id-1' }, role),
+      ),
+      ...Object.entries(NOTIFICATION_EVENT_TARGETS[area] ?? {}).flatMap(([eventType, byTarget]) =>
+        Object.keys(byTarget).map((targetType) =>
+          notificationTargetPath({ eventType, targetType, targetId: 'id-1' } as NotificationEvent, role),
+        ),
+      ),
+    ]
 
     const refused = targets.filter((path) => {
       const route = path ? routeFor(path) : undefined
@@ -213,6 +259,33 @@ describe('every notification target', () => {
     'x'.repeat(200),
   ])('keeps a conversation id that is not an id (%s) out of the address', (targetId) => {
     expect(notificationTargetPath({ targetType: 'conversation', targetId }, 'student')).toBe('/ask')
+  })
+
+  it.each(['..', '../admin', '//evil.com', 'r-1/..', 'javascript:alert(1)', 'r-1?x=1', 123, null])(
+    'keeps an offered request id that is not an id (%s) out of the address',
+    (targetId) => {
+      const offered = { eventType: 'teacher_help_dispatched', targetType: 'question', targetId } as unknown as NotificationEvent
+      expect(notificationTargetPath(offered, 'teacher')).toBe('/teacher')
+    },
+  )
+
+  it('leads any other role where its own target type does, never to the request', () => {
+    const offered = { eventType: 'teacher_help_dispatched', targetType: 'question', targetId: 'req-1' } as const
+    expect(notificationTargetPath(offered, 'student')).toBe('/ask')
+    expect(notificationTargetPath(offered, 'admin')).toBeNull()
+  })
+
+  // Only an event the payload names reaches an event's own target: a target
+  // type spelled like one, or an event type off an object prototype, does not.
+  it.each([
+    [{ targetType: 'teacher_help_dispatched:question', targetId: 'req-1' }, null],
+    [{ targetType: 'teacher_help_dispatched', targetId: 'req-1' }, null],
+    [{ eventType: 'constructor', targetType: 'question', targetId: 'req-1' }, '/teacher'],
+    [{ eventType: '__proto__', targetType: 'question', targetId: 'req-1' }, '/teacher'],
+    [{ eventType: 'teacher_help_dispatched', targetType: 'constructor', targetId: 'req-1' }, null],
+    [{ eventType: 'teacher_help_dispatched', targetType: 'conversation', targetId: 'req-1' }, null],
+  ])('reaches an offered request only by its event (%o)', (payload, path) => {
+    expect(notificationTargetPath(payload as unknown as NotificationEvent, 'teacher')).toBe(path)
   })
 
   it('trims a conversation id the backend padded', () => {

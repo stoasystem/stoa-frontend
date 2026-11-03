@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import {
   addModerationCaseNote,
   getModerationCase,
+  getModerationCaseImage,
   getModerationCases,
   updateModerationCase,
   type ModerationCaseListFilters,
@@ -23,6 +24,25 @@ export function useAdminModerationCaseQuery(caseId: string | null) {
     queryKey: [...adminQueryKeys.moderationCases(), 'detail', caseId],
     queryFn: () => getModerationCase(caseId as string),
     enabled: Boolean(caseId),
+    retry: false,
+  })
+}
+
+/**
+ * The image an `image_upload` case refused (#538), read only while that case is
+ * open on screen. Nothing is kept: once the case leaves the screen its bytes go
+ * with it (`gcTime: 0`), and the next look reads them again. While open, it
+ * is read once: a note or a status change refreshes the cases, a language
+ * switch every query, and `'static'` keeps the image out of both. A 404 is
+ * final: the image was deleted.
+ */
+export function useAdminModerationCaseImageQuery(caseId: string, enabled: boolean) {
+  return useQuery({
+    queryKey: adminQueryKeys.moderationCaseImage(caseId),
+    queryFn: () => getModerationCaseImage(caseId),
+    enabled,
+    staleTime: 'static',
+    gcTime: 0,
     retry: false,
   })
 }

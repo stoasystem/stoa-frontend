@@ -104,10 +104,22 @@ export class Contract {
     // The backend's OpenAPI declares no error responses beyond 422, so an
     // undeclared 4xx is held to the envelope every HTTPException has instead.
     if (!response && status >= 400 && status < 500) return this.check('error envelope', ERROR_ENVELOPE, body)
+    // A declared 422 is FastAPI's request validation, `detail` a list. A
+    // refusal the backend raises itself with 422 -- an upload that did not
+    // pass, say -- has its `{ code, message, correlationId }` there instead,
+    // which the document does not declare; it is held to the envelope too.
+    if (status === 422 && isRefusal(body)) return this.check('error envelope', ERROR_ENVELOPE, body)
     if (!response) return `answers ${status}, which the operation does not declare`
     const schema = response.content?.['application/json']?.schema
     if (schema === undefined) return body === undefined ? null : `answers ${status} with a body the operation does not declare`
     return this.check(`${op.method} ${op.template} ${status}`, schema, body)
+  }
+
+  /** The values a named enum schema allows, e.g. the backend's `AttachmentErrorCode`. */
+  enumOf(name: string): string[] {
+    const schema = this.doc.components.schemas[name] as { enum?: string[] } | undefined
+    if (!schema?.enum) throw new Error(`the backend's OpenAPI document has no enum ${name}`)
+    return schema.enum
   }
 
   private check(key: string, schema: Json, body: unknown): string | null {
@@ -122,6 +134,11 @@ export class Contract {
     if (validate(body)) return null
     return this.ajv.errorsText(validate.errors, { separator: '; ' })
   }
+}
+
+function isRefusal(body: unknown) {
+  const detail = (body as { detail?: unknown } | null)?.detail
+  return typeof detail === 'object' && detail !== null && !Array.isArray(detail)
 }
 
 function templatePattern(template: string) {

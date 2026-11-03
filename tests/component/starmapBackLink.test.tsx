@@ -62,11 +62,11 @@ describe('the card keeps the map’s query (#146 C7)', () => {
     })
   }
 
-  it('the links to the stars to light first keep it too', () => {
+  it('the links to the stars to learn first keep it too', () => {
     const map = skyMap(1000, 'math', { relations: true })
-    const locked = map.stars.find((s) => s.state === 'locked' && map.prerequisites.some((e) => e.to === s.unitId && map.stars.find((b) => b.unitId === e.from)?.state !== 'lit'))!
-    expect(locked).toBeDefined()
-    const { container } = showStar(map, locked, 1280, 776)
+    const waiting = map.stars.find((s) => s.unlitPrerequisiteIds.some((id) => map.stars.some((b) => b.unitId === id)))!
+    expect(waiting).toBeDefined()
+    const { container } = showStar(map, waiting, 1280, 776)
     const links = [...container.querySelectorAll<HTMLAnchorElement>('#starmap-star-prerequisites ~ ul a')]
     expect(links.length).toBeGreaterThan(0)
     for (const link of links) expect(link.getAttribute('href')!.endsWith(QUERY)).toBe(true)

@@ -3,7 +3,14 @@
  * real route it ships under. `preview.html?surface=<id>` opens one; the
  * comparison page lists them.
  */
-import { DEMO_BRIDGE_STAR, DEMO_HELP_CONVERSATION_ID, DEMO_KNOWLEDGE_POINT, type FixtureSize } from '@/dev/demo/data'
+import {
+  DEMO_BRIDGE_STAR,
+  DEMO_FIND_STAR_CONVERSATION_ID,
+  DEMO_HELP_CONVERSATION_ID,
+  DEMO_KNOWLEDGE_POINT,
+  DEMO_SECTIONS_CONVERSATION_ID,
+  type FixtureSize,
+} from '@/dev/demo/data'
 
 export const STAR_COUNTS = [10, 1000, 2000] as const satisfies readonly FixtureSize[]
 export type StarCount = (typeof STAR_COUNTS)[number]
@@ -27,7 +34,7 @@ export type Surface = {
    */
   focus?: string
   /** The demo backend's state to start from, when it is not #116's opening state. */
-  demo?: 'demo-point-finished' | 'review-due'
+  demo?: 'demo-point-finished' | 'review-due' | 'newcomer'
   /** What must be on the page before it counts as ready, for the screenshot. */
   readyWhen?: string
   /** Why the surface cannot be shown yet, if it cannot. */
@@ -38,6 +45,13 @@ const { subjectId, topicId, unitId } = DEMO_KNOWLEDGE_POINT
 const [firstLesson] = DEMO_KNOWLEDGE_POINT.lessons
 /** The lesson the chapter goes on with: the first one not done when the preview opens. */
 const nextLesson = DEMO_KNOWLEDGE_POINT.lessons[DEMO_KNOWLEDGE_POINT.lessonsDone] ?? firstLesson
+/** The small star with more than one stage, and the extension one (#501). */
+const coreStages = DEMO_KNOWLEDGE_POINT.skills.find(
+  (skill) => DEMO_KNOWLEDGE_POINT.lessons.filter((lesson) => lesson.skillId === skill.skillId).length > 1,
+)!
+const extension = DEMO_KNOWLEDGE_POINT.skills.find((skill) => skill.extension)!
+/** `skillPath` of the chapter, spelled out: no application module loads before the preview's interception. */
+const skillPath = (unit: string, skillId: string) => `/chapter/${unit}?skill=${encodeURIComponent(skillId)}`
 
 /** The physics nebula of `DEMO_BRIDGE_STAR` (`demo-sky.json`'s `bridge.topicId`). */
 const DEMO_BRIDGE_TOPIC = 'optics'
@@ -89,17 +103,46 @@ export const SURFACES: readonly Surface[] = [
   },
   {
     id: 'map-refraction',
-    label: 'Star map · Refraction (locked, cross-subject)',
+    label: 'Star map · Refraction (waiting on a prerequisite, cross-subject)',
     path: (points) => withPoints(`/map/physics/${DEMO_BRIDGE_TOPIC}/${DEMO_BRIDGE_STAR}`, points),
     signedIn: true,
     stars: true,
   },
+  // The first landing (plan A): a student who has not started anything opens the app on
+  // the recommended star's nebula, Murmi beside the star, instead of the whole sky.
+  {
+    id: 'map-newcomer',
+    label: 'Star map · newcomer, first landing',
+    path: (points) => withPoints('/', points),
+    signedIn: true,
+    stars: true,
+    demo: 'newcomer',
+    readyWhen: '[data-first-landing] [data-shown]',
+  },
+  // The whole first sign-in (docs/research/user-onboarding-design.md): the invitation link,
+  // signing in, which subject school is on, and the first landing on "Integers", where the
+  // course starts. That star has no chapter in the preview, so the walk-through ends there.
+  {
+    id: 'onboarding',
+    label: 'First sign-in · the whole onboarding',
+    path: () => '/activate?token=demo-invitation',
+    signedIn: false,
+    stars: false,
+    demo: 'newcomer',
+  },
   { id: 'chapter', label: 'Chapter', path: () => `/chapter/${unitId}`, signedIn: true, stars: false },
   { id: 'lesson', label: 'Practice stage', path: () => `/chapter/${unitId}/${nextLesson.lessonId}`, signedIn: true, stars: false },
+  // #501: a small star's own page -- a core one in two stages, and the
+  // extension one with what it asks to be learned first.
+  { id: 'skill', label: 'Small star · stages', path: () => skillPath(unitId, coreStages.skillId), signedIn: true, stars: false },
+  { id: 'skill-extension', label: 'Small star · extension', path: () => skillPath(unitId, extension.skillId), signedIn: true, stars: false },
   // #181: the review page with questions due, one of each way of answering.
   { id: 'review', label: 'Review', path: () => `/review/${unitId}`, signedIn: true, stars: false, demo: 'review-due', readyWhen: 'main form, main [role="radiogroup"], main textarea, main input' },
   { id: 'ask', label: 'Ask · new question', path: (points) => withPoints('/ask', points), signedIn: true, stars: true },
   { id: 'ask-conversation', label: 'Ask · conversation', path: (points) => withPoints(`/ask/${DEMO_HELP_CONVERSATION_ID}`, points), signedIn: true, stars: true },
+  // #487: an answer that found a star, read back with the conversation; its card flies to it.
+  { id: 'ask-find-star', label: 'Ask · find a star', path: (points) => withPoints(`/ask/${DEMO_FIND_STAR_CONVERSATION_ID}`, points), signedIn: true, stars: true },
+  { id: 'ask-sections', label: 'Ask · answer in sections', path: (points) => withPoints(`/ask/${DEMO_SECTIONS_CONVERSATION_ID}`, points), signedIn: true, stars: true },
   { id: 'me', label: '/me', path: () => '/me', signedIn: true, stars: false },
   { id: 'account-menu', label: 'Account menu', path: () => '/me', signedIn: true, stars: false, open: 'account-menu' },
   {

@@ -128,13 +128,16 @@ const OUTLINE_OFF_SITES: Record<string, { why: ('moved' | 'programmatic')[]; mar
   'features/ask/AskPanel.tsx': { why: ['programmatic'] },
   // Ask's list, focused by code on the way back from a conversation not in it (#408).
   'features/ask/AskConversationList.tsx': { why: ['programmatic'] },
-  // The exercise prompt, the quiz's "Not yet", the lesson-done heading and the
-  // heading of a refused quiz: each is focused by code when it appears.
+  // The exercise prompt, the quiz's "Not yet", the lesson-done heading, the
+  // heading of a refused quiz and the heading of a star quiz's end (#486):
+  // each is focused by code when it appears.
   'features/chapter/LessonStage.tsx': {
-    why: ['programmatic', 'programmatic', 'programmatic', 'programmatic'],
+    why: ['programmatic', 'programmatic', 'programmatic', 'programmatic', 'programmatic'],
   },
   // The help sheet, and the stage, which takes focus when a choice removes the link it was on (#330 M2).
   'features/starmap/components/StarMapView.tsx': { why: ['programmatic', 'programmatic'] },
+  // A newcomer's subject question: its heading is focused by code when the question opens (#467).
+  'features/starmap/onboarding/FirstSubjectQuestion.tsx': { why: ['programmatic'] },
 }
 
 describe('no stop without an indicator (#102)', () => {
