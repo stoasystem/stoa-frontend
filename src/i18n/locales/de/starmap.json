@@ -32,6 +32,12 @@
     "show": "Nächsten Stern zeigen",
     "later": "Alles klar"
   },
+  "findStar": {
+    "suggest": "Ich schlage vor, du lernst zuerst {{name}}.",
+    "start": "Mit {{name}} beginnen",
+    "quiz": "Teste mich in {{name}}",
+    "direct": "Gleich {{name}} lernen"
+  },
   "help": {
     "open": "So funktioniert die Sternkarte",
     "close": "Schliessen"

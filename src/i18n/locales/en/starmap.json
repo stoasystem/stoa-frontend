@@ -32,6 +32,12 @@
     "show": "Show me the next star",
     "later": "Got it"
   },
+  "findStar": {
+    "suggest": "I suggest you learn {{name}} first.",
+    "start": "Start {{name}}",
+    "quiz": "Test me on {{name}}",
+    "direct": "Learn {{name}} right away"
+  },
   "help": {
     "open": "How the star map works",
     "close": "Close"

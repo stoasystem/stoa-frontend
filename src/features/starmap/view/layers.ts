@@ -238,9 +238,17 @@ export function pathForTarget(subjectId: string, target: LayerTarget): string {
   return `${nebula}/${encodeURIComponent(target.unitId)}`
 }
 
+/**
+ * Whether two choices are the same. The galaxy framing some stars (the first
+ * reveal, a path found, #489) is another choice than the galaxy seen whole,
+ * and than the galaxy framing other stars.
+ */
 export function sameTarget(a: LayerTarget, b: LayerTarget): boolean {
   if (a.layer !== b.layer) return false
-  if (a.layer === 'map') return true
+  if (a.layer === 'map') {
+    const [x, y] = [a.frame ?? [], (b as typeof a).frame ?? []]
+    return x.length === y.length && x.every((unitId, i) => unitId === y[i])
+  }
   if (a.layer === 'nebula') return a.nebulaId === (b as typeof a).nebulaId
   return a.nebulaId === (b as typeof a).nebulaId && a.unitId === (b as typeof a).unitId
 }

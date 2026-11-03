@@ -19,6 +19,8 @@ import { useLocation, useNavigate, useParams, useSearchParams } from 'react-rout
 import { StarMapView } from '@/features/starmap/components/StarMapView'
 import { LightingOverlay } from '@/features/starmap/lighting/LightingOverlay'
 import { useLightingStage } from '@/features/starmap/lighting/useLightingStage'
+import { FindStarBubble } from '@/features/starmap/findStar/FindStarBubble'
+import { useFindStar } from '@/features/starmap/findStar/useFindStar'
 import { FirstLandingBubble } from '@/features/starmap/onboarding/FirstLandingBubble'
 import { FirstSubjectQuestion } from '@/features/starmap/onboarding/FirstSubjectQuestion'
 import { useFirstLanding } from '@/features/starmap/onboarding/useFirstLanding'
@@ -60,6 +62,8 @@ export function StarMapRoute({ relations = false, longNames = false }: { relatio
   // its recommended star with Murmi beside it, and after the first lighting sees the galaxy (plan A).
   const first = useFirstLanding(map, stage.target, ownerId)
   const firstReveal = useFirstReveal(map, first.target, stage.reveal)
+  // A star found from Ask with stars missing on the way: the path to it, and Murmi beside it (#489).
+  const findStar = useFindStar(map)
   // A star picked -- by a tap, a link, a hint, a card from Ask -- loads its small stars if it has none yet;
   // with none picked, the stars around where the student last practised in the galaxy in focus (#503).
   const pickedStar = routeTarget.layer === 'star' ? routeTarget.unitId : null
@@ -94,17 +98,29 @@ export function StarMapRoute({ relations = false, longNames = false }: { relatio
   if (map.subjects.length === 0) return <EmptyStarMap onShown={onFirstFrame} />
 
   return (
-    <StarMapView demo={demo} map={stage.map} target={firstReveal.target ?? first.target} onNavigate={onNavigate} land={stage.land} onFirstFrame={onFirstFrame} onCentreGalaxy={onCentreGalaxy} foveate={search.has('foveation') ? foveationFrom(search) : false}
+    <StarMapView demo={demo} map={stage.map} target={firstReveal.target ?? findStar.target ?? first.target} path={findStar.path} onNavigate={onNavigate} land={stage.land} onFirstFrame={onFirstFrame} onCentreGalaxy={onCentreGalaxy} foveate={search.has('foveation') ? foveationFrom(search) : false}
       overlay={(locate, watch) => (
         <>
           <LightingOverlay map={map} locate={locate} watch={watch} onReveal={firstReveal.onReveal} />
           {first.asking && <FirstSubjectQuestion subjects={first.asking} onChoose={first.choose} />}
-          {first.star && (
+          {first.star && !findStar.path && (
             // In the design preview only the demo knowledge point has a chapter, as on the star's card.
             <FirstLandingBubble star={first.star} startable={!(demo && first.star.chapter.lessonCount === 0)} locate={locate} watch={watch} onDismiss={first.dismiss} />
           )}
           {firstReveal.star && firstReveal.next && (
             <FirstLandingBubble key={firstReveal.star.unitId} star={firstReveal.star} next={firstReveal.next} locate={locate} watch={watch} onDismiss={firstReveal.dismiss} />
+          )}
+          {findStar.star && findStar.first && !firstReveal.target && (
+            <FindStarBubble
+              key={`${findStar.star.unitId}:${findStar.first.unitId}`}
+              star={findStar.star}
+              first={findStar.first}
+              // In the design preview only the demo knowledge point has a chapter, as on the star's card.
+              startable={(star) => !(demo && star.chapter.lessonCount === 0)}
+              locate={locate}
+              watch={watch}
+              onDismiss={findStar.dismiss}
+            />
           )}
         </>
       )} />

@@ -439,6 +439,11 @@ export function drawLinks(
   }
   const dragStar = view.dragStar ?? -1
   const drag = dragStar >= 0 ? (view.drag ?? 0) : 0
+  // A path found (#489): its own lines are drawn over these (`drawPath`), and every
+  // other line steps back as it does around a chosen star -- the same rule, eased in with the path.
+  const giveWay = Math.max(0, Math.min(1, frame.path?.amount ?? 0))
+  const onPath = frame.path ? new Set(frame.path.edges.map(({ from, to }) => `${from}:${to}`)) : null
+  const lineView: LinkView = giveWay > 0 ? { ...view, star: Math.max(view.star, giveWay) } : view
   // How far a star is from its place (#136): a line between moved stars runs between where they are drawn.
   const offX = frame.drag?.offsetX
   const periods = options.wrap ? [0, -1, 1] : [0]
@@ -459,7 +464,7 @@ export function drawLinks(
     for (const hint of data.hints) {
       const bridged = focus >= 0 && data.bridges.some((b) => b.crossGalaxy && (b.a === focus || b.b === focus) &&
         [data.galaxyOf[b.a], data.galaxyOf[b.b]].includes(hint.a) && [data.galaxyOf[b.a], data.galaxyOf[b.b]].includes(hint.b))
-      const strength = galaxyHintLook(bridged, view)
+      const strength = galaxyHintLook(bridged, view) * (1 - giveWay)
       if (strength <= 0.001 || !scene.galaxies) continue
       let drawn = false
       for (const side of [0, 1] as const) {
@@ -503,7 +508,7 @@ export function drawLinks(
     }
 
     for (const bridge of data.bridges) {
-      const strength = bridgeLook(bridge, focus, view)
+      const strength = bridgeLook(bridge, focus, view) * (1 - giveWay)
       if (strength <= 0.001) continue
       const { a, b } = bridge
       const dx = shortestDx(scene.nebulae[a].x, scene.nebulae[b].x) * band
@@ -585,9 +590,10 @@ export function drawLinks(
     /** Other nebulae a drawn line from the chosen one leads to: the strongest line to each, and (focused) where it runs. */
     const leadsTo = new Map<number, { strength: number; along: { x: number; y: number; ux: number; uy: number; d: number } | null }>()
     const ends: [number, number][] = []
-    const web = waitingWebHint(frame)
+    const web = waitingWebHint(frame) * (1 - giveWay)
     for (const line of data.lines) {
-      const look = starLineLook(line, view)
+      if (onPath?.has(`${line.from}:${line.to}`)) continue
+      const look = starLineLook(line, lineView)
       const { reach, lit } = look
       // The waiting web far out: tier 4 where neither the bridges nor the focus rule reach it.
       const strength = line.tier === TIER_WAITING ? Math.max(look.strength, web) : look.strength
@@ -766,6 +772,110 @@ export function drawLinks(
     if (drag > 0.5 && frame.drag) {
       stats.dragLabels = drawDragDestinations(ctx, scene, frame, theme, data.galaxyOf, obstacles, Math.min(1, 2 * drag - 1))
     }
+  }
+
+  ctx.restore()
+  return stats
+}
+
+/** A path found (#489): its lines as wide as the recommended tier's, and the glow round a missing star. */
+export const PATH = {
+  /** The glow round a missing star: this many times its drawn radius, at least `glowMin` px, at this strength. */
+  glow: 2.6,
+  glowMin: 14,
+  glowAlpha: 0.55,
+} as const
+
+/**
+ * A path to a star found from Ask (#489, #488 point 2): a layer of its own
+ * over every other line (`drawLinks`, which lets them step back), outside the
+ * four tiers. Each prerequisite on it is drawn in the recommended tier's gold,
+ * brightest, with its warm halo, from star to star whatever the zoom -- never
+ * faded out as a line leaving a nebula is, and drawn where the panorama draws
+ * no line between stars. Each missing star gets a soft ring of the same gold
+ * round it, under its glyph. Names keep clear of the lines.
+ */
+export function drawPath(
+  ctx: CanvasRenderingContext2D,
+  scene: SceneData,
+  frame: SceneFrame,
+  theme: StarMapTheme,
+  obstacles: Pick<LinkObstacles, 'segments'>,
+  options: Pick<LinkOptions, 'wrap'> = {},
+): { lines: number; glows: number } {
+  const stats = { lines: 0, glows: 0 }
+  const path = frame.path
+  const amount = Math.max(0, Math.min(1, path?.amount ?? 0))
+  if (!path || amount <= 0.001) return stats
+  const ink = (theme.links ?? LINK_INK).recommended
+  const { width, height } = frame.viewport
+  const periods = options.wrap ? [0, -1, 1] : [0]
+  const band = frame.scale
+  const onScreen = (x0: number, y0: number, x1: number, y1: number, pad: number) =>
+    Math.max(x0, x1) + pad > 0 && Math.min(x0, x1) - pad < width && Math.max(y0, y1) + pad > 0 && Math.min(y0, y1) - pad < height
+  const radius = Math.max(frame.glyphSize * 0.42, frame.dotRadius * 2)
+  const trim = Math.max(frame.glyphSize * 0.5, frame.dotRadius * 2) + 2
+
+  ctx.save()
+  ctx.lineCap = 'round'
+  ctx.setLineDash([])
+
+  // The glow round each missing star, under the lines and the glyphs.
+  const r = Math.max(PATH.glowMin, radius * PATH.glow)
+  const glow = ctx.createRadialGradient(0, 0, 0, 0, 0, 1)
+  glow.addColorStop(0, fade(ink, 0))
+  glow.addColorStop(0.45, fade(ink, 0.9))
+  glow.addColorStop(1, fade(ink, 0))
+  for (const i of path.missing) {
+    let seen = false
+    for (const k of periods) {
+      const x = frame.x[i] + k * band
+      const y = frame.y[i]
+      if (!onScreen(x, y, x, y, r)) continue
+      ctx.save()
+      ctx.translate(x, y)
+      ctx.scale(r, r)
+      ctx.globalAlpha = PATH.glowAlpha * amount
+      ctx.fillStyle = glow
+      ctx.beginPath()
+      ctx.arc(0, 0, 1, 0, Math.PI * 2)
+      ctx.fill()
+      ctx.restore()
+      seen = true
+    }
+    if (seen) stats.glows += 1
+  }
+
+  // The lines, star to star: anchored on the star they lead into, the shorter way round the ring.
+  for (const { from, to } of path.edges) {
+    const px = frame.x[to]
+    const py = frame.y[to]
+    const qx = px + shortestDx(scene.mapX[to], scene.mapX[from]) * band
+    const qy = frame.y[from]
+    const d = Math.hypot(qx - px, qy - py)
+    if (d <= trim * 2) continue
+    const ux = (qx - px) / d
+    const uy = (qy - py) / d
+    let seen = false
+    for (const k of periods) {
+      const x0 = px + ux * trim + k * band
+      const y0 = py + uy * trim
+      const x1 = qx - ux * trim + k * band
+      const y1 = qy - uy * trim
+      if (!onScreen(x0, y0, x1, y1, 8)) continue
+      for (const [lineWidth, alpha] of [[LINE.glow.width, LINE.glow.alpha], [LINE.width[TIER_RECOMMENDED], 1]] as const) {
+        ctx.strokeStyle = fade(ink, 1)
+        ctx.globalAlpha = alpha * amount
+        ctx.lineWidth = lineWidth
+        ctx.beginPath()
+        ctx.moveTo(x0, y0)
+        ctx.lineTo(x1, y1)
+        ctx.stroke()
+      }
+      obstacles.segments.push({ x0, y0, x1, y1 })
+      seen = true
+    }
+    if (seen) stats.lines += 1
   }
 
   ctx.restore()

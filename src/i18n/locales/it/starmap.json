@@ -32,6 +32,12 @@
     "show": "Mostra la prossima stella",
     "later": "Capito"
   },
+  "findStar": {
+    "suggest": "Ti consiglio di imparare prima {{name}}.",
+    "start": "Inizia {{name}}",
+    "quiz": "Mettimi alla prova su {{name}}",
+    "direct": "Impara subito {{name}}"
+  },
   "help": {
     "open": "Come funziona la mappa stellare",
     "close": "Chiudi"

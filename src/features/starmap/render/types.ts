@@ -243,6 +243,19 @@ export type SceneFrame = {
   }
   /** Skill dots beside the stars, 0..1 by zoom (large enough glyphs only). */
   showSkills: number
+  /**
+   * A path to a star found from Ask (#489), by star index, or absent: the
+   * prerequisites from the missing stars into each other and into the
+   * target, drawn over every line in the recommended gold, all the way, at
+   * any zoom; a glow round each missing star. `amount` (0..1, eased) draws it
+   * in and lets every other line step back, as around a chosen star.
+   */
+  path?: {
+    target: number
+    missing: readonly number[]
+    edges: readonly { from: number; to: number }[]
+    amount: number
+  }
   /** The frame's time, ms, and how long a name takes to fade when it gains or loses its place (0: at once). */
   time?: number
   labelFadeMs?: number
@@ -263,6 +276,8 @@ export type RenderStats = {
   highlightNebula: number
   /** Connection lines drawn in the last frame (#121). */
   links?: { bridges: number; hints: number; lines: number; labels: number; dragLabels?: number; bridgeLabels?: number }
+  /** A path found (#489), as drawn in the last frame: its lines and the glows round its missing stars. */
+  path?: { lines: number; glows: number }
   /** Galaxy names drawn in the last frame (#137; one sky, far out). */
   galaxyNames?: number
   /** Names drawn in the last frame, star and nebula (#134). */
