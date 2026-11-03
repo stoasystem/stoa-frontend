@@ -56,8 +56,20 @@ export function starLook(star: Pick<Star, 'state' | 'unlitPrerequisiteIds'>): St
   return star.state === 'ready' && star.unlitPrerequisiteIds.length > 0 ? 'waiting' : star.state
 }
 
-/** A suggestion laid over a learning state; at most one per subject (#9 point 8). */
-export type Recommendation = { source: 'system' | 'teacher' }
+/** Why the system recommends a star (#474, stoa-backend#164). */
+export type RecommendationReason = 'in_progress' | 'after_lit' | 'start'
+
+/**
+ * A suggestion laid over a learning state; at most one per subject (#9 point 8).
+ * The system's says why (#485): the star in progress, the one after the star
+ * lit last (`relatedUnitId`), or where to start. `reason` is missing from a
+ * backend before stoa-backend#164, and from a teacher's recommendation.
+ */
+export type Recommendation = {
+  source: 'system' | 'teacher'
+  reason?: RecommendationReason
+  relatedUnitId?: string | null
+}
 
 /** A star the student has not mastered what a small star's next practice needs from (#501). */
 export type MissingPrerequisite = { unitId: string; name: string }

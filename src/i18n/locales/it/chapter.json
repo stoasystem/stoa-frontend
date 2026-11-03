@@ -77,6 +77,7 @@
       "allDone": "Tutte le lezioni di {{chapter}} sono completate.",
       "backToChapter": "Torna al capitolo",
       "next": "Lezione successiva: {{title}}",
+      "nextStar": "Prossima stella: {{name}}",
       "progress": "{{done}} lezioni su {{total}} completate in {{chapter}}",
       "testedOut": "La lezione conta come completata. La stella si accende quando ogni esercizio di questo capitolo è stato risolto correttamente almeno una volta.",
       "title": "Lezione completata",

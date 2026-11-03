@@ -34,8 +34,11 @@ import { quizTroubleIsRestartable, quizTroubleKey } from '@/features/chapter/qui
 import { chapterPath, isOpenLesson, lessonAfter, QUIZ_MODE, useChapter, type Chapter } from '@/features/chapter/useChapter'
 import { useLessonRun, type LessonRun } from '@/features/chapter/useLessonRun'
 import { formatRetryAt, starQuizTroubleIsRestartable, starQuizTroubleKey, useStarQuizRun, type StarQuizRun } from '@/features/chapter/useStarQuizRun'
+import { recommendationReason } from '@/features/starmap/components/labels'
 import { StarGlyph } from '@/features/starmap/components/StarGlyph'
 import { usePrefersReducedMotion } from '@/features/starmap/motion/usePrefersReducedMotion'
+import { useKnowledgeMapQuery } from '@/hooks/practice/useKnowledgeMapQuery'
+import { subjectOfStar } from '@/hooks/practice/useKnowledgeMapStars'
 import { useLessonQuery } from '@/hooks/practice/useLessonQuery'
 import { useMediaQuery } from '@/hooks/layout/useMediaQuery'
 import { AppLayout } from '@/layouts/AppLayout'
@@ -800,7 +803,43 @@ function LessonDone({
             </Link>
           )}
         </div>
+        {allDone && chapter?.star?.state === 'lit' && <NextStar unitId={chapter.unitId} />}
       </section>
+    </div>
+  )
+}
+
+/**
+ * The star just lit leads on (#485): to the star its subject's system
+ * recommendation is on now, straight into that star's card, with the same
+ * sentence the card gives for why. Read from the sky already on hand -- the
+ * chapter read it -- not asked for again. Nothing while the subject has no
+ * recommendation, or while it is still on this star (the backend recomputes
+ * it once the lighting is in).
+ */
+function NextStar({ unitId }: { unitId: string }) {
+  const { t } = useTranslation('chapter')
+  const { t: tMap } = useTranslation('starmap')
+  const sky = useKnowledgeMapQuery().data
+  if (!sky) return null
+  const subjectId = subjectOfStar(sky, unitId)
+  const star = subjectId
+    ? sky.stars.find((candidate) => candidate.recommendation?.source === 'system' && subjectOfStar(sky, candidate.unitId) === subjectId)
+    : undefined
+  if (!star || !subjectId || star.unitId === unitId) return null
+  const reason = recommendationReason(tMap, sky.stars, star.recommendation)
+  return (
+    <div data-stage-done-next-star className="flex max-w-full flex-col items-center gap-1">
+      <Button asChild lift variant="onSky" className="max-w-full py-2" style={{ height: 'auto' }}>
+        <Link to={pathForTarget(subjectId, { layer: 'star', nebulaId: star.nebulaId, unitId: star.unitId })}>
+          <span className="min-w-0 whitespace-normal leading-5 [overflow-wrap:anywhere]">{t('stage.done.nextStar', { name: star.name })}</span>
+        </Link>
+      </Button>
+      {reason && (
+        <p data-stage-done-next-star-reason className={cn('m-0 text-[15px]', bodyOnSky)}>
+          {reason}
+        </p>
+      )}
     </div>
   )
 }

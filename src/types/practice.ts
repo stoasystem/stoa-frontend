@@ -514,7 +514,16 @@ export type KnowledgeMapResponse = {
     progress: number
     unmetExercises: number
     reviewDue: number
-    recommendation: { source: 'system' | 'teacher' } | null
+    /**
+     * Why the system recommends it (stoa-backend#164): `in_progress`, `after_lit`
+     * (then `relatedUnitId` is the star whose lighting it follows) or `start`.
+     * Missing from a backend before it; a teacher's recommendation has none.
+     */
+    recommendation: {
+      source: 'system' | 'teacher'
+      reason?: 'in_progress' | 'after_lit' | 'start'
+      relatedUnitId?: string | null
+    } | null
     x: number
     y: number
     /**

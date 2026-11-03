@@ -39,6 +39,7 @@ import {
   type KnowledgeSkill,
   type StarLook,
   type Prerequisite,
+  type Recommendation,
   type Sky,
   type SkyNebula,
   type Star,
@@ -304,7 +305,7 @@ function build(size: FixtureSize): Built {
     ...star,
     state: state === 'waiting' ? 'ready' : state,
     unlitPrerequisiteIds: prerequisites.filter((edge) => edge.to === star.unitId && !litIds.has(edge.from)).map((edge) => edge.from),
-    recommendation: recommended.has(star.unitId) ? { source: 'system' as const } : star.recommendation,
+    recommendation: recommended.get(star.unitId) ?? star.recommendation,
   }))
 
   // One sky (#119): galaxies along a band, neighbours where prerequisites cross subjects.
@@ -425,7 +426,7 @@ function prerequisitesFor(members: Map<string, Draft[]>, rand: () => number): Pr
  * the rest of the sky stays as it was, and no edge crosses nebulae, so the
  * layout does not move.
  */
-function withWayIn(edges: Prerequisite[], members: Map<string, Draft[]>, recommended: Set<string>): Prerequisite[] {
+function withWayIn(edges: Prerequisite[], members: Map<string, Draft[]>, recommended: ReadonlyMap<string, Recommendation>): Prerequisite[] {
   const seen = new Set(edges.map((edge) => `${edge.from}\u0000${edge.to}`))
   const out = [...edges]
   for (const list of members.values()) {
@@ -442,22 +443,33 @@ function withWayIn(edges: Prerequisite[], members: Map<string, Draft[]>, recomme
   return out
 }
 
-/** At most one per subject the student takes: the demo knowledge point in its subject, else the backend's rule. */
-function recommendationsFor(nebulae: SkyNebula[], stars: Draft[]): Set<string> {
-  const picks = new Set<string>()
+/**
+ * At most one per subject the student takes: the demo knowledge point in its
+ * subject, else the backend's rule from before #474. Each says why (#485): in
+ * progress, after the subject's last lit star in course order, or where to start.
+ */
+function recommendationsFor(nebulae: SkyNebula[], stars: Draft[]): Map<string, Recommendation> {
+  const picks = new Map<string, Recommendation>()
   for (const galaxy of data.galaxies) {
     if (!galaxy.enrolled) continue
-    if (galaxy.subjectId === DEMO_KNOWLEDGE_POINT.subjectId && stars.some((star) => star.unitId === DEMO_KNOWLEDGE_POINT.unitId)) {
-      picks.add(DEMO_KNOWLEDGE_POINT.unitId)
-      continue
-    }
     const own = nebulae.filter((nebula) => nebula.subjectId === galaxy.subjectId)
     const order = new Map(own.map((nebula) => [nebula.topicId, nebula.order]))
     const sorted = stars
       .filter((star) => order.has(star.nebulaId))
       .sort((a, b) => order.get(a.nebulaId)! - order.get(b.nebulaId)! || a.order - b.order || (a.unitId < b.unitId ? -1 : 1))
-    const pick = sorted.find((star) => star.state === 'in_progress') ?? sorted.find((star) => star.state === 'ready')
-    if (pick) picks.add(pick.unitId)
+    const demoPoint =
+      galaxy.subjectId === DEMO_KNOWLEDGE_POINT.subjectId ? stars.find((star) => star.unitId === DEMO_KNOWLEDGE_POINT.unitId) : undefined
+    const pick = demoPoint ?? sorted.find((star) => star.state === 'in_progress') ?? sorted.find((star) => star.state === 'ready')
+    if (!pick) continue
+    const lastLit = [...sorted].reverse().find((star) => star.state === 'lit')
+    picks.set(
+      pick.unitId,
+      pick.state === 'in_progress'
+        ? { source: 'system', reason: 'in_progress', relatedUnitId: null }
+        : lastLit
+          ? { source: 'system', reason: 'after_lit', relatedUnitId: lastLit.unitId }
+          : { source: 'system', reason: 'start', relatedUnitId: null },
+    )
   }
   return picks
 }

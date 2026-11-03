@@ -48,6 +48,11 @@
     "announce": "La stella {{name}} è accesa"
   },
   "marker": {
+    "reason": {
+      "inProgress": "L’ultima volta hai studiato qui",
+      "afterLit": "Dopo {{name}}, che hai appena acceso",
+      "start": "Comincia da qui"
+    },
     "recommended": "Suggerita come prossima",
     "reviewDue_one": "{{count}} scheda da ripassare",
     "reviewDue_many": "{{count}} schede da ripassare",
