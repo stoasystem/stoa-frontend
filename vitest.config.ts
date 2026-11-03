@@ -13,7 +13,8 @@ export default defineConfig({
     environment: 'jsdom',
     globals: true,
     setupFiles: ['./tests/setup.ts'],
-    include: ['tests/component/**/*.test.{ts,tsx}'],
+    // tests/fakes: the in-memory servers tests put behind the app, with their own tests (#571).
+    include: ['tests/component/**/*.test.{ts,tsx}', 'tests/fakes/**/*.test.{ts,tsx}'],
     // Vitest's 5 s default is too tight for a full run on a busy machine (#133).
     // The longest user flows (mePage, passwordChange, askHost, adminAccounts,
     // the star map's nebula focus walk) take 0.5-2 s alone and 2-5 s in an

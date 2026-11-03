@@ -27,6 +27,7 @@
     "tests/setup.ts",
     "tests/mswServer.ts",
     "tests/component/**/*.ts",
-    "tests/component/**/*.tsx"
+    "tests/component/**/*.tsx",
+    "tests/fakes/**/*.ts"
   ]
 }

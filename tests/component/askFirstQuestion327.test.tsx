@@ -14,26 +14,18 @@ import { MemoryRouter } from 'react-router-dom'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { StageWithAsk } from '@/features/chapter/StageAsk'
 import { useAskQuoteStore } from '@/features/ask/practiceContext'
+import { AskServerProvider } from '@/features/ask/server/askServer'
 import i18n from '@/i18n'
 import { readPendingMessage } from '@/lib/pendingChatMessages'
 import { ApiError } from '@/services/api/httpClient'
 import { resetAsk, useAskStore } from '@/store/askStore'
 import { type CurrentUser, useAuthStore } from '@/store/authStore'
+import { createFakeAskServer, type FakeAskServer } from '../fakes/askServer'
 
-vi.mock('@/services/chat/chatApi', () => ({ getConversations: vi.fn(), getConversation: vi.fn(), createConversation: vi.fn() }))
-vi.mock('@/services/chat/chatStreamApi', () => ({ streamConversationMessage: vi.fn(), getGenerationProgress: vi.fn() }))
-vi.mock('@/services/teacherHelp/teacherHelpApi', () => ({
-  getTeacherAvailability: vi.fn(async () => ({ online: false, availableTeachers: 0 })),
-  getTeacherHelpRequest: vi.fn(async () => {
-    throw new ApiError('x', { status: 404 })
-  }),
-  createTeacherHelpRequest: vi.fn(),
-}))
-vi.mock('@/services/student/studentApi', () => ({ getStudentProfile: vi.fn(async () => ({ grade: '8', primarySubjects: ['math'] })) }))
-vi.mock('@/services/learning/memoryApi', () => ({ getMyMemorySummary: vi.fn(async () => ({ recommendations: [], weakTopics: [] })) }))
-
-import { createConversation, getConversation, getConversations } from '@/services/chat/chatApi'
-import { getGenerationProgress, streamConversationMessage } from '@/services/chat/chatStreamApi'
+/** The server behind Ask, in memory (#571). */
+let server: FakeAskServer
+let createConversation: FakeAskServer['conversations']['createConversation']
+let streamConversationMessage: FakeAskServer['stream']['streamConversationMessage']
 
 function wide() {
   window.matchMedia = ((query: string) => ({
@@ -57,7 +49,9 @@ function mount(node: ReactNode) {
   const wrap = (inner: ReactNode) => (
     <I18nextProvider i18n={i18n}>
       <QueryClientProvider client={client}>
-        <MemoryRouter>{inner}</MemoryRouter>
+        <MemoryRouter>
+          <AskServerProvider value={server}>{inner}</AskServerProvider>
+        </MemoryRouter>
       </QueryClientProvider>
     </I18nextProvider>
   )
@@ -100,30 +94,32 @@ beforeEach(async () => {
   })
   resetAsk()
   useAskQuoteStore.setState({ quote: null })
-  vi.mocked(getConversations).mockResolvedValue({ items: [] } as never)
-  vi.mocked(getConversation).mockImplementation(async (id: string) => conversation(id) as never)
-  vi.mocked(getGenerationProgress).mockResolvedValue({ status: 'completed', steps: [] } as never)
-  vi.mocked(streamConversationMessage).mockResolvedValue('streamed' as never)
+  // Nothing listed, a first question and a message answered as they are sent, and no teacher online.
+  server = createFakeAskServer()
+  server.availability = { online: false, availableTeachers: 0 }
+  ;({ createConversation } = server.conversations)
+  ;({ streamConversationMessage } = server.stream)
 })
 
 describe('K3: the first question asked beside an exercise', () => {
   it('is sent again with its exercise, under the key the server took it with', async () => {
-    vi.mocked(createConversation).mockResolvedValue(conversation('new-1') as never)
-    vi.mocked(getGenerationProgress).mockResolvedValue({
-      conversationId: 'new-1', steps: [], updatedAt: '', status: 'failed', retryable: true,
-    } as never)
+    // The conversation is made, and its first question's answer fails in a way that may be tried again.
+    server.seed({
+      newConversationIds: ['new-1'],
+      generations: [{ conversationId: 'new-1', idempotencyKey: 'initial-new-1', status: 'failed', retryable: true }],
+    })
     mount(<Stage />)
     const panel = await ask('Why subtract 3 first?')
 
     await waitFor(() => expect(createConversation).toHaveBeenCalledTimes(1))
-    expect(vi.mocked(createConversation).mock.calls[0][0]).toMatchObject({ initialMessage: 'Why subtract 3 first?', practiceContext: practice })
+    expect(createConversation.mock.calls[0][0]).toMatchObject({ initialMessage: 'Why subtract 3 first?', practiceContext: practice })
     await waitFor(() => expect(readPendingMessage('new-1')?.practiceContext).toEqual(practice))
 
     const again = await panel.findByRole('button', { name: i18n.t('chat:ask.thread.sendAgain') }, { timeout: 5000 })
     await userEvent.click(again)
 
     await waitFor(() => expect(streamConversationMessage).toHaveBeenCalledTimes(1))
-    const [call] = vi.mocked(streamConversationMessage).mock.calls[0]
+    const [call] = streamConversationMessage.mock.calls[0]
     expect(call.conversationId).toBe('new-1')
     expect(call.payload.idempotencyKey).toBe('initial-new-1')
     expect(call.payload.practiceContext).toEqual(practice)
@@ -132,7 +128,9 @@ describe('K3: the first question asked beside an exercise', () => {
 
 describe('K4: a first question refused after its conversation was made', () => {
   it('is asked again in that conversation, not in a new empty one', async () => {
-    vi.mocked(createConversation).mockRejectedValueOnce(refusal('made-1'))
+    // The conversation made-1 is made, and its first question refused.
+    server.seed({ conversations: [conversation('made-1')] })
+    server.refuseNextWith(refusal('made-1'), 'createConversation')
     mount(<Stage />)
     const panel = await ask('Why subtract 3 first?')
     await waitFor(() => expect(panel.getByRole('textbox')).toHaveValue('Why subtract 3 first?'))
@@ -144,7 +142,7 @@ describe('K4: a first question refused after its conversation was made', () => {
 
     await waitFor(() => expect(streamConversationMessage).toHaveBeenCalledTimes(1))
     expect(createConversation).toHaveBeenCalledTimes(1)
-    const [call] = vi.mocked(streamConversationMessage).mock.calls[0]
+    const [call] = streamConversationMessage.mock.calls[0]
     expect(call.conversationId).toBe('made-1')
     expect(call.payload).toMatchObject({ content: 'Why subtract 3 first?', idempotencyKey: 'initial-made-1', practiceContext: practice })
     // The refusal is no longer shown once the question is on its way again.
@@ -159,11 +157,11 @@ describe('#370: only the refused question goes into the conversation made for it
   // The backend titles a conversation after its first question, so the one a
   // refusal leaves behind carries the refused question's title.
   const titled: Record<string, string> = { 'made-1': 'Why subtract 3 first?', 'new-2': 'Why not divide first?' }
-  const sentTo = () => vi.mocked(streamConversationMessage).mock.calls.map(([call]) => call.conversationId)
+  const sentTo = () => streamConversationMessage.mock.calls.map(([call]) => call.conversationId)
 
   beforeEach(() => {
-    vi.mocked(getConversation).mockImplementation(async (id: string) => ({ ...conversation(id), title: titled[id] ?? id }) as never)
-    vi.mocked(createConversation).mockReset().mockRejectedValueOnce(refusal('made-1')).mockResolvedValueOnce(conversation('new-2') as never)
+    server.seed({ conversations: [{ ...conversation('made-1'), title: titled['made-1'] }], newConversationIds: ['new-2'] })
+    server.refuseNextWith(refusal('made-1'), 'createConversation')
   })
 
   it('starts a new conversation for a different question, under its own title', async () => {
@@ -174,7 +172,7 @@ describe('#370: only the refused question goes into the conversation made for it
     await ask('Why not divide first?')
 
     await waitFor(() => expect(createConversation).toHaveBeenCalledTimes(2))
-    expect(vi.mocked(createConversation).mock.calls[1][0]).toMatchObject({ initialMessage: 'Why not divide first?', practiceContext: practice })
+    expect(createConversation.mock.calls[1][0]).toMatchObject({ initialMessage: 'Why not divide first?', practiceContext: practice })
     expect(await panel.findByRole('heading', { name: 'Why not divide first?' })).toBeInTheDocument()
     expect(panel.queryByRole('heading', { name: 'Why subtract 3 first?' })).toBeNull()
     expect(sentTo()).not.toContain('made-1')

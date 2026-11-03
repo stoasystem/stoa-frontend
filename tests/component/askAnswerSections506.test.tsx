@@ -15,47 +15,26 @@ import { I18nextProvider } from 'react-i18next'
 import { MemoryRouter } from 'react-router-dom'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { AskHost } from '@/features/ask/AskHost'
+import { AskServerProvider } from '@/features/ask/server/askServer'
 import i18n from '@/i18n'
 import { ApiError } from '@/services/api/httpClient'
 import { resetAsk } from '@/store/askStore'
 import { type CurrentUser, useAuthStore } from '@/store/authStore'
 import type { ChatMessage, ChatStreamEvent, Conversation, StructuredAnswer } from '@/types/chat'
 import type { TeacherSupportStanding } from '@/types/teacherHelp'
+import { createFakeAskServer, type FakeAskServer } from '../fakes/askServer'
 
-vi.mock('@/services/chat/chatApi', () => ({
-  getConversations: vi.fn(),
-  getConversation: vi.fn(),
-  createConversation: vi.fn(),
-}))
-vi.mock('@/services/chat/chatStreamApi', () => ({
-  streamConversationMessage: vi.fn(),
-  getGenerationProgress: vi.fn(),
-}))
-vi.mock('@/services/teacherHelp/teacherHelpApi', () => ({
-  getTeacherAvailability: vi.fn(),
-  getTeacherHelpRequest: vi.fn(),
-  createTeacherHelpRequest: vi.fn(),
-}))
-vi.mock('@/services/student/studentApi', () => ({
-  getStudentProfile: vi.fn(async () => ({ grade: '8', primarySubjects: ['math'] })),
-}))
-vi.mock('@/services/learning/memoryApi', () => ({
-  getMyMemorySummary: vi.fn(async () => ({ recommendations: [], weakTopics: [] })),
-}))
+/** The server behind Ask, in memory (#571). */
+let server: FakeAskServer
+let getConversationMock: FakeAskServer['conversations']['getConversation']
+let streamMock: FakeAskServer['stream']['streamConversationMessage']
+let availabilityMock: FakeAskServer['teacherHelp']['getTeacherAvailability']
+let requestHelpMock: FakeAskServer['teacherHelp']['createTeacherHelpRequest']
 
-import { getConversation, getConversations } from '@/services/chat/chatApi'
-import { getGenerationProgress, streamConversationMessage } from '@/services/chat/chatStreamApi'
-import {
-  createTeacherHelpRequest,
-  getTeacherAvailability,
-  getTeacherHelpRequest,
-} from '@/services/teacherHelp/teacherHelpApi'
-
-const getConversationMock = vi.mocked(getConversation)
-const streamMock = vi.mocked(streamConversationMessage)
-const progressMock = vi.mocked(getGenerationProgress)
-const availabilityMock = vi.mocked(getTeacherAvailability)
-const requestHelpMock = vi.mocked(createTeacherHelpRequest)
+/** What conversation c1 reads back from now on. */
+function readBack(messages: ChatMessage[]) {
+  server.seed({ conversations: [conversation(messages)] })
+}
 
 const SECTIONS: StructuredAnswer = {
   kind: 'answer',
@@ -92,7 +71,9 @@ function openAsk() {
     <I18nextProvider i18n={i18n}>
       <QueryClientProvider client={client}>
         <MemoryRouter initialEntries={['/ask/c1']}>
-          <AskHost route={{ conversationId: 'c1' }} />
+          <AskServerProvider value={server}>
+            <AskHost route={{ conversationId: 'c1' }} />
+          </AskServerProvider>
         </MemoryRouter>
       </QueryClientProvider>
     </I18nextProvider>,
@@ -132,9 +113,12 @@ beforeEach(async () => {
     isAuthenticated: true,
   })
   resetAsk()
-  vi.mocked(getConversations).mockResolvedValue({ items: [] })
-  availabilityMock.mockResolvedValue({ online: true, availableTeachers: 2 })
-  vi.mocked(getTeacherHelpRequest).mockRejectedValue(new ApiError('never escalated', { status: 404 }))
+  // Nothing listed, teachers online, c1 never escalated: the fake's own defaults.
+  server = createFakeAskServer()
+  getConversationMock = server.conversations.getConversation
+  streamMock = server.stream.streamConversationMessage
+  availabilityMock = server.teacherHelp.getTeacherAvailability
+  requestHelpMock = server.teacherHelp.createTeacherHelpRequest
 })
 
 const originalMatchMedia = window.matchMedia
@@ -147,7 +131,7 @@ afterEach(() => {
 
 describe('an answer read back in its sections', () => {
   it('shows the steps and the answer at once, and keeps the hints and the exercises closed', async () => {
-    getConversationMock.mockResolvedValue(conversation([message('s1', 'student', 'Solve 3x + 5 = 20.'), answer('a1', SECTIONS)]))
+    readBack([message('s1', 'student', 'Solve 3x + 5 = 20.'), answer('a1', SECTIONS)])
     const ask = openAsk()
 
     const steps = await thread(ask).findByRole('list', { name: 'Steps' })
@@ -171,7 +155,7 @@ describe('an answer read back in its sections', () => {
   })
 
   it('opens the hints one at a time, and moves the keyboard onto the last one', async () => {
-    getConversationMock.mockResolvedValue(conversation([answer('a1', SECTIONS)]))
+    readBack([answer('a1', SECTIONS)])
     const ask = openAsk()
 
     const show = await thread(ask).findByRole('button', { name: 'Show a hint' })
@@ -196,18 +180,16 @@ describe('an answer read back in its sections', () => {
   })
 
   it('shows an answer from before the sections, and a follow-up, as their text', async () => {
-    getConversationMock.mockResolvedValue(
-      conversation([
-        answer('a-old', null, 'An older answer, in one piece.'),
-        message('s2', 'student', 'Why divide?'),
-        // A follow-up has nothing in the list sections, and may still have its words as `answer`.
-        answer(
-          'a-follow',
-          { kind: 'followUp', steps: [], answer: 'Because 3x means 3 · x.', hints: [], similarExercises: [], knowledgePoints: [] },
-          'Because 3x means 3 · x.',
-        ),
-      ]),
-    )
+    readBack([
+      answer('a-old', null, 'An older answer, in one piece.'),
+      message('s2', 'student', 'Why divide?'),
+      // A follow-up has nothing in the list sections, and may still have its words as `answer`.
+      answer(
+        'a-follow',
+        { kind: 'followUp', steps: [], answer: 'Because 3x means 3 · x.', hints: [], similarExercises: [], knowledgePoints: [] },
+        'Because 3x means 3 · x.',
+      ),
+    ])
     const ask = openAsk()
 
     expect(await thread(ask).findByText('An older answer, in one piece.')).toBeInTheDocument()
@@ -218,12 +200,14 @@ describe('an answer read back in its sections', () => {
 
   it('says its sections in German', async () => {
     await i18n.changeLanguage('de')
-    getConversationMock.mockResolvedValue(conversation([answer('a1', { ...SECTIONS, suggestTeacher: true })]))
+    readBack([answer('a1', { ...SECTIONS, suggestTeacher: true })])
     render(
       <I18nextProvider i18n={i18n}>
         <QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}>
           <MemoryRouter initialEntries={['/ask/c1']}>
-            <AskHost route={{ conversationId: 'c1' }} />
+            <AskServerProvider value={server}>
+              <AskHost route={{ conversationId: 'c1' }} />
+            </AskServerProvider>
           </MemoryRouter>
         </QueryClientProvider>
       </I18nextProvider>,
@@ -238,30 +222,22 @@ describe('an answer read back in its sections', () => {
 
 describe('an answer just written', () => {
   it('shows the text while it is written and its sections once it ends, before the conversation is read back', async () => {
-    let reads = 0
-    let releaseReadBack!: () => void
-    const readBack = new Promise<void>((resolve) => {
-      releaseReadBack = resolve
-    })
-    getConversationMock.mockImplementation(async () => {
-      reads += 1
-      if (reads > 1) await readBack
-      return conversation(reads > 1 ? [message('student:c1:x', 'student', 'Solve 3x + 5 = 20.'), answer('a-new', SECTIONS)] : [])
-    })
-    progressMock.mockResolvedValue({ conversationId: 'c1', steps: [], updatedAt: new Date().toISOString(), status: 'ai_running' })
+    readBack([])
     let finish!: () => void
     const finished = new Promise<void>((resolve) => {
       finish = resolve
     })
-    streamMock.mockImplementation(async ({ onEvent }: { onEvent: (event: ChatStreamEvent) => void }) => {
-      onEvent({ type: 'message_start', messageId: 'a-new', role: 'assistant', createdAt: new Date().toISOString() })
-      onEvent({ type: 'message_delta', messageId: 'a-new', delta: '1. Subtract 5 on both sides' })
-      await finished
-      onEvent({ type: 'message_done', messageId: 'a-new', status: 'completed', structured: SECTIONS })
-      return 'streamed'
-    })
+    const written: ChatStreamEvent[] = [
+      { type: 'message_start', messageId: 'a-new', role: 'assistant', createdAt: new Date().toISOString() },
+      { type: 'message_delta', messageId: 'a-new', delta: '1. Subtract 5 on both sides' },
+    ]
+    const done: ChatStreamEvent = { type: 'message_done', messageId: 'a-new', status: 'completed', structured: SECTIONS }
+    server.answerWith({ events: written, until: finished, after: [done] })
     const ask = openAsk()
     await ask.findByText('Linear equations')
+    // The next read of the conversation holds until the test lets it answer, with the answer in it.
+    const releaseReadBack = server.holdNext('getConversation')
+    readBack([message('student:c1:x', 'student', 'Solve 3x + 5 = 20.'), answer('a-new', SECTIONS)])
 
     await userEvent.type(ask.getByRole('textbox', { name: 'Your question' }), 'Solve 3x + 5 = 20.{Enter}')
     expect(await thread(ask).findByText('1. Subtract 5 on both sides')).toBeInTheDocument()
@@ -273,7 +249,7 @@ describe('an answer just written', () => {
     // Read out as it is shown: the steps and the answer, not the hint.
     await waitFor(() => expect(announcer()).toHaveTextContent('Divide both sides by 3.'))
     expect(announcer()).not.toHaveTextContent('What undoes')
-    expect(reads).toBe(2)
+    expect(getConversationMock.mock.calls.length).toBe(2)
 
     await act(async () => releaseReadBack())
     expect(await thread(ask).findByRole('list', { name: 'Steps' })).toBeInTheDocument()
@@ -282,9 +258,7 @@ describe('an answer just written', () => {
 
 describe("I don't get this step", () => {
   it('quotes that step of the answer, with a question the student can send as it is', async () => {
-    getConversationMock.mockResolvedValue(conversation([message('s1', 'student', 'Solve 3x + 5 = 20.'), answer('a1', SECTIONS)]))
-    progressMock.mockResolvedValue({ conversationId: 'c1', steps: [], updatedAt: new Date().toISOString(), status: 'completed' })
-    streamMock.mockResolvedValue('streamed')
+    readBack([message('s1', 'student', 'Solve 3x + 5 = 20.'), answer('a1', SECTIONS)])
     const ask = openAsk()
 
     await userEvent.click(await thread(ask).findByRole('button', { name: "I don't get this step (Step 2)" }))
@@ -310,7 +284,7 @@ describe("I don't get this step", () => {
   })
 
   it('keeps what the student already started to write', async () => {
-    getConversationMock.mockResolvedValue(conversation([answer('a1', SECTIONS)]))
+    readBack([answer('a1', SECTIONS)])
     const ask = openAsk()
     const composer = await ask.findByRole('textbox', { name: 'Your question' })
     await userEvent.type(composer, 'Why by 3')
@@ -323,9 +297,8 @@ describe("I don't get this step", () => {
 
 describe('Ask a teacher', () => {
   it('is always there under the latest answer, quiet, when the answer does not suggest a teacher', async () => {
-    availabilityMock.mockResolvedValue({ online: true, availableTeachers: 2, teacherSupport: support() })
-    getConversationMock.mockResolvedValue(conversation([answer('a1', SECTIONS)]))
-    requestHelpMock.mockResolvedValue({ requestId: 'r1', conversationId: 'c1', status: 'pending', createdAt: '2026-10-29T10:00:00.000Z' })
+    server.availability = { online: true, availableTeachers: 2, teacherSupport: support() }
+    readBack([answer('a1', SECTIONS)])
     const ask = openAsk()
 
     const button = await ask.findByRole('button', { name: 'Ask a teacher' })
@@ -342,9 +315,7 @@ describe('Ask a teacher', () => {
   })
 
   it('is offered plainly under an answer that suggests a teacher', async () => {
-    getConversationMock.mockResolvedValue(
-      conversation([message('s1', 'student', 'Solve 3x + 5 = 20.'), answer('a1', { ...SECTIONS, suggestTeacher: true })]),
-    )
+    readBack([message('s1', 'student', 'Solve 3x + 5 = 20.'), answer('a1', { ...SECTIONS, suggestTeacher: true })])
     const ask = openAsk()
 
     const button = await ask.findByRole('button', { name: 'Ask a teacher' })
@@ -357,13 +328,11 @@ describe('Ask a teacher', () => {
   })
 
   it('goes quiet again under a follow-up that does not suggest one, and sits under it', async () => {
-    getConversationMock.mockResolvedValue(
-      conversation([
-        answer('a1', { ...SECTIONS, suggestTeacher: true }),
-        message('s2', 'student', 'Why divide?'),
-        answer('a2', { kind: 'followUp', suggestTeacher: false }, 'Because 3x means 3 · x.'),
-      ]),
-    )
+    readBack([
+      answer('a1', { ...SECTIONS, suggestTeacher: true }),
+      message('s2', 'student', 'Why divide?'),
+      answer('a2', { kind: 'followUp', suggestTeacher: false }, 'Because 3x means 3 · x.'),
+    ])
     const ask = openAsk()
     await thread(ask).findByText('Because 3x means 3 · x.')
     const button = await ask.findByRole('button', { name: 'Ask a teacher' })
@@ -374,14 +343,8 @@ describe('Ask a teacher', () => {
   })
 
   it('asks for help in this conversation and reads the week’s allowance again at once', async () => {
-    availabilityMock.mockResolvedValue({ online: true, availableTeachers: 2, teacherSupport: support() })
-    getConversationMock.mockResolvedValue(conversation([answer('a1', { ...SECTIONS, suggestTeacher: true })]))
-    requestHelpMock.mockResolvedValue({
-      requestId: 'r1',
-      conversationId: 'c1',
-      status: 'pending',
-      createdAt: '2026-10-29T10:00:00.000Z',
-    })
+    server.availability = { online: true, availableTeachers: 2, teacherSupport: support() }
+    readBack([answer('a1', { ...SECTIONS, suggestTeacher: true })])
     const ask = openAsk()
 
     expect(await ask.findByText('2 teacher requests left this week')).toBeInTheDocument()
@@ -393,7 +356,7 @@ describe('Ask a teacher', () => {
   })
 
   it('is greyed with the reason once the week’s requests are used up', async () => {
-    availabilityMock.mockResolvedValue({
+    server.availability = {
       online: true,
       availableTeachers: 2,
       teacherSupport: support({
@@ -402,8 +365,8 @@ describe('Ask a teacher', () => {
         blockedReason: 'teacher_support_allowance_exhausted',
         resetsAt: '2026-11-02T00:00:00+01:00',
       }),
-    })
-    getConversationMock.mockResolvedValue(conversation([answer('a1', { ...SECTIONS, suggestTeacher: true })]))
+    }
+    readBack([answer('a1', { ...SECTIONS, suggestTeacher: true })])
     const ask = openAsk()
 
     const button = await ask.findByRole('button', { name: 'Ask a teacher' })
@@ -415,9 +378,9 @@ describe('Ask a teacher', () => {
   })
 
   it('says nothing of an allowance it could not read, and answers a refusal in words', async () => {
-    availabilityMock.mockResolvedValue({ online: true, availableTeachers: 2, teacherSupport: null })
-    getConversationMock.mockResolvedValue(conversation([answer('a1', { ...SECTIONS, suggestTeacher: true })]))
-    requestHelpMock.mockRejectedValue(new ApiError('exhausted', { status: 429 }))
+    server.availability = { online: true, availableTeachers: 2, teacherSupport: null }
+    readBack([answer('a1', { ...SECTIONS, suggestTeacher: true })])
+    server.refuseNextWith(new ApiError('exhausted', { status: 429 }), 'createTeacherHelpRequest')
     const ask = openAsk()
 
     const button = await ask.findByRole('button', { name: 'Ask a teacher' })

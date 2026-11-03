@@ -16,39 +16,17 @@ import { I18nextProvider } from 'react-i18next'
 import { MemoryRouter } from 'react-router-dom'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { AskHost } from '@/features/ask/AskHost'
+import { AskServerProvider } from '@/features/ask/server/askServer'
 import i18n from '@/i18n'
 import { ApiError } from '@/services/api/httpClient'
 import { resetAsk } from '@/store/askStore'
 import { type CurrentUser, useAuthStore } from '@/store/authStore'
 import type { Conversation } from '@/types/chat'
+import { createFakeAskServer, type FakeAskServer } from '../fakes/askServer'
 
-vi.mock('@/services/chat/chatApi', () => ({
-  getConversations: vi.fn(),
-  getConversation: vi.fn(),
-  createConversation: vi.fn(),
-}))
-vi.mock('@/services/chat/chatStreamApi', () => ({
-  streamConversationMessage: vi.fn(),
-  getGenerationProgress: vi.fn(),
-}))
-vi.mock('@/services/teacherHelp/teacherHelpApi', () => ({
-  getTeacherAvailability: vi.fn(),
-  getTeacherHelpRequest: vi.fn(),
-  createTeacherHelpRequest: vi.fn(),
-}))
-vi.mock('@/services/student/studentApi', () => ({
-  getStudentProfile: vi.fn(async () => ({ grade: '8', primarySubjects: ['math'] })),
-}))
-vi.mock('@/services/learning/memoryApi', () => ({
-  getMyMemorySummary: vi.fn(async () => ({ recommendations: [], weakTopics: [] })),
-}))
-
-import { getConversation, getConversations } from '@/services/chat/chatApi'
-import { getGenerationProgress, streamConversationMessage } from '@/services/chat/chatStreamApi'
-import { getTeacherAvailability, getTeacherHelpRequest } from '@/services/teacherHelp/teacherHelpApi'
-
-const streamMock = vi.mocked(streamConversationMessage)
-const progressMock = vi.mocked(getGenerationProgress)
+/** The server behind Ask, in memory (#571). */
+let server: FakeAskServer
+let streamMock: FakeAskServer['stream']['streamConversationMessage']
 
 /** As the backend sends it: `ATTACHMENT_ERROR_REGISTRY[MESSAGE_DAILY_LIMIT]`. */
 const dailyLimit = () =>
@@ -80,7 +58,9 @@ function openAsk() {
     <I18nextProvider i18n={i18n}>
       <QueryClientProvider client={client}>
         <MemoryRouter initialEntries={['/ask/c1']}>
-          <AskHost route={{ conversationId: 'c1' }} />
+          <AskServerProvider value={server}>
+            <AskHost route={{ conversationId: 'c1' }} />
+          </AskServerProvider>
         </MemoryRouter>
       </QueryClientProvider>
     </I18nextProvider>,
@@ -131,12 +111,11 @@ beforeEach(async () => {
     isAuthenticated: true,
   })
   resetAsk()
-  vi.mocked(getConversations).mockResolvedValue({ items: [] })
-  vi.mocked(getConversation).mockResolvedValue(conversation())
-  vi.mocked(getTeacherAvailability).mockResolvedValue({ online: true, availableTeachers: 2 })
-  vi.mocked(getTeacherHelpRequest).mockRejectedValue(new ApiError('never escalated', { status: 404 }))
-  // Refused before it was stored: the server holds no command under its key.
-  progressMock.mockRejectedValue(new ApiError('not found', { status: 404, code: 'message_command_not_found' }))
+  // Nothing listed, teachers online, c1 never escalated. A message refused
+  // before it was stored leaves no command under its key.
+  server = createFakeAskServer()
+  server.seed({ conversations: [conversation()] })
+  streamMock = server.stream.streamConversationMessage
 })
 
 afterEach(async () => {
@@ -153,7 +132,7 @@ describe('the day’s messages used up', () => {
     'says so in %s, and offers no "Send again"',
     async (language) => {
       await i18n.changeLanguage(language)
-      streamMock.mockRejectedValue(dailyLimit())
+      server.refuseNextWith(dailyLimit())
       const panel = openAsk()
 
       await ask(panel, 'Why both sides?')
@@ -171,7 +150,7 @@ describe('the day’s messages used up', () => {
   })
 
   it('stays without "Send again" after a reload the same day', async () => {
-    streamMock.mockRejectedValue(dailyLimit())
+    server.refuseNextWith(dailyLimit())
     const first = openAsk()
     await ask(first, 'Why both sides?')
     expect(await thread(first).findByText(LIMIT_WORDS.en)).toBeInTheDocument()
@@ -186,7 +165,7 @@ describe('the day’s messages used up', () => {
 
   it('offers "Send again" once the server’s UTC day has turned, not Zurich’s, and sends the same message', async () => {
     process.env.TZ = 'Europe/Zurich'
-    streamMock.mockRejectedValueOnce(dailyLimit()).mockResolvedValue('streamed')
+    server.refuseNextWith(dailyLimit())
     const panel = openAsk()
     await ask(panel, 'Why both sides?')
     expect(await thread(panel).findByText(LIMIT_WORDS.en)).toBeInTheDocument()
@@ -215,7 +194,7 @@ describe('any other failure', () => {
     ['a 503', () => new ApiError('Request failed with status code 503', { status: 503 })],
     ['another 429', () => new ApiError('Request failed with status code 429', { status: 429 })],
   ])('keeps the general words and "Send again" after %s', async (_, failure) => {
-    streamMock.mockRejectedValueOnce(failure()).mockResolvedValue('streamed')
+    server.refuseNextWith(failure())
     const panel = openAsk()
 
     await ask(panel, 'Why both sides?')

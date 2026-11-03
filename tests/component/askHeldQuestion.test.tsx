@@ -20,26 +20,18 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { AskHost } from '@/features/ask/AskHost'
 import { StageWithAsk } from '@/features/chapter/StageAsk'
 import { makeQuote, useAskQuoteStore } from '@/features/ask/practiceContext'
+import { AskServerProvider } from '@/features/ask/server/askServer'
 import i18n from '@/i18n'
 import { readPendingMessage, writePendingMessage } from '@/lib/pendingChatMessages'
-import { ApiError } from '@/services/api/httpClient'
 import { resetAsk, useAskStore } from '@/store/askStore'
 import { type CurrentUser, useAuthStore } from '@/store/authStore'
+import { createFakeAskServer, type FakeAskServer } from '../fakes/askServer'
 
-vi.mock('@/services/chat/chatApi', () => ({ getConversations: vi.fn(), getConversation: vi.fn(), createConversation: vi.fn() }))
-vi.mock('@/services/chat/chatStreamApi', () => ({ streamConversationMessage: vi.fn(), getGenerationProgress: vi.fn() }))
-vi.mock('@/services/teacherHelp/teacherHelpApi', () => ({
-  getTeacherAvailability: vi.fn(async () => ({ online: false, availableTeachers: 0 })),
-  getTeacherHelpRequest: vi.fn(async () => {
-    throw new ApiError('x', { status: 404 })
-  }),
-  createTeacherHelpRequest: vi.fn(),
-}))
-vi.mock('@/services/student/studentApi', () => ({ getStudentProfile: vi.fn(async () => ({ grade: '8', primarySubjects: ['math'] })) }))
-vi.mock('@/services/learning/memoryApi', () => ({ getMyMemorySummary: vi.fn(async () => ({ recommendations: [], weakTopics: [] })) }))
-
-import { createConversation, getConversation, getConversations } from '@/services/chat/chatApi'
-import { getGenerationProgress, streamConversationMessage } from '@/services/chat/chatStreamApi'
+/** The server behind Ask, in memory (#571): each test seeds the conversations it opens. */
+let server: FakeAskServer
+let createConversation: FakeAskServer['conversations']['createConversation']
+let getConversation: FakeAskServer['conversations']['getConversation']
+let streamConversationMessage: FakeAskServer['stream']['streamConversationMessage']
 
 function wide() {
   window.matchMedia = ((query: string) => ({
@@ -63,7 +55,9 @@ function mount(node: ReactNode) {
   return render(
     <I18nextProvider i18n={i18n}>
       <QueryClientProvider client={client}>
-        <MemoryRouter>{node}</MemoryRouter>
+        <MemoryRouter>
+          <AskServerProvider value={server}>{node}</AskServerProvider>
+        </MemoryRouter>
       </QueryClientProvider>
     </I18nextProvider>,
   )
@@ -71,11 +65,11 @@ function mount(node: ReactNode) {
 
 /** `POST /conversations` held open until the test lets it answer. */
 function createHeldOpen() {
-  let answer!: (value: unknown) => void
-  vi.mocked(createConversation).mockImplementation(
-    () => new Promise((resolve) => (answer = resolve)) as never,
-  )
-  return (id: string) => act(async () => answer(conversation(id)))
+  const answer = server.holdNext('createConversation')
+  return (id: string) => {
+    server.seed({ newConversationIds: [id] })
+    return act(async () => answer())
+  }
 }
 
 const exerciseQuote = () => makeQuote('2x + 3 = 7', { kind: 'challenge', id: 'ch-1' })
@@ -86,7 +80,7 @@ const Stage = () => (
     <p>exercise</p>
   </StageWithAsk>
 )
-const sentTo = () => vi.mocked(streamConversationMessage).mock.calls.map(([call]) => call.conversationId)
+const sentTo = () => streamConversationMessage.mock.calls.map(([call]) => call.conversationId)
 
 async function sendFromPanel() {
   const panel = within(screen.getByRole('complementary', { name: 'Ask' }))
@@ -94,7 +88,7 @@ async function sendFromPanel() {
   await userEvent.keyboard('{Enter}')
   await waitFor(() => expect(createConversation).toHaveBeenCalledTimes(1))
   // `POST /conversations` cannot carry the quote, so it carries no question.
-  expect(vi.mocked(createConversation).mock.calls[0][0]).not.toHaveProperty('initialMessage')
+  expect(createConversation.mock.calls[0][0]).not.toHaveProperty('initialMessage')
   return panel
 }
 
@@ -110,14 +104,15 @@ beforeEach(async () => {
   })
   resetAsk()
   useAskQuoteStore.setState({ quote: null })
-  vi.mocked(getConversation).mockImplementation(async (id: string) => conversation(id) as never)
-  vi.mocked(getGenerationProgress).mockResolvedValue({ status: 'completed', steps: [] } as never)
-  vi.mocked(streamConversationMessage).mockResolvedValue('streamed' as never)
+  // Nothing listed, a message answered as it is sent, and no teacher online.
+  server = createFakeAskServer()
+  server.availability = { online: false, availableTeachers: 0 }
+  ;({ createConversation, getConversation } = server.conversations)
+  ;({ streamConversationMessage } = server.stream)
 })
 
 describe('a question held back from POST /conversations', () => {
   it('goes out into the new conversation even when Ask was closed before it existed', async () => {
-    vi.mocked(getConversations).mockResolvedValue({ items: [] } as never)
     const answerCreate = createHeldOpen()
     useAskQuoteStore.setState({ quote: exerciseQuote() })
     act(() => useAskStore.getState().setDraft('u-1', 'Why subtract 3 first?'))
@@ -128,7 +123,7 @@ describe('a question held back from POST /conversations', () => {
     await answerCreate('new-1')
 
     await waitFor(() => expect(streamConversationMessage).toHaveBeenCalledTimes(1))
-    const [call] = vi.mocked(streamConversationMessage).mock.calls[0]
+    const [call] = streamConversationMessage.mock.calls[0]
     expect(call.conversationId).toBe('new-1')
     // Kept as the conversation's pending message, so opening it shows it waiting.
     expect(readPendingMessage('new-1')?.content).toBe('Why subtract 3 first?')
@@ -139,6 +134,7 @@ describe('a question held back from POST /conversations', () => {
   })
 
   it('is sent again, with the same key, when a reload lost its request', async () => {
+    server.seed({ conversations: [conversation('new-1')] })
     writePendingMessage('new-1', {
       idempotencyKey: 'held-new-1',
       content: 'Why subtract 3 first?',
@@ -146,21 +142,21 @@ describe('a question held back from POST /conversations', () => {
       quote: { text: '2x + 3 = 7', source: { kind: 'challenge', id: 'ch-1' } },
       unconfirmed: true,
     })
-    vi.mocked(getConversations).mockResolvedValue({ items: [] } as never)
     act(() => useAskStore.getState().select('u-1', 'new-1'))
     mount(<AskHost />)
 
     await waitFor(() => expect(streamConversationMessage).toHaveBeenCalledTimes(1))
-    const [call] = vi.mocked(streamConversationMessage).mock.calls[0]
+    const [call] = streamConversationMessage.mock.calls[0]
     expect(call.conversationId).toBe('new-1')
     expect(call.payload.idempotencyKey).toBe('held-new-1')
     expect(call.payload.quote?.source).toEqual({ kind: 'challenge', id: 'ch-1' })
   })
 
   it('goes only into its own conversation, not one the student opened while it was made', async () => {
-    vi.mocked(getConversations).mockResolvedValue({
-      items: [{ id: 'old', title: 'Old chat', subject: 'math', grade: '8', updatedAt: '2026-10-01T10:00:00Z' }],
-    } as never)
+    server.seed({
+      conversations: [conversation('old')],
+      list: [{ id: 'old', title: 'Old chat', subject: 'math', grade: '8', updatedAt: '2026-10-01T10:00:00Z' }],
+    })
     const answerCreate = createHeldOpen()
     useAskQuoteStore.setState({ quote: exerciseQuote() })
     act(() => useAskStore.getState().setDraft('u-1', 'Why subtract 3 first?'))
@@ -185,7 +181,6 @@ describe('a question held back from POST /conversations', () => {
 
 describe('a quote chosen beside an exercise', () => {
   it('is dropped when the stage goes, and not shown in Ask on the planet', async () => {
-    vi.mocked(getConversations).mockResolvedValue({ items: [] } as never)
     const stage = mount(
       <StageWithAsk practice={practiceOn('ch-1')}>
         <p>exercise</p>
@@ -202,7 +197,6 @@ describe('a quote chosen beside an exercise', () => {
   })
 
   it('is dropped on moving to the next exercise', () => {
-    vi.mocked(getConversations).mockResolvedValue({ items: [] } as never)
     const view = mount(
       <StageWithAsk practice={practiceOn('ch-1')}>
         <p>exercise</p>
@@ -213,9 +207,11 @@ describe('a quote chosen beside an exercise', () => {
       <I18nextProvider i18n={i18n}>
         <QueryClientProvider client={new QueryClient()}>
           <MemoryRouter>
-            <StageWithAsk practice={practiceOn('ch-2')}>
-              <p>exercise</p>
-            </StageWithAsk>
+            <AskServerProvider value={server}>
+              <StageWithAsk practice={practiceOn('ch-2')}>
+                <p>exercise</p>
+              </StageWithAsk>
+            </AskServerProvider>
           </MemoryRouter>
         </QueryClientProvider>
       </I18nextProvider>,
@@ -224,23 +220,22 @@ describe('a quote chosen beside an exercise', () => {
   })
 
   it('of an answer is not shown or sent in another conversation', async () => {
-    vi.mocked(getConversations).mockResolvedValue({ items: [] } as never)
+    server.seed({ conversations: [conversation('conv-b')] })
     useAskQuoteStore.setState({ quote: makeQuote('Subtract 3 from both sides.', { kind: 'message', id: 'a1' }, 'conv-a') })
     act(() => useAskStore.getState().select('u-1', 'conv-b'))
     const { container } = mount(<AskHost />)
     const panel = within(await screen.findByRole('complementary', { name: 'Ask' }))
-    await waitFor(() => expect(vi.mocked(getConversation).mock.calls[0]?.[0]).toBe('conv-b'))
+    await waitFor(() => expect(getConversation.mock.calls[0]?.[0]).toBe('conv-b'))
     expect(container.querySelector('[data-ask-pending-quote]')).toBeNull()
 
     await userEvent.type(panel.getByRole('textbox'), 'And then?{Enter}')
     await waitFor(() => expect(streamConversationMessage).toHaveBeenCalledTimes(1))
-    expect(vi.mocked(streamConversationMessage).mock.calls[0][0].payload).not.toHaveProperty('quote')
+    expect(streamConversationMessage.mock.calls[0][0].payload).not.toHaveProperty('quote')
   })
 })
 
 describe('Ask beside an exercise says how to dictate, behind a microphone (#515, #553)', () => {
   it('in the docked composer under the stage on a phone', async () => {
-    vi.mocked(getConversations).mockResolvedValue({ items: [] } as never)
     const mac = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Safari/605.1.15'
     Object.defineProperty(window.navigator, 'userAgent', { value: mac, configurable: true })
     // Narrow: Ask starts closed and the composer is docked under the exercise.
