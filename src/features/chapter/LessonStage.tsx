@@ -919,19 +919,24 @@ function StarQuizStrip({ run, chapter, starPath, side }: { run: StarQuizRun; cha
   )
 }
 
-/** One end of the star quiz: Murmi, a title that takes the keyboard, a sentence, the way on. */
+/**
+ * One end of the star quiz: Murmi, a title that takes the keyboard, a
+ * sentence, the way on, and under it what comes after (the next star, #578).
+ */
 function StarQuizEnd({
   name,
   mood,
   title,
   body,
   children,
+  after,
 }: {
   name: string
   mood: 'delighted' | 'calm' | 'thinking'
   title: string
   body: string
   children: ReactNode
+  after?: ReactNode
 }) {
   const heading = useRef<HTMLHeadingElement>(null)
   useEffect(() => heading.current?.focus(), [])
@@ -952,6 +957,7 @@ function StarQuizEnd({
           {body}
         </p>
         <div className="flex flex-col items-center gap-2 pt-2 sm:flex-row sm:gap-5">{children}</div>
+        {after}
       </section>
     </div>
   )
@@ -960,7 +966,14 @@ function StarQuizEnd({
 function StarQuizPassed({ chapter, starPath }: { chapter: Chapter | null; starPath: string }) {
   const { t } = useTranslation('chapter')
   return (
-    <StarQuizEnd name="passed" mood="delighted" title={t('starQuiz.passed.title')} body={t('starQuiz.passed.body', { star: chapter?.title ?? '' })}>
+    <StarQuizEnd
+      name="passed"
+      mood="delighted"
+      title={t('starQuiz.passed.title')}
+      body={t('starQuiz.passed.body', { star: chapter?.title ?? '' })}
+      // The whole star is lit, as at the end of its last lesson: the way on (#578).
+      after={chapter && <NextStar unitId={chapter.unitId} />}
+    >
       <Button asChild lift variant="onSky" size="large" style={{ minWidth: 200 }}>
         <Link to={starPath}>{t('starQuiz.passed.toMap')}</Link>
       </Button>
