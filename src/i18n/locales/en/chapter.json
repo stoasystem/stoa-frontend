@@ -72,6 +72,7 @@
       "allDone": "Every lesson in {{chapter}} is done.",
       "backToChapter": "Back to the chapter",
       "next": "Next lesson: {{title}}",
+      "nextStar": "Next star: {{name}}",
       "progress": "{{done}} of {{total}} lessons in {{chapter}} done",
       "testedOut": "The lesson counts as done. The star lights up once every exercise in this chapter has been answered right at least once.",
       "title": "Lesson complete",

@@ -48,6 +48,11 @@
     "announce": "L’étoile {{name}} est allumée"
   },
   "marker": {
+    "reason": {
+      "inProgress": "Tu en étais là la dernière fois",
+      "afterLit": "Dans la suite de {{name}}, que tu viens d’allumer",
+      "start": "Commence ici"
+    },
     "recommended": "Suggérée ensuite",
     "reviewDue_one": "{{count}} carte à réviser",
     "reviewDue_many": "{{count}} cartes à réviser",

@@ -5,7 +5,7 @@
  * review marker when it has them.
  */
 import type { TFunction } from 'i18next'
-import { nebulaCounts, starLook, type Nebula, type Star } from '@/features/starmap/model/starMap'
+import { nebulaCounts, starLook, type Nebula, type Recommendation, type Star } from '@/features/starmap/model/starMap'
 
 export function starLabel(t: TFunction<'starmap'>, star: Star): string {
   const parts = [
@@ -21,4 +21,31 @@ export function starLabel(t: TFunction<'starmap'>, star: Star): string {
 
 export function nebulaLabel(t: TFunction<'starmap'>, nebula: Nebula, stars: readonly Star[]): string {
   return t('nebula.link', { nebula: nebula.name, ...nebulaCounts(stars, nebula.topicId) })
+}
+
+/**
+ * Why the system recommends a star, in one sentence (#485): the star card
+ * says it under the marker, and the lesson's done page under the way to it.
+ * Null for a teacher's recommendation, for a backend that does not say why
+ * yet, and for `after_lit` when the star it follows is not in `stars`: a
+ * sentence naming no star says nothing.
+ */
+export function recommendationReason(
+  t: TFunction<'starmap'>,
+  stars: readonly Pick<Star, 'unitId' | 'name'>[],
+  recommendation: Recommendation | null | undefined,
+): string | null {
+  if (recommendation?.source !== 'system') return null
+  switch (recommendation.reason) {
+    case 'in_progress':
+      return t('marker.reason.inProgress')
+    case 'start':
+      return t('marker.reason.start')
+    case 'after_lit': {
+      const related = recommendation.relatedUnitId ? stars.find((star) => star.unitId === recommendation.relatedUnitId) : undefined
+      return related ? t('marker.reason.afterLit', { name: related.name }) : null
+    }
+    default:
+      return null
+  }
 }

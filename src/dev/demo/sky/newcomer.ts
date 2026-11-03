@@ -60,7 +60,9 @@ function newcomerParts(map: StarMap): Made {
     const pick = own.find((star) => !waits.has(star.unitId))
     if (pick) picks.add(pick.unitId)
   }
-  const stars = fresh.map((star) => (picks.has(star.unitId) ? { ...star, recommendation: { source: 'system' as const } } : star))
+  const stars = fresh.map((star) =>
+    picks.has(star.unitId) ? { ...star, recommendation: { source: 'system' as const, reason: 'start' as const, relatedUnitId: null } } : star,
+  )
 
   const parts = { stars, prerequisites }
   byPrerequisites.set(map.prerequisites, parts)
@@ -112,7 +114,13 @@ function withProgress(map: StarMap, parts: Made, completed: readonly string[], l
     // At most one per subject: mathematics' recommendation moves, wherever it was.
     const math = new Set(own.map((star) => star.unitId))
     stars = stars.map((star) =>
-      !math.has(star.unitId) ? star : { ...star, recommendation: star.unitId === pick?.unitId ? { source: 'system' as const } : null },
+      !math.has(star.unitId)
+        ? star
+        : {
+            ...star,
+            recommendation:
+              star.unitId === pick?.unitId ? { source: 'system' as const, reason: 'after_lit' as const, relatedUnitId: kp.unitId } : null,
+          },
     )
   }
   known.set(key, stars)

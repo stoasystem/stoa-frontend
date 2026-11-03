@@ -48,6 +48,11 @@
     "announce": "{{name}} leuchtet jetzt"
   },
   "marker": {
+    "reason": {
+      "inProgress": "Hier hast du zuletzt gelernt",
+      "afterLit": "Weiter nach {{name}}: gerade von dir zum Leuchten gebracht",
+      "start": "Fang hier an"
+    },
     "recommended": "Als Nächstes empfohlen",
     "reviewDue_one": "{{count}} Karte zur Wiederholung fällig",
     "reviewDue_other": "{{count}} Karten zur Wiederholung fällig"

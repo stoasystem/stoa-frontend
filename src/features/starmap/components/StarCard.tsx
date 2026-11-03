@@ -17,6 +17,7 @@ import { formatRetryAt } from '@/features/chapter/useStarQuizRun'
 import { Button } from '@/components/base'
 import { ExtensionTag, SkillDot, SkillHints } from '@/features/starmap/components/SkillHints'
 import { StarGlyph } from '@/features/starmap/components/StarGlyph'
+import { recommendationReason } from '@/features/starmap/components/labels'
 import { isQuestionType, prerequisiteHints } from '@/features/starmap/model/skillPractice'
 import { useStarMapSource } from '@/features/starmap/starMapSource'
 import { pathForTarget } from '@/features/starmap/view/layers'
@@ -110,6 +111,8 @@ export function StarCardDetails({ map, demo = false, star }: { map: StarMap; dem
   // Small stars as question types (#501) are listed one per line, each with its hints.
   const questionTypes = star.skills.some((skill) => isQuestionType(skill, star.unitId))
   const { retrySkills } = useStarMapSource()
+  // Why the system recommends it (#485); a teacher's recommendation says nothing more.
+  const reason = recommendationReason(t, map.stars, star.recommendation)
   // The review's way back is to this star, not to the whole sky (#411).
   const reviewFrom: ReviewReturnState = {
     star: here(pathForTarget(subjectOfNebula(map, star.nebulaId), { layer: 'star', nebulaId: star.nebulaId, unitId: star.unitId })),
@@ -146,6 +149,7 @@ export function StarCardDetails({ map, demo = false, star }: { map: StarMap; dem
       {(star.recommendation || star.reviewDue > 0 || star.unmetExercises > 0) && (
         <ul className="m-0 flex list-none flex-col gap-1 p-0 text-[13px] text-on-sky">
           {star.recommendation && <li>{t('marker.recommended')}</li>}
+          {reason && <li data-recommendation-reason>{reason}</li>}
           {star.state === 'in_progress' && star.unmetExercises > 0 && (
             <li>
               {allLessonsDone

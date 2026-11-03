@@ -92,7 +92,8 @@ describe("the design preview's newcomer sky", () => {
       expect(subjects.sort()).toEqual(map.subjects.filter((galaxy) => galaxy.enrolled).map((galaxy) => galaxy.subjectId).sort())
       expect(recommended.every((star) => star.state === 'ready')).toBe(true)
       // Not the demo knowledge point (sine and cosine is no first star): "Integers", first in course order.
-      expect(map.stars.find((star) => star.unitId === START)?.recommendation).toEqual({ source: 'system' })
+      // Nothing lit yet: where to start, as the backend says it (#485).
+      expect(map.stars.find((star) => star.unitId === START)?.recommendation).toEqual({ source: 'system', reason: 'start', relatedUnitId: null })
       expect(map.stars.find((star) => star.unitId === KP)?.recommendation).toBeNull()
     })
   }

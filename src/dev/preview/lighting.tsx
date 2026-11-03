@@ -98,8 +98,13 @@ export function demoStarMapOverride(map: StarMap, size: FixtureSize, completed: 
   if (hasPoint && state === 'lit' && stars.some((star) => star.unitId === kp.unitId && star.recommendation)) {
     const ordered = orderedStars({ ...map, stars }).filter((star) => subjectOfNebula(map, star.nebulaId) === kp.subjectId)
     const pick = ordered.find((star) => star.state === 'in_progress' && star.unitId !== kp.unitId) ?? ordered.find((star) => star.state === 'ready' && star.unlitPrerequisiteIds.length === 0)
+    // Why, as the backend says it (#485): the star in progress, else the one after the point just lit.
+    const recommendation: Star['recommendation'] =
+      pick?.state === 'in_progress'
+        ? { source: 'system', reason: 'in_progress', relatedUnitId: null }
+        : { source: 'system', reason: 'after_lit', relatedUnitId: kp.unitId }
     stars = stars.map((star) =>
-      star.unitId === kp.unitId ? { ...star, recommendation: null } : star.unitId === pick?.unitId ? { ...star, recommendation: { source: 'system' } } : star,
+      star.unitId === kp.unitId ? { ...star, recommendation: null } : star.unitId === pick?.unitId ? { ...star, recommendation } : star,
     )
   }
 

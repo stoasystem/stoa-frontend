@@ -48,6 +48,11 @@
     "announce": "{{name}} is lit"
   },
   "marker": {
+    "reason": {
+      "inProgress": "Where you left off last time",
+      "afterLit": "Follows on from {{name}}, which you just lit",
+      "start": "Start here"
+    },
     "recommended": "Suggested next",
     "reviewDue_one": "{{count}} card due for review",
     "reviewDue_other": "{{count}} cards due for review"

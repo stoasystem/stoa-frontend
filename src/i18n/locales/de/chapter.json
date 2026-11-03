@@ -72,6 +72,7 @@
       "allDone": "Alle Lektionen in {{chapter}} sind erledigt.",
       "backToChapter": "Zurück zum Kapitel",
       "next": "Nächste Lektion: {{title}}",
+      "nextStar": "Nächster Stern: {{name}}",
       "progress": "{{done}} von {{total}} Lektionen in {{chapter}} erledigt",
       "testedOut": "Die Lektion zählt als erledigt. Der Stern leuchtet, sobald jede Aufgabe in diesem Kapitel mindestens einmal richtig beantwortet ist.",
       "title": "Lektion abgeschlossen",
