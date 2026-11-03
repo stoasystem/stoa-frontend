@@ -20,6 +20,8 @@ vi.mock('@/lib/env', () => ({
   isDevelopment: false,
   allowDemoFallback: false,
 }))
+// These send real events: not the silent trackEvent tests/setup.ts puts in (#571).
+vi.unmock('@/services/analytics/analyticsClient')
 
 const V4_UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/
 const TAB_SIGN_IN_KEY = 'stoa_tab_sign_in'

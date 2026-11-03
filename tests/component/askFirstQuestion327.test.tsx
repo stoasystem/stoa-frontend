@@ -20,10 +20,6 @@ import { ApiError } from '@/services/api/httpClient'
 import { resetAsk, useAskStore } from '@/store/askStore'
 import { type CurrentUser, useAuthStore } from '@/store/authStore'
 
-vi.mock('@/services/analytics/analyticsClient', () => ({ trackEvent: vi.fn() }))
-vi.mock('@/services/chat/commandMessageIds', () => ({
-  commandMessageIds: vi.fn(async (c: string, k: string) => ({ studentMessageId: `s:${c}:${k}`, assistantMessageId: `a:${c}:${k}` })),
-}))
 vi.mock('@/services/chat/chatApi', () => ({ getConversations: vi.fn(), getConversation: vi.fn(), createConversation: vi.fn() }))
 vi.mock('@/services/chat/chatStreamApi', () => ({ streamConversationMessage: vi.fn(), getGenerationProgress: vi.fn() }))
 vi.mock('@/services/teacherHelp/teacherHelpApi', () => ({

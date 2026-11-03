@@ -40,7 +40,6 @@ vi.mock('@/components/ui/MathRenderer', async (importOriginal) => {
     },
   }
 })
-vi.mock('@/services/analytics/analyticsClient', () => ({ trackEvent: vi.fn() }))
 vi.mock('@/services/chat/chatApi', () => ({
   getConversations: vi.fn(async () => ({ items: [] })),
   getConversation: vi.fn(),

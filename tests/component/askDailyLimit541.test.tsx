@@ -22,13 +22,6 @@ import { resetAsk } from '@/store/askStore'
 import { type CurrentUser, useAuthStore } from '@/store/authStore'
 import type { Conversation } from '@/types/chat'
 
-vi.mock('@/services/analytics/analyticsClient', () => ({ trackEvent: vi.fn() }))
-vi.mock('@/services/chat/commandMessageIds', () => ({
-  commandMessageIds: vi.fn(async (conversationId: string, key: string) => ({
-    studentMessageId: `student:${conversationId}:${key}`,
-    assistantMessageId: `assistant:${conversationId}:${key}`,
-  })),
-}))
 vi.mock('@/services/chat/chatApi', () => ({
   getConversations: vi.fn(),
   getConversation: vi.fn(),

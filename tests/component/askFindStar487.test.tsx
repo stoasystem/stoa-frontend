@@ -24,14 +24,11 @@ import { pathForTarget } from '@/features/starmap/view/layers'
 import { DemoStarMapSource, readDemoStarMap } from '@/dev/demo/sky/source'
 import i18n from '@/i18n'
 import { ApiError } from '@/services/api/httpClient'
+import { commandMessageIds } from '@/services/chat/commandMessageIds'
 import { askFor, resetAsk, useAskStore } from '@/store/askStore'
 import { useAuthStore } from '@/store/authStore'
 import type { ChatMessage, ChatStreamEvent, TargetUnit } from '@/types/chat'
 
-vi.mock('@/services/analytics/analyticsClient', () => ({ trackEvent: vi.fn(), rotateAnalyticsSession: vi.fn() }))
-vi.mock('@/services/chat/commandMessageIds', () => ({
-  commandMessageIds: vi.fn(async (c: string, k: string) => ({ studentMessageId: `s:${c}:${k}`, assistantMessageId: `a:${c}:${k}` })),
-}))
 vi.mock('@/services/chat/chatApi', () => ({ getConversations: vi.fn(async () => ({ items: [] })), getConversation: vi.fn(), createConversation: vi.fn() }))
 vi.mock('@/services/chat/chatStreamApi', () => ({ streamConversationMessage: vi.fn(), getGenerationProgress: vi.fn() }))
 vi.mock('@/services/teacherHelp/teacherHelpApi', () => ({
@@ -271,9 +268,10 @@ describe('the card under an answer that found a star (#487)', () => {
 
     // Read back: the server holds the same answer under the same id.
     const reads = vi.mocked(getConversation).mock.calls.length
-    const studentId = vi.mocked(streamConversationMessage).mock.calls[0][0].payload.idempotencyKey
+    const key = vi.mocked(streamConversationMessage).mock.calls[0][0].payload.idempotencyKey
+    const { studentMessageId } = await commandMessageIds('c-1', key)
     readBack([
-      message(`s:c-1:${studentId}`, 'student', 'I want to practise numbers 5'),
+      message(studentMessageId, 'student', 'I want to practise numbers 5'),
       message('a-1', 'assistant', 'Off to Numbers 5.', { unitId: NUMBERS.unitId }),
     ])
     await act(async () => finish())
