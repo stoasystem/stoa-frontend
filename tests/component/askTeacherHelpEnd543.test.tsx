@@ -21,48 +21,25 @@ import { I18nextProvider } from 'react-i18next'
 import { MemoryRouter, Route, Routes, useParams } from 'react-router-dom'
 import { afterAll, afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { AskHost } from '@/features/ask/AskHost'
+import { AskServerProvider } from '@/features/ask/server/askServer'
 import i18n from '@/i18n'
-import { ApiError, apiErrorFromBody } from '@/services/api/httpClient'
+import { apiErrorFromBody } from '@/services/api/httpClient'
 import { resetAsk } from '@/store/askStore'
 import { type CurrentUser, useAuthStore } from '@/store/authStore'
 import type { ChatMessage, Conversation } from '@/types/chat'
 import { isEndedHelpRequest, isWithdrawableHelpRequest, type TeacherHelpRequest, type TeacherHelpStatus } from '@/types/teacherHelp'
+import { createFakeAskServer, type FakeAskServer } from '../fakes/askServer'
 
-vi.mock('@/services/analytics/analyticsClient', () => ({ trackEvent: vi.fn() }))
-vi.mock('@/services/chat/chatApi', () => ({
-  getConversations: vi.fn(),
-  getConversation: vi.fn(),
-  createConversation: vi.fn(),
-}))
-vi.mock('@/services/chat/chatStreamApi', () => ({
-  streamConversationMessage: vi.fn(),
-  getGenerationProgress: vi.fn(),
-}))
-vi.mock('@/services/teacherHelp/teacherHelpApi', () => ({
-  getTeacherAvailability: vi.fn(),
-  getTeacherHelpRequest: vi.fn(),
-  createTeacherHelpRequest: vi.fn(),
-  withdrawTeacherHelpRequest: vi.fn(),
-}))
-vi.mock('@/services/student/studentApi', () => ({
-  getStudentProfile: vi.fn(async () => ({ grade: '8', primarySubjects: ['math'] })),
-}))
-vi.mock('@/services/learning/memoryApi', () => ({
-  getMyMemorySummary: vi.fn(async () => ({ recommendations: [], weakTopics: [] })),
-}))
+/** The server behind Ask, in memory (#571): c1 with its answer, and each test's request for a teacher. */
+let server: FakeAskServer
+let availabilityMock: FakeAskServer['teacherHelp']['getTeacherAvailability']
+let withdrawMock: FakeAskServer['teacherHelp']['withdrawTeacherHelpRequest']
+let requestHelpMock: FakeAskServer['teacherHelp']['createTeacherHelpRequest']
 
-import { getConversation, getConversations } from '@/services/chat/chatApi'
-import {
-  createTeacherHelpRequest,
-  getTeacherAvailability,
-  getTeacherHelpRequest,
-  withdrawTeacherHelpRequest,
-} from '@/services/teacherHelp/teacherHelpApi'
-
-const availabilityMock = vi.mocked(getTeacherAvailability)
-const helpMock = vi.mocked(getTeacherHelpRequest)
-const withdrawMock = vi.mocked(withdrawTeacherHelpRequest)
-const requestHelpMock = vi.mocked(createTeacherHelpRequest)
+/** The conversation's request for a teacher, as the server reports it from now on. */
+function helpIs(request: TeacherHelpRequest) {
+  server.seed({ helpRequests: [request] })
+}
 
 const LANGUAGES = ['en', 'de', 'fr', 'it'] as const
 const ENDED: TeacherHelpStatus[] = ['resolved', 'cancelled', 'withdrawn', 'expired']
@@ -119,10 +96,12 @@ function openAsk() {
     <I18nextProvider i18n={i18n}>
       <QueryClientProvider client={client}>
         <MemoryRouter initialEntries={['/ask/c1']}>
-          <Routes>
-            <Route path="/ask/:id" element={<RoutedAsk />} />
-            <Route path="/ask" element={<RoutedAsk />} />
-          </Routes>
+          <AskServerProvider value={server}>
+            <Routes>
+              <Route path="/ask/:id" element={<RoutedAsk />} />
+              <Route path="/ask" element={<RoutedAsk />} />
+            </Routes>
+          </AskServerProvider>
         </MemoryRouter>
       </QueryClientProvider>
     </I18nextProvider>,
@@ -157,13 +136,19 @@ beforeEach(async () => {
     isAuthenticated: true,
   })
   resetAsk()
-  vi.mocked(getConversations).mockResolvedValue({ items: [] })
-  vi.mocked(getConversation).mockResolvedValue(conversation())
-  availabilityMock.mockResolvedValue({
+  // Nothing listed, and c1 never escalated unless a test says so: the fake's own defaults.
+  server = createFakeAskServer()
+  ;({
+    getTeacherAvailability: availabilityMock,
+    withdrawTeacherHelpRequest: withdrawMock,
+    createTeacherHelpRequest: requestHelpMock,
+  } = server.teacherHelp)
+  server.seed({ conversations: [conversation()] })
+  server.availability = {
     online: true,
     availableTeachers: 2,
     teacherSupport: { canRequest: true, remainingCases: 5, weeklyCases: 6, blockedReason: null, resetsAt: null },
-  })
+  }
 })
 
 const originalMatchMedia = window.matchMedia
@@ -190,11 +175,8 @@ describe('withdrawing a request no teacher has taken (#543)', () => {
         'ask.help.withdraw.errors.closed',
         'ask.help.withdraw.errors.unavailable',
       ])
-      helpMock.mockResolvedValue(help('pending'))
-      withdrawMock.mockImplementation(async () => {
-        helpMock.mockResolvedValue(help('withdrawn'))
-        return help('withdrawn')
-      })
+      // Taken back as withdrawn, and read back so: the fake's own answer.
+      helpIs(help('pending'))
       const ask = openAsk()
       const before = await card(ask)
 
@@ -219,13 +201,13 @@ describe('withdrawing a request no teacher has taken (#543)', () => {
   }
 
   it.each(['pending', 'waiting_no_teacher', 'assigned'])('is offered while the request is %s', async (status) => {
-    helpMock.mockResolvedValue(help(status))
+    helpIs(help(status))
     const ask = openAsk()
     expect(await (await card(ask)).findByRole('button', { name: 'Withdraw request' })).toBeInTheDocument()
   })
 
   it.each(['in_progress', ...ENDED, 'reassigning'])('is not offered while the request is %s', async (status) => {
-    helpMock.mockResolvedValue(help(status))
+    helpIs(help(status))
     const ask = openAsk()
     const shown = await card(ask)
     await answered(ask)
@@ -233,7 +215,7 @@ describe('withdrawing a request no teacher has taken (#543)', () => {
   })
 
   it('keeps the request when the student changes their mind, with the keyboard back where it was', async () => {
-    helpMock.mockResolvedValue(help('pending'))
+    helpIs(help('pending'))
     const ask = openAsk()
     const shown = await card(ask)
     const action = await shown.findByRole('button', { name: 'Withdraw request' })
@@ -246,14 +228,13 @@ describe('withdrawing a request no teacher has taken (#543)', () => {
   })
 
   it('says so when a teacher took it first, and shows the request as it now stands', async () => {
-    helpMock.mockResolvedValue(help('assigned'))
-    withdrawMock.mockImplementation(async () => {
-      helpMock.mockResolvedValue(help('in_progress'))
-      throw refusal(409, { code: 'teacher_help_already_accepted' })
-    })
+    helpIs(help('assigned'))
     const ask = openAsk()
     const shown = await card(ask)
     await userEvent.click(await shown.findByRole('button', { name: 'Withdraw request' }))
+    // Meanwhile a teacher takes it, so the withdrawal is refused.
+    helpIs(help('in_progress'))
+    server.refuseNextWith(refusal(409, { code: 'teacher_help_already_accepted' }), 'withdrawTeacherHelpRequest')
     await userEvent.click(shown.getByRole('button', { name: 'Withdraw' }))
 
     expect(await shown.findByRole('alert')).toHaveTextContent(
@@ -264,14 +245,13 @@ describe('withdrawing a request no teacher has taken (#543)', () => {
   })
 
   it('says so when the request had already ended', async () => {
-    helpMock.mockResolvedValue(help('pending'))
-    withdrawMock.mockImplementation(async () => {
-      helpMock.mockResolvedValue(help('expired'))
-      throw refusal(409, { code: 'teacher_help_request_closed' })
-    })
+    helpIs(help('pending'))
     const ask = openAsk()
     const shown = await card(ask)
     await userEvent.click(await shown.findByRole('button', { name: 'Withdraw request' }))
+    // Meanwhile it expires, so the withdrawal is refused.
+    helpIs(help('expired'))
+    server.refuseNextWith(refusal(409, { code: 'teacher_help_request_closed' }), 'withdrawTeacherHelpRequest')
     await userEvent.click(shown.getByRole('button', { name: 'Withdraw' }))
 
     expect(await shown.findByRole('alert')).toHaveTextContent('This request has already ended.')
@@ -279,13 +259,14 @@ describe('withdrawing a request no teacher has taken (#543)', () => {
   })
 
   it('asks to try again when withdrawing is briefly unavailable, and the second try goes through', async () => {
-    helpMock.mockResolvedValue(help('pending'))
-    withdrawMock.mockRejectedValueOnce(
+    helpIs(help('pending'))
+    server.refuseNextWith(
       refusal(503, {
         code: 'teacher_help_withdrawal_unavailable',
         message: 'Withdrawing is briefly unavailable. Please try again.',
         action: 'retry_same_case',
       }),
+      'withdrawTeacherHelpRequest',
     )
     const ask = openAsk()
     const shown = await card(ask)
@@ -295,11 +276,7 @@ describe('withdrawing a request no teacher has taken (#543)', () => {
     expect(await shown.findByRole('alert')).toHaveTextContent(
       'Withdrawing is briefly unavailable. Please try again in a moment.',
     )
-    // Still waiting, and the question is still there to answer again.
-    withdrawMock.mockImplementation(async () => {
-      helpMock.mockResolvedValue(help('withdrawn'))
-      return help('withdrawn')
-    })
+    // Still waiting, and the question is still there to answer again; this time it is taken back.
     await userEvent.click(shown.getByRole('button', { name: 'Withdraw' }))
     expect(await shown.findByText('You withdrew the request')).toBeInTheDocument()
     expect(withdrawMock).toHaveBeenCalledTimes(2)
@@ -313,7 +290,7 @@ describe('one request per conversation (#544)', () => {
     it.each(ENDED)(`offers no "Ask a teacher" once the request is %s, and points to a new conversation (${language})`, async (status) => {
       await i18n.changeLanguage(language)
       ownWords(language, [`ask.help.body.${status}`, 'ask.help.newConversation'])
-      helpMock.mockResolvedValue(help(status))
+      helpIs(help(status))
       const ask = openAsk()
       const shown = await card(ask)
       await answered(ask)
@@ -325,7 +302,7 @@ describe('one request per conversation (#544)', () => {
   }
 
   it.each(ENDED)('no longer tells an English student to ask again under an answer once it is %s', async (status) => {
-    helpMock.mockResolvedValue(help(status))
+    helpIs(help(status))
     const ask = openAsk()
     const shown = await card(ask)
     const said = shown.getByText(tr(`ask.help.body.${status}`)).textContent ?? ''
@@ -334,7 +311,7 @@ describe('one request per conversation (#544)', () => {
   })
 
   it('goes back to the list, where the next question starts a new conversation', async () => {
-    helpMock.mockResolvedValue(help('resolved'))
+    helpIs(help('resolved'))
     const ask = openAsk()
     const shown = await card(ask)
     await userEvent.click(shown.getByRole('button', { name: 'New conversation' }))
@@ -345,7 +322,7 @@ describe('one request per conversation (#544)', () => {
   })
 
   it('offers no "Ask a teacher" while the request is still open either, nor a new conversation', async () => {
-    helpMock.mockResolvedValue(help('pending'))
+    helpIs(help('pending'))
     const ask = openAsk()
     const shown = await card(ask)
     await answered(ask)
@@ -354,8 +331,7 @@ describe('one request per conversation (#544)', () => {
   })
 
   it('still offers "Ask a teacher" in a conversation that never had a request', async () => {
-    helpMock.mockRejectedValue(new ApiError('never escalated', { status: 404 }))
-    requestHelpMock.mockResolvedValue(help('pending'))
+    // Never escalated, and a request asked for is pending: the fake's own answers.
     const ask = openAsk()
     await userEvent.click(await ask.findByRole('button', { name: 'Ask a teacher' }))
     await waitFor(() => expect(requestHelpMock).toHaveBeenCalledWith({ conversationId: 'c1' }))

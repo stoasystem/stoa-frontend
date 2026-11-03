@@ -184,6 +184,20 @@ describe('availability, profile and memory summary', () => {
     expect(await server.teacherHelp.getTeacherAvailability()).toEqual({ online: false, availableTeachers: 0, nextWindow: '16:00' })
   })
 
+  it('makes a request for a teacher with what it was given, and the defaults past that', async () => {
+    const server = createFakeAskServer()
+    server.seed({ newHelpRequests: [{ requestId: 'r1', createdAt: UPDATED }] })
+
+    expect(await server.teacherHelp.createTeacherHelpRequest({ conversationId: 'c1' })).toEqual({
+      requestId: 'r1',
+      conversationId: 'c1',
+      status: 'pending',
+      createdAt: UPDATED,
+    })
+    expect((await server.teacherHelp.getTeacherHelpRequest('c1')).requestId).toBe('r1')
+    expect((await server.teacherHelp.createTeacherHelpRequest({ conversationId: 'c2' })).requestId).toBe('request-2')
+  })
+
   it('takes a request back, as withdrawn', async () => {
     const server = createFakeAskServer()
     await server.teacherHelp.createTeacherHelpRequest({ conversationId: 'c1' })

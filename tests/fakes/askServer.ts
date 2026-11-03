@@ -75,6 +75,8 @@ export type AskServerSeed = {
   generations?: GenerationRecord[]
   /** The ids the next conversations made are given, in order. */
   newConversationIds?: string[]
+  /** What the next requests for a teacher are made with (an id, a time), in order, over the defaults. */
+  newHelpRequests?: Array<Partial<TeacherHelpRequest>>
 }
 
 /** How one message sent is answered. */
@@ -119,6 +121,7 @@ export function createFakeAskServer(): FakeAskServer {
   const helpRequests = new Map<string, TeacherHelpRequest>()
   const generations = new Map<string, GenerationState & { idempotencyKey: string }>()
   const newConversationIds: string[] = []
+  const newHelpRequests: Array<Partial<TeacherHelpRequest>> = []
   const answers: StreamAnswer[] = []
   const refusals = new Map<AskRequest, unknown[]>()
   const holds = new Map<AskRequest, Array<Promise<void>>>()
@@ -204,9 +207,10 @@ export function createFakeAskServer(): FakeAskServer {
         asked += 1
         const help: TeacherHelpRequest = {
           requestId: `request-${asked}`,
+          createdAt: new Date().toISOString(),
+          ...newHelpRequests.shift(),
           conversationId,
           status: 'pending',
-          createdAt: new Date().toISOString(),
         }
         helpRequests.set(conversationId, help)
         return help
@@ -272,6 +276,7 @@ export function createFakeAskServer(): FakeAskServer {
       for (const help of data.helpRequests ?? []) helpRequests.set(help.conversationId, help)
       for (const generation of data.generations ?? []) record(generation)
       newConversationIds.push(...(data.newConversationIds ?? []))
+      newHelpRequests.push(...(data.newHelpRequests ?? []))
     },
     answerWith(...next) {
       answers.push(...next)
