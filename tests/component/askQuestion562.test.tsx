@@ -24,8 +24,6 @@ import { clearPendingMessages, readPendingMessage, sendingFor } from '@/lib/pend
 import { ApiError } from '@/services/api/httpClient'
 import type { Conversation, CreateConversationRequest } from '@/types/chat'
 
-vi.mock('@/services/analytics/analyticsClient', () => ({ trackEvent: vi.fn() }))
-
 const practice = { context: { unitId: 'u', lessonId: 'l', challengeId: 'ch-1' } }
 const exerciseQuote = () => makeQuote('2x + 3 = 7', { kind: 'challenge', id: 'ch-1' })
 const wireQuote = { text: '2x + 3 = 7', source: { kind: 'challenge', id: 'ch-1' } }
