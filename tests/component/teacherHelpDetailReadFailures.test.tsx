@@ -17,7 +17,9 @@ import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { queryClient as appQueryClient } from '@/app/query/queryClient'
 import { AiTeacherToolsPanel } from '@/components/teacher/AiTeacherToolsPanel'
-import { TeacherReplyComposer } from '@/components/teacher/TeacherReplyComposer'
+import { TeacherReplyComposer } from '@/features/teacherReply/TeacherReplyComposer'
+import type { TeacherReplyAdapter } from '@/features/teacherReply/teacherReplyAdapter'
+import { useTeacherReply } from '@/features/teacherReply/useTeacherReply'
 import { useTeacherHelpRequestDetailQuery } from '@/hooks/teacher/useTeacherHelpRequestDetailQuery'
 import i18n from '@/i18n'
 import de from '@/i18n/locales/de/teacher.json'
@@ -28,6 +30,7 @@ import { TeacherHelpRequestDetailPage } from '@/pages/teacher/TeacherHelpRequest
 import { ApiError } from '@/services/api/httpClient'
 import * as teacherApi from '@/services/teacher/teacherApi'
 import { teacherQueryKeys } from '@/services/teacher/teacherQueryKeys'
+import type { TeacherHelpRequestNote } from '@/types/teacher'
 import type { TeacherHelpStatus } from '@/types/teacherHelp'
 
 vi.mock('@/layouts/DashboardLayout', () => ({
@@ -134,10 +137,18 @@ describe('T1: a read that fails while the teacher writes a reply', () => {
 })
 
 describe('T1: the reply draft outlives the composer', () => {
-  function Composer({ onSubmit = vi.fn() }: { onSubmit?: Parameters<typeof TeacherReplyComposer>[0]['onSubmit'] }) {
+  const server: TeacherReplyAdapter = { addNote: async () => ({ id: 'n1' }) as TeacherHelpRequestNote }
+
+  function ReplyBox({ requestId }: { requestId: string }) {
+    return <TeacherReplyComposer reply={useTeacherReply(requestId, { adapter: server })} />
+  }
+
+  function Composer({ requestId = 'r1' }: { requestId?: string }) {
     return (
       <I18nextProvider i18n={i18n}>
-        <TeacherReplyComposer isSubmitting={false} draftKey="r1" onSubmit={onSubmit} />
+        <QueryClientProvider client={new QueryClient()}>
+          <ReplyBox requestId={requestId} />
+        </QueryClientProvider>
       </I18nextProvider>
     )
   }
@@ -157,9 +168,10 @@ describe('T1: the reply draft outlives the composer', () => {
   })
 
   it('is forgotten once sent', async () => {
-    const first = render(<Composer onSubmit={(_content, _rich, onSuccess) => onSuccess()} />)
+    const first = render(<Composer />)
     await userEvent.type(screen.getByLabelText(REPLY), 'Gesendet')
     await userEvent.click(screen.getByRole('button', { name: SEND }))
+    await waitFor(() => expect(screen.getByLabelText(REPLY)).toHaveValue(''))
     first.unmount()
 
     render(<Composer />)
@@ -172,11 +184,7 @@ describe('T1: the reply draft outlives the composer', () => {
     await userEvent.type(screen.getByLabelText(REPLY), 'Nur für r1')
     first.unmount()
 
-    render(
-      <I18nextProvider i18n={i18n}>
-        <TeacherReplyComposer isSubmitting={false} draftKey="r2" onSubmit={vi.fn()} />
-      </I18nextProvider>,
-    )
+    render(<Composer requestId="r2" />)
     expect(screen.getByLabelText(REPLY)).toHaveValue('')
   })
 })

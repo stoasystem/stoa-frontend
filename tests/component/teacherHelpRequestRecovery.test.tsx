@@ -96,6 +96,7 @@ describe('a request that moved on under the teacher (409)', () => {
     },
   )
 
+  // The reply's own refusal reaches the page as `reply.conflict` (#564).
   it('also reads it again when a reply is refused', async () => {
     vi.mocked(teacherApi.getTeacherHelpRequestDetail).mockResolvedValue(detail('pending'))
     vi.mocked(teacherApi.addTeacherHelpRequestNote).mockRejectedValue(
