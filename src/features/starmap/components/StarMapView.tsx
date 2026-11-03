@@ -42,7 +42,7 @@ import { StarSheet } from '@/features/starmap/components/StarSheet'
 import { StarGlyph } from '@/features/starmap/components/StarGlyph'
 import { nebulaLabel, starLabel } from '@/features/starmap/components/labels'
 import { nebulaLinks } from '@/features/starmap/model/links'
-import { animationFrameScheduler, StarMapEngine, type FrameScheduler, type NebulaDiscOnScreen, type StarOnScreen, type VisibleStar, type ZoomState } from '@/features/starmap/engine/starMapEngine'
+import { animationFrameScheduler, StarMapEngine, type FoundPath, type FrameScheduler, type NebulaDiscOnScreen, type StarOnScreen, type VisibleStar, type ZoomState } from '@/features/starmap/engine/starMapEngine'
 import { LEARNING_STATES, nebulaCounts, orderedNebulae, orderedStars, subjectOfNebula, type StarMap } from '@/features/starmap/model/starMap'
 import { usePrefersReducedMotion } from '@/features/starmap/motion/usePrefersReducedMotion'
 import { createRenderer } from '@/features/starmap/render/createRenderer'
@@ -101,6 +101,8 @@ export type StarMapViewProps = {
   /** Fixture-backed route: label sample progress and keep chapter actions local. */
   demo?: boolean
   target: LayerTarget
+  /** A path to a star found from Ask (#489), drawn over the lines; null or absent: none. */
+  path?: FoundPath | null
   /** Go to another layer's route. */
   onNavigate: (target: LayerTarget) => void
   /** Where a choice made on the map lands, asked before its flight takes off (#145 C6: a star waiting for its lighting, its nebula seen whole). */
@@ -201,7 +203,7 @@ function LegendHow({ t }: { t: UseTranslationResponse<'starmap', undefined>['t']
 const OVERLAY_LINK =
   'inline-flex min-h-11 items-center text-on-sky hover:opacity-70 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring'
 
-export function StarMapView({ map, demo = false, target, onNavigate, land, onFirstFrame, onCentreGalaxy, foveate, scheduler, createRendererFor, overlay }: StarMapViewProps) {
+export function StarMapView({ map, demo = false, target, path, onNavigate, land, onFirstFrame, onCentreGalaxy, foveate, scheduler, createRendererFor, overlay }: StarMapViewProps) {
   const { t, i18n } = useTranslation('starmap')
   // The map's own links keep the query (`?points=`, the dev switches), as its
   // navigation does: a switch must hand the engine the same sky (#123).
@@ -434,6 +436,11 @@ export function StarMapView({ map, demo = false, target, onNavigate, land, onFir
   useEffect(() => {
     engineRef.current?.setReducedMotion(reducedMotion)
   }, [reducedMotion])
+
+  // A path found from Ask (#489): drawn over the lines while the route has it.
+  useEffect(() => {
+    engineRef.current?.setPath(path ?? null)
+  }, [path])
 
   // Say where the student is now, after they move (not on arrival).
   const firstTarget = useRef(true)

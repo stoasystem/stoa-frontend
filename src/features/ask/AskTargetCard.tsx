@@ -2,6 +2,7 @@ import { useId } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link, useLocation } from 'react-router-dom'
 import { ASK_STAR_LINK_CLASS, AskStarFrame } from '@/features/ask/AskStarFrame'
+import type { FindStarArrival } from '@/features/starmap/findStar/useFindStar'
 import { subjectOfNebula } from '@/features/starmap/model/starMap'
 import { DEFAULT_SUBJECT_ID, DEMO_STAR_COUNT, fixtureSizeFrom, useStarMap } from '@/features/starmap/useStarMap'
 import { pathForTarget, type StarCardFocus } from '@/features/starmap/view/layers'
@@ -14,6 +15,10 @@ import { useAskStore } from '@/store/askStore'
  * the star and opens its card, which takes the focus -- the star's own route,
  * so a star of another subject, in a dimmed galaxy or already lit, is reached
  * the same way.
+ *
+ * The link also asks the map to find the star (#489, `FindStarArrival`): with
+ * stars missing on the way, the map shows the path to it and Murmi's
+ * suggestion instead of the card (`starmap/findStar/useFindStar.ts`).
  *
  * The star is looked up in the student's whole sky. One the sky does not
  * hold (not read yet, could not be read, or not drawn as a star) gets no
@@ -32,7 +37,7 @@ export function AskTargetCard({ unitId }: { unitId: string }) {
     map.subjects.find((subject) => subject.subjectId === subjectId)?.name,
     map.nebulae.find((nebula) => nebula.topicId === star.nebulaId)?.name,
   ].filter(Boolean).join(' · ')
-  const arrival: StarCardFocus = { focusStarCard: star.unitId }
+  const arrival: StarCardFocus & FindStarArrival = { focusStarCard: star.unitId, findStar: { unitId: star.unitId } }
 
   return (
     <AskStarFrame state={star.state} progress={star.progress} data-ask-target={star.unitId} aria-label={t('ask.target.label', { name: star.name })}>

@@ -8,6 +8,12 @@
  * dimmed one included, lit or not -- and opens its card, which takes the
  * focus. An answer without a star, a failed answer, and a star the sky does
  * not hold (or a sky that could not be read) show nothing more.
+ *
+ * Since #489 that is a star with nothing missing on the way (lit, or its
+ * prerequisites all lit); one with stars missing shows the path to it
+ * instead (`findStarPath489.test.tsx`). Refraction is such a star (sine and
+ * cosine is missing), so the flight to a card follows a physics star in
+ * progress instead.
  */
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { act, render, screen, waitFor, within } from '@testing-library/react'
@@ -45,6 +51,8 @@ const litStar = () => sky().stars.find((star) => star.state === 'lit' && subject
 /** The demo sky's physics star (another galaxy than maths, where the map opens) and a maths one. */
 const REFRACTION = { unitId: 'demo-refraction', name: 'Refraction', path: '/map/physics/optics/demo-refraction' }
 const NUMBERS = { unitId: 'numbers-5', name: 'Numbers 5' }
+/** A physics star in progress with nothing missing on the way (#489): finding it opens its card. */
+const MECHANICS = { unitId: 'mechanics-57', name: 'Mechanics 57', path: '/map/physics/mechanics/mechanics-57' }
 
 const cards = () => screen.queryAllByRole('region').filter((region) => region.hasAttribute('data-ask-target'))
 const showLink = (card: HTMLElement) => within(card).getByRole('link', { name: i18n.t('chat:ask.target.show') })
@@ -274,7 +282,7 @@ describe('the card under an answer that found a star (#487)', () => {
     ['opened on the map', '/map/math'],
     ['opened at /ask/c-1', '/ask/c-1'],
   ])('closes Ask (%s) and flies to the star in another galaxy, its card open and focused', async (_, at) => {
-    readBack(answered(REFRACTION.unitId))
+    readBack(answered(MECHANICS.unitId))
     // On the map, Ask is open over it on the conversation, as the docked composer leaves it.
     if (at.startsWith('/map')) useAskStore.getState().select('student-a', 'c-1')
     mount(at)
@@ -284,8 +292,8 @@ describe('the card under an answer that found a star (#487)', () => {
     await follow()
 
     // The star's own route, under its own galaxy: the map flies there and opens its card.
-    expect(screen.getByTestId('where')).toHaveTextContent(REFRACTION.path)
-    await expectStarCardFocused(REFRACTION.name)
+    expect(screen.getByTestId('where')).toHaveTextContent(MECHANICS.path)
+    await expectStarCardFocused(MECHANICS.name)
     expect(document.querySelector('[data-ask-surface]')).toBeNull()
   })
 

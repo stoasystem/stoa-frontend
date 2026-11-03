@@ -68,6 +68,7 @@ import {
 import { createInertia, type Inertia } from '@/features/starmap/view/inertia'
 import { createStarDrag, linkedStars, stepStarDrag, type StarDrag } from '@/features/starmap/view/starDrag'
 import { shortestDx } from '@/features/starmap/render/links'
+import type { FindStarPath } from '@/features/starmap/model/missingStars'
 import { nebulaShade } from '@/features/starmap/render/galaxy'
 import { framedView, hitsNebulaName, interpolateView, sameTarget, starPickRadius, viewForTarget, wholeNebulaView, type LayerTarget } from '@/features/starmap/view/layers'
 import {
@@ -131,6 +132,9 @@ export type ZoomState = { starPx: number; band: ZoomBand; atMin: boolean; atMax:
  * closed, zoomed out past it).
  */
 export type ChoiceMotion = 'fly' | 'stay'
+
+/** A path to a star found from Ask (#489, `model/missingStars.ts`): drawn over the lines while it is set. */
+export type FoundPath = Pick<FindStarPath, 'target' | 'missing' | 'edges'>
 
 export type StarMapEngineOptions = {
   renderer: StarMapRenderer
@@ -250,9 +254,14 @@ function stateIndex(star: Star): number {
   return index < 0 ? STAR_LOOKS.indexOf('ready') : index
 }
 
-/** Whether `next` only lets a choice of `previous` go: back to the galaxy, or the card closed on its own nebula. */
+/**
+ * Whether `next` only lets a choice of `previous` go: back to the galaxy, or
+ * the card closed on its own nebula. On the galaxy, a framing let go (a path
+ * found and waved away, #489) leaves the camera where it is too; only one
+ * asked to fly (`fly`) moves it.
+ */
 function letsGo(previous: LayerTarget, next: LayerTarget): boolean {
-  if (next.layer === 'map') return previous.layer !== 'map'
+  if (next.layer === 'map') return previous.layer !== 'map' || !next.fly
   return next.layer === 'nebula' && previous.layer === 'star' && previous.nebulaId === next.nebulaId
 }
 
@@ -354,6 +363,10 @@ export class StarMapEngine {
   /** The star under the mouse, where single stars can be picked (#138 B2: its name shows), or -1. */
   private hoveredStar = -1
   private pressedStar = -1
+  /** The path to a star found from Ask (#489), by unit id, and how far it is drawn in (eased); kept while it eases out. */
+  private path: FoundPath | null = null
+  private pathShown: FoundPath | null = null
+  private pathAmount = 0
 
   private visibleKey = ''
   private emittedOnce = false
@@ -399,7 +412,8 @@ export class StarMapEngine {
         this.cancelGestures()
         this.target = target
         this.released = ''
-        this.panTo(this.viewFor(target), this.policy.layerMs * GALAXY_FLIGHT)
+        // A framing asked for (a path found in another galaxy, #489) takes as long as it says.
+        this.panTo(this.viewFor(target), target.flightMs ?? this.policy.layerMs * GALAXY_FLIGHT)
         this.centred = map.subject.subjectId
       }
       this.invalidate()
@@ -651,6 +665,18 @@ export class StarMapEngine {
 
   setTheme(theme: StarMapTheme): void {
     this.renderer.setTheme(theme)
+    this.invalidate()
+  }
+
+  /**
+   * The path to a star found from Ask (#489), or null once it is gone: its
+   * lines and the glow round each missing star, over every other line, which
+   * steps back as a chosen star's surroundings do. Eased in and out.
+   */
+  setPath(path: FoundPath | null): void {
+    if (path === this.path) return
+    this.path = path
+    if (path) this.pathShown = path
     this.invalidate()
   }
 
@@ -1549,6 +1575,11 @@ export class StarMapEngine {
     // The one exception: the recommended star is the student's way in, so it
     // is drawn, and breathes, even inside a blurred nebula -- one sprite.
     for (const i of scene.recommendations ?? []) this.starAlpha[i] = 1
+    // So are the stars of a path found (#489): its lines lead to them.
+    for (const unitId of this.pathStars()) {
+      const i = this.starIndex.get(unitId)
+      if (i !== undefined) this.starAlpha[i] = 1
+    }
     if (this.applyDrag(dt)) {
       moving = true
       keepGoing = true
@@ -1559,7 +1590,10 @@ export class StarMapEngine {
     const approach = (value: number, to: number) => (Math.abs(to - value) < 0.002 ? to : value + (to - value) * ease)
     this.chosenAmount = approach(this.chosenAmount, chosen >= 0 ? 1 : 0)
     this.starAmount = approach(this.starAmount, target.layer === 'star' ? 1 : 0)
-    let easing = (this.chosenAmount > 0 && this.chosenAmount < 1) || (this.starAmount > 0 && this.starAmount < 1)
+    this.pathAmount = approach(this.pathAmount, this.path ? 1 : 0)
+    if (this.pathAmount === 0 && !this.path) this.pathShown = null
+    let easing =
+      (this.chosenAmount > 0 && this.chosenAmount < 1) || (this.starAmount > 0 && this.starAmount < 1) || (this.pathAmount > 0 && this.pathAmount < 1)
     for (let n = 0; n < this.nebulaLift.length; n += 1) {
       this.nebulaLift[n] = approach(this.nebulaLift[n], n === chosen ? 1 : 0)
       if (this.nebulaLift[n] > 0 && this.nebulaLift[n] < 1) easing = true
@@ -1649,6 +1683,27 @@ export class StarMapEngine {
     return true
   }
 
+  /** The stars of the path drawn now (#489): the target and the missing ones. */
+  private pathStars(): readonly string[] {
+    const path = this.path ?? this.pathShown
+    return path ? [path.target, ...path.missing] : []
+  }
+
+  /** The path drawn this frame, by star index (#489); absent once it has eased out, or with no star of it on this map. */
+  private pathFrame(): SceneFrame['path'] {
+    const path = this.path ?? this.pathShown
+    if (!path || this.pathAmount <= 0) return undefined
+    const target = this.starIndex.get(path.target)
+    if (target === undefined) return undefined
+    const missing = path.missing.flatMap((unitId) => this.starIndex.get(unitId) ?? [])
+    const edges = path.edges.flatMap(({ from, to }) => {
+      const a = this.starIndex.get(from)
+      const b = this.starIndex.get(to)
+      return a === undefined || b === undefined || a === b ? [] : [{ from: a, to: b }]
+    })
+    return { target, missing, edges, amount: this.pathAmount }
+  }
+
   /** What the renderer draws this frame: every reveal a continuous function of the zoom (#134). */
   private frameState(
     t: { scale: number; ox: number; oy: number },
@@ -1728,6 +1783,7 @@ export class StarMapEngine {
         ? { star: this.drag.star, related: this.dragRelated, offsetX: this.dragX, offsetY: this.dragY, amount: this.drag.amount, grow: this.drag.grow }
         : undefined,
       showSkills: skillAlpha(starPx),
+      path: this.pathFrame(),
       crossfade,
       time: now,
       labelFadeMs: this.policy.inertia ? REVEAL.labelFadeMs : 0,

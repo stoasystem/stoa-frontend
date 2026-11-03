@@ -32,6 +32,12 @@
     "show": "Voir l’étoile suivante",
     "later": "Compris"
   },
+  "findStar": {
+    "suggest": "Je te propose d’apprendre d’abord {{name}}.",
+    "start": "Commencer {{name}}",
+    "quiz": "Teste-moi sur {{name}}",
+    "direct": "Apprendre {{name}} tout de suite"
+  },
   "help": {
     "open": "Comment fonctionne la carte du ciel",
     "close": "Fermer"

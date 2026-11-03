@@ -14,7 +14,7 @@ import { DRAG, panoramaDot, panoramaLook, ramp, reachFade, REVEAL, type Ramp } f
 import { createTileCache, nebulaStateKeys, tileKey, tileSizeFor, TILE_REACH, type TileCache } from '@/features/starmap/render/nebulaTiles'
 import { CLOUD_REACH, galaxyHazeAlpha, galaxyHazeBox, nebulaGlowAlpha, paintGalaxy, paintGalaxyHaze, paintNebulaCloud } from '@/features/starmap/render/galaxy'
 import { createGalaxyNames } from '@/features/starmap/render/galaxyNames'
-import { drawEdgeLabels, drawLinks, paintGlowSprite, type EdgeLabel, type EdgeStars } from '@/features/starmap/render/links'
+import { drawEdgeLabels, drawLinks, drawPath, paintGlowSprite, type EdgeLabel, type EdgeStars } from '@/features/starmap/render/links'
 import { sheetBand } from '@/features/starmap/view/layers'
 import { DRAW_THRESHOLD } from '@/features/starmap/view/foveation'
 import type { Viewport } from '@/features/starmap/view/camera'
@@ -737,6 +737,8 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
         wrap: frame.galaxyShift !== undefined,
         glowSprite,
       })
+      // A path found (#489): its own layer over the lines, under the stars.
+      stats.path = drawPath(ctx, scene, frame, colours, { segments }, { wrap: frame.galaxyShift !== undefined })
       // Where the edge names went this frame, for the page's own overlays (#145 keeps its labels clear of them).
       stats.edgeLabels = edgeLabels.map(({ text, box, alpha }) => ({ text, x0: box.x0, y0: box.y0, x1: box.x1, y1: box.y1, alpha }))
 
