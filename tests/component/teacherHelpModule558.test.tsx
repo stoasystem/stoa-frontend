@@ -1,6 +1,6 @@
 /**
  * #558: 真人求助 as the student sees it, driven through the module's own
- * interface (`useTeacherHelp`) against an in-memory teacher help server. What
+ * interface (`useTeacherHelp`) against the in-memory server behind Ask (#571). What
  * the student sees, how often the request and the conversation are read, what
  * a change of status reads again, asking and taking back, and every refusal
  * as the translation key the view says. The words themselves, and the wiring
@@ -10,59 +10,26 @@ import { QueryClient, QueryClientProvider, focusManager } from '@tanstack/react-
 import { act, cleanup, renderHook } from '@testing-library/react'
 import type { ReactNode } from 'react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { AskServerProvider } from '@/features/ask/server/askServer'
 import { useTeacherHelp } from '@/features/ask/teacherHelp/useTeacherHelp'
 import { useConversationsQuery } from '@/hooks/chat/useConversationsQuery'
+import { trackEvent } from '@/services/analytics/analyticsClient'
 import { ApiError } from '@/services/api/httpClient'
 import type { ChatMessage, StructuredAnswer } from '@/types/chat'
 import type { TeacherHelpRequest, TeacherHelpStatus, TeacherSupportStanding } from '@/types/teacherHelp'
+import { createFakeAskServer, type FakeAskServer } from '../fakes/askServer'
 
-vi.mock('@/services/analytics/analyticsClient', () => ({ trackEvent: vi.fn() }))
-vi.mock('@/services/chat/chatApi', () => ({
-  getConversations: vi.fn(),
-  getConversation: vi.fn(),
-}))
-vi.mock('@/services/teacherHelp/teacherHelpApi', () => ({
-  getTeacherHelpRequest: vi.fn(),
-  createTeacherHelpRequest: vi.fn(),
-  withdrawTeacherHelpRequest: vi.fn(),
-  getTeacherAvailability: vi.fn(),
-}))
-
-import { trackEvent } from '@/services/analytics/analyticsClient'
-import { getConversation, getConversations } from '@/services/chat/chatApi'
-import {
-  createTeacherHelpRequest,
-  getTeacherAvailability,
-  getTeacherHelpRequest,
-  withdrawTeacherHelpRequest,
-} from '@/services/teacherHelp/teacherHelpApi'
-
-const readHelp = vi.mocked(getTeacherHelpRequest)
-const askHelp = vi.mocked(createTeacherHelpRequest)
-const takeBack = vi.mocked(withdrawTeacherHelpRequest)
-const readAvailability = vi.mocked(getTeacherAvailability)
-const readConversation = vi.mocked(getConversation)
-const readList = vi.mocked(getConversations)
+/** The server behind Ask, in memory: one student's conversation c1, and its request for a teacher. */
+let server: FakeAskServer
+let readHelp: FakeAskServer['teacherHelp']['getTeacherHelpRequest']
+let askHelp: FakeAskServer['teacherHelp']['createTeacherHelpRequest']
+let takeBack: FakeAskServer['teacherHelp']['withdrawTeacherHelpRequest']
+let readAvailability: FakeAskServer['teacherHelp']['getTeacherAvailability']
+let readConversation: FakeAskServer['conversations']['getConversation']
+let readList: FakeAskServer['conversations']['getConversations']
 const track = vi.mocked(trackEvent)
 
 const UPDATED = '2026-11-02T10:00:00.000Z'
-
-/** The teacher help server, as far as one student's conversation c1 goes. */
-type Server = {
-  request: TeacherHelpRequest | null
-  online: boolean
-  support: TeacherSupportStanding | null
-  /** Thrown by the next reads of the request instead of answering. */
-  readFails: unknown
-  /** Thrown by asking instead of opening a request. */
-  askRefused: unknown
-  /** Asking waits for this before it answers. */
-  askHeld: Promise<void> | null
-  /** Thrown by taking back instead of withdrawing. */
-  withdrawRefused: unknown
-}
-
-let server: Server
 
 function help(status: TeacherHelpStatus | string, teacherName?: string): TeacherHelpRequest {
   return { requestId: 'r1', conversationId: 'c1', status: status as TeacherHelpStatus, createdAt: UPDATED, teacherName }
@@ -82,6 +49,19 @@ function answer(id: string, structured: Partial<StructuredAnswer> | null = null,
 
 const ANSWERED = [message('s1', 'student'), answer('a1')]
 
+/** The request for a teacher, as the server reports it from now on. */
+function helpIs(request: TeacherHelpRequest) {
+  server.seed({ helpRequests: [request] })
+}
+
+/** Whether a teacher is online, and the week's allowance, as the server answers them from now on. */
+function standing({ online = server.availability.online, support: teacherSupport = server.availability.teacherSupport ?? null }: {
+  online?: boolean
+  support?: TeacherSupportStanding | null
+}) {
+  server.availability = { online, availableTeachers: online ? 1 : 0, teacherSupport }
+}
+
 function refusal(status: number, code?: string) {
   return new ApiError('refused', { status, code })
 }
@@ -97,7 +77,9 @@ function openHelp({
   client = newClient(),
 }: { messages?: readonly ChatMessage[]; isStreaming?: boolean; client?: QueryClient } = {}) {
   const wrapper = ({ children }: { children: ReactNode }) => (
-    <QueryClientProvider client={client}>{children}</QueryClientProvider>
+    <QueryClientProvider client={client}>
+      <AskServerProvider value={server}>{children}</AskServerProvider>
+    </QueryClientProvider>
   )
   return renderHook(
     (props: { conversationId: string; messages: readonly ChatMessage[]; isStreaming: boolean }) => {
@@ -138,43 +120,20 @@ function cardOf(opened: Opened) {
 
 beforeEach(() => {
   vi.useFakeTimers()
-  server = {
-    request: null,
-    online: true,
-    support: support(),
-    readFails: null,
-    askRefused: null,
-    askHeld: null,
-    withdrawRefused: null,
-  }
-  readHelp.mockImplementation(async () => {
-    if (server.readFails) throw server.readFails
-    if (!server.request) throw refusal(404)
-    return server.request
-  })
-  askHelp.mockImplementation(async ({ conversationId }) => {
-    if (server.askHeld) await server.askHeld
-    if (server.askRefused) throw server.askRefused
-    server.request = { ...help('pending'), conversationId }
-    server.support = server.support && { ...server.support, remainingCases: server.support.remainingCases - 1 }
-    return server.request
-  })
-  takeBack.mockImplementation(async () => {
-    if (server.withdrawRefused) throw server.withdrawRefused
-    server.request = server.request && { ...server.request, status: 'withdrawn' }
-    server.support = server.support && { ...server.support, remainingCases: server.support.remainingCases + 1 }
-    return server.request as TeacherHelpRequest
-  })
-  readAvailability.mockImplementation(async () => ({
-    online: server.online,
-    availableTeachers: server.online ? 1 : 0,
-    teacherSupport: server.support,
-  }))
-  readConversation.mockImplementation(async () => ({
-    id: 'c1', title: 'Linear equations', subject: 'math', grade: '8', updatedAt: UPDATED, messages: ANSWERED,
-  }))
-  readList.mockResolvedValue({
-    items: [{ id: 'c1', title: 'Linear equations', subject: 'math', grade: '8', updatedAt: UPDATED }],
+  // c1 never escalated: the fake's own default. A request asked for is r1.
+  server = createFakeAskServer()
+  ;({
+    getTeacherHelpRequest: readHelp,
+    createTeacherHelpRequest: askHelp,
+    withdrawTeacherHelpRequest: takeBack,
+    getTeacherAvailability: readAvailability,
+  } = server.teacherHelp)
+  ;({ getConversation: readConversation, getConversations: readList } = server.conversations)
+  standing({ online: true, support: support() })
+  server.seed({
+    conversations: [{ id: 'c1', title: 'Linear equations', subject: 'math', grade: '8', updatedAt: UPDATED, messages: ANSWERED }],
+    list: [{ id: 'c1', title: 'Linear equations', subject: 'math', grade: '8', updatedAt: UPDATED }],
+    newHelpRequests: [{ requestId: 'r1', createdAt: UPDATED }],
   })
 })
 
@@ -204,7 +163,7 @@ describe('what the student sees', () => {
   })
 
   it('says when no teacher is online', async () => {
-    server.online = false
+    standing({ online: false })
     const opened = openHelp()
     await advance()
     expect(offerOf(opened).teachersOnline).toBe(false)
@@ -253,7 +212,7 @@ describe('what the student sees', () => {
     ['withdrawn', 'ended', false],
     ['expired', 'ended', false],
   ])('shows a request that is %s as %s', async (status, kind, withdrawable) => {
-    server.request = help(status, 'Frau Keller')
+    helpIs(help(status, 'Frau Keller'))
     const opened = openHelp()
     await advance()
     expect(opened.result.current.view).toEqual({
@@ -268,7 +227,7 @@ describe('what the student sees', () => {
   })
 
   it('keeps showing the card while an answer is written', async () => {
-    server.request = help('in_progress')
+    helpIs(help('in_progress'))
     const opened = openHelp({ isStreaming: true })
     await advance()
     expect(opened.result.current.view.kind).toBe('withTeacher')
@@ -290,18 +249,18 @@ describe('why "Ask a teacher" cannot be pressed', () => {
     [support({ canRequest: false, remainingCases: 0, blockedReason: 'teacher_support_allowance_exhausted' }), 'teacher.errors.allowanceExhausted'],
     [support({ canRequest: false, remainingCases: 0, blockedReason: null }), 'teacher.errors.allowanceExhausted'],
     [support({ canRequest: false, remainingCases: 0, blockedReason: 'teacher_support_not_included' }), 'teacher.errors.planDenied'],
-  ])('with the allowance %j it says %s', async (standing, key) => {
-    server.support = standing
+  ])('with the allowance %j it says %s', async (allowance, key) => {
+    standing({ support: allowance })
     const opened = openHelp()
     await advance()
     expect(offerOf(opened).blockedKey).toBe(key)
-    expect(offerOf(opened).support).toEqual(standing)
+    expect(offerOf(opened).support).toEqual(allowance)
   })
 })
 
 describe('how often it is read', () => {
   it('reads the request and the conversation every five seconds while a teacher has it', async () => {
-    server.request = help('in_progress')
+    helpIs(help('in_progress'))
     openHelp()
     await advance()
     expect(readHelp).toHaveBeenCalledTimes(1)
@@ -315,7 +274,7 @@ describe('how often it is read', () => {
   })
 
   it.each(['pending', 'waiting_no_teacher', 'reassigning'])('reads every fifteen seconds while it is %s', async (status) => {
-    server.request = help(status)
+    helpIs(help(status))
     openHelp()
     await advance()
 
@@ -329,7 +288,7 @@ describe('how often it is read', () => {
   })
 
   it.each(['resolved', 'cancelled', 'withdrawn', 'expired'])('stops reading once the request is %s', async (status) => {
-    server.request = help(status)
+    helpIs(help(status))
     openHelp()
     await advance()
     await advance(60_000)
@@ -338,11 +297,11 @@ describe('how often it is read', () => {
   })
 
   it('speeds up when a waiting request is offered to a teacher', async () => {
-    server.request = help('pending')
+    helpIs(help('pending'))
     const opened = openHelp()
     await advance()
 
-    server.request = help('assigned')
+    helpIs(help('assigned'))
     await advance(15_000)
     expect(readHelp).toHaveBeenCalledTimes(2)
     expect(opened.result.current.view.kind).toBe('assigned')
@@ -352,7 +311,7 @@ describe('how often it is read', () => {
   })
 
   it('reads nothing while the tab is hidden', async () => {
-    server.request = help('in_progress')
+    helpIs(help('in_progress'))
     openHelp()
     await advance()
 
@@ -380,7 +339,9 @@ describe('how often it is read', () => {
   })
 
   it('reads the request again when it opens again after any other failure', async () => {
-    server.readFails = refusal(503)
+    // Each reading of the request fails.
+    server.refuseNextWith(refusal(503), 'getTeacherHelpRequest')
+    server.refuseNextWith(refusal(503), 'getTeacherHelpRequest')
     const client = newClient(60_000)
     const first = openHelp({ client })
     await advance()
@@ -394,7 +355,7 @@ describe('how often it is read', () => {
 
 describe('a change of status', () => {
   it('reads the conversation and the list once more, and only then', async () => {
-    server.request = help('pending')
+    helpIs(help('pending'))
     const opened = openHelp()
     await advance()
     // The first reading of the request is no change.
@@ -412,11 +373,11 @@ describe('a change of status', () => {
   })
 
   it('reads the list once more when a poll finds the request taken', async () => {
-    server.request = help('pending')
+    helpIs(help('pending'))
     openHelp()
     await advance()
 
-    server.request = help('assigned')
+    helpIs(help('assigned'))
     await advance(15_000)
     expect(readList).toHaveBeenCalledTimes(2)
     await advance(5_000)
@@ -426,10 +387,7 @@ describe('a change of status', () => {
 
 describe('asking a teacher', () => {
   it('asks in this conversation, says so while it is on its way, then shows the request as the server has it', async () => {
-    let letGo = () => {}
-    server.askHeld = new Promise((resolve) => {
-      letGo = resolve
-    })
+    const letGo = server.holdNext('createTeacherHelpRequest')
     const opened = openHelp()
     await advance()
 
@@ -445,7 +403,8 @@ describe('asking a teacher', () => {
   })
 
   it('stays "on its way" while an answer is being written', async () => {
-    server.askHeld = new Promise(() => {})
+    // Never let go.
+    server.holdNext('createTeacherHelpRequest')
     const opened = openHelp()
     await advance()
     await press(opened, 'request')
@@ -463,7 +422,7 @@ describe('asking a teacher', () => {
   })
 
   it('offers nothing more in the conversation once asked (#544)', async () => {
-    server.request = help('resolved')
+    helpIs(help('resolved'))
     const opened = openHelp({ messages: [...ANSWERED, message('s2', 'student'), answer('a2', { suggestTeacher: true })] })
     await advance()
     expect(opened.result.current.view.kind).toBe('ended')
@@ -483,7 +442,7 @@ describe('asking a teacher', () => {
     [refusal(418), 'teacher.errors.generic'],
     [new Error('offline'), 'teacher.errors.generic'],
   ])('says a refusal (%s) as %s, counts it, and reads the allowance again', async (error, key) => {
-    server.askRefused = error
+    server.refuseNextWith(error, 'createTeacherHelpRequest')
     const opened = openHelp()
     await advance()
 
@@ -498,7 +457,7 @@ describe('asking a teacher', () => {
 
 describe('taking the request back (#543)', () => {
   it('withdraws, then reads the request and the week’s allowance back', async () => {
-    server.request = help('pending')
+    helpIs(help('pending'))
     const opened = openHelp()
     await advance()
     expect(readAvailability).toHaveBeenCalledTimes(1)
@@ -511,8 +470,9 @@ describe('taking the request back (#543)', () => {
   })
 
   it('says it is withdrawing while it is', async () => {
-    server.request = help('pending')
-    takeBack.mockImplementation(() => new Promise(() => {}))
+    helpIs(help('pending'))
+    // Never let go.
+    server.holdNext('withdrawTeacherHelpRequest')
     const opened = openHelp()
     await advance()
     await press(opened, 'withdraw')
@@ -529,8 +489,8 @@ describe('taking the request back (#543)', () => {
     [refusal(409, 'teacher_help_request_not_withdrawable'), 'ask.help.withdraw.errors.generic'],
     [new Error('offline'), 'ask.help.withdraw.errors.generic'],
   ])('says a refusal (%s) as %s, and reads the request and the allowance again', async (error, key) => {
-    server.request = help('assigned')
-    server.withdrawRefused = error
+    helpIs(help('assigned'))
+    server.refuseNextWith(error, 'withdrawTeacherHelpRequest')
     const opened = openHelp()
     await advance()
 
@@ -541,18 +501,18 @@ describe('taking the request back (#543)', () => {
   })
 
   it('keeps saying why while the request moves on, and forgets it once a withdrawal goes through', async () => {
-    server.request = help('assigned')
-    server.withdrawRefused = refusal(409, 'teacher_help_already_accepted')
+    helpIs(help('assigned'))
+    server.refuseNextWith(refusal(409, 'teacher_help_already_accepted'), 'withdrawTeacherHelpRequest')
     const opened = openHelp()
     await advance()
     await press(opened, 'withdraw')
 
-    server.request = help('in_progress')
+    helpIs(help('in_progress'))
     await advance(5_000)
     expect(opened.result.current.view.kind).toBe('withTeacher')
     expect(cardOf(opened).withdraw.errorKey).toBe('ask.help.withdraw.errors.accepted')
 
-    server.withdrawRefused = null
+    // Refused once only: the next withdrawal goes through.
     await press(opened, 'withdraw')
     expect(opened.result.current.view.kind).toBe('ended')
     expect(cardOf(opened).withdraw.errorKey).toBeNull()

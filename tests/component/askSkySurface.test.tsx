@@ -20,41 +20,14 @@ import { MemoryRouter } from 'react-router-dom'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { AskHost } from '@/features/ask/AskHost'
 import { ASK_SURFACE_BACKGROUND } from '@/features/ask/askLayout'
+import { AskServerProvider } from '@/features/ask/server/askServer'
 import i18n from '@/i18n'
-import { ApiError } from '@/services/api/httpClient'
 import { resetAsk } from '@/store/askStore'
 import { type CurrentUser, useAuthStore } from '@/store/authStore'
+import { createFakeAskServer, type FakeAskServer } from '../fakes/askServer'
 
-vi.mock('@/services/analytics/analyticsClient', () => ({ trackEvent: vi.fn() }))
-vi.mock('@/services/chat/chatApi', () => ({
-  getConversations: vi.fn(async () => ({ items: [] })),
-  getConversation: vi.fn(async (id: string) => ({
-    id,
-    title: 'Linear equations',
-    subject: 'math',
-    grade: '8',
-    updatedAt: '2026-10-11T10:00:00.000Z',
-    messages: [],
-  })),
-  createConversation: vi.fn(),
-}))
-vi.mock('@/services/chat/chatStreamApi', () => ({
-  streamConversationMessage: vi.fn(),
-  getGenerationProgress: vi.fn(),
-}))
-vi.mock('@/services/teacherHelp/teacherHelpApi', () => ({
-  getTeacherAvailability: vi.fn(async () => ({ online: false, availableTeachers: 0 })),
-  getTeacherHelpRequest: vi.fn(async () => {
-    throw new ApiError('never escalated', { status: 404 })
-  }),
-  createTeacherHelpRequest: vi.fn(),
-}))
-vi.mock('@/services/student/studentApi', () => ({
-  getStudentProfile: vi.fn(async () => ({ grade: '8', primarySubjects: ['math'] })),
-}))
-vi.mock('@/services/learning/memoryApi', () => ({
-  getMyMemorySummary: vi.fn(async () => ({ recommendations: [], weakTopics: [] })),
-}))
+/** The server behind Ask, in memory (#571): c1 with no messages yet, and no teacher online. */
+let server: FakeAskServer
 
 // ---- the tokens, read where they are declared --------------------------
 
@@ -131,7 +104,9 @@ function openAsk() {
     <I18nextProvider i18n={i18n}>
       <QueryClientProvider client={client}>
         <MemoryRouter initialEntries={['/ask/c1']}>
-          <AskHost route={{ conversationId: 'c1' }} />
+          <AskServerProvider value={server}>
+            <AskHost route={{ conversationId: 'c1' }} />
+          </AskServerProvider>
         </MemoryRouter>
       </QueryClientProvider>
     </I18nextProvider>,
@@ -159,6 +134,14 @@ beforeEach(async () => {
     isAuthenticated: true,
   })
   resetAsk()
+  // Nothing listed, and c1 never escalated: the fake's own defaults.
+  server = createFakeAskServer()
+  server.availability = { online: false, availableTeachers: 0 }
+  server.seed({
+    conversations: [
+      { id: 'c1', title: 'Linear equations', subject: 'math', grade: '8', updatedAt: '2026-10-11T10:00:00.000Z', messages: [] },
+    ],
+  })
 })
 
 afterEach(() => {

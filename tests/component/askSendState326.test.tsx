@@ -10,58 +10,31 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { act, renderHook, waitFor } from '@testing-library/react'
 import type { ReactNode } from 'react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-
-vi.mock('@/services/analytics/analyticsClient', () => ({ trackEvent: vi.fn() }))
-
-vi.mock('@/services/chat/commandMessageIds', () => ({
-  commandMessageIds: vi.fn(async (conversationId: string, key: string) => ({
-    studentMessageId: `student:${conversationId}:${key}`,
-    assistantMessageId: `assistant:${conversationId}:${key}`,
-  })),
-}))
-
-vi.mock('@/services/chat/chatStreamApi', () => ({
-  streamConversationMessage: vi.fn(),
-  getGenerationProgress: vi.fn(),
-}))
-
-import {
-  getGenerationProgress,
-  streamConversationMessage,
-  type GenerationState,
-  type StreamOutcome,
-} from '@/services/chat/chatStreamApi'
 import { mergeWithServerMessages, SEND_REQUEST_LIMIT_MS, useStreamingChat } from '@/hooks/chat/useStreamingChat'
+import { AskServerProvider } from '@/features/ask/server/askServer'
 import { clearPendingMessages, FAILED_MESSAGE_KEY_PREFIX } from '@/lib/pendingChatMessages'
 import { chatQueryKeys } from '@/services/chat/chatQueryKeys'
+import { commandMessageIds } from '@/services/chat/commandMessageIds'
 import { useAuthStore } from '@/store/authStore'
 import type { Conversation } from '@/types/chat'
+import { createFakeAskServer, type FakeAskServer } from '../fakes/askServer'
 
-const mockedStream = vi.mocked(streamConversationMessage)
-const mockedProgress = vi.mocked(getGenerationProgress)
+/** The server behind Ask, in memory (#571): each test says how its messages are answered. */
+let server: FakeAskServer
+let mockedStream: FakeAskServer['stream']['streamConversationMessage']
+
+/** A send request that never ends, and ignores its signal; the command reads as running unless said otherwise. */
+const never = () => new Promise<never>(() => {})
 
 const ACCESS = 'stoa_tab_access_token'
 const REFRESH = 'stoa_tab_refresh_token'
 
-function state(overrides: Partial<GenerationState> = {}): GenerationState {
-  return {
-    conversationId: 'c1',
-    steps: [],
-    updatedAt: new Date(Date.now() + 60_000).toISOString(),
-    commandId: 'command-1',
-    attempt: 1,
-    status: null,
-    assistantMessageId: null,
-    failureCategory: null,
-    retryable: null,
-    ...overrides,
-  }
-}
-
 function setup(initial = 'c1') {
   const client = new QueryClient({ defaultOptions: { queries: { retry: false } } })
   const Wrapper = ({ children }: { children: ReactNode }) => (
-    <QueryClientProvider client={client}>{children}</QueryClientProvider>
+    <QueryClientProvider client={client}>
+      <AskServerProvider value={server}>{children}</AskServerProvider>
+    </QueryClientProvider>
   )
   const hook = renderHook(({ id }: { id: string | null }) => useStreamingChat(id), {
     wrapper: Wrapper,
@@ -80,8 +53,8 @@ function signIn(id = 'student-a') {
 }
 
 async function failOnce(result: Hook, content = 'Was ist 2 + 2?') {
-  mockedStream.mockRejectedValueOnce(new Error('Request failed with status code 503'))
-  mockedProgress.mockResolvedValue(state({ status: 'failed', failureCategory: 'deadline_exceeded', retryable: true }))
+  // Refused, and its command read back as failed, to be sent again under the same key.
+  server.answerWith({ refuse: new Error('Request failed with status code 503'), status: 'failed', retryable: true })
   act(() => {
     void result.current.sendStreamingMessage({ content })
   })
@@ -95,6 +68,8 @@ async function failOnce(result: Hook, content = 'Was ist 2 + 2?') {
 beforeEach(() => {
   vi.useFakeTimers({ shouldAdvanceTime: true })
   signIn()
+  server = createFakeAskServer()
+  mockedStream = server.stream.streamConversationMessage
 })
 
 afterEach(() => {
@@ -110,12 +85,8 @@ describe('S1: a session renewed while a question is asked', () => {
     sessionStorage.setItem(ACCESS, 'token-a')
     sessionStorage.setItem(REFRESH, 'refresh-a')
     let finish: () => void = () => {}
-    mockedStream.mockImplementationOnce(
-      () => new Promise<StreamOutcome>((resolve) => {
-        finish = () => resolve('streamed')
-      }),
-    )
-    mockedProgress.mockResolvedValue(state({ status: 'ai_running' }))
+    // Held open, the command running, until the answer is in.
+    server.answerWith({ until: new Promise<void>((resolve) => (finish = resolve)) })
     const { result } = setup()
     act(() => {
       void result.current.sendStreamingMessage({ content: 'Was ist eine Primzahl?' })
@@ -137,12 +108,8 @@ describe('S1: a session renewed while a question is asked', () => {
     sessionStorage.setItem(ACCESS, 'token-a')
     sessionStorage.setItem(REFRESH, 'refresh-a')
     let finish: () => void = () => {}
-    mockedStream.mockImplementationOnce(
-      () => new Promise<StreamOutcome>((resolve) => {
-        finish = () => resolve('streamed')
-      }),
-    )
-    mockedProgress.mockResolvedValue(state({ status: 'ai_running' }))
+    // Held open, the command running, until the answer is in.
+    server.answerWith({ until: new Promise<void>((resolve) => (finish = resolve)) })
     const { result } = setup()
     act(() => {
       void result.current.sendStreamingMessage({ content: "A's question" })
@@ -167,7 +134,7 @@ describe('K1: a message that did not go through', () => {
     const { result } = setup()
     await failOnce(result)
 
-    mockedStream.mockResolvedValueOnce('streamed')
+    server.answerWith({ outcome: 'streamed' })
     await act(async () => {
       await result.current.sendStreamingMessage({ content: 'Und 3 + 3?' })
     })
@@ -194,11 +161,13 @@ describe('K1: a message that did not go through', () => {
       ['assistant', 'failed'],
     ])
 
-    mockedStream.mockResolvedValueOnce('streamed')
+    server.answerWith({ outcome: 'streamed' })
     await act(async () => {
       reopened.result.current.retryMessage!(failed!.id)
       await vi.advanceTimersByTimeAsync(100)
     })
+    // The ids are worked out first (real SHA-1, off the fake clock): wait for the send itself.
+    await waitFor(() => expect(mockedStream).toHaveBeenCalledTimes(2))
     const keys = mockedStream.mock.calls.map((call) => call[0].payload.idempotencyKey)
     expect(keys).toHaveLength(2)
     expect(keys[1]).toBe(keys[0])
@@ -227,8 +196,7 @@ describe('K2: sending a failed message again while another is on its way', () =>
     const failed = failedStudent(result)!
     const staleRetry = result.current.retryMessage!
 
-    mockedStream.mockImplementationOnce(() => new Promise<StreamOutcome>(() => {}))
-    mockedProgress.mockResolvedValue(state({ status: 'ai_running' }))
+    server.answerWith({ until: never() })
     act(() => {
       void result.current.sendStreamingMessage({ content: 'Und 3 + 3?' })
     })
@@ -247,8 +215,7 @@ describe('K2: sending a failed message again while another is on its way', () =>
 
 describe('K5: stopping', () => {
   async function sendAndStop(serverHasIt: boolean) {
-    mockedStream.mockImplementationOnce(() => new Promise<StreamOutcome>(() => {}))
-    mockedProgress.mockResolvedValue(state({ status: 'ai_running' }))
+    server.answerWith({ until: never() })
     const { result, client } = setup()
     act(() => {
       void result.current.sendStreamingMessage({ content: 'Was ist eine Primzahl?' })
@@ -262,7 +229,7 @@ describe('K5: stopping', () => {
       grade: '',
       updatedAt: '',
       messages: serverHasIt
-        ? [{ id: `student:c1:${key}`, conversationId: 'c1', role: 'student', content: 'Was ist eine Primzahl?', createdAt: '', status: 'completed' }]
+        ? [{ id: (await commandMessageIds('c1', key)).studentMessageId, conversationId: 'c1', role: 'student', content: 'Was ist eine Primzahl?', createdAt: '', status: 'completed' }]
         : [],
     } as Conversation
     client.setQueryData(chatQueryKeys.conversation('c1'), conversation)
@@ -295,8 +262,8 @@ describe('K5: stopping', () => {
 describe('K6: a send request that hangs', () => {
   it('is let go once the command has ended', async () => {
     // A request that never ends and ignores its signal.
-    mockedStream.mockImplementationOnce(() => new Promise<StreamOutcome>(() => {}))
-    mockedProgress.mockResolvedValue(state({ status: 'completed', assistantMessageId: 'a-1' }))
+    // The command ends while the request hangs.
+    server.answerWith({ until: never(), status: 'completed' })
     const { result } = setup()
     act(() => {
       void result.current.sendStreamingMessage({ content: 'Was ist 2 + 2?' })
@@ -311,22 +278,21 @@ describe('K6: a send request that hangs', () => {
   })
 
   it('is let go after the time limit, and the command is still waited for', async () => {
-    mockedStream.mockImplementationOnce(() => new Promise<StreamOutcome>(() => {}))
-    let answered = false
-    mockedProgress.mockImplementation(async () =>
-      state({ status: answered ? 'completed' : 'ai_running' }),
-    )
+    server.answerWith({ until: never() })
     const { result } = setup()
     act(() => {
       void result.current.sendStreamingMessage({ content: 'Was ist 2 + 2?' })
     })
+    // The ids are worked out first (real SHA-1, off the fake clock): the limit runs from the send.
+    await waitFor(() => expect(mockedStream).toHaveBeenCalled())
     await act(async () => {
       await vi.advanceTimersByTimeAsync(SEND_REQUEST_LIMIT_MS + 1000)
     })
     expect(mockedStream.mock.calls[0][0].signal?.aborted).toBe(true)
     expect(result.current.isStreaming).toBe(true)
 
-    answered = true
+    const { idempotencyKey } = mockedStream.mock.calls[0][0].payload
+    server.seed({ generations: [{ conversationId: 'c1', idempotencyKey, status: 'completed' }] })
     await act(async () => {
       await vi.advanceTimersByTimeAsync(6000)
     })
@@ -338,8 +304,7 @@ describe('K6: a send request that hangs', () => {
 // The independent audit of this change (#326) found these three.
 describe('a failed message, after the audit', () => {
   it('is kept when the conversation is left while a stop is still asking the server (B1)', async () => {
-    mockedStream.mockImplementationOnce(() => new Promise<StreamOutcome>(() => {}))
-    mockedProgress.mockResolvedValue(state({ status: 'ai_running' }))
+    server.answerWith({ until: never() })
     const { result, client, rerender } = setup()
     act(() => {
       void result.current.sendStreamingMessage({ content: 'Was ist eine Primzahl?' })
@@ -384,7 +349,7 @@ describe('a failed message, after the audit', () => {
         { id: 'a-late', conversationId: 'c1', role: 'assistant', content: '4', createdAt: '', status: 'completed' },
       ],
     } as Conversation)
-    mockedStream.mockResolvedValueOnce('streamed')
+    server.answerWith({ outcome: 'streamed' })
     await act(async () => {
       await result.current.sendStreamingMessage({ content: 'Und 3 + 3?' })
     })
@@ -402,7 +367,7 @@ describe('a failed message, after the audit', () => {
     try {
       const { result } = setup()
       await failOnce(result)
-      mockedStream.mockResolvedValueOnce('streamed')
+      server.answerWith({ outcome: 'streamed' })
       await act(async () => {
         await result.current.sendStreamingMessage({ content: 'Und 3 + 3?' })
       })

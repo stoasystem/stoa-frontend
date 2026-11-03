@@ -14,7 +14,9 @@
  *   replied, the request moved on, the command ended).
  * - `answerWith(...)` says how the next messages sent are answered: events
  *   streamed, a hold, and whether the answer came on the request
- *   (`streamed`) or only the message was stored (`accepted`). Past the ones
+ *   (`streamed`) or only the message was stored (`accepted`); where the
+ *   command stands meanwhile, what the server holds once it is through
+ *   (`leaves`), and a refusal after all that (`refuse`). Past the ones
  *   given, a message is answered `streamed` with no events.
  * - `refuseNextWith(error, request)` refuses the next call of one request.
  * - `holdNext(request)` holds the next call of one request until the test
@@ -27,7 +29,8 @@
  *
  * Nothing is written on its own beyond what a request itself makes: a message
  * sent leaves its command, not messages in the conversation. What the
- * conversation reads back afterwards is what the test seeds.
+ * conversation reads back afterwards is what the test seeds, then or with
+ * `leaves`.
  */
 import { vi, type Mock } from 'vitest'
 import type { AskServer } from '@/features/ask/server/askServer'
@@ -72,6 +75,8 @@ export type AskServerSeed = {
   generations?: GenerationRecord[]
   /** The ids the next conversations made are given, in order. */
   newConversationIds?: string[]
+  /** What the next requests for a teacher are made with (an id, a time), in order, over the defaults. */
+  newHelpRequests?: Array<Partial<TeacherHelpRequest>>
 }
 
 /** How one message sent is answered. */
@@ -86,6 +91,14 @@ export type StreamAnswer = {
   outcome?: StreamOutcome
   /** The steps the command reports while it runs. */
   steps?: string[]
+  /** Where the command stands while the request is on: `ai_running` (the default), or already ended. */
+  status?: GenerationStatus
+  /** Whether a command that `failed` may be sent again under the same key. */
+  retryable?: boolean
+  /** What the server holds once the request is through, seeded before it answers: the answer written, say. */
+  leaves?: AskServerSeed
+  /** The request is then refused with this, and the command left as `status` says. */
+  refuse?: unknown
 }
 
 export type FakeAskServer = MockedAskServer & {
@@ -108,6 +121,7 @@ export function createFakeAskServer(): FakeAskServer {
   const helpRequests = new Map<string, TeacherHelpRequest>()
   const generations = new Map<string, GenerationState & { idempotencyKey: string }>()
   const newConversationIds: string[] = []
+  const newHelpRequests: Array<Partial<TeacherHelpRequest>> = []
   const answers: StreamAnswer[] = []
   const refusals = new Map<AskRequest, unknown[]>()
   const holds = new Map<AskRequest, Array<Promise<void>>>()
@@ -160,10 +174,12 @@ export function createFakeAskServer(): FakeAskServer {
       streamConversationMessage: async ({ conversationId, payload, onEvent }) => {
         const reply = answers.shift() ?? {}
         const { idempotencyKey } = payload
-        record({ conversationId, idempotencyKey, status: 'ai_running', steps: reply.steps })
+        record({ conversationId, idempotencyKey, status: reply.status ?? 'ai_running', steps: reply.steps, retryable: reply.retryable })
         for (const event of reply.events ?? []) onEvent(event)
         if (reply.until) await reply.until
         for (const event of reply.after ?? []) onEvent(event)
+        if (reply.leaves) server.seed(reply.leaves)
+        if ('refuse' in reply) throw reply.refuse
         const outcome = reply.outcome ?? 'streamed'
         if (outcome === 'streamed') record({ conversationId, idempotencyKey, status: 'completed' })
         return outcome
@@ -191,9 +207,10 @@ export function createFakeAskServer(): FakeAskServer {
         asked += 1
         const help: TeacherHelpRequest = {
           requestId: `request-${asked}`,
+          createdAt: new Date().toISOString(),
+          ...newHelpRequests.shift(),
           conversationId,
           status: 'pending',
-          createdAt: new Date().toISOString(),
         }
         helpRequests.set(conversationId, help)
         return help
@@ -259,6 +276,7 @@ export function createFakeAskServer(): FakeAskServer {
       for (const help of data.helpRequests ?? []) helpRequests.set(help.conversationId, help)
       for (const generation of data.generations ?? []) record(generation)
       newConversationIds.push(...(data.newConversationIds ?? []))
+      newHelpRequests.push(...(data.newHelpRequests ?? []))
     },
     answerWith(...next) {
       answers.push(...next)

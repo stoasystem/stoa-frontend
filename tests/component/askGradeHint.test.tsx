@@ -9,20 +9,21 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { act, render, screen, waitFor } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
-import { afterEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import i18n from '@/i18n'
 import { AskPanel } from '@/features/ask/AskPanel'
+import { AskServerProvider } from '@/features/ask/server/askServer'
 import { useAskController } from '@/features/ask/useAskController'
+import type { StudentProfile } from '@/types/student'
+import { createFakeAskServer, type FakeAskServer } from '../fakes/askServer'
 
-vi.mock('@/services/student/studentApi', () => ({ getStudentProfile: vi.fn() }))
-vi.mock('@/services/chat/chatApi', () => ({
-  getConversations: vi.fn(async () => ({ items: [] })),
-  getConversation: vi.fn(async () => ({ id: 'c-1', messages: [] })),
-  createConversation: vi.fn(),
-}))
-vi.mock('@/services/analytics/analyticsClient', () => ({ trackEvent: vi.fn(), rotateAnalyticsSession: vi.fn() }))
+/** The server behind Ask, in memory (#571): each test says which year group the profile has. */
+let server: FakeAskServer
 
-import { getStudentProfile } from '@/services/student/studentApi'
+/** The student's profile, as the server answers it from now on. */
+function profileHas(grade: string) {
+  server.profile = { grade } as StudentProfile
+}
 
 function Host() {
   const controller = useAskController()
@@ -34,17 +35,23 @@ function show() {
   return render(
     <QueryClientProvider client={client}>
       <MemoryRouter>
-        <Host />
+        <AskServerProvider value={server}>
+          <Host />
+        </AskServerProvider>
       </MemoryRouter>
     </QueryClientProvider>,
   )
 }
 
+beforeEach(() => {
+  // Nothing listed: the fake's own default.
+  server = createFakeAskServer()
+})
 afterEach(() => vi.clearAllMocks())
 
 describe('a student with no year group', () => {
   it('is told where to add it, and the link goes to their account', async () => {
-    vi.mocked(getStudentProfile).mockResolvedValue({ grade: '' } as never)
+    profileHas('')
 
     show()
 
@@ -53,7 +60,7 @@ describe('a student with no year group', () => {
   })
 
   it('has the composer point at it, so a screen reader hears it on the field', async () => {
-    vi.mocked(getStudentProfile).mockResolvedValue({ grade: '' } as never)
+    profileHas('')
 
     const { container } = show()
 
@@ -65,7 +72,7 @@ describe('a student with no year group', () => {
 
 describe('a student who has one', () => {
   it('is not told anything', async () => {
-    vi.mocked(getStudentProfile).mockResolvedValue({ grade: 'grade_6_primary' } as never)
+    profileHas('grade_6_primary')
 
     const { container } = show()
 
@@ -73,7 +80,7 @@ describe('a student who has one', () => {
     // first render has no profile at all, so asserting too early passes for
     // the wrong reason.
     await waitFor(() => expect(container.querySelector('textarea')?.placeholder).toBeTruthy())
-    await waitFor(() => expect(getStudentProfile).toHaveBeenCalled())
+    await waitFor(() => expect(server.student.getStudentProfile).toHaveBeenCalled())
     await act(async () => {
       await Promise.resolve()
     })

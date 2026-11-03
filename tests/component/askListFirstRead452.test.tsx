@@ -11,30 +11,26 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { act, renderHook } from '@testing-library/react'
 import type { ReactNode } from 'react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { AskServerProvider } from '@/features/ask/server/askServer'
 import { useAskConversation } from '@/features/ask/useAskConversation'
 import { useConversationsQuery } from '@/hooks/chat/useConversationsQuery'
-import { ApiError } from '@/services/api/httpClient'
 import type { ChatMessage, Conversation, ConversationSummary } from '@/types/chat'
+import { createFakeAskServer, type FakeAskServer } from '../fakes/askServer'
 
-vi.mock('@/services/analytics/analyticsClient', () => ({ trackEvent: vi.fn() }))
-vi.mock('@/services/chat/chatApi', () => ({
-  getConversations: vi.fn(),
-  getConversation: vi.fn(),
-}))
-vi.mock('@/services/chat/chatStreamApi', () => ({
-  streamConversationMessage: vi.fn(),
-  getGenerationProgress: vi.fn(),
-}))
-vi.mock('@/services/teacherHelp/teacherHelpApi', () => ({
-  getTeacherHelpRequest: vi.fn(),
-}))
+/** The server behind Ask, in memory (#571): each test seeds the list and the conversation it reads. */
+let server: FakeAskServer
+let listMock: FakeAskServer['conversations']['getConversations']
+let conversationMock: FakeAskServer['conversations']['getConversation']
 
-import { getConversation, getConversations } from '@/services/chat/chatApi'
-import { getTeacherHelpRequest } from '@/services/teacherHelp/teacherHelpApi'
+/** What `GET /conversations` answers from now on. */
+function listIs(items: ConversationSummary[]) {
+  server.seed({ list: items })
+}
 
-const listMock = vi.mocked(getConversations)
-const conversationMock = vi.mocked(getConversation)
-const helpMock = vi.mocked(getTeacherHelpRequest)
+/** What the conversation reads back from now on. */
+function readBack(data: Conversation) {
+  server.seed({ conversations: [data] })
+}
 
 const ASKED = '2026-10-20T10:00:00.000Z'
 const REPLIED = '2026-10-20T10:05:00.000Z'
@@ -58,7 +54,9 @@ function entry(id: string, updatedAt: string, lastMessagePreview: string): Conve
 function openAsk(conversationId: string | null) {
   const client = new QueryClient({ defaultOptions: { queries: { retry: false } } })
   const wrapper = ({ children }: { children: ReactNode }) => (
-    <QueryClientProvider client={client}>{children}</QueryClientProvider>
+    <QueryClientProvider client={client}>
+      <AskServerProvider value={server}>{children}</AskServerProvider>
+    </QueryClientProvider>
   )
   return renderHook(
     ({ id }) => ({ list: useConversationsQuery(), ask: useAskConversation(id) }),
@@ -77,7 +75,10 @@ async function advance(ms: number) {
 
 beforeEach(() => {
   vi.useFakeTimers()
-  helpMock.mockRejectedValue(new ApiError('This conversation was never escalated to a teacher', { status: 404 }))
+  // Nothing listed, and no conversation ever escalated: the fake's own defaults.
+  server = createFakeAskServer()
+  listMock = server.conversations.getConversations
+  conversationMock = server.conversations.getConversation
 })
 
 afterEach(() => {
@@ -89,13 +90,13 @@ afterEach(() => {
 describe('the first reading of a conversation', () => {
   it('reads the list again when the list has it at an older time', async () => {
     // Ask sits on the list; meanwhile a teacher replies to c2.
-    listMock.mockResolvedValue({ items: [entry('c1', ASKED, 'x = 4'), entry('c2', ASKED, asked[1].content)] })
+    listIs([entry('c1', ASKED, 'x = 4'), entry('c2', ASKED, asked[1].content)])
     const { result, rerender } = openAsk(null)
     await advance(0)
     expect(listMock).toHaveBeenCalledTimes(1)
 
-    listMock.mockResolvedValue({ items: [entry('c2', REPLIED, reply.content), entry('c1', ASKED, 'x = 4')] })
-    conversationMock.mockResolvedValue(conversation('c2', REPLIED, [...asked, reply]))
+    listIs([entry('c2', REPLIED, reply.content), entry('c1', ASKED, 'x = 4')])
+    readBack(conversation('c2', REPLIED, [...asked, reply]))
     rerender({ id: 'c2' })
     await advance(0)
 
@@ -113,11 +114,11 @@ describe('the first reading of a conversation', () => {
   })
 
   it('reads the list again when the list does not have it', async () => {
-    listMock.mockResolvedValue({ items: [entry('c1', ASKED, 'x = 4')] })
+    listIs([entry('c1', ASKED, 'x = 4')])
     const { rerender } = openAsk(null)
     await advance(0)
 
-    conversationMock.mockResolvedValue(conversation('c2', ASKED, asked))
+    readBack(conversation('c2', ASKED, asked))
     rerender({ id: 'c2' })
     await advance(0)
 
@@ -125,11 +126,11 @@ describe('the first reading of a conversation', () => {
   })
 
   it('does not read the list again when the list has it as it is', async () => {
-    listMock.mockResolvedValue({ items: [entry('c1', ASKED, 'x = 4'), entry('c2', ASKED, asked[1].content)] })
+    listIs([entry('c1', ASKED, 'x = 4'), entry('c2', ASKED, asked[1].content)])
     const { rerender } = openAsk(null)
     await advance(0)
 
-    conversationMock.mockResolvedValue(conversation('c2', ASKED, asked))
+    readBack(conversation('c2', ASKED, asked))
     rerender({ id: 'c2' })
     await advance(0)
 
@@ -143,14 +144,16 @@ describe('the first reading of a conversation', () => {
     // entry for it yet, so it is invalidated -- and TanStack joins the read in
     // flight rather than sending a second one. Nothing in this app decides
     // that; the test holds TanStack to it (#452 relies on it).
-    let listed: (value: { items: ConversationSummary[] }) => void = () => {}
-    listMock.mockImplementation(() => new Promise((resolve) => (listed = resolve)))
-    conversationMock.mockResolvedValue(conversation('c2', REPLIED, [...asked, reply]))
+    const answerList = server.holdNext('getConversations')
+    readBack(conversation('c2', REPLIED, [...asked, reply]))
     const { result } = openAsk('c2')
     await advance(0)
     expect(result.current.ask.conversation?.updatedAt).toBe(REPLIED)
 
-    await act(async () => listed({ items: [entry('c2', REPLIED, reply.content)] }))
+    await act(async () => {
+      listIs([entry('c2', REPLIED, reply.content)])
+      answerList()
+    })
     await advance(0)
     expect(listMock).toHaveBeenCalledTimes(1)
   })

@@ -22,28 +22,14 @@ import { I18nextProvider } from 'react-i18next'
 import { MemoryRouter } from 'react-router-dom'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { AskHost } from '@/features/ask/AskHost'
+import { AskServerProvider } from '@/features/ask/server/askServer'
 import i18n from '@/i18n'
 import { ApiError } from '@/services/api/httpClient'
 import { resetAsk } from '@/store/askStore'
 import { type CurrentUser, useAuthStore } from '@/store/authStore'
 import type { ChatMessage, Conversation } from '@/types/chat'
+import { createFakeAskServer, type FakeAskServer } from '../fakes/askServer'
 
-vi.mock('@/services/analytics/analyticsClient', () => ({ trackEvent: vi.fn() }))
-vi.mock('@/services/chat/commandMessageIds', () => ({
-  commandMessageIds: vi.fn(async (conversationId: string, key: string) => ({
-    studentMessageId: `student:${conversationId}:${key}`,
-    assistantMessageId: `assistant:${conversationId}:${key}`,
-  })),
-}))
-vi.mock('@/services/chat/chatApi', () => ({
-  getConversations: vi.fn(),
-  getConversation: vi.fn(),
-  createConversation: vi.fn(),
-}))
-vi.mock('@/services/chat/chatStreamApi', () => ({
-  streamConversationMessage: vi.fn(),
-  getGenerationProgress: vi.fn(),
-}))
 vi.mock('@/services/files/fileApi', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@/services/files/fileApi')>()),
   uploadFile: vi.fn(),
@@ -54,28 +40,13 @@ vi.mock('@/services/files/prepareImage', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@/services/files/prepareImage')>()),
   prepareImage: vi.fn(async (file: File) => file),
 }))
-vi.mock('@/services/teacherHelp/teacherHelpApi', () => ({
-  getTeacherAvailability: vi.fn(async () => ({ online: false, availableTeachers: 0 })),
-  getTeacherHelpRequest: vi.fn(async () => {
-    throw new ApiError('never escalated', { status: 404 })
-  }),
-  createTeacherHelpRequest: vi.fn(),
-}))
-vi.mock('@/services/student/studentApi', () => ({
-  getStudentProfile: vi.fn(async () => ({ grade: '8', primarySubjects: ['math'] })),
-}))
-vi.mock('@/services/learning/memoryApi', () => ({
-  getMyMemorySummary: vi.fn(async () => ({ recommendations: [], weakTopics: [] })),
-}))
 
-import { createConversation, getConversation, getConversations } from '@/services/chat/chatApi'
-import { getGenerationProgress, streamConversationMessage } from '@/services/chat/chatStreamApi'
 import { uploadFile } from '@/services/files/fileApi'
 import { prepareImage } from '@/services/files/prepareImage'
 
-const getConversationMock = vi.mocked(getConversation)
-const streamMock = vi.mocked(streamConversationMessage)
-const progressMock = vi.mocked(getGenerationProgress)
+/** The server behind Ask, in memory (#571): c1, a message answered as it is sent, and no teacher online. */
+let server: FakeAskServer
+let streamMock: FakeAskServer['stream']['streamConversationMessage']
 const uploadMock = vi.mocked(uploadFile)
 const prepareMock = vi.mocked(prepareImage)
 
@@ -113,7 +84,9 @@ function renderAsk(conversationId: string | null = 'c1') {
     <I18nextProvider i18n={i18n}>
       <QueryClientProvider client={client}>
         <MemoryRouter initialEntries={[conversationId ? `/ask/${conversationId}` : '/ask']}>
-          <AskHost route={{ conversationId }} />
+          <AskServerProvider value={server}>
+            <AskHost route={{ conversationId }} />
+          </AskServerProvider>
         </MemoryRouter>
       </QueryClientProvider>
     </I18nextProvider>,
@@ -147,9 +120,11 @@ beforeEach(async () => {
     isAuthenticated: true,
   })
   resetAsk()
-  getConversationMock.mockResolvedValue(conversation())
-  progressMock.mockResolvedValue({ status: 'completed', steps: [] } as never)
-  streamMock.mockResolvedValue('streamed')
+  // Nothing listed, and c1 never escalated: the fake's own defaults.
+  server = createFakeAskServer()
+  server.availability = { online: false, availableTeachers: 0 }
+  server.seed({ conversations: [conversation()] })
+  streamMock = server.stream.streamConversationMessage
   prepareMock.mockImplementation(async (file: File) => file)
 })
 
@@ -181,8 +156,8 @@ describe('a question that carries a file', () => {
   })
 
   it('starts a new conversation with it, and the tray lets it go once it is sent there (#263)', async () => {
-    vi.mocked(getConversations).mockResolvedValue({ items: [] } as never)
-    vi.mocked(createConversation).mockResolvedValue(conversation() as never)
+    // The conversation made is c1.
+    server.seed({ newConversationIds: ['c1'] })
     uploadMock.mockResolvedValue(uploaded('up-1', 'exercise.png'))
     const ask = openAsk(null)
     const box = await ask.findByRole('textbox', { name: 'Your question' })
@@ -194,7 +169,7 @@ describe('a question that carries a file', () => {
 
     await waitFor(() => expect(streamMock).toHaveBeenCalledTimes(1))
     // A question carrying a file starts the conversation empty and goes into it.
-    expect(vi.mocked(createConversation).mock.calls[0][0]).not.toHaveProperty('initialMessage')
+    expect(server.conversations.createConversation.mock.calls[0][0]).not.toHaveProperty('initialMessage')
     expect(streamMock.mock.calls[0][0].payload.attachmentIds).toEqual([{ uploadId: 'up-1' }])
     await waitFor(() => expect(screen.queryByRole('list', { name: 'Attached files' })).toBeNull())
   })
@@ -226,7 +201,8 @@ describe('a question that carries a file', () => {
 
   it('shows the file on the student’s own bubble, before the server has seen it', async () => {
     uploadMock.mockResolvedValue(uploaded('up-1', 'exercise.png'))
-    streamMock.mockImplementation(() => new Promise(() => {}))
+    // Never answered on the request, its command read back as ended.
+    server.answerWith({ until: new Promise(() => {}), status: 'completed' })
     const ask = openAsk()
     await ask.findByText('Linear equations')
 
