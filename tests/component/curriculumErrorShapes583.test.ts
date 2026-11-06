@@ -11,7 +11,7 @@
  * Both go through the real client (msw), not a hand-built `ApiError`, so a
  * change in how the client reads a body breaks this test too.
  */
-import { http, HttpResponse } from 'msw'
+import { http, HttpResponse, type JsonBodyType } from 'msw'
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest'
 import i18n from '@/i18n'
 import enAdmin from '@/i18n/locales/en/admin.json'
@@ -51,7 +51,7 @@ afterEach(() => {
 })
 
 /** The error a publish fails with when the backend answers `status` with `body`. */
-async function refusal(body: unknown, status = 409): Promise<ApiError> {
+async function refusal(body: JsonBodyType, status = 409): Promise<ApiError> {
   mswServer.use(
     http.post(`${API}/admin/curriculum/lessons/:id/publish`, () => HttpResponse.json(body, { status })),
   )
