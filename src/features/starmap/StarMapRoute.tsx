@@ -117,13 +117,14 @@ export function StarMapRoute({ relations = false, longNames = false }: { relatio
             <FirstLandingBubble star={first.star} startable={!(demo && first.star.chapter.lessonCount === 0)} onFindOwn={onFindOwn} locate={locate} watch={watch} onDismiss={first.dismiss} />
           )}
           {firstReveal.star && firstReveal.next && (
-            <FirstLandingBubble key={firstReveal.star.unitId} star={firstReveal.star} next={firstReveal.next} locate={locate} watch={watch} onDismiss={firstReveal.dismiss} />
+            <FirstLandingBubble key={firstReveal.star.unitId} star={firstReveal.star} next={firstReveal.next} avoid={firstReveal.lit ? [firstReveal.lit] : undefined} locate={locate} watch={watch} onDismiss={firstReveal.dismiss} />
           )}
           {findStar.star && findStar.first && !firstReveal.target && (
             <FindStarBubble
               key={`${findStar.star.unitId}:${findStar.first.unitId}`}
               star={findStar.star}
               first={findStar.first}
+              path={findStar.path?.missing}
               // In the design preview only the demo knowledge point has a chapter, as on the star's card.
               startable={(star) => !(demo && star.chapter.lessonCount === 0)}
               locate={locate}

@@ -35,6 +35,8 @@ import { StageWithAsk } from '@/features/chapter/StageAsk'
 import { findStarPath } from '@/features/starmap/model/missingStars'
 import { exampleGroupFor, findOwnExamples } from '@/features/starmap/onboarding/findOwnStar'
 import { BUBBLE_EXIT_MS, FirstLandingBubble } from '@/features/starmap/onboarding/FirstLandingBubble'
+import { dockedPlace, placeAvoiding, starBox } from '@/features/starmap/components/MurmiBubble'
+import { FindStarBubble } from '@/features/starmap/findStar/FindStarBubble'
 import i18n from '@/i18n'
 import { resetAsk, useAskStore } from '@/store/askStore'
 import { type CurrentUser, useAuthStore } from '@/store/authStore'
@@ -284,5 +286,64 @@ describe("the design preview's newcomer", () => {
     expect(demoConversationList().items).toEqual([])
     resetDemoServer()
     expect(demoConversationList().items.length).toBeGreaterThan(0)
+  })
+})
+
+describe('Murmi keeps clear of the stars it talks about (#586, found in testing)', () => {
+  const layer = { width: 1024, height: 700 }
+  const bubble = { width: 320, height: 120 }
+  const anchor = { x: 500, y: 300, size: 20 }
+  const coversBox = (place: { x: number; y: number }, box: { x0: number; y0: number; x1: number; y1: number }) =>
+    place.x < box.x1 && place.x + bubble.width > box.x0 && place.y < box.y1 && place.y + bubble.height > box.y0
+
+  it('takes another side when its first choice, below, would cover the star it names', () => {
+    const named = starBox({ x: 500, y: 380, size: 20 })
+    expect(placeAvoiding(anchor, bubble, layer, [], null).side).toBe('below')
+    const place = placeAvoiding(anchor, bubble, layer, [], named)
+    expect(place.side).not.toBe('below')
+    expect(coversBox(place, named)).toBe(false)
+  })
+
+  it('keeps clear of the named star before the rest of the path when it cannot clear them all', () => {
+    const named = starBox({ x: 500, y: 380, size: 20 })
+    // The path's other stars sit above, right and left: no side clears every star.
+    const rest = [starBox({ x: 500, y: 200, size: 20 }), starBox({ x: 700, y: 300, size: 20 }), starBox({ x: 300, y: 300, size: 20 })]
+    const place = placeAvoiding(anchor, bubble, layer, [], named, rest)
+    expect(coversBox(place, named)).toBe(false)
+  })
+
+  it('docks under the top controls on a phone when the bottom would cover the star it names', () => {
+    const phone = { width: 375, height: 700 }
+    const controls = [{ x0: 300, y0: 600, x1: 360, y1: 680 }, { x0: 16, y0: 16, x1: 300, y1: 60 }]
+    expect(dockedPlace({ x: 180, y: 250, size: 20 }, { height: 150 }, phone, controls).side).toBe('docked-bottom')
+    const named = starBox({ x: 180, y: 520, size: 20 })
+    expect(dockedPlace({ x: 180, y: 250, size: 20 }, { height: 150 }, phone, controls, named).side).toBe('docked-top')
+  })
+
+  it('places the find-star bubble off the first missing star on the map', () => {
+    const map = newcomerMap()
+    const path = findStarPath(map, KP)!
+    const star = map.stars.find((candidate) => candidate.unitId === KP)!
+    const first = map.stars.find((candidate) => candidate.unitId === path.first)!
+    const spots: Record<string, { x: number; y: number; size: number }> = { [KP]: anchor, [first.unitId]: { x: 500, y: 380, size: 20 } }
+    const clock = fakeClock()
+    render(
+      <I18nextProvider i18n={i18n}>
+        <MemoryRouter>
+          <FindStarBubble star={star} first={first} path={path.missing} locate={(unitId) => spots[unitId] ?? null} onDismiss={() => {}} scheduler={clock} />
+        </MemoryRouter>
+      </I18nextProvider>,
+    )
+    const layerEl = document.querySelector<HTMLElement>('[data-find-star]')!
+    Object.defineProperty(layerEl, 'clientWidth', { value: layer.width })
+    Object.defineProperty(layerEl, 'clientHeight', { value: layer.height })
+    const box = layerEl.querySelector<HTMLElement>('aside')!
+    Object.defineProperty(box, 'offsetWidth', { value: bubble.width })
+    Object.defineProperty(box, 'offsetHeight', { value: bubble.height })
+    act(() => clock.advance(500))
+    expect(box.dataset.side).toBeDefined()
+    expect(box.dataset.side).not.toBe('below')
+    const [, x, y] = /translate\((-?[\d.]+)px, (-?[\d.]+)px\)/.exec(box.style.transform)!.map(Number)
+    expect(coversBox({ x, y }, starBox(spots[first.unitId]))).toBe(false)
   })
 })

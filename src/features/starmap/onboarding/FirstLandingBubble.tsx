@@ -30,6 +30,8 @@ export type FirstLandingBubbleProps = {
   next?: string
   /** Whether `star` has a chapter to start: not the design preview's placeholder stars (as the star's card). */
   startable?: boolean
+  /** Other stars to keep clear, glyph and name (`MurmiBubble`'s `avoid`): after the first lighting, the star just lit. */
+  avoid?: readonly string[]
   /** On the first landing: "Find my own star" (#586); Murmi goes once it is taken. */
   onFindOwn?: () => void
   /** Where a star is drawn now, from the map's engine. */
@@ -41,13 +43,14 @@ export type FirstLandingBubbleProps = {
   scheduler?: FrameScheduler
 }
 
-export function FirstLandingBubble({ star, next, startable = true, onFindOwn, locate, watch, onDismiss, scheduler }: FirstLandingBubbleProps) {
+export function FirstLandingBubble({ star, next, startable = true, avoid, onFindOwn, locate, watch, onDismiss, scheduler }: FirstLandingBubbleProps) {
   const { t } = useTranslation('starmap')
   const chapterTo = `/chapter/${encodeURIComponent(star.unitId)}`
   return (
     <MurmiBubble
       unitId={star.unitId}
       marker="data-first-landing"
+      avoid={avoid}
       title={next ? t('firstReveal.title') : t('firstLanding.title', { name: star.name })}
       body={next ? t('firstReveal.body', { name: star.name }) : t('firstLanding.body')}
       locate={locate}
