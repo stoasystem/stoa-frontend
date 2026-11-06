@@ -91,7 +91,8 @@
       "starting": "La conversation démarre…",
       "startFailed": "La conversation n’a pas pu démarrer. Réessaie.",
       "answerFailed": "L’explication n’a pas pu être préparée pour le moment. Réessaie ou demande à un enseignant.",
-      "dailyLimit": "Tu as utilisé tous tes messages pour aujourd’hui. Reviens demain, ou demande à un enseignant si tu as besoin d’aide maintenant."
+      "dailyLimit": "Tu as utilisé tous tes messages pour aujourd’hui. Reviens demain, ou demande à un enseignant si tu as besoin d’aide maintenant.",
+      "weeklyAllowance": "Ton quota d’IA pour cette semaine est épuisé. Il revient lundi prochain (heure de Zurich). Demande à un enseignant si tu as besoin d’aide maintenant."
     },
     "answer": {
       "steps": "Étapes",

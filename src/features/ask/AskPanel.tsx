@@ -26,7 +26,7 @@ import {
 import { Attachments } from '@/features/uploads/Attachments'
 import { useAttachments, type AttachmentBatch } from '@/features/uploads/useAttachments'
 import { useConversationsQuery } from '@/hooks/chat/useConversationsQuery'
-import { refusedForToday } from '@/hooks/chat/useStreamingChat'
+import { askRefusalWords, refusedForNow } from '@/hooks/chat/useStreamingChat'
 import { useTeacherAvailabilityQuery } from '@/hooks/chat/useTeacherAvailabilityQuery'
 import { useRecommendationsQuery } from '@/hooks/learning/useWeakTopicsQuery'
 import { useStudentProfileQuery } from '@/hooks/student/useStudentProfileQuery'
@@ -300,7 +300,7 @@ export function AskPanel({
           </div>
           {question.startError && (
             <p role="alert" className="px-3 py-2 text-[13px] text-red">
-              {toUserFacingError(question.startError, t('ask.thread.startFailed'))}
+              {toUserFacingError(question.startError, t('ask.thread.startFailed'), askRefusalWords)}
             </p>
           )}
         </div>
@@ -499,7 +499,7 @@ function AskThread({
             key={entry.message.id}
             message={entry.message}
             teacherName={help.teacherName}
-            onRetry={refusedForToday(entry.message) ? undefined : retryMessage}
+            onRetry={refusedForNow(entry.message) ? undefined : retryMessage}
             onAskAboutStep={onAskAboutStep}
             after={entry.message.id === offer?.underMessageId ? helpAction : undefined}
           />

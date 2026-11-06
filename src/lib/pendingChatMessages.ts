@@ -147,6 +147,8 @@ export type FailedMessage = {
     retryPayload: Omit<PendingMessage, 'askedAt' | 'idempotencyKey' | 'unconfirmed'> & { idempotencyKey?: string }
     /** The UTC day the daily limit refused it: not sent again before the next (#541). */
     limitDay?: string
+    /** The Zurich Monday of the week the AI allowance refused it in: not sent again before the next (#581). */
+    allowanceWeek?: string
   }
   /** What stood in the answer's place, if anything. */
   answer?: ChatMessage
