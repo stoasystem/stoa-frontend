@@ -35,6 +35,8 @@ type LocalChatMessage = ChatMessage & {
   failedAnswerId?: string
   /** On a failed student bubble: the day the daily limit refused it (#541). */
   limitDay?: string
+  /** On a failed student bubble: the week the AI allowance refused it in (#581). */
+  allowanceWeek?: string
 }
 
 /**
@@ -82,9 +84,46 @@ const DAILY_LIMIT = 'message_daily_limit'
 /** Today as the server counts the daily limit: its UTC date. */
 const limitDay = () => new Date().toISOString().slice(0, 10)
 
-/** A failed message the daily limit refused today, which sending again would only have refused again. */
-export function refusedForToday(message: ChatMessage): boolean {
-  return (message as LocalChatMessage).limitDay === limitDay()
+/**
+ * The code a message is refused with once this week's AI allowance is used up
+ * (stoa-backend#206). The allowance comes back on Monday, Zurich time, so
+ * until then the same message is refused again: it says so, and offers no
+ * "send again" (#581). Like the daily limit, the refusal is not kept under
+ * its key, so the next week the same message goes out as itself.
+ */
+const ALLOWANCE_EXHAUSTED = 'allowance_exhausted'
+
+const zurichDate = new Intl.DateTimeFormat('en-CA', {
+  timeZone: 'Europe/Zurich',
+  year: 'numeric',
+  month: '2-digit',
+  day: '2-digit',
+})
+
+/** This week as the allowance counts it: the date of its Monday in Zurich. */
+export function allowanceWeek(now = new Date()): string {
+  const [year, month, day] = zurichDate.format(now).split('-').map(Number)
+  const date = new Date(Date.UTC(year, month - 1, day))
+  date.setUTCDate(date.getUTCDate() - ((date.getUTCDay() + 6) % 7))
+  return date.toISOString().slice(0, 10)
+}
+
+/**
+ * A failed message refused by a limit that still stands -- the daily limit
+ * today, the weekly allowance this week -- which sending again would only
+ * have refused again.
+ */
+export function refusedForNow(message: ChatMessage): boolean {
+  const local = message as LocalChatMessage
+  return local.limitDay === limitDay() || (local.allowanceWeek !== undefined && local.allowanceWeek === allowanceWeek())
+}
+
+/** What a refusal by a limit leaves on the failed bubble, so it is not offered again too soon. */
+function limitMarks(error: unknown): Pick<LocalChatMessage, 'limitDay' | 'allowanceWeek'> {
+  const code = errorCode(error)
+  if (code === DAILY_LIMIT) return { limitDay: limitDay() }
+  if (code === ALLOWANCE_EXHAUSTED) return { allowanceWeek: allowanceWeek() }
+  return {}
 }
 
 function errorCode(error: unknown) {
@@ -98,7 +137,17 @@ function getErrorMessage(error: unknown) {
   // choosing the file again can (#507).
   if (isUploadGone(error)) return i18n.t('chat:ask.attachments.errors.sendExpired')
   if (code === DAILY_LIMIT) return i18n.t('chat:ask.thread.dailyLimit')
+  if (code === ALLOWANCE_EXHAUSTED) return i18n.t('chat:ask.thread.weeklyAllowance')
   return toUserFacingError(error, streamErrorFallback())
+}
+
+/**
+ * A refusal Ask has words of its own for, in the reader's language; '' for
+ * any other. Also for a first question, which `POST /conversations` carries
+ * and refuses in the same way (#581).
+ */
+export function askRefusalWords(code: string): string {
+  return code === ALLOWANCE_EXHAUSTED ? i18n.t('chat:ask.thread.weeklyAllowance') : ''
 }
 
 /**
@@ -546,7 +595,7 @@ export function useStreamingChat(conversationId: string | null) {
         }
 
         const retryPayload = sameMessageRetry(outcome.kind !== 'failed' || outcome.retryable)
-        const limited = errorCode(requestError) === DAILY_LIMIT ? { limitDay: limitDay() } : {}
+        const limited = limitMarks(requestError)
         // What the answer's place showed when it failed: the steps written so
         // far, or the failure in words.
         const shown = localMessagesRef.current.find((message) => message.id === settledAssistantId)

@@ -91,7 +91,8 @@
       "starting": "Avvio della conversazione…",
       "startFailed": "Non è stato possibile avviare la conversazione. Riprova.",
       "answerFailed": "Al momento non è stato possibile preparare la spiegazione. Riprova o chiedi a un docente.",
-      "dailyLimit": "Hai usato tutti i tuoi messaggi di oggi. Torna domani, oppure chiedi a un docente se hai bisogno di aiuto adesso."
+      "dailyLimit": "Hai usato tutti i tuoi messaggi di oggi. Torna domani, oppure chiedi a un docente se hai bisogno di aiuto adesso.",
+      "weeklyAllowance": "La tua quota di IA per questa settimana è esaurita. Torna lunedì prossimo (ora di Zurigo). Chiedi a un docente se hai bisogno di aiuto adesso."
     },
     "answer": {
       "steps": "Passaggi",

@@ -91,7 +91,8 @@
       "starting": "Starting the conversation…",
       "startFailed": "The conversation could not be started. Try again.",
       "answerFailed": "The explanation could not be prepared right now. Please try again or ask a teacher.",
-      "dailyLimit": "You have used all your messages for today. Come back tomorrow, or ask a teacher if you need help now."
+      "dailyLimit": "You have used all your messages for today. Come back tomorrow, or ask a teacher if you need help now.",
+      "weeklyAllowance": "This week’s AI allowance is used up. It comes back next Monday (Zurich time). Ask a teacher if you need help now."
     },
     "answer": {
       "steps": "Steps",
