@@ -121,7 +121,9 @@ export const SURFACES: readonly Surface[] = [
   },
   // The whole first sign-in (docs/research/user-onboarding-design.md): the invitation link,
   // signing in, which subject school is on, and the first landing on "Integers", where the
-  // course starts. That star has no chapter in the preview, so the walk-through ends there.
+  // course starts. That star has no chapter in the preview; "Find my own star" (#586) goes on:
+  // the example about sine and cosine finds the demo knowledge point, whose path and chapter
+  // lead to the practice stage, where Murmi points at Ask once.
   {
     id: 'onboarding',
     label: 'First sign-in · the whole onboarding',
@@ -132,6 +134,16 @@ export const SURFACES: readonly Surface[] = [
   },
   { id: 'chapter', label: 'Chapter', path: () => `/chapter/${unitId}`, signedIn: true, stars: false },
   { id: 'lesson', label: 'Practice stage', path: () => `/chapter/${unitId}/${nextLesson.lessonId}`, signedIn: true, stars: false },
+  // #586: a student new to Ask on the practice stage for the first time: Murmi points at Ask.
+  {
+    id: 'lesson-first',
+    label: 'Practice stage · first time, new to Ask',
+    path: () => `/chapter/${unitId}/${firstLesson.lessonId}`,
+    signedIn: true,
+    stars: false,
+    demo: 'newcomer',
+    readyWhen: '[data-stage-ask-tip]',
+  },
   // #501: a small star's own page -- a core one in two stages, and the
   // extension one with what it asks to be learned first.
   { id: 'skill', label: 'Small star · stages', path: () => skillPath(unitId, coreStages.skillId), signedIn: true, stars: false },

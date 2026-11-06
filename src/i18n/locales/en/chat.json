@@ -248,6 +248,14 @@
       "failed": "The picture could not be loaded.",
       "retry": "Load again",
       "retryNamed": "Load again: {{name}}"
+    },
+    "examples": {
+      "label": "For example:"
+    },
+    "stageTip": {
+      "title": "Stuck? Ask me here.",
+      "body": "You can also take a photo of your working or a homework problem and send it to me.",
+      "close": "Got it"
     }
   }
 }

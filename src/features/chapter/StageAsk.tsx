@@ -11,6 +11,7 @@ import {
 } from '@/features/ask/askLayout'
 import { clearAskQuote, useAskQuoteStore, type AskPractice } from '@/features/ask/practiceContext'
 import { QuoteSelection } from '@/features/chapter/QuoteSelection'
+import { StageAskTipBubble, StageAskTipStatus, useStageAskTip } from '@/features/chapter/StageAskTip'
 import { useAskController, type AskController } from '@/features/ask/useAskController'
 import { useAskKeyboard } from '@/features/ask/useAskKeyboard'
 import { useSheetDrag } from '@/features/ask/useSheetDrag'
@@ -92,6 +93,10 @@ export function useStageAskController(side: boolean, off = false): AskController
  *
  * `off` (the short quiz, `quiz.ts`): the panel and the sheet are closed and
  * the docked composer is disabled, with `off` as the one-line reason.
+ *
+ * The first time a student new to Ask is here (#586), Murmi points at Ask
+ * once, and its way to add a photo is highlighted (`StageAskTip.tsx`); not
+ * during a quiz, nor over the phone's sheet.
  */
 export function StageWithAsk({
   children,
@@ -118,6 +123,8 @@ export function StageWithAsk({
   const wasOff = useRef(off)
   const composing = useRef(false)
   useCoverShell(sheet)
+  const tip = useStageAskTip(Boolean(off))
+  const tipShown = tip.shown && !sheet
 
   useEffect(() => {
     const opened = !wasOpen.current && open
@@ -164,7 +171,7 @@ export function StageWithAsk({
   )
 
   return (
-    <div ref={host} data-stage-host className="relative flex min-h-0 flex-1 overflow-hidden">
+    <div ref={host} data-stage-host data-ask-guide={tipShown || undefined} className="relative flex min-h-0 flex-1 overflow-hidden">
       <div
         data-surface="sky"
         data-stage-page
@@ -172,9 +179,11 @@ export function StageWithAsk({
         className="relative flex min-w-0 flex-1 flex-col bg-sky text-on-sky"
       >
         <div className="flex min-h-0 flex-1 flex-col">{children}</div>
+        <StageAskTipStatus shown={tipShown} />
         {!open && (
           <div ref={docked} data-ask-docked className="flex shrink-0 justify-center px-3 pt-2 pb-[34px] sm:px-6 sm:pb-[22px]">
             <div className="flex w-full max-w-[640px] flex-col gap-1.5">
+              {tipShown && <StageAskTipBubble beside={false} onDismiss={tip.dismiss} />}
               {off && (
                 <p data-ask-off id="stage-ask-off" className="m-0 text-center text-[13px] text-[color:var(--on-sky-text-body)]">
                   {off}
@@ -236,6 +245,7 @@ export function StageWithAsk({
             } as CSSProperties}
           >
             <AskPanel controller={controller} layout="panel" subjectId={subjectId} practice={practice} />
+            {tipShown && <StageAskTipBubble beside onDismiss={tip.dismiss} />}
           </aside>
         ) : (
           <section

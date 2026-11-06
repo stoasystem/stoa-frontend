@@ -47,7 +47,8 @@ type AskState = {
 /** What /me saved (#184): the year group, and the notification preferences. Null until saved. */
 type AccountState = { grade: string | null; notificationPreferences: NotificationPreferenceMatrix | null }
 
-type ServerState = { completed: string[]; litAt: string | null; acknowledged: boolean; ask: AskState; reviewDue: boolean; account: AccountState }
+/** `newcomer`: a student who has not started anything has not asked anything either (#586). */
+type ServerState = { completed: string[]; litAt: string | null; acknowledged: boolean; ask: AskState; reviewDue: boolean; account: AccountState; newcomer: boolean }
 
 function opening(): ServerState {
   return {
@@ -57,6 +58,7 @@ function opening(): ServerState {
     ask: { created: [], sent: {} },
     reviewDue: false,
     account: { grade: null, notificationPreferences: null },
+    newcomer: false,
   }
 }
 
@@ -97,13 +99,14 @@ export function resetDemoServer() {
 }
 
 /**
- * A student who has not started anything (`&newcomer=1`): no lesson done.
- * Only for a tab whose demo backend has no record yet (or `again`, with
+ * A student who has not started anything (`&newcomer=1`): no lesson done,
+ * and none of the demo conversations in Ask (#586), so the practice stage's
+ * first-time tip shows. Only for a tab whose demo backend has no record yet (or `again`, with
  * `&fresh=1`), so a reload keeps the lessons done since.
  */
 export function startAsNewcomer(again = false) {
   if (restored && !again) return
-  server = { ...opening(), completed: [] }
+  server = { ...opening(), completed: [], newcomer: true }
   completed.clear()
   changed()
 }
@@ -251,10 +254,11 @@ export function demoConversation(conversationId: string): Conversation | null {
   return withSent({ ...conversation, messages: [...conversation.messages, ...(server.ask.sent[conversationId] ?? [])] })
 }
 
-/** Ask's list: the conversations started here first, then the demo ones. */
+/** Ask's list: the conversations started here first, then the demo ones (a newcomer has none of those). */
 export function demoConversationList(): ConversationListResponse {
   const created = [...server.ask.created].reverse().map(withSent)
-  return { items: [...created, ...data.demoConversationList.items.map(withSent)] }
+  const fixtures = server.newcomer ? [] : data.demoConversationList.items.map(withSent)
+  return { items: [...created, ...fixtures] }
 }
 
 /** The student's profile as the backend reads it back: the demo one, with the year group saved on /me. */

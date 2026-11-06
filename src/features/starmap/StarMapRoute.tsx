@@ -22,6 +22,7 @@ import { useLightingStage } from '@/features/starmap/lighting/useLightingStage'
 import { FindStarBubble } from '@/features/starmap/findStar/FindStarBubble'
 import { useFindStar } from '@/features/starmap/findStar/useFindStar'
 import { FirstLandingBubble } from '@/features/starmap/onboarding/FirstLandingBubble'
+import { findOwnExamples } from '@/features/starmap/onboarding/findOwnStar'
 import { FirstSubjectQuestion } from '@/features/starmap/onboarding/FirstSubjectQuestion'
 import { useFirstLanding } from '@/features/starmap/onboarding/useFirstLanding'
 import { useFirstReveal } from '@/features/starmap/onboarding/useFirstReveal'
@@ -30,10 +31,12 @@ import { pathForTarget, resolveTarget, type LayerTarget } from '@/features/starm
 import { markLoginFirstScreenReady } from '@/lib/loginTiming'
 import { subjectOfNebula } from '@/features/starmap/model/starMap'
 import { defaultSubject, useStarMapSource } from '@/features/starmap/starMapSource'
+import { useAskStore } from '@/store/askStore'
 import { useAuthStore } from '@/store/authStore'
 import { useStarMapStore } from '@/store/starMapStore'
 
 export function StarMapRoute({ relations = false, longNames = false }: { relations?: boolean; longNames?: boolean } = {}) {
+  const { t } = useTranslation('starmap')
   const params = useParams()
   const [search] = useSearchParams()
   const location = useLocation()
@@ -64,6 +67,12 @@ export function StarMapRoute({ relations = false, longNames = false }: { relatio
   const firstReveal = useFirstReveal(map, first.target, stage.reveal)
   // A star found from Ask with stars missing on the way: the path to it, and Murmi beside it (#489).
   const findStar = useFindStar(map)
+  // "Find my own star" (#586): Ask's docked composer offers what to say, for the landing star's subject.
+  const offerExamples = useAskStore((state) => state.offerExamples)
+  const landingStar = first.star
+  const onFindOwn = useCallback(() => {
+    if (landingStar) offerExamples(ownerId, findOwnExamples(t, subjectOfNebula(map, landingStar.nebulaId)))
+  }, [landingStar, map, offerExamples, ownerId, t])
   // A star picked -- by a tap, a link, a hint, a card from Ask -- loads its small stars if it has none yet;
   // with none picked, the stars around where the student last practised in the galaxy in focus (#503).
   const pickedStar = routeTarget.layer === 'star' ? routeTarget.unitId : null
@@ -105,7 +114,7 @@ export function StarMapRoute({ relations = false, longNames = false }: { relatio
           {first.asking && <FirstSubjectQuestion subjects={first.asking} onChoose={first.choose} />}
           {first.star && !findStar.path && (
             // In the design preview only the demo knowledge point has a chapter, as on the star's card.
-            <FirstLandingBubble star={first.star} startable={!(demo && first.star.chapter.lessonCount === 0)} locate={locate} watch={watch} onDismiss={first.dismiss} />
+            <FirstLandingBubble star={first.star} startable={!(demo && first.star.chapter.lessonCount === 0)} onFindOwn={onFindOwn} locate={locate} watch={watch} onDismiss={first.dismiss} />
           )}
           {firstReveal.star && firstReveal.next && (
             <FirstLandingBubble key={firstReveal.star.unitId} star={firstReveal.star} next={firstReveal.next} locate={locate} watch={watch} onDismiss={firstReveal.dismiss} />

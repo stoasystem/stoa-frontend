@@ -7,6 +7,7 @@ import { conversationDisplayTitle, subjectDisplayLabel } from '@/components/chat
 import { MathRenderer } from '@/components/ui/MathRenderer'
 import { GRADE_SECTION_ID } from '@/features/account/GradeGroup'
 import { AskConversationList, AskEmptyState } from '@/features/ask/AskConversationList'
+import { rememberGuideConversation } from '@/features/ask/askGuide'
 import { hasSections, quoteCaption, sectionsSpokenText, type AnswerStep } from '@/features/ask/AskAnswerSections'
 import { AskLitCard } from '@/features/ask/AskLitCard'
 import { AskMessage } from '@/features/ask/AskMessage'
@@ -33,6 +34,7 @@ import { useStudentProfileQuery } from '@/hooks/student/useStudentProfileQuery'
 import { conversationGrade } from '@/lib/conversationGrade'
 import { toUserFacingError } from '@/lib/userFacingText'
 import { cn } from '@/lib/utils'
+import { askFor, useAskStore } from '@/store/askStore'
 import { useAuthStore } from '@/store/authStore'
 import { litMomentsFor, useLitMoments, type LitMoment } from '@/store/litMomentsStore'
 import { learningSubjectOptions } from '@/types/learningProfile'
@@ -73,10 +75,12 @@ export function AskPanel({
 }) {
   const { t } = useTranslation('chat')
   const { conversationId, draft, setDraft, select, close } = controller
+  const ownerId = useAuthStore((state) => state.user?.id ?? null)
   const conversationsQuery = useConversationsQuery()
   const availability = useTeacherAvailabilityQuery().data
   const teachersOnline = availability?.online
-  const profile = useStudentProfileQuery().data
+  const profileQuery = useStudentProfileQuery()
+  const profile = profileQuery.data
   const ask = useAskConversation(conversationId)
   const { sendStreamingMessage, isStreaming, conversation } = ask
   const phone = layout === 'sheet'
@@ -154,7 +158,7 @@ export function AskPanel({
   // (#125): from the chooser, the camera (#509) or a phone by QR (#514).
   const attachments = useAttachments({ camera: true, phone: conversationId })
 
-  function send(content: string, files: AttachmentBatch) {
+  function send(content: string, files: AttachmentBatch, guide = false) {
     // Sent is sent: the question leaves the composer now, so closing Ask while
     // the conversation is being made cannot leave it there to be sent twice.
     // It comes back only if it could not go out.
@@ -167,6 +171,8 @@ export function AskPanel({
         if (!controller.readDraft()) setDraft(content)
         return
       }
+      // The onboarding asked this for the student: it is not their own question yet (#586).
+      if (guide && ownerId) rememberGuideConversation(ownerId, outcome.conversationId)
       // Gone with the question -- unless another was chosen meanwhile.
       if (quote && useAskQuoteStore.getState().quote === quote) clearQuote()
       // Opened only in the panel that asked, and only if the student is still
@@ -189,14 +195,29 @@ export function AskPanel({
     send(content, files)
   }
 
-  function askRecommended(recommended: string) {
+  function askRecommended(recommended: string, guide = false) {
     if (!question.canAsk()) return
     // A file still going up, or one that waited past its upload's 30 minutes,
     // holds the question; the tray says which.
     const files = attachments.take()
     if (!files) return
-    send(recommended, files)
+    send(recommended, files, guide)
   }
+
+  // An example chosen on the star map ("Find my own star", #586) goes out as
+  // soon as Ask is open on its list, once the student's year is known (the
+  // conversation is made for it). Taken from the store once, so it is sent once.
+  const pending = useAskStore((state) => askFor(state, ownerId).pending)
+  const askPending = useRef(askRecommended)
+  useEffect(() => {
+    askPending.current = askRecommended
+  })
+  const takesPending = controller.entry === 'planet' && conversationId === null && !profileQuery.isPending
+  useEffect(() => {
+    if (!pending || !takesPending || !ownerId) return
+    const taken = useAskStore.getState().takePending(ownerId)
+    if (taken) askPending.current(taken, true)
+  }, [pending, takesPending, ownerId])
 
   // Named as the list names it until it is read itself, so the title the
   // keyboard lands on says which conversation opened, not "Ask" (#452).
