@@ -44,7 +44,10 @@ const BARE_CODE = /^[a-z][a-z0-9_]*$/
  *
  * It sends it two ways: as `{detail: {code}}`, which the shared client reads
  * into `code`, and as a bare string `{detail: "stale_pointer"}`, which only
- * reaches `detail`.
+ * reaches `detail`. The backend is moving the bare strings to the object
+ * shape (stoa-backend#211, #277); both are read, and the same code says the
+ * same thing in either (#583, `curriculumErrorShapes583.test.ts`). Keep the
+ * bare-string branch until no curriculum endpoint sends one.
  */
 export function curriculumErrorCode(error: unknown): string | undefined {
   if (!(error instanceof ApiError)) return undefined
