@@ -306,7 +306,11 @@ it('reads the same id through two scopes as two files', async () => {
     </I18nextProvider>,
   )
 
-  expect(await screen.findAllByRole('button', { name: copy.open('tafel.png') })).toHaveLength(2)
+  // findAllByRole settles on the first match: under load the second viewer may not be
+  // there yet, so wait for both.
+  await waitFor(() =>
+    expect(screen.getAllByRole('button', { name: copy.open('tafel.png') })).toHaveLength(2),
+  )
   expect(student.read).toHaveBeenCalledTimes(1)
   expect(teacher.read).toHaveBeenCalledTimes(1)
 })
