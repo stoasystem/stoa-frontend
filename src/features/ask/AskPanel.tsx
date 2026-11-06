@@ -7,7 +7,6 @@ import { conversationDisplayTitle, subjectDisplayLabel } from '@/components/chat
 import { MathRenderer } from '@/components/ui/MathRenderer'
 import { GRADE_SECTION_ID } from '@/features/account/GradeGroup'
 import { AskConversationList, AskEmptyState } from '@/features/ask/AskConversationList'
-import { rememberGuideConversation } from '@/features/ask/askGuide'
 import { hasSections, quoteCaption, sectionsSpokenText, type AnswerStep } from '@/features/ask/AskAnswerSections'
 import { AskLitCard } from '@/features/ask/AskLitCard'
 import { AskMessage } from '@/features/ask/AskMessage'
@@ -158,7 +157,7 @@ export function AskPanel({
   // (#125): from the chooser, the camera (#509) or a phone by QR (#514).
   const attachments = useAttachments({ camera: true, phone: conversationId })
 
-  function send(content: string, files: AttachmentBatch, guide = false) {
+  function send(content: string, files: AttachmentBatch) {
     // Sent is sent: the question leaves the composer now, so closing Ask while
     // the conversation is being made cannot leave it there to be sent twice.
     // It comes back only if it could not go out.
@@ -171,8 +170,6 @@ export function AskPanel({
         if (!controller.readDraft()) setDraft(content)
         return
       }
-      // The onboarding asked this for the student: it is not their own question yet (#586).
-      if (guide && ownerId) rememberGuideConversation(ownerId, outcome.conversationId)
       // Gone with the question -- unless another was chosen meanwhile.
       if (quote && useAskQuoteStore.getState().quote === quote) clearQuote()
       // Opened only in the panel that asked, and only if the student is still
@@ -195,13 +192,13 @@ export function AskPanel({
     send(content, files)
   }
 
-  function askRecommended(recommended: string, guide = false) {
+  function askRecommended(recommended: string) {
     if (!question.canAsk()) return
     // A file still going up, or one that waited past its upload's 30 minutes,
     // holds the question; the tray says which.
     const files = attachments.take()
     if (!files) return
-    send(recommended, files, guide)
+    send(recommended, files)
   }
 
   // An example chosen on the star map ("Find my own star", #586) goes out as
@@ -216,7 +213,7 @@ export function AskPanel({
   useEffect(() => {
     if (!pending || !takesPending || !ownerId) return
     const taken = useAskStore.getState().takePending(ownerId)
-    if (taken) askPending.current(taken, true)
+    if (taken) askPending.current(taken)
   }, [pending, takesPending, ownerId])
 
   // Named as the list names it until it is read itself, so the title the

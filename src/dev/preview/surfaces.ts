@@ -123,7 +123,8 @@ export const SURFACES: readonly Surface[] = [
   // signing in, which subject school is on, and the first landing on "Integers", where the
   // course starts. That star has no chapter in the preview; "Find my own star" (#586) goes on:
   // the example about sine and cosine finds the demo knowledge point, whose path and chapter
-  // lead to the practice stage, where Murmi points at Ask once.
+  // lead to the practice stage. That question counts as asking, so the practice stage's
+  // first-time tip is not shown on this walk; `lesson-first` shows it.
   {
     id: 'onboarding',
     label: 'First sign-in · the whole onboarding',

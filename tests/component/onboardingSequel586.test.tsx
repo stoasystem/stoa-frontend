@@ -10,7 +10,8 @@
  *   3. the first time a student new to Ask is on the practice stage, Murmi
  *      points at Ask and its way to add a photo -- not for a student who has
  *      asked something, not during a quiz, and not again once waved away in
- *      this tab. The conversation "Find my own star" started does not count.
+ *      this tab. Read from the server alone: any conversation, the one a
+ *      "Find my own star" example started included, means the student has asked.
  *
  * The design preview walks it: the sine-and-cosine example finds the demo
  * knowledge point, which a newcomer has a path to.
@@ -28,7 +29,6 @@ import { asNewcomer } from '@/dev/demo/sky/newcomer'
 import { demoConversationList, resetDemoServer, startAsNewcomer } from '@/dev/preview/demoSource'
 import { demoTargetFor } from '@/dev/preview/handlers'
 import { demoStarMapOverride } from '@/dev/preview/lighting'
-import { guideConversations, rememberGuideConversation } from '@/features/ask/askGuide'
 import { AskHost } from '@/features/ask/AskHost'
 import { AskServerProvider } from '@/features/ask/server/askServer'
 import { StageWithAsk } from '@/features/chapter/StageAsk'
@@ -182,8 +182,6 @@ describe('2. finding my own star', () => {
     expect(server.conversations.createConversation.mock.calls[0][0]).toMatchObject({ initialMessage: examples[2] })
     expect(useAskStore.getState().examples).toBeNull()
     expect(useAskStore.getState().pending).toBeNull()
-    // The onboarding asked it: the practice stage still counts the student as new to Ask.
-    await waitFor(() => expect(guideConversations(OWNER).has('found-1')).toBe(true))
   })
 
   it('ends the offer on Escape, leaving Ask closed', () => {
@@ -242,11 +240,19 @@ describe('3. the first time on the practice stage', () => {
     expect(screen.queryByRole('complementary', { name: TIP })).toBeNull()
   })
 
-  it("counts the conversation \"Find my own star\" started as the onboarding's, not the student's", async () => {
-    rememberGuideConversation(OWNER, 'found-1')
-    server.seed({ list: [summary('found-1')] })
+  it('is not shown after any conversation, one started from a "Find my own star" example included', async () => {
+    server.seed({ newConversationIds: ['found-1'] })
+    const map = mount(<AskHost subjectId="math"><p>sky</p></AskHost>)
+    act(() => useAskStore.getState().offerExamples(OWNER, ["We're doing sine and cosine at school"]))
+    await userEvent.click(screen.getByRole('button', { name: "We're doing sine and cosine at school" }))
+    await waitFor(() => expect(server.conversations.createConversation).toHaveBeenCalledTimes(1))
+    map.unmount()
+    resetAsk()
+
     mount(<Stage />)
-    expect(await screen.findByRole('complementary', { name: TIP })).toBeTruthy()
+    await waitFor(() => expect(server.conversations.getConversations).toHaveBeenCalled())
+    await act(async () => {})
+    expect(screen.queryByRole('complementary', { name: TIP })).toBeNull()
   })
 
   it('is not shown during a quiz', async () => {

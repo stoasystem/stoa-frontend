@@ -4,9 +4,9 @@
  * once -- stuck, ask here; a photo of your working or a homework problem works
  * too -- and Ask's way to add a photo is highlighted with it.
  *
- * Who is new to Ask is read from the server: a student with no conversation
- * of their own (the one the first landing's "Find my own star" started for
- * them does not count, `askGuide.ts`). Nothing says "seen" anywhere; waved
+ * Who is new to Ask is read from the server alone: a student with no Ask
+ * conversation at all -- one started from a "Find my own star" example counts
+ * too. Nothing says "seen" anywhere; waved
  * away -- "Got it" or Escape -- it stays away in this tab only, as the first
  * landing does. Never during a quiz, where Ask is off.
  *
@@ -18,7 +18,7 @@ import { useCallback, useEffect, useId, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/base'
 import { Murmi } from '@/components/brand/Murmi'
-import { dismissStageTip, hasAskedOwnQuestion, stageTipDismissed } from '@/features/ask/askGuide'
+import { dismissStageTip, stageTipDismissed } from '@/features/ask/askGuide'
 import { useConversationsQuery } from '@/hooks/chat/useConversationsQuery'
 import { cn } from '@/lib/utils'
 import { useAuthStore } from '@/store/authStore'
@@ -30,12 +30,12 @@ export type StageAskTip = {
   dismiss: () => void
 }
 
-/** Whether the tip is due: Ask on, a student with no question of their own, not waved away in this tab. */
+/** Whether the tip is due: Ask on, no Ask conversation on the server, not waved away in this tab. */
 export function useStageAskTip(off: boolean): StageAskTip {
   const ownerId = useAuthStore((state) => state.user?.id ?? null)
   const conversations = useConversationsQuery()
   const [dismissed, setDismissed] = useState(() => ownerId === null || stageTipDismissed(ownerId))
-  const newToAsk = ownerId !== null && conversations.isSuccess && !hasAskedOwnQuestion(ownerId, conversations.data.items)
+  const newToAsk = conversations.isSuccess && conversations.data.items.length === 0
   const dismiss = useCallback(() => {
     if (ownerId) dismissStageTip(ownerId)
     setDismissed(true)
