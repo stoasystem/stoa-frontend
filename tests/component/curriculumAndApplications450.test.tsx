@@ -41,7 +41,7 @@ import {
   publishCurriculumVersion,
   submitCurriculumReview,
 } from '@/services/admin/curriculumApi'
-import { ApiError } from '@/services/api/httpClient'
+import { ApiError, apiErrorFromBody } from '@/services/api/httpClient'
 import type { CurriculumMigrationDryRunResponse, CurriculumVersion, CurriculumWorklistResponse } from '@/types/curriculumOperations'
 
 vi.mock('@/layouts/DashboardLayout', () => ({
@@ -99,6 +99,13 @@ const PUBLISHED_ELSEWHERE = version('v5', 'published', '2026-10-19T08:00:00Z')
 const ITEMS = [CANDIDATE, LIVE]
 
 const STALE_POINTER = () => new ApiError('conflict', { status: 409, detail: 'stale_pointer' })
+
+// The same refusal in the two body shapes the backend sends while it moves to
+// `{detail: {code, message}}` (#583), read by the client's own parser.
+const STALE_POINTER_BODIES = [
+  { shape: 'a bare string detail', body: { detail: 'stale_pointer' } },
+  { shape: 'a {detail: {code, message}} body', body: { detail: { code: 'stale_pointer', message: 'Pointer moved.', correlationId: 'c-1' } } },
+]
 
 const DRY_RUN: CurriculumMigrationDryRunResponse = {
   migrationId: 'mig-1',
@@ -172,10 +179,10 @@ async function openPublishDialog(user: ReturnType<typeof userEvent.setup>) {
 const confirmButton = (dialog: HTMLElement) => within(dialog).getByRole('button', { name: copy.confirm.submit.publish })
 
 describe('#450: a publish refused as stale, in the dialog still open', () => {
-  it('shows the version live now, and Publish there sends that one', async () => {
+  it.each(STALE_POINTER_BODIES)('shows the version live now, and Publish there sends that one ($shape)', async ({ body }) => {
     publish.mockImplementationOnce(async () => {
       items = [PUBLISHED_ELSEWHERE, ...ITEMS]
-      throw STALE_POINTER()
+      throw apiErrorFromBody(body, { status: 409, fallback: 'conflict' })
     })
     const user = userEvent.setup()
     renderPage(<AdminCurriculumPage />)
