@@ -17,9 +17,35 @@
   },
   "firstLanding": {
     "title": "Hier anfangen: {{name}}",
-    "body": "Jeder Stern ist etwas zum Lernen. Schliess seine Lektionen ab, dann leuchtet er.",
+    "body": "Jeder Stern ist etwas zum Lernen. Kannst du das schon? Sag mir, wo ihr in der Schule gerade seid, dann finde ich deinen Stern.",
     "start": "Mit diesem Stern beginnen",
-    "later": "Erst umschauen"
+    "later": "Erst umschauen",
+    "findOwn": "Meinen eigenen Stern finden"
+  },
+  "findOwn": {
+    "examples": {
+      "math": {
+        "quadratic": "Ich will quadratische Gleichungen üben",
+        "derivatives": "Wir lernen gerade Ableitungen",
+        "trig": "Wir nehmen in der Schule gerade den Sinus durch"
+      },
+      "physics": {
+        "forces": "Wir haben gerade Kräfte und die newtonschen Gesetze",
+        "circuits": "Ich will Stromkreise üben"
+      },
+      "german": {
+        "essay": "Wir schreiben gerade Erörterungen",
+        "grammar": "Ich will die Fälle üben"
+      },
+      "english": {
+        "tenses": "Ich will das Present Perfect üben",
+        "essay": "Wir schreiben auf Englisch gerade Meinungstexte"
+      },
+      "general": {
+        "class": "Ich will üben, was wir gerade im Unterricht machen",
+        "start": "Wo soll ich für meine Klassenstufe anfangen?"
+      }
+    }
   },
   "firstQuestion": {
     "title": "Welches Fach hast du gerade in der Schule?",

@@ -23,6 +23,13 @@ type AskState = {
   conversationId: string | null
   /** What is in the composer; kept in memory only, never in storage. */
   draft: string
+  /**
+   * "Find my own star" (#586): what the student could say, offered beside the
+   * docked composer while Ask is closed. Memory only: the moment passes.
+   */
+  examples: string[] | null
+  /** A question to send as soon as Ask is open on its list: an example the student chose (#586). */
+  pending: string | null
 }
 
 type AskActions = {
@@ -31,13 +38,21 @@ type AskActions = {
   select: (ownerId: string, conversationId: string | null) => void
   setDraft: (ownerId: string, draft: string) => void
   close: () => void
+  /** Offer `examples` beside the docked composer (#586). */
+  offerExamples: (ownerId: string, examples: string[]) => void
+  /** The examples go: one was chosen, the student typed, or waved them away. */
+  endExamples: () => void
+  /** Open Ask on its list and send `question` there, in a conversation of its own (#586). */
+  askNow: (ownerId: string, question: string) => void
+  /** The question waiting to be sent, taken once: the panel that sends it. */
+  takePending: (ownerId: string) => string | null
 }
 
 export const ASK_STORAGE_KEY = 'stoa_ask_panel'
 
 type Persisted = Pick<AskState, 'ownerId' | 'open' | 'conversationId'>
 
-const CLOSED: AskState = { ownerId: null, open: false, conversationId: null, draft: '' }
+const CLOSED: AskState = { ownerId: null, open: false, conversationId: null, draft: '', examples: null, pending: null }
 
 /** What a reload restores: which account's Ask was open, and on which conversation. */
 export function readPersistedAsk(): Persisted {
@@ -77,7 +92,7 @@ function forOwner(state: AskState, ownerId: string): Partial<AskState> {
   return state.ownerId === ownerId ? {} : { ...CLOSED, ownerId }
 }
 
-export const useAskStore = create<AskState & AskActions>((set) => ({
+export const useAskStore = create<AskState & AskActions>((set, get) => ({
   ...CLOSED,
   ...readPersistedAsk(),
   openWithDraft: (ownerId, draft) => set((state) => ({ ...forOwner(state, ownerId), open: true, draft })),
@@ -85,6 +100,16 @@ export const useAskStore = create<AskState & AskActions>((set) => ({
     set((state) => ({ ...forOwner(state, ownerId), open: true, conversationId })),
   setDraft: (ownerId, draft) => set((state) => ({ ...forOwner(state, ownerId), draft })),
   close: () => set({ open: false }),
+  offerExamples: (ownerId, examples) => set((state) => ({ ...forOwner(state, ownerId), examples })),
+  endExamples: () => set({ examples: null }),
+  askNow: (ownerId, question) =>
+    set((state) => ({ ...forOwner(state, ownerId), open: true, conversationId: null, draft: '', examples: null, pending: question })),
+  takePending: (ownerId) => {
+    const { ownerId: owner, pending } = get()
+    if (owner !== ownerId || pending === null) return null
+    set({ pending: null })
+    return pending
+  },
 }))
 
 useAskStore.subscribe((state, previous) => {
@@ -117,5 +142,7 @@ export function askFor(state: AskState, ownerId: string | null) {
     open: mine && state.open,
     conversationId: mine ? state.conversationId : null,
     draft: mine ? state.draft : '',
+    examples: mine ? state.examples : null,
+    pending: mine ? state.pending : null,
   }
 }

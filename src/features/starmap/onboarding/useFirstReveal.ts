@@ -32,6 +32,8 @@ export type FirstReveal = {
   star: Star | null
   /** Its route, the bubble's way to it. */
   next: string | null
+  /** The star just lit, which the bubble keeps clear of (#586). */
+  lit: string | null
   /** The lighting moment's "draw it lit now", wrapped: the first one starts the reveal. */
   onReveal: (unitId: string) => void
   dismiss: () => void
@@ -98,5 +100,5 @@ export function useFirstReveal(map: StarMap, target: LayerTarget, reveal: (unitI
         : null,
     [revealing, reducedMotion],
   )
-  return { target: !over ? revealTarget : null, star, next, onReveal, dismiss }
+  return { target: !over ? revealTarget : null, star, next, lit: revealing?.lit ?? null, onReveal, dismiss }
 }
