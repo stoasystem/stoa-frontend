@@ -28,10 +28,13 @@ import { ZOOM_MS } from '@/features/starmap/motion/motionPolicy'
 import { REVEAL_FLIGHT_MS } from '@/features/starmap/onboarding/useFirstReveal'
 import { daysBetween, localDay, mostDueStar, nextReview, reminderKeys, reminderMood } from '@/features/starmap/reviewReminder/reviewReminder'
 import { reminderTarget } from '@/features/starmap/reviewReminder/useReviewReminder'
+import { StarMapEngine } from '@/features/starmap/engine/starMapEngine'
 import { StarMapRoute } from '@/features/starmap/StarMapRoute'
 import { StarMapSourceContext, type StarMapSource } from '@/features/starmap/starMapSource'
 import { asNewcomer } from '@/dev/demo/sky/newcomer'
 import { readDemoStarMap } from '@/dev/demo/sky/source'
+import { demoReviewSummary, makeReviewDue, makeReviewScheduled, resetDemoServer } from '@/dev/preview/demoSource'
+import { demoKnowledgeMap, demoSkyReviewDue } from '@/dev/preview/lighting'
 import i18n from '@/i18n'
 import { getReviewSummary } from '@/services/practice/practiceApi'
 import { useAuthStore } from '@/store/authStore'
@@ -278,6 +281,18 @@ describe('the tap', () => {
     await waitFor(() => expect(screen.getByText('review')).toBeInTheDocument())
   })
 
+  it('picks the star out while the bubble is up (drawn and named as a focused star), and lets it go with the bubble', async () => {
+    const marked = vi.spyOn(StarMapEngine.prototype, 'setMarkedStar')
+    const best = mostDueStar(sky())!
+    summaryFn.mockResolvedValue(due(3))
+    mountRoute()
+    fireEvent.click(await screen.findByRole('button', { name: '3 cards due for review' }))
+    await waitFor(() => expect(bubble()).not.toBeNull())
+    expect(marked).toHaveBeenLastCalledWith(best.unitId)
+    fireEvent.click(bubble()!.querySelector('button[aria-label="Close"]')!)
+    await waitFor(() => expect(marked).toHaveBeenLastCalledWith(null), { timeout: BUBBLE_EXIT_MS + 1000 })
+  })
+
   it('from a nebula: the star’s galaxy route, in place', async () => {
     const map = sky()
     const best = mostDueStar(map)!
@@ -399,5 +414,28 @@ describe('giving way', () => {
     await waitFor(() => expect(summaryFn).toHaveBeenCalled())
     await act(async () => {})
     expect(corner()).toBeNull()
+  })
+})
+
+// ---------------------------------------------------------------- the design preview
+
+describe('the design preview’s demo backend agrees with its sky', () => {
+  afterEach(() => resetDemoServer())
+
+  it('with reviews due: the summary’s count is the cards on the sky’s stars, so the corner and the bubble agree', () => {
+    makeReviewDue()
+    const stars = demoKnowledgeMap(1000).stars
+    const onStars = stars.reduce((sum, star) => sum + star.reviewDue, 0)
+    expect(onStars).toBeGreaterThan(0)
+    expect(demoSkyReviewDue(1000)).toBe(onStars)
+    expect(demoReviewSummary(demoSkyReviewDue(1000))).toMatchObject({ dueCount: onStars })
+    expect(reminderMood(demoReviewSummary(demoSkyReviewDue(1000)))).toBe('calling')
+  })
+
+  it('with reviews scheduled and none due: no star has cards due, and Murmi sleeps', () => {
+    makeReviewScheduled()
+    expect(demoKnowledgeMap(1000).stars.some((star) => star.reviewDue > 0)).toBe(false)
+    expect(demoSkyReviewDue(1000)).toBe(0)
+    expect(reminderMood(demoReviewSummary(demoSkyReviewDue(1000)))).toBe('sleeping')
   })
 })

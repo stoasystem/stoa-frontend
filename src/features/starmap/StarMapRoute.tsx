@@ -110,7 +110,7 @@ export function StarMapRoute({ relations = false, longNames = false }: { relatio
   if (map.subjects.length === 0) return <EmptyStarMap onShown={onFirstFrame} />
 
   return (
-    <StarMapView demo={demo} map={stage.map} target={firstReveal.target ?? findStar.target ?? (reminderBubble ? reminder.target : null) ?? first.target} path={findStar.path} onNavigate={onNavigate} land={stage.land} onFirstFrame={onFirstFrame} onCentreGalaxy={onCentreGalaxy} foveate={search.has('foveation') ? foveationFrom(search) : false}
+    <StarMapView demo={demo} map={stage.map} target={firstReveal.target ?? findStar.target ?? (reminderBubble ? reminder.target : null) ?? first.target} path={findStar.path} marked={reminderBubble?.unitId ?? null} onNavigate={onNavigate} land={stage.land} onFirstFrame={onFirstFrame} onCentreGalaxy={onCentreGalaxy} foveate={search.has('foveation') ? foveationFrom(search) : false}
       overlay={(locate, watch) => (
         <>
           <LightingOverlay map={map} locate={locate} watch={watch} onReveal={firstReveal.onReveal} />

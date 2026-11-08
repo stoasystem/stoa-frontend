@@ -34,6 +34,7 @@ import {
   acknowledgeLit,
   completedLessons,
   demoLanguage,
+  demoReviewState,
   demoServerVersion,
   onDemoServerChange,
   unacknowledgedLit,
@@ -185,11 +186,33 @@ export function demoKnowledgeStars(size: FixtureSize, around: string | null): Kn
   }
 }
 
+const reviewsNotDue = new WeakMap<Star[], Star[]>()
+
+/**
+ * The sky's review cards as the demo backend has them (#593): with reviews scheduled and none due
+ * (`makeReviewScheduled`), no star has cards due; otherwise the demo sky's own. The same array for
+ * the same stars, so the engine keeps its sky.
+ */
+export function withDemoReviews<T extends { stars: Star[] }>(map: T): T {
+  if (demoReviewState() !== 'scheduled') return map
+  let stars = reviewsNotDue.get(map.stars)
+  if (!stars) {
+    stars = map.stars.map((star) => (star.reviewDue > 0 ? { ...star, reviewDue: 0 } : star))
+    reviewsNotDue.set(map.stars, stars)
+  }
+  return { ...map, stars }
+}
+
+/** The cards due on the whole sky, its stars' `reviewDue` summed: what the review summary says is due (#593). */
+export function demoSkyReviewDue(size: FixtureSize): number {
+  return demoFollowedSky(size).stars.reduce((sum, star) => sum + star.reviewDue, 0)
+}
+
 /** The whole sky as the demo backend has it after the lessons completed so far, small stars included. */
 function demoFollowedSky(size: FixtureSize): KnowledgeMapResponse {
   const sky = demoSky(size, demoLanguage())
   const subjectId = DEMO_KNOWLEDGE_POINT.subjectId
-  const map = demoStarMapOverride(
+  const map = withDemoReviews(demoStarMapOverride(
     {
       subject: { subjectId, name: sky.galaxies.find((galaxy) => galaxy.subjectId === subjectId)?.name ?? subjectId },
       nebulae: sky.nebulae,
@@ -199,7 +222,7 @@ function demoFollowedSky(size: FixtureSize): KnowledgeMapResponse {
       subjects: sky.galaxies,
     },
     size,
-  )
+  ))
   return { subjectId, galaxies: map.subjects, nebulae: sky.nebulae, stars: map.stars, prerequisites: map.prerequisites, summary: map.summary }
 }
 
@@ -233,7 +256,7 @@ export function PreviewLighting({ children, longNames = false, newcomer = false 
         // The newcomer's sky is built from the demo sky's own arrays, so the engine keeps its tiles.
         const followed = newcomer
           ? asNewcomer({ ...read, prerequisites: read.prerequisites.length > 0 ? read.prerequisites : demoSky(request.size).prerequisites }, completed, demoLanguage())
-          : demoStarMapOverride(read, request.size, completed)
+          : withDemoReviews(demoStarMapOverride(read, request.size, completed))
         return longNames ? withLongNebulaNames(followed, t) : followed
       },
     }

@@ -168,16 +168,27 @@ export function demoReviewDue(): ReviewDueResponse {
   return { items, dueCount: items.length, generatedAt }
 }
 
-/** `GET /practice/review/summary`, agreeing with `demoReviewDue`; with `makeReviewScheduled`, three questions two days off. */
-export function demoReviewSummary(): ReviewSummary {
-  const { dueCount, generatedAt } = demoReviewDue()
-  if (dueCount === 0 && server.reviewScheduled) {
+/** Which review state the demo backend is in (#593): questions due, scheduled and none due, or neither. */
+export function demoReviewState(): 'due' | 'scheduled' | null {
+  return server.reviewDue ? 'due' : server.reviewScheduled ? 'scheduled' : null
+}
+
+/**
+ * `GET /practice/review/summary`. With `makeReviewDue`, the cards due are the ones the sky shows
+ * on its stars (`skyDue`, their `reviewDue` summed), so the map's review reminder and the bubble
+ * beside the star it flies to agree (#593); with `makeReviewScheduled`, none is due and three
+ * questions are two days off (the sky then shows none due either).
+ */
+export function demoReviewSummary(skyDue: number): ReviewSummary {
+  const generatedAt = new Date().toISOString()
+  if (server.reviewDue) return { dueCount: skyDue, scheduledCount: skyDue, nextDueAt: generatedAt }
+  if (server.reviewScheduled) {
     const next = new Date()
     next.setDate(next.getDate() + 2)
     next.setHours(9, 0, 0, 0)
     return { dueCount: 0, scheduledCount: 3, nextDueAt: next.toISOString() }
   }
-  return { dueCount, scheduledCount: dueCount, nextDueAt: generatedAt }
+  return { dueCount: 0, scheduledCount: 0, nextDueAt: generatedAt }
 }
 
 /** Called when the demo backend's state changes. */
