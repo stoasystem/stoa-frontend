@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef, type RefObject } from 'react'
+import { useEffect, useLayoutEffect, useRef, type RefObject } from 'react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/base/Button'
@@ -10,6 +10,7 @@ import { useMediaQuery } from '@/hooks/layout/useMediaQuery'
 import { addressContext } from '@/lib/addressForm'
 import { stoaContactInfo } from '@/lib/brandContact'
 import { LoginNebula } from '@/pages/login/LoginNebula'
+import { prewarmBackend } from '@/services/api/backendPrewarm'
 import type { SignOutReason, TabAccount } from '@/lib/tabAccount'
 
 /*
@@ -29,6 +30,9 @@ import type { SignOutReason, TabAccount } from '@/lib/tabAccount'
  * account, with a way out to another (#217). A tab that last showed somebody
  * else than the account the browser is signed in as now says who that is and
  * offers to continue as them, or to sign in as someone else (#320).
+ *
+ * As it opens, the page wakes the backend, so a cold start happens while the
+ * visitor types rather than after Sign in (#601, backendPrewarm).
  */
 
 export type LoginMode =
@@ -99,6 +103,9 @@ export function LoginPage({ mode = { kind: 'signIn' } }: { mode?: LoginMode } = 
   const bar = useMediaQuery(WIDE_LOGIN_QUERY) ? TOP_BAR : TOP_BAR_PHONE
   const surface = useRef<HTMLDivElement>(null)
   usePaintDocumentWithSky(surface)
+  useEffect(() => {
+    prewarmBackend()
+  }, [])
 
   return (
     <div
