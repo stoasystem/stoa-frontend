@@ -183,13 +183,19 @@ function hasTagWithEventHandler(text: string) {
 }
 
 /*
- * The server's code for a refusal, read before its message (#371). stoa-backend
- * sends none for a refused reply yet (the teachers router passes only
- * `detail=str(exc)`), so nothing is listed (#388). When it adds codes
- * (stoa-backend#211), register the ones it really sends here and delete
- * `refusalFromMessage`; until then any other code falls back to the message.
+ * The server's code for a refused reply (stoa-backend#274, #573). The 422
+ * body is {detail: {code, message, correlationId}}; the message is rendered
+ * in the reader's language and is never read here. `teacher_reply_empty` and
+ * `teacher_reply_malformed` have no reason of their own (the composer sends
+ * neither an empty reply nor a malformed one) and read as `unknown`.
  */
-const REFUSAL_CODES = new Map<string, ContentRefusal>()
+const REFUSAL_CODES = new Map<string, ContentRefusal>([
+  ['teacher_reply_unsafe_html', 'html'],
+  ['teacher_reply_private_markers', 'privateMarkers'],
+  ['teacher_reply_block_too_long', 'blockTooLong'],
+  ['teacher_reply_too_many_blocks', 'tooManyBlocks'],
+  ['teacher_reply_too_long', 'tooLong'],
+])
 
 /**
  * Why the server would not take a reply, in the words the check before
@@ -197,30 +203,12 @@ const REFUSAL_CODES = new Map<string, ContentRefusal>()
  * sending it again may pass.
  *
  * A refused picture is chosen again (#513); a 409 means the request moved on,
- * a 422 that the server refused the reply's content (#271), and what in it
- * (#332).
+ * a 422 that the server refused the reply's content (#271), and its code says
+ * what in it (#573).
  */
 export function classifyRefusal(error: unknown): ReplyRefusal | null {
   if (isUploadGone(error)) return 'images'
   if (isHelpRequestConflict(error)) return 'conflict'
   if (!(error instanceof ApiError) || error.status !== 422) return null
-  const coded = error.code ? REFUSAL_CODES.get(error.code) : undefined
-  return coded ?? refusalFromMessage(error.message) ?? 'unknown'
-}
-
-/*
- * teacher_reply_service's TeacherReplyValidationError messages, as the router
- * passes them on in `detail`. A block's own limit names its field ("text
- * exceeds 2000 characters", "latex exceeds 500 characters"); the whole reply's
- * is "teacher reply fallback exceeds 4000 characters" (#371). Goes once the
- * server sends codes (stoa-backend#211).
- */
-export function refusalFromMessage(message: string): ContentRefusal | null {
-  const lowered = message.toLowerCase()
-  if (lowered.includes('unsafe raw html')) return 'html'
-  if (lowered.includes('private markers') || lowered.includes('private credentials')) return 'privateMarkers'
-  if (lowered.includes('1 to 20 blocks')) return 'tooManyBlocks'
-  if (/\b(?:text|latex) exceeds\b/.test(lowered)) return 'blockTooLong'
-  if (lowered.includes('exceeds')) return 'tooLong'
-  return null
+  return (error.code ? REFUSAL_CODES.get(error.code) : undefined) ?? 'unknown'
 }

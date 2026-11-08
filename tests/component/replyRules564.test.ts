@@ -6,12 +6,11 @@
 import { describe, expect, it } from 'vitest'
 import {
   classifyRefusal,
-  refusalFromMessage,
   REPLY_LIMITS,
   replyProblem,
   type ReplyRefusal,
 } from '@/features/teacherReply/replyRules'
-import { ApiError } from '@/services/api/httpClient'
+import { ApiError, apiErrorFromBody } from '@/services/api/httpClient'
 import type { TeacherReplyBlock } from '@/types/teacher'
 
 const paragraph = (text: string): TeacherReplyBlock => ({ type: 'paragraph', text })
@@ -123,59 +122,53 @@ describe('the refusal after sending', () => {
     expect(classifyRefusal(new ApiError('changed', { status: 409, code: 'help_request_changed' }))).toBe('conflict')
   })
 
-  it('is read by its sentence while the server sends no code for it (#388)', () => {
-    expect(classifyRefusal(refused('text exceeds 2000 characters'))).toBe('blockTooLong')
-    // A code not registered falls back to the sentence.
-    expect(classifyRefusal(refused('teacher reply fallback exceeds 4000 characters', 'teacher_reply_block_too_long'))).toBe(
-      'tooLong',
+  // The codes stoa-backend#274 sends for a refused reply (#573).
+  it.each([
+    ['teacher_reply_unsafe_html', 'html'],
+    ['teacher_reply_private_markers', 'privateMarkers'],
+    ['teacher_reply_block_too_long', 'blockTooLong'],
+    ['teacher_reply_too_many_blocks', 'tooManyBlocks'],
+    ['teacher_reply_too_long', 'tooLong'],
+  ])('reads %s', (code, reason) => {
+    expect(classifyRefusal(refused('Die Antwort wurde abgelehnt.', code))).toBe(reason)
+  })
+
+  it('reads the code from the body the server sends', () => {
+    const error = apiErrorFromBody(
+      { detail: { code: 'teacher_reply_too_long', message: 'Die Antwort ist zu lang.', correlationId: 'c-1' } },
+      { status: 422, fallback: 'refused' },
     )
-    expect(refusalFromMessage('teacher reply contains unsafe raw HTML')).toBe('html')
+    expect(classifyRefusal(error)).toBe('tooLong')
   })
 
+  // #573: the message is the reader's language, not a reason; only the code decides.
   it.each([
-    ['teacher reply contains unsafe raw HTML', 'html'],
-    ['teacher reply contains private markers', 'privateMarkers'],
-    ['teacher reply contains private credentials', 'privateMarkers'],
-    ['rich_content blocks must contain 1 to 20 blocks', 'tooManyBlocks'],
-    ['text exceeds 2000 characters', 'blockTooLong'],
-    ['latex exceeds 500 characters', 'blockTooLong'],
-    ['teacher reply fallback exceeds 4000 characters', 'tooLong'],
-    ['content exceeds 4000 characters', 'tooLong'],
-  ])('reads "%s"', (sentence, reason) => {
-    expect(classifyRefusal(refused(sentence))).toBe(reason)
+    ['teacher reply contains unsafe raw HTML', undefined],
+    ['text exceeds 2000 characters', undefined],
+    ['teacher reply fallback exceeds 4000 characters', 'teacher_reply_empty'],
+    ['unsupported block type', 'teacher_reply_malformed'],
+    ['reworded by the server', 'teacher_reply_private_credentials'],
+    ['reworded by the server', 'constructor'],
+  ])('does not read "%s" with code %s', (message, code) => {
+    expect(classifyRefusal(refused(message, code))).toBe('unknown')
   })
 
-  // #388: stoa-backend sends no code for a refused reply, so the codes #371
-  // guessed say nothing; the message still decides.
-  it.each([
-    'teacher_reply_unsafe_html',
-    'teacher_reply_private_markers',
-    'teacher_reply_private_credentials',
-    'teacher_reply_too_many_blocks',
-    'teacher_reply_block_too_long',
-    'teacher_reply_too_long',
-    'constructor',
-  ])('does not read the guessed code %s', (code) => {
-    expect(classifyRefusal(refused('reworded by the server', code))).toBe('unknown')
-  })
-
-  it('is unknown for a 422 it cannot read, and no refusal at all for anything else', () => {
-    expect(classifyRefusal(refused('something else'))).toBe('unknown')
-    expect(classifyRefusal(new ApiError('boom', { status: 500 }))).toBeNull()
+  it('is no refusal at all for anything but a 422, 409 or a gone picture', () => {
+    expect(classifyRefusal(new ApiError('boom', { status: 500, code: 'teacher_reply_too_long' }))).toBeNull()
     expect(classifyRefusal(new Error('offline'))).toBeNull()
   })
 })
 
 describe('one vocabulary', () => {
   it.each([
-    [[paragraph('<a href="x">hier</a>')], 'teacher reply contains unsafe raw HTML'],
-    [[paragraph('password=geheim')], 'teacher reply contains private credentials'],
-    [[paragraph('a'.repeat(2001))], 'text exceeds 2000 characters'],
-    [Array.from({ length: 21 }, () => paragraph('x')), 'rich_content blocks must contain 1 to 20 blocks'],
-    [[paragraph('a'.repeat(2000)), paragraph('a'.repeat(2000))], 'teacher reply fallback exceeds 4000 characters'],
-  ] as const)('names a reply the same before and after: %#', (blocks, sentence) => {
+    [[paragraph('<a href="x">hier</a>')], 'teacher_reply_unsafe_html'],
+    [[paragraph('password=geheim')], 'teacher_reply_private_markers'],
+    [[paragraph('a'.repeat(2001))], 'teacher_reply_block_too_long'],
+    [Array.from({ length: 21 }, () => paragraph('x')), 'teacher_reply_too_many_blocks'],
+    [[paragraph('a'.repeat(2000)), paragraph('a'.repeat(2000))], 'teacher_reply_too_long'],
+  ] as const)('names a reply the same before and after: %#', (blocks, code) => {
     const before: ReplyRefusal | undefined = replyProblem([...blocks])?.reason
-    const after: ReplyRefusal | null = classifyRefusal(refused(sentence))
+    const after: ReplyRefusal | null = classifyRefusal(refused('refused', code))
     expect(before).toBeDefined()
     expect(after).toBe(before)
   })

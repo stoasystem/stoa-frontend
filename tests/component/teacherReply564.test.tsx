@@ -388,10 +388,10 @@ describe('a reply the server would not take', () => {
     expect(reply.reply().attachments.view.drafts[0]).toMatchObject({ state: 'failed', problem: 'expired' })
   })
 
-  it('a 422 is said by its sentence while the server sends no code for it', async () => {
+  it('a refused reply is said by its code, and keeps its pictures (#573)', async () => {
     uploadMock.mockResolvedValue(uploaded('up-1'))
     const reply = setup()
-    reply.server.refuse(new ApiError('text exceeds 2000 characters', { status: 422 }))
+    reply.server.refuse(new ApiError('Ein Textblock ist zu lang.', { status: 422, code: 'teacher_reply_block_too_long' }))
     await choosePicture(reply.reply)
     reply.type('Hallo')
 
@@ -403,7 +403,7 @@ describe('a reply the server would not take', () => {
 
   it('a 422 it cannot read keeps the general message', async () => {
     const reply = setup()
-    reply.server.refuse(new ApiError('something else', { status: 422 }))
+    reply.server.refuse(new ApiError('text exceeds 2000 characters', { status: 422 }))
     reply.type('Hallo')
     await reply.send()
     expect(toast.error).toHaveBeenCalledWith(de.toasts.replyRefused)
