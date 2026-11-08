@@ -32,6 +32,9 @@ export class MockBackend {
 
   constructor(contract: Contract) {
     this.contract = contract
+    // The sign-in page wakes the backend as it opens (#601); the backend
+    // always answers this, so every test's mock does too.
+    this.on('GET', '/health', () => ({ status: 200, body: { status: 'ok' } }))
   }
 
   /** Answer `method template`, e.g. `('POST', '/auth/login')`, exactly as the OpenAPI document spells it. */
