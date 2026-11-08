@@ -175,6 +175,15 @@ export type PracticeAnswerRequest = {
   answer: string | string[]
 }
 
+/**
+ * One lesson quiz answer (stoa-backend `QuizAnswerSubmission`; extra fields 422).
+ * `exerciseId` is the exercise it answers, so a resend after a lost reply gets
+ * the first verdict back instead of being judged against the next exercise.
+ */
+export type LessonQuizAnswerRequest = PracticeAnswerRequest & {
+  exerciseId: string
+}
+
 export type PracticeAnswerResult = {
   challengeId: string
   correct: boolean

@@ -87,10 +87,12 @@ type QuizSession = {
   queue: string[]
   mistakes: number
   status: 'inProgress' | 'passed' | 'failed'
+  /** The last answer judged and its reply: the same exercise again gets this back. */
+  last: { exerciseId: string; reply: Record<string, unknown> } | null
 }
 type Seen = {
   starts: { lessonId: string; kind: unknown }[]
-  quizAnswers: { quizId: string; answer: unknown }[]
+  quizAnswers: { quizId: string; exerciseId: unknown; answer: unknown }[]
   answers: { id: string; answer: unknown }[]
   completes: { lessonId: string; credential: unknown }[]
   hints: unknown[]
@@ -104,6 +106,8 @@ type Rules = {
   startRefusal: Refusal | null
   answerRefusal: Refusal | null
   completeRefusal: Refusal | null
+  /** Quiz answers (1-based) the backend judges and whose reply is then lost on the way back. */
+  loseReply: number[]
   /** The approved hint for an exercise, null for none; `fail` drops the request. */
   hint: (challengeId: string) => string | null | 'fail'
   /** Exercises the backend lists with `hintAvailable: false`. */
@@ -293,19 +297,31 @@ function backend() {
         queue: rules.paper(exerciseIds(lessonId), body.kind),
         mistakes: 0,
         status: 'inProgress',
+        last: null,
       }
       quizzes.set(session.quizId, session)
       return HttpResponse.json(quizView(session, spoken(request)))
     }),
     http.post(`${API}/practice/lessons/:lessonId/quiz/:quizId/answer`, async ({ params, request }) => {
       const quizId = String(params.quizId)
-      const { answer } = (await request.json()) as { answer: unknown }
-      seen.quizAnswers.push({ quizId, answer })
+      const body = (await request.json()) as Record<string, unknown>
+      const { answer, exerciseId } = body
+      seen.quizAnswers.push({ quizId, exerciseId, answer })
+      // As stoa-backend's QuizAnswerSubmission once #295 makes the exercise
+      // required (#589): extra fields are a 422 too.
+      if (typeof exerciseId !== 'string' || !exerciseId) return HttpResponse.json({ detail: 'exerciseId' }, { status: 422 })
+      if (Object.keys(body).some((key) => key !== 'answer' && key !== 'exerciseId'))
+        return HttpResponse.json({ detail: 'extra field' }, { status: 422 })
       if (rules.answerRefusal) return refuse(rules.answerRefusal)
       const session = quizzes.get(quizId)
       if (!session) return refuse({ status: 404, code: 'lesson_quiz_not_found' })
 
       const asked = session.queue[0]
+      if (exerciseId !== asked) {
+        // The answer just judged, sent again after its reply was lost: the first verdict.
+        if (session.last?.exerciseId === exerciseId) return HttpResponse.json(session.last.reply)
+        return refuse({ status: 409, code: 'lesson_quiz_out_of_order' })
+      }
       const correct = rules.judge(asked, answer)
       session.queue = session.queue.slice(1)
       if (!correct) {
@@ -322,12 +338,15 @@ function backend() {
       const passed = session.status === 'passed'
       const credential = passed ? `cred-${session.quizId}` : null
       if (credential) credentials.set(credential, { lessonId: session.lessonId })
-      return HttpResponse.json({
+      const reply = {
         ...quizView(session, spoken(request)),
         correct,
         credential,
         credentialExpiresAt: credential ? FAR_FUTURE : null,
-      })
+      }
+      session.last = { exerciseId, reply }
+      if (rules.loseReply.includes(seen.quizAnswers.length)) return HttpResponse.error()
+      return HttpResponse.json(reply)
     }),
     http.post(`${API}/practice/lessons/:lessonId/complete`, async ({ params, request }) => {
       const lessonId = String(params.lessonId)
@@ -518,6 +537,7 @@ beforeEach(async () => {
     startRefusal: null,
     answerRefusal: null,
     completeRefusal: null,
+    loseReply: [],
     hint: () => 'Add it to itself.',
     noHint: [],
     figures: false,
@@ -567,6 +587,19 @@ describe('the quiz is judged by the backend, not here', () => {
     }
     expect(await screen.findByRole('heading', { name: 'Lesson complete' })).toBeInTheDocument()
     expect(seen.quizAnswers.map((item) => item.answer)).toEqual(Array(6).fill('definitely not the answer'))
+  })
+
+  // The backend judges the exercise the answer names, not whatever it thinks is
+  // being asked (#589); a resend then gets the first verdict back.
+  it('names the exercise on screen with every answer, a re-asked one included', async () => {
+    await skipIntoQuiz(0)
+
+    const missed = await answerWrong()
+    const rest = await passQuiz()
+    expect(await screen.findByRole('heading', { name: 'Lesson complete' })).toBeInTheDocument()
+    expect(missed).toBe('l-2-e1')
+    expect(rest).toEqual(['l-2-e2', 'l-2-e3', 'l-2-e4', 'l-2-e5', 'l-2-e6', 'l-2-e1'])
+    expect(seen.quizAnswers.map((item) => item.exerciseId)).toEqual([missed, ...rest])
   })
 
   it('calls a right answer wrong when the backend does, and loses the quiz on it', async () => {
@@ -811,6 +844,29 @@ describe('a request that fails on the way, not a refusal', () => {
     expect(screen.queryByText('Your answer could not be checked. Try again.')).not.toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: 'Next question' }))
     expect(await screen.findByText(/Quiz · Question 3 of 5$/)).toBeInTheDocument()
+  })
+
+  it('a reply lost after the backend judged: sent again for the same exercise, judged once (#589)', async () => {
+    open('/chapter/u-5/l-2?mode=quiz')
+    await screen.findByText(/Quiz · Question 1 of 5$/)
+    await answerRight()
+    expect(await screen.findByText(/Quiz · Question 2 of 5$/)).toBeInTheDocument()
+
+    // The second answer is judged wrong -- one heart gone -- and the reply never arrives.
+    rules.loseReply = [2]
+    const id = await onScreen()
+    await typeAnswer('0')
+    expect(await screen.findByText('Your answer could not be checked. Try again.')).toBeInTheDocument()
+    expect(await onScreen()).toBe(id)
+
+    await user.click(screen.getByRole('button', { name: 'Check answer' }))
+    expect(await screen.findByText('Not quite')).toBeInTheDocument()
+    // Judged once: a second judgement would have taken the last heart and the quiz.
+    expect(hearts()).toHaveAccessibleName('1 of 2 hearts left')
+    expect(seen.quizAnswers.map((item) => item.exerciseId)).toEqual(['l-2-e1', id, id])
+    await user.click(screen.getByRole('button', { name: 'Continue' }))
+    expect(await onScreen()).not.toBe(id)
+    expect(screen.queryByRole('heading', { name: 'Not yet' })).not.toBeInTheDocument()
   })
 
   it('a skip quiz keeps the lesson: a server error on an answer ends nothing', async () => {
