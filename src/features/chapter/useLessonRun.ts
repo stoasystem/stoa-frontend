@@ -187,7 +187,14 @@ export function useLessonRun(lesson: PracticeLesson | undefined, { testOut = fal
       setAnswering(true)
       setQuizCheckFailed(false)
       try {
-        setQuizResult(await answerLessonQuiz(quiz.view.lessonId, quiz.view.quizId, { answer: state.answer }))
+        // The exercise on screen stays until advance, so a resend after a lost
+        // reply names the same one and gets the first verdict back (#589).
+        setQuizResult(
+          await answerLessonQuiz(quiz.view.lessonId, quiz.view.quizId, {
+            exerciseId: challenge.challengeId,
+            answer: state.answer,
+          }),
+        )
       } catch (error) {
         if (quizRefused(error)) refuse(error, true)
         else setQuizCheckFailed(true)
