@@ -58,6 +58,15 @@ export type MurmiMood =
   | 'curious'
   /** Upright, paws at the mouth: the marmot's alarm whistle. Something needs attention (reviews due). */
   | 'calling'
+  /**
+   * Round glasses, a slate held up with three step marks: the `concise` answer
+   * style. Focused, never stern: the usual smile stays.
+   */
+  | 'steps'
+  /** Eyes smiling shut, cheeks warm, a glowing star held out in both paws: the `encouraging` answer style. */
+  | 'offering'
+  /** An apple in one paw, a ringed planet in the other, a bulb overhead: the `vivid` answer style (an analogy). */
+  | 'storytelling'
 
 /** Every mood, in the order the gallery shows them. */
 export const MURMI_MOODS = [
@@ -73,6 +82,9 @@ export const MURMI_MOODS = [
   'sleeping',
   'curious',
   'calling',
+  'steps',
+  'offering',
+  'storytelling',
 ] as const satisfies readonly MurmiMood[]
 
 const FUR = 'var(--murmi-fur)'
@@ -89,6 +101,9 @@ const SCOPE = 'var(--murmi-scope)'
 const BRASS = 'var(--murmi-brass)'
 const PAGE = 'var(--murmi-page)'
 const MARK = 'var(--murmi-mark)'
+const GLOW = 'var(--murmi-glow)'
+const APPLE = 'var(--murmi-apple)'
+const LEAF = 'var(--murmi-leaf)'
 /** The sky's lit colour; on a light page, where --lit is not defined, the streak's gold. */
 const LIT = 'var(--lit, var(--star))'
 
@@ -106,6 +121,16 @@ type Part = { mood: MurmiMood; full: boolean }
 /** A four-pointed sparkle centred on (x, y). */
 function sparkle(x: number, y: number, s: number) {
   return `M${x} ${y - s}Q${x} ${y} ${x + s} ${y}Q${x} ${y} ${x} ${y + s}Q${x} ${y} ${x - s} ${y}Q${x} ${y} ${x} ${y - s}Z`
+}
+
+/** A five-pointed star centred on (x, y), outer radius `r`. */
+function star(x: number, y: number, r: number) {
+  const points = Array.from({ length: 10 }, (_, i) => {
+    const radius = i % 2 ? r * 0.46 : r
+    const angle = -Math.PI / 2 + (i * Math.PI) / 5
+    return `${(x + radius * Math.cos(angle)).toFixed(2)} ${(y + radius * Math.sin(angle)).toFixed(2)}`
+  })
+  return `M${points.join('L')}Z`
 }
 
 /* ---------------------------------------------------------------- head */
@@ -158,8 +183,8 @@ function Ears({ mood, full }: Part) {
 
 function Eyes({ mood, full }: Part) {
   const stroke = full ? 2.2 : 2.6
-  if (mood === 'delighted' || mood === 'cheering') {
-    // Eyes closed in a smile: the one moment the face is not watching.
+  if (mood === 'delighted' || mood === 'cheering' || mood === 'offering') {
+    // Eyes closed in a smile: the big moment, and the warm one (offering).
     return (
       <>
         <path d="M26.5 29 q3.5 -3.5 7 0" stroke={INK} strokeWidth={stroke} fill="none" strokeLinecap="round" />
@@ -232,8 +257,8 @@ function Mouth({ mood, full }: Part) {
       </>
     )
   }
-  if (mood === 'clapping') {
-    // Open and smiling, eyes open: pleased, a size smaller than cheering's beam.
+  if (mood === 'clapping' || mood === 'storytelling') {
+    // Storytelling: mid-sentence. Clapping: open and smiling, eyes open: pleased, a size smaller than cheering's beam.
     return (
       <>
         <path d="M32.8 37.6 q3.2 4.4 6.4 0 q-3.2 0.9 -6.4 0 z" fill={INK} />
@@ -269,6 +294,28 @@ function Mouth({ mood, full }: Part) {
   )
 }
 
+/** Small round glasses: the concise one. Scope blue, so they read as kit, not as a frown. */
+function Glasses({ full }: { full: boolean }) {
+  const rim = full ? 0.95 : 1.3
+  return (
+    <>
+      <circle cx="30" cy="29" r="4.6" fill="#fff" fillOpacity="0.16" stroke={SCOPE} strokeWidth={rim} />
+      <circle cx="42" cy="29" r="4.6" fill="#fff" fillOpacity="0.16" stroke={SCOPE} strokeWidth={rim} />
+      <path d="M34.6 28.6 q1.4 -1.1 2.8 0" stroke={SCOPE} strokeWidth={rim} fill="none" strokeLinecap="round" />
+      {full && (
+        <path
+          d="M26.6 27.2 a3.8 3.8 0 0 1 2.2 -2.4 M38.6 27.2 a3.8 3.8 0 0 1 2.2 -2.4"
+          stroke="#fff"
+          strokeWidth="0.6"
+          strokeLinecap="round"
+          opacity="0.75"
+          fill="none"
+        />
+      )}
+    </>
+  )
+}
+
 function Head({ mood, full }: Part) {
   return (
     <g transform={HEAD_POSE[mood]}>
@@ -279,9 +326,20 @@ function Head({ mood, full }: Part) {
         <path d="M21.2 24 A16 16 0 0 1 50.8 24 Q43 19.2 36 21.6 Q29 19.2 21.2 24 Z" fill={CROWN} />
         {full && <path d="M33.6 33 Q34.6 26 36 23.4 Q37.4 26 38.4 33 Z" fill={MUZZLE} opacity="0.7" />}
         <ellipse cx="36" cy="37.6" rx="7.6" ry="5.6" fill={MUZZLE} />
-        <ellipse cx="26.6" cy="36.2" rx="2.8" ry="1.7" fill={BLUSH} opacity="0.6" />
-        <ellipse cx="45.4" cy="36.2" rx="2.8" ry="1.7" fill={BLUSH} opacity="0.6" />
+        {mood === 'offering' ? (
+          // Warmer cheeks: the encouraging one.
+          <>
+            <ellipse cx="26.4" cy="35.8" rx="3.4" ry="2.1" fill={BLUSH} opacity="0.95" />
+            <ellipse cx="45.6" cy="35.8" rx="3.4" ry="2.1" fill={BLUSH} opacity="0.95" />
+          </>
+        ) : (
+          <>
+            <ellipse cx="26.6" cy="36.2" rx="2.8" ry="1.7" fill={BLUSH} opacity="0.6" />
+            <ellipse cx="45.4" cy="36.2" rx="2.8" ry="1.7" fill={BLUSH} opacity="0.6" />
+          </>
+        )}
         <Eyes mood={mood} full={full} />
+        {mood === 'steps' && <Glasses full={full} />}
         <Brows mood={mood} full={full} />
         <Mouth mood={mood} full={full} />
         <path d="M33.5 33.7 q2.5 -1.5 5 0 q-0.3 2.1 -2.5 2.7 q-2.2 -0.6 -2.5 -2.7 z" fill={INK} />
@@ -418,6 +476,30 @@ function Arms({ mood, full }: Part) {
         <>
           <Limb {...REST_LEFT} full={full} />
           <Limb d="M48.6 46.6 Q52.5 44 50.6 39.6" at={[50.2, 38.6]} full={full} />
+        </>
+      )
+    case 'steps':
+      return (
+        <>
+          <Limb {...REST_LEFT} full={full} />
+          {/* Holding the slate up by its lower corner. */}
+          <Limb d="M48.6 46.6 Q51.5 48.4 54.4 46.6" at={[55.2, 45.8]} r={[2.6, 2.9]} full={full} />
+        </>
+      )
+    case 'offering':
+      // Both paws out in front, cupped under the star.
+      return (
+        <>
+          <Limb d="M23.5 46.5 Q23.4 55 28.6 56" at={[29.8, 55.6]} r={[3, 2.4]} angle={18} full={full} />
+          <Limb d="M48.5 46.5 Q48.6 55 43.4 56" at={[42.2, 55.6]} r={[3, 2.4]} angle={-18} full={full} />
+        </>
+      )
+    case 'storytelling':
+      // The apple held up on one side, the planet on the other.
+      return (
+        <>
+          <Limb d="M23.5 46 Q16.5 44.2 15 36.6" at={[14.8, 35]} r={[3, 3]} full={full} />
+          <Limb d="M48.5 46 Q55.5 44.2 57 36.6" at={[57.2, 35]} r={[3, 3]} full={full} />
         </>
       )
     case 'calling':
@@ -611,6 +693,103 @@ function Confetti({ full }: { full: boolean }) {
   )
 }
 
+/** A slate held up beside the head, with 1 · 2 · 3 drawn on it in strokes (no font). */
+function Slate({ full }: { full: boolean }) {
+  return (
+    <g className="murmi-part murmi-tap">
+      <path d="M54 30 h16 a2 2 0 0 1 2 2 v12 a2 2 0 0 1 -2 2 h-16 a2 2 0 0 1 -2 -2 v-12 a2 2 0 0 1 2 -2 z" fill={BRASS} />
+      <path
+        d="M54.4 31.3 h15.2 a1.1 1.1 0 0 1 1.1 1.1 v11.2 a1.1 1.1 0 0 1 -1.1 1.1 h-15.2 a1.1 1.1 0 0 1 -1.1 -1.1 v-11.2 a1.1 1.1 0 0 1 1.1 -1.1 z"
+        fill={SCOPE}
+      />
+      {full && (
+        <>
+          <path
+            d={[
+              // 1
+              'M55.5 36.6 l1.2 -1.1 v5',
+              // 2
+              'M60.7 36.6 q0.3 -1.1 1.4 -1.1 q1.4 0 1.4 1.3 q0 0.9 -0.8 1.6 l-2.1 2.1 h3',
+              // 3
+              'M66.7 35.9 q0.5 -0.4 1.3 -0.4 q1.3 0 1.3 1.2 q0 1.2 -1.5 1.3 q1.7 0 1.7 1.3 q0 1.2 -1.5 1.2 q-0.9 0 -1.4 -0.5',
+            ].join(' ')}
+            stroke={PAGE}
+            strokeWidth="0.9"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            fill="none"
+          />
+          <circle cx="58.6" cy="38" r="0.55" fill={PAGE} />
+          <circle cx="65.1" cy="38" r="0.55" fill={PAGE} />
+        </>
+      )}
+    </g>
+  )
+}
+
+/** A star held out in both paws, in a soft glow. */
+function Offering({ full }: { full: boolean }) {
+  return (
+    <>
+      <circle className="murmi-part murmi-glow" cx="36" cy="49.4" r="9.4" fill={GLOW} opacity="0.4" />
+      <path d={star(36, 49.6, 6.2)} fill={GLOW} stroke={CROWN} strokeWidth={full ? 0.7 : 1} strokeLinejoin="round" />
+      {full && (
+        <g className="murmi-part murmi-twinkle">
+          <path d={sparkle(17.5, 40, 1.8)} fill={LIT} />
+          <path d={sparkle(55, 39, 1.5)} fill={LIT} />
+        </g>
+      )}
+    </>
+  )
+}
+
+/** An apple, a ringed planet, and the bulb of the idea that one is like the other. */
+function Analogy({ full }: { full: boolean }) {
+  const thin = full ? 0.8 : 1.1
+  const ring = full ? 1.1 : 1.5
+  return (
+    <>
+      {/* The apple, held up on the left. */}
+      <g transform="translate(14.6 33) scale(1.2) translate(-14.6 -33)">
+      <path
+        d="M14.6 26.6 q-1.4 -1 -2.8 -0.4 q-2.3 1 -1.9 4 q.5 3.3 3.2 3.7 q.8 .1 1.5 -.3 q.7 .4 1.5 .3 q2.7 -.4 3.2 -3.7 q.4 -3 -1.9 -4 q-1.4 -.6 -2.8 .4 z"
+        fill={APPLE}
+      />
+      <path d="M14.6 26.8 q.1 -1.6 1.1 -2.6" stroke={PAW} strokeWidth={thin} strokeLinecap="round" fill="none" />
+      {full && (
+        <>
+          <ellipse cx="17.2" cy="24.6" rx="1.4" ry="0.65" fill={LEAF} transform="rotate(-28 17.2 24.6)" />
+          <ellipse cx="12.4" cy="28.6" rx="0.7" ry="1.1" fill="#fff" opacity="0.5" transform="rotate(25 12.4 28.6)" />
+        </>
+      )}
+      </g>
+      {/* The planet, held up on the right: ring behind, ball, ring in front. */}
+      <g transform="rotate(-18 57.6 29)">
+        <ellipse cx="57.6" cy="29" rx="7.4" ry="2.1" stroke={MARK} strokeWidth={ring} fill="none" />
+        <circle cx="57.6" cy="29" r="4.1" fill={SCOPE} />
+        <path d="M50.2 29 A7.4 2.1 0 0 0 65 29" stroke={MARK} strokeWidth={ring} fill="none" />
+      </g>
+      {full && (
+        <path d="M55 27 a3 3 0 0 1 2.3 -1.4" stroke="#fff" strokeWidth="0.6" strokeLinecap="round" opacity="0.6" fill="none" />
+      )}
+      {/* The bulb over the head. */}
+      <g className="murmi-part murmi-bulb">
+        <circle cx="36" cy="5.4" r="3.4" fill={GLOW} stroke={CROWN} strokeWidth={full ? 0.6 : 0.9} />
+        {full && (
+          <path
+            d="M30.2 5.4 h-2 M41.8 5.4 h2 M31.6 1.6 l-1.4 -1.1 M40.4 1.6 l1.4 -1.1"
+            stroke={MARK}
+            strokeWidth="0.9"
+            strokeLinecap="round"
+            fill="none"
+          />
+        )}
+      </g>
+      <path d="M34.4 8.4 h3.2 v2.2 q0 .8 -.8 .8 h-1.6 q-.8 0 -.8 -.8 z" fill={SCOPE} />
+    </>
+  )
+}
+
 /* ---------------------------------------------------------------- figure */
 
 export function Murmi({
@@ -644,6 +823,9 @@ export function Murmi({
   else if (mood === 'calling') front = <Whistle full={full} />
   else if (mood === 'cheering') front = <Confetti full={full} />
   else if (mood === 'clapping') front = <Clap full={full} />
+  else if (mood === 'steps') front = <Slate full={full} />
+  else if (mood === 'offering') front = <Offering full={full} />
+  else if (mood === 'storytelling') front = <Analogy full={full} />
 
   return (
     <svg

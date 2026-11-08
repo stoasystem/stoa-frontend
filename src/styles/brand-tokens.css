@@ -231,7 +231,10 @@
   --murmi-brass: #C9A15A;   /* the telescope's rings */
   --murmi-page: #FFF8EA;    /* the pages of the book or star chart */
   --murmi-mark: #D9A441;    /* z's, whistle lines, the question sparkle: reads on paper and on the sky */
-  --murmi-inline: 28px;   /* beside a line of text */
+  --murmi-glow: #FFCF4D;    /* a thing that is lit and held (the offered star, the idea's bulb): always outlined in --murmi-crown, so it holds on paper; on the sky it shines */
+  --murmi-apple: #D9574A;  /* the apple in the vivid answer style's analogy: a warm red that holds on paper and on the sky */
+  --murmi-leaf: #6DAE58;    /* the apple's leaf: a hair-thin part, full detail only */
+  --murmi-inline: 28px;  /* beside a line of text */
   --murmi-state: 72px;    /* an empty or failed page, where it is the picture */
 
   /* ---- Empty, loading and failed pages (card 059) ---------------------

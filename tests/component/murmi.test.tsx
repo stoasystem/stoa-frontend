@@ -23,6 +23,9 @@ const EVERY_MOOD: Record<MurmiMood, true> = {
   sleeping: true,
   curious: true,
   calling: true,
+  steps: true,
+  offering: true,
+  storytelling: true,
 }
 
 describe('Murmi', () => {
@@ -83,6 +86,10 @@ describe('Murmi', () => {
     for (const mood of ['waving', 'pointing', 'reading', 'curious', 'calling', 'clapping'] as const) expect(eyes(mood), mood).toBe(2)
     expect(eyes('cheering')).toBe(0)
     expect(eyes('sleeping')).toBe(0)
+    // The answer styles (#597): concise and vivid look at you; encouraging smiles its eyes shut.
+    expect(eyes('steps')).toBe(2)
+    expect(eyes('storytelling')).toBe(2)
+    expect(eyes('offering')).toBe(0)
   })
 
   it('never frowns: a wrong answer is looking again, not disappointment', () => {
@@ -155,6 +162,75 @@ describe('Murmi', () => {
       expect(mirror.getAttribute('transform')).toBe('matrix(-1 0 0 1 76 0)')
       expect(mirror.classList.contains('murmi-part')).toBe(false)
     }
+  })
+
+  describe('the answer-style poses (#597)', () => {
+    const svg = (mood: MurmiMood, size: number | string = 56, animated = false) =>
+      render(<Murmi mood={mood} size={size} animated={animated} />).container.querySelector('svg')!
+    const scopeStroked = (node: Element) => node.querySelectorAll('circle[stroke="var(--murmi-scope)"]').length
+
+    it('steps: round glasses and a slate of three step marks, the marks only at full detail', () => {
+      const full = svg('steps', 56)
+      expect(full).toHaveAttribute('data-murmi-detail', 'full')
+      expect(scopeStroked(full)).toBe(2)
+      const slate = full.querySelector('.murmi-tap')!
+      expect(slate).not.toBeNull()
+      expect(slate.querySelectorAll('path[stroke="var(--murmi-page)"]')).toHaveLength(1)
+      expect(slate.querySelectorAll('circle[fill="var(--murmi-page)"]')).toHaveLength(2)
+      // Still smiling: the concise one is focused, not cold.
+      expect([...full.querySelectorAll('path')].some((p) => (p.getAttribute('d') ?? '').includes('q2.1 1.9 4.2 0.5'))).toBe(true)
+
+      const simple = svg('steps', 32)
+      expect(simple).toHaveAttribute('data-murmi-detail', 'simple')
+      // The glasses and the slate stay; the marks and the rims' highlights go.
+      expect(scopeStroked(simple)).toBe(2)
+      expect(simple.querySelector('.murmi-tap')).not.toBeNull()
+      expect(simple.querySelectorAll('[stroke="var(--murmi-page)"], [fill="var(--murmi-page)"]')).toHaveLength(0)
+      expect(simple.querySelectorAll('[stroke="#fff"]')).toHaveLength(0)
+    })
+
+    it('offering: a star with its glow in both paws, warmer cheeks, sparkles only at full detail', () => {
+      const full = svg('offering', 56)
+      expect(full.querySelector('.murmi-glow')).not.toBeNull()
+      // The star is outlined, so the bright glow colour holds on paper as well as on the sky.
+      const star = full.querySelectorAll('path[fill="var(--murmi-glow)"]')
+      expect(star).toHaveLength(1)
+      expect(star[0].getAttribute('stroke')).toBe('var(--murmi-crown)')
+      expect(full.querySelectorAll('path[fill="var(--lit, var(--star))"]')).toHaveLength(2)
+      const blush = [...full.querySelectorAll('ellipse[fill="var(--murmi-blush)"]')].map((e) => Number(e.getAttribute('opacity')))
+      expect(blush.filter((o) => o > 0.9)).toHaveLength(2)
+
+      const simple = svg('offering', 32)
+      expect(simple.querySelector('.murmi-glow')).not.toBeNull()
+      expect(simple.querySelectorAll('path[fill="var(--murmi-glow)"]')).toHaveLength(1)
+      expect(simple.querySelectorAll('path[fill="var(--lit, var(--star))"]')).toHaveLength(0)
+    })
+
+    it('storytelling: an apple, a ringed planet and a bulb; leaf and rays only at full detail', () => {
+      const full = svg('storytelling', 56)
+      expect(full.querySelector('[fill="var(--murmi-apple)"]')).not.toBeNull()
+      expect(full.querySelector('[fill="var(--murmi-leaf)"]')).not.toBeNull()
+      expect(full.querySelector('.murmi-bulb')).not.toBeNull()
+      expect(full.querySelectorAll('[stroke="var(--murmi-mark)"]').length).toBe(3)
+
+      const simple = svg('storytelling', 32)
+      expect(simple.querySelector('[fill="var(--murmi-apple)"]')).not.toBeNull()
+      expect(simple.querySelector('circle[fill="var(--murmi-scope)"]')).not.toBeNull()
+      expect(simple.querySelector('.murmi-bulb')).not.toBeNull()
+      expect(simple.querySelector('[fill="var(--murmi-leaf)"]')).toBeNull()
+      // Ring behind and in front stay; the bulb's rays go.
+      expect(simple.querySelectorAll('[stroke="var(--murmi-mark)"]').length).toBe(2)
+    })
+
+    it('each moves only when animated', () => {
+      const parts = { steps: '.murmi-tap', offering: '.murmi-glow', storytelling: '.murmi-bulb' } as const
+      for (const [mood, part] of Object.entries(parts) as [MurmiMood, string][]) {
+        expect(svg(mood)).not.toHaveClass('murmi--animated')
+        const moving = svg(mood, 56, true)
+        expect(moving).toHaveClass('murmi--animated')
+        expect(moving.querySelector(part)).toHaveClass('murmi-part')
+      }
+    })
   })
 
   it('leaves the hair-thin parts out below 40px, and at the inline token', () => {
