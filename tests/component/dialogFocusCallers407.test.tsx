@@ -313,6 +313,7 @@ describe('curriculum: a confirmed step', () => {
     reviewState: 'approved',
     updatedAt: '2026-10-18T09:00:00Z',
     updatedBy: 'admin-1',
+    publishedVersionId: null,
   }
   const DRY_RUN: CurriculumMigrationDryRunResponse = {
     migrationId: 'mig-1',

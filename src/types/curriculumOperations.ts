@@ -15,8 +15,18 @@ export type CurriculumVersion = {
   exercises?: Record<string, unknown>[] | null
 }
 
+/**
+ * A version as the worklist and the preview return it: with its lesson's live
+ * version, the publish pointer (stoa-backend#307). Every version of a lesson
+ * carries the same value; `null` when the lesson was never published. A
+ * publish sends it as `expectedPublishedVersionId` (#596).
+ */
+export type CurriculumListedVersion = CurriculumVersion & {
+  publishedVersionId: string | null
+}
+
 export type CurriculumWorklistResponse = {
-  items: CurriculumVersion[]
+  items: CurriculumListedVersion[]
   count: number
   permissionDenied?: boolean
 }

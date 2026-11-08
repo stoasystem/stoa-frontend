@@ -42,7 +42,7 @@ import {
   submitCurriculumReview,
 } from '@/services/admin/curriculumApi'
 import { ApiError, apiErrorFromBody } from '@/services/api/httpClient'
-import type { CurriculumMigrationDryRunResponse, CurriculumVersion, CurriculumWorklistResponse } from '@/types/curriculumOperations'
+import type { CurriculumListedVersion, CurriculumMigrationDryRunResponse, CurriculumWorklistResponse } from '@/types/curriculumOperations'
 
 vi.mock('@/layouts/DashboardLayout', () => ({
   DashboardLayout: ({ children }: { children: ReactNode }) => <>{children}</>,
@@ -87,8 +87,9 @@ const publish = vi.mocked(publishCurriculumVersion)
 const dryRun = vi.mocked(dryRunCurriculumMigration)
 const apply = vi.mocked(applyCurriculumMigration)
 
-function version(versionId: string, state: string, updatedAt: string, extra: Partial<CurriculumVersion> = {}) {
-  return { publicLessonId: 'lesson-1', versionId, state, updatedAt, updatedBy: 'admin-1', ...extra }
+// Every version of lesson-1 carries its live pointer, v2 until someone else publishes (#596).
+function version(versionId: string, state: string, updatedAt: string, extra: Partial<CurriculumListedVersion> = {}): CurriculumListedVersion {
+  return { publicLessonId: 'lesson-1', versionId, state, updatedAt, updatedBy: 'admin-1', publishedVersionId: 'v2', ...extra }
 }
 
 // lesson-1: v2 is live, v3 is approved and waiting to be published. Someone
@@ -97,6 +98,16 @@ const LIVE = version('v2', 'published', '2026-10-17T12:00:00Z')
 const CANDIDATE = version('v3', 'approved', '2026-10-18T09:00:00Z', { reviewState: 'approved' })
 const PUBLISHED_ELSEWHERE = version('v5', 'published', '2026-10-19T08:00:00Z')
 const ITEMS = [CANDIDATE, LIVE]
+
+/**
+ * The worklist after `row` was published: it is live, every version of the
+ * lesson carries its id, and the one it replaced is superseded (stoa-backend#307).
+ */
+function publishedNow(row: CurriculumListedVersion, rest: CurriculumListedVersion[]): CurriculumListedVersion[] {
+  return [row, ...rest.map((item) => ({ ...item, state: item.state === 'published' ? 'superseded' : item.state }))].map(
+    (item) => ({ ...item, publishedVersionId: row.versionId }),
+  )
+}
 
 const STALE_POINTER = () => new ApiError('conflict', { status: 409, detail: 'stale_pointer' })
 
@@ -121,7 +132,7 @@ function evidenceOf(migrationId: string) {
 }
 
 /** The worklist the backend holds now; every read answers from it. */
-let items: CurriculumVersion[]
+let items: CurriculumListedVersion[]
 
 beforeEach(async () => {
   await i18n.changeLanguage('en')
@@ -181,7 +192,7 @@ const confirmButton = (dialog: HTMLElement) => within(dialog).getByRole('button'
 describe('#450: a publish refused as stale, in the dialog still open', () => {
   it.each(STALE_POINTER_BODIES)('shows the version live now, and Publish there sends that one ($shape)', async ({ body }) => {
     publish.mockImplementationOnce(async () => {
-      items = [PUBLISHED_ELSEWHERE, ...ITEMS]
+      items = publishedNow(PUBLISHED_ELSEWHERE, ITEMS)
       throw apiErrorFromBody(body, { status: 409, fallback: 'conflict' })
     })
     const user = userEvent.setup()
@@ -206,7 +217,7 @@ describe('#450: a publish refused as stale, in the dialog still open', () => {
   it('holds Publish while the worklist is read again, and says why', async () => {
     let answer: (response: CurriculumWorklistResponse) => void = () => {}
     publish.mockImplementationOnce(async () => {
-      items = [PUBLISHED_ELSEWHERE, ...ITEMS]
+      items = publishedNow(PUBLISHED_ELSEWHERE, ITEMS)
       worklist.mockImplementationOnce(() => new Promise((resolve) => (answer = resolve)))
       throw STALE_POINTER()
     })
@@ -255,7 +266,7 @@ describe('#450: a publish refused as stale, in the dialog still open', () => {
     const dialog = await openPublishDialog(user)
 
     // The worklist moves on while the dialog is open, without a refusal.
-    items = [PUBLISHED_ELSEWHERE, ...ITEMS]
+    items = publishedNow(PUBLISHED_ELSEWHERE, ITEMS)
     const reads = worklist.mock.calls.length
     await act(() => client.invalidateQueries({ queryKey: adminQueryKeys.curriculumWorklistAll() }))
     await waitFor(() => expect(worklist.mock.calls.length).toBeGreaterThan(reads))
