@@ -18,6 +18,7 @@ const EVERY_MOOD: Record<MurmiMood, true> = {
   waving: true,
   pointing: true,
   cheering: true,
+  clapping: true,
   reading: true,
   sleeping: true,
   curious: true,
@@ -78,7 +79,8 @@ describe('Murmi', () => {
     expect(eyes('thinking')).toBe(2)
     expect(eyes('delighted')).toBe(0)
     // The new poses: closed only to celebrate or to sleep.
-    for (const mood of ['waving', 'pointing', 'reading', 'curious', 'calling'] as const) expect(eyes(mood), mood).toBe(2)
+    // Clapping keeps them open: well done, not the big one (#592).
+    for (const mood of ['waving', 'pointing', 'reading', 'curious', 'calling', 'clapping'] as const) expect(eyes(mood), mood).toBe(2)
     expect(eyes('cheering')).toBe(0)
     expect(eyes('sleeping')).toBe(0)
   })
@@ -121,6 +123,37 @@ describe('Murmi', () => {
       expect(moving.hasAttribute('data-murmi-animated')).toBe(true)
       // Something in every pose has a part to move.
       expect(moving.querySelector('.murmi-part')).not.toBeNull()
+    }
+  })
+
+  it('claps from the shoulders with its paws meeting at the chest, the marks in the mark colour (#592)', () => {
+    const svg = render(<Murmi mood="clapping" size={72} />).container.querySelector('svg')!
+    expect(svg.querySelectorAll('.murmi-clap')).toHaveLength(2)
+    expect(svg.querySelector('.murmi-clap-l')).not.toBeNull()
+    expect(svg.querySelector('.murmi-clap-r')).not.toBeNull()
+    const marks = svg.querySelectorAll('.murmi-clap-mark')
+    expect(marks).toHaveLength(2)
+    for (const mark of marks) expect(mark.getAttribute('stroke')).toBe('var(--murmi-mark)')
+    // Not cheering's confetti or bounce: the smaller moment.
+    expect(svg.querySelector('.murmi-bounce')).toBeNull()
+  })
+
+  it('turns round on an inner group, keeping its box, its name and its size (#592)', () => {
+    for (const mood of MOODS) {
+      const right = render(<Murmi mood={mood} size={32} />).container.querySelector('svg')!
+      expect(right).toHaveAttribute('data-murmi-facing', 'right')
+      expect(right.querySelector(':scope > g')!.hasAttribute('transform')).toBe(false)
+
+      const left = render(<Murmi mood={mood} size={32} facing="left" />).container.querySelector('svg')!
+      expect(left).toHaveAttribute('data-murmi-facing', 'left')
+      expect(left).toHaveAttribute('data-murmi', mood)
+      expect(left).toHaveAttribute('aria-hidden', 'true')
+      expect(left.getAttribute('viewBox')).toBe(right.getAttribute('viewBox'))
+      expect(left.getAttribute('width')).toBe('32')
+      // A mirror across the 76-wide box, on a group of its own: the pose's CSS transforms stay inside it.
+      const mirror = left.querySelector(':scope > g')!
+      expect(mirror.getAttribute('transform')).toBe('matrix(-1 0 0 1 76 0)')
+      expect(mirror.classList.contains('murmi-part')).toBe(false)
     }
   })
 

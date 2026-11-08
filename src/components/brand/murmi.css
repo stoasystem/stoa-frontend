@@ -142,6 +142,40 @@
   96%, 100% { transform: scaleX(-1); opacity: 0; }
 }
 
+/* Clapping: two quick claps, then a rest. Each arm swings out from its own
+ * shoulder and back until the paws meet; the marks flash as they do. */
+.murmi--animated .murmi-clap {
+  animation: murmi-clap 2.4s ease-in-out infinite;
+}
+.murmi--animated .murmi-clap-l {
+  transform-origin: 0% 0%; /* the left shoulder */
+}
+.murmi--animated .murmi-clap-r {
+  transform-origin: 100% 0%; /* the right shoulder */
+  animation-name: murmi-clap-r;
+}
+@keyframes murmi-clap {
+  0%, 20%, 40%, 100% { transform: rotate(0deg) scaleX(1); }
+  10%, 30% { transform: rotate(-9deg) scaleX(0.84); }
+}
+@keyframes murmi-clap-r {
+  0%, 20%, 40%, 100% { transform: rotate(0deg) scaleX(1); }
+  10%, 30% { transform: rotate(9deg) scaleX(0.84); }
+}
+.murmi--animated .murmi-clap-mark {
+  animation: murmi-clap-mark 2.4s ease-out infinite;
+}
+.murmi--animated .murmi-clap-mark-l {
+  transform-origin: 100% 100%;
+}
+.murmi--animated .murmi-clap-mark-r {
+  transform-origin: 0% 100%;
+}
+@keyframes murmi-clap-mark {
+  0%, 12%, 32%, 52%, 100% { transform: scale(0.7); opacity: 0.25; }
+  20%, 40% { transform: scale(1.1); opacity: 1; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .murmi--animated .murmi-part {
     animation: none;

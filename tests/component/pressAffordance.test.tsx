@@ -314,8 +314,8 @@ function sectionAt(source: string, marker: string): string {
  * the attribute it carries, and the mood the marmot wears there.
  */
 const MOMENTS: [file: string, marker: string, mood: RegExp][] = [
-  // Finished: at the telescope while a lesson is left, delighted once whole.
-  ['features/chapter/LessonStage.tsx', 'data-stage-done', /mood=\{allDone \? 'delighted' : 'watching'\}/],
+  // Finished: at the telescope while a lesson is left, cheering (and moving) once whole (#592).
+  ['features/chapter/LessonStage.tsx', 'data-stage-done', /mood=\{allDone \? 'cheering' : 'watching'\} size=\{56\} animated=\{allDone\}/],
   // Failed: the quiz lost, and the quiz refused. Looking again, never sorry.
   ['features/chapter/LessonStage.tsx', 'data-quiz-failed', /mood="thinking"/],
   ['features/chapter/LessonStage.tsx', 'data-quiz-trouble', /mood="thinking"/],

@@ -95,6 +95,11 @@ export type StarQuizRun = LessonRun & {
   starTrouble: { code: StarQuizTrouble; retryAt: string | null } | null
   /** Lost: when it can be taken again. */
   retryAt: string | null
+  /**
+   * Passed: how many answers were wrong on the way, as the backend counted
+   * them on the paper (an answer sent again is judged once); null until then.
+   */
+  passedMistakes: number | null
 }
 
 export function useStarQuizRun(unitId: string | undefined): StarQuizRun {
@@ -104,7 +109,7 @@ export function useStarQuizRun(unitId: string | undefined): StarQuizRun {
   // The answer just judged; the exercise on screen holds until it is read.
   const [result, setResult] = useState<StarQuizAnswer | null>(null)
   const [pending, setPending] = useState(true)
-  const [outcome, setOutcome] = useState<{ passed: boolean; retryAt: string | null } | null>(null)
+  const [outcome, setOutcome] = useState<{ passed: boolean; retryAt: string | null; mistakes: number } | null>(null)
   const [trouble, setTrouble] = useState<{ code: StarQuizTrouble; retryAt: string | null } | null>(null)
   const [answering, setAnswering] = useState(false)
   const [checkFailed, setCheckFailed] = useState(false)
@@ -169,7 +174,7 @@ export function useStarQuizRun(unitId: string | undefined): StarQuizRun {
   const advance = useCallback(() => {
     if (!result) return
     if (result.status !== 'inProgress') {
-      setOutcome({ passed: result.status === 'passed', retryAt: result.retryAt })
+      setOutcome({ passed: result.status === 'passed', retryAt: result.retryAt, mistakes: result.mistakes })
       setView(null)
       setResult(null)
       readSkyAgain()
@@ -220,6 +225,7 @@ export function useStarQuizRun(unitId: string | undefined): StarQuizRun {
     retry,
     starTrouble: trouble,
     retryAt: outcome && !outcome.passed ? outcome.retryAt : null,
+    passedMistakes: outcome?.passed ? outcome.mistakes : null,
   }
 }
 

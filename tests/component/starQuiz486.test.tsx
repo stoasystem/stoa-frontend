@@ -377,10 +377,38 @@ describe('taking the star quiz', () => {
     expect(await screen.findByRole('heading', { level: 2, name: 'The whole star is lit' })).toHaveFocus()
     expect(screen.getByText('You knew it: Linear equations now shines on your star map.')).toBeInTheDocument()
     expect(seen.answers.map((sent) => sent.exerciseId)).toEqual(['sq-e1', 'sq-e2', 'sq-e3', 'sq-e4', 'sq-e5', 'sq-e6'])
+    // Every answer right: the big one, cheering and moving (#592).
+    const murmi = document.querySelector('[data-star-quiz-end="passed"] [data-murmi]')
+    expect(murmi).toHaveAttribute('data-murmi', 'cheering')
+    expect(murmi).toHaveAttribute('data-murmi-animated')
     const reads = seen.skyReads
     expect(reads).toBeGreaterThan(1)
     await user.click(screen.getByRole('link', { name: 'See it on the star map' }))
     expect(where()).toBe('/map/math/algebra/u-5')
+  })
+
+  it('passed with one wrong answer: Murmi claps, not the big cheer (#592)', async () => {
+    open('/star-quiz/u-5')
+    await answerWrong()
+    for (let n = 0; n < 5; n += 1) await answerRight()
+    expect(await screen.findByRole('heading', { level: 2, name: 'The whole star is lit' })).toHaveFocus()
+    const murmi = document.querySelector('[data-star-quiz-end="passed"] [data-murmi]')
+    expect(murmi).toHaveAttribute('data-murmi', 'clapping')
+    expect(murmi).toHaveAttribute('data-murmi-animated')
+  })
+
+  it('counts an answer sent again after a lost reply once: still every answer right (#592)', async () => {
+    rules.dropAnswer = [1]
+    open('/star-quiz/u-5')
+    await onScreen()
+    await user.type(document.querySelector<HTMLInputElement>('[data-stage-exercise] input')!, `${right('sq-e1')}{Enter}`)
+    expect(await screen.findByText('Your answer could not be checked. Try again.')).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: 'Check answer' }))
+    await screen.findByText('Correct')
+    await user.click(screen.getByRole('button', { name: 'Next question' }))
+    for (let n = 0; n < 5; n += 1) await answerRight()
+    expect(await screen.findByRole('heading', { level: 2, name: 'The whole star is lit' })).toBeInTheDocument()
+    expect(document.querySelector('[data-star-quiz-end="passed"] [data-murmi]')).toHaveAttribute('data-murmi', 'cheering')
   })
 
   it('takes one wrong answer, a heart lost, and goes on', async () => {
@@ -423,6 +451,9 @@ describe('what the student reads when the backend refuses', () => {
     open('/star-quiz/u-5')
     expect(await screen.findByText(/^You can take this star quiz again from .+\.$/)).toBeInTheDocument()
     expect(document.querySelector('[data-star-quiz-end="trouble"]')).not.toBeNull()
+    // A refusal is an error: thinking, and still (#592).
+    expect(document.querySelector('[data-star-quiz-end="trouble"] [data-murmi]')).toHaveAttribute('data-murmi', 'thinking')
+    expect(document.querySelector('[data-star-quiz-end="trouble"] [data-murmi]')).not.toHaveAttribute('data-murmi-animated')
     expect(screen.getByRole('link', { name: 'Go to its lessons' })).toHaveAttribute('href', '/chapter/u-5')
     expect(screen.queryByRole('button', { name: 'Start the star quiz again' })).toBeNull()
   })
