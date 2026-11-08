@@ -279,3 +279,15 @@ export function afterParentLink(queryClient: QueryClient, input: { parentId: str
     (_, query) => (!student && holds(query, input.parentId)) || (!parent && holds(query, input.studentId)),
   )
 }
+
+/**
+ * A revoked link (#588) leaves both rows without the other account. Nothing
+ * else a list shows changes, so no read goes to the server again.
+ */
+export function afterParentLinkRevoke(queryClient: QueryClient, input: { parentId: string; studentId: string }) {
+  changeRows(queryClient, (row) => {
+    const other = row.userId === input.parentId ? input.studentId : row.userId === input.studentId ? input.parentId : undefined
+    if (!other || !row.linkedAccounts.some((held) => held.userId === other)) return row
+    return { ...row, linkedAccounts: row.linkedAccounts.filter((held) => held.userId !== other) }
+  })
+}

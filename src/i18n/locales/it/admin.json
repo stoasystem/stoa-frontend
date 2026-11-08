@@ -104,7 +104,9 @@
       "account_not_a_student": "Solo un account studente ha un numero settimanale di supporto dell'insegnante.",
       "allowance_version_conflict": "Un altro amministratore ha modificato questo numero mentre lo stavi modificando. Riaprilo per vedere quello attuale.",
       "link_target_not_found": "Uno dei due account non è utilizzabile: non esiste, non ha il ruolo giusto o non è attivo. Entrambi gli account devono essere attivi.",
-      "link_already_exists": "Questi due account sono già collegati. Non è stato modificato nulla."
+      "link_already_exists": "Questi due account sono già collegati. Non è stato modificato nulla.",
+      "link_not_open": "Tra questi due account non c’è nessun collegamento aperto: è già stato revocato o non è mai esistito. Non è stato modificato nulla.",
+      "link_revoke_conflict": "Il collegamento è cambiato dopo che questa pagina lo ha letto, quindi non è stato modificato nulla. L’elenco è stato ricaricato; controllarlo e riprovare."
     },
     "requiredTag": "obbligatorio",
     "optionalTag": "facoltativo",
@@ -176,6 +178,22 @@
       "body": "{{student}} verrà collegato a {{parent}}, relazione: «{{relationship}}». Il collegamento vale subito e nessuno dei due account deve confermarlo.",
       "cancel": "Annulla",
       "submit": "Collega ora"
+    },
+    "revoke": {
+      "submit": "Revoca il collegamento",
+      "explainer": "Chiude il collegamento tra i due account. Il genitore perde subito l’accesso al figlio.",
+      "rowLabel": "Revoca il collegamento con {{student}}",
+      "done": "{{student}} non è più collegato a {{parent}}.",
+      "failed": "Non è stato possibile revocare il collegamento.",
+      "forbidden": "Non hai il permesso di revocare i collegamenti dei genitori. Rivolgiti a un amministratore con i diritti sulle operazioni degli account.",
+      "confirm": {
+        "title": "Revocare questo collegamento?",
+        "body": "{{parent}} perde subito l’accesso ai dati di {{student}}: progressi, rapporti e tutto ciò che il collegamento mostrava. Entrambi i lati del collegamento vengono chiusi. Per ripristinarlo, il figlio deve essere collegato di nuovo.",
+        "reasonLabel": "Motivo",
+        "reasonHint": "Obbligatorio, fino a 500 caratteri. Registrato nel registro di audit.",
+        "cancel": "Annulla",
+        "submit": "Revoca ora"
+      }
     }
   },
   "activation": {

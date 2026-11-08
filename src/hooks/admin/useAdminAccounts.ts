@@ -9,6 +9,7 @@ import {
 } from '@tanstack/react-query'
 import {
   afterParentLink,
+  afterParentLinkRevoke,
   afterReissue,
   afterRevoke,
   afterStatusChange,
@@ -25,6 +26,7 @@ import {
   readTeacherSupportAllowance,
   resetAccountPassword,
   revokeInvitation,
+  revokeParentLink,
   setTeacherSupportAllowance,
   updateAccountProfile,
   type AccountListFilters,
@@ -151,6 +153,10 @@ export function useUpdateAccountProfileMutation() {
 
 export function useAssignParentLinkMutation() {
   return useAccountMutation(assignParentLink, afterParentLink)
+}
+
+export function useRevokeParentLinkMutation() {
+  return useAccountMutation(revokeParentLink, afterParentLinkRevoke)
 }
 
 export function useTeacherSupportAllowanceQuery(studentId: string | null) {

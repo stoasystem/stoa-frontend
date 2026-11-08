@@ -290,6 +290,33 @@ export async function assignParentLink(input: {
   return response.data
 }
 
+/** The link as it now stands: both sides closed (stoa-backend #288). */
+export type ParentLinkRevokeResponse = {
+  parent_id: string
+  student_id: string
+  relationship: string
+  status: string
+  link_updated_at: string
+}
+
+/**
+ * Ends a parent-student relationship (#588). The parent stops seeing the
+ * child's data at once. The reason, 1-500 characters, goes to the audit log;
+ * the route refuses any field it does not know, so only these three are sent.
+ */
+export async function revokeParentLink(input: {
+  parentId: string
+  studentId: string
+  reason: string
+}) {
+  const response = await httpClient.post<ParentLinkRevokeResponse>('/admin/parent-links/revoke', {
+    parent_id: input.parentId,
+    student_id: input.studentId,
+    reason: input.reason,
+  })
+  return response.data
+}
+
 export type TeacherSupportAllowance = {
   studentId: string
   weeklyCases: number

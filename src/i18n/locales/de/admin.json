@@ -104,7 +104,9 @@
       "account_not_a_student": "Nur ein Schülerkonto hat einen wöchentlichen Wert für Lehrerunterstützung.",
       "allowance_version_conflict": "Eine andere Person hat diesen Wert während Ihrer Bearbeitung geändert. Öffnen Sie ihn erneut, um den aktuellen zu sehen.",
       "link_target_not_found": "Eines der beiden Konten ist nicht verwendbar: Es existiert nicht, hat nicht die passende Rolle oder ist nicht aktiv. Beide Konten müssen aktiv sein.",
-      "link_already_exists": "Diese beiden Konten sind bereits verknüpft. Es wurde nichts geändert."
+      "link_already_exists": "Diese beiden Konten sind bereits verknüpft. Es wurde nichts geändert.",
+      "link_not_open": "Zwischen diesen beiden Konten besteht keine offene Verknüpfung: Sie wurde bereits aufgehoben oder nie angelegt. Es wurde nichts geändert.",
+      "link_revoke_conflict": "Die Verknüpfung hat sich geändert, nachdem diese Seite sie gelesen hat. Es wurde nichts geändert. Die Liste wurde neu geladen; bitte prüfen und noch einmal versuchen."
     },
     "requiredTag": "Pflichtfeld",
     "optionalTag": "optional",
@@ -175,6 +177,22 @@
       "body": "{{student}} wird mit {{parent}} verknüpft, Beziehung: «{{relationship}}». Die Verknüpfung gilt sofort, und keines der beiden Konten muss sie bestätigen.",
       "cancel": "Abbrechen",
       "submit": "Jetzt verknüpfen"
+    },
+    "revoke": {
+      "submit": "Verknüpfung aufheben",
+      "explainer": "Beendet die Verknüpfung der beiden Konten. Der Elternteil verliert sofort den Zugriff auf das Kind.",
+      "rowLabel": "Verknüpfung aufheben mit {{student}}",
+      "done": "{{student}} ist nicht mehr mit {{parent}} verknüpft.",
+      "failed": "Die Verknüpfung konnte nicht aufgehoben werden.",
+      "forbidden": "Sie dürfen Eltern-Verknüpfungen nicht aufheben. Wenden Sie sich an eine Administratorin oder einen Administrator mit Rechten für Kontovorgänge.",
+      "confirm": {
+        "title": "Diese Verknüpfung aufheben?",
+        "body": "{{parent}} verliert sofort den Zugriff auf die Daten von {{student}}: Fortschritt, Berichte und alles andere, was die Verknüpfung zeigte. Beide Seiten der Verknüpfung werden geschlossen. Um sie wiederherzustellen, muss das Kind neu verknüpft werden.",
+        "reasonLabel": "Grund",
+        "reasonHint": "Pflichtfeld, bis zu 500 Zeichen. Wird im Prüfprotokoll festgehalten.",
+        "cancel": "Abbrechen",
+        "submit": "Jetzt aufheben"
+      }
     }
   },
   "activation": {
