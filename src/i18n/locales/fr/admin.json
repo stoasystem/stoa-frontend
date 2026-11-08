@@ -104,7 +104,9 @@
       "account_not_a_student": "Seul un compte élève dispose d'un nombre hebdomadaire de soutien enseignant.",
       "allowance_version_conflict": "Un autre administrateur a modifié ce nombre pendant votre saisie. Rouvrez-le pour voir la valeur actuelle.",
       "link_target_not_found": "L’un des deux comptes est inutilisable : il n’existe pas, n’a pas le bon rôle ou n’est pas actif. Les deux comptes doivent être actifs.",
-      "link_already_exists": "Ces deux comptes sont déjà liés. Rien n’a été modifié."
+      "link_already_exists": "Ces deux comptes sont déjà liés. Rien n’a été modifié.",
+      "link_not_open": "Il n’y a aucun lien ouvert entre ces deux comptes : il a déjà été révoqué, ou n’a jamais existé. Rien n’a été modifié.",
+      "link_revoke_conflict": "Le lien a changé après la lecture de cette page, donc rien n’a été modifié. La liste a été rechargée ; vérifiez-la et réessayez."
     },
     "requiredTag": "obligatoire",
     "optionalTag": "facultatif",
@@ -176,6 +178,22 @@
       "body": "{{student}} sera lié à {{parent}}, relation : « {{relationship}} ». Le lien prend effet immédiatement, et aucun des deux comptes n’a à le confirmer.",
       "cancel": "Annuler",
       "submit": "Lier maintenant"
+    },
+    "revoke": {
+      "submit": "Révoquer le lien",
+      "explainer": "Met fin au lien entre les deux comptes. Le parent perd immédiatement l’accès à l’enfant.",
+      "rowLabel": "Révoquer le lien avec {{student}}",
+      "done": "{{student}} n’est plus lié à {{parent}}.",
+      "failed": "Le lien n’a pas pu être révoqué.",
+      "forbidden": "Vous n’avez pas le droit de révoquer des liens parentaux. Adressez-vous à un administrateur disposant des droits sur les opérations de compte.",
+      "confirm": {
+        "title": "Révoquer ce lien ?",
+        "body": "{{parent}} perd immédiatement l’accès aux données de {{student}} : progrès, rapports et tout ce que le lien montrait. Les deux côtés du lien sont fermés. Pour le rétablir, l’enfant doit être lié à nouveau.",
+        "reasonLabel": "Motif",
+        "reasonHint": "Obligatoire, 500 caractères au plus. Inscrit au journal d’audit.",
+        "cancel": "Annuler",
+        "submit": "Révoquer maintenant"
+      }
     }
   },
   "activation": {

@@ -104,7 +104,9 @@
       "account_not_a_student": "Only a student account has a weekly teacher-support figure.",
       "allowance_version_conflict": "Another administrator changed this figure while you were editing it. Reopen it to see the current one.",
       "link_target_not_found": "One of the two accounts cannot be used: it does not exist, does not hold that role, or is not active. Both accounts have to be active.",
-      "link_already_exists": "These two accounts are already linked. Nothing was changed."
+      "link_already_exists": "These two accounts are already linked. Nothing was changed.",
+      "link_not_open": "There is no open link between these two accounts: it was already revoked, or never made. Nothing was changed.",
+      "link_revoke_conflict": "The link changed after this page read it, so nothing was changed. The list has been reloaded; check it and try again."
     },
     "requiredTag": "required",
     "optionalTag": "optional",
@@ -175,6 +177,22 @@
       "body": "{{student}} will be linked to {{parent}} as “{{relationship}}”. The link takes effect at once, and neither account is asked to confirm it.",
       "cancel": "Cancel",
       "submit": "Link now"
+    },
+    "revoke": {
+      "submit": "Revoke the link",
+      "explainer": "Ends the link between the two accounts. The parent loses access to the child at once.",
+      "rowLabel": "Revoke the link to {{student}}",
+      "done": "{{student}} is no longer linked to {{parent}}.",
+      "failed": "The link could not be revoked.",
+      "forbidden": "You do not have permission to revoke parent links. Ask an administrator with account operations rights.",
+      "confirm": {
+        "title": "Revoke this link?",
+        "body": "{{parent}} immediately loses access to the data of {{student}}: progress, reports and everything else the link showed. Both sides of the link are closed. To restore it, the child has to be linked again.",
+        "reasonLabel": "Reason",
+        "reasonHint": "Required, up to 500 characters. Written to the audit log.",
+        "cancel": "Cancel",
+        "submit": "Revoke now"
+      }
     }
   },
   "activation": {

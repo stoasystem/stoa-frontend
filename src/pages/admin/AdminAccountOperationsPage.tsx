@@ -1,7 +1,7 @@
-import { type FormEvent, useMemo, useRef, useState } from 'react'
+import { type FormEvent, type RefObject, useMemo, useRef, useState } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import type { TFunction } from 'i18next'
-import { AlertTriangle, CheckCircle2, Link2, RefreshCw, Search, ShieldAlert, UserRound } from 'lucide-react'
+import { AlertTriangle, CheckCircle2, Link2, RefreshCw, Search, ShieldAlert, Unlink, UserRound } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { useSearchParams } from 'react-router-dom'
 import { PageContainer } from '@/components/common/PageContainer'
@@ -20,9 +20,14 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
 import { isApiPathValue } from '@/services/api/apiPath'
 import { ApiError } from '@/services/api/httpClient'
-import { useAdminAccountsQuery, useAssignParentLinkMutation } from '@/hooks/admin/useAdminAccounts'
+import {
+  useAdminAccountsQuery,
+  useAssignParentLinkMutation,
+  useRevokeParentLinkMutation,
+} from '@/hooks/admin/useAdminAccounts'
 import { useAdminParentAccountOperationsQuery } from '@/hooks/admin/useAdminAccountOperationsQuery'
 import { useAdminBillingOperation } from '@/hooks/admin/useAdminBillingOperation'
 import { useDebouncedValue } from '@/hooks/admin/useDebouncedValue'
@@ -190,6 +195,7 @@ function ParentLinkAssignment({ parentId, lookedUp }: { parentId: string; looked
   const parents = useAdminAccountsQuery(parentFilters)
   const students = useAdminAccountsQuery(studentFilters)
   const assignment = useAssignParentLinkMutation()
+  const revocation = useParentLinkRevocation('parent-link-revoke', heading)
 
   // #372: the pickers keep the last answer on screen while the next keyword is
   // read, and those rows stayed pickable: a parent chosen from the previous
@@ -209,6 +215,7 @@ function ParentLinkAssignment({ parentId, lookedUp }: { parentId: string; looked
       ?? (lookedUpParent?.userId === selectedParent ? lookedUpParent : undefined)
   const studentPick = studentsSearching ? undefined : studentRows.find((row) => row.userId === studentChoice)
   const ready = Boolean(parentPick && studentPick && relationship.trim())
+  const revokable = Boolean(parentPick && studentPick) && !revocation.pending
 
   function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -302,10 +309,28 @@ function ParentLinkAssignment({ parentId, lookedUp }: { parentId: string; looked
             </span>
           </label>
 
-          <div className="flex items-end">
+          <div className="flex flex-wrap items-end gap-2">
             <Button type="submit" disabled={!ready || assignment.isPending} title={t('parentLinks.submitExplainer')}>
               <Link2 className="mr-2 h-4 w-4" aria-hidden="true" />
               {t('parentLinks.submit')}
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              disabled={!revokable}
+              title={t('parentLinks.revoke.explainer')}
+              onClick={() => {
+                if (!parentPick || !studentPick) return
+                revocation.open({
+                  parentId: parentPick.userId,
+                  parentLabel: accountOptionLabel(parentPick),
+                  studentId: studentPick.userId,
+                  studentLabel: accountOptionLabel(studentPick),
+                })
+              }}
+            >
+              <Unlink className="mr-2 h-4 w-4" aria-hidden="true" />
+              {t('parentLinks.revoke.submit')}
             </Button>
           </div>
         </form>
@@ -343,9 +368,135 @@ function ParentLinkAssignment({ parentId, lookedUp }: { parentId: string; looked
             {failure}
           </p>
         )}
+        {revocation.view}
       </CardContent>
     </Card>
   )
+}
+
+type RevokeTarget = { parentId: string; parentLabel: string; studentId: string; studentLabel: string }
+
+const REVOKE_REASON_MAX = 500
+
+/**
+ * Revoking a parent-student link (#588): the parent loses sight of the
+ * child's data the moment it goes through, so it is confirmed in a dialog that
+ * names both accounts and says so, and asks for the reason the audit log
+ * keeps. Opened from the picker card for any two accounts, or from a row of
+ * the looked-up parent's linked children - the only way to reach a child whose
+ * account is no longer active, since the pickers list active accounts only,
+ * and a suspended account is exactly the link an administrator most needs to
+ * close.
+ *
+ * A success re-reads the looked-up parent's children and takes the link off
+ * both rows of the cached account lists; a refusal is said by its code.
+ */
+function useParentLinkRevocation(idPrefix: string, returnFocus: RefObject<HTMLElement | null>) {
+  const { t } = useTranslation('admin')
+  const queryClient = useQueryClient()
+  const mutation = useRevokeParentLinkMutation()
+  const [target, setTarget] = useState<RevokeTarget | null>(null)
+  const [reason, setReason] = useState('')
+  const [notice, setNotice] = useState<string | null>(null)
+  const [failure, setFailure] = useState<string | null>(null)
+  const trimmed = reason.trim()
+  const ready = Boolean(target && trimmed && trimmed.length <= REVOKE_REASON_MAX) && !mutation.isPending
+
+  function open(next: RevokeTarget) {
+    if (mutation.isPending) return
+    setTarget(next)
+    setReason('')
+    setNotice(null)
+    setFailure(null)
+  }
+
+  function confirm() {
+    if (!target || !ready) return
+    const link = target
+    setTarget(null)
+    mutation.mutate(
+      { parentId: link.parentId, studentId: link.studentId, reason: trimmed },
+      {
+        onSuccess: () => {
+          setNotice(t('parentLinks.revoke.done', { student: link.studentLabel, parent: link.parentLabel }))
+          void queryClient.invalidateQueries({ queryKey: adminQueryKeys.accountOperationsForParent(link.parentId) })
+        },
+        onError: (error) => {
+          setFailure(revokeRefusal(error, t))
+          // The link moved since the page read it: show what it is now.
+          if (error instanceof ApiError && error.status === 409) {
+            void queryClient.invalidateQueries({ queryKey: adminQueryKeys.accountOperationsForParent(link.parentId) })
+          }
+        },
+      },
+    )
+  }
+
+  const view = (
+    <>
+      <Dialog open={target !== null} onOpenChange={(next) => { if (!next) setTarget(null) }}>
+        <DialogContent returnFocusFallback={returnFocus}>
+          <DialogHeader>
+            <DialogTitle>{t('parentLinks.revoke.confirm.title')}</DialogTitle>
+            <DialogDescription>
+              {t('parentLinks.revoke.confirm.body', {
+                student: target?.studentLabel ?? '',
+                parent: target?.parentLabel ?? '',
+              })}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-2">
+            <label className="block text-sm font-medium text-foreground" htmlFor={`${idPrefix}-reason`}>
+              {t('parentLinks.revoke.confirm.reasonLabel')}
+            </label>
+            <Textarea
+              id={`${idPrefix}-reason`}
+              value={reason}
+              maxLength={REVOKE_REASON_MAX}
+              required
+              aria-describedby={`${idPrefix}-reason-hint`}
+              onChange={(event) => setReason(event.target.value)}
+            />
+            <p id={`${idPrefix}-reason-hint`} className="text-xs text-muted-foreground">
+              {t('parentLinks.revoke.confirm.reasonHint')}
+            </p>
+          </div>
+          <DialogFooter className="gap-2">
+            <Button type="button" variant="outline" onClick={() => setTarget(null)}>
+              {t('parentLinks.revoke.confirm.cancel')}
+            </Button>
+            <Button type="button" variant="destructive" onClick={confirm} disabled={!ready}>
+              {t('parentLinks.revoke.confirm.submit')}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      {/* Always mounted, only its text changes (#410). */}
+      <p className={notice ? 'mt-4 text-sm text-foreground' : 'sr-only'} role="status" data-testid={`${idPrefix}-notice`}>
+        {notice}
+      </p>
+      {failure && (
+        <p className="mt-4 text-sm text-destructive" role="alert" data-testid={`${idPrefix}-error`}>
+          {failure}
+        </p>
+      )}
+    </>
+  )
+
+  return { open, pending: mutation.isPending, view }
+}
+
+/**
+ * Say why a revocation was refused. The two conflicts carry a code with a
+ * phrase in the account catalog; a 403 is said here, since the catalog's
+ * `action_not_allowed` speaks of listing accounts.
+ */
+function revokeRefusal(error: unknown, t: (key: string, options?: Record<string, unknown>) => string) {
+  const fallback = t('parentLinks.revoke.failed')
+  if (error instanceof ApiError && error.status === 403) return t('parentLinks.revoke.forbidden')
+  const code = error instanceof ApiError ? error.code : undefined
+  if (!code) return toUserFacingError(error, fallback)
+  return t(`accounts.errors.${code}`, { defaultValue: toUserFacingError(error, fallback) })
 }
 
 function AccountPicker({
@@ -732,6 +883,9 @@ function BillingRecoveryError({
 
 function AdminAccountOperationsDetail({ data }: { data: AdminAccountOperations }) {
   const { t } = useTranslation('admin')
+  const childrenHeading = useRef<HTMLHeadingElement>(null)
+  const revocation = useParentLinkRevocation('child-link-revoke', childrenHeading)
+  const parentLabel = data.parent.name || data.parent.email || data.parentId
   const state = data.supportState.state
   const Icon = state === 'blocked' ? ShieldAlert : state === 'attention' ? AlertTriangle : CheckCircle2
   const issues = [...data.supportState.blockers, ...data.supportState.warnings]
@@ -777,7 +931,9 @@ function AdminAccountOperationsDetail({ data }: { data: AdminAccountOperations }
       <BillingEvidence data={data} />
 
       <section className="space-y-3">
-        <h2 className="text-xl font-semibold text-foreground">{t('accountOperations.children.title')}</h2>
+        <h2 ref={childrenHeading} tabIndex={-1} className="text-xl font-semibold text-foreground">
+          {t('accountOperations.children.title')}
+        </h2>
         {data.children.length === 0 ? (
           <Card>
             <CardContent className="p-5 text-sm text-muted-foreground">{t('accountOperations.children.empty')}</CardContent>
@@ -785,10 +941,23 @@ function AdminAccountOperationsDetail({ data }: { data: AdminAccountOperations }
         ) : (
           <div className="grid gap-3">
             {data.children.map((child) => (
-              <ChildOperationsRow key={child.studentId} child={child} />
+              <ChildOperationsRow
+                key={child.studentId}
+                child={child}
+                revoking={revocation.pending}
+                onRevoke={() =>
+                  revocation.open({
+                    parentId: data.parentId,
+                    parentLabel,
+                    studentId: child.studentId,
+                    studentLabel: child.profile.name || child.profile.email || child.studentId,
+                  })
+                }
+              />
             ))}
           </div>
         )}
+        {revocation.view}
       </section>
 
       <UsageSummary usage={data.usage} />
@@ -838,7 +1007,18 @@ function BillingEvidence({ data }: { data: AdminAccountOperations }) {
   )
 }
 
-function ChildOperationsRow({ child }: { child: AccountOperationsChild }) {
+/** A link with no open side has nothing left to revoke. */
+const CLOSED_BINDINGS = new Set(['missing', 'rejected', 'revoked'])
+
+function ChildOperationsRow({
+  child,
+  revoking,
+  onRevoke,
+}: {
+  child: AccountOperationsChild
+  revoking: boolean
+  onRevoke: () => void
+}) {
   const { t } = useTranslation('admin')
   const usage = child.usage
   const usageLabel = usage
@@ -861,6 +1041,21 @@ function ChildOperationsRow({ child }: { child: AccountOperationsChild }) {
         <ChildMetric label={t('accountOperations.children.recovery')} value={codeLabel((child.profile.verification ?? child.verification)?.supportAction, t)} />
         <ChildMetric label={t('accountOperations.children.plan')} value={codeLabel(child.entitlement?.effectivePlan, t, 'plan')} />
         <ChildMetric label={t('accountOperations.children.usage')} value={usageLabel} muted={Boolean(usage?.unreconciled)} />
+        {!CLOSED_BINDINGS.has(child.binding.status ?? '') && (
+          <div className="lg:col-span-full">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              disabled={revoking}
+              aria-label={t('parentLinks.revoke.rowLabel', { student: child.profile.name || child.profile.email || child.studentId })}
+              onClick={onRevoke}
+            >
+              <Unlink className="mr-2 h-4 w-4" aria-hidden="true" />
+              {t('parentLinks.revoke.submit')}
+            </Button>
+          </div>
+        )}
       </CardContent>
     </Card>
   )
