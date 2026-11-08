@@ -176,6 +176,39 @@
   20%, 40% { transform: scale(1.1); opacity: 1; }
 }
 
+/* Steps (concise): the slate tips once, as if tapped for emphasis, then rests. */
+.murmi--animated .murmi-tap {
+  transform-origin: 0% 100%; /* the corner the paw holds */
+  animation: murmi-tap 4s ease-in-out infinite;
+}
+@keyframes murmi-tap {
+  0%, 70%, 100% { transform: rotate(0deg); }
+  78% { transform: rotate(-5deg); }
+  86% { transform: rotate(1deg); }
+}
+
+/* Offering (encouraging): the star's glow breathes. */
+.murmi--animated .murmi-glow {
+  transform-origin: 50% 50%;
+  animation: murmi-glow 2.8s ease-in-out infinite;
+}
+@keyframes murmi-glow {
+  0%, 100% { transform: scale(0.88); opacity: 0.22; }
+  50% { transform: scale(1.06); opacity: 0.42; }
+}
+
+/* Storytelling (vivid): the idea's bulb flickers on now and then. */
+.murmi--animated .murmi-bulb {
+  animation: murmi-bulb 3.6s ease-in-out infinite;
+}
+@keyframes murmi-bulb {
+  0%, 60%, 100% { opacity: 1; }
+  66% { opacity: 0.45; }
+  70% { opacity: 1; }
+  74% { opacity: 0.6; }
+  78% { opacity: 1; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .murmi--animated .murmi-part {
     animation: none;
