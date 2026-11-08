@@ -14,7 +14,7 @@
  * is read out once (`role="status"`). It fades in; nothing moves with reduced
  * motion (`askGuide.css`).
  */
-import { useCallback, useEffect, useId, useState } from 'react'
+import { useCallback, useEffect, useId, useLayoutEffect, useRef, useState, type RefObject } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/base'
 import { Murmi } from '@/components/brand/Murmi'
@@ -56,14 +56,52 @@ export function StageAskTipStatus({ shown }: { shown: boolean }) {
   )
 }
 
+/** Beside: how far above the panel's composer area the tip stands. */
+export const STAGE_TIP_GAP = 14
+/** Beside, before the composer area is measured: its usual height (a 46 composer, 16 under it) and the gap. */
+const STAGE_TIP_BOTTOM_FALLBACK = 76
+
+/**
+ * Beside: how far up from the panel's bottom the tip stands -- clear of all of
+ * the composer area, as tall as it is now (#598): the tray of pictures added
+ * with "+", a passage waiting to go out, a composer grown to several lines.
+ */
+function useAboveComposerArea(tip: RefObject<HTMLElement | null>, beside: boolean): number {
+  const [bottom, setBottom] = useState(STAGE_TIP_BOTTOM_FALLBACK)
+  useLayoutEffect(() => {
+    const panel = tip.current?.parentElement
+    const area = panel?.querySelector<HTMLElement>('[data-ask-composer-area]')
+    if (!beside || !panel || !area) return
+    const measure = () => {
+      const height = panel.getBoundingClientRect().bottom - area.getBoundingClientRect().top
+      if (height > 0) setBottom(Math.round(height) + STAGE_TIP_GAP)
+    }
+    measure()
+    // A tray or a passage arriving changes what is in the area; the panel or a
+    // growing composer changes its size.
+    const contents = new MutationObserver(measure)
+    contents.observe(area, { childList: true, subtree: true })
+    const size = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(measure)
+    size?.observe(area)
+    size?.observe(panel)
+    return () => {
+      contents.disconnect()
+      size?.disconnect()
+    }
+  }, [tip, beside])
+  return bottom
+}
+
 /**
  * Murmi's line. `beside`: the panel is open beside the stage, and the tip
- * stands in it, just above its composer; otherwise it sits over the docked
- * composer, in the flow.
+ * stands in it, just above its composer area -- tray and all, as tall as it
+ * is now; otherwise it sits over the docked composer, in the flow.
  */
 export function StageAskTipBubble({ beside, onDismiss }: { beside: boolean; onDismiss: () => void }) {
   const { t } = useTranslation('chat')
   const titleId = useId()
+  const own = useRef<HTMLElement>(null)
+  const bottom = useAboveComposerArea(own, beside)
 
   // Escape waves Murmi away wherever focus is -- the tip does not take it -- and only Murmi:
   // Ask's own Escape waits for the next press. Not while a dialog (Ask's sheet) is open.
@@ -80,15 +118,16 @@ export function StageAskTipBubble({ beside, onDismiss }: { beside: boolean; onDi
 
   return (
     <aside
+      ref={own}
       data-stage-ask-tip={beside ? 'beside' : 'docked'}
       data-ask-guide-in
       aria-labelledby={titleId}
       className={cn(
         'z-10 space-y-2 rounded-[var(--corner-card)] border border-solid border-[color:var(--sky-glass-border)] px-4 py-3 text-on-sky',
         // Over the panel's own composer (its way to add a photo on the left), clear of the exercise.
-        beside ? 'absolute inset-x-[14px] bottom-[76px]' : 'w-full',
+        beside ? 'absolute inset-x-[14px]' : 'w-full',
       )}
-      style={{ background: 'var(--sky-glass)', backdropFilter: 'blur(var(--sky-glass-blur))', WebkitBackdropFilter: 'blur(var(--sky-glass-blur))' }}
+      style={{ bottom: beside ? bottom : undefined, background: 'var(--sky-glass)', backdropFilter: 'blur(var(--sky-glass-blur))', WebkitBackdropFilter: 'blur(var(--sky-glass-blur))' }}
     >
       <div className="flex items-center gap-2">
         <Murmi mood="watching" size={32} />

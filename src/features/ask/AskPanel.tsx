@@ -324,7 +324,7 @@ export function AskPanel({
         </div>
       )}
 
-      <div ref={composerArea} className="shrink-0" style={{ padding: phone ? '0 12px 34px' : '0 14px 16px' }}>
+      <div ref={composerArea} data-ask-composer-area className="shrink-0" style={{ padding: phone ? '0 12px 34px' : '0 14px 16px' }}>
         {isStreaming && (
           <div className="flex justify-end pb-1">
             <Button variant="plain" size="small" onClick={ask.stopStreaming}>
