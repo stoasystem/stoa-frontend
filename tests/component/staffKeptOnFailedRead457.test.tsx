@@ -150,8 +150,8 @@ describe('the SLA figures on the system page (#457)', () => {
 
 describe('the curriculum worklist read again (#457)', () => {
   const ITEMS = [
-    { publicLessonId: 'lesson-1', versionId: 'v4', state: 'draft', updatedAt: '2026-10-18T10:00:00Z', updatedBy: 'admin-1' },
-    { publicLessonId: 'lesson-1', versionId: 'v2', state: 'published', updatedAt: '2026-10-17T12:00:00Z', updatedBy: 'admin-1' },
+    { publicLessonId: 'lesson-1', versionId: 'v4', state: 'draft', updatedAt: '2026-10-18T10:00:00Z', updatedBy: 'admin-1', publishedVersionId: 'v2' },
+    { publicLessonId: 'lesson-1', versionId: 'v2', state: 'published', updatedAt: '2026-10-17T12:00:00Z', updatedBy: 'admin-1', publishedVersionId: 'v2' },
   ]
 
   it('keeps the worklist under the alert when Refresh cannot read it again', async () => {

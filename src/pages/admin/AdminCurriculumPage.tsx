@@ -34,6 +34,7 @@ import {
 import type {
   CurriculumAuditResponse,
   CurriculumDiffResponse,
+  CurriculumListedVersion,
   CurriculumMigrationDryRunResponse,
   CurriculumMigrationEvidenceResponse,
   CurriculumValidationPreview,
@@ -80,7 +81,7 @@ const starterManifest = JSON.stringify(
 
 export function AdminCurriculumPage() {
   const { t } = useTranslation('admin')
-  const [selected, setSelected] = useState<CurriculumVersion | null>(null)
+  const [selected, setSelected] = useState<CurriculumListedVersion | null>(null)
   // #258: an empty patch, not an English "Updated title" a save would write.
   const [patchJson, setPatchJson] = useState('{}')
   const [patchJsonInvalid, setPatchJsonInvalid] = useState(false)
@@ -143,7 +144,7 @@ export function AdminCurriculumPage() {
     publishMutation.isPending
   const dryRun = dryRunManifest ? dryRunMutation.data : undefined
 
-  function selectVersion(version: CurriculumVersion) {
+  function selectVersion(version: CurriculumListedVersion) {
     if (version.versionId !== selectedVersionId) {
       // #328: the editor belongs to one version. A patch typed (or loaded)
       // for lesson A and saved after opening lesson B wrote A's content,
@@ -224,7 +225,7 @@ export function AdminCurriculumPage() {
       kind,
       publicLessonId: selectedPublicId,
       versionId: selectedVersionId,
-      liveVersionId: liveVersionOf(worklist, selectedPublicId),
+      liveVersionId: livePointerOf(selectedPublicId, [...worklist, selectedPreview, selected]),
     })
   }
 
@@ -305,12 +306,23 @@ export function AdminCurriculumPage() {
   function showLiveVersionNow(publicLessonId: string, versionId: string) {
     setLiveVersionReading(true)
     // `cancelRefetch: false` joins the read the refusal has already started.
-    void worklistQuery.refetch({ cancelRefetch: false }).then((read) => {
-      setLiveVersionReading(false)
+    void worklistQuery.refetch({ cancelRefetch: false }).then(async (read) => {
       // A failed read leaves the version as it was; a retry is refused, and read,
       // again. So does a refused one: its empty list would say nothing is live.
-      if (!read.isSuccess || read.data.permissionDenied) return
-      const liveVersionId = liveVersionOf(read.data.items, publicLessonId)
+      if (!read.isSuccess || read.data.permissionDenied) {
+        setLiveVersionReading(false)
+        return
+      }
+      let source: CurriculumListedVersion | undefined = read.data.items.find((item) => item.publicLessonId === publicLessonId)
+      if (!source) {
+        // The lesson is no longer among the worklist's rows; the preview of the
+        // version being published carries the same pointer (#596).
+        const previewRead = await previewQuery.refetch({ cancelRefetch: false })
+        if (previewRead.isSuccess && previewRead.data.publicLessonId === publicLessonId) source = previewRead.data
+      }
+      setLiveVersionReading(false)
+      if (!source) return
+      const liveVersionId = source.publishedVersionId ?? null
       setAction((current) =>
         current?.kind === 'publish' && current.versionId === versionId ? { ...current, liveVersionId } : current,
       )
@@ -512,9 +524,9 @@ function WorklistPanel({
    * fails, the page's alert says so above it and the list stays (#457).
    */
   failed: boolean
-  items: CurriculumVersion[]
+  items: CurriculumListedVersion[]
   selectedVersionId?: string
-  onSelect: (version: CurriculumVersion) => void
+  onSelect: (version: CurriculumListedVersion) => void
 }) {
   const { t } = useTranslation('admin')
   if (isLoading) return <Card><CardContent className="p-5 text-sm text-muted-foreground">{t('curriculum.worklist.loading')}</CardContent></Card>
@@ -908,16 +920,22 @@ function parseJsonObject(value: string): Record<string, unknown> | null {
 }
 
 /**
- * The version the console believes is live: the newest published one in the
- * worklist, `null` when there is none. The backend checks it against its own
- * pointer and refuses the publish with `stale_pointer` if it is wrong, so a
- * wrong guess is a refusal, never an overwrite (#258).
+ * The lesson's live version as the backend returns it: every worklist item and
+ * preview carries its lesson's publish pointer, `null` when the lesson was
+ * never published (stoa-backend#307). The first of `versions` that belongs to
+ * the lesson answers; all of them carry the same value. A publish sends it, and
+ * the backend refuses it with `stale_pointer` if it has moved since, so a stale
+ * value is a refusal, never an overwrite (#258).
+ *
+ * It used to be inferred as the newest `published` row of the lesson in the
+ * worklist, which was wrong after a rollback and missing when the live version
+ * was not among the worklist's first 100 rows (#596).
  */
-function liveVersionOf(items: CurriculumVersion[], publicLessonId: string): string | null {
-  const published = items
-    .filter((item) => item.publicLessonId === publicLessonId && item.state === 'published')
-    .sort((a, b) => String(b.updatedAt ?? '').localeCompare(String(a.updatedAt ?? '')))
-  return published[0]?.versionId ?? null
+function livePointerOf(
+  publicLessonId: string,
+  versions: readonly (CurriculumListedVersion | null | undefined)[],
+): string | null {
+  return versions.find((version) => version?.publicLessonId === publicLessonId)?.publishedVersionId ?? null
 }
 
 /** A backend value in the reader's language; one the console has no words for yet is shown as sent. */
