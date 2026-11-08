@@ -31,6 +31,7 @@ const idleMutation = { mutate: vi.fn(), isPending: false, error: null, data: und
 vi.mock('@/hooks/admin/useAdminAccounts', () => ({
   useAdminAccountsQuery: () => ({ data: { items: [] }, isLoading: false, isError: false }),
   useAssignParentLinkMutation: () => idleMutation,
+  useRevokeParentLinkMutation: () => idleMutation,
 }))
 vi.mock('@/hooks/admin/useAdminAccountOperationsQuery', () => ({
   useAdminParentAccountOperationsQuery: () => ({
