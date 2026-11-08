@@ -26,8 +26,8 @@ import {
   demoTeacherAvailability,
   demoTeacherHelpRequests,
   recordDemoExchange,
-  saveDemoGrade,
   saveDemoNotificationPreferences,
+  saveDemoProfile,
   setDemoLanguage,
 } from '@/dev/preview/demoSource'
 import { starCountFrom } from '@/dev/preview/surfaces'
@@ -135,10 +135,21 @@ const routes: Array<[method: string, pattern: string, handler: Handler]> = [
     return { preferredLocale, effectiveLocale, supportedLocales, updatedAt: now() }
   }],
   ['GET', '/students/me/profile', () => demoProfileNow()],
-  // Kept, so the year group saved on /me is the one read back (#184).
+  // Kept, so the year group and subjects saved ("About you", /me) are the ones read back (#184, #591).
+  // As the backend (stoa-backend#310): a code from the list, or "", is stored; a value written as a
+  // code the list does not offer is refused; other text is still stored as sent (its transition).
   ['PATCH', '/students/me/profile', ({ body }) => {
     const grade = field<string>(body, 'grade')
-    if (typeof grade === 'string') saveDemoGrade(grade)
+    const subjects = field<unknown>(body, 'primarySubjects')
+    const code = typeof grade === 'string' ? grade.trim() : undefined
+    const offered = demoProfileNow().choices?.grade ?? []
+    if (code && code.toLowerCase().startsWith('grade_') && !offered.some((choice) => choice.code === code)) {
+      return { [REFUSAL]: 422, data: { detail: { code: 'profile_choice_unknown', message: 'Choose a year group from the list.', action: 'correct_input', fields: ['grade'] } } } satisfies Refusal
+    }
+    saveDemoProfile({
+      grade: code,
+      primarySubjects: Array.isArray(subjects) ? subjects.filter((subject): subject is string => typeof subject === 'string') : undefined,
+    })
     return demoProfileNow()
   }],
   // The password change on /me (#184): the current password with the marker in

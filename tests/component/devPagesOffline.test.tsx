@@ -69,12 +69,14 @@ afterEach(() => {
 })
 
 describe.each([
-  ['starmap.html', () => import('@/dev/starmapBench'), ['@/i18n', '@/store/authStore', '@/pages/map/MapPages']],
-  ['components.html', () => import('@/dev/gallery'), ['@/i18n', '@/components/base', '@/store/authStore']],
-])('%s', (_page, load, modules) => {
+  // The bench's page is up once the map is: the student's profile is read first ("About you", #591),
+  // and a test that ends before the map mounts leaves its loads to the next one.
+  ['starmap.html', () => import('@/dev/starmapBench'), ['@/i18n', '@/store/authStore', '@/pages/map/MapPages'], 'canvas'],
+  ['components.html', () => import('@/dev/gallery'), ['@/i18n', '@/components/base', '@/store/authStore'], '#root > *'],
+])('%s', (_page, load, modules, ready) => {
   it('isolates storage and intercepts the network before any app module loads', async () => {
     await load()
-    await waitFor(() => expect(document.getElementById('root')?.childElementCount).toBeGreaterThan(0), { timeout: 20_000 })
+    await waitFor(() => expect(document.querySelector(ready)).not.toBeNull(), { timeout: 20_000 })
     for (const module of modules) {
       expect(seen.loads).toContainEqual({ module, isolated: true, intercepted: true })
     }
@@ -85,7 +87,7 @@ describe.each([
     const realLocal = window.localStorage
     const realSession = window.sessionStorage
     await load()
-    await waitFor(() => expect(document.getElementById('root')?.childElementCount).toBeGreaterThan(0), { timeout: 20_000 })
+    await waitFor(() => expect(document.querySelector(ready)).not.toBeNull(), { timeout: 20_000 })
 
     expect(window.localStorage).not.toBe(realLocal)
     expect(window.localStorage.getItem('stoa_access_token')).toBeNull()

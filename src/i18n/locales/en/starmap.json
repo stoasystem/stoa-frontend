@@ -1,4 +1,17 @@
 {
+  "aboutYou": {
+    "title": "About you",
+    "body": "Tell me your year and what you're learning, and I'll find you a good place to start.",
+    "grade": "Your year group",
+    "gradeNone": "Choose your year",
+    "subjects": "Subjects you have this term",
+    "done": "Done",
+    "saving": "Saving…",
+    "later": "Later",
+    "laterNote": "Later means you start with the very basics. You can change this any time in your account.",
+    "saveFailed": "That didn't save. Try again, or choose Later: you can set it any time in your account.",
+    "unknownGrade": "That year group is no longer on the list. Choose it again."
+  },
   "announce": {
     "map": "{{subject}}, the whole star map: {{lit}} of {{total}} lit",
     "nebula": "{{nebula}}: {{lit}} of {{total}} lit",
@@ -17,6 +30,7 @@
   },
   "firstLanding": {
     "title": "Start here: {{name}}",
+    "titleGrade": "Based on your year, start here: {{name}}",
     "body": "Every star is one thing to learn. Know all this already? Tell me where you are at school and I'll find your star.",
     "start": "Start this star",
     "later": "Look around first",
@@ -90,7 +104,8 @@
     "reason": {
       "inProgress": "Where you left off last time",
       "afterLit": "Follows on from {{name}}, which you just lit",
-      "start": "Start here"
+      "start": "Start here",
+      "grade": "Fits your year group"
     },
     "recommended": "Suggested next",
     "reviewDue_one": "{{count}} card due for review",

@@ -1,4 +1,17 @@
 {
+  "aboutYou": {
+    "title": "Über dich",
+    "body": "Sag mir, in welcher Klasse du bist und was du gerade lernst, dann finde ich einen guten Anfang für dich.",
+    "grade": "Deine Klassenstufe",
+    "gradeNone": "Klasse wählen",
+    "subjects": "Deine Fächer in diesem Semester",
+    "done": "Fertig",
+    "saving": "Wird gespeichert …",
+    "later": "Später",
+    "laterNote": "Mit «Später» fängst du ganz von vorne an. Du kannst das jederzeit in deinem Konto ändern.",
+    "saveFailed": "Das wurde nicht gespeichert. Versuch es noch einmal oder wähle «Später»: Du kannst es jederzeit in deinem Konto eintragen.",
+    "unknownGrade": "Diese Klassenstufe steht nicht mehr in der Liste. Wähl sie noch einmal."
+  },
   "announce": {
     "map": "{{subject}}, die ganze Sternkarte: {{lit}} von {{total}} leuchten",
     "nebula": "{{nebula}}: {{lit}} von {{total}} leuchten",
@@ -17,6 +30,7 @@
   },
   "firstLanding": {
     "title": "Hier anfangen: {{name}}",
+    "titleGrade": "Passend zu deiner Klasse, fang hier an: {{name}}",
     "body": "Jeder Stern ist etwas zum Lernen. Kannst du das schon? Sag mir, wo ihr in der Schule gerade seid, dann finde ich deinen Stern.",
     "start": "Mit diesem Stern beginnen",
     "later": "Erst umschauen",
@@ -90,7 +104,8 @@
     "reason": {
       "inProgress": "Hier hast du zuletzt gelernt",
       "afterLit": "Weiter nach {{name}}: gerade von dir zum Leuchten gebracht",
-      "start": "Fang hier an"
+      "start": "Fang hier an",
+      "grade": "Passt zu deiner Klassenstufe"
     },
     "recommended": "Als Nächstes empfohlen",
     "reviewDue_one": "{{count}} Karte zur Wiederholung fällig",

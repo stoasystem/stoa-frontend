@@ -74,13 +74,15 @@
   "me": {
     "grade": {
       "heading": "Year group",
-      "hint": "For example “Year 6”. Explanations will then fit you better.",
+      "hint": "Explanations, and where your star map starts, will then fit you better.",
       "label": "Your year group",
       "save": "Save",
       "saveFailed": "Your year group was not saved. Try again.",
       "saved": "Saved.",
       "unavailable": "Your year group can't be loaded right now.",
-      "refreshFailed": "Your year group couldn't be refreshed right now."
+      "refreshFailed": "Your year group couldn't be refreshed right now.",
+      "none": "Not chosen yet",
+      "unknownChoice": "That year group is no longer on the list. Choose it again."
     },
     "language": {
       "heading": "Language"

@@ -54,10 +54,11 @@ async function start() {
   await installInterception()
   const { LANGUAGE_STORAGE_KEY, isSupportedLanguage } = await import('@/i18n/languages')
   if (language && isSupportedLanguage(language)) localStorage.setItem(LANGUAGE_STORAGE_KEY, language)
-  const [, { default: i18n, i18nReady }, { demo, setDemoLanguage, resetDemoServer, startAsNewcomer, finishDemoKnowledgePoint, makeReviewDue, makeReviewScheduled }] = await Promise.all([
+  const [, { default: i18n, i18nReady }, { demo, setDemoLanguage, resetDemoServer, startAsNewcomer, finishDemoKnowledgePoint, makeReviewDue, makeReviewScheduled, saveDemoProfile }, { aboutYouPassedKey }] = await Promise.all([
     import('../../index.css'),
     import('@/i18n'),
     import('@/dev/preview/demoSource'),
+    import('@/features/starmap/onboarding/AboutYouGate'),
   ])
   // The page's language loads before it is read (#414).
   await i18nReady
@@ -66,6 +67,9 @@ async function start() {
   setDemoLanguage(isSupportedLanguage(reading) ? reading : 'en')
   if (params.get('fresh') === '1') resetDemoServer()
   if (newcomer) startAsNewcomer(params.get('fresh') === '1')
+  // "About you" answered already (#591): put off for this tab, or saved as year 9 and mathematics.
+  if (surface?.aboutYou === 'later') sessionStorage.setItem(aboutYouPassedKey(demo().demoStudent.id), '1')
+  if (surface?.aboutYou === 'year-9') saveDemoProfile({ grade: 'grade_9_secondary', primarySubjects: ['math'] })
   // For a scripted walk-through (scripts/record-onboarding.mjs): the demo knowledge point's lessons
   // done at once, as finishing them on the page would leave the demo backend.
   ;(window as Window & { __stoaPreviewDemo?: unknown }).__stoaPreviewDemo = { finishDemoKnowledgePoint }

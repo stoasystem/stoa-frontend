@@ -24,7 +24,8 @@
  * preview's `&longNames=1`) the source also gives the nebulae long names,
  * and with `newcomer` (`&newcomer=1`, the `map-newcomer` surface) the sky of
  * a student who has not started anything (`src/dev/demo/sky/newcomer.ts`),
- * which follows the demo knowledge point's lessons completed on the page.
+ * which follows the demo knowledge point's lessons completed on the page, and
+ * the year group and subjects "About you" saved (#591).
  */
 import type { TFunction } from 'i18next'
 import { useMemo, useSyncExternalStore, type ReactNode } from 'react'
@@ -34,6 +35,7 @@ import {
   acknowledgeLit,
   completedLessons,
   demoLanguage,
+  demoProfileNow,
   demoReviewState,
   demoServerVersion,
   onDemoServerChange,
@@ -249,13 +251,15 @@ export function PreviewLighting({ children, longNames = false, newcomer = false 
   const source = useMemo<StarMapSource>(() => {
     void version
     const completed = completedLessons()
+    // What "About you" saved (#591): the newcomer's sky follows it, as the backend's does.
+    const { grade, primarySubjects } = demoProfileNow()
     return {
       demo: true,
       read: (request) => {
         const read = readDemoStarMap(request)
         // The newcomer's sky is built from the demo sky's own arrays, so the engine keeps its tiles.
         const followed = newcomer
-          ? asNewcomer({ ...read, prerequisites: read.prerequisites.length > 0 ? read.prerequisites : demoSky(request.size).prerequisites }, completed, demoLanguage())
+          ? asNewcomer({ ...read, prerequisites: read.prerequisites.length > 0 ? read.prerequisites : demoSky(request.size).prerequisites }, completed, demoLanguage(), { grade, primarySubjects })
           : withDemoReviews(demoStarMapOverride(read, request.size, completed))
         return longNames ? withLongNebulaNames(followed, t) : followed
       },

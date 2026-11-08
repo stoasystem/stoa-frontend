@@ -1,4 +1,17 @@
 {
+  "aboutYou": {
+    "title": "Su di te",
+    "body": "Dimmi in che anno sei e cosa stai imparando, e ti trovo un buon punto di partenza.",
+    "grade": "Il tuo anno scolastico",
+    "gradeNone": "Scegli il tuo anno",
+    "subjects": "Le tue materie in questo semestre",
+    "done": "Fatto",
+    "saving": "Salvataggio…",
+    "later": "Più tardi",
+    "laterNote": "Con «Più tardi» parti dalle basi. Puoi cambiarlo quando vuoi nel tuo account.",
+    "saveFailed": "Non è stato salvato. Riprova, oppure scegli «Più tardi»: puoi farlo quando vuoi nel tuo account.",
+    "unknownGrade": "Questo anno scolastico non è più nella lista. Sceglilo di nuovo."
+  },
   "announce": {
     "map": "{{subject}}, tutta la mappa stellare: {{lit}} su {{total}} accese",
     "nebula": "{{nebula}}: {{lit}} su {{total}} accese",
@@ -17,6 +30,7 @@
   },
   "firstLanding": {
     "title": "Inizia da qui: {{name}}",
+    "titleGrade": "In base al tuo anno, inizia da qui: {{name}}",
     "body": "Ogni stella è una cosa da imparare. Sai già tutto questo? Dimmi a che punto siete a scuola e troverò la tua stella.",
     "start": "Inizia questa stella",
     "later": "Prima dai un’occhiata",
@@ -90,7 +104,8 @@
     "reason": {
       "inProgress": "L’ultima volta hai studiato qui",
       "afterLit": "Dopo {{name}}, che hai appena acceso",
-      "start": "Comincia da qui"
+      "start": "Comincia da qui",
+      "grade": "Adatto al tuo anno scolastico"
     },
     "recommended": "Suggerita come prossima",
     "reviewDue_one": "{{count}} scheda da ripassare",

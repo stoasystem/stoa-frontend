@@ -74,13 +74,15 @@
   "me": {
     "grade": {
       "heading": "Année scolaire",
-      "hint": "Par exemple « 6e année ». Les explications seront alors mieux adaptées.",
+      "hint": "Les explications et le point de départ de ta carte du ciel seront alors mieux adaptés.",
       "label": "Ton année scolaire",
       "save": "Enregistrer",
       "saveFailed": "Ton année scolaire n’a pas été enregistrée. Réessaie.",
       "saved": "Enregistré.",
       "unavailable": "Ton année scolaire ne peut pas être chargée pour le moment.",
-      "refreshFailed": "Ton année scolaire n’a pas pu être actualisée pour le moment."
+      "refreshFailed": "Ton année scolaire n’a pas pu être actualisée pour le moment.",
+      "none": "Pas encore choisie",
+      "unknownChoice": "Cette année scolaire n’est plus dans la liste. Choisis-la à nouveau."
     },
     "language": {
       "heading": "Langue"

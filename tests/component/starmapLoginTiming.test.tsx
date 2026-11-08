@@ -11,6 +11,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import i18n from '@/i18n'
 import { MapHomePage } from '@/pages/map/MapPages'
 import { trackEvent } from '@/services/analytics/analyticsClient'
+import { studentQueryKeys } from '@/services/student/studentQueryKeys'
 import { useAuthStore } from '@/store/authStore'
 
 vi.mock('@/services/analytics/analyticsClient', () => ({ trackEvent: vi.fn() }))
@@ -42,10 +43,21 @@ afterEach(() => {
   sessionStorage.clear()
 })
 
+/** The student's profile, read already: a year group from the list, so "About you" (#591) does not come first. */
+function profileRead() {
+  const client = new QueryClient({ defaultOptions: { queries: { retry: false, enabled: false, staleTime: Infinity } } })
+  client.setQueryData(studentQueryKeys.profile(), {
+    grade: 'grade_8_secondary',
+    primarySubjects: [],
+    choices: { grade: [{ code: 'grade_8_secondary', label: 'Year 8' }] },
+  })
+  return client
+}
+
 function landOnMap() {
   render(
     <I18nextProvider i18n={i18n}>
-      <QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false, enabled: false } } })}>
+      <QueryClientProvider client={profileRead()}>
         <MemoryRouter initialEntries={['/']}>
           <Routes>
             <Route path="/" element={<MapHomePage />} />

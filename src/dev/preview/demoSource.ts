@@ -44,8 +44,12 @@ type AskState = {
   sent: Record<string, ChatMessage[]>
 }
 
-/** What /me saved (#184): the year group, and the notification preferences. Null until saved. */
-type AccountState = { grade: string | null; notificationPreferences: NotificationPreferenceMatrix | null }
+/**
+ * What the profile saved (#184, #591): the year group and the subjects taken
+ * ("About you", /me), and the notification preferences. Null until saved: the
+ * demo profile's own. A newcomer starts with neither said.
+ */
+type AccountState = { grade: string | null; primarySubjects: string[] | null; notificationPreferences: NotificationPreferenceMatrix | null }
 
 /** `newcomer`: a student who has not started anything has not asked anything either (#586). */
 type ServerState = { completed: string[]; litAt: string | null; acknowledged: boolean; ask: AskState; reviewDue: boolean; reviewScheduled: boolean; account: AccountState; newcomer: boolean }
@@ -58,7 +62,7 @@ function opening(): ServerState {
     ask: { created: [], sent: {} },
     reviewDue: false,
     reviewScheduled: false,
-    account: { grade: null, notificationPreferences: null },
+    account: { grade: null, primarySubjects: null, notificationPreferences: null },
     newcomer: false,
   }
 }
@@ -107,7 +111,8 @@ export function resetDemoServer() {
  */
 export function startAsNewcomer(again = false) {
   if (restored && !again) return
-  server = { ...opening(), completed: [], newcomer: true }
+  // A new account: no year group said, no subject ticked, so "About you" asks (#591).
+  server = { ...opening(), completed: [], newcomer: true, account: { grade: '', primarySubjects: [], notificationPreferences: null } }
   completed.clear()
   changed()
 }
@@ -289,14 +294,18 @@ export function demoConversationList(): ConversationListResponse {
   return { items: [...created, ...fixtures] }
 }
 
-/** The student's profile as the backend reads it back: the demo one, with the year group saved on /me. */
+/** The student's profile as the backend reads it back: the demo one, with what "About you" and /me saved. */
 export function demoProfileNow(): StudentProfile {
-  const { grade } = server.account
-  return grade === null ? data.demoProfile : { ...data.demoProfile, grade }
+  const { grade, primarySubjects } = server.account
+  return { ...data.demoProfile, grade: grade ?? data.demoProfile.grade, primarySubjects: primarySubjects ?? data.demoProfile.primarySubjects }
 }
 
-export function saveDemoGrade(grade: string) {
-  server = { ...server, account: { ...server.account, grade } }
+/** `PATCH /students/me/profile`: the fields sent, each kept as sent. */
+export function saveDemoProfile(update: { grade?: string; primarySubjects?: string[] }) {
+  const account = { ...server.account }
+  if (update.grade !== undefined) account.grade = update.grade
+  if (update.primarySubjects !== undefined) account.primarySubjects = update.primarySubjects
+  server = { ...server, account }
   changed()
 }
 

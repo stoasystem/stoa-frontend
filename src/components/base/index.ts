@@ -6,6 +6,7 @@
  */
 export { Avatar, initialsOf, type AvatarSize, type AvatarTone } from '@/components/base/Avatar'
 export { Button, type ButtonProps, type ButtonSize, type ButtonVariant } from '@/components/base/Button'
+export { ChoiceSelect, type Choice, type ChoiceSelectProps } from '@/components/base/ChoiceSelect'
 export { Composer, type ComposerProps, type ComposerVariant } from '@/components/base/Composer'
 export { Group, Row, rowHeight, type RowLeading, type RowProps } from '@/components/base/Group'
 export { IconButton, type IconButtonProps, type IconButtonSize, type IconButtonVariant } from '@/components/base/IconButton'

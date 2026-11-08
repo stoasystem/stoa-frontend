@@ -31,6 +31,7 @@ import { useTeacherAvailabilityQuery } from '@/hooks/chat/useTeacherAvailability
 import { useRecommendationsQuery } from '@/hooks/learning/useWeakTopicsQuery'
 import { useStudentProfileQuery } from '@/hooks/student/useStudentProfileQuery'
 import { conversationGrade } from '@/lib/conversationGrade'
+import { saysGrade } from '@/lib/profileChoices'
 import { toUserFacingError } from '@/lib/userFacingText'
 import { cn } from '@/lib/utils'
 import { askFor, useAskStore } from '@/store/askStore'
@@ -338,7 +339,7 @@ export function AskPanel({
           the sentence did not come with it, so for months the only person
           who could fix it was never told (#154).
         */}
-        {profile && !conversationGrade(profile.grade) && (
+        {profile && !saysGrade(profile) && (
           <p id="ask-grade-missing" className="m-0 pb-1 text-[13px] text-[color:var(--on-sky-text-body)]">
             <Link to={`/me#${GRADE_SECTION_ID}`} className="text-[color:var(--on-sky-plain)] underline underline-offset-2">
               {t('gradeMissingHint')}
@@ -358,7 +359,7 @@ export function AskPanel({
           label={t('ask.composerLabel')}
           placeholder={practice ? t('ask.practice.placeholder') : t('ask.placeholder')}
           busy={isStreaming || question.starting || attachments.busy}
-          describedBy={profile && !conversationGrade(profile.grade) ? 'ask-grade-missing' : undefined}
+          describedBy={profile && !saysGrade(profile) ? 'ask-grade-missing' : undefined}
         />
       </div>
     </div>

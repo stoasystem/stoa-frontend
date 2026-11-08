@@ -35,6 +35,11 @@ export type Surface = {
   focus?: string
   /** The demo backend's state to start from, when it is not #116's opening state. */
   demo?: 'demo-point-finished' | 'review-due' | 'review-scheduled' | 'newcomer'
+  /**
+   * A newcomer's "About you" (#591), already answered in this tab: `later`
+   * went on without saying anything; `year-9` said year 9 and mathematics.
+   */
+  aboutYou?: 'later' | 'year-9'
   /** What must be on the page before it counts as ready, for the screenshot. */
   readyWhen?: string
   /** Why the surface cannot be shown yet, if it cannot. */
@@ -108,8 +113,20 @@ export const SURFACES: readonly Surface[] = [
     signedIn: true,
     stars: true,
   },
+  // "About you" (#591): a newcomer whose profile has no year group is asked it, and the
+  // subjects taken this term, before the first landing.
+  {
+    id: 'about-you',
+    label: 'Star map · newcomer, About you',
+    path: (points) => withPoints('/', points),
+    signedIn: true,
+    stars: true,
+    demo: 'newcomer',
+    readyWhen: '[data-about-you]',
+  },
   // The first landing (plan A): a student who has not started anything opens the app on
-  // the recommended star's nebula, Murmi beside the star, instead of the whole sky.
+  // the recommended star's nebula, Murmi beside the star, instead of the whole sky. Here
+  // "About you" was put off ("Later"), so the start is where the course starts.
   {
     id: 'map-newcomer',
     label: 'Star map · newcomer, first landing',
@@ -117,10 +134,24 @@ export const SURFACES: readonly Surface[] = [
     signedIn: true,
     stars: true,
     demo: 'newcomer',
+    aboutYou: 'later',
+    readyWhen: '[data-first-landing] [data-shown]',
+  },
+  // The first landing by year group (#591): "About you" said year 9 and mathematics, so the
+  // start is the first year-9 star, the demo knowledge point, and Murmi says why.
+  {
+    id: 'map-newcomer-year',
+    label: 'Star map · newcomer, first landing by year group',
+    path: (points) => withPoints('/', points),
+    signedIn: true,
+    stars: true,
+    demo: 'newcomer',
+    aboutYou: 'year-9',
     readyWhen: '[data-first-landing] [data-shown]',
   },
   // The whole first sign-in (docs/research/user-onboarding-design.md): the invitation link,
-  // signing in, which subject school is on, and the first landing on "Integers", where the
+  // signing in, "About you" (#591: the year group and the subjects; "Done" lands by year,
+  // "Later" goes on as below), and the first landing on "Integers", where the
   // course starts. That star has no chapter in the preview; "Find my own star" (#586) goes on:
   // the example about sine and cosine finds the demo knowledge point, whose path and chapter
   // lead to the practice stage. That question counts as asking, so the practice stage's

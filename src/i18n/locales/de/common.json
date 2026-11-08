@@ -74,13 +74,15 @@
   "me": {
     "grade": {
       "heading": "Klassenstufe",
-      "hint": "Zum Beispiel «6. Klasse». Danach passen die Erklärungen besser zu dir.",
+      "hint": "Danach passen die Erklärungen und der Anfang deiner Sternkarte besser zu dir.",
       "label": "Deine Klassenstufe",
       "save": "Speichern",
       "saveFailed": "Die Klassenstufe wurde nicht gespeichert. Versuch es noch einmal.",
       "saved": "Gespeichert.",
       "unavailable": "Die Klassenstufe kann gerade nicht geladen werden.",
-      "refreshFailed": "Die Klassenstufe konnte gerade nicht aktualisiert werden."
+      "refreshFailed": "Die Klassenstufe konnte gerade nicht aktualisiert werden.",
+      "none": "Noch nicht gewählt",
+      "unknownChoice": "Diese Klassenstufe steht nicht mehr in der Liste. Wähl sie noch einmal."
     },
     "language": {
       "heading": "Sprache"

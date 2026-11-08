@@ -68,6 +68,9 @@ function profile(grade: string): StudentProfile {
     guardianStatus: 'not_linked',
     createdAt: '2026-09-01T09:00:00Z',
     updatedAt: '2026-09-01T09:00:00Z',
+    choices: {
+      grade: ['grade_7_secondary', 'grade_8_secondary', 'grade_9_secondary'].map((code) => ({ code, label: code })),
+    },
   }
 }
 
@@ -126,40 +129,38 @@ afterAll(async () => {
 })
 
 describe('the year group read again (#457)', () => {
-  const field = () => screen.getByRole('textbox', { name: enCommon.me.grade.label })
+  const field = () => screen.getByRole('combobox', { name: enCommon.me.grade.label })
 
   it('keeps the form, with the grade just saved, when the read after the save fails', async () => {
-    vi.mocked(getStudentProfile).mockResolvedValueOnce(profile('7')).mockRejectedValue(upstream())
-    vi.mocked(updateStudentProfile).mockResolvedValue(profile('8'))
+    vi.mocked(getStudentProfile).mockResolvedValueOnce(profile('grade_7_secondary')).mockRejectedValue(upstream())
+    vi.mocked(updateStudentProfile).mockResolvedValue(profile('grade_8_secondary'))
     const user = userEvent.setup()
     open(<GradeGroup />)
-    await waitFor(() => expect(field()).toHaveValue('7'))
+    await waitFor(() => expect(field()).toHaveValue('grade_7_secondary'))
 
-    await user.clear(field())
-    await user.type(field(), '8')
+    await user.selectOptions(field(), 'grade_8_secondary')
     await user.click(screen.getByRole('button', { name: enCommon.me.grade.save }))
     await waitFor(() => expect(getStudentProfile).toHaveBeenCalledTimes(2))
 
     expect(await screen.findByRole('alert')).toHaveTextContent(enCommon.me.grade.refreshFailed)
     expect(screen.getByRole('status')).toHaveTextContent(enCommon.me.grade.saved)
-    expect(field()).toHaveValue('8')
+    expect(field()).toHaveValue('grade_8_secondary')
     // Nothing left to save: the grade on the page is the one saved.
     expect(screen.getByRole('button', { name: enCommon.me.grade.save })).toBeDisabled()
     expect(screen.queryByText(enCommon.me.grade.unavailable)).toBeNull()
   })
 
   it('keeps the form and what is being typed when a language switch cannot read the profile again', async () => {
-    vi.mocked(getStudentProfile).mockResolvedValueOnce(profile('7')).mockRejectedValue(upstream())
+    vi.mocked(getStudentProfile).mockResolvedValueOnce(profile('grade_7_secondary')).mockRejectedValue(upstream())
     const user = userEvent.setup()
     const client = open(<GradeGroup />)
-    await waitFor(() => expect(field()).toHaveValue('7'))
-    await user.clear(field())
-    await user.type(field(), '9')
+    await waitFor(() => expect(field()).toHaveValue('grade_7_secondary'))
+    await user.selectOptions(field(), 'grade_9_secondary')
 
     await readEverythingAgain(client)
 
     expect(await screen.findByRole('alert')).toHaveTextContent(enCommon.me.grade.refreshFailed)
-    expect(field()).toHaveValue('9')
+    expect(field()).toHaveValue('grade_9_secondary')
     expect(screen.getByRole('button', { name: enCommon.me.grade.save })).toBeEnabled()
   })
 
@@ -168,7 +169,7 @@ describe('the year group read again (#457)', () => {
     open(<GradeGroup />)
 
     expect(await screen.findByText(enCommon.me.grade.unavailable)).toBeInTheDocument()
-    expect(screen.queryByRole('textbox', { name: enCommon.me.grade.label })).toBeNull()
+    expect(screen.queryByRole('combobox', { name: enCommon.me.grade.label })).toBeNull()
     expect(screen.queryByText(enCommon.me.grade.refreshFailed)).toBeNull()
   })
 })

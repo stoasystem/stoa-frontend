@@ -143,6 +143,8 @@ describe('only the big moments move', () => {
       'features/chapter/ChapterView.tsx',
       'features/chapter/LessonStage.tsx',
       'features/starmap/components/MurmiBubble.tsx',
+      // The first sign-in: "About you" (#591), then plan B's question.
+      'features/starmap/onboarding/AboutYou.tsx',
       'features/starmap/onboarding/FirstSubjectQuestion.tsx',
       'features/starmap/reviewReminder/ReviewReminderMurmi.tsx',
     ])

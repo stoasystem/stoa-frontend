@@ -1,4 +1,17 @@
 {
+  "aboutYou": {
+    "title": "À propos de toi",
+    "body": "Dis-moi en quelle année tu es et ce que tu apprends, et je te trouverai un bon point de départ.",
+    "grade": "Ton année scolaire",
+    "gradeNone": "Choisir ton année",
+    "subjects": "Tes matières ce semestre",
+    "done": "C’est bon",
+    "saving": "Enregistrement…",
+    "later": "Plus tard",
+    "laterNote": "Avec « Plus tard », tu commences par les bases. Tu peux changer ça à tout moment dans ton compte.",
+    "saveFailed": "Ça n’a pas été enregistré. Réessaie, ou choisis « Plus tard » : tu peux le faire à tout moment dans ton compte.",
+    "unknownGrade": "Cette année scolaire n’est plus dans la liste. Choisis-la à nouveau."
+  },
   "announce": {
     "map": "{{subject}}, toute la carte du ciel : {{lit}} sur {{total}} allumées",
     "nebula": "{{nebula}} : {{lit}} sur {{total}} allumées",
@@ -17,6 +30,7 @@
   },
   "firstLanding": {
     "title": "Commence ici : {{name}}",
+    "titleGrade": "D’après ton année, commence ici : {{name}}",
     "body": "Chaque étoile est une chose à apprendre. Tu sais déjà tout ça ? Dis-moi où tu en es à l’école et je trouverai ton étoile.",
     "start": "Commencer cette étoile",
     "later": "D’abord explorer",
@@ -90,7 +104,8 @@
     "reason": {
       "inProgress": "Tu en étais là la dernière fois",
       "afterLit": "Dans la suite de {{name}}, que tu viens d’allumer",
-      "start": "Commence ici"
+      "start": "Commence ici",
+      "grade": "Adapté à ton année scolaire"
     },
     "recommended": "Suggérée ensuite",
     "reviewDue_one": "{{count}} carte à réviser",

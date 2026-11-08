@@ -57,12 +57,13 @@ export function starLook(star: Pick<Star, 'state' | 'unlitPrerequisiteIds'>): St
 }
 
 /** Why the system recommends a star (#474, stoa-backend#164). */
-export type RecommendationReason = 'in_progress' | 'after_lit' | 'start'
+export type RecommendationReason = 'in_progress' | 'after_lit' | 'start' | 'grade'
 
 /**
  * A suggestion laid over a learning state; at most one per subject (#9 point 8).
  * The system's says why (#485): the star in progress, the one after the star
- * lit last (`relatedUnitId`), or where to start. `reason` is missing from a
+ * lit last (`relatedUnitId`), where to start, or (stoa-backend#310) the first star
+ * of the student's year group. `reason` is missing from a
  * backend before stoa-backend#164, and from a teacher's recommendation.
  */
 export type Recommendation = {

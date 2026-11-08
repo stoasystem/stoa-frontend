@@ -30,6 +30,7 @@ import { ReviewReminderBubble, ReviewReminderCorner } from '@/features/starmap/r
 import { useReviewReminder } from '@/features/starmap/reviewReminder/useReviewReminder'
 import { DEFAULT_SUBJECT_ID, DEMO_STAR_COUNT, fixtureSizeFrom, foveationFrom, useStarMap } from '@/features/starmap/useStarMap'
 import { pathForTarget, resolveTarget, type LayerTarget } from '@/features/starmap/view/layers'
+import { useStudentProfileQuery } from '@/hooks/student/useStudentProfileQuery'
 import { markLoginFirstScreenReady } from '@/lib/loginTiming'
 import { subjectOfNebula } from '@/features/starmap/model/starMap'
 import { defaultSubject, useStarMapSource } from '@/features/starmap/starMapSource'
@@ -66,7 +67,9 @@ export function StarMapRoute({ relations = false, longNames = false }: { relatio
   const stage = useLightingStage(map, routeTarget)
   // A student who has not started anything is asked which subject school is on (plan B), lands on
   // its recommended star with Murmi beside it, and after the first lighting sees the galaxy (plan A).
-  const first = useFirstLanding(map, stage.target, ownerId)
+  // The subjects ticked on the profile ("About you", #591) answer plan B's question before it is asked.
+  const profile = useStudentProfileQuery({ enabled: student })
+  const first = useFirstLanding(map, stage.target, ownerId, student ? profile.data?.primarySubjects : undefined)
   const firstReveal = useFirstReveal(map, first.target, stage.reveal)
   // A star found from Ask with stars missing on the way: the path to it, and Murmi beside it (#489).
   const findStar = useFindStar(map)
@@ -156,7 +159,7 @@ export function StarMapRoute({ relations = false, longNames = false }: { relatio
 }
 
 /** The sky is still on the wire (#329): the dark it will be drawn on, and a word for a screen reader. */
-function StarMapLoading() {
+export function StarMapLoading() {
   const { t } = useTranslation('starmap')
   return (
     <section data-starmap-loading aria-busy="true" className="flex h-full min-h-0 w-full flex-1 items-center justify-center p-6">

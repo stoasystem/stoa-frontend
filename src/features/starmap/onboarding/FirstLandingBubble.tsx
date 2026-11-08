@@ -4,7 +4,8 @@
  * star's chapter, by the jump from where the star is drawn, or, for a student
  * who knows all this already, "Find my own star" (#586), which hands over to
  * Ask's docked composer with things to say -- and "Look around first", kept
- * as the quiet way out (Escape does the same).
+ * as the quiet way out (Escape does the same). A star the backend chose by
+ * the student's year group (#591) is introduced as such.
  *
  * How Murmi stands on the map -- following its star, arriving once the
  * camera has landed, docking on a phone, going on Escape -- is the star
@@ -46,12 +47,14 @@ export type FirstLandingBubbleProps = {
 export function FirstLandingBubble({ star, next, startable = true, avoid, onFindOwn, locate, watch, onDismiss, scheduler }: FirstLandingBubbleProps) {
   const { t } = useTranslation('starmap')
   const chapterTo = `/chapter/${encodeURIComponent(star.unitId)}`
+  // The backend chose it by the student's year group (stoa-backend#310): Murmi says so.
+  const byGrade = star.recommendation?.source === 'system' && star.recommendation.reason === 'grade'
   return (
     <MurmiBubble
       unitId={star.unitId}
       marker="data-first-landing"
       avoid={avoid}
-      title={next ? t('firstReveal.title') : t('firstLanding.title', { name: star.name })}
+      title={next ? t('firstReveal.title') : t(byGrade ? 'firstLanding.titleGrade' : 'firstLanding.title', { name: star.name })}
       body={next ? t('firstReveal.body', { name: star.name }) : t('firstLanding.body')}
       locate={locate}
       watch={watch}

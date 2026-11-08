@@ -406,7 +406,9 @@ function profile() {
     userId: STUDENT.id,
     name: STUDENT.name,
     email: STUDENT.email,
-    grade: 'Grade 6',
+    // The code the backend reads the stored year group as (stoa-backend#310): a code from `choices.grade`,
+    // so "About you" (#591) does not ask before the map.
+    grade: 'grade_6_primary',
     primarySubjects: ['math'],
     guardianStatus: 'linked',
     // What the list-chosen fields may be set to (stoa-backend#310): required on the reply.

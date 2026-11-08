@@ -74,13 +74,15 @@
   "me": {
     "grade": {
       "heading": "Anno scolastico",
-      "hint": "Per esempio «6ª classe». Così le spiegazioni saranno più adatte a te.",
+      "hint": "Così le spiegazioni e il punto di partenza della tua mappa stellare saranno più adatti a te.",
       "label": "Il tuo anno scolastico",
       "save": "Salva",
       "saveFailed": "Il tuo anno scolastico non è stato salvato. Riprova.",
       "saved": "Salvato.",
       "unavailable": "Il tuo anno scolastico non può essere caricato in questo momento.",
-      "refreshFailed": "Non è stato possibile aggiornare il tuo anno scolastico in questo momento."
+      "refreshFailed": "Non è stato possibile aggiornare il tuo anno scolastico in questo momento.",
+      "none": "Non ancora scelto",
+      "unknownChoice": "Questo anno scolastico non è più nella lista. Sceglilo di nuovo."
     },
     "language": {
       "heading": "Lingua"

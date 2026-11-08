@@ -7,6 +7,10 @@
  * is another page, mounted afresh, which takes the landing over from there.
  * Moving on (another nebula, a star, back out) ends it.
  *
+ * A student whose profile ticks the subjects taken this term ("About you",
+ * #591) is not asked: the camera goes to the first of them that has
+ * somewhere to start.
+ *
  * A student who takes more than one subject is asked first (plan B): the
  * map stays on the galaxy until they answer, then the camera flies to the
  * answer's recommended star, and the route follows once it has arrived, so
@@ -66,7 +70,18 @@ export type FirstLanding = {
   choose: (subjectId: string | null) => void
 }
 
-export function useFirstLanding(map: StarMap, target: LayerTarget, ownerId: string): FirstLanding {
+/**
+ * The subject a newcomer said they take this term (#591): the first ticked on
+ * the profile whose galaxy has somewhere to start; "" when the profile ticks
+ * subjects and none of them has; null when it ticks none, and plan B asks.
+ */
+export function tickedSubject(map: StarMap, primarySubjects: readonly string[] = []): string | null {
+  if (primarySubjects.length === 0) return null
+  const startable = new Set(startableSubjects(map).map((galaxy) => galaxy.subjectId))
+  return primarySubjects.find((subjectId) => startable.has(subjectId)) ?? ''
+}
+
+export function useFirstLanding(map: StarMap, target: LayerTarget, ownerId: string, primarySubjects?: readonly string[]): FirstLanding {
   const navigate = useNavigate()
   const location = useLocation()
   const { search } = location
@@ -82,9 +97,11 @@ export function useFirstLanding(map: StarMap, target: LayerTarget, ownerId: stri
     // Carried here by the route: it already follows the landing.
     if (star && star.nebulaId === nebulaId) return { landing: landingOn(star), asking: false, followed: true }
     if (target.layer !== 'map' || !isNewcomer(map)) return { landing: null, asking: false, followed: false }
+    // The subjects ticked on the profile ("About you", #591) answer plan B's question before it is asked.
+    const ticked = tickedSubject(map, primarySubjects)
     const answer = readTab(answerKey)
-    if (answer === null && startableSubjects(map).length > 1) return { landing: null, asking: true, followed: false }
-    return { landing: firstLandingFor(map, target, answer || undefined), asking: false, followed: false }
+    if (ticked === null && answer === null && startableSubjects(map).length > 1) return { landing: null, asking: true, followed: false }
+    return { landing: firstLandingFor(map, target, ticked || answer || undefined), asking: false, followed: false }
   }
   const [arrived, setArrived] = useState(() => map.stars.length > 0)
   const [first] = useState(arriving)
