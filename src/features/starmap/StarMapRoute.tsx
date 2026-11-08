@@ -25,6 +25,8 @@ import { FirstLandingBubble } from '@/features/starmap/onboarding/FirstLandingBu
 import { FirstSubjectQuestion } from '@/features/starmap/onboarding/FirstSubjectQuestion'
 import { useFirstLanding } from '@/features/starmap/onboarding/useFirstLanding'
 import { useFirstReveal } from '@/features/starmap/onboarding/useFirstReveal'
+import { ReviewReminderBubble, ReviewReminderCorner } from '@/features/starmap/reviewReminder/ReviewReminderMurmi'
+import { useReviewReminder } from '@/features/starmap/reviewReminder/useReviewReminder'
 import { DEFAULT_SUBJECT_ID, DEMO_STAR_COUNT, fixtureSizeFrom, foveationFrom, useStarMap } from '@/features/starmap/useStarMap'
 import { pathForTarget, resolveTarget, type LayerTarget } from '@/features/starmap/view/layers'
 import { markLoginFirstScreenReady } from '@/lib/loginTiming'
@@ -39,6 +41,7 @@ export function StarMapRoute({ relations = false, longNames = false }: { relatio
   const location = useLocation()
   const navigate = useNavigate()
   const ownerId = useAuthStore((state) => state.user?.id) ?? 'demo'
+  const student = useAuthStore((state) => state.user?.role === 'student')
   const lastSubject = useStarMapStore((state) => state.lastSubjects[ownerId])
   const remember = useStarMapStore((state) => state.remember)
   const defaults = useStarMap(DEFAULT_SUBJECT_ID, fixtureSizeFrom(search, DEMO_STAR_COUNT))
@@ -64,6 +67,8 @@ export function StarMapRoute({ relations = false, longNames = false }: { relatio
   const firstReveal = useFirstReveal(map, first.target, stage.reveal)
   // A star found from Ask with stars missing on the way: the path to it, and Murmi beside it (#489).
   const findStar = useFindStar(map)
+  // Reviews due: Murmi whistles in a corner, and a tap flies to the star with the most cards due (#593).
+  const reminder = useReviewReminder(map, ownerId, student)
   // A star picked -- by a tap, a link, a hint, a card from Ask -- loads its small stars if it has none yet;
   // with none picked, the stars around where the student last practised in the galaxy in focus (#503).
   const pickedStar = routeTarget.layer === 'star' ? routeTarget.unitId : null
@@ -93,12 +98,19 @@ export function StarMapRoute({ relations = false, longNames = false }: { relatio
   )
 
   // Neither a skeleton nor an error is the first screen a student signing in waits for: the clock runs on.
+  // One Murmi bubble on the map at a time: the reminder gives way to the first landing and to finding a star.
+  const firstLandingUp = Boolean(first.asking || (first.star && !findStar.path) || (firstReveal.star && firstReveal.next))
+  const findStarUp = Boolean(findStar.star && findStar.first && !firstReveal.target)
+  const reminderBubble = !firstLandingUp && !findStarUp ? reminder.star : null
+  // Not with a star chosen either: its card or sheet has that side of the map.
+  const reminderCorner = !firstLandingUp && !findStarUp && !reminder.star && routeTarget.layer !== 'star' ? reminder.mood : null
+
   if (status === 'pending') return <StarMapLoading />
   if (status === 'error') return <StarMapError onRetry={retry} />
   if (map.subjects.length === 0) return <EmptyStarMap onShown={onFirstFrame} />
 
   return (
-    <StarMapView demo={demo} map={stage.map} target={firstReveal.target ?? findStar.target ?? first.target} path={findStar.path} onNavigate={onNavigate} land={stage.land} onFirstFrame={onFirstFrame} onCentreGalaxy={onCentreGalaxy} foveate={search.has('foveation') ? foveationFrom(search) : false}
+    <StarMapView demo={demo} map={stage.map} target={firstReveal.target ?? findStar.target ?? (reminderBubble ? reminder.target : null) ?? first.target} path={findStar.path} onNavigate={onNavigate} land={stage.land} onFirstFrame={onFirstFrame} onCentreGalaxy={onCentreGalaxy} foveate={search.has('foveation') ? foveationFrom(search) : false}
       overlay={(locate, watch) => (
         <>
           <LightingOverlay map={map} locate={locate} watch={watch} onReveal={firstReveal.onReveal} />
@@ -121,6 +133,12 @@ export function StarMapRoute({ relations = false, longNames = false }: { relatio
               watch={watch}
               onDismiss={findStar.dismiss}
             />
+          )}
+          {reminderBubble && (
+            <ReviewReminderBubble key={reminderBubble.unitId} star={reminderBubble} map={map} locate={locate} watch={watch} onDismiss={reminder.close} onWave={reminder.wave} />
+          )}
+          {reminderCorner && reminder.summary && (
+            <ReviewReminderCorner key={reminderCorner} mood={reminderCorner} summary={reminder.summary} ownerId={ownerId} onOpen={reminder.mostDue ? reminder.open : undefined} />
           )}
         </>
       )} />

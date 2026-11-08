@@ -47,7 +47,7 @@ type AskState = {
 /** What /me saved (#184): the year group, and the notification preferences. Null until saved. */
 type AccountState = { grade: string | null; notificationPreferences: NotificationPreferenceMatrix | null }
 
-type ServerState = { completed: string[]; litAt: string | null; acknowledged: boolean; ask: AskState; reviewDue: boolean; account: AccountState }
+type ServerState = { completed: string[]; litAt: string | null; acknowledged: boolean; ask: AskState; reviewDue: boolean; reviewScheduled: boolean; account: AccountState }
 
 function opening(): ServerState {
   return {
@@ -56,6 +56,7 @@ function opening(): ServerState {
     acknowledged: false,
     ask: { created: [], sent: {} },
     reviewDue: false,
+    reviewScheduled: false,
     account: { grade: null, notificationPreferences: null },
   }
 }
@@ -127,6 +128,16 @@ export function makeReviewDue() {
 }
 
 /**
+ * The same lessons done, their questions scheduled but none due yet: the review reminder's
+ * sleeping Murmi on the map (#593), the next review two days from now.
+ */
+export function makeReviewScheduled() {
+  for (const lesson of DEMO_KNOWLEDGE_POINT.lessons.slice(0, 2)) completed.add(lesson.lessonId)
+  server = { ...server, reviewDue: false, reviewScheduled: true }
+  changed()
+}
+
+/**
  * `GET /practice/review/due`: nothing, as #116 opens; with `makeReviewDue`,
  * one question of each kind the lessons done have -- a picked one, missed
  * twice, a written one and one put in order -- so the review shows each way
@@ -157,9 +168,15 @@ export function demoReviewDue(): ReviewDueResponse {
   return { items, dueCount: items.length, generatedAt }
 }
 
-/** `GET /practice/review/summary`, agreeing with `demoReviewDue`. */
+/** `GET /practice/review/summary`, agreeing with `demoReviewDue`; with `makeReviewScheduled`, three questions two days off. */
 export function demoReviewSummary(): ReviewSummary {
   const { dueCount, generatedAt } = demoReviewDue()
+  if (dueCount === 0 && server.reviewScheduled) {
+    const next = new Date()
+    next.setDate(next.getDate() + 2)
+    next.setHours(9, 0, 0, 0)
+    return { dueCount: 0, scheduledCount: 3, nextDueAt: next.toISOString() }
+  }
   return { dueCount, scheduledCount: dueCount, nextDueAt: generatedAt }
 }
 

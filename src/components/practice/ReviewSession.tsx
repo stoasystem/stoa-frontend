@@ -71,6 +71,9 @@ export function ReviewSession({ unitId }: { unitId?: string } = {}) {
     () => () => {
       if (answered.current) {
         queryClient.removeQueries({ queryKey: [...practiceQueryKeys.all, 'review-due'] })
+        // And the totals the map's review reminder reads (#593): back on the map it reads them again,
+        // rather than whistling about cards just answered.
+        queryClient.removeQueries({ queryKey: practiceQueryKeys.reviewSummary() })
       }
     },
     [queryClient],

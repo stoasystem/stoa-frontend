@@ -34,7 +34,7 @@ export type Surface = {
    */
   focus?: string
   /** The demo backend's state to start from, when it is not #116's opening state. */
-  demo?: 'demo-point-finished' | 'review-due' | 'newcomer'
+  demo?: 'demo-point-finished' | 'review-due' | 'review-scheduled' | 'newcomer'
   /** What must be on the page before it counts as ready, for the screenshot. */
   readyWhen?: string
   /** Why the surface cannot be shown yet, if it cannot. */
@@ -129,6 +129,26 @@ export const SURFACES: readonly Surface[] = [
     signedIn: false,
     stars: false,
     demo: 'newcomer',
+  },
+  // #593: the review reminder -- Murmi whistling in the map's corner with reviews due, asleep
+  // with reviews scheduled and none due yet.
+  {
+    id: 'map-review-due',
+    label: 'Star map · review reminder, reviews due',
+    path: (points) => withPoints(`/map/${subjectId}`, points),
+    signedIn: true,
+    stars: true,
+    demo: 'review-due',
+    readyWhen: '[data-review-reminder="calling"]',
+  },
+  {
+    id: 'map-review-scheduled',
+    label: 'Star map · review reminder, none due yet',
+    path: (points) => withPoints(`/map/${subjectId}`, points),
+    signedIn: true,
+    stars: true,
+    demo: 'review-scheduled',
+    readyWhen: '[data-review-reminder="sleeping"]',
   },
   { id: 'chapter', label: 'Chapter', path: () => `/chapter/${unitId}`, signedIn: true, stars: false },
   { id: 'lesson', label: 'Practice stage', path: () => `/chapter/${unitId}/${nextLesson.lessonId}`, signedIn: true, stars: false },

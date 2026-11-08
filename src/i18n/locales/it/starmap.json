@@ -42,6 +42,13 @@
     "open": "Come funziona la mappa stellare",
     "close": "Chiudi"
   },
+  "reviewReminder": {
+    "next": "Prossimo ripasso: {{when}}",
+    "nextToday": "Prossimo ripasso: più tardi oggi",
+    "nextTomorrow": "Prossimo ripasso: domani",
+    "nextUnknown": "Niente da ripassare per ora",
+    "gotIt": "Ho capito"
+  },
   "legend": {
     "howLabel": "Come muoversi",
     "keys": "Tastiera: frecce verso il più vicino da quel lato, Tab segue il corso, + e − per lo zoom.",
