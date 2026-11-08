@@ -17,6 +17,7 @@
   },
   "firstLanding": {
     "title": "Inizia da qui: {{name}}",
+    "titleGrade": "Per il tuo anno scolastico, inizia da qui: {{name}}",
     "body": "Ogni stella è una cosa da imparare. Sai già tutto questo? Dimmi a che punto siete a scuola e troverò la tua stella.",
     "start": "Inizia questa stella",
     "later": "Prima dai un’occhiata",
@@ -51,6 +52,19 @@
     "title": "Quale materia stai facendo adesso a scuola?",
     "body": "Murmi ti porta a una buona prima stella.",
     "unsure": "Non lo so"
+  },
+  "aboutYou": {
+    "title": "Su di te",
+    "why": "Dimmi in che anno sei e cosa stai studiando, e troverò il punto di partenza giusto per te.",
+    "grade": "Il tuo anno scolastico",
+    "gradePlaceholder": "Scegli il tuo anno scolastico",
+    "gradeMissing": "Scegli prima il tuo anno scolastico.",
+    "subjects": "Le materie che segui questo semestre",
+    "done": "Fatto",
+    "saving": "Salvataggio…",
+    "later": "Più tardi",
+    "laterNote": "Se salti questo passo, comincerai dalle basi. Puoi cambiarlo quando vuoi in «Io».",
+    "saveFailed": "Non è stato salvato. Riprova, oppure scegli «Più tardi» e continua."
   },
   "firstReveal": {
     "title": "La tua prima stella è accesa!",
@@ -90,7 +104,8 @@
     "reason": {
       "inProgress": "L’ultima volta hai studiato qui",
       "afterLit": "Dopo {{name}}, che hai appena acceso",
-      "start": "Comincia da qui"
+      "start": "Comincia da qui",
+      "grade": "Qui comincia il tuo anno scolastico"
     },
     "recommended": "Suggerita come prossima",
     "reviewDue_one": "{{count}} scheda da ripassare",

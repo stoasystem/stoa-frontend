@@ -56,8 +56,12 @@ export function starLook(star: Pick<Star, 'state' | 'unlitPrerequisiteIds'>): St
   return star.state === 'ready' && star.unlitPrerequisiteIds.length > 0 ? 'waiting' : star.state
 }
 
-/** Why the system recommends a star (#474, stoa-backend#164). */
-export type RecommendationReason = 'in_progress' | 'after_lit' | 'start'
+/**
+ * Why the system recommends a star (#474, stoa-backend#164): `grade` is a
+ * subject not started yet, where the student's year group begins
+ * (stoa-backend#310, #591).
+ */
+export type RecommendationReason = 'in_progress' | 'after_lit' | 'start' | 'grade'
 
 /**
  * A suggestion laid over a learning state; at most one per subject (#9 point 8).

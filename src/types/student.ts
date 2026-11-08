@@ -1,10 +1,28 @@
 import type { SupportedLanguage } from '@/i18n/languages'
 
+/** One value a list-chosen profile field may take, named by the backend in the request's language (stoa-backend#310). */
+export type ProfileChoice = { code: string; label: string }
+
+/**
+ * What each list-chosen profile field may be set to, in the order offered
+ * (`choices.<field>`). The grade first; the answer style preset (#597) is the
+ * next field of this shape.
+ */
+export type ProfileChoices = {
+  grade: ProfileChoice[]
+  answerStyle?: ProfileChoice[]
+}
+
 export type StudentProfile = {
   id: string
   userId: string
   name: string
   email: string
+  /**
+   * A code from `choices.grade`, "" when none was said. Old text the backend
+   * cannot read comes back as stored: it is in no list, so it counts as no
+   * grade (`readableChoice`).
+   */
   grade: string
   primarySubjects: string[]
   schoolSystem?: string
@@ -12,6 +30,8 @@ export type StudentProfile = {
   guardianStatus: 'linked' | 'not_linked'
   createdAt: string
   updatedAt: string
+  /** Missing only from a backend before stoa-backend#310. */
+  choices?: ProfileChoices
 }
 
 /** Where a history row came from, and what happened in it. */

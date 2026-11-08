@@ -1,5 +1,6 @@
 import { createHash } from 'node:crypto'
 import type { MockBackend } from './backend'
+import { GRADES } from '../../fakes/profileChoices'
 
 export const STUDENT = {
   id: 'e2e-student-1',
@@ -53,6 +54,15 @@ export class StudentWorld {
    */
   newcomer = false
   /**
+   * The profile's year group (stoa-backend#310): a code from `choices.grade`, or "" for none, which
+   * has "About you" ask before the first landing (#591). A newcomer with a year group is recommended
+   * the star where it starts (reason `grade`), as the read model does.
+   */
+  grade = 'grade_6_primary'
+  primarySubjects: string[] = ['math']
+  /** What `PATCH /students/me/profile` was sent, in order. */
+  readonly profileWrites: Record<string, unknown>[] = []
+  /**
    * `GET /practice/review/summary` (#593): by default nothing scheduled, so the map's review
    * reminder shows no Murmi. With cards due, the student's star carries them too (`reviewDue`),
    * as the read model would, so the reminder has a star to fly to.
@@ -78,6 +88,22 @@ export class StudentWorld {
     const command = this.commands.get(key)
     if (!command) throw new Error(`no command ${key}`)
     this.complete(command)
+  }
+
+  /** `GET /students/me/profile`, with the year groups to choose from (stoa-backend#310). */
+  profile() {
+    return {
+      id: 'e2e-profile-1',
+      userId: STUDENT.id,
+      name: STUDENT.name,
+      email: STUDENT.email,
+      grade: this.grade,
+      primarySubjects: this.primarySubjects,
+      guardianStatus: 'linked',
+      createdAt: '2026-09-01T08:00:00Z',
+      updatedAt: '2026-09-01T08:00:00Z',
+      choices: { grade: GRADES },
+    }
   }
 
   install() {
@@ -107,7 +133,23 @@ export class StudentWorld {
     b.on('GET', '/notifications', ({ headers }) =>
       signedIn(headers) ? { status: 200, body: { items: [], count: 0 } } : denied,
     )
-    b.on('GET', '/students/me/profile', ({ headers }) => (signedIn(headers) ? { status: 200, body: profile() } : denied))
+    b.on('GET', '/students/me/profile', ({ headers }) => (signedIn(headers) ? { status: 200, body: this.profile() } : denied))
+    b.on('PATCH', '/students/me/profile', ({ headers, body }) => {
+      if (!signedIn(headers)) return denied
+      const sent = body as { grade?: string; primarySubjects?: string[] }
+      this.profileWrites.push(sent)
+      if (sent.grade !== undefined) {
+        if (sent.grade !== '' && !GRADES.some((choice) => choice.code === sent.grade)) {
+          return {
+            status: 422,
+            body: { detail: { code: 'profile_choice_unknown', message: 'Choose a year group from the list.', fields: ['grade'], action: 'correct_input' } },
+          }
+        }
+        this.grade = sent.grade
+      }
+      if (sent.primarySubjects !== undefined) this.primarySubjects = sent.primarySubjects
+      return { status: 200, body: this.profile() }
+    })
     b.on('GET', '/conversations', ({ headers }) =>
       signedIn(headers)
         ? { status: 200, body: { items: [...this.conversations.values()].map((c) => this.summary(c)), truncated: false } }
@@ -218,7 +260,7 @@ export class StudentWorld {
       progress: this.newcomer ? 0 : 0.5,
       unmetExercises: 2,
       reviewDue: this.reviewSummary.dueCount,
-      recommendation: { source: 'system' },
+      recommendation: { source: 'system' } as Record<string, unknown>,
       x: 0.5,
       y: 0.5,
       skills: [],
@@ -235,6 +277,11 @@ export class StudentWorld {
         stars: [{ ...reducing, relation: 'focus', prerequisiteUnitIds: [], practiceSets: [] }],
       },
     }))
+    // Read when asked: "About you" saves a year group, and the sky read again recommends by it.
+    const graded = () =>
+      this.newcomer && GRADES.some((choice) => choice.code === this.grade)
+        ? { ...reducing, recommendation: { source: 'system', reason: 'grade', relatedUnitId: null } }
+        : reducing
     this.backend.on('GET', '/practice/knowledge-map', () => ({
       status: 200,
       body: {
@@ -242,7 +289,7 @@ export class StudentWorld {
         subjectId: 'math',
         galaxies: [{ subjectId: 'math', name: 'Mathematics', lit: 0, total: 1, enrolled: true }],
         nebulae: [{ topicId: 'fractions', name: 'Fractions', order: 0, subjectId: 'math' }],
-        stars: [reducing],
+        stars: [graded()],
         prerequisites: [],
         summary: { lit: 0, total: 1, streakDays: 0, score: 0 },
       },
@@ -400,27 +447,6 @@ function user() {
   }
 }
 
-function profile() {
-  return {
-    id: 'e2e-profile-1',
-    userId: STUDENT.id,
-    name: STUDENT.name,
-    email: STUDENT.email,
-    grade: 'Grade 6',
-    primarySubjects: ['math'],
-    guardianStatus: 'linked',
-    // What the list-chosen fields may be set to (stoa-backend#310): required on the reply.
-    choices: {
-      grade: [
-        { code: 'grade_5_primary', label: 'Grade 5' },
-        { code: 'grade_6_primary', label: 'Grade 6' },
-        { code: 'grade_7_secondary', label: 'Grade 7' },
-      ],
-    },
-    createdAt: '2026-09-01T08:00:00Z',
-    updatedAt: '2026-09-01T08:00:00Z',
-  }
-}
 
 function lastSegment(pathname: string) {
   return pathname.split('/').filter(Boolean).pop() ?? ''

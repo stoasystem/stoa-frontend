@@ -26,12 +26,13 @@ import {
   demoTeacherAvailability,
   demoTeacherHelpRequests,
   recordDemoExchange,
-  saveDemoGrade,
+  saveDemoProfile,
   saveDemoNotificationPreferences,
   setDemoLanguage,
 } from '@/dev/preview/demoSource'
 import { starCountFrom } from '@/dev/preview/surfaces'
 import { DEMO_BRIDGE_STAR, DEMO_KNOWLEDGE_POINT } from '@/dev/demo/data'
+import { DEMO_GRADE_CODES } from '@/dev/demo/data/student'
 import { isSupportedLanguage } from '@/i18n/languages'
 import { commandMessageIds } from '@/services/chat/commandMessageIds'
 import type { ChatMessage, ConversationSummary, MessageQuote } from '@/types/chat'
@@ -135,10 +136,18 @@ const routes: Array<[method: string, pattern: string, handler: Handler]> = [
     return { preferredLocale, effectiveLocale, supportedLocales, updatedAt: now() }
   }],
   ['GET', '/students/me/profile', () => demoProfileNow()],
-  // Kept, so the year group saved on /me is the one read back (#184).
+  // Kept, so the year group saved on /me or in "About you" is the one read back (#184, #591). As the
+  // backend (stoa-backend#310): a year group is one of `choices.grade`, or "" for not said.
   ['PATCH', '/students/me/profile', ({ body }) => {
     const grade = field<string>(body, 'grade')
-    if (typeof grade === 'string') saveDemoGrade(grade)
+    if (typeof grade === 'string' && grade.trim() !== '' && !DEMO_GRADE_CODES.includes(grade.trim())) {
+      return refuse(422, 'profile_choice_unknown', 'Choose a year group from the list.')
+    }
+    const primarySubjects = field<string[]>(body, 'primarySubjects')
+    saveDemoProfile({
+      grade: typeof grade === 'string' ? grade.trim() : undefined,
+      primarySubjects: Array.isArray(primarySubjects) ? primarySubjects.filter((id) => typeof id === 'string') : undefined,
+    })
     return demoProfileNow()
   }],
   // The password change on /me (#184): the current password with the marker in

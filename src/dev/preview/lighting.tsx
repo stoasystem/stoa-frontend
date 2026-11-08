@@ -33,6 +33,7 @@ import { DEMO_BRIDGE_STAR, DEMO_KNOWLEDGE_POINT, demoKnowledgePointState, demoPr
 import {
   acknowledgeLit,
   completedLessons,
+  demoGradeNow,
   demoLanguage,
   demoReviewState,
   demoServerVersion,
@@ -249,13 +250,15 @@ export function PreviewLighting({ children, longNames = false, newcomer = false 
   const source = useMemo<StarMapSource>(() => {
     void version
     const completed = completedLessons()
+    // The year group saved in "About you" moves a newcomer's start (#591).
+    const grade = demoGradeNow()
     return {
       demo: true,
       read: (request) => {
         const read = readDemoStarMap(request)
         // The newcomer's sky is built from the demo sky's own arrays, so the engine keeps its tiles.
         const followed = newcomer
-          ? asNewcomer({ ...read, prerequisites: read.prerequisites.length > 0 ? read.prerequisites : demoSky(request.size).prerequisites }, completed, demoLanguage())
+          ? asNewcomer({ ...read, prerequisites: read.prerequisites.length > 0 ? read.prerequisites : demoSky(request.size).prerequisites }, completed, demoLanguage(), grade)
           : withDemoReviews(demoStarMapOverride(read, request.size, completed))
         return longNames ? withLongNebulaNames(followed, t) : followed
       },

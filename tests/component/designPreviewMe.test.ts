@@ -5,7 +5,7 @@
  * the backend does, so each state of the form can be seen.
  */
 import { beforeEach, describe, expect, it } from 'vitest'
-import { resetDemoServer } from '@/dev/preview/demoSource'
+import { resetDemoServer, startAsNewcomer } from '@/dev/preview/demoSource'
 import { answer, DEMO_FAIL_ONCE } from '@/dev/preview/handlers'
 
 const call = (method: string, path: string, body: unknown = null) => Promise.resolve(answer({ method, path, query: new URLSearchParams(), body }))
@@ -16,9 +16,22 @@ beforeEach(() => {
 })
 
 describe('what /me saves in the design preview', () => {
-  it('reads back the year group it saved', async () => {
-    await call('PATCH', '/students/me/profile', { grade: '10. Klasse' })
-    expect((await call('GET', '/students/me/profile'))?.data).toMatchObject({ grade: '10. Klasse' })
+  it('reads back the year group it saved, a code from its own list (#591)', async () => {
+    const before = (await call('GET', '/students/me/profile'))?.data as { choices: { grade: { code: string }[] } }
+    expect(before.choices.grade.map((choice) => choice.code)).toContain('grade_8_secondary')
+    await call('PATCH', '/students/me/profile', { grade: 'grade_8_secondary', primarySubjects: ['math'] })
+    expect((await call('GET', '/students/me/profile'))?.data).toMatchObject({ grade: 'grade_8_secondary', primarySubjects: ['math'] })
+  })
+
+  it('refuses a code-shaped year group that is not in its list, as the backend does (stoa-backend#310)', async () => {
+    const refused = await call('PATCH', '/students/me/profile', { grade: 'grade_6' })
+    expect(refused).toMatchObject({ status: 422 })
+    expect((await call('GET', '/students/me/profile'))?.data).toMatchObject({ grade: 'grade_9_secondary' })
+  })
+
+  it('gives a newcomer no year group and no subjects, so "About you" asks (#591)', async () => {
+    startAsNewcomer(true)
+    expect((await call('GET', '/students/me/profile'))?.data).toMatchObject({ grade: '', primarySubjects: [] })
   })
 
   it('answers the backend\'s whole matrix, every category and channel at its default (#184 review)', async () => {

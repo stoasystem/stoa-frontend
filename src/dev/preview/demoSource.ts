@@ -44,8 +44,11 @@ type AskState = {
   sent: Record<string, ChatMessage[]>
 }
 
-/** What /me saved (#184): the year group, and the notification preferences. Null until saved. */
-type AccountState = { grade: string | null; notificationPreferences: NotificationPreferenceMatrix | null }
+/**
+ * What /me and "About you" saved (#184, #591): the year group, the subjects
+ * ticked, and the notification preferences. Null until saved.
+ */
+type AccountState = { grade: string | null; primarySubjects: string[] | null; notificationPreferences: NotificationPreferenceMatrix | null }
 
 /** `newcomer`: a student who has not started anything has not asked anything either (#586). */
 type ServerState = { completed: string[]; litAt: string | null; acknowledged: boolean; ask: AskState; reviewDue: boolean; reviewScheduled: boolean; account: AccountState; newcomer: boolean }
@@ -58,7 +61,7 @@ function opening(): ServerState {
     ask: { created: [], sent: {} },
     reviewDue: false,
     reviewScheduled: false,
-    account: { grade: null, notificationPreferences: null },
+    account: { grade: null, primarySubjects: null, notificationPreferences: null },
     newcomer: false,
   }
 }
@@ -66,7 +69,7 @@ function opening(): ServerState {
 function restore(): ServerState {
   try {
     const saved = JSON.parse(demoServerStorage()?.getItem(SERVER_KEY) ?? 'null') as ServerState | null
-    if (saved && Array.isArray(saved.completed)) return { ...opening(), ...saved }
+    if (saved && Array.isArray(saved.completed)) return { ...opening(), ...saved, account: { ...opening().account, ...saved.account } }
   } catch {
     // A broken record is no record.
   }
@@ -289,14 +292,35 @@ export function demoConversationList(): ConversationListResponse {
   return { items: [...created, ...fixtures] }
 }
 
-/** The student's profile as the backend reads it back: the demo one, with the year group saved on /me. */
+/**
+ * The student's profile as the backend reads it back: the demo one, with what
+ * /me and "About you" saved. A newcomer has said nothing yet (#591): no year
+ * group and no subjects, so "About you" asks.
+ */
 export function demoProfileNow(): StudentProfile {
-  const { grade } = server.account
-  return grade === null ? data.demoProfile : { ...data.demoProfile, grade }
+  const { grade, primarySubjects } = server.account
+  return {
+    ...data.demoProfile,
+    grade: grade ?? (server.newcomer ? '' : data.demoProfile.grade),
+    primarySubjects: primarySubjects ?? (server.newcomer ? [] : data.demoProfile.primarySubjects),
+  }
 }
 
-export function saveDemoGrade(grade: string) {
-  server = { ...server, account: { ...server.account, grade } }
+/** The year group the profile holds now, a code or "" (`demoProfileNow`). */
+export function demoGradeNow(): string {
+  return demoProfileNow().grade
+}
+
+/** A profile write (`PATCH /students/me/profile`): only the fields sent change. */
+export function saveDemoProfile({ grade, primarySubjects }: { grade?: string; primarySubjects?: string[] }) {
+  server = {
+    ...server,
+    account: {
+      ...server.account,
+      ...(grade === undefined ? {} : { grade }),
+      ...(primarySubjects === undefined ? {} : { primarySubjects }),
+    },
+  }
   changed()
 }
 

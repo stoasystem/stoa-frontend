@@ -35,10 +35,12 @@ const signedIn = params.has('signedIn') ? params.get('signedIn') !== '0' : (surf
 const language = params.get('lang')
 const longNames = params.get('longNames') === '1'
 const newcomer = params.get('newcomer') === '1' || surface?.demo === 'newcomer'
+const aboutYouLater = params.get('aboutYou') === 'later' || surface?.aboutYou === 'later'
 // Kept in the address: once the page moves, `path` replaces the surface, and a reload stays a newcomer's.
-if (newcomer && !params.has('newcomer')) {
+if ((newcomer && !params.has('newcomer')) || (aboutYouLater && !params.has('aboutYou'))) {
   const url = new URL(window.location.href)
-  url.searchParams.set('newcomer', '1')
+  if (newcomer) url.searchParams.set('newcomer', '1')
+  if (aboutYouLater) url.searchParams.set('aboutYou', 'later')
   window.history.replaceState(null, '', url)
 }
 
@@ -66,6 +68,14 @@ async function start() {
   setDemoLanguage(isSupportedLanguage(reading) ? reading : 'en')
   if (params.get('fresh') === '1') resetDemoServer()
   if (newcomer) startAsNewcomer(params.get('fresh') === '1')
+  if (aboutYouLater) {
+    // "About you" put off in this tab (#591), as its "Later" leaves it: the page's storage is the preview's own.
+    const [{ putAboutYouOff }, { DEMO_STUDENT_ID }] = await Promise.all([
+      import('@/features/starmap/onboarding/useAboutYou'),
+      import('@/dev/demo/data/student'),
+    ])
+    putAboutYouOff(DEMO_STUDENT_ID)
+  }
   // For a scripted walk-through (scripts/record-onboarding.mjs): the demo knowledge point's lessons
   // done at once, as finishing them on the page would leave the demo backend.
   ;(window as Window & { __stoaPreviewDemo?: unknown }).__stoaPreviewDemo = { finishDemoKnowledgePoint }

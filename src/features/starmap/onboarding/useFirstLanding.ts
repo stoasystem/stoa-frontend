@@ -12,6 +12,15 @@
  * answer's recommended star, and the route follows once it has arrived, so
  * a new page mounting does not cut the flight short.
  *
+ * A student whose profile ticks subjects (`primarySubjects`, saved by "About
+ * you", #591) is not asked: the camera goes to the first of them that has
+ * somewhere to start, else the first such subject they take. The map's
+ * galaxy ids are the ones the profile is written with, so nothing is mapped.
+ *
+ * "About you" comes before all of it (`hold`): the landing is decided only
+ * once it is answered (and the sky read again) or put off, so it lands on the
+ * star the backend recommends for the year group just saved.
+ *
  * The answer and "Look around first" are remembered for this tab only
  * (sessionStorage, one key per account): a reload or a way back to the map in
  * this tab does not ask again. A new tab does; the answer only steers the
@@ -66,7 +75,14 @@ export type FirstLanding = {
   choose: (subjectId: string | null) => void
 }
 
-export function useFirstLanding(map: StarMap, target: LayerTarget, ownerId: string): FirstLanding {
+export type FirstLandingOptions = {
+  /** Not yet: "About you" is still up, or its answer still on its way (`useAboutYou`). */
+  hold?: boolean
+  /** The subjects the student's profile ticks, in its order; null when it ticks none or could not be read. */
+  subjects?: readonly string[] | null
+}
+
+export function useFirstLanding(map: StarMap, target: LayerTarget, ownerId: string, { hold = false, subjects = null }: FirstLandingOptions = {}): FirstLanding {
   const navigate = useNavigate()
   const location = useLocation()
   const { search } = location
@@ -83,11 +99,18 @@ export function useFirstLanding(map: StarMap, target: LayerTarget, ownerId: stri
     if (star && star.nebulaId === nebulaId) return { landing: landingOn(star), asking: false, followed: true }
     if (target.layer !== 'map' || !isNewcomer(map)) return { landing: null, asking: false, followed: false }
     const answer = readTab(answerKey)
-    if (answer === null && startableSubjects(map).length > 1) return { landing: null, asking: true, followed: false }
+    const startable = startableSubjects(map)
+    if (answer === null && startable.length > 1) {
+      // The profile says what school is on: no need to ask.
+      const taken = subjects?.length ? (subjects.find((id) => startable.some((galaxy) => galaxy.subjectId === id)) ?? startable[0].subjectId) : null
+      if (taken === null) return { landing: null, asking: true, followed: false }
+      return { landing: firstLandingFor(map, target, taken), asking: false, followed: false }
+    }
     return { landing: firstLandingFor(map, target, answer || undefined), asking: false, followed: false }
   }
-  const [arrived, setArrived] = useState(() => map.stars.length > 0)
-  const [first] = useState(arriving)
+  const nothing: Arrival = { landing: null, asking: false, followed: false }
+  const [arrived, setArrived] = useState(() => !hold && map.stars.length > 0)
+  const [first] = useState(() => (hold ? nothing : arriving()))
   const [landing, setLanding] = useState<LayerTarget | null>(first.landing)
   const [asking, setAsking] = useState(first.asking)
   /** The landing was chosen on this page: the route waits for the flight. */
@@ -100,7 +123,7 @@ export function useFirstLanding(map: StarMap, target: LayerTarget, ownerId: stri
    */
   const [followed, setFollowed] = useState(first.followed)
   const [dismissed, setDismissed] = useState(false)
-  if (!arrived && map.stars.length > 0) {
+  if (!arrived && !hold && map.stars.length > 0) {
     const now = arriving()
     setArrived(true)
     setLanding(now.landing)

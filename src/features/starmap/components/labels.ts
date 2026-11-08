@@ -41,6 +41,8 @@ export function recommendationReason(
       return t('marker.reason.inProgress')
     case 'start':
       return t('marker.reason.start')
+    case 'grade':
+      return t('marker.reason.grade')
     case 'after_lit': {
       const related = recommendation.relatedUnitId ? stars.find((star) => star.unitId === recommendation.relatedUnitId) : undefined
       return related ? t('marker.reason.afterLit', { name: related.name }) : null

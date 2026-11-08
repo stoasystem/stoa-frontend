@@ -35,6 +35,11 @@ export type Surface = {
   focus?: string
   /** The demo backend's state to start from, when it is not #116's opening state. */
   demo?: 'demo-point-finished' | 'review-due' | 'review-scheduled' | 'newcomer'
+  /**
+   * `later`: "About you" (#591) already put off in this tab, for a newcomer's
+   * surface that shows what comes after it.
+   */
+  aboutYou?: 'later'
   /** What must be on the page before it counts as ready, for the screenshot. */
   readyWhen?: string
   /** Why the surface cannot be shown yet, if it cannot. */
@@ -108,8 +113,20 @@ export const SURFACES: readonly Surface[] = [
     signedIn: true,
     stars: true,
   },
+  // #591: before the first landing, a newcomer with no year group on the profile is asked it
+  // and the subjects school is on. A lower-secondary year lands on the demo knowledge point.
+  {
+    id: 'about-you',
+    label: 'Star map · newcomer, About you',
+    path: (points) => withPoints('/', points),
+    signedIn: true,
+    stars: true,
+    demo: 'newcomer',
+    readyWhen: '[data-about-you] [data-shown]',
+  },
   // The first landing (plan A): a student who has not started anything opens the app on
   // the recommended star's nebula, Murmi beside the star, instead of the whole sky.
+  // "About you" put off, so it lands where the course starts.
   {
     id: 'map-newcomer',
     label: 'Star map · newcomer, first landing',
@@ -117,6 +134,7 @@ export const SURFACES: readonly Surface[] = [
     signedIn: true,
     stars: true,
     demo: 'newcomer',
+    aboutYou: 'later',
     readyWhen: '[data-first-landing] [data-shown]',
   },
   // The whole first sign-in (docs/research/user-onboarding-design.md): the invitation link,
