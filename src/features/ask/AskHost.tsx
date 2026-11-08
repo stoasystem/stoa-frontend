@@ -4,6 +4,7 @@ import { Button, Composer } from '@/components/base'
 import { COMPOSER } from '@/components/base/sizes'
 import { AskPanel } from '@/features/ask/AskPanel'
 import { AskReopen } from '@/features/ask/AskReopen'
+import { useClearOfControls } from '@/features/ask/clearOfControls'
 import {
   ASK_PANEL,
   ASK_SHEET,
@@ -45,7 +46,10 @@ import '@/features/ask/askGuide.css'
  * takes the focus, is highlighted once, and offers two or three things the
  * student could say: one tap sends it, in a conversation of its own, and the
  * answer finds the star as any other does (#489). They are offered for that
- * moment only: opening Ask, Escape, or leaving the map ends it.
+ * moment only: opening Ask, Escape, or leaving the map ends it. They stand
+ * over the composer without taking the page's own controls from under it:
+ * narrowed to the room between the map's "?" and zoom pair, wrapping, and
+ * only the examples themselves take a tap (#598).
  */
 export function AskHost({
   children,
@@ -81,6 +85,9 @@ export function AskHost({
   const endExamples = useAskStore((state) => state.endExamples)
   const offering = !open && examples !== null && examples.length > 0
   const examplesLabel = useId()
+  const page = useRef<HTMLDivElement>(null)
+  const examplesArea = useRef<HTMLDivElement>(null)
+  useClearOfControls(examplesArea, page, offering)
   useEffect(() => {
     if (open) endExamples()
   }, [open, endExamples])
@@ -134,6 +141,7 @@ export function AskHost({
   return (
     <div data-ask-host className="relative min-h-0 flex-1 overflow-hidden">
       <div
+        ref={page}
         data-surface="sky"
         data-ask-page
         inert={sheet || undefined}
@@ -158,21 +166,35 @@ export function AskHost({
             }
           >
             <div
-              className="w-full"
+              className="relative w-full"
               data-ask-guide={offering || undefined}
               onKeyDown={onDockedKeyDown}
               style={{ maxWidth: wide ? DOCKED_COMPOSER.desktop.width : undefined }}
             >
               {offering && (
-                <div data-ask-examples data-ask-guide-in className="mb-2 flex flex-col items-center gap-1.5">
+                // Out of the flow, so the dock's box stays the composer's; the
+                // band itself lets taps through to the map, its examples take them.
+                <div
+                  ref={examplesArea}
+                  data-ask-examples
+                  data-ask-guide-in
+                  className="pointer-events-none absolute inset-x-0 bottom-full mb-2 flex flex-col items-center gap-1.5"
+                >
                   <p id={examplesLabel} role="status" className="m-0 text-[13px] text-[color:var(--on-sky-text-body)]">
                     {t('ask.examples.label')}
                   </p>
                   <ul aria-labelledby={examplesLabel} className="m-0 flex max-w-full list-none flex-wrap justify-center gap-2 p-0">
                     {examples.map((example) => (
-                      <li key={example} className="max-w-full">
-                        <Button variant="onSky" size="small" className="max-w-full" onClick={() => ownerId && askNow(ownerId, example)}>
-                          <span className="min-w-0 truncate">{example}</span>
+                      <li key={example} className="pointer-events-auto max-w-full">
+                        <Button
+                          variant="onSky"
+                          size="small"
+                          // Narrowed between the map's controls, an example wraps rather than lose its end.
+                          className="max-w-full whitespace-normal text-center leading-snug"
+                          style={{ height: 'auto', minHeight: 32, paddingBlock: 7 }}
+                          onClick={() => ownerId && askNow(ownerId, example)}
+                        >
+                          <span className="min-w-0">{example}</span>
                         </Button>
                       </li>
                     ))}

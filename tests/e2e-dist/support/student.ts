@@ -409,6 +409,14 @@ function profile() {
     grade: 'Grade 6',
     primarySubjects: ['math'],
     guardianStatus: 'linked',
+    // What the list-chosen fields may be set to (stoa-backend#310): required on the reply.
+    choices: {
+      grade: [
+        { code: 'grade_5_primary', label: 'Grade 5' },
+        { code: 'grade_6_primary', label: 'Grade 6' },
+        { code: 'grade_7_secondary', label: 'Grade 7' },
+      ],
+    },
     createdAt: '2026-09-01T08:00:00Z',
     updatedAt: '2026-09-01T08:00:00Z',
   }
