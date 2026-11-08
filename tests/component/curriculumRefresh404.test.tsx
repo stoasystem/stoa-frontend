@@ -46,7 +46,7 @@ import { ApiError } from '@/services/api/httpClient'
 import type {
   CurriculumAuditEvent,
   CurriculumMigrationDryRunResponse,
-  CurriculumVersion,
+  CurriculumListedVersion,
 } from '@/types/curriculumOperations'
 
 vi.mock('@/layouts/DashboardLayout', () => ({
@@ -87,8 +87,9 @@ const publish = vi.mocked(publishCurriculumVersion)
 const dryRun = vi.mocked(dryRunCurriculumMigration)
 const apply = vi.mocked(applyCurriculumMigration)
 
-function version(versionId: string, state: string, updatedAt: string, extra: Partial<CurriculumVersion> = {}) {
-  return { publicLessonId: 'lesson-1', versionId, state, updatedAt, updatedBy: 'admin-1', ...extra }
+// Every version of lesson-1 carries its live pointer, v2 (#596).
+function version(versionId: string, state: string, updatedAt: string, extra: Partial<CurriculumListedVersion> = {}): CurriculumListedVersion {
+  return { publicLessonId: 'lesson-1', versionId, state, updatedAt, updatedBy: 'admin-1', publishedVersionId: 'v2', ...extra }
 }
 
 // lesson-1: v2 is live, v3 is approved and waiting to be published, v4 is a
@@ -97,6 +98,16 @@ const LIVE = version('v2', 'published', '2026-10-17T12:00:00Z')
 const CANDIDATE = version('v3', 'approved', '2026-10-18T09:00:00Z', { reviewState: 'approved' })
 const DRAFT = version('v4', 'draft', '2026-10-18T10:00:00Z')
 const ITEMS = [DRAFT, CANDIDATE, LIVE]
+
+/**
+ * The worklist after `row` was published: it is live, every version of the
+ * lesson carries its id, and the one it replaced is superseded (stoa-backend#307).
+ */
+function publishedNow(row: CurriculumListedVersion, rest: CurriculumListedVersion[]): CurriculumListedVersion[] {
+  return [row, ...rest.map((item) => ({ ...item, state: item.state === 'published' ? 'superseded' : item.state }))].map(
+    (item) => ({ ...item, publishedVersionId: row.versionId }),
+  )
+}
 
 function event(operation: string, versionId: string): CurriculumAuditEvent {
   return {
@@ -121,7 +132,7 @@ const DRY_RUN: CurriculumMigrationDryRunResponse = {
 const STALE_POINTER = () => new ApiError('conflict', { status: 409, detail: 'stale_pointer' })
 
 /** What the backend holds; the mocks answer from it, so a read after a write sees the write. */
-let server: { items: CurriculumVersion[]; fixed: boolean; events: CurriculumAuditEvent[] }
+let server: { items: CurriculumListedVersion[]; fixed: boolean; events: CurriculumAuditEvent[] }
 
 beforeEach(async () => {
   await i18n.changeLanguage('en')
@@ -337,7 +348,7 @@ describe('the page after a write', () => {
 
   it('after a migration publishes a lesson, the worklist and the next publish know its new live version', async () => {
     apply.mockImplementation(async () => {
-      server.items = [version('m1', 'published', '2026-10-20T08:00:00Z'), ...ITEMS]
+      server.items = publishedNow(version('m1', 'published', '2026-10-20T08:00:00Z'), ITEMS)
       return { ...DRY_RUN, status: 'applied' }
     })
     const user = userEvent.setup()
@@ -387,7 +398,7 @@ describe('the page after a write', () => {
   it('after a publish is refused as stale, the audit shows the refusal and a second try sends the version live now', async () => {
     publish.mockImplementationOnce(async () => {
       // Someone else published v5 in the meantime; the backend audits the refusal.
-      server.items = [version('v5', 'published', '2026-10-19T08:00:00Z'), ...ITEMS]
+      server.items = publishedNow(version('v5', 'published', '2026-10-19T08:00:00Z'), ITEMS)
       server.events = [event('publish_refused', 'v3'), ...server.events]
       throw STALE_POINTER()
     })

@@ -12,6 +12,7 @@ import type {
   StarQuizView,
   ReviewDueResponse,
   ReviewSummary,
+  LessonQuizAnswerRequest,
   PracticeAnswerRequest,
   PracticeAnswerResult,
   PracticeHintRequest,
@@ -113,14 +114,17 @@ export async function answerStarQuiz(unitId: string, quizId: string, payload: { 
 /**
  * Hand one quiz answer to the backend, which judges it. The reply carries
  * `correct`, the hearts left and the next exercise -- never the right answer.
+ * `exerciseId` is the exercise it answers, so the same answer sent again after
+ * a lost reply gets the first verdict back rather than being judged against
+ * the next one.
  *
- * 404 `lesson_quiz_not_found`; 409 `lesson_quiz_expired` / `lesson_quiz_finished`
- * / `lesson_quiz_unavailable`.
+ * 404 `lesson_quiz_not_found`; 409 `lesson_quiz_out_of_order` /
+ * `lesson_quiz_expired` / `lesson_quiz_finished` / `lesson_quiz_unavailable`.
  */
 export async function answerLessonQuiz(
   lessonId: string,
   quizId: string,
-  payload: PracticeAnswerRequest,
+  payload: LessonQuizAnswerRequest,
 ) {
   const response = await httpClient.post<LessonQuizAnswer>(
     apiPath`/practice/lessons/${lessonId}/quiz/${quizId}/answer`,

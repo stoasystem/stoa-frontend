@@ -19,6 +19,8 @@ export type FindStarBubbleProps = {
   star: Star
   /** The first missing star, which Murmi suggests. */
   first: Star
+  /** The other stars on the path (`FindStarPath.missing`): kept clear, `first` before them all (#586). */
+  path?: readonly string[]
   /** Whether a star has a chapter and a quiz to go to: not the design preview's placeholder stars (as the star's card). */
   startable?: (star: Star) => boolean
   locate: (unitId: string) => StarOnScreen | null
@@ -28,7 +30,7 @@ export type FindStarBubbleProps = {
   scheduler?: FrameScheduler
 }
 
-export function FindStarBubble({ star, first, startable = () => true, locate, watch, onDismiss, scheduler }: FindStarBubbleProps) {
+export function FindStarBubble({ star, first, path = [], startable = () => true, locate, watch, onDismiss, scheduler }: FindStarBubbleProps) {
   const { t } = useTranslation('starmap')
   const firstChapter = chapterPath(first.unitId)
   const starChapter = chapterPath(star.unitId)
@@ -36,6 +38,8 @@ export function FindStarBubble({ star, first, startable = () => true, locate, wa
     <MurmiBubble
       unitId={star.unitId}
       marker="data-find-star"
+      // Murmi stands beside the star asked for and names `first`: never over it, nor over the path if it can help it.
+      avoid={[first.unitId, ...path.filter((unitId) => unitId !== first.unitId)]}
       title={t('findStar.suggest', { name: first.name })}
       closeLabel={t('help.close')}
       leaveOnTap

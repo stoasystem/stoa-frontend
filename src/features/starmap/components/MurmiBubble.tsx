@@ -55,18 +55,62 @@ export function murmiFacing(starX: number, bubbleX: number): 'left' | 'right' {
   return starX < bubbleX + MURMI_MIDDLE_PX ? 'left' : 'right'
 }
 
+/** Half the width a star's name takes under it, at least, CSS px: the name is wider than the glyph. */
+const NAME_HALF_WIDTH_PX = 56
+/** The name's line under a star's glyph, CSS px. */
+const NAME_LINE_PX = 24
+
+/** What another star on screen needs kept clear (#586): its glyph and its name underneath. */
+export function starBox(spot: StarOnScreen): Rect {
+  const half = Math.max(spot.size / 2, NAME_HALF_WIDTH_PX)
+  return { x0: spot.x - half, y0: spot.y - spot.size / 2, x1: spot.x + half, y1: spot.y + spot.size / 2 + NAME_LINE_PX }
+}
+
+/**
+ * Beside its star, clear of `controls` and of other stars (#586): `strict`
+ * (the star Murmi names, say) and the `rest`. When no side clears every star,
+ * a side that clears `strict` wins over one that covers less in all.
+ */
+export function placeAvoiding(
+  spot: StarOnScreen,
+  size: { width: number; height: number },
+  layer: { width: number; height: number },
+  controls: readonly Rect[],
+  strict: Rect | null,
+  rest: readonly Rect[] = [],
+  was?: LabelSide,
+) {
+  const gap = spot.size / 2 + 30
+  const edges = [...(spot.keepClear ?? []), ...controls]
+  const all = placeBesideStar(spot, size, gap, layer, [...edges, ...(strict ? [strict] : []), ...rest], was)
+  if (!strict || !covers(all, size, strict)) return all
+  const kept = placeBesideStar(spot, size, gap, layer, [...edges, strict], was)
+  return covers(kept, size, strict) ? all : kept
+}
+
+function covers(place: { x: number; y: number }, size: { width: number; height: number }, box: Rect): boolean {
+  return place.x < box.x1 && place.x + size.width > box.x0 && place.y < box.y1 && place.y + size.height > box.y0
+}
+
 /**
  * On a phone: across the map, just above the controls along its bottom (zoom,
- * help) -- or, where that would cover the star, just under the ones along
- * its top (the switcher, the way back).
+ * help) -- or, where that would cover the star, or `strict` (the star Murmi
+ * names, #586), just under the ones along its top (the switcher,
+ * the way back).
  */
-export function dockedPlace(spot: StarOnScreen, box: { height: number }, layer: { width: number; height: number }, controls: readonly Rect[]) {
+export function dockedPlace(
+  spot: StarOnScreen,
+  box: { height: number },
+  layer: { width: number; height: number },
+  controls: readonly Rect[],
+  strict: Rect | null = null,
+) {
   // Along the bottom: below 60% of the map; along the top: above 40%. Between them (Ask's button
   // on the edge) a control is beside the bubble, which stops short of it.
   const floor = Math.min(layer.height, ...controls.filter((rect) => rect.y0 > 0.6 * layer.height).map((rect) => rect.y0)) - GUTTER_PX
   const ceiling = Math.max(0, ...controls.filter((rect) => rect.y1 < 0.4 * layer.height).map((rect) => rect.y1)) + GUTTER_PX
   const low = floor - box.height
-  const coversStar = spot.y + spot.size / 2 + GUTTER_PX > low
+  const coversStar = spot.y + spot.size / 2 + GUTTER_PX > low || (strict !== null && strict.y1 + GUTTER_PX > low && strict.y0 < floor)
   const y = coversStar ? ceiling : low
   const beside = controls.filter((rect) => rect.y0 < y + box.height && rect.y1 > y && rect.x0 > layer.width / 2)
   const right = Math.min(layer.width, ...beside.map((rect) => rect.x0)) - GUTTER_PX / 2
@@ -107,6 +151,11 @@ export type MurmiBubbleWays = {
 export type MurmiBubbleProps = {
   /** The star Murmi stands beside, and that has the focus once Murmi goes. */
   unitId: string
+  /**
+   * Other stars the bubble keeps clear of, glyph and name (#586): the stars on
+   * a path, say. The first is kept clear before the rest -- the star Murmi names.
+   */
+  avoid?: readonly string[]
   /** The layer's mark (`data-…`), for the design preview and tests. */
   marker: `data-${string}`
   title: string
@@ -134,6 +183,7 @@ export type MurmiBubbleProps = {
 
 export function MurmiBubble({
   unitId,
+  avoid,
   marker,
   title,
   body,
@@ -157,8 +207,11 @@ export function MurmiBubble({
   const [docked, setDocked] = useState(false)
   const [facing, setFacing] = useState<'left' | 'right'>('right')
   const reducedMotion = usePrefersReducedMotion()
+  // The stars to keep clear, by value: a new array of the same stars does not restart the following.
+  const avoidKey = (avoid ?? []).join('\n')
 
   useEffect(() => {
+    const avoiding = avoidKey ? avoidKey.split('\n') : []
     const root = rootRef.current
     const box = boxRef.current
     if (!root || !box) return
@@ -181,6 +234,13 @@ export function MurmiBubble({
       box.style.visibility = inside && arrived ? 'visible' : 'hidden'
       if (spot && inside && arrived) {
         const controls = controlsOver(root, box)
+        // Other stars on screen, glyph and name; the first named is kept clear before the rest.
+        const boxOf = (other: string) => {
+          const at = other === unitId ? null : locate(other)
+          return at && at.x >= 0 && at.x <= width && at.y >= 0 && at.y <= height ? starBox(at) : null
+        }
+        const [strict = null, ...rest] = avoiding.map(boxOf)
+        const others = rest.filter((other): other is Rect => other !== null)
         const isDocked = width < DOCK_BELOW_PX
         setDocked(isDocked)
         if (!isDocked) box.style.width = ''
@@ -188,11 +248,11 @@ export function MurmiBubble({
         let at: { x: number; y: number; side: string }
         if (isDocked) {
           // Its height follows its width, so the next frame settles what this one measures.
-          const dock = dockedPlace(spot, size, { width, height }, controls)
+          const dock = dockedPlace(spot, size, { width, height }, controls, strict)
           box.style.width = `${dock.width}px`
           at = dock
         } else {
-          const beside = placeBesideStar(spot, size, spot.size / 2 + 30, { width, height }, [...(spot.keepClear ?? []), ...controls], side)
+          const beside = placeAvoiding(spot, size, { width, height }, controls, strict, others, side)
           side = beside.side
           at = beside
         }
@@ -220,7 +280,7 @@ export function MurmiBubble({
       window.removeEventListener('resize', follow)
       unwatch?.()
     }
-  }, [unitId, locate, watch, scheduler])
+  }, [unitId, avoidKey, locate, watch, scheduler])
 
   // Into a chapter by the jump, from where a star is drawn (#50 point 5), as the star's card does.
   const jumpFrom = (from: string, to: string) => (event: MouseEvent<HTMLAnchorElement>) => {

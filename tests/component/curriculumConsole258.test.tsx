@@ -29,7 +29,7 @@ import {
   submitCurriculumReview,
 } from '@/services/admin/curriculumApi'
 import { ApiError } from '@/services/api/httpClient'
-import type { CurriculumMigrationDryRunResponse, CurriculumVersion } from '@/types/curriculumOperations'
+import type { CurriculumListedVersion, CurriculumMigrationDryRunResponse, CurriculumVersion } from '@/types/curriculumOperations'
 
 vi.mock('@/layouts/DashboardLayout', () => ({
   DashboardLayout: ({ children }: { children: ReactNode }) => <>{children}</>,
@@ -63,18 +63,19 @@ const publish = vi.mocked(publishCurriculumVersion)
 const dryRun = vi.mocked(dryRunCurriculumMigration)
 const apply = vi.mocked(applyCurriculumMigration)
 
-function version(versionId: string, state: string, updatedAt: string, extra: Partial<CurriculumVersion> = {}) {
-  return { publicLessonId: 'lesson-1', versionId, state, updatedAt, updatedBy: 'admin-1', ...extra }
+// Every version of lesson-1 carries its live pointer, v2 (#596).
+function version(versionId: string, state: string, updatedAt: string, extra: Partial<CurriculumListedVersion> = {}): CurriculumListedVersion {
+  return { publicLessonId: 'lesson-1', versionId, state, updatedAt, updatedBy: 'admin-1', publishedVersionId: 'v2', ...extra }
 }
 
-// The newest published version of lesson-1 is v2; v1 is an older one, and
+// lesson-1 is live at v2; v1 was live before it, and
 // lesson-2 has its own live version that must not be taken for lesson-1's.
 const CANDIDATE = version('v3', 'approved', '2026-10-18T09:00:00Z', { reviewState: 'approved' })
 const ITEMS = [
   CANDIDATE,
-  { ...version('w1', 'published', '2026-10-18T08:30:00Z'), publicLessonId: 'lesson-2' },
+  version('w1', 'published', '2026-10-18T08:30:00Z', { publicLessonId: 'lesson-2', publishedVersionId: 'w1' }),
   version('v2', 'published', '2026-10-17T12:00:00Z'),
-  version('v1', 'published', '2026-10-01T12:00:00Z'),
+  version('v1', 'superseded', '2026-10-01T12:00:00Z'),
 ]
 
 const DRY_RUN: CurriculumMigrationDryRunResponse = {
@@ -175,7 +176,7 @@ describe('publish', () => {
   })
 
   it('sends null when no version of the lesson is live, and says so', async () => {
-    worklist.mockResolvedValue({ items: [CANDIDATE], count: 1 })
+    worklist.mockResolvedValue({ items: [{ ...CANDIDATE, publishedVersionId: null }], count: 1 })
     const user = userEvent.setup()
     await openReview(user)
 

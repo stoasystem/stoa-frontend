@@ -248,6 +248,14 @@
       "failed": "Bild konnte nicht geladen werden.",
       "retry": "Noch einmal laden",
       "retryNamed": "Noch einmal laden: {{name}}"
+    },
+    "examples": {
+      "label": "Zum Beispiel:"
+    },
+    "stageTip": {
+      "title": "Kommst du nicht weiter? Frag mich hier.",
+      "body": "Du kannst auch deine Notizen oder eine Hausaufgabe fotografieren und mir schicken.",
+      "close": "Verstanden"
     }
   }
 }

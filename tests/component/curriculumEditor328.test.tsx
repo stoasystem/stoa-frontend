@@ -28,7 +28,7 @@ import {
   submitCurriculumReview,
 } from '@/services/admin/curriculumApi'
 import { ApiError } from '@/services/api/httpClient'
-import type { CurriculumVersion } from '@/types/curriculumOperations'
+import type { CurriculumListedVersion } from '@/types/curriculumOperations'
 
 vi.mock('@/layouts/DashboardLayout', () => ({
   DashboardLayout: ({ children }: { children: ReactNode }) => <>{children}</>,
@@ -52,12 +52,12 @@ const preview = vi.mocked(getCurriculumPreview)
 const patch = vi.mocked(patchCurriculumDraft)
 const submit = vi.mocked(submitCurriculumReview)
 
-const LESSON_A: CurriculumVersion = { publicLessonId: 'lesson-a', versionId: 'va1', state: 'draft' }
-const LESSON_B: CurriculumVersion = { publicLessonId: 'lesson-b', versionId: 'vb1', state: 'draft' }
+const LESSON_A: CurriculumListedVersion = { publicLessonId: 'lesson-a', versionId: 'va1', state: 'draft', publishedVersionId: null }
+const LESSON_B: CurriculumListedVersion = { publicLessonId: 'lesson-b', versionId: 'vb1', state: 'draft', publishedVersionId: null }
 const EXERCISE_A = { exerciseId: 'exercise-a-1', prompt: 'Solve x + 4 = 9.' }
 const EXERCISE_B = { exerciseId: 'exercise-b-1', prompt: 'Solve 2x = 8.' }
 
-function previewOf(versionId: string): CurriculumVersion {
+function previewOf(versionId: string): CurriculumListedVersion {
   return versionId === 'va1'
     ? { ...LESSON_A, lesson: { title: 'Lesson A' }, exercises: [EXERCISE_A] }
     : { ...LESSON_B, lesson: { title: 'Lesson B' }, exercises: [EXERCISE_B] }
@@ -163,7 +163,7 @@ describe('switching versions', () => {
 
 describe('the current content', () => {
   it('says it is loading, and keeps Load current and Save off, until the preview arrives', async () => {
-    let arrive!: (value: CurriculumVersion) => void
+    let arrive!: (value: CurriculumListedVersion) => void
     preview.mockReturnValue(new Promise((done) => (arrive = done)))
     const user = userEvent.setup()
     renderPage()

@@ -874,6 +874,7 @@
       "changes_requested": "Modifiche richieste",
       "approved": "Approvata",
       "published": "Pubblicata",
+      "superseded": "Sostituita",
       "archived": "Archiviata"
     },
     "reviewState": {

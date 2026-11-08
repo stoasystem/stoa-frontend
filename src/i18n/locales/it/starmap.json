@@ -17,9 +17,35 @@
   },
   "firstLanding": {
     "title": "Inizia da qui: {{name}}",
-    "body": "Ogni stella è una cosa da imparare. Completa le sue lezioni e si accende.",
+    "body": "Ogni stella è una cosa da imparare. Sai già tutto questo? Dimmi a che punto siete a scuola e troverò la tua stella.",
     "start": "Inizia questa stella",
-    "later": "Prima dai un’occhiata"
+    "later": "Prima dai un’occhiata",
+    "findOwn": "Trova la mia stella"
+  },
+  "findOwn": {
+    "examples": {
+      "math": {
+        "quadratic": "Voglio esercitarmi con le equazioni di secondo grado",
+        "derivatives": "Stiamo studiando le derivate",
+        "trig": "A scuola facciamo seno e coseno"
+      },
+      "physics": {
+        "forces": "Stiamo facendo le forze e le leggi di Newton",
+        "circuits": "Voglio esercitarmi sui circuiti elettrici"
+      },
+      "german": {
+        "essay": "In tedesco scriviamo testi argomentativi",
+        "grammar": "Voglio esercitarmi con i casi del tedesco"
+      },
+      "english": {
+        "tenses": "Voglio esercitarmi con il present perfect",
+        "essay": "In inglese scriviamo testi d’opinione"
+      },
+      "general": {
+        "class": "Voglio esercitarmi su quello che facciamo in classe",
+        "start": "Da dove comincio per la mia classe?"
+      }
+    }
   },
   "firstQuestion": {
     "title": "Quale materia stai facendo adesso a scuola?",

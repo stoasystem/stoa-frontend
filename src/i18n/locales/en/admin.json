@@ -861,6 +861,7 @@
       "changes_requested": "Changes requested",
       "approved": "Approved",
       "published": "Published",
+      "superseded": "Superseded",
       "archived": "Archived"
     },
     "reviewState": {

@@ -3,6 +3,7 @@ import { ApiError, httpClient } from '@/services/api/httpClient'
 import type {
   CurriculumAuditResponse,
   CurriculumDiffResponse,
+  CurriculumListedVersion,
   CurriculumMigrationApplyInput,
   CurriculumMigrationDryRunResponse,
   CurriculumMigrationEvidenceResponse,
@@ -42,7 +43,7 @@ export async function getCurriculumWorklist(status?: string) {
 }
 
 export async function getCurriculumPreview(publicLessonId: string, versionId: string) {
-  const response = await httpClient.get<CurriculumVersion>(
+  const response = await httpClient.get<CurriculumListedVersion>(
     apiPath`/admin/curriculum/lessons/${publicLessonId}/preview`,
     { params: { versionId } },
   )

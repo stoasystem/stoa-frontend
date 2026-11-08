@@ -17,9 +17,35 @@
   },
   "firstLanding": {
     "title": "Commence ici : {{name}}",
-    "body": "Chaque étoile est une chose à apprendre. Termine ses leçons et elle s’allume.",
+    "body": "Chaque étoile est une chose à apprendre. Tu sais déjà tout ça ? Dis-moi où tu en es à l’école et je trouverai ton étoile.",
     "start": "Commencer cette étoile",
-    "later": "D’abord explorer"
+    "later": "D’abord explorer",
+    "findOwn": "Trouver ma propre étoile"
+  },
+  "findOwn": {
+    "examples": {
+      "math": {
+        "quadratic": "Je veux m’entraîner aux équations du second degré",
+        "derivatives": "On apprend les dérivées",
+        "trig": "On fait sinus et cosinus en classe"
+      },
+      "physics": {
+        "forces": "On étudie les forces et les lois de Newton",
+        "circuits": "Je veux m’entraîner sur les circuits électriques"
+      },
+      "german": {
+        "essay": "On écrit des textes argumentatifs en allemand",
+        "grammar": "Je veux m’entraîner aux cas en allemand"
+      },
+      "english": {
+        "tenses": "Je veux m’entraîner au present perfect",
+        "essay": "On écrit des textes d’opinion en anglais"
+      },
+      "general": {
+        "class": "Je veux m’entraîner sur ce qu’on fait en classe",
+        "start": "Par où commencer pour mon année ?"
+      }
+    }
   },
   "firstQuestion": {
     "title": "Quelle matière travailles-tu en ce moment à l’école ?",

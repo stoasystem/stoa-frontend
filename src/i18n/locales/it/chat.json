@@ -250,6 +250,14 @@
       "failed": "Non è stato possibile caricare l’immagine.",
       "retry": "Ricarica",
       "retryNamed": "Ricarica: {{name}}"
+    },
+    "examples": {
+      "label": "Per esempio:"
+    },
+    "stageTip": {
+      "title": "Non sai come andare avanti? Chiedimi qui.",
+      "body": "Puoi anche fotografare la tua brutta copia o un esercizio dei compiti e mandarmelo.",
+      "close": "Ho capito"
     }
   }
 }
