@@ -51,6 +51,11 @@ signed in across a reload; asks a question, gets the answer, and a reload in
 the middle of the next answer picks it up again without sending the question
 twice; signs out, which clears the session here and calls `POST /auth/logout`.
 
+`reviewReminder.spec.ts`: with reviews due (`GET /practice/review/summary`), the
+star map's corner Murmi is a button with the count, and a tap leads to Murmi's
+bubble beside the star, whose link is that star's review; with nothing
+scheduled (the mock's default) there is no reminder at all (#593).
+
 `firstScreen.spec.ts`: after a student's reload, the star map's code is asked
 for, once, while `/auth/me` is still being answered rather than after it, and
 the map follows the account without the page skeleton in between (#415); a

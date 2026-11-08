@@ -42,6 +42,14 @@ export function reminderTarget(map: Pick<StarMap, 'nebulae' | 'subject'>, star: 
   return { layer: 'map', fly: true, frame: [star.unitId], flightMs: reducedMotion ? undefined : home ? ZOOM_MS : REVEAL_FLIGHT_MS }
 }
 
+/** Router state: the tap asked to fly to this star. From `/` the galaxy's route is another page, mounted afresh, which takes it over from here. */
+type ReminderArrival = { reviewReminder: string }
+
+function askedToReview(state: unknown): string | null {
+  const unitId = typeof state === 'object' && state !== null ? (state as Partial<ReminderArrival>).reviewReminder : undefined
+  return typeof unitId === 'string' && unitId.length > 0 ? unitId : null
+}
+
 export function useReviewReminder(map: StarMap, ownerId: string, enabled: boolean): ReviewReminder {
   const location = useLocation()
   const navigate = useNavigate()
@@ -52,21 +60,31 @@ export function useReviewReminder(map: StarMap, ownerId: string, enabled: boolea
   const [today] = useState(() => localDay(new Date()))
   const [waved, setWaved] = useState(() => readDay(keys.waved) === today)
 
+  const asked = askedToReview(location.state)
   const [guide, setGuide] = useState<{ unitId: string; key: string } | null>(null)
   // Still this visit: the entry it was opened on, or one that only replaced it (the move to the
   // galaxy's route, a pan to another galaxy). A push or a pop is a move elsewhere.
   const following = guide !== null && (navigationType === 'REPLACE' || location.key === guide.key)
   useEffect(() => {
-    if (guide && !following) setGuide(null)
-  }, [guide, following])
+    if (guide && !following && !asked) setGuide(null)
+  }, [guide, following, asked])
+  // Arrived by the tap: the flight starts, and the state is taken out of the entry at once, so
+  // neither a reload nor a way back to it brings the bubble back.
+  const { key, pathname, search } = location
+  useEffect(() => {
+    if (!asked) return
+    setGuide({ unitId: asked, key })
+    void navigate({ pathname, search }, { replace: true, state: null })
+  }, [asked, key, pathname, search, navigate])
 
   const mostDue = enabled ? mostDueStar(map) : null
   const open = useCallback(() => {
     if (!mostDue) return
-    setGuide({ unitId: mostDue.unitId, key: location.key })
+    // The star's galaxy, the tap carried in the state (taken over just above, on this page or the next).
     const galaxy = pathForTarget(subjectOfNebula(map, mostDue.nebulaId), { layer: 'map' })
-    if (location.pathname !== galaxy) void navigate({ pathname: galaxy, search: location.search }, { replace: true })
-  }, [mostDue, map, location.key, location.pathname, location.search, navigate])
+    const state: ReminderArrival = { reviewReminder: mostDue.unitId }
+    void navigate({ pathname: galaxy, search }, { replace: true, state })
+  }, [mostDue, map, search, navigate])
   const close = useCallback(() => setGuide(null), [])
   const wave = useCallback(() => {
     writeDay(keys.waved, today)
