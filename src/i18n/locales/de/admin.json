@@ -175,6 +175,24 @@
       "body": "{{student}} wird mit {{parent}} verknüpft, Beziehung: «{{relationship}}». Die Verknüpfung gilt sofort, und keines der beiden Konten muss sie bestätigen.",
       "cancel": "Abbrechen",
       "submit": "Jetzt verknüpfen"
+    },
+    "revoke": {
+      "open": "Verknüpfung mit {{student}} aufheben",
+      "revoked": "{{student}} ist nicht mehr mit {{parent}} verknüpft.",
+      "failed": "Die Verknüpfung konnte nicht aufgehoben werden.",
+      "reasonLabel": "Grund",
+      "reasonHint": "Wird im Audit-Log festgehalten. Höchstens 500 Zeichen.",
+      "confirm": {
+        "title": "Diese Verknüpfung aufheben?",
+        "body": "{{parent}} sieht die Lerndaten von {{student}} ab sofort nicht mehr. Die Verknüpfung wird für beide Konten geschlossen.",
+        "cancel": "Abbrechen",
+        "submit": "Jetzt aufheben"
+      },
+      "errors": {
+        "link_not_open": "Zwischen diesen beiden Konten besteht keine offene Verknüpfung; vielleicht wurde sie schon aufgehoben. Die Liste wurde neu geladen.",
+        "link_revoke_conflict": "Die Verknüpfung hat sich während des Aufhebens geändert, deshalb wurde nichts geändert. Prüfen Sie die neu geladene Liste und versuchen Sie es erneut.",
+        "action_not_allowed": "Sie haben keine Berechtigung, eine Eltern-Verknüpfung aufzuheben."
+      }
     }
   },
   "activation": {

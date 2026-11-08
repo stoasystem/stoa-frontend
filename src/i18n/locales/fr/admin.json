@@ -176,6 +176,24 @@
       "body": "{{student}} sera lié à {{parent}}, relation : « {{relationship}} ». Le lien prend effet immédiatement, et aucun des deux comptes n’a à le confirmer.",
       "cancel": "Annuler",
       "submit": "Lier maintenant"
+    },
+    "revoke": {
+      "open": "Révoquer la liaison avec {{student}}",
+      "revoked": "{{student}} n’est plus lié à {{parent}}.",
+      "failed": "La liaison n’a pas pu être révoquée.",
+      "reasonLabel": "Motif",
+      "reasonHint": "Consigné dans le journal d’audit. 500 caractères au maximum.",
+      "confirm": {
+        "title": "Révoquer cette liaison ?",
+        "body": "{{parent}} ne verra plus les données d’apprentissage de {{student}}, avec effet immédiat. La liaison est fermée pour les deux comptes.",
+        "cancel": "Annuler",
+        "submit": "Révoquer maintenant"
+      },
+      "errors": {
+        "link_not_open": "Ces deux comptes n’ont pas de liaison ouverte ; elle a peut-être déjà été révoquée. La liste a été actualisée.",
+        "link_revoke_conflict": "La liaison a changé pendant la révocation, rien n’a donc été modifié. Vérifiez la liste actualisée et réessayez.",
+        "action_not_allowed": "Vous n’avez pas l’autorisation de révoquer une liaison parentale."
+      }
     }
   },
   "activation": {

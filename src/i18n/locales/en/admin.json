@@ -175,6 +175,24 @@
       "body": "{{student}} will be linked to {{parent}} as “{{relationship}}”. The link takes effect at once, and neither account is asked to confirm it.",
       "cancel": "Cancel",
       "submit": "Link now"
+    },
+    "revoke": {
+      "open": "Revoke the link to {{student}}",
+      "revoked": "{{student}} is no longer linked to {{parent}}.",
+      "failed": "The link could not be revoked.",
+      "reasonLabel": "Reason",
+      "reasonHint": "Written to the audit log. Up to 500 characters.",
+      "confirm": {
+        "title": "Revoke this link?",
+        "body": "{{parent}} will stop seeing {{student}}’s learning data at once. The link is closed for both accounts.",
+        "cancel": "Cancel",
+        "submit": "Revoke now"
+      },
+      "errors": {
+        "link_not_open": "These two accounts have no open link; it may already have been revoked. The list has been refreshed.",
+        "link_revoke_conflict": "The link changed while it was being revoked, so nothing was changed. Check the refreshed list and try again.",
+        "action_not_allowed": "You do not have permission to revoke a parent link."
+      }
     }
   },
   "activation": {

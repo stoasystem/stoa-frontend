@@ -176,6 +176,24 @@
       "body": "{{student}} verrà collegato a {{parent}}, relazione: «{{relationship}}». Il collegamento vale subito e nessuno dei due account deve confermarlo.",
       "cancel": "Annulla",
       "submit": "Collega ora"
+    },
+    "revoke": {
+      "open": "Revoca il collegamento con {{student}}",
+      "revoked": "{{student}} non è più collegato a {{parent}}.",
+      "failed": "Non è stato possibile revocare il collegamento.",
+      "reasonLabel": "Motivo",
+      "reasonHint": "Registrato nel log di audit. Al massimo 500 caratteri.",
+      "confirm": {
+        "title": "Revocare questo collegamento?",
+        "body": "{{parent}} non vedrà più i dati di apprendimento di {{student}}, con effetto immediato. Il collegamento viene chiuso per entrambi gli account.",
+        "cancel": "Annulla",
+        "submit": "Revoca ora"
+      },
+      "errors": {
+        "link_not_open": "Tra questi due account non c’è un collegamento aperto; forse è già stato revocato. L’elenco è stato aggiornato.",
+        "link_revoke_conflict": "Il collegamento è cambiato durante la revoca, quindi non è stato modificato nulla. Controlla l’elenco aggiornato e riprova.",
+        "action_not_allowed": "Non hai l’autorizzazione per revocare un collegamento genitore."
+      }
     }
   },
   "activation": {

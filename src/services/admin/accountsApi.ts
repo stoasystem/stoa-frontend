@@ -290,6 +290,32 @@ export async function assignParentLink(input: {
   return response.data
 }
 
+/** The link as it stands after a revocation: closed on both sides. */
+export type ParentLinkRevokeResponse = {
+  parent_id: string
+  student_id: string
+  relationship: string
+  status: string
+  link_updated_at: string
+}
+
+/**
+ * Close the link between a parent and a student (#588, stoa-backend#288).
+ *
+ * The parent stops seeing the child's data at once. The reason goes to the
+ * audit log; the route takes 1 to 500 characters and no other field. It
+ * refuses with `link_not_open` when there is no open link between the two,
+ * and with `link_revoke_conflict` when the link changed while it was read.
+ */
+export async function revokeParentLink(input: { parentId: string; studentId: string; reason: string }) {
+  const response = await httpClient.post<ParentLinkRevokeResponse>('/admin/parent-links/revoke', {
+    parent_id: input.parentId,
+    student_id: input.studentId,
+    reason: input.reason,
+  })
+  return response.data
+}
+
 export type TeacherSupportAllowance = {
   studentId: string
   weeklyCases: number

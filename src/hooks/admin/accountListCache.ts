@@ -279,3 +279,15 @@ export function afterParentLink(queryClient: QueryClient, input: { parentId: str
     (_, query) => (!student && holds(query, input.parentId)) || (!parent && holds(query, input.studentId)),
   )
 }
+
+/**
+ * A revoked link closes on both sides (#588): each row stops listing the
+ * other. A read holding neither account has nothing to change.
+ */
+export function afterParentLinkRevoke(queryClient: QueryClient, input: { parentId: string; studentId: string }) {
+  changeRows(queryClient, (row) => {
+    const other = row.userId === input.parentId ? input.studentId : row.userId === input.studentId ? input.parentId : undefined
+    if (!other || !row.linkedAccounts.some((held) => held.userId === other)) return row
+    return { ...row, linkedAccounts: row.linkedAccounts.filter((held) => held.userId !== other) }
+  })
+}

@@ -1,7 +1,7 @@
 import { type FormEvent, useMemo, useRef, useState } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import type { TFunction } from 'i18next'
-import { AlertTriangle, CheckCircle2, Link2, RefreshCw, Search, ShieldAlert, UserRound } from 'lucide-react'
+import { AlertTriangle, CheckCircle2, Link2, RefreshCw, Search, ShieldAlert, Unlink, UserRound } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { useSearchParams } from 'react-router-dom'
 import { PageContainer } from '@/components/common/PageContainer'
@@ -22,7 +22,11 @@ import {
 import { Input } from '@/components/ui/input'
 import { isApiPathValue } from '@/services/api/apiPath'
 import { ApiError } from '@/services/api/httpClient'
-import { useAdminAccountsQuery, useAssignParentLinkMutation } from '@/hooks/admin/useAdminAccounts'
+import {
+  useAdminAccountsQuery,
+  useAssignParentLinkMutation,
+  useRevokeParentLinkMutation,
+} from '@/hooks/admin/useAdminAccounts'
 import { useAdminParentAccountOperationsQuery } from '@/hooks/admin/useAdminAccountOperationsQuery'
 import { useAdminBillingOperation } from '@/hooks/admin/useAdminBillingOperation'
 import { useDebouncedValue } from '@/hooks/admin/useDebouncedValue'
@@ -776,20 +780,7 @@ function AdminAccountOperationsDetail({ data }: { data: AdminAccountOperations }
 
       <BillingEvidence data={data} />
 
-      <section className="space-y-3">
-        <h2 className="text-xl font-semibold text-foreground">{t('accountOperations.children.title')}</h2>
-        {data.children.length === 0 ? (
-          <Card>
-            <CardContent className="p-5 text-sm text-muted-foreground">{t('accountOperations.children.empty')}</CardContent>
-          </Card>
-        ) : (
-          <div className="grid gap-3">
-            {data.children.map((child) => (
-              <ChildOperationsRow key={child.studentId} child={child} />
-            ))}
-          </div>
-        )}
-      </section>
+      <LinkedChildren data={data} />
 
       <UsageSummary usage={data.usage} />
     </>
@@ -838,7 +829,174 @@ function BillingEvidence({ data }: { data: AdminAccountOperations }) {
   )
 }
 
-function ChildOperationsRow({ child }: { child: AccountOperationsChild }) {
+/** A link already closed: there is nothing left to revoke, and the route would say `link_not_open`. */
+const CLOSED_LINK_STATUSES = new Set(['rejected', 'missing'])
+
+/** The longest reason the revoke route takes (stoa-backend#288). */
+const REVOKE_REASON_MAX = 500
+
+function childLabel(child: AccountOperationsChild) {
+  return child.profile.name || child.profile.email || child.studentId
+}
+
+/**
+ * The looked-up parent's children, each with a way to close its link (#588).
+ *
+ * Revoking takes effect at once: the parent stops seeing that child's data.
+ * So it is confirmed in a dialog that names both accounts and says so, and
+ * it asks for the reason the audit log keeps. A suspended or archived account
+ * does not stop it; that is the link an administrator most needs to close.
+ * Afterwards this list and the account lists are read again, so the row
+ * shows the link as the server now has it. A refusal because the link was
+ * already closed or changed meanwhile reads them again too: the list on
+ * screen is what was wrong.
+ */
+function LinkedChildren({ data }: { data: AdminAccountOperations }) {
+  const { t } = useTranslation('admin')
+  const queryClient = useQueryClient()
+  const revoke = useRevokeParentLinkMutation()
+  const [target, setTarget] = useState<AccountOperationsChild | null>(null)
+  const [reason, setReason] = useState('')
+  const [notice, setNotice] = useState<string | null>(null)
+  const [failure, setFailure] = useState<string | null>(null)
+  // The row's button can be gone once the list is read again, so focus comes back here.
+  const heading = useRef<HTMLHeadingElement>(null)
+  const parentName = data.parent.name || data.parent.email || data.parentId
+  const trimmed = reason.trim()
+  const ready = Boolean(target) && trimmed.length > 0 && trimmed.length <= REVOKE_REASON_MAX && !revoke.isPending
+
+  function open(child: AccountOperationsChild) {
+    setTarget(child)
+    setReason('')
+  }
+
+  function confirm(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+    if (!target || !ready) return
+    const child = target
+    setTarget(null)
+    setNotice(null)
+    setFailure(null)
+    const reread = () =>
+      void queryClient.invalidateQueries({ queryKey: adminQueryKeys.accountOperationsForParent(data.parentId) })
+    revoke.mutate(
+      { parentId: data.parentId, studentId: child.studentId, reason: trimmed },
+      {
+        onSuccess: () => {
+          setNotice(t('parentLinks.revoke.revoked', { student: childLabel(child), parent: parentName }))
+          reread()
+        },
+        onError: (error) => {
+          setFailure(revokeRefusal(error, t))
+          if (error instanceof ApiError && error.status === 409) reread()
+        },
+      },
+    )
+  }
+
+  return (
+    <section className="space-y-3">
+      <h2 ref={heading} tabIndex={-1} className="text-xl font-semibold text-foreground">
+        {t('accountOperations.children.title')}
+      </h2>
+      {data.children.length === 0 ? (
+        <Card>
+          <CardContent className="p-5 text-sm text-muted-foreground">{t('accountOperations.children.empty')}</CardContent>
+        </Card>
+      ) : (
+        <div className="grid gap-3">
+          {data.children.map((child) => (
+            <ChildOperationsRow
+              key={child.studentId}
+              child={child}
+              onRevoke={CLOSED_LINK_STATUSES.has(child.binding.status ?? '') ? undefined : () => open(child)}
+              revoking={revoke.isPending}
+            />
+          ))}
+        </div>
+      )}
+
+      {/* Always mounted, only its text changes: a live region added together
+          with its words is not announced (#410). */}
+      <p className={notice ? 'text-sm text-foreground' : 'sr-only'} role="status" data-testid="parent-link-revoke-notice">
+        {notice}
+      </p>
+      {failure && (
+        <p className="text-sm text-destructive" role="alert" data-testid="parent-link-revoke-error">
+          {failure}
+        </p>
+      )}
+
+      <Dialog open={target !== null} onOpenChange={(next) => { if (!next) setTarget(null) }}>
+        <DialogContent returnFocusFallback={heading}>
+          <form onSubmit={confirm} className="space-y-4">
+            <DialogHeader>
+              <DialogTitle>{t('parentLinks.revoke.confirm.title')}</DialogTitle>
+              <DialogDescription>
+                {t('parentLinks.revoke.confirm.body', {
+                  student: target ? childLabel(target) : '',
+                  parent: parentName,
+                })}
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-foreground" htmlFor="parent-link-revoke-reason">
+                {t('parentLinks.revoke.reasonLabel')}
+              </label>
+              <Input
+                id="parent-link-revoke-reason"
+                value={reason}
+                maxLength={REVOKE_REASON_MAX}
+                aria-describedby="parent-link-revoke-reason-hint"
+                onChange={(event) => setReason(event.target.value)}
+              />
+              <p id="parent-link-revoke-reason-hint" className="text-xs text-muted-foreground">
+                {t('parentLinks.revoke.reasonHint')}
+              </p>
+            </div>
+            <DialogFooter className="gap-2">
+              <Button type="button" variant="outline" onClick={() => setTarget(null)}>
+                {t('parentLinks.revoke.confirm.cancel')}
+              </Button>
+              <Button type="submit" variant="destructive" disabled={!ready}>
+                {t('parentLinks.revoke.confirm.submit')}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+    </section>
+  )
+}
+
+/**
+ * Say why a revocation was refused. The two conflicts and a missing
+ * permission have words of their own here; any other code the account
+ * catalogue knows is named from there, and the rest falls back.
+ */
+function revokeRefusal(error: unknown, t: TFunction) {
+  const fallback = t('parentLinks.revoke.failed')
+  const status = error instanceof ApiError ? error.status : undefined
+  const code = error instanceof ApiError ? error.code : undefined
+  if (code) {
+    const own = t(`parentLinks.revoke.errors.${code}`, { defaultValue: '' })
+    if (own) return own
+  }
+  if (status === 403) return t('parentLinks.revoke.errors.action_not_allowed')
+  if (!code) return toUserFacingError(error, fallback)
+  return t(`accounts.errors.${code}`, { defaultValue: toUserFacingError(error, fallback) })
+}
+
+function ChildOperationsRow({
+  child,
+  onRevoke,
+  revoking,
+}: {
+  child: AccountOperationsChild
+  /** Absent when the link is already closed. */
+  onRevoke?: () => void
+  revoking: boolean
+}) {
   const { t } = useTranslation('admin')
   const usage = child.usage
   const usageLabel = usage
@@ -861,6 +1019,14 @@ function ChildOperationsRow({ child }: { child: AccountOperationsChild }) {
         <ChildMetric label={t('accountOperations.children.recovery')} value={codeLabel((child.profile.verification ?? child.verification)?.supportAction, t)} />
         <ChildMetric label={t('accountOperations.children.plan')} value={codeLabel(child.entitlement?.effectivePlan, t, 'plan')} />
         <ChildMetric label={t('accountOperations.children.usage')} value={usageLabel} muted={Boolean(usage?.unreconciled)} />
+        {onRevoke && (
+          <div className="lg:col-span-full">
+            <Button type="button" variant="outline" size="sm" onClick={onRevoke} disabled={revoking}>
+              <Unlink className="mr-2 h-4 w-4" aria-hidden="true" />
+              {t('parentLinks.revoke.open', { student: childLabel(child) })}
+            </Button>
+          </div>
+        )}
       </CardContent>
     </Card>
   )
