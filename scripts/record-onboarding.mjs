@@ -98,6 +98,12 @@ await page.locator('#password').pressSequentially('Sternkarte2026', { delay: 20 
 await step('sign-in', '2 · First sign-in', 600)
 await page.locator('form button[type="submit"]').click()
 
+// 3. About you (#591): the year group and the subjects. Put off here, so the walk goes on to
+// plan B and "Integers", where the course starts; a year group lands elsewhere (`about-you`).
+await page.locator('[data-about-you] [data-shown]').waitFor({ timeout: 15000 })
+await step('about-you', '3 · About you: year group and subjects', 2600)
+await page.keyboard.press('Escape')
+
 // 3. Plan B.
 await page.locator('[data-first-question]').waitFor({ timeout: 15000 })
 await step('question', '3 · Which subject is school on? (plan B)', 2600)

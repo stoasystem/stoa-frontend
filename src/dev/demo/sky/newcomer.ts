@@ -20,6 +20,12 @@
  * follows it (#474): its successors in the outer fringe first, else the next
  * fringe star after it in course order.
  *
+ * A year group on the profile (`grade`, saved by "About you", #591) moves
+ * mathematics' recommendation as the backend does (stoa-backend#310, reason
+ * `grade`): a lower-secondary year starts on the demo knowledge point, the
+ * one star of the demo with a chapter, so the walk-through goes on from
+ * there; a primary year keeps "Integers", now said to be for that year.
+ *
  * Arrays are kept per input, so the same map gives the same sky (the engine
  * compares by identity).
  */
@@ -67,6 +73,36 @@ function newcomerParts(map: StarMap): Made {
   const parts = { stars, prerequisites }
   byPrerequisites.set(map.prerequisites, parts)
   return parts
+}
+
+/** Where the demo's mathematics starts for a year group: secondary on the demo knowledge point. */
+function gradeStart(grade: string): 'knowledge-point' | 'first' | null {
+  if (!grade.startsWith('grade_')) return null
+  return grade.includes('secondary') ? 'knowledge-point' : 'first'
+}
+
+const graded = new WeakMap<Star[], Map<string, Made>>()
+
+/** `parts` with mathematics' recommendation where `grade` starts (`gradeStart`), the same arrays for the same year. */
+function withGrade(map: StarMap, parts: Made, grade: string): Made {
+  const start = gradeStart(grade)
+  if (!start) return parts
+  const known = graded.get(parts.stars) ?? new Map<string, Made>()
+  graded.set(parts.stars, known)
+  const hit = known.get(start)
+  if (hit) return hit
+  const kp = DEMO_KNOWLEDGE_POINT
+  const own = new Set(parts.stars.filter((star) => subjectOfNebula(map, star.nebulaId) === kp.subjectId).map((star) => star.unitId))
+  const first = parts.stars.find((star) => own.has(star.unitId) && star.recommendation)?.unitId
+  const pick = start === 'knowledge-point' ? kp.unitId : first
+  const stars = parts.stars.map((star) =>
+    !own.has(star.unitId)
+      ? star
+      : { ...star, recommendation: star.unitId === pick ? { source: 'system' as const, reason: 'grade' as const, relatedUnitId: null } : null },
+  )
+  const made = { stars, prerequisites: parts.prerequisites }
+  known.set(start, made)
+  return made
 }
 
 const progressed = new WeakMap<Star[], Map<string, Star[]>>()
@@ -127,10 +163,14 @@ function withProgress(map: StarMap, parts: Made, completed: readonly string[], l
   return stars
 }
 
-/** `map` for a student who has not started anything, but for the `completed` lessons of the demo knowledge point. */
-export function asNewcomer(map: StarMap, completed: readonly string[] = [], language: SupportedLanguage = 'en'): StarMap {
+/**
+ * `map` for a student who has not started anything, but for the `completed`
+ * lessons of the demo knowledge point, with the year group `grade` (a code,
+ * or "" for none) on the profile.
+ */
+export function asNewcomer(map: StarMap, completed: readonly string[] = [], language: SupportedLanguage = 'en', grade = ''): StarMap {
   if (map.stars.length === 0) return map
-  const parts = newcomerParts(map)
+  const parts = withGrade(map, newcomerParts(map), grade)
   const stars = withProgress(map, parts, completed, language)
   const lit = stars === parts.stars ? 0 : stars.filter((star) => star.state === 'lit').length
   const inFocus = subjectOfNebula(map, DEMO_KNOWLEDGE_POINT.topicId) === map.subject.subjectId ? lit : 0

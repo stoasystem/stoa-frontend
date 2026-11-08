@@ -3,8 +3,8 @@ import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useLocation } from 'react-router-dom'
 import { Button } from '@/components/base/Button'
+import { ChoiceSelect, readableChoice } from '@/components/base/ChoiceSelect'
 import { ROW } from '@/components/base/sizes'
-import { TextField } from '@/components/base/TextField'
 import { useStudentProfileQuery } from '@/hooks/student/useStudentProfileQuery'
 import { updateStudentProfile } from '@/services/student/studentApi'
 import { studentQueryKeys } from '@/services/student/studentQueryKeys'
@@ -14,18 +14,22 @@ import type { StudentProfile } from '@/types/student'
 export const GRADE_SECTION_ID = 'me-grade'
 
 /*
- * A student's year group, the one profile field a student sets: it decides
- * how deep an answer goes (stoasystem/stoa-backend#19), and a blank one leaves
- * the backend to guess (`UNKNOWN_GRADE`, #50). Free text, as the profile has
- * always taken it; `PATCH /students/me/profile` with `grade` only.
+ * A student's year group: it decides how deep an answer goes
+ * (stoasystem/stoa-backend#19), where a newcomer's star map starts
+ * (stoa-backend#310), and a blank one leaves the backend to guess
+ * (`UNKNOWN_GRADE`, #50). Chosen from the backend's list (`choices.grade`,
+ * #591), the same dropdown as the first sign-in's "About you"; a stored text
+ * the backend cannot read selects nothing. `PATCH /students/me/profile` with
+ * `grade` only, a code or "" for not said.
  */
 export function GradeGroup() {
   const { t } = useTranslation('common')
   const profile = useStudentProfileQuery()
   const queryClient = useQueryClient()
   const location = useLocation()
-  const field = useRef<HTMLInputElement>(null)
-  const stored = profile.data?.grade ?? ''
+  const field = useRef<HTMLSelectElement>(null)
+  const choices = profile.data?.choices?.grade ?? []
+  const stored = readableChoice(choices, profile.data?.grade)
   const [value, setValue] = useState<string | null>(null)
   const draft = value ?? stored
 
@@ -49,12 +53,11 @@ export function GradeGroup() {
 
   function submit(event: FormEvent) {
     event.preventDefault()
-    const grade = draft.trim()
-    if (grade === stored.trim() || save.isPending) return
-    save.mutate(grade)
+    if (draft === stored || save.isPending) return
+    save.mutate(draft)
   }
 
-  const unchanged = draft.trim() === stored.trim()
+  const unchanged = draft === stored
 
   return (
     <section id={GRADE_SECTION_ID} aria-labelledby="me-grade-heading" className="flex scroll-mt-20 flex-col">
@@ -75,16 +78,17 @@ export function GradeGroup() {
           <p className="m-0 text-[15px] leading-[1.45] text-caption">{t('me.grade.unavailable')}</p>
         ) : (
           <form className="grid max-w-md gap-4" onSubmit={submit} noValidate>
-            <TextField
+            <ChoiceSelect
               ref={field}
               id="me-grade-field"
               label={t('me.grade.label')}
               hint={t('me.grade.hint')}
+              placeholder={t('me.grade.placeholder')}
+              choices={choices}
               value={draft}
-              maxLength={40}
               disabled={!profile.data}
-              onChange={(event) => {
-                setValue(event.target.value)
+              onChange={(code) => {
+                setValue(code)
                 if (save.isSuccess || save.isError) save.reset()
               }}
             />

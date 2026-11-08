@@ -51,7 +51,14 @@ export function FirstLandingBubble({ star, next, startable = true, avoid, onFind
       unitId={star.unitId}
       marker="data-first-landing"
       avoid={avoid}
-      title={next ? t('firstReveal.title') : t('firstLanding.title', { name: star.name })}
+      title={
+        next
+          ? t('firstReveal.title')
+          : // Recommended for the year group the profile says (#591): Murmi says so.
+            star.recommendation?.reason === 'grade'
+            ? t('firstLanding.titleGrade', { name: star.name })
+            : t('firstLanding.title', { name: star.name })
+      }
       body={next ? t('firstReveal.body', { name: star.name }) : t('firstLanding.body')}
       locate={locate}
       watch={watch}

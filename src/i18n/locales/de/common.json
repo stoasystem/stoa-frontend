@@ -74,8 +74,9 @@
   "me": {
     "grade": {
       "heading": "Klassenstufe",
-      "hint": "Zum Beispiel «6. Klasse». Danach passen die Erklärungen besser zu dir.",
+      "hint": "Danach passen die Erklärungen besser zu dir.",
       "label": "Deine Klassenstufe",
+      "placeholder": "Klassenstufe wählen",
       "save": "Speichern",
       "saveFailed": "Die Klassenstufe wurde nicht gespeichert. Versuch es noch einmal.",
       "saved": "Gespeichert.",

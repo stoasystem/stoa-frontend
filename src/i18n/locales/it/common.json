@@ -74,8 +74,9 @@
   "me": {
     "grade": {
       "heading": "Anno scolastico",
-      "hint": "Per esempio «6ª classe». Così le spiegazioni saranno più adatte a te.",
+      "hint": "Così le spiegazioni saranno più adatte a te.",
       "label": "Il tuo anno scolastico",
+      "placeholder": "Scegli il tuo anno scolastico",
       "save": "Salva",
       "saveFailed": "Il tuo anno scolastico non è stato salvato. Riprova.",
       "saved": "Salvato.",

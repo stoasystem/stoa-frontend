@@ -17,6 +17,7 @@
   },
   "firstLanding": {
     "title": "Commence ici : {{name}}",
+    "titleGrade": "Pour ton année scolaire, commence ici : {{name}}",
     "body": "Chaque étoile est une chose à apprendre. Tu sais déjà tout ça ? Dis-moi où tu en es à l’école et je trouverai ton étoile.",
     "start": "Commencer cette étoile",
     "later": "D’abord explorer",
@@ -51,6 +52,19 @@
     "title": "Quelle matière travailles-tu en ce moment à l’école ?",
     "body": "Murmi t’emmène vers une bonne première étoile.",
     "unsure": "Je ne sais pas"
+  },
+  "aboutYou": {
+    "title": "À propos de toi",
+    "why": "Dis-moi en quelle année tu es et ce que tu étudies, et je te trouverai le bon point de départ.",
+    "grade": "Ton année scolaire",
+    "gradePlaceholder": "Choisis ton année scolaire",
+    "gradeMissing": "Choisis d’abord ton année scolaire.",
+    "subjects": "Les matières que tu suis ce semestre",
+    "done": "C’est bon",
+    "saving": "Enregistrement…",
+    "later": "Plus tard",
+    "laterNote": "Si tu passes cette étape, tu commenceras par les bases. Tu peux le changer à tout moment dans « Moi ».",
+    "saveFailed": "Ça n’a pas été enregistré. Réessaie, ou choisis « Plus tard » pour continuer."
   },
   "firstReveal": {
     "title": "Ta première étoile brille !",
@@ -90,7 +104,8 @@
     "reason": {
       "inProgress": "Tu en étais là la dernière fois",
       "afterLit": "Dans la suite de {{name}}, que tu viens d’allumer",
-      "start": "Commence ici"
+      "start": "Commence ici",
+      "grade": "C’est là que commence ton année scolaire"
     },
     "recommended": "Suggérée ensuite",
     "reviewDue_one": "{{count}} carte à réviser",

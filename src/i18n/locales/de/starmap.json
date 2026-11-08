@@ -17,6 +17,7 @@
   },
   "firstLanding": {
     "title": "Hier anfangen: {{name}}",
+    "titleGrade": "Für deine Klassenstufe fängst du hier an: {{name}}",
     "body": "Jeder Stern ist etwas zum Lernen. Kannst du das schon? Sag mir, wo ihr in der Schule gerade seid, dann finde ich deinen Stern.",
     "start": "Mit diesem Stern beginnen",
     "later": "Erst umschauen",
@@ -51,6 +52,19 @@
     "title": "Welches Fach hast du gerade in der Schule?",
     "body": "Murmi bringt dich dort zu einem guten ersten Stern.",
     "unsure": "Weiss nicht"
+  },
+  "aboutYou": {
+    "title": "Über dich",
+    "why": "Sag mir, in welcher Klasse du bist und was du gerade lernst, dann finde ich den richtigen Anfang für dich.",
+    "grade": "Deine Klassenstufe",
+    "gradePlaceholder": "Klassenstufe wählen",
+    "gradeMissing": "Wähl zuerst deine Klassenstufe.",
+    "subjects": "Fächer, die du dieses Semester hast",
+    "done": "Fertig",
+    "saving": "Wird gespeichert …",
+    "later": "Später",
+    "laterNote": "Wenn du das überspringst, fängst du ganz bei den Grundlagen an. Du kannst es jederzeit unter «Ich» ändern.",
+    "saveFailed": "Das wurde nicht gespeichert. Versuch es noch einmal oder mach mit «Später» weiter."
   },
   "firstReveal": {
     "title": "Dein erster Stern leuchtet!",
@@ -90,7 +104,8 @@
     "reason": {
       "inProgress": "Hier hast du zuletzt gelernt",
       "afterLit": "Weiter nach {{name}}: gerade von dir zum Leuchten gebracht",
-      "start": "Fang hier an"
+      "start": "Fang hier an",
+      "grade": "Hier fängt deine Klassenstufe an"
     },
     "recommended": "Als Nächstes empfohlen",
     "reviewDue_one": "{{count}} Karte zur Wiederholung fällig",

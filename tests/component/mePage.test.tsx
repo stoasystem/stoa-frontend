@@ -20,6 +20,7 @@ import enCommon from '@/i18n/locales/en/common.json'
 import { type CurrentUser, useAuthStore } from '@/store/authStore'
 import type { UserRole } from '@/types/user'
 import { mswServer } from '../mswServer'
+import { GRADES } from '../fakes/profileChoices'
 
 const copy = enAuth.changePassword
 
@@ -46,7 +47,7 @@ function backend({
 } = {}): Seen {
   const seen: Seen = { request: [], confirm: [], preferences: [], profile: [], log: [] }
   let storedGrade = grade
-  const profileBody = () => ({ userId: 'u-1', grade: storedGrade, primarySubjects: ['math'], schoolSystem: null })
+  const profileBody = () => ({ userId: 'u-1', grade: storedGrade, primarySubjects: ['math'], schoolSystem: null, choices: { grade: GRADES } })
   let matrix: Record<string, unknown> = structuredClone(DEFAULT_MATRIX)
   const preferencesBody = () => ({
     userId: 'u-1',
@@ -660,52 +661,65 @@ describe('notification preferences on /me', () => {
   })
 })
 
-describe('the year group on /me (#154)', () => {
+describe('the year group on /me (#154, #591)', () => {
   const grade = enCommon.me.grade
 
-  it('saves the year group a student types, trimmed, and shows it as stored', async () => {
+  it("offers the backend's year groups in its order, and saves the code chosen", async () => {
     const seen = backend()
     const user = userEvent.setup()
     openAt('/me')
 
     const section = await screen.findByRole('region', { name: grade.heading })
-    const field = within(section).getByRole('textbox', { name: grade.label })
+    const field = within(section).getByRole('combobox', { name: grade.label })
     await waitFor(() => expect(field).toBeEnabled())
+    // Nothing chosen yet: the empty first option, then the backend's list as it gave it.
     expect(field).toHaveValue('')
+    expect(within(field).getAllByRole('option').map((option) => option.textContent)).toEqual([grade.placeholder, ...GRADES.map((choice) => choice.label)])
     const save = within(section).getByRole('button', { name: grade.save })
     expect(save).toBeDisabled()
 
-    await user.type(field, '  Year 6 ')
+    await user.selectOptions(field, 'Year 6 (primary school)')
     await user.click(save)
 
     await waitFor(() => expect(within(section).getByRole('status')).toHaveTextContent(grade.saved))
-    expect(seen.profile).toEqual([{ grade: 'Year 6' }])
-    expect(field).toHaveValue('Year 6')
+    expect(seen.profile).toEqual([{ grade: 'grade_6_primary' }])
+    expect(field).toHaveValue('grade_6_primary')
     expect(save).toBeDisabled()
   })
 
   it('shows the year group already stored', async () => {
-    backend({ grade: 'Year 8' })
+    backend({ grade: 'grade_8_secondary' })
     openAt('/me')
 
     const section = await screen.findByRole('region', { name: grade.heading })
-    await waitFor(() => expect(within(section).getByRole('textbox', { name: grade.label })).toHaveValue('Year 8'))
+    await waitFor(() => expect(within(section).getByRole('combobox', { name: grade.label })).toHaveValue('grade_8_secondary'))
   })
 
-  it('says so when the year group was not saved, and keeps what was typed', async () => {
+  it('selects nothing for old text the backend cannot read', async () => {
+    backend({ grade: '6. Klasse' })
+    openAt('/me')
+
+    const section = await screen.findByRole('region', { name: grade.heading })
+    const field = within(section).getByRole('combobox', { name: grade.label })
+    await waitFor(() => expect(field).toBeEnabled())
+    expect(field).toHaveValue('')
+    expect(within(section).getByRole('button', { name: grade.save })).toBeDisabled()
+  })
+
+  it('says so when the year group was not saved, and keeps what was chosen', async () => {
     const seen = backend({ saveGrade: () => HttpResponse.json({ detail: 'nope' }, { status: 503 }) })
     const user = userEvent.setup()
     openAt('/me')
 
     const section = await screen.findByRole('region', { name: grade.heading })
-    const field = within(section).getByRole('textbox', { name: grade.label })
+    const field = within(section).getByRole('combobox', { name: grade.label })
     await waitFor(() => expect(field).toBeEnabled())
-    await user.type(field, 'Year 6')
+    await user.selectOptions(field, 'grade_6_primary')
     await user.click(within(section).getByRole('button', { name: grade.save }))
 
     expect(await within(section).findByRole('alert')).toHaveTextContent(grade.saveFailed)
     expect(seen.profile).toHaveLength(1)
-    expect(field).toHaveValue('Year 6')
+    expect(field).toHaveValue('grade_6_primary')
   })
 
   it('says it is saved in a status line already on the page (#410)', async () => {
@@ -714,24 +728,24 @@ describe('the year group on /me (#154)', () => {
     openAt('/me')
 
     const section = await screen.findByRole('region', { name: grade.heading })
-    const field = within(section).getByRole('textbox', { name: grade.label })
+    const field = within(section).getByRole('combobox', { name: grade.label })
     await waitFor(() => expect(field).toBeEnabled())
     // A live region put on the page together with its words is not read out.
     const line = within(section).getByRole('status')
     expect(line).toBeEmptyDOMElement()
 
-    await user.type(field, 'Year 6')
+    await user.selectOptions(field, 'grade_6_primary')
     await user.click(within(section).getByRole('button', { name: grade.save }))
     await waitFor(() => expect(line).toHaveTextContent(grade.saved))
     expect(within(section).getByRole('status')).toBe(line)
   })
 
-  it('is where Ask\'s hint leads, with the field ready to type in', async () => {
+  it("is where Ask's hint leads, with the field ready to choose from", async () => {
     backend()
     openAt('/me#me-grade')
 
     const section = await screen.findByRole('region', { name: grade.heading })
-    const field = within(section).getByRole('textbox', { name: grade.label })
+    const field = within(section).getByRole('combobox', { name: grade.label })
     await waitFor(() => expect(field).toHaveFocus())
   })
 })

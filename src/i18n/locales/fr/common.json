@@ -74,8 +74,9 @@
   "me": {
     "grade": {
       "heading": "Année scolaire",
-      "hint": "Par exemple « 6e année ». Les explications seront alors mieux adaptées.",
+      "hint": "Les explications seront alors mieux adaptées.",
       "label": "Ton année scolaire",
+      "placeholder": "Choisis ton année scolaire",
       "save": "Enregistrer",
       "saveFailed": "Ton année scolaire n’a pas été enregistrée. Réessaie.",
       "saved": "Enregistré.",
