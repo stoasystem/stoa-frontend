@@ -1,7 +1,10 @@
 /*
  * Murmi beside the recommended star on a newcomer's first landing
- * (`firstLanding.ts`): one line on what a star is, one way in -- the star's
- * chapter, by the jump from where the star is drawn -- and one way out.
+ * (`firstLanding.ts`): one line on what a star is, and two ways on -- the
+ * star's chapter, by the jump from where the star is drawn, or, for a student
+ * who knows all this already, "Find my own star" (#586), which hands over to
+ * Ask's docked composer with things to say -- and "Look around first", kept
+ * as the quiet way out (Escape does the same).
  *
  * How Murmi stands on the map -- following its star, arriving once the
  * camera has landed, docking on a phone, going on Escape -- is the star
@@ -27,6 +30,10 @@ export type FirstLandingBubbleProps = {
   next?: string
   /** Whether `star` has a chapter to start: not the design preview's placeholder stars (as the star's card). */
   startable?: boolean
+  /** Other stars to keep clear, glyph and name (`MurmiBubble`'s `avoid`): after the first lighting, the star just lit. */
+  avoid?: readonly string[]
+  /** On the first landing: "Find my own star" (#586); Murmi goes once it is taken. */
+  onFindOwn?: () => void
   /** Where a star is drawn now, from the map's engine. */
   locate: (unitId: string) => StarOnScreen | null
   /** Calls `listener` when the map comes to rest; returns the way to stop. */
@@ -36,19 +43,21 @@ export type FirstLandingBubbleProps = {
   scheduler?: FrameScheduler
 }
 
-export function FirstLandingBubble({ star, next, startable = true, locate, watch, onDismiss, scheduler }: FirstLandingBubbleProps) {
+export function FirstLandingBubble({ star, next, startable = true, avoid, onFindOwn, locate, watch, onDismiss, scheduler }: FirstLandingBubbleProps) {
   const { t } = useTranslation('starmap')
   const chapterTo = `/chapter/${encodeURIComponent(star.unitId)}`
   return (
     <MurmiBubble
       unitId={star.unitId}
       marker="data-first-landing"
+      avoid={avoid}
       title={next ? t('firstReveal.title') : t('firstLanding.title', { name: star.name })}
       body={next ? t('firstReveal.body', { name: star.name }) : t('firstLanding.body')}
       locate={locate}
       watch={watch}
       onDismiss={onDismiss}
       scheduler={scheduler}
+      stackDocked
       ways={({ leave, jumpFrom }) => (
         <>
           {next ? (
@@ -56,13 +65,29 @@ export function FirstLandingBubble({ star, next, startable = true, locate, watch
               <Link to={next}>{t('firstReveal.show')}</Link>
             </Button>
           ) : (
-            startable && (
-              <Button asChild lift variant="onSky" size="small">
-                <Link to={chapterTo} onClick={jumpFrom(star.unitId, chapterTo)}>
-                  {t('firstLanding.start')}
-                </Link>
-              </Button>
-            )
+            <>
+              {startable && (
+                <Button asChild lift variant="onSky" size="small">
+                  <Link to={chapterTo} onClick={jumpFrom(star.unitId, chapterTo)}>
+                    {t('firstLanding.start')}
+                  </Link>
+                </Button>
+              )}
+              {onFindOwn && (
+                <Button
+                  lift
+                  variant="onSky"
+                  size="small"
+                  onClick={() => {
+                    // Ask takes the focus first, so Murmi going does not hand it back to the star.
+                    onFindOwn()
+                    leave()
+                  }}
+                >
+                  {t('firstLanding.findOwn')}
+                </Button>
+              )}
+            </>
           )}
           <Button variant="onSkyPlain" size="small" onClick={leave}>
             {next ? t('firstReveal.later') : t('firstLanding.later')}

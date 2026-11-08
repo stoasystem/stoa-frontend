@@ -1,6 +1,6 @@
-import { useCallback, useEffect, useRef, type CSSProperties, type ReactNode } from 'react'
+import { useCallback, useEffect, useId, useRef, type CSSProperties, type KeyboardEvent, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Composer } from '@/components/base'
+import { Button, Composer } from '@/components/base'
 import { COMPOSER } from '@/components/base/sizes'
 import { AskPanel } from '@/features/ask/AskPanel'
 import { AskReopen } from '@/features/ask/AskReopen'
@@ -16,6 +16,9 @@ import { useAskKeyboard } from '@/features/ask/useAskKeyboard'
 import { useSheetDrag } from '@/features/ask/useSheetDrag'
 import { WIDE_QUERY, useMediaQuery } from '@/hooks/layout/useMediaQuery'
 import { useCoverShell } from '@/layouts/shellCover'
+import { askFor, useAskStore } from '@/store/askStore'
+import { useAuthStore } from '@/store/authStore'
+import '@/features/ask/askGuide.css'
 
 /**
  * The planet with Ask on it (#12 points 1 and 6; #13 point 1).
@@ -37,6 +40,12 @@ import { useCoverShell } from '@/layouts/shellCover'
  * into the sky's colours, so they hold inside them and Ask no longer reads as a white card from another product.
  *
  * Closed, `AskReopen` on the right edge calls the same conversation back.
+ *
+ * After "Find my own star" on the first landing (#586) the docked composer
+ * takes the focus, is highlighted once, and offers two or three things the
+ * student could say: one tap sends it, in a conversation of its own, and the
+ * answer finds the star as any other does (#489). They are offered for that
+ * moment only: opening Ask, Escape, or leaving the map ends it.
  */
 export function AskHost({
   children,
@@ -64,6 +73,24 @@ export function AskHost({
   const reducedMotion = useMediaQuery('(prefers-reduced-motion: reduce)')
   const composing = useRef(false)
   useCoverShell(modal)
+
+  // "Find my own star" (#586): the examples, while Ask is closed.
+  const ownerId = useAuthStore((state) => state.user?.id ?? null)
+  const examples = useAskStore((state) => askFor(state, ownerId).examples)
+  const askNow = useAskStore((state) => state.askNow)
+  const endExamples = useAskStore((state) => state.endExamples)
+  const offering = !open && examples !== null && examples.length > 0
+  const examplesLabel = useId()
+  useEffect(() => {
+    if (open) endExamples()
+  }, [open, endExamples])
+  useEffect(() => () => useAskStore.getState().endExamples(), [])
+  useEffect(() => {
+    if (offering) docked.current?.querySelector<HTMLElement>('[data-composer-field]')?.focus({ preventScroll: true })
+  }, [offering])
+  const onDockedKeyDown = (event: KeyboardEvent) => {
+    if (offering && event.key === 'Escape') endExamples()
+  }
 
   // Closed again: the focus goes back to where Ask was opened from -- unless
   // closing it sent the student somewhere that took the focus itself (a star's
@@ -130,7 +157,28 @@ export function AskHost({
                 : { left: DOCKED_COMPOSER.phone.inset, right: DOCKED_COMPOSER.phone.inset, bottom: DOCKED_COMPOSER.phone.bottom }
             }
           >
-            <div className="w-full" style={{ maxWidth: wide ? DOCKED_COMPOSER.desktop.width : undefined }}>
+            <div
+              className="w-full"
+              data-ask-guide={offering || undefined}
+              onKeyDown={onDockedKeyDown}
+              style={{ maxWidth: wide ? DOCKED_COMPOSER.desktop.width : undefined }}
+            >
+              {offering && (
+                <div data-ask-examples data-ask-guide-in className="mb-2 flex flex-col items-center gap-1.5">
+                  <p id={examplesLabel} role="status" className="m-0 text-[13px] text-[color:var(--on-sky-text-body)]">
+                    {t('ask.examples.label')}
+                  </p>
+                  <ul aria-labelledby={examplesLabel} className="m-0 flex max-w-full list-none flex-wrap justify-center gap-2 p-0">
+                    {examples.map((example) => (
+                      <li key={example} className="max-w-full">
+                        <Button variant="onSky" size="small" className="max-w-full" onClick={() => ownerId && askNow(ownerId, example)}>
+                          <span className="min-w-0 truncate">{example}</span>
+                        </Button>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
               <Composer
                 value={controller.draft}
                 onChange={onDockedChange}

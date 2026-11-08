@@ -17,9 +17,35 @@
   },
   "firstLanding": {
     "title": "Start here: {{name}}",
-    "body": "Every star is one thing to learn. Finish its lessons and it lights up.",
+    "body": "Every star is one thing to learn. Know all this already? Tell me where you are at school and I'll find your star.",
     "start": "Start this star",
-    "later": "Look around first"
+    "later": "Look around first",
+    "findOwn": "Find my own star"
+  },
+  "findOwn": {
+    "examples": {
+      "math": {
+        "quadratic": "I want to practise quadratic equations",
+        "derivatives": "We're learning derivatives",
+        "trig": "We're doing sine and cosine at school"
+      },
+      "physics": {
+        "forces": "We're doing forces and Newton's laws",
+        "circuits": "I want to practise electric circuits"
+      },
+      "german": {
+        "essay": "We're writing argumentative essays in German",
+        "grammar": "I want to practise the German cases"
+      },
+      "english": {
+        "tenses": "I want to practise the present perfect",
+        "essay": "We're writing opinion essays in English"
+      },
+      "general": {
+        "class": "I want to practise what we're doing in class",
+        "start": "Where should I start for my year?"
+      }
+    }
   },
   "firstQuestion": {
     "title": "Which subject are you working on at school right now?",

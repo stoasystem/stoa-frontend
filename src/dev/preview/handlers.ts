@@ -31,7 +31,7 @@ import {
   setDemoLanguage,
 } from '@/dev/preview/demoSource'
 import { starCountFrom } from '@/dev/preview/surfaces'
-import { DEMO_BRIDGE_STAR } from '@/dev/demo/data'
+import { DEMO_BRIDGE_STAR, DEMO_KNOWLEDGE_POINT } from '@/dev/demo/data'
 import { isSupportedLanguage } from '@/i18n/languages'
 import { commandMessageIds } from '@/services/chat/commandMessageIds'
 import type { ChatMessage, ConversationSummary, MessageQuote } from '@/types/chat'
@@ -306,6 +306,22 @@ const replyTo = (content: string) => (REPLY[demoLanguage()] ?? REPLY.en)(content
  */
 export const DEMO_FIND_STAR = '#star'
 
+/**
+ * A question about sine and cosine, in any of the four languages, is
+ * answered as one that names the demo knowledge point (#586): the first
+ * landing's "Find my own star" offers one in mathematics ("We're doing sine
+ * and cosine at school"), and with nothing lit the map draws the path to it,
+ * so the walk-through goes on into its chapter and the practice stage.
+ */
+const DEMO_FINDS_KNOWLEDGE_POINT = /\b(sine|sinus|seno)\b/i
+
+/** The star a question's answer names in the demo backend, if any. */
+export function demoTargetFor(content: string): { unitId: string } | null {
+  if (content.includes(DEMO_FIND_STAR)) return { unitId: DEMO_BRIDGE_STAR }
+  if (DEMO_FINDS_KNOWLEDGE_POINT.test(content)) return { unitId: DEMO_KNOWLEDGE_POINT.unitId }
+  return null
+}
+
 /** A question and its answer as the backend stores them, with the ids it derives from the command. */
 async function exchange(
   conversationId: string,
@@ -315,7 +331,7 @@ async function exchange(
 ): Promise<ChatMessage[]> {
   const { studentMessageId, assistantMessageId } = await commandMessageIds(conversationId, idempotencyKey)
   const askedAt = now()
-  const targetUnit = content.includes(DEMO_FIND_STAR) ? { unitId: DEMO_BRIDGE_STAR } : null
+  const targetUnit = demoTargetFor(content)
   return [
     // Its quote kept, as the backend keeps it, so a step quoted from an answer (#506) reads back.
     { id: studentMessageId, conversationId, role: 'student', content, createdAt: askedAt, status: 'completed', quote: quote ?? null, targetUnit: null },

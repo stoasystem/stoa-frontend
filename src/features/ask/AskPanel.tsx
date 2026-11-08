@@ -33,6 +33,7 @@ import { useStudentProfileQuery } from '@/hooks/student/useStudentProfileQuery'
 import { conversationGrade } from '@/lib/conversationGrade'
 import { toUserFacingError } from '@/lib/userFacingText'
 import { cn } from '@/lib/utils'
+import { askFor, useAskStore } from '@/store/askStore'
 import { useAuthStore } from '@/store/authStore'
 import { litMomentsFor, useLitMoments, type LitMoment } from '@/store/litMomentsStore'
 import { learningSubjectOptions } from '@/types/learningProfile'
@@ -73,10 +74,12 @@ export function AskPanel({
 }) {
   const { t } = useTranslation('chat')
   const { conversationId, draft, setDraft, select, close } = controller
+  const ownerId = useAuthStore((state) => state.user?.id ?? null)
   const conversationsQuery = useConversationsQuery()
   const availability = useTeacherAvailabilityQuery().data
   const teachersOnline = availability?.online
-  const profile = useStudentProfileQuery().data
+  const profileQuery = useStudentProfileQuery()
+  const profile = profileQuery.data
   const ask = useAskConversation(conversationId)
   const { sendStreamingMessage, isStreaming, conversation } = ask
   const phone = layout === 'sheet'
@@ -197,6 +200,21 @@ export function AskPanel({
     if (!files) return
     send(recommended, files)
   }
+
+  // An example chosen on the star map ("Find my own star", #586) goes out as
+  // soon as Ask is open on its list, once the student's year is known (the
+  // conversation is made for it). Taken from the store once, so it is sent once.
+  const pending = useAskStore((state) => askFor(state, ownerId).pending)
+  const askPending = useRef(askRecommended)
+  useEffect(() => {
+    askPending.current = askRecommended
+  })
+  const takesPending = controller.entry === 'planet' && conversationId === null && !profileQuery.isPending
+  useEffect(() => {
+    if (!pending || !takesPending || !ownerId) return
+    const taken = useAskStore.getState().takePending(ownerId)
+    if (taken) askPending.current(taken)
+  }, [pending, takesPending, ownerId])
 
   // Named as the list names it until it is read itself, so the title the
   // keyboard lands on says which conversation opened, not "Ask" (#452).
