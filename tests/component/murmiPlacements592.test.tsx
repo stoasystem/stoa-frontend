@@ -136,13 +136,15 @@ describe('only the big moments move', () => {
     }
   })
 
-  it('moves only at the four big moments', () => {
+  // The fifth: the review reminder whistling, once a day (#593).
+  it('moves only at the big moments', () => {
     const moving = murmis.filter(({ tag }) => /\banimated\b/.test(tag)).map(({ file }) => file)
     expect([...new Set(moving)].sort()).toEqual([
       'features/chapter/ChapterView.tsx',
       'features/chapter/LessonStage.tsx',
       'features/starmap/components/MurmiBubble.tsx',
       'features/starmap/onboarding/FirstSubjectQuestion.tsx',
+      'features/starmap/reviewReminder/ReviewReminderMurmi.tsx',
     ])
   })
 })

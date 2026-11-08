@@ -42,6 +42,13 @@
     "open": "How the star map works",
     "close": "Close"
   },
+  "reviewReminder": {
+    "next": "Next review: {{when}}",
+    "nextToday": "Next review: later today",
+    "nextTomorrow": "Next review: tomorrow",
+    "nextUnknown": "Nothing due for review right now",
+    "gotIt": "Got it"
+  },
   "legend": {
     "howLabel": "How to move around",
     "keys": "Keys: arrows go to the nearest one that way, Tab follows the course, + and − zoom.",

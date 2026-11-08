@@ -358,6 +358,8 @@ export class StarMapEngine {
   /** A choice already let go by zooming out (asked once, until the route answers). */
   private released = ''
   private focusStar = -1
+  /** A star Murmi points at from its bubble (#593), drawn as keyboard focus draws one: picked out and named. */
+  private markedStar: string | null = null
   private focusNebula = -1
   private hoveredNebula = -1
   /** The star under the mouse, where single stars can be picked (#138 B2: its name shows), or -1. */
@@ -678,6 +680,18 @@ export class StarMapEngine {
     this.path = path
     if (path) this.pathShown = path
     this.invalidate()
+  }
+
+  /** Murmi points at this star from its bubble (#593), or at none: it is drawn as a focused star is, unless focus is on another. */
+  setMarkedStar(unitId: string | null): void {
+    if (unitId === this.markedStar) return
+    this.markedStar = unitId
+    this.invalidate()
+  }
+
+  /** The star drawn as focused: keyboard focus, else the one Murmi points at. */
+  private shownFocusStar(): number {
+    return this.focusStar >= 0 ? this.focusStar : this.markedStar ? (this.starIndex.get(this.markedStar) ?? -1) : -1
   }
 
   /** Keyboard focus moved onto a star's link (or off, with -1). Its nebula comes into focus. */
@@ -1548,8 +1562,8 @@ export class StarMapEngine {
       target.layer === 'map'
         ? this.focusNebula >= 0
           ? this.focusNebula
-          : this.focusStar >= 0
-            ? scene.nebula[this.focusStar]
+          : this.shownFocusStar() >= 0
+            ? scene.nebula[this.shownFocusStar()]
             : -1
         : (this.nebulaIndex.get(target.nebulaId) ?? -1)
     // On the ring, each galaxy at its copy nearest the centre of the view.
@@ -1719,7 +1733,7 @@ export class StarMapEngine {
     const chosenStar = this.starAmount > 0 ? this.lastChosenStar : -1
     // With a star chosen, the map gives way to it as the zoom closes in (eased in as it is chosen, out as its card closes).
     const focus = chosenStar >= 0 ? starFocusAmount(starPx) * this.starAmount : 0
-    const focusStar = chosenStar >= 0 ? chosenStar : this.focusStar
+    const focusStar = chosenStar >= 0 ? chosenStar : this.shownFocusStar()
     // One sky names a nebula by its size on screen, past the panorama; a flat
     // map of one subject (no galaxies, tests and the bench's old maps) names every nebula.
     const giveWay = this.sky ? 1 - ramp(starPx, REVEAL.nebulaNameOut) : 1
