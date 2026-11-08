@@ -421,7 +421,7 @@ function TripodLegs({ full }: { full: boolean }) {
     <path
       d="M59 20.5 L52.5 67 M59 20.5 L59.5 67.5 M59 20.5 L66 67"
       stroke={SCOPE}
-      strokeWidth={full ? 1.3 : 2.2}
+      strokeWidth={full ? 1.6 : 2.8}
       strokeLinecap="round"
       fill="none"
     />
