@@ -111,6 +111,7 @@
       "finished": "Ce quiz est déjà terminé. Lances-en un nouveau.",
       "notFound": "Ce quiz n’est plus ouvert. Lances-en un nouveau.",
       "notStarted": "Le quiz n’a pas pu démarrer. Vérifie ta connexion et réessaie.",
+      "outOfOrder": "Cette réponse concernait une autre question. Lance un nouveau quiz.",
       "restart": "Recommencer le quiz",
       "title": "Ça n’a pas marché",
       "unanswered": "Réponds correctement à tous les exercices de cette leçon, ou réussis le petit quiz, avant de la terminer.",

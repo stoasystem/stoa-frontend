@@ -106,6 +106,7 @@
       "finished": "Dieses Quiz ist bereits vorbei. Starte ein neues.",
       "notFound": "Dieses Quiz ist nicht mehr offen. Starte ein neues.",
       "notStarted": "Das Quiz konnte nicht gestartet werden. Prüf deine Verbindung und versuch es nochmals.",
+      "outOfOrder": "Diese Antwort gehörte zu einer anderen Frage. Starte ein neues Quiz.",
       "restart": "Quiz neu starten",
       "title": "Das hat nicht geklappt",
       "unanswered": "Beantworte alle Aufgaben dieser Lektion richtig oder bestehe das kurze Quiz, bevor du sie abschliesst.",

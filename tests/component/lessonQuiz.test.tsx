@@ -729,6 +729,22 @@ describe('what the student reads when it goes wrong', () => {
     expect(screen.getByRole('button', { name: 'Start the quiz again' })).toBeInTheDocument()
   })
 
+  // Not a failed check: Try again would send the same answer into the same refusal.
+  it('an answer for a question the quiz is no longer asking: its own sentence, and a fresh paper (#589)', async () => {
+    open('/chapter/u-5/l-2?mode=quiz')
+    await screen.findByText(/Quiz · Question 1 of 5$/)
+    // The paper moved on without this screen (another tab, say).
+    quizzes.get('q-1')!.queue.shift()
+    await typeAnswer(right(await onScreen()))
+
+    expect(await screen.findByText('That answer was for a different question. Start a new quiz.')).toBeInTheDocument()
+    expect(trouble()).toHaveAttribute('data-quiz-trouble', 'lesson_quiz_out_of_order')
+    expect(screen.queryByText('Your answer could not be checked. Try again.')).not.toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: 'Start the quiz again' }))
+    expect(await screen.findByText(/Quiz · Question 1 of 5$/)).toBeInTheDocument()
+    expect(seen.starts).toHaveLength(2)
+  })
+
   it('a credential the backend will not take: the reason, not a shrug', async () => {
     open('/chapter/u-5/l-2?mode=quiz')
     await screen.findByText(/Quiz · Question 1 of 5$/)
@@ -793,6 +809,7 @@ describe('what the student reads when it goes wrong', () => {
       'notStarted',
       'expired',
       'finished',
+      'outOfOrder',
       'credentialInvalid',
       'credentialExpired',
       'unanswered',
