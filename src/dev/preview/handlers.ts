@@ -252,7 +252,7 @@ const routes: Array<[method: string, pattern: string, handler: Handler]> = [
   }],
   ['POST', '/practice/hints', ({ body }) => demoHint(field<string>(body, 'challengeId') ?? '', demoLanguage())],
   ['GET', '/practice/review/due', () => demoReviewDue()],
-  ['GET', '/practice/review/summary', () => demoReviewSummary()],
+  ['GET', '/practice/review/summary', async () => demoReviewSummary((await import('@/dev/preview/lighting')).demoSkyReviewDue(pageStarCount()))],
   ['GET', '/practice/mistakes', () => ({ items: [] })],
 ]
 

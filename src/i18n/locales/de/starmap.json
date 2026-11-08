@@ -68,6 +68,13 @@
     "open": "So funktioniert die Sternkarte",
     "close": "Schliessen"
   },
+  "reviewReminder": {
+    "next": "Nächste Wiederholung: {{when}}",
+    "nextToday": "Nächste Wiederholung: später heute",
+    "nextTomorrow": "Nächste Wiederholung: morgen",
+    "nextUnknown": "Gerade nichts zu wiederholen",
+    "gotIt": "Verstanden"
+  },
   "legend": {
     "howLabel": "Wie du dich bewegst",
     "keys": "Tasten: Pfeile zum Nächsten in dieser Richtung, Tab folgt dem Kurs, + und − zoomen.",

@@ -63,6 +63,14 @@ describe('a waiting page', () => {
 
     expect(screen.getByRole('status')).toHaveTextContent('Aufgaben werden geladen')
   })
+
+  it('has Murmi reading while it waits, and holding still (#592)', () => {
+    const { container } = render(<LoadingState />)
+    const murmi = container.querySelector('[data-murmi]')
+
+    expect(murmi).toHaveAttribute('data-murmi', 'reading')
+    expect(murmi).not.toHaveAttribute('data-murmi-animated')
+  })
 })
 
 describe('how big Murmi is', () => {

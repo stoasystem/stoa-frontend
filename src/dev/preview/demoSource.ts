@@ -48,7 +48,7 @@ type AskState = {
 type AccountState = { grade: string | null; notificationPreferences: NotificationPreferenceMatrix | null }
 
 /** `newcomer`: a student who has not started anything has not asked anything either (#586). */
-type ServerState = { completed: string[]; litAt: string | null; acknowledged: boolean; ask: AskState; reviewDue: boolean; account: AccountState; newcomer: boolean }
+type ServerState = { completed: string[]; litAt: string | null; acknowledged: boolean; ask: AskState; reviewDue: boolean; reviewScheduled: boolean; account: AccountState; newcomer: boolean }
 
 function opening(): ServerState {
   return {
@@ -57,6 +57,7 @@ function opening(): ServerState {
     acknowledged: false,
     ask: { created: [], sent: {} },
     reviewDue: false,
+    reviewScheduled: false,
     account: { grade: null, notificationPreferences: null },
     newcomer: false,
   }
@@ -130,6 +131,16 @@ export function makeReviewDue() {
 }
 
 /**
+ * The same lessons done, their questions scheduled but none due yet: the review reminder's
+ * sleeping Murmi on the map (#593), the next review two days from now.
+ */
+export function makeReviewScheduled() {
+  for (const lesson of DEMO_KNOWLEDGE_POINT.lessons.slice(0, 2)) completed.add(lesson.lessonId)
+  server = { ...server, reviewDue: false, reviewScheduled: true }
+  changed()
+}
+
+/**
  * `GET /practice/review/due`: nothing, as #116 opens; with `makeReviewDue`,
  * one question of each kind the lessons done have -- a picked one, missed
  * twice, a written one and one put in order -- so the review shows each way
@@ -160,10 +171,27 @@ export function demoReviewDue(): ReviewDueResponse {
   return { items, dueCount: items.length, generatedAt }
 }
 
-/** `GET /practice/review/summary`, agreeing with `demoReviewDue`. */
-export function demoReviewSummary(): ReviewSummary {
-  const { dueCount, generatedAt } = demoReviewDue()
-  return { dueCount, scheduledCount: dueCount, nextDueAt: generatedAt }
+/** Which review state the demo backend is in (#593): questions due, scheduled and none due, or neither. */
+export function demoReviewState(): 'due' | 'scheduled' | null {
+  return server.reviewDue ? 'due' : server.reviewScheduled ? 'scheduled' : null
+}
+
+/**
+ * `GET /practice/review/summary`. With `makeReviewDue`, the cards due are the ones the sky shows
+ * on its stars (`skyDue`, their `reviewDue` summed), so the map's review reminder and the bubble
+ * beside the star it flies to agree (#593); with `makeReviewScheduled`, none is due and three
+ * questions are two days off (the sky then shows none due either).
+ */
+export function demoReviewSummary(skyDue: number): ReviewSummary {
+  const generatedAt = new Date().toISOString()
+  if (server.reviewDue) return { dueCount: skyDue, scheduledCount: skyDue, nextDueAt: generatedAt }
+  if (server.reviewScheduled) {
+    const next = new Date()
+    next.setDate(next.getDate() + 2)
+    next.setHours(9, 0, 0, 0)
+    return { dueCount: 0, scheduledCount: 3, nextDueAt: next.toISOString() }
+  }
+  return { dueCount: 0, scheduledCount: 0, nextDueAt: generatedAt }
 }
 
 /** Called when the demo backend's state changes. */

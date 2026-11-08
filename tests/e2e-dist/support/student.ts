@@ -52,6 +52,12 @@ export class StudentWorld {
    * student's session, not the onboarding, and open on the galaxy.
    */
   newcomer = false
+  /**
+   * `GET /practice/review/summary` (#593): by default nothing scheduled, so the map's review
+   * reminder shows no Murmi. With cards due, the student's star carries them too (`reviewDue`),
+   * as the read model would, so the reminder has a star to fly to.
+   */
+  reviewSummary = { dueCount: 0, scheduledCount: 0, nextDueAt: '2026-09-29T08:00:00Z' }
   /** The sections an answer to this question comes in (stoa-backend#132); others are text only. */
   readonly sections = new Map<string, Record<string, unknown>>()
   private clock = Date.parse('2026-09-29T08:00:00Z')
@@ -211,13 +217,16 @@ export class StudentWorld {
       state: this.newcomer ? 'ready' : 'in_progress',
       progress: this.newcomer ? 0 : 0.5,
       unmetExercises: 2,
-      reviewDue: 0,
+      reviewDue: this.reviewSummary.dueCount,
       recommendation: { source: 'system' },
       x: 0.5,
       y: 0.5,
       skills: [],
       chapter: this.newcomer ? { lessonCount: 2, lessonsDone: 0, nextLesson: null } : { lessonCount: 2, lessonsDone: 1, nextLesson: null },
     }
+    this.backend.on('GET', '/practice/review/summary', ({ headers }) =>
+      headers.authorization === `Bearer ${ACCESS_TOKEN}` ? { status: 200, body: this.reviewSummary } : { status: 401, body: { detail: 'Not authenticated' } },
+    )
     this.backend.on('GET', '/practice/knowledge-map/stars', () => ({
       status: 200,
       body: {

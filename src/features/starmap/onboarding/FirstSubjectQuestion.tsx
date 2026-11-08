@@ -64,7 +64,7 @@ export function FirstSubjectQuestion({ subjects, onChoose }: FirstSubjectQuestio
         style={{ background: 'var(--sky-glass)', backdropFilter: 'blur(var(--sky-glass-blur))', WebkitBackdropFilter: 'blur(var(--sky-glass-blur))' }}
       >
         <div className="flex items-center gap-3">
-          <Murmi mood="calm" size={40} />
+          <Murmi mood="waving" size={40} animated />
           <h2 id={titleId} ref={titleRef} tabIndex={-1} className="m-0 text-[16px] font-semibold leading-snug text-[color:var(--on-sky-text)] outline-none">
             {t('firstQuestion.title')}
           </h2>

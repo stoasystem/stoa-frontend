@@ -68,6 +68,13 @@
     "open": "Comment fonctionne la carte du ciel",
     "close": "Fermer"
   },
+  "reviewReminder": {
+    "next": "Prochaine révision : {{when}}",
+    "nextToday": "Prochaine révision : plus tard aujourd’hui",
+    "nextTomorrow": "Prochaine révision : demain",
+    "nextUnknown": "Rien à réviser pour l’instant",
+    "gotIt": "Compris"
+  },
   "legend": {
     "howLabel": "Comment se déplacer",
     "keys": "Clavier : flèches vers le plus proche dans ce sens, Tab suit le cours, + et − zooment.",

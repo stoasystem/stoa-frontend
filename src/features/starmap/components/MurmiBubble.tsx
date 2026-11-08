@@ -43,6 +43,17 @@ export const DOCK_BELOW_PX = 560
 const GUTTER_PX = 16
 /** A press that moves less than this, CSS px, is a tap (the engine's own slop). */
 const TAP_SLOP_PX = 5
+/** Murmi's middle from the bubble's left edge, CSS px: the card's padding (`px-4`) and half its 32px. */
+const MURMI_MIDDLE_PX = 32
+
+/**
+ * Which way Murmi points from the bubble at `bubbleX` (its left edge) to the
+ * star at `starX`: Murmi is drawn pointing right, and stands at the bubble's
+ * left end, so a bubble to the right of its star has Murmi turn round.
+ */
+export function murmiFacing(starX: number, bubbleX: number): 'left' | 'right' {
+  return starX < bubbleX + MURMI_MIDDLE_PX ? 'left' : 'right'
+}
 
 /** Half the width a star's name takes under it, at least, CSS px: the name is wider than the glyph. */
 const NAME_HALF_WIDTH_PX = 56
@@ -194,6 +205,7 @@ export function MurmiBubble({
   const [placed, setPlaced] = useState(false)
   const [leaving, setLeaving] = useState(false)
   const [docked, setDocked] = useState(false)
+  const [facing, setFacing] = useState<'left' | 'right'>('right')
   const reducedMotion = usePrefersReducedMotion()
   // The stars to keep clear, by value: a new array of the same stars does not restart the following.
   const avoidKey = (avoid ?? []).join('\n')
@@ -246,6 +258,7 @@ export function MurmiBubble({
         }
         box.style.transform = `translate(${at.x}px, ${at.y}px)`
         box.dataset.side = at.side
+        setFacing(murmiFacing(spot.x, at.x))
         setPlaced(true)
       }
       if (!arrived || still < STILL_FRAMES) handle = scheduler.request(frame)
@@ -363,7 +376,8 @@ export function MurmiBubble({
           style={{ background: 'var(--sky-glass)', backdropFilter: 'blur(var(--sky-glass-blur))', WebkitBackdropFilter: 'blur(var(--sky-glass-blur))' }}
         >
           <div className="flex items-center gap-2">
-            <Murmi mood="watching" size={32} />
+            {/* Pointing at the star it stands beside, whichever side of it the bubble is on. */}
+            <Murmi mood="pointing" size={32} facing={facing} animated />
             <h2 id={titleId} className={cn('m-0 min-w-0 text-[15px] font-semibold text-[color:var(--on-sky-text)]', closeLabel && 'flex-1')}>
               {title}
             </h2>
