@@ -48,6 +48,8 @@ export type MurmiMood =
   | 'pointing'
   /** Both paws up: a whole set finished. Bigger than `delighted`; rarer still. */
   | 'cheering'
+  /** A star quiz passed with a slip: well done, not the big one. Paws clapping at the chest. */
+  | 'clapping'
   /** Holding an open star chart: loading, a lesson in progress. */
   | 'reading'
   /** Eyes closed, a few z's: nothing is due right now. */
@@ -66,6 +68,7 @@ export const MURMI_MOODS = [
   'waving',
   'pointing',
   'cheering',
+  'clapping',
   'reading',
   'sleeping',
   'curious',
@@ -122,6 +125,7 @@ const GAZE: Partial<Record<MurmiMood, [number, number]>> = {
   pointing: [0.9, 0],
   reading: [0, 0.9],
   curious: [0, -0.3],
+  clapping: [0, -0.4],
 }
 
 function Ears({ mood, full }: Part) {
@@ -225,6 +229,15 @@ function Mouth({ mood, full }: Part) {
         <path d="M31.5 37.4 q4.5 7 9 0 q-4.5 1.2 -9 0 z" fill={INK} />
         <ellipse cx="36" cy="41.4" rx="2" ry="1" fill={BLUSH} />
         {full && <Teeth y={37.7} />}
+      </>
+    )
+  }
+  if (mood === 'clapping') {
+    // Open and smiling, eyes open: pleased, a size smaller than cheering's beam.
+    return (
+      <>
+        <path d="M32.8 37.6 q3.2 4.4 6.4 0 q-3.2 0.9 -6.4 0 z" fill={INK} />
+        {full && <Teeth y={37.8} />}
       </>
     )
   }
@@ -379,6 +392,18 @@ function Arms({ mood, full }: Part) {
         <>
           <Limb d="M24 45 Q16.5 38 15.5 27.5" at={[15.4, 25.6]} r={[3, 3.4]} full={full} />
           <Limb d="M48 45 Q55.5 38 56.5 27.5" at={[56.6, 25.6]} r={[3, 3.4]} full={full} />
+        </>
+      )
+    case 'clapping':
+      // Paws meeting at mid-chest; each arm claps from its own shoulder (murmi.css).
+      return (
+        <>
+          <g className="murmi-part murmi-clap murmi-clap-l">
+            <Limb d="M23.5 46.5 Q26 50.6 32.6 49.8" at={[33.9, 49.2]} r={[2.4, 3.1]} angle={-12} full={full} />
+          </g>
+          <g className="murmi-part murmi-clap murmi-clap-r">
+            <Limb d="M48.5 46.5 Q46 50.6 39.4 49.8" at={[38.1, 49.2]} r={[2.4, 3.1]} angle={12} full={full} />
+          </g>
         </>
       )
     case 'reading':
@@ -549,6 +574,26 @@ function Whistle({ full }: { full: boolean }) {
   )
 }
 
+/** Two short marks either side of the chest: the sound of the clap. */
+function Clap({ full }: { full: boolean }) {
+  const marks = (d: string, side: 'l' | 'r') => (
+    <path
+      className={`murmi-part murmi-clap-mark murmi-clap-mark-${side}`}
+      d={d}
+      stroke={MARK}
+      strokeWidth={full ? 1.4 : 1.9}
+      strokeLinecap="round"
+      fill="none"
+    />
+  )
+  return (
+    <>
+      {marks('M16.6 44.6 l-3.6 -2.8 M15.6 50 l-4.4 -0.4', 'l')}
+      {marks('M55.4 44.6 l3.6 -2.8 M56.4 50 l4.4 -0.4', 'r')}
+    </>
+  )
+}
+
 function Confetti({ full }: { full: boolean }) {
   return (
     <>
@@ -598,6 +643,7 @@ export function Murmi({
   else if (mood === 'curious') front = <Question full={full} />
   else if (mood === 'calling') front = <Whistle full={full} />
   else if (mood === 'cheering') front = <Confetti full={full} />
+  else if (mood === 'clapping') front = <Clap full={full} />
 
   return (
     <svg

@@ -18,6 +18,7 @@ const EVERY_MOOD: Record<MurmiMood, true> = {
   waving: true,
   pointing: true,
   cheering: true,
+  clapping: true,
   reading: true,
   sleeping: true,
   curious: true,
@@ -78,7 +79,8 @@ describe('Murmi', () => {
     expect(eyes('thinking')).toBe(2)
     expect(eyes('delighted')).toBe(0)
     // The new poses: closed only to celebrate or to sleep.
-    for (const mood of ['waving', 'pointing', 'reading', 'curious', 'calling'] as const) expect(eyes(mood), mood).toBe(2)
+    // Clapping keeps them open: well done, not the big one (#592).
+    for (const mood of ['waving', 'pointing', 'reading', 'curious', 'calling', 'clapping'] as const) expect(eyes(mood), mood).toBe(2)
     expect(eyes('cheering')).toBe(0)
     expect(eyes('sleeping')).toBe(0)
   })
@@ -122,6 +124,18 @@ describe('Murmi', () => {
       // Something in every pose has a part to move.
       expect(moving.querySelector('.murmi-part')).not.toBeNull()
     }
+  })
+
+  it('claps from the shoulders with its paws meeting at the chest, the marks in the mark colour (#592)', () => {
+    const svg = render(<Murmi mood="clapping" size={72} />).container.querySelector('svg')!
+    expect(svg.querySelectorAll('.murmi-clap')).toHaveLength(2)
+    expect(svg.querySelector('.murmi-clap-l')).not.toBeNull()
+    expect(svg.querySelector('.murmi-clap-r')).not.toBeNull()
+    const marks = svg.querySelectorAll('.murmi-clap-mark')
+    expect(marks).toHaveLength(2)
+    for (const mark of marks) expect(mark.getAttribute('stroke')).toBe('var(--murmi-mark)')
+    // Not cheering's confetti or bounce: the smaller moment.
+    expect(svg.querySelector('.murmi-bounce')).toBeNull()
   })
 
   it('turns round on an inner group, keeping its box, its name and its size (#592)', () => {

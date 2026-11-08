@@ -869,7 +869,7 @@ export function StarQuizStage({ unitId }: { unitId: string | undefined }) {
         <StageWithAsk subjectId={chapter?.subjectId ?? ''} off={t('quiz.askOff')}>
           <StarQuizStrip run={run} chapter={chapter} starPath={starPath} side={side} />
           {run.finished ? (
-            <StarQuizPassed chapter={chapter} starPath={starPath} />
+            <StarQuizPassed chapter={chapter} starPath={starPath} mistakes={run.passedMistakes ?? 0} />
           ) : run.starTrouble ? (
             <StarQuizTroubleView run={run} unitId={unitId} starPath={starPath} />
           ) : run.failed ? (
@@ -932,7 +932,7 @@ function StarQuizEnd({
   after,
 }: {
   name: string
-  mood: 'cheering' | 'calm' | 'thinking'
+  mood: 'cheering' | 'clapping' | 'calm' | 'thinking'
   title: string
   body: string
   children: ReactNode
@@ -943,8 +943,8 @@ function StarQuizEnd({
   return (
     <div className="relative flex min-h-0 flex-1 items-center justify-center overflow-y-auto p-6">
       <section aria-labelledby={`star-quiz-${name}-title`} data-star-quiz-end={name} className="flex max-w-[520px] flex-col items-center gap-4 text-center">
-        {/* Animated only at the big moment: every answer right, the star lit. */}
-        <Murmi mood={mood} size="var(--murmi-state)" animated={mood === 'cheering'} />
+        {/* Animated only at the big moment: the star lit by its quiz. */}
+        <Murmi mood={mood} size="var(--murmi-state)" animated={mood === 'cheering' || mood === 'clapping'} />
         <h2
           ref={heading}
           id={`star-quiz-${name}-title`}
@@ -964,12 +964,13 @@ function StarQuizEnd({
   )
 }
 
-function StarQuizPassed({ chapter, starPath }: { chapter: Chapter | null; starPath: string }) {
+function StarQuizPassed({ chapter, starPath, mistakes }: { chapter: Chapter | null; starPath: string; mistakes: number }) {
   const { t } = useTranslation('chapter')
   return (
     <StarQuizEnd
       name="passed"
-      mood="cheering"
+      // Every answer right is the big one; passed with a slip, well done (#592).
+      mood={mistakes === 0 ? 'cheering' : 'clapping'}
       title={t('starQuiz.passed.title')}
       body={t('starQuiz.passed.body', { star: chapter?.title ?? '' })}
       // The whole star is lit, as at the end of its last lesson: the way on (#578).

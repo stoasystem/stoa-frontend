@@ -21,6 +21,7 @@ const NOTES: Record<MurmiMood, string> = {
   waving: 'Greeting: one paw raised.',
   pointing: 'Toward the star it suggests.',
   cheering: 'A whole set finished.',
+  clapping: 'A star quiz passed with a slip: well done, not the big one.',
   reading: 'Loading, a lesson in progress.',
   sleeping: 'Nothing is due right now.',
   curious: 'Thinking’s lighter cousin.',
