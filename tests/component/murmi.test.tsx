@@ -1,12 +1,28 @@
 import { render } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
-import { Murmi, type MurmiMood } from '@/components/brand/Murmi'
+import { Murmi, MURMI_MOODS, type MurmiMood } from '@/components/brand/Murmi'
 
 // Murmi is decorative: everything it is used to say is in text beside it, so a
 // reader who never sees the figure misses nothing. These tests hold that, and
 // hold the figure to the token rule — none of its colours is written into it.
 
-const MOODS: MurmiMood[] = ['calm', 'watching', 'delighted', 'thinking']
+const MOODS: readonly MurmiMood[] = MURMI_MOODS
+
+// Every name in the union is in the list: a mood added to the type and not to
+// MURMI_MOODS would never be rendered by these tests or the gallery.
+const EVERY_MOOD: Record<MurmiMood, true> = {
+  calm: true,
+  watching: true,
+  delighted: true,
+  thinking: true,
+  waving: true,
+  pointing: true,
+  cheering: true,
+  reading: true,
+  sleeping: true,
+  curious: true,
+  calling: true,
+}
 
 describe('Murmi', () => {
   it('is hidden from the accessibility tree in every mood', () => {
@@ -46,8 +62,9 @@ describe('Murmi', () => {
 
     expect(scopes('watching')).toBe(1)
     expect(scopes('delighted')).toBe(1)
-    expect(scopes('calm')).toBe(0)
-    expect(scopes('thinking')).toBe(0)
+    for (const mood of MOODS.filter((name) => name !== 'watching' && name !== 'delighted')) {
+      expect(scopes(mood), mood).toBe(0)
+    }
   })
 
   it('closes its eyes only in the one big moment', () => {
@@ -60,6 +77,10 @@ describe('Murmi', () => {
     expect(eyes('watching')).toBe(2)
     expect(eyes('thinking')).toBe(2)
     expect(eyes('delighted')).toBe(0)
+    // The new poses: closed only to celebrate or to sleep.
+    for (const mood of ['waving', 'pointing', 'reading', 'curious', 'calling'] as const) expect(eyes(mood), mood).toBe(2)
+    expect(eyes('cheering')).toBe(0)
+    expect(eyes('sleeping')).toBe(0)
   })
 
   it('never frowns: a wrong answer is looking again, not disappointment', () => {
@@ -76,5 +97,42 @@ describe('Murmi', () => {
 
     expect(svg.getAttribute('width')).toBe('40')
     expect(svg.getAttribute('height')).toBe('40')
+  })
+
+  it('lists every mood, and renders each with its name and hidden', () => {
+    expect([...MOODS].sort()).toEqual(Object.keys(EVERY_MOOD).sort())
+    for (const mood of MOODS) {
+      const { container } = render(<Murmi mood={mood} />)
+      const svg = container.querySelector('svg')!
+
+      expect(svg.getAttribute('data-murmi')).toBe(mood)
+      expect(svg).toHaveAttribute('aria-hidden', 'true')
+    }
+  })
+
+  it('stands still unless asked to move', () => {
+    for (const mood of MOODS) {
+      const still = render(<Murmi mood={mood} />).container.querySelector('svg')!
+      expect(still).not.toHaveClass('murmi--animated')
+      expect(still.hasAttribute('data-murmi-animated')).toBe(false)
+
+      const moving = render(<Murmi mood={mood} animated />).container.querySelector('svg')!
+      expect(moving).toHaveClass('murmi--animated')
+      expect(moving.hasAttribute('data-murmi-animated')).toBe(true)
+      // Something in every pose has a part to move.
+      expect(moving.querySelector('.murmi-part')).not.toBeNull()
+    }
+  })
+
+  it('leaves the hair-thin parts out below 40px, and at the inline token', () => {
+    const teeth = (size: number | string) =>
+      render(<Murmi mood="calm" size={size} />).container.querySelectorAll('path[fill="var(--murmi-tooth)"]').length
+
+    expect(teeth(72)).toBe(2)
+    expect(teeth(56)).toBe(2)
+    expect(teeth('var(--murmi-state)')).toBe(2)
+    expect(teeth(28)).toBe(0)
+    expect(teeth(22)).toBe(0)
+    expect(teeth('var(--murmi-inline)')).toBe(0)
   })
 })

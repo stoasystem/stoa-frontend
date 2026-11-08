@@ -216,7 +216,21 @@
   --murmi-fur-dark: #A8784F;
   --murmi-belly: #E6CBA8;
   --murmi-ink: #2B1F14;
-  --murmi-scope: #2B3A6B;
+  /* Enzian-family mid blue: 4.2:1 on --sky, 4.1:1 on --ground, 4.5:1 on white. The
+     earlier #2B3A6B was 1.7:1 on the sky and the telescope vanished there. One
+     value for both surfaces: Murmi is drawn on dark places that need not carry a
+     data-surface="sky" ancestor (the star map, the lighting overlay), so a
+     sky-scoped override could miss them. */
+  --murmi-scope: #5370D6;
+  --murmi-crown: #7A5436;   /* the dark cap over the top of the head, the tail's tip */
+  --murmi-muzzle: #F2E1C6;  /* the pale patch round the nose */
+  --murmi-blush: #E59A88;   /* cheeks, inner ears' warmth, a tongue */
+  --murmi-ear: #D9A88C;     /* inside the ears */
+  --murmi-tooth: #FFF5E0;   /* the two front teeth */
+  --murmi-paw: #6E4C32;     /* paws and feet */
+  --murmi-brass: #C9A15A;   /* the telescope's rings */
+  --murmi-page: #FFF8EA;    /* the pages of the book or star chart */
+  --murmi-mark: #D9A441;    /* z's, whistle lines, the question sparkle: reads on paper and on the sky */
   --murmi-inline: 28px;   /* beside a line of text */
   --murmi-state: 72px;    /* an empty or failed page, where it is the picture */
 
