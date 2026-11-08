@@ -224,7 +224,7 @@ export function AdminCurriculumPage() {
       kind,
       publicLessonId: selectedPublicId,
       versionId: selectedVersionId,
-      liveVersionId: liveVersionOf(worklist, selectedPublicId),
+      liveVersionId: publishedVersionOf([...worklist, selectedPreview], selectedPublicId) ?? null,
     })
   }
 
@@ -298,19 +298,24 @@ export function AdminCurriculumPage() {
    * After a stale_pointer refusal the open dialog held the live version the
    * backend had just refused, so Publish in it was refused again; only
    * cancelling and reopening read the new one (#450). The refusal re-reads the
-   * worklist (#404). Confirm waits for that read, and the dialog then shows the
-   * version live now, so the admin sees it before publishing over it: it is
-   * never swapped in at confirm time.
+   * worklist and the version's preview (#404). Confirm waits for those reads,
+   * and the dialog then shows the version live now, so the admin sees it
+   * before publishing over it: it is never swapped in at confirm time.
    */
   function showLiveVersionNow(publicLessonId: string, versionId: string) {
     setLiveVersionReading(true)
-    // `cancelRefetch: false` joins the read the refusal has already started.
-    void worklistQuery.refetch({ cancelRefetch: false }).then((read) => {
+    // `cancelRefetch: false` joins the reads the refusal has already started.
+    void Promise.all([
+      worklistQuery.refetch({ cancelRefetch: false }),
+      previewQuery.refetch({ cancelRefetch: false }),
+    ]).then(([list, read]) => {
       setLiveVersionReading(false)
       // A failed read leaves the version as it was; a retry is refused, and read,
-      // again. So does a refused one: its empty list would say nothing is live.
-      if (!read.isSuccess || read.data.permissionDenied) return
-      const liveVersionId = liveVersionOf(read.data.items, publicLessonId)
+      // again. So does a refused one: its empty list says nothing about the lesson.
+      const rows = list.isSuccess && !list.data.permissionDenied ? list.data.items : []
+      const previewed = read.isSuccess && read.data.versionId === versionId ? read.data : undefined
+      const liveVersionId = publishedVersionOf([...rows, previewed], publicLessonId)
+      if (liveVersionId === undefined) return
       setAction((current) =>
         current?.kind === 'publish' && current.versionId === versionId ? { ...current, liveVersionId } : current,
       )
@@ -908,16 +913,22 @@ function parseJsonObject(value: string): Record<string, unknown> | null {
 }
 
 /**
- * The version the console believes is live: the newest published one in the
- * worklist, `null` when there is none. The backend checks it against its own
- * pointer and refuses the publish with `stale_pointer` if it is wrong, so a
- * wrong guess is a refusal, never an overwrite (#258).
+ * The lesson's live version as the backend's pointer says, from the first of
+ * `versions` that is of this lesson and carries it: `null` when the lesson was
+ * never published, `undefined` when none of them says.
+ *
+ * It used to be guessed from the worklist's newest `published` row, which was
+ * wrong after a rollback and when the live version was not among the 100 rows
+ * the worklist returns, and the publish was then refused (#596). The backend
+ * still checks it and refuses a stale one with `stale_pointer`, so a wrong
+ * value is a refusal, never an overwrite (#258).
  */
-function liveVersionOf(items: CurriculumVersion[], publicLessonId: string): string | null {
-  const published = items
-    .filter((item) => item.publicLessonId === publicLessonId && item.state === 'published')
-    .sort((a, b) => String(b.updatedAt ?? '').localeCompare(String(a.updatedAt ?? '')))
-  return published[0]?.versionId ?? null
+function publishedVersionOf(
+  versions: (CurriculumVersion | undefined)[],
+  publicLessonId: string,
+): string | null | undefined {
+  return versions.find((version) => version?.publicLessonId === publicLessonId && version.publishedVersionId !== undefined)
+    ?.publishedVersionId
 }
 
 /** A backend value in the reader's language; one the console has no words for yet is shown as sent. */

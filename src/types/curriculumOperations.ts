@@ -7,7 +7,18 @@ export type CurriculumCapability =
 export type CurriculumVersion = {
   publicLessonId: string
   versionId: string
+  /**
+   * Read against the lesson's pointer (stoa-backend#307): the live version is
+   * `published`, one that was live and was replaced is `superseded`.
+   */
   state: string
+  /**
+   * The lesson's live version, from its pointer; `null` when it was never
+   * published. Every worklist row and preview of the lesson carries the same
+   * value, including when the live version is not among the rows (#596).
+   * Optional only for responses built without it, such as a draft patch.
+   */
+  publishedVersionId?: string | null
   reviewState?: string | null
   updatedAt?: string | null
   updatedBy?: string | null

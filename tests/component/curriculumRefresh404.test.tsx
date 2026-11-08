@@ -120,16 +120,21 @@ const DRY_RUN: CurriculumMigrationDryRunResponse = {
 
 const STALE_POINTER = () => new ApiError('conflict', { status: 409, detail: 'stale_pointer' })
 
-/** What the backend holds; the mocks answer from it, so a read after a write sees the write. */
-let server: { items: CurriculumVersion[]; fixed: boolean; events: CurriculumAuditEvent[] }
+/**
+ * What the backend holds; the mocks answer from it, so a read after a write
+ * sees the write. `live` is lesson-1's pointer, sent on every row (#596).
+ */
+let server: { items: CurriculumVersion[]; live: string | null; fixed: boolean; events: CurriculumAuditEvent[] }
+
+const withPointer = (item: CurriculumVersion) => ({ ...item, publishedVersionId: server.live })
 
 beforeEach(async () => {
   await i18n.changeLanguage('en')
   vi.clearAllMocks()
-  server = { items: ITEMS, fixed: false, events: [event('create_draft', 'v4')] }
-  worklist.mockImplementation(async () => ({ items: server.items, count: server.items.length }))
+  server = { items: ITEMS, live: 'v2', fixed: false, events: [event('create_draft', 'v4')] }
+  worklist.mockImplementation(async () => ({ items: server.items.map(withPointer), count: server.items.length }))
   preview.mockImplementation(async (_lesson, versionId) => ({
-    ...(server.items.find((item) => item.versionId === versionId) ?? DRAFT),
+    ...withPointer(server.items.find((item) => item.versionId === versionId) ?? DRAFT),
     lesson: { title: server.fixed ? 'Fixed title' : '' },
     exercises: [],
   }))
@@ -338,6 +343,7 @@ describe('the page after a write', () => {
   it('after a migration publishes a lesson, the worklist and the next publish know its new live version', async () => {
     apply.mockImplementation(async () => {
       server.items = [version('m1', 'published', '2026-10-20T08:00:00Z'), ...ITEMS]
+      server.live = 'm1'
       return { ...DRY_RUN, status: 'applied' }
     })
     const user = userEvent.setup()
@@ -388,6 +394,7 @@ describe('the page after a write', () => {
     publish.mockImplementationOnce(async () => {
       // Someone else published v5 in the meantime; the backend audits the refusal.
       server.items = [version('v5', 'published', '2026-10-19T08:00:00Z'), ...ITEMS]
+      server.live = 'v5'
       server.events = [event('publish_refused', 'v3'), ...server.events]
       throw STALE_POINTER()
     })

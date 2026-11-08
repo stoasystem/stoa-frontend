@@ -64,17 +64,17 @@ const dryRun = vi.mocked(dryRunCurriculumMigration)
 const apply = vi.mocked(applyCurriculumMigration)
 
 function version(versionId: string, state: string, updatedAt: string, extra: Partial<CurriculumVersion> = {}) {
-  return { publicLessonId: 'lesson-1', versionId, state, updatedAt, updatedBy: 'admin-1', ...extra }
+  return { publicLessonId: 'lesson-1', versionId, state, updatedAt, updatedBy: 'admin-1', publishedVersionId: 'v2', ...extra }
 }
 
-// The newest published version of lesson-1 is v2; v1 is an older one, and
-// lesson-2 has its own live version that must not be taken for lesson-1's.
+// lesson-1's pointer says v2 is live; v1 was live before it, and lesson-2 has
+// its own live version that must not be taken for lesson-1's.
 const CANDIDATE = version('v3', 'approved', '2026-10-18T09:00:00Z', { reviewState: 'approved' })
 const ITEMS = [
   CANDIDATE,
-  { ...version('w1', 'published', '2026-10-18T08:30:00Z'), publicLessonId: 'lesson-2' },
+  version('w1', 'published', '2026-10-18T08:30:00Z', { publicLessonId: 'lesson-2', publishedVersionId: 'w1' }),
   version('v2', 'published', '2026-10-17T12:00:00Z'),
-  version('v1', 'published', '2026-10-01T12:00:00Z'),
+  version('v1', 'superseded', '2026-10-01T12:00:00Z'),
 ]
 
 const DRY_RUN: CurriculumMigrationDryRunResponse = {
@@ -175,7 +175,9 @@ describe('publish', () => {
   })
 
   it('sends null when no version of the lesson is live, and says so', async () => {
-    worklist.mockResolvedValue({ items: [CANDIDATE], count: 1 })
+    const neverPublished = { ...CANDIDATE, publishedVersionId: null }
+    worklist.mockResolvedValue({ items: [neverPublished], count: 1 })
+    preview.mockResolvedValue({ ...neverPublished, lesson: {}, exercises: [] })
     const user = userEvent.setup()
     await openReview(user)
 

@@ -122,14 +122,19 @@ function evidenceOf(migrationId: string) {
 
 /** The worklist the backend holds now; every read answers from it. */
 let items: CurriculumVersion[]
+/** lesson-1's pointer, sent on every row and preview (#596). */
+let live: string | null
+
+const withPointer = (item: CurriculumVersion) => ({ ...item, publishedVersionId: live })
 
 beforeEach(async () => {
   await i18n.changeLanguage('en')
   vi.clearAllMocks()
   items = ITEMS
-  worklist.mockImplementation(async () => ({ items, count: items.length }))
+  live = 'v2'
+  worklist.mockImplementation(async () => ({ items: items.map(withPointer), count: items.length }))
   preview.mockImplementation(async (_lesson, versionId) => ({
-    ...(items.find((item) => item.versionId === versionId) ?? CANDIDATE),
+    ...withPointer(items.find((item) => item.versionId === versionId) ?? CANDIDATE),
     lesson: {},
     exercises: [],
   }))
@@ -182,6 +187,7 @@ describe('#450: a publish refused as stale, in the dialog still open', () => {
   it.each(STALE_POINTER_BODIES)('shows the version live now, and Publish there sends that one ($shape)', async ({ body }) => {
     publish.mockImplementationOnce(async () => {
       items = [PUBLISHED_ELSEWHERE, ...ITEMS]
+      live = 'v5'
       throw apiErrorFromBody(body, { status: 409, fallback: 'conflict' })
     })
     const user = userEvent.setup()
@@ -207,6 +213,7 @@ describe('#450: a publish refused as stale, in the dialog still open', () => {
     let answer: (response: CurriculumWorklistResponse) => void = () => {}
     publish.mockImplementationOnce(async () => {
       items = [PUBLISHED_ELSEWHERE, ...ITEMS]
+      live = 'v5'
       worklist.mockImplementationOnce(() => new Promise((resolve) => (answer = resolve)))
       throw STALE_POINTER()
     })
@@ -222,7 +229,7 @@ describe('#450: a publish refused as stale, in the dialog still open', () => {
     // Leaving is still possible.
     expect(within(dialog).getByRole('button', { name: copy.confirm.cancel })).toBeEnabled()
 
-    act(() => answer({ items, count: items.length }))
+    act(() => answer({ items: items.map(withPointer), count: items.length }))
     expect(await within(dialog).findByText(/^Currently live: v5\./)).toBeInTheDocument()
     expect(confirmButton(dialog)).toBeEnabled()
     expect(publish).toHaveBeenCalledTimes(1)
@@ -256,6 +263,7 @@ describe('#450: a publish refused as stale, in the dialog still open', () => {
 
     // The worklist moves on while the dialog is open, without a refusal.
     items = [PUBLISHED_ELSEWHERE, ...ITEMS]
+    live = 'v5'
     const reads = worklist.mock.calls.length
     await act(() => client.invalidateQueries({ queryKey: adminQueryKeys.curriculumWorklistAll() }))
     await waitFor(() => expect(worklist.mock.calls.length).toBeGreaterThan(reads))

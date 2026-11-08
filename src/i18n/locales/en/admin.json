@@ -843,6 +843,7 @@
       "changes_requested": "Changes requested",
       "approved": "Approved",
       "published": "Published",
+      "superseded": "Replaced",
       "archived": "Archived"
     },
     "reviewState": {
