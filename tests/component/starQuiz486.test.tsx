@@ -423,6 +423,9 @@ describe('what the student reads when the backend refuses', () => {
     open('/star-quiz/u-5')
     expect(await screen.findByText(/^You can take this star quiz again from .+\.$/)).toBeInTheDocument()
     expect(document.querySelector('[data-star-quiz-end="trouble"]')).not.toBeNull()
+    // A refusal is an error: thinking, and still (#592).
+    expect(document.querySelector('[data-star-quiz-end="trouble"] [data-murmi]')).toHaveAttribute('data-murmi', 'thinking')
+    expect(document.querySelector('[data-star-quiz-end="trouble"] [data-murmi]')).not.toHaveAttribute('data-murmi-animated')
     expect(screen.getByRole('link', { name: 'Go to its lessons' })).toHaveAttribute('href', '/chapter/u-5')
     expect(screen.queryByRole('button', { name: 'Start the star quiz again' })).toBeNull()
   })

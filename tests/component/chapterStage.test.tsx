@@ -454,6 +454,9 @@ describe('the chapter', () => {
     // Card 059: a page with nothing on it is not left as one grey line. The
     // marmot is decorative, so the sentence above is what is read out.
     expect(document.querySelector('[data-murmi]')).toHaveAttribute('aria-hidden', 'true')
+    // Not found: curious, and still (#592).
+    expect(document.querySelector('[data-murmi]')).toHaveAttribute('data-murmi', 'curious')
+    expect(document.querySelector('[data-murmi]')).not.toHaveAttribute('data-murmi-animated')
   })
 
   it('offers another try when the chapter could not be loaded, and does not stand there bare', async () => {
@@ -464,6 +467,9 @@ describe('the chapter', () => {
     expect(await screen.findByRole('alert')).toHaveTextContent('The chapter could not be loaded.')
     expect(screen.getByRole('button', { name: 'Try again' })).toBeInTheDocument()
     expect(document.querySelector('[data-murmi]')).toHaveAttribute('aria-hidden', 'true')
+    // An error stays thinking, and still (#592).
+    expect(document.querySelector('[data-murmi]')).toHaveAttribute('data-murmi', 'thinking')
+    expect(document.querySelector('[data-murmi]')).not.toHaveAttribute('data-murmi-animated')
   })
 })
 
@@ -613,6 +619,10 @@ describe('the practice stage', () => {
     expect(screen.getByRole('link', { name: 'See it on the star map' })).toHaveAttribute('href', '/map/math/algebra/u-5')
     expect(screen.getByRole('link', { name: 'Back to the chapter' })).toHaveAttribute('href', '/chapter/u-5')
     expect(screen.queryByRole('link', { name: /^Next lesson/ })).not.toBeInTheDocument()
+    // The whole chapter: one of Murmi's big moments, cheering and moving (#592).
+    const murmi = document.querySelector('[data-stage-done] [data-murmi]')
+    expect(murmi).toHaveAttribute('data-murmi', 'cheering')
+    expect(murmi).toHaveAttribute('data-murmi-animated')
   })
 
   it('moves the keyboard to the next question, and does it all without a pointer', async () => {
@@ -1088,6 +1098,7 @@ describe('lit is the star map\'s word (#342)', () => {
     // Not the marmot's delight either: the point is not whole yet.
     const card = screen.getByRole('progressbar', { name: 'Chapter progress' }).parentElement!
     expect(card.querySelector('[data-murmi]')).toHaveAttribute('data-murmi', 'watching')
+    expect(card.querySelector('[data-murmi]')).not.toHaveAttribute('data-murmi-animated')
   })
 
   it('calls it lit when the sky does', async () => {
@@ -1096,6 +1107,10 @@ describe('lit is the star map\'s word (#342)', () => {
     open('/chapter/u-5')
 
     expect(await screen.findByText('This knowledge point is lit.')).toBeInTheDocument()
+    // The whole chapter: cheering, and moving (#592).
+    const card = screen.getByRole('progressbar', { name: 'Chapter progress' }).parentElement!
+    expect(card.querySelector('[data-murmi]')).toHaveAttribute('data-murmi', 'cheering')
+    expect(card.querySelector('[data-murmi]')).toHaveAttribute('data-murmi-animated')
   })
 
   it('says only how many lessons are left when the sky cannot be read', async () => {

@@ -124,6 +124,25 @@ describe('Murmi', () => {
     }
   })
 
+  it('turns round on an inner group, keeping its box, its name and its size (#592)', () => {
+    for (const mood of MOODS) {
+      const right = render(<Murmi mood={mood} size={32} />).container.querySelector('svg')!
+      expect(right).toHaveAttribute('data-murmi-facing', 'right')
+      expect(right.querySelector(':scope > g')!.hasAttribute('transform')).toBe(false)
+
+      const left = render(<Murmi mood={mood} size={32} facing="left" />).container.querySelector('svg')!
+      expect(left).toHaveAttribute('data-murmi-facing', 'left')
+      expect(left).toHaveAttribute('data-murmi', mood)
+      expect(left).toHaveAttribute('aria-hidden', 'true')
+      expect(left.getAttribute('viewBox')).toBe(right.getAttribute('viewBox'))
+      expect(left.getAttribute('width')).toBe('32')
+      // A mirror across the 76-wide box, on a group of its own: the pose's CSS transforms stay inside it.
+      const mirror = left.querySelector(':scope > g')!
+      expect(mirror.getAttribute('transform')).toBe('matrix(-1 0 0 1 76 0)')
+      expect(mirror.classList.contains('murmi-part')).toBe(false)
+    }
+  })
+
   it('leaves the hair-thin parts out below 40px, and at the inline token', () => {
     const teeth = (size: number | string) =>
       render(<Murmi mood="calm" size={size} />).container.querySelectorAll('path[fill="var(--murmi-tooth)"]').length

@@ -12,7 +12,7 @@ export function LoadingState({ message }: { message?: string }) {
 
   return (
     <div className="flex items-center gap-2 text-sm text-muted-foreground" role="status">
-      <Murmi mood="thinking" size="var(--murmi-inline)" />
+      <Murmi mood="reading" size="var(--murmi-inline)" />
       <span>{message ?? t('status.loading')}</span>
     </div>
   )

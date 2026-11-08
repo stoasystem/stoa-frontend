@@ -81,7 +81,7 @@ function ChapterState({ query }: { query: Exclude<ReturnType<typeof useChapter>,
       </Link>
       {query.status === 'loading' ? (
         <div className="flex items-center gap-2">
-          <Murmi mood="thinking" size="var(--murmi-inline)" />
+          <Murmi mood="reading" size="var(--murmi-inline)" />
           <p role="status" className="m-0 text-[15px] text-[color:var(--on-sky-text-body)]">
             {t('chapter.loading')}
           </p>
@@ -98,7 +98,7 @@ function ChapterState({ query }: { query: Exclude<ReturnType<typeof useChapter>,
         </div>
       ) : (
         <div className="flex flex-col items-start gap-3">
-          <Murmi mood="calm" size="var(--murmi-state)" />
+          <Murmi mood="curious" size="var(--murmi-state)" />
           <p role="alert" className="m-0 text-[15px] text-[color:var(--on-sky-text-body)]">
             {t('chapter.missing')}
           </p>
@@ -131,6 +131,8 @@ function ChapterBody({ chapter }: { chapter: Chapter }) {
         ? t('chapter.toGo', { count: remaining })
         : t('chapter.allDone')
   const firstLearn = star?.unlitPrerequisites ?? []
+  // The whole chapter: one of Murmi's big moments (#592).
+  const whole = lit || (!star && remaining === 0)
 
   return (
     <>
@@ -166,7 +168,7 @@ function ChapterBody({ chapter }: { chapter: Chapter }) {
         className="flex items-center gap-3 rounded-[var(--r-card)] border p-4"
         style={{ background: 'var(--sky-glass)', borderColor: 'var(--sky-glass-border)' }}
       >
-        <Murmi mood={lit || (!star && remaining === 0) ? 'delighted' : 'watching'} size={56} />
+        <Murmi mood={whole ? 'cheering' : 'watching'} size={56} animated={whole} />
         <p
           role="progressbar"
           aria-label={t('chapter.progress')}

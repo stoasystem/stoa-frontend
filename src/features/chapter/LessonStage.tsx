@@ -125,7 +125,7 @@ function StageNotice({ unitId, kind, retry }: { unitId?: string; kind: StageNoti
       )}
       {kind === 'loading' ? (
         <div className="flex items-center gap-2">
-          <Murmi mood="thinking" size="var(--murmi-inline)" />
+          <Murmi mood="reading" size="var(--murmi-inline)" />
           <p role="status" className={cn('m-0 text-[15px]', bodyOnSky)}>
             {t('stage.loading')}
           </p>
@@ -142,7 +142,7 @@ function StageNotice({ unitId, kind, retry }: { unitId?: string; kind: StageNoti
         </>
       ) : (
         <>
-          <Murmi mood="calm" size="var(--murmi-state)" />
+          <Murmi mood="curious" size="var(--murmi-state)" />
           <p role="alert" className={cn('m-0 text-[15px]', bodyOnSky)}>
             {t('stage.missing')}
           </p>
@@ -198,7 +198,7 @@ function LessonRunStage({
           <QuizFailed run={run} unitId={unitId} />
         ) : run.quizPending ? (
           <div className="flex items-center gap-2 p-6">
-            <Murmi mood="thinking" size="var(--murmi-inline)" />
+            <Murmi mood="reading" size="var(--murmi-inline)" />
             <p role="status" className={cn('m-0 text-[15px]', bodyOnSky)}>
               {t('quiz.drawing')}
             </p>
@@ -208,7 +208,7 @@ function LessonRunStage({
         ) : (
           <div className="flex items-center gap-2 p-6">
             {/* A lesson with nothing in it is still an empty state. */}
-            <Murmi mood="calm" size="var(--murmi-inline)" />
+            <Murmi mood="curious" size="var(--murmi-inline)" />
             <p className={cn('m-0 text-[15px]', bodyOnSky)}>{t('stage.empty')}</p>
           </div>
         )}
@@ -752,10 +752,10 @@ function LessonDone({
         )}
         {/* Finishing is the fourth of the marmot's moments, and the chapter
           * page already draws exactly this pair a level up: at the telescope
-          * while there is a lesson left to look at, delighted once the
+          * while there is a lesson left to look at, cheering once the
           * chapter is whole. The star above says how far; this says how it
           * went. */}
-        <Murmi mood={allDone ? 'delighted' : 'watching'} size={56} />
+        <Murmi mood={allDone ? 'cheering' : 'watching'} size={56} animated={allDone} />
         <h2
           ref={heading}
           id="stage-done-title"
@@ -876,7 +876,7 @@ export function StarQuizStage({ unitId }: { unitId: string | undefined }) {
             <StarQuizFailed run={run} unitId={unitId} />
           ) : run.quizPending ? (
             <div className="flex items-center gap-2 p-6">
-              <Murmi mood="thinking" size="var(--murmi-inline)" />
+              <Murmi mood="reading" size="var(--murmi-inline)" />
               <p role="status" className={cn('m-0 text-[15px]', bodyOnSky)}>
                 {t('starQuiz.drawing')}
               </p>
@@ -932,7 +932,7 @@ function StarQuizEnd({
   after,
 }: {
   name: string
-  mood: 'delighted' | 'calm' | 'thinking'
+  mood: 'cheering' | 'calm' | 'thinking'
   title: string
   body: string
   children: ReactNode
@@ -943,7 +943,8 @@ function StarQuizEnd({
   return (
     <div className="relative flex min-h-0 flex-1 items-center justify-center overflow-y-auto p-6">
       <section aria-labelledby={`star-quiz-${name}-title`} data-star-quiz-end={name} className="flex max-w-[520px] flex-col items-center gap-4 text-center">
-        <Murmi mood={mood} size="var(--murmi-state)" />
+        {/* Animated only at the big moment: every answer right, the star lit. */}
+        <Murmi mood={mood} size="var(--murmi-state)" animated={mood === 'cheering'} />
         <h2
           ref={heading}
           id={`star-quiz-${name}-title`}
@@ -968,7 +969,7 @@ function StarQuizPassed({ chapter, starPath }: { chapter: Chapter | null; starPa
   return (
     <StarQuizEnd
       name="passed"
-      mood="delighted"
+      mood="cheering"
       title={t('starQuiz.passed.title')}
       body={t('starQuiz.passed.body', { star: chapter?.title ?? '' })}
       // The whole star is lit, as at the end of its last lesson: the way on (#578).

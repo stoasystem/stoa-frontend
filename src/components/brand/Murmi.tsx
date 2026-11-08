@@ -572,6 +572,7 @@ export function Murmi({
   mood = 'calm',
   size = 'var(--murmi-state)',
   animated = false,
+  facing = 'right',
   className,
 }: {
   mood?: MurmiMood
@@ -579,6 +580,11 @@ export function Murmi({
   size?: number | string
   /** A quiet idle loop for the pose (blink, breath, the pose's own movement). Still under reduced motion. */
   animated?: boolean
+  /**
+   * Which way the figure looks and points. Drawn facing right; `left` mirrors
+   * it on an inner group, so the box, its size and its data attributes stay.
+   */
+  facing?: 'left' | 'right'
   className?: string
 }) {
   const measured = typeof size === 'number'
@@ -602,17 +608,21 @@ export function Murmi({
       data-murmi={mood}
       data-murmi-detail={detail}
       data-murmi-animated={animated ? '' : undefined}
+      data-murmi-facing={facing}
       aria-hidden="true"
       focusable="false"
       className={cn('shrink-0', animated && 'murmi--animated', className)}
     >
-      <g className={cn('murmi-part', mood === 'cheering' && 'murmi-bounce')}>
-        {atScope && <TripodLegs full={full} />}
-        <Body {...part} />
-        {mood === 'reading' && <Book full={full} animated={animated} />}
-        <Head {...part} />
-        {front}
-        <Arms {...part} />
+      {/* The mirror is its own group: the part inside may take a CSS transform, which would replace it. */}
+      <g transform={facing === 'left' ? 'matrix(-1 0 0 1 76 0)' : undefined}>
+        <g className={cn('murmi-part', mood === 'cheering' && 'murmi-bounce')}>
+          {atScope && <TripodLegs full={full} />}
+          <Body {...part} />
+          {mood === 'reading' && <Book full={full} animated={animated} />}
+          <Head {...part} />
+          {front}
+          <Arms {...part} />
+        </g>
       </g>
     </svg>
   )

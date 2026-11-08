@@ -342,6 +342,9 @@ describe('the question card', () => {
         <FirstSubjectQuestion subjects={startableSubjects(newcomerMap())} onChoose={(id) => answers.push(id)} />
       </I18nextProvider>,
     )
+    // Asking a newcomer: Murmi waves, and moves (#592).
+    expect(document.querySelector('[data-first-question] [data-murmi]')).toHaveAttribute('data-murmi', 'waving')
+    expect(document.querySelector('[data-first-question] [data-murmi]')).toHaveAttribute('data-murmi-animated')
     fireEvent.click(screen.getByRole('button', { name: 'Mathematics' }))
     fireEvent.click(screen.getByRole('button', { name: 'Physics' }))
     expect(answers).toEqual([])

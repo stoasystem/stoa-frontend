@@ -284,6 +284,9 @@ describe('the star quiz passed leads on to the next star (#578)', () => {
     // Under the row with the way to the map, not in it; that way stays.
     const end = document.querySelector('[data-star-quiz-end="passed"]')!
     expect(end.querySelector(':scope > [data-stage-done-next-star]')).not.toBeNull()
+    // The whole star lit: one of Murmi's big moments, cheering and moving (#592).
+    expect(end.querySelector('[data-murmi]')).toHaveAttribute('data-murmi', 'cheering')
+    expect(end.querySelector('[data-murmi]')).toHaveAttribute('data-murmi-animated')
     expect(screen.getByRole('link', { name: 'See it on the star map' })).toHaveAttribute('href', '/map/math/algebra/u-5')
 
     await user.click(link)
