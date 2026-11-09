@@ -4,7 +4,6 @@ import { CreditCard, ShieldCheck } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { useStudentEntitlementQuery } from '@/hooks/student/useStudentEntitlementQuery'
 import { getSubscriptionPlanLabel } from '@/lib/displayLabels'
-import { formatDayAndMonth } from '@/lib/formatDateTime'
 import type { SubscriptionPlan } from '@/types/billing'
 
 function formatLimit(value: number | null | undefined, t: TFunction<'practice'>) {
@@ -37,18 +36,6 @@ export function StudentPlanAccessSection() {
                 label={t('ui.chatMessages')}
                 value={formatLimit(entitlement.dailyChatMessageLimit, t)}
               />
-              {entitlement.freeTrialActive && (
-                <Detail
-                  label={t('ui.freeTrial')}
-                  value={
-                    entitlement.freeTrialEndsAt
-                      ? t('dashboard.plan.trialEnds', {
-                          date: formatDayAndMonth(entitlement.freeTrialEndsAt),
-                        })
-                      : t('dashboard.plan.trialActive')
-                  }
-                />
-              )}
             </>
           ) : (
             <p>{t('progress.planLimits')}</p>

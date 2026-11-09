@@ -478,5 +478,12 @@
       "body": "Aucune page n’existe à cette adresse.",
       "action": "Aller à l’accueil"
     }
+  },
+  "usagePeriod": {
+    "paused": "Ta période d’utilisation est terminée : poser des questions et demander à un enseignant sont en pause. L’historique et les exercices restent disponibles.",
+    "renewal": {
+      "parent": "Demande à un parent de la renouveler.",
+      "contact": "Pour la renouveler, écris à STOA : <email>{{email}}</email>"
+    }
   }
 }

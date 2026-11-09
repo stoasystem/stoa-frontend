@@ -70,6 +70,16 @@ export class StudentWorld {
    * as the read model would, so the reminder has a star to fly to.
    */
   reviewSummary = { dueCount: 0, scheduledCount: 0, nextDueAt: '2026-09-29T08:00:00Z' }
+  /**
+   * `usagePeriod` of `GET /students/me/entitlement` (stoa-backend#343): running, paid by a parent,
+   * unless a test ends it. Ended (`expired`, or `none` for no period), Ask takes no new question (#615).
+   */
+  usagePeriod: { endsAt: string | null; state: 'active' | 'expired' | 'none'; daysLeft: number | null; paidBy: 'self' | 'parent' | null } = {
+    endsAt: '2027-06-30',
+    state: 'active',
+    daysLeft: 200,
+    paidBy: 'parent',
+  }
   /** The sections an answer to this question comes in (stoa-backend#132); others are text only. */
   readonly sections = new Map<string, Record<string, unknown>>()
   private clock = Date.parse('2026-09-29T08:00:00Z')
@@ -308,6 +318,19 @@ export class StudentWorld {
   private installAskSurroundings() {
     const b = this.backend
     b.on('GET', '/teacher-help/availability', () => ({ status: 200, body: { online: false, availableTeachers: 0 } }))
+    // The student's plan and usage period, as stoa-backend#343 shapes it (no trial fields since).
+    b.on('GET', '/students/me/entitlement', () => ({
+      status: 200,
+      body: {
+        effectivePlan: 'standard',
+        newUsageAllowed: this.usagePeriod.state === 'active',
+        teacherSupportIncluded: true,
+        dailyAiQuestionLimit: null,
+        dailyChatMessageLimit: null,
+        usagePeriod: this.usagePeriod,
+        renewalContactEmail: 'info@stoaedu.ch',
+      },
+    }))
     // What the backend answers for a conversation nobody asked a teacher about.
     b.on('GET', '/teacher-help/conversations/{conv_id}/request', () => ({
       status: 404,

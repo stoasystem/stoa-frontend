@@ -475,5 +475,12 @@
       "body": "Unter dieser Adresse gibt es keine Seite.",
       "action": "Zur Startseite"
     }
+  },
+  "usagePeriod": {
+    "paused": "Deine Nutzungsdauer ist abgelaufen: Fragen stellen und eine Lehrperson fragen sind pausiert. Verlauf und Üben gehen wie gewohnt weiter.",
+    "renewal": {
+      "parent": "Bitte deine Eltern, sie zu verlängern.",
+      "contact": "Zum Verlängern schreib STOA: <email>{{email}}</email>"
+    }
   }
 }

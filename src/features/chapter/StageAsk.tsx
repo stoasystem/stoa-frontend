@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Composer } from '@/components/base'
+import { UsagePeriodPausedNotice } from '@/components/usagePeriod/UsagePeriodRenewal'
 import { AskPanel } from '@/features/ask/AskPanel'
 import { AskReopen } from '@/features/ask/AskReopen'
 import {
@@ -14,6 +15,7 @@ import { QuoteSelection } from '@/features/chapter/QuoteSelection'
 import { StageAskTipBubble, StageAskTipStatus, useStageAskTip } from '@/features/chapter/StageAskTip'
 import { useAskController, type AskController } from '@/features/ask/useAskController'
 import { useAskKeyboard } from '@/features/ask/useAskKeyboard'
+import { useAskUsagePeriod } from '@/features/ask/useAskUsagePeriod'
 import { useSheetDrag } from '@/features/ask/useSheetDrag'
 import { usePrefersReducedMotion } from '@/features/starmap/motion/usePrefersReducedMotion'
 import { useMediaQuery } from '@/hooks/layout/useMediaQuery'
@@ -114,6 +116,10 @@ export function StageWithAsk({
   const side = useMediaQuery(STAGE_SIDE_QUERY)
   const controller = useStageAskController(side, Boolean(off))
   const { open, close } = controller
+  // The usage period has ended (#615): the docked composer is greyed and says
+  // why; the conversation still opens from the reopen button beside it.
+  const usagePeriod = useAskUsagePeriod()
+  const paused = usagePeriod.paused
   const sheet = open && !side
   const reducedMotion = usePrefersReducedMotion()
   const surface = useRef<HTMLElement>(null)
@@ -189,11 +195,18 @@ export function StageWithAsk({
                   {off}
                 </p>
               )}
+              {!off && paused && usagePeriod.entitlement && (
+                <UsagePeriodPausedNotice
+                  id="stage-ask-paused"
+                  entitlement={usagePeriod.entitlement}
+                  className="m-0 text-center text-[13px] text-[color:var(--on-sky-text-body)] [&_a]:text-[color:var(--on-sky-plain)]"
+                />
+              )}
               <div className="flex items-center gap-2">
               <div className="min-w-0 flex-1">
               <Composer
-                disabled={Boolean(off)}
-                describedBy={off ? 'stage-ask-off' : undefined}
+                disabled={Boolean(off) || paused}
+                describedBy={off ? 'stage-ask-off' : paused ? 'stage-ask-paused' : undefined}
                 value={controller.draft}
                 onChange={onDockedChange}
                 onCompositionStart={() => {

@@ -171,7 +171,8 @@
         "title": "Aiuto di un insegnante richiesto",
         "status": "Richiesta",
         "body": "Le risposte di un insegnante appaiono in questa conversazione."
-      }
+      },
+      "usagePeriodPaused": "Il tuo periodo di utilizzo è terminato, quindi per ora non puoi chiedere a un docente."
     },
     "practice": {
       "subtitle": "Conosce la domanda su cui sei",

@@ -2,6 +2,7 @@ import { useCallback, useEffect, useId, useRef, type CSSProperties, type Keyboar
 import { useTranslation } from 'react-i18next'
 import { Button, Composer } from '@/components/base'
 import { COMPOSER } from '@/components/base/sizes'
+import { UsagePeriodPausedNotice } from '@/components/usagePeriod/UsagePeriodRenewal'
 import { AskPanel } from '@/features/ask/AskPanel'
 import { AskReopen } from '@/features/ask/AskReopen'
 import { useClearOfControls } from '@/features/ask/clearOfControls'
@@ -14,6 +15,7 @@ import {
 } from '@/features/ask/askLayout'
 import { useAskController, type AskRoute } from '@/features/ask/useAskController'
 import { useAskKeyboard } from '@/features/ask/useAskKeyboard'
+import { useAskUsagePeriod } from '@/features/ask/useAskUsagePeriod'
 import { useSheetDrag } from '@/features/ask/useSheetDrag'
 import { WIDE_QUERY, useMediaQuery } from '@/hooks/layout/useMediaQuery'
 import { useCoverShell } from '@/layouts/shellCover'
@@ -83,7 +85,12 @@ export function AskHost({
   const examples = useAskStore((state) => askFor(state, ownerId).examples)
   const askNow = useAskStore((state) => state.askNow)
   const endExamples = useAskStore((state) => state.endExamples)
-  const offering = !open && examples !== null && examples.length > 0
+  // The usage period has ended (#615): the docked composer is greyed and says
+  // why; Ask still opens on its conversations, from the reopen button.
+  const usagePeriod = useAskUsagePeriod()
+  const paused = usagePeriod.paused
+  const pausedNoticeId = useId()
+  const offering = !open && !paused && examples !== null && examples.length > 0
   const examplesLabel = useId()
   const page = useRef<HTMLDivElement>(null)
   const examplesArea = useRef<HTMLDivElement>(null)
@@ -201,7 +208,17 @@ export function AskHost({
                   </ul>
                 </div>
               )}
+              {paused && usagePeriod.entitlement && (
+                // Out of the flow, as the examples are, so the dock's box stays the composer's.
+                <UsagePeriodPausedNotice
+                  id={pausedNoticeId}
+                  entitlement={usagePeriod.entitlement}
+                  className="absolute inset-x-0 bottom-full m-0 mb-2 text-center text-[13px] text-[color:var(--on-sky-text-body)] [&_a]:text-[color:var(--on-sky-plain)]"
+                />
+              )}
               <Composer
+                disabled={paused}
+                describedBy={paused ? pausedNoticeId : undefined}
                 value={controller.draft}
                 onChange={onDockedChange}
                 onCompositionStart={() => {

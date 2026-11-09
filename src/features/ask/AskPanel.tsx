@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom'
 import { Button, Composer, IconButton, PresenceDot } from '@/components/base'
 import { conversationDisplayTitle, subjectDisplayLabel } from '@/components/chat/conversationTitle'
 import { MathRenderer } from '@/components/ui/MathRenderer'
+import { UsagePeriodPausedNotice } from '@/components/usagePeriod/UsagePeriodRenewal'
 import { GRADE_SECTION_ID } from '@/features/account/GradeGroup'
 import { AskConversationList, AskEmptyState } from '@/features/ask/AskConversationList'
 import { hasSections, quoteCaption, sectionsSpokenText, type AnswerStep } from '@/features/ask/AskAnswerSections'
@@ -15,6 +16,7 @@ import { TeacherHelpAction, TeacherHelpStatusCard } from '@/features/ask/teacher
 import { useTeacherHelp } from '@/features/ask/teacherHelp/useTeacherHelp'
 import type { AskController } from '@/features/ask/useAskController'
 import { useAskConversation } from '@/features/ask/useAskConversation'
+import { useAskUsagePeriod } from '@/features/ask/useAskUsagePeriod'
 import { useAskQuestion } from '@/features/ask/question/useAskQuestion'
 import {
   makeQuote,
@@ -93,6 +95,10 @@ export function AskPanel({
     sendStreamingMessage,
     isStreaming,
   })
+  // The usage period has ended, or none was set (#615): the history stays
+  // readable and an answer being written finishes, but nothing new is asked.
+  const usagePeriod = useAskUsagePeriod()
+  const paused = usagePeriod.paused
 
   // Whether this panel is still on screen when the conversation comes back,
   // and still on the list rather than in a conversation the student opened
@@ -181,7 +187,7 @@ export function AskPanel({
 
   function submit(value: string) {
     const content = value.trim()
-    if (!content) return
+    if (!content || paused) return
     // Pressing send while a file is still going up is held by the composer's
     // `busy`, which says so; `take()` is the second lock, so a question can
     // never leave without the file it was written for. A file that waited past
@@ -193,7 +199,7 @@ export function AskPanel({
   }
 
   function askRecommended(recommended: string) {
-    if (!question.canAsk()) return
+    if (paused || !question.canAsk()) return
     // A file still going up, or one that waited past its upload's 30 minutes,
     // holds the question; the tray says which.
     const files = attachments.take()
@@ -209,7 +215,8 @@ export function AskPanel({
   useEffect(() => {
     askPending.current = askRecommended
   })
-  const takesPending = controller.entry === 'planet' && conversationId === null && !profileQuery.isPending
+  // Not while the period has ended: it waits in the store until it is renewed.
+  const takesPending = controller.entry === 'planet' && conversationId === null && !profileQuery.isPending && !paused
   useEffect(() => {
     if (!pending || !takesPending || !ownerId) return
     const taken = useAskStore.getState().takePending(ownerId)
@@ -272,6 +279,7 @@ export function AskPanel({
           key={conversationId}
           conversationId={conversationId}
           ask={ask}
+          paused={paused}
           layout={layout}
           onAskAboutStep={askAboutStep}
           onNewConversation={() => select(null)}
@@ -305,7 +313,7 @@ export function AskPanel({
             <RecommendedEmptyState
               subject={subject}
               onAsk={askRecommended}
-              disabled={question.starting}
+              disabled={question.starting || paused}
             />
           ) : (
             <AskConversationList conversations={conversationsQuery.data?.items ?? []} onSelect={(id) => select(id)} />
@@ -345,6 +353,13 @@ export function AskPanel({
             </Link>
           </p>
         )}
+        {paused && usagePeriod.entitlement && (
+          <UsagePeriodPausedNotice
+            id={USAGE_PERIOD_NOTICE_ID}
+            entitlement={usagePeriod.entitlement}
+            className="m-0 pb-1 text-[13px] text-[color:var(--on-sky-text-body)] [&_a]:text-[color:var(--on-sky-plain)]"
+          />
+        )}
         {quote && <PendingQuote quote={quote} onRemove={clearQuote} />}
         <Attachments view={attachments.view} />
         <Composer
@@ -358,12 +373,23 @@ export function AskPanel({
           label={t('ask.composerLabel')}
           placeholder={practice ? t('ask.practice.placeholder') : t('ask.placeholder')}
           busy={isStreaming || question.starting || attachments.busy}
-          describedBy={profile && !conversationGrade(profile.grade) ? 'ask-grade-missing' : undefined}
+          disabled={paused}
+          describedBy={
+            [
+              paused && usagePeriod.entitlement ? USAGE_PERIOD_NOTICE_ID : null,
+              profile && !conversationGrade(profile.grade) ? 'ask-grade-missing' : null,
+            ]
+              .filter(Boolean)
+              .join(' ') || undefined
+          }
         />
       </div>
     </div>
   )
 }
+
+/** The line under which the composer is paused once the usage period has ended (#615). */
+const USAGE_PERIOD_NOTICE_ID = 'ask-usage-period-paused'
 
 /**
  * The passage waiting to go out with the next question, above the composer,
@@ -410,12 +436,15 @@ function RecommendedEmptyState({
 function AskThread({
   conversationId,
   ask,
+  paused,
   layout,
   onAskAboutStep,
   onNewConversation,
 }: {
   conversationId: string
   ask: ReturnType<typeof useAskConversation>
+  /** The usage period has ended (#615): nothing is sent again either. */
+  paused: boolean
   layout: AskLayout
   onAskAboutStep: (step: AnswerStep) => void
   /** Back to the list, where the next question starts a new conversation. */
@@ -517,7 +546,7 @@ function AskThread({
             key={entry.message.id}
             message={entry.message}
             teacherName={help.teacherName}
-            onRetry={refusedForNow(entry.message) ? undefined : retryMessage}
+            onRetry={paused || refusedForNow(entry.message) ? undefined : retryMessage}
             onAskAboutStep={onAskAboutStep}
             after={entry.message.id === offer?.underMessageId ? helpAction : undefined}
           />

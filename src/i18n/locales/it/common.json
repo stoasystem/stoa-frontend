@@ -478,5 +478,12 @@
       "body": "A questo indirizzo non c’è nessuna pagina.",
       "action": "Alla pagina iniziale"
     }
+  },
+  "usagePeriod": {
+    "paused": "Il tuo periodo di utilizzo è terminato: fare domande e chiedere a un docente sono in pausa. La cronologia e gli esercizi restano disponibili.",
+    "renewal": {
+      "parent": "Chiedi a un genitore di rinnovarlo.",
+      "contact": "Per rinnovarlo, scrivi a STOA: <email>{{email}}</email>"
+    }
   }
 }

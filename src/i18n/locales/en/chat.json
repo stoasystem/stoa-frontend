@@ -169,7 +169,8 @@
         "title": "Teacher support requested",
         "status": "Requested",
         "body": "Replies from a teacher appear in this conversation."
-      }
+      },
+      "usagePeriodPaused": "Your usage period has ended, so asking a teacher is paused."
     },
     "practice": {
       "subtitle": "Knows the question you are on",

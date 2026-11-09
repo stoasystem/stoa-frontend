@@ -171,7 +171,8 @@
         "title": "Aide d’un enseignant demandée",
         "status": "Demandée",
         "body": "Les réponses d’un enseignant apparaissent dans cette conversation."
-      }
+      },
+      "usagePeriodPaused": "Ta période d’utilisation est terminée, tu ne peux donc pas demander à un enseignant pour le moment."
     },
     "practice": {
       "subtitle": "Connaît la question sur laquelle tu es",

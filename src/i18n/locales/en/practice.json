@@ -88,8 +88,6 @@
     "plan": {
       "perDay": "{{count}} per day",
       "notLimited": "Not limited",
-      "trialEnds": "Ends {{date}}",
-      "trialActive": "Active",
       "yourPlan": "Your plan",
       "usagePaused": "New questions are paused on this plan. Ask a parent to review the family plan.",
       "usageCovered": "This plan covers the questions, practice, and teacher support shown above.",
@@ -228,7 +226,6 @@
   "ui": {
     "activeSubjects": "Active subjects",
     "chatMessages": "Chat messages",
-    "freeTrial": "Free trial",
     "teacherHelp": "Teacher help"
   }
 }

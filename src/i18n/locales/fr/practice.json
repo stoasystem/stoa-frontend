@@ -89,8 +89,6 @@
     "plan": {
       "perDay": "{{count}} par jour",
       "notLimited": "Sans limite",
-      "trialEnds": "Se termine le {{date}}",
-      "trialActive": "Actif",
       "yourPlan": "Ton abonnement",
       "usagePaused": "Les nouvelles questions sont suspendues sur cet abonnement. Demande à un parent de vérifier l’abonnement famille.",
       "usageCovered": "Cet abonnement couvre les questions, la pratique et l’aide des enseignants indiquées ci-dessus.",
@@ -233,7 +231,6 @@
   "ui": {
     "activeSubjects": "Matières actives",
     "chatMessages": "Messages du chat",
-    "freeTrial": "Essai gratuit",
     "teacherHelp": "Aide d’un enseignant"
   }
 }
