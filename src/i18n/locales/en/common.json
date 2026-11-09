@@ -83,6 +83,24 @@
       "unavailable": "Your year group can't be loaded right now.",
       "refreshFailed": "Your year group couldn't be refreshed right now."
     },
+    "answerStyle": {
+      "heading": "Answer style",
+      "label": "How answers explain things to you",
+      "placeholder": "Choose a style",
+      "about": {
+        "standard": "Calm and even, one step after another.",
+        "concise": "Straight to the steps, without small talk.",
+        "encouraging": "Takes its time and cheers you on along the way.",
+        "vivid": "Explains with comparisons and everyday examples."
+      },
+      "note": "Every style helps you find the answer yourself.",
+      "save": "Save",
+      "saveFailed": "Your answer style was not saved. Try again.",
+      "unknown": "This style isn't available any more. Choose one from the list.",
+      "saved": "Saved.",
+      "unavailable": "Your answer style can't be loaded right now.",
+      "refreshFailed": "Your answer style couldn't be refreshed right now."
+    },
     "language": {
       "heading": "Language"
     },

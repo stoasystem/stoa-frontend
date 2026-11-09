@@ -83,6 +83,24 @@
       "unavailable": "Ton année scolaire ne peut pas être chargée pour le moment.",
       "refreshFailed": "Ton année scolaire n’a pas pu être actualisée pour le moment."
     },
+    "answerStyle": {
+      "heading": "Style de réponse",
+      "label": "Comment les réponses t’expliquent les choses",
+      "placeholder": "Choisis un style",
+      "about": {
+        "standard": "Calme et posé, une étape après l’autre.",
+        "concise": "Droit aux étapes, sans bavardage.",
+        "encouraging": "Prend son temps et t’encourage en chemin.",
+        "vivid": "Explique avec des comparaisons et des exemples du quotidien."
+      },
+      "note": "Avec chaque style, c’est toi qui trouves la réponse.",
+      "save": "Enregistrer",
+      "saveFailed": "Ton style de réponse n’a pas été enregistré. Réessaie.",
+      "unknown": "Ce style n’existe plus. Choisis-en un dans la liste.",
+      "saved": "Enregistré.",
+      "unavailable": "Ton style de réponse ne peut pas être chargé pour le moment.",
+      "refreshFailed": "Ton style de réponse n’a pas pu être actualisé pour le moment."
+    },
     "language": {
       "heading": "Langue"
     },

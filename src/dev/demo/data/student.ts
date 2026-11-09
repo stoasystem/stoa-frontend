@@ -61,6 +61,30 @@ export function demoGradeChoicesFor(language: SupportedLanguage): ProfileChoice[
   return DEMO_GRADE_CODES.map((code) => ({ code, label: GRADE_LABELS[code][language] }))
 }
 
+/**
+ * The answer styles the backend offers (`choices.answerStyle`, stoa-backend#314),
+ * in its order, named as its `message_catalog` names them (`choice.answer_style.*`).
+ */
+const ANSWER_STYLE_LABELS: Record<string, Record<SupportedLanguage, string>> = {
+  standard: { de: 'Ausgewogen', en: 'Balanced', fr: 'Équilibré', it: 'Equilibrato' },
+  concise: { de: 'Kurz und genau', en: 'Short and precise', fr: 'Court et précis', it: 'Breve e preciso' },
+  encouraging: {
+    de: 'Geduldig und ermutigend',
+    en: 'Patient and encouraging',
+    fr: 'Patient et encourageant',
+    it: 'Paziente e incoraggiante',
+  },
+  vivid: {
+    de: 'Mit Vergleichen und Beispielen',
+    en: 'With comparisons and examples',
+    fr: 'Avec des comparaisons et des exemples',
+    it: 'Con paragoni ed esempi',
+  },
+}
+
+/** The codes of `choices.answerStyle`, in the backend's order. */
+export const DEMO_ANSWER_STYLE_CODES: readonly string[] = Object.keys(ANSWER_STYLE_LABELS)
+
 /** `GET /students/me/profile`. Its subjects are the galaxies the student takes. */
 export function demoProfileFor(language: SupportedLanguage): StudentProfile {
   return {
@@ -70,11 +94,15 @@ export function demoProfileFor(language: SupportedLanguage): StudentProfile {
     email: EMAIL,
     grade: 'grade_9_secondary',
     primarySubjects: demoSky(10).galaxies.filter((galaxy) => galaxy.enrolled).map((galaxy) => galaxy.subjectId),
+    answerStyle: 'standard',
     schoolSystem: 'Swiss Gymnasium',
     preferredAnswerLanguage: language,
     guardianStatus: 'linked',
     createdAt: CREATED_AT,
     updatedAt: '2026-09-30T18:00:00.000Z',
-    choices: { grade: demoGradeChoicesFor(language) },
+    choices: {
+      grade: demoGradeChoicesFor(language),
+      answerStyle: DEMO_ANSWER_STYLE_CODES.map((code) => ({ code, label: ANSWER_STYLE_LABELS[code][language] })),
+    },
   }
 }
