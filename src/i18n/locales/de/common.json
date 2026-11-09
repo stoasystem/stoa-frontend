@@ -342,6 +342,12 @@
     },
     "unauthorized": {
       "title": "Anmeldung erforderlich"
+    },
+    "usagePeriod": {
+      "title": "Nutzungsdauer"
+    },
+    "endingUsagePeriods": {
+      "title": "Bald ablaufende Nutzungsdauern"
     }
   },
   "state": {

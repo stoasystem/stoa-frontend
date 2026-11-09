@@ -24,7 +24,7 @@ import { act, useEffect, useRef } from 'react'
 import { I18nextProvider } from 'react-i18next'
 import { BrowserRouter, Link, MemoryRouter, createPath, resolvePath, useLocation, useNavigate, type To } from 'react-router-dom'
 import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest'
-import { askPathFor, legacyRedirects, moderationPathFor, teacherRequestPathFor } from '@/app/router/routeManifest'
+import { askPathFor, legacyRedirects, moderationPathFor, teacherRequestPathFor, usagePeriodPathFor } from '@/app/router/routeManifest'
 import {
   NOTIFICATION_EVENT_TARGETS,
   NOTIFICATION_TARGETS,
@@ -139,6 +139,7 @@ function builtTargets(): Built[] {
     add('askPathFor', id, askPathFor(id))
     add('moderationPathFor', id, moderationPathFor(id))
     add('teacherRequestPathFor', id, teacherRequestPathFor(id))
+    add('usagePeriodPathFor', id, usagePeriodPathFor(id))
     add('reviewReturnPath', id, reviewReturnPath(id))
     add('reviewReturnPath', { star: id }, reviewReturnPath({ star: id }))
   }

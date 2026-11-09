@@ -262,6 +262,8 @@ const PARAMETER_NAMES = [
   'subjectId',
   'topicId',
   'unitId',
+  // An account of any role, where the page serves more than one (#614: a student's or a parent's usage period).
+  'userId',
 ]
 
 const allPatterns = [...pageRoutes.map((route) => route.path), ...legacyRedirects.map((redirect) => redirect.from)]

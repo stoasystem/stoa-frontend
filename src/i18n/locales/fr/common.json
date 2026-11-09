@@ -342,6 +342,12 @@
     },
     "unauthorized": {
       "title": "Connexion requise"
+    },
+    "usagePeriod": {
+      "title": "Période d'utilisation"
+    },
+    "endingUsagePeriods": {
+      "title": "Périodes bientôt échues"
     }
   },
   "state": {

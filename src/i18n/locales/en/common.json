@@ -342,6 +342,12 @@
     },
     "unauthorized": {
       "title": "Sign-in required"
+    },
+    "usagePeriod": {
+      "title": "Usage period"
+    },
+    "endingUsagePeriods": {
+      "title": "Periods ending soon"
     }
   },
   "state": {

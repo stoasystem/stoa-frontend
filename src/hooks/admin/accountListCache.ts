@@ -281,6 +281,18 @@ export function afterParentLink(queryClient: QueryClient, input: { parentId: str
 }
 
 /**
+ * A set or extended period (#614) is the account's own new end date, in its
+ * row's "ends" column. No filter reads that column, so no read goes again.
+ */
+export function afterUsagePeriodChange(queryClient: QueryClient, input: { userId: string; endsOn: string | null }) {
+  changeRows(queryClient, (row) =>
+    row.userId === input.userId && row.usagePeriodEndsAt !== input.endsOn
+      ? { ...row, usagePeriodEndsAt: input.endsOn }
+      : row,
+  )
+}
+
+/**
  * A revoked link (#588) leaves both rows without the other account. Nothing
  * else a list shows changes, so no read goes to the server again.
  */

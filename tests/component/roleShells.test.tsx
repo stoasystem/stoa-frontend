@@ -61,7 +61,7 @@ describe('what each role is offered beside the logo', () => {
     expect(navigation.kind).toBe('sourceList')
     if (navigation.kind !== 'sourceList') return
     expect(navigation.items.map((item) => [item.path, item.labelKey, item.covers ?? []])).toEqual([
-      ['/admin/users', 'navigation.admin.users', ['/admin/account-operations']],
+      ['/admin/users', 'navigation.admin.users', ['/admin/account-operations', '/admin/usage-periods']],
       ['/admin/teacher-applications', 'navigation.admin.teacherApplications', []],
       ['/admin/curriculum', 'navigation.admin.curriculum', []],
       ['/admin/moderation', 'navigation.admin.moderation', []],
