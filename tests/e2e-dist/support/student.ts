@@ -1,6 +1,6 @@
 import { createHash } from 'node:crypto'
 import type { MockBackend } from './backend'
-import { GRADES } from '../../fakes/profileChoices'
+import { ANSWER_STYLES, GRADES } from '../../fakes/profileChoices'
 
 export const STUDENT = {
   id: 'e2e-student-1',
@@ -60,6 +60,8 @@ export class StudentWorld {
    */
   grade = 'grade_6_primary'
   primarySubjects: string[] = ['math']
+  /** The answer style preset (stoa-backend#314): a code from `choices.answerStyle`, "standard" when never chosen. */
+  answerStyle = 'standard'
   /** What `PATCH /students/me/profile` was sent, in order. */
   readonly profileWrites: Record<string, unknown>[] = []
   /**
@@ -90,7 +92,7 @@ export class StudentWorld {
     this.complete(command)
   }
 
-  /** `GET /students/me/profile`, with the year groups to choose from (stoa-backend#310). */
+  /** `GET /students/me/profile`, with the year groups (stoa-backend#310) and answer styles (stoa-backend#314) to choose from. */
   profile() {
     return {
       id: 'e2e-profile-1',
@@ -99,10 +101,11 @@ export class StudentWorld {
       email: STUDENT.email,
       grade: this.grade,
       primarySubjects: this.primarySubjects,
+      answerStyle: this.answerStyle,
       guardianStatus: 'linked',
       createdAt: '2026-09-01T08:00:00Z',
       updatedAt: '2026-09-01T08:00:00Z',
-      choices: { grade: GRADES },
+      choices: { grade: GRADES, answerStyle: ANSWER_STYLES },
     }
   }
 
@@ -136,17 +139,23 @@ export class StudentWorld {
     b.on('GET', '/students/me/profile', ({ headers }) => (signedIn(headers) ? { status: 200, body: this.profile() } : denied))
     b.on('PATCH', '/students/me/profile', ({ headers, body }) => {
       if (!signedIn(headers)) return denied
-      const sent = body as { grade?: string; primarySubjects?: string[] }
+      const sent = body as { grade?: string; primarySubjects?: string[]; answerStyle?: string }
       this.profileWrites.push(sent)
-      if (sent.grade !== undefined) {
-        if (sent.grade !== '' && !GRADES.some((choice) => choice.code === sent.grade)) {
-          return {
-            status: 422,
-            body: { detail: { code: 'profile_choice_unknown', message: 'Choose a year group from the list.', fields: ['grade'], action: 'correct_input' } },
-          }
+      // As the backend: any code in no list refuses the whole request, nothing in it is saved.
+      if (sent.grade !== undefined && sent.grade !== '' && !GRADES.some((choice) => choice.code === sent.grade)) {
+        return {
+          status: 422,
+          body: { detail: { code: 'profile_choice_unknown', message: 'Choose a year group from the list.', fields: ['grade'], action: 'correct_input' } },
         }
-        this.grade = sent.grade
       }
+      if (sent.answerStyle !== undefined && sent.answerStyle !== '' && !ANSWER_STYLES.some((choice) => choice.code === sent.answerStyle)) {
+        return {
+          status: 422,
+          body: { detail: { code: 'profile_choice_unknown', message: 'Choose an answer style from the list.', fields: ['answerStyle'], action: 'correct_input' } },
+        }
+      }
+      if (sent.grade !== undefined) this.grade = sent.grade
+      if (sent.answerStyle !== undefined) this.answerStyle = sent.answerStyle || 'standard'
       if (sent.primarySubjects !== undefined) this.primarySubjects = sent.primarySubjects
       return { status: 200, body: this.profile() }
     })

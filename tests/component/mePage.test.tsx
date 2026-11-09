@@ -20,11 +20,18 @@ import enCommon from '@/i18n/locales/en/common.json'
 import { type CurrentUser, useAuthStore } from '@/store/authStore'
 import type { UserRole } from '@/types/user'
 import { mswServer } from '../mswServer'
-import { GRADES } from '../fakes/profileChoices'
+import { ANSWER_STYLES, GRADES } from '../fakes/profileChoices'
 
 const copy = enAuth.changePassword
 
-type Seen = { request: unknown[]; confirm: unknown[]; preferences: unknown[]; profile: unknown[]; log: string[] }
+type Seen = {
+  request: unknown[]
+  confirm: unknown[]
+  preferences: unknown[]
+  profile: unknown[]
+  log: string[]
+  withdrawStyle: (code: string) => void
+}
 
 const DEFAULT_MATRIX = {
   admin_operations: { in_app: true, realtime: true, email_digest: false, push: false },
@@ -39,15 +46,33 @@ function backend({
   confirm = () => HttpResponse.json({ status: 'changed' }),
   grade = '',
   saveGrade,
+  answerStyle = 'standard',
+  answerStyles = ANSWER_STYLES,
 }: {
   request?: () => Response
   confirm?: () => Response
   grade?: string
   saveGrade?: () => Response
+  answerStyle?: string
+  /** `choices.answerStyle`; what a write is checked against, as the backend does (stoa-backend#314). */
+  answerStyles?: { code: string; label: string }[]
 } = {}): Seen {
-  const seen: Seen = { request: [], confirm: [], preferences: [], profile: [], log: [] }
+  const seen: Seen = { request: [], confirm: [], preferences: [], profile: [], log: [], withdrawStyle: () => {} }
   let storedGrade = grade
-  const profileBody = () => ({ userId: 'u-1', grade: storedGrade, primarySubjects: ['math'], schoolSystem: null, choices: { grade: GRADES } })
+  let storedStyle = answerStyle
+  let offeredStyles = answerStyles
+  const profileBody = () => ({
+    userId: 'u-1',
+    grade: storedGrade,
+    primarySubjects: ['math'],
+    answerStyle: storedStyle,
+    schoolSystem: null,
+    choices: { grade: GRADES, answerStyle: offeredStyles },
+  })
+  // A style the backend stops offering between the page's read and the write.
+  seen.withdrawStyle = (code: string) => {
+    offeredStyles = offeredStyles.filter((choice) => choice.code !== code)
+  }
   let matrix: Record<string, unknown> = structuredClone(DEFAULT_MATRIX)
   const preferencesBody = () => ({
     userId: 'u-1',
@@ -73,10 +98,18 @@ function backend({
     }),
     http.get('https://api.test/students/me/profile', () => HttpResponse.json(profileBody())),
     http.patch('https://api.test/students/me/profile', async ({ request: req }) => {
-      const body = (await req.json()) as { grade?: string }
+      const body = (await req.json()) as { grade?: string; answerStyle?: string }
       seen.profile.push(body)
       if (saveGrade) return saveGrade()
+      if (body.answerStyle !== undefined && body.answerStyle !== '' && !offeredStyles.some((choice) => choice.code === body.answerStyle)) {
+        // As stoa-backend#314: nothing in this request is saved.
+        return HttpResponse.json(
+          { detail: { code: 'profile_choice_unknown', message: 'Choose an answer style from the list.', fields: ['answerStyle'], action: 'correct_input' } },
+          { status: 422 },
+        )
+      }
       storedGrade = body.grade ?? storedGrade
+      if (body.answerStyle !== undefined) storedStyle = body.answerStyle || 'standard'
       return HttpResponse.json(profileBody())
     }),
     http.post('https://api.test/auth/password-change/request', async ({ request: req }) => {
@@ -183,6 +216,16 @@ describe('/me', () => {
     expect(await screen.findByLabelText(copy.currentPasswordLabel)).toBeInTheDocument()
     expect(screen.queryByRole('switch')).toBeNull()
     expect(screen.queryByRole('region', { name: enCommon.me.grade.heading })).toBeNull()
+  })
+
+  it.each(['admin', 'organization_admin'] as const)('shows %s no answer style and sends none (#597)', async (role) => {
+    const seen = backend()
+    openAt('/me', role)
+
+    expect(await screen.findByLabelText(copy.currentPasswordLabel)).toBeInTheDocument()
+    expect(screen.queryByRole('region', { name: enCommon.me.answerStyle.heading })).toBeNull()
+    expect(screen.queryByRole('combobox', { name: enCommon.me.answerStyle.label })).toBeNull()
+    expect(seen.profile).toEqual([])
   })
 
   it('switches the language from the list', async () => {
@@ -747,5 +790,101 @@ describe('the year group on /me (#154, #591)', () => {
     const section = await screen.findByRole('region', { name: grade.heading })
     const field = within(section).getByRole('combobox', { name: grade.label })
     await waitFor(() => expect(field).toHaveFocus())
+  })
+})
+
+describe('the answer style on /me (#597)', () => {
+  const style = enCommon.me.answerStyle
+
+  async function openStyle(path = '/me') {
+    openAt(path)
+    const section = await screen.findByRole('region', { name: style.heading })
+    const field = within(section).getByRole('combobox', { name: style.label })
+    await waitFor(() => expect(field).toBeEnabled())
+    return { section, field, save: within(section).getByRole('button', { name: style.save }) }
+  }
+
+  it("offers the backend's styles in its order, with the stored one chosen and its Murmi", async () => {
+    backend({ answerStyle: 'encouraging' })
+    const { section, field, save } = await openStyle()
+
+    expect(field).toHaveValue('encouraging')
+    expect(within(field).getAllByRole('option').map((option) => option.textContent)).toEqual([style.placeholder, ...ANSWER_STYLES.map((choice) => choice.label)])
+    expect(section.querySelector('[data-murmi]')).toHaveAttribute('data-murmi', 'offering')
+    expect(field).toHaveAccessibleDescription(style.about.encouraging)
+    expect(save).toBeDisabled()
+  })
+
+  it('reads a student who never chose as the default style', async () => {
+    backend()
+    const { section, field } = await openStyle()
+
+    expect(field).toHaveValue('standard')
+    expect(section.querySelector('[data-murmi]')).toHaveAttribute('data-murmi', 'calm')
+  })
+
+  it('saves the code chosen, alone, and Murmi follows the choice', async () => {
+    const seen = backend()
+    const user = userEvent.setup()
+    const { section, field, save } = await openStyle()
+
+    await user.selectOptions(field, 'Short and precise')
+    expect(section.querySelector('[data-murmi]')).toHaveAttribute('data-murmi', 'steps')
+    expect(field).toHaveAccessibleDescription(style.about.concise)
+    await user.click(save)
+
+    await waitFor(() => expect(within(section).getByRole('status')).toHaveTextContent(style.saved))
+    expect(seen.profile).toEqual([{ answerStyle: 'concise' }])
+    expect(field).toHaveValue('concise')
+    expect(save).toBeDisabled()
+  })
+
+  it('takes the empty first option as the default style, not as nothing', async () => {
+    backend({ answerStyle: 'vivid' })
+    const user = userEvent.setup()
+    const { field, save } = await openStyle()
+
+    await user.selectOptions(field, '')
+    expect(field).toHaveValue('standard')
+    expect(save).toBeEnabled()
+  })
+
+  it('says a style the backend no longer offers was refused, and reads the list again', async () => {
+    const seen = backend()
+    const user = userEvent.setup()
+    const { section, field, save } = await openStyle()
+
+    await user.selectOptions(field, 'vivid')
+    seen.withdrawStyle('vivid')
+    await user.click(save)
+
+    expect(await within(section).findByRole('alert')).toHaveTextContent(style.unknown)
+    expect(seen.profile).toEqual([{ answerStyle: 'vivid' }])
+    await waitFor(() => expect(within(field).queryByRole('option', { name: 'With comparisons and examples' })).toBeNull())
+  })
+
+  it('says so in place when it was not saved, and leaves the year group alone', async () => {
+    backend({ grade: 'grade_8_secondary' })
+    mswServer.use(http.patch('https://api.test/students/me/profile', () => HttpResponse.json({ detail: 'nope' }, { status: 503 })))
+    const user = userEvent.setup()
+    const { section, field, save } = await openStyle()
+
+    await user.selectOptions(field, 'concise')
+    await user.click(save)
+
+    expect(await within(section).findByRole('alert')).toHaveTextContent(style.saveFailed)
+    expect(field).toHaveValue('concise')
+    const gradeSection = screen.getByRole('region', { name: enCommon.me.grade.heading })
+    expect(within(gradeSection).getByRole('combobox', { name: enCommon.me.grade.label })).toHaveValue('grade_8_secondary')
+    expect(within(gradeSection).queryByRole('alert')).toBeNull()
+  })
+
+  it('is not shown by a backend that offers no styles', async () => {
+    backend({ answerStyles: [] })
+    openAt('/me')
+
+    await screen.findByRole('region', { name: enCommon.me.grade.heading })
+    await waitFor(() => expect(screen.getByRole('combobox', { name: enCommon.me.grade.label })).toBeEnabled())
+    expect(screen.queryByRole('region', { name: style.heading })).toBeNull()
   })
 })

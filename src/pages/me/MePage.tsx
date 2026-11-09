@@ -1,6 +1,6 @@
 /*
  * `/me`, the account page (#13 point 4, built in #46): profile, a student's
- * year group (#154), language,
+ * year group (#154) and answer style (#597), language,
  * notification preferences and the password change. A student's, and the
  * profile page for administrators and the organisation roles, who have no
  * other; teachers and parents keep their own (/teacher/profile,
@@ -15,6 +15,7 @@ import { Avatar } from '@/components/base/Avatar'
 import { Button } from '@/components/base/Button'
 import { Group, Row } from '@/components/base/Group'
 import { ICON, ROW } from '@/components/base/sizes'
+import { AnswerStyleGroup } from '@/features/account/AnswerStyleGroup'
 import { GradeGroup } from '@/features/account/GradeGroup'
 import { NotificationPreferencesGroup } from '@/features/account/NotificationPreferencesGroup'
 import { PasswordChangeFields, passwordChangeStatusKey } from '@/features/account/PasswordChangeFields'
@@ -141,6 +142,9 @@ export function MePage({ titleKey = 'studentRoutes.me.title' }: { titleKey?: str
         </div>
 
         {user.role === 'student' && <GradeGroup />}
+
+        {/* The student's own: administrators and the organisation roles see no answer style (#597). */}
+        {user.role === 'student' && <AnswerStyleGroup />}
 
         <LanguageGroup />
 

@@ -32,7 +32,7 @@ import {
 } from '@/dev/preview/demoSource'
 import { starCountFrom } from '@/dev/preview/surfaces'
 import { DEMO_BRIDGE_STAR, DEMO_KNOWLEDGE_POINT } from '@/dev/demo/data'
-import { DEMO_GRADE_CODES } from '@/dev/demo/data/student'
+import { DEMO_ANSWER_STYLE_CODES, DEMO_GRADE_CODES } from '@/dev/demo/data/student'
 import { isSupportedLanguage } from '@/i18n/languages'
 import { commandMessageIds } from '@/services/chat/commandMessageIds'
 import type { ChatMessage, ConversationSummary, MessageQuote } from '@/types/chat'
@@ -137,14 +137,21 @@ const routes: Array<[method: string, pattern: string, handler: Handler]> = [
   }],
   ['GET', '/students/me/profile', () => demoProfileNow()],
   // Kept, so the year group saved on /me or in "About you" is the one read back (#184, #591). As the
-  // backend (stoa-backend#310): a year group is one of `choices.grade`, or "" for not said.
+  // backend (stoa-backend#310): a year group is one of `choices.grade`, or "" for not said. The answer
+  // style (stoa-backend#314, #597) is one of `choices.answerStyle`, "" saves `standard`. Any unknown
+  // code refuses the whole request.
   ['PATCH', '/students/me/profile', ({ body }) => {
     const grade = field<string>(body, 'grade')
     if (typeof grade === 'string' && grade.trim() !== '' && !DEMO_GRADE_CODES.includes(grade.trim())) {
       return refuse(422, 'profile_choice_unknown', 'Choose a year group from the list.')
     }
+    const answerStyle = field<string>(body, 'answerStyle')
+    if (typeof answerStyle === 'string' && answerStyle !== '' && !DEMO_ANSWER_STYLE_CODES.includes(answerStyle)) {
+      return refuse(422, 'profile_choice_unknown', 'Choose an answer style from the list.')
+    }
     const primarySubjects = field<string[]>(body, 'primarySubjects')
     saveDemoProfile({
+      answerStyle: typeof answerStyle === 'string' ? answerStyle || 'standard' : undefined,
       grade: typeof grade === 'string' ? grade.trim() : undefined,
       primarySubjects: Array.isArray(primarySubjects) ? primarySubjects.filter((id) => typeof id === 'string') : undefined,
     })

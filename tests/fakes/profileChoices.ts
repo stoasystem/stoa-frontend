@@ -16,3 +16,11 @@ export const GRADES: { code: string; label: string }[] = [
   { code: 'grade_9_secondary', label: 'Year 9 (lower secondary)' },
   { code: 'grade_secondary_i', label: 'Lower secondary, not sure which year' },
 ]
+
+/** `choices.answerStyle` as the backend sends it in English (stoa-backend#314), in its order. */
+export const ANSWER_STYLES: { code: string; label: string }[] = [
+  { code: 'standard', label: 'Balanced' },
+  { code: 'concise', label: 'Short and precise' },
+  { code: 'encouraging', label: 'Patient and encouraging' },
+  { code: 'vivid', label: 'With comparisons and examples' },
+]

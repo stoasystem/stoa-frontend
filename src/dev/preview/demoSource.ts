@@ -48,7 +48,13 @@ type AskState = {
  * What /me and "About you" saved (#184, #591): the year group, the subjects
  * ticked, and the notification preferences. Null until saved.
  */
-type AccountState = { grade: string | null; primarySubjects: string[] | null; notificationPreferences: NotificationPreferenceMatrix | null }
+type AccountState = {
+  grade: string | null
+  primarySubjects: string[] | null
+  /** Optional: a tab saved before #597 has none. */
+  answerStyle?: string | null
+  notificationPreferences: NotificationPreferenceMatrix | null
+}
 
 /** `newcomer`: a student who has not started anything has not asked anything either (#586). */
 type ServerState = { completed: string[]; litAt: string | null; acknowledged: boolean; ask: AskState; reviewDue: boolean; reviewScheduled: boolean; account: AccountState; newcomer: boolean }
@@ -298,9 +304,10 @@ export function demoConversationList(): ConversationListResponse {
  * group and no subjects, so "About you" asks.
  */
 export function demoProfileNow(): StudentProfile {
-  const { grade, primarySubjects } = server.account
+  const { grade, primarySubjects, answerStyle } = server.account
   return {
     ...data.demoProfile,
+    answerStyle: answerStyle ?? data.demoProfile.answerStyle,
     grade: grade ?? (server.newcomer ? '' : data.demoProfile.grade),
     primarySubjects: primarySubjects ?? (server.newcomer ? [] : data.demoProfile.primarySubjects),
   }
@@ -312,12 +319,21 @@ export function demoGradeNow(): string {
 }
 
 /** A profile write (`PATCH /students/me/profile`): only the fields sent change. */
-export function saveDemoProfile({ grade, primarySubjects }: { grade?: string; primarySubjects?: string[] }) {
+export function saveDemoProfile({
+  grade,
+  primarySubjects,
+  answerStyle,
+}: {
+  grade?: string
+  primarySubjects?: string[]
+  answerStyle?: string
+}) {
   server = {
     ...server,
     account: {
       ...server.account,
       ...(grade === undefined ? {} : { grade }),
+      ...(answerStyle === undefined ? {} : { answerStyle }),
       ...(primarySubjects === undefined ? {} : { primarySubjects }),
     },
   }

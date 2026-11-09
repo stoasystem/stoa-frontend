@@ -83,6 +83,24 @@
       "unavailable": "Die Klassenstufe kann gerade nicht geladen werden.",
       "refreshFailed": "Die Klassenstufe konnte gerade nicht aktualisiert werden."
     },
+    "answerStyle": {
+      "heading": "Antwortstil",
+      "label": "Wie dir die Antworten etwas erklären",
+      "placeholder": "Stil wählen",
+      "about": {
+        "standard": "Ruhig und ausgeglichen, ein Schritt nach dem anderen.",
+        "concise": "Gleich zu den Schritten, ohne Plauderei.",
+        "encouraging": "Nimmt sich Zeit und macht dir unterwegs Mut.",
+        "vivid": "Erklärt mit Vergleichen und Beispielen aus dem Alltag."
+      },
+      "note": "Mit jedem Stil findest du die Lösung selbst.",
+      "save": "Speichern",
+      "saveFailed": "Der Antwortstil wurde nicht gespeichert. Versuch es noch einmal.",
+      "unknown": "Diesen Stil gibt es nicht mehr. Wähl einen aus der Liste.",
+      "saved": "Gespeichert.",
+      "unavailable": "Der Antwortstil kann gerade nicht geladen werden.",
+      "refreshFailed": "Der Antwortstil konnte gerade nicht aktualisiert werden."
+    },
     "language": {
       "heading": "Sprache"
     },

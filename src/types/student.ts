@@ -5,11 +5,11 @@ export type ProfileChoice = { code: string; label: string }
 
 /**
  * What each list-chosen profile field may be set to, in the order offered
- * (`choices.<field>`). The grade first; the answer style preset (#597) is the
- * next field of this shape.
+ * (`choices.<field>`): the grade, and the answer style preset (#597).
  */
 export type ProfileChoices = {
   grade: ProfileChoice[]
+  /** Missing only from a backend before stoa-backend#314. */
   answerStyle?: ProfileChoice[]
 }
 
@@ -25,6 +25,12 @@ export type StudentProfile = {
    */
   grade: string
   primarySubjects: string[]
+  /**
+   * A code from `choices.answerStyle`, "standard" when none was chosen
+   * (stoa-backend#314). Missing only from a backend before it. The student's
+   * own: no other role reads or sends it.
+   */
+  answerStyle?: string
   schoolSystem?: string
   preferredAnswerLanguage: SupportedLanguage
   guardianStatus: 'linked' | 'not_linked'
