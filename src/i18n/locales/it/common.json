@@ -342,6 +342,12 @@
     },
     "unauthorized": {
       "title": "Accesso richiesto"
+    },
+    "usagePeriod": {
+      "title": "Periodo di utilizzo"
+    },
+    "endingUsagePeriods": {
+      "title": "Periodi in scadenza"
     }
   },
   "state": {

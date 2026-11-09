@@ -13,6 +13,11 @@ export const adminQueryKeys = {
   accountsAll: () => [...adminQueryKeys.all, 'accounts'] as const,
   accounts: (filters: Record<string, unknown>) => [...adminQueryKeys.all, 'accounts', filters] as const,
   teacherSupportAllowance: (studentId: string) => [...adminQueryKeys.all, 'teacher-support-allowance', studentId] as const,
+  // Every account's period read, and the ending-soon list: a parent's write
+  // changes each child's period in force too (#614).
+  usagePeriodsAll: () => [...adminQueryKeys.all, 'usage-period'] as const,
+  usagePeriod: (userId: string) => [...adminQueryKeys.usagePeriodsAll(), 'account', userId] as const,
+  endingUsagePeriods: (endingWithinDays: number) => [...adminQueryKeys.usagePeriodsAll(), 'ending', endingWithinDays] as const,
   // Every usage day of one parent: a write that changes the parent's children
   // has to reach the query whatever `?day=` it was read with (#262).
   accountOperationsForParent: (parentId?: string) => [...adminQueryKeys.all, 'account-operations', parentId ?? ''] as const,

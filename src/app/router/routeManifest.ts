@@ -270,6 +270,8 @@ const AdminModerationPage = lazyPage('AdminModerationPage', () => import('@/page
 const AdminCurriculumPage = lazyPage('AdminCurriculumPage', () => import('@/pages/admin/AdminCurriculumPage'))
 const AdminTeacherApplicationsPage = lazyPage('AdminTeacherApplicationsPage', () => import('@/pages/admin/AdminTeacherApplicationsPage'))
 const AdminAccountOperationsPage = lazyPage('AdminAccountOperationsPage', () => import('@/pages/admin/AdminAccountOperationsPage'))
+const AdminUsagePeriodPage = lazyPage('AdminUsagePeriodPage', () => import('@/pages/admin/AdminUsagePeriodPage'))
+const AdminEndingUsagePeriodsPage = lazyPage('AdminEndingUsagePeriodsPage', () => import('@/pages/admin/AdminEndingUsagePeriodsPage'))
 const AdminOperationsPlaceholderPage = lazyPage('AdminOperationsPlaceholderPage', () => import('@/pages/admin/OperationsPlaceholder'))
 
 /* Card 007: payments and billing are frozen.
@@ -450,7 +452,7 @@ export const pageRoutes: readonly PageRoute[] = [
     access: ADMIN,
     page: AdminAccountsPage,
     copy: ADMIN_COPY,
-    nav: [{ area: 'admin', label: 'Users', labelKey: 'navigation.admin.users', priority: 'primary', icon: 'students', covers: ['/admin/account-operations'], description: 'Invite, assign, reset, suspend and archive accounts.' }],
+    nav: [{ area: 'admin', label: 'Users', labelKey: 'navigation.admin.users', priority: 'primary', icon: 'students', covers: ['/admin/account-operations', '/admin/usage-periods'], description: 'Invite, assign, reset, suspend and archive accounts.' }],
     meta: { module: 'Admin', status: 'core', purpose: 'Account console: invite, assign, reset password, suspend and archive.' },
   },
   {
@@ -489,6 +491,9 @@ export const pageRoutes: readonly PageRoute[] = [
   { path: '/admin/learning-operations', access: ADMIN, page: LearningOperationsDashboardPage, copy: ADMIN_COPY, titleKey: 'routes.learningOperations.title', meta: { module: 'Admin', status: 'core', purpose: 'Platform learning operations.' } },
   { path: '/admin/learning-automation', access: ADMIN, page: LearningAutomationConsolePage, titleKey: 'routes.learningAutomation.title', meta: { module: 'Admin', status: 'core', purpose: 'Platform learning automation.' } },
   { path: '/admin/account-operations', access: ADMIN, page: AdminAccountOperationsPage, copy: ADMIN_COPY, titleKey: 'routes.accountOperations.title', meta: { module: 'Admin', status: 'core', purpose: 'Account operations queue.' } },
+  // #614: one account's usage period, and the accounts whose period ends soon or just ended.
+  { path: '/admin/users/:userId/usage-period', access: ADMIN, page: AdminUsagePeriodPage, copy: ADMIN_COPY, titleKey: 'routes.usagePeriod.title', meta: { module: 'Admin', status: 'core', purpose: 'Usage period of one account: extend, change the end date, records.' } },
+  { path: '/admin/usage-periods', access: ADMIN, page: AdminEndingUsagePeriodsPage, copy: ADMIN_COPY, titleKey: 'routes.endingUsagePeriods.title', meta: { module: 'Admin', status: 'core', purpose: 'Usage periods ending within two weeks or ended in the last thirty days.' } },
   // untranslated-ok: OperationsPlaceholder shows routes.systemStatus.title for this path; the English is its fallback.
   { path: '/admin/system', access: ADMIN, page: AdminOperationsPlaceholderPage, copy: ADMIN_COPY, props: { title: 'System status' }, titleKey: 'routes.systemStatus.title', meta: { module: 'Admin', status: 'placeholder', purpose: 'Future system status admin placeholder.' } },
 ]
@@ -520,6 +525,15 @@ export function askPathFor(conversationId: unknown): string {
 export function moderationPathFor(caseId: unknown): string {
   const id = typeof caseId === 'string' ? caseId.trim() : ''
   return CONVERSATION_ID.test(id) ? `/admin/moderation?case=${encodeURIComponent(id)}` : '/admin/moderation'
+}
+
+/**
+ * One account's usage period, `/admin/users/<id>/usage-period` (#614), or the
+ * users list when there is no id. An account id has a conversation id's shape.
+ */
+export function usagePeriodPathFor(userId: unknown): string {
+  const id = typeof userId === 'string' ? userId.trim() : ''
+  return CONVERSATION_ID.test(id) ? `/admin/users/${id}/usage-period` : '/admin/users'
 }
 
 /**

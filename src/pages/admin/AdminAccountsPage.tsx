@@ -1,6 +1,8 @@
 import { Fragment, useMemo, useRef, useState } from 'react'
-import { ClipboardList } from 'lucide-react'
+import { CalendarClock, ClipboardList } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
+import { Link } from 'react-router-dom'
+import { usagePeriodPathFor } from '@/app/router/routeManifest'
 import { Group, Row } from '@/components/base'
 import { PageContainer } from '@/components/common/PageContainer'
 import { PageHeader } from '@/components/common/PageHeader'
@@ -24,6 +26,8 @@ import { AccountActionDialog, accountLabel } from '@/pages/admin/AccountActionDi
 import { AccountDraftFields, BlockedReason } from '@/pages/admin/AccountFormFields'
 import { AssignAccountDialog } from '@/pages/admin/AssignAccountDialog'
 import { TeacherSupportAllowanceEditor } from '@/pages/admin/TeacherSupportAllowanceEditor'
+import { UsagePeriodPanel, UsagePeriodStateBadge, periodDay } from '@/pages/admin/UsagePeriodPanel'
+import { stateOn, zurichToday } from '@/pages/admin/usagePeriodRules'
 import type { AccountDraft } from '@/pages/admin/accountFormRules'
 import {
   accountDraftIssues,
@@ -50,6 +54,14 @@ const STATUSES: AccountStatus[] = ['invited', 'active', 'suspended', 'archived']
 // An archived account is read-only and keeps its number; there is no delete.
 const EMPTY_DRAFT: AccountDraft = { role: 'student', email: '', fullName: '', dateOfBirth: '' }
 
+/** The roles that hold a usage period (#614); a teacher's or an administrator's account has none. */
+function holdsPeriod(role: string) {
+  return role === 'student' || role === 'parent'
+}
+
+/** An account just opened, whose period is set next, on this page (#614). */
+type OpenedAccount = { userId: string; accountNumber: string; role: AccountRole }
+
 const NEXT_STATUS: Record<string, Exclude<AccountStatus, 'invited'>[]> = {
   invited: ['archived'],
   active: ['suspended', 'archived'],
@@ -75,6 +87,11 @@ export function AdminAccountsPage() {
   const [notice, setNotice] = useState<string | null>(null)
   const [secret, setSecret] = useState<string | null>(null)
   const [allowanceFor, setAllowanceFor] = useState<string | null>(null)
+  // #614: a new student or parent account goes straight to its period. Here,
+  // under the one-time password or code, rather than on another page: leaving
+  // would take the secret off the screen before it was passed on.
+  const [opened, setOpened] = useState<OpenedAccount | null>(null)
+  const openedHeading = useRef<HTMLParagraphElement>(null)
 
   // #335: the list used to be read in full on every key typed. The keyword
   // now waits for a pause, and the previous answer stays up meanwhile.
@@ -111,6 +128,7 @@ export function AdminAccountsPage() {
   const listFailed = accountsQuery.isError && !accountsQuery.data
   const rows = accountsQuery.data?.items ?? []
   const groups = accountsQuery.data?.groups ?? {}
+  const today = zurichToday()
   const grouped = ROLES.map((item) => ({ role: item, rows: rows.filter((row) => row.role === item) }))
 
   // Card 014: the button that cannot be pressed has to name what is missing.
@@ -138,10 +156,21 @@ export function AdminAccountsPage() {
     setTouched({})
   }
 
+  /** Opens the new account's period under the notice, and moves focus to it. */
+  function openPeriod(result: { userId: string; accountNumber: string; role: AccountRole }) {
+    if (!holdsPeriod(result.role)) {
+      setOpened(null)
+      return
+    }
+    setOpened({ userId: result.userId, accountNumber: result.accountNumber, role: result.role })
+    window.setTimeout(() => openedHeading.current?.focus(), 0)
+  }
+
   function invite() {
     if (inviteBlocking.length > 0 || inviteMutation.isPending) return
     setNotice(null)
     setSecret(null)
+    setOpened(null)
     inviteMutation.mutate(accountDraftPayload(draft), {
       onSuccess: (result) => {
         clearDraft()
@@ -151,6 +180,7 @@ export function AdminAccountsPage() {
             : t('accounts.inviteNotDelivered', { accountNumber: result.accountNumber }),
         )
         if (!result.invitationDelivered) setSecret(result.activationToken)
+        openPeriod(result)
         // #449: the page holds what it shows now. The mutation's answer, code
         // and all, would otherwise stay in the query client's cache for as
         // long as the page is open; reset, it is collected at once.
@@ -186,6 +216,7 @@ export function AdminAccountsPage() {
     if (blockingIssues(filled).length > 0) return
     setNotice(null)
     setSecret(null)
+    setOpened(null)
     setAssignError(null)
     assignMutation.mutate(accountDraftPayload(filled), {
       onSuccess: (result) => {
@@ -193,6 +224,7 @@ export function AdminAccountsPage() {
         clearDraft()
         setNotice(t('accounts.assigned', { accountNumber: result.accountNumber }))
         setSecret(result.initialPassword)
+        openPeriod(result)
         assignMutation.reset()
       },
       // The dialog stays open on a refusal, and it sits over the page, so the
@@ -329,6 +361,12 @@ export function AdminAccountsPage() {
             leading={{ kind: 'icon', icon: ClipboardList }}
             title={t('accounts.operations')}
             subtitle={t('accounts.operationsDescription')}
+          />
+          <Row
+            to="/admin/usage-periods"
+            leading={{ kind: 'icon', icon: CalendarClock }}
+            title={t('usagePeriod.endingTitle')}
+            subtitle={t('usagePeriod.endingRowDescription')}
           />
         </Group>
 
@@ -473,6 +511,24 @@ export function AdminAccountsPage() {
             </Button>
           </div>
         ) : null}
+        {opened ? (
+          <Card className="mb-4">
+            <CardHeader>
+              <CardTitle ref={openedHeading} tabIndex={-1}>
+                {t('usagePeriod.newAccountTitle', { accountNumber: opened.accountNumber })}
+              </CardTitle>
+              <p className="text-sm text-muted-foreground">{t('usagePeriod.newAccountHint')}</p>
+            </CardHeader>
+            <CardContent className="flex flex-col gap-3">
+              <UsagePeriodPanel userId={opened.userId} accounts={rows} />
+              <div>
+                <Button type="button" size="sm" variant="outline" onClick={() => setOpened(null)}>
+                  {t('usagePeriod.newAccountDone')}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        ) : null}
         {/* A list that could not be read is not a list of nothing.
           * The refusal used to print as one grey line above four cards each
           * saying "0" and "no accounts in this group", which reads as an answer:
@@ -542,6 +598,7 @@ export function AdminAccountsPage() {
                       <th className="p-2">{t('accounts.columnCreatedAt')}</th>
                       <th className="p-2">{t('accounts.columnLastLogin')}</th>
                       <th className="p-2">{t('accounts.columnLinked')}</th>
+                      {holdsPeriod(group.role) ? <th className="p-2">{t('usagePeriod.columnEndsOn')}</th> : null}
                       <th className="p-2">{t('accounts.columnActions')}</th>
                     </tr>
                   </thead>
@@ -578,6 +635,11 @@ export function AdminAccountsPage() {
                                 .map((link) => link.accountNumber || link.userId)
                                 .join(', ')}
                         </td>
+                        {holdsPeriod(group.role) ? (
+                          <td className="p-2 whitespace-nowrap">
+                            <PeriodCell endsOn={row.usagePeriodEndsAt} today={today} />
+                          </td>
+                        ) : null}
                         <td className="p-2">
                           <div className="flex flex-wrap gap-2">
                             <Button
@@ -615,6 +677,16 @@ export function AdminAccountsPage() {
                                 {t(`accounts.moveTo.${next}`)}
                               </Button>
                             ))}
+                            {holdsPeriod(row.role) ? (
+                              <Button asChild size="sm" variant="outline">
+                                <Link
+                                  to={usagePeriodPathFor(row.userId)}
+                                  aria-label={rowActionName(t('usagePeriod.open'), row)}
+                                >
+                                  {t('usagePeriod.open')}
+                                </Link>
+                              </Button>
+                            ) : null}
                             {row.role === 'student' ? (
                               <Button
                                 type="button"
@@ -637,7 +709,7 @@ export function AdminAccountsPage() {
                         * opened for. */}
                       {allowanceFor === row.userId ? (
                         <tr className="border-t bg-muted/30">
-                          <td className="p-2" colSpan={10}>
+                          <td className="p-2" colSpan={holdsPeriod(group.role) ? 11 : 10}>
                             <TeacherSupportAllowanceEditor
                               studentId={row.userId}
                               onClose={() => setAllowanceFor(null)}
@@ -655,5 +727,17 @@ export function AdminAccountsPage() {
         ))}
       </PageContainer>
     </DashboardLayout>
+  )
+}
+
+/** The account's own end date, marked when it has passed; a dash without one. */
+function PeriodCell({ endsOn, today }: { endsOn: string | null | undefined; today: string }) {
+  const state = stateOn(endsOn, today)
+  if (state === 'none') return <>—</>
+  return (
+    <span className="flex flex-wrap items-center gap-2">
+      {periodDay(endsOn)}
+      {state === 'expired' ? <UsagePeriodStateBadge state={state} /> : null}
+    </span>
   )
 }

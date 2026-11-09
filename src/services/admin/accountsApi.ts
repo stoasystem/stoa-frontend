@@ -28,6 +28,11 @@ export type AccountRow = {
   linkedAccounts: AccountLink[]
   /** Present only while the account is `invited` and a live invitation exists. */
   invitationId?: string
+  /**
+   * The account's own usage period end, a Zurich day (#614, stoa-backend#342);
+   * null without one. A student's period in force may be a parent's instead.
+   */
+  usagePeriodEndsAt?: string | null
 }
 
 export type AccountListResponse = {
