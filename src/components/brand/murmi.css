@@ -1,6 +1,8 @@
 /*
- * Murmi's idle loops (`<Murmi animated />`). Every rule is scoped to
- * `.murmi--animated`, so a figure without the prop never moves. Each moving
+ * Murmi's idle loops (`<Murmi animated />`) and its one-shot entrance
+ * (`<Murmi entrance />`, at the end). Every rule is scoped to
+ * `.murmi--animated` or `.murmi--entrance`, so a figure without either prop
+ * never moves. Each moving
  * part carries `murmi-part`; parts that also take a pose carry it on an
  * inner group, because a CSS transform replaces the `transform` attribute.
  * Under reduced motion all of it stops and the pose stands still.
@@ -209,8 +211,116 @@
   78% { opacity: 1; }
 }
 
+/* Hourglass (the usage period ends soon, #616): the sand runs down, then the
+ * glass is turned over once. One timeline shared by every part: the sand
+ * fades out while the glass turns and comes back as it was drawn, so it never
+ * hangs the wrong way up; the turn ends at 180deg, which the symmetric frame
+ * makes the same shape as 0. */
+.murmi--animated .murmi-turn {
+  transform-origin: 50% 50%;
+  animation: murmi-turn 6s ease-in-out infinite;
+}
+.murmi--animated .murmi-sand {
+  animation: murmi-sand 6s ease-in-out infinite;
+}
+.murmi--animated .murmi-sand-top {
+  transform-origin: 50% 100%; /* the neck */
+  animation: murmi-sand-top 6s ease-in-out infinite;
+}
+.murmi--animated .murmi-sand-bottom {
+  transform-origin: 50% 100%; /* the floor of the glass */
+  animation: murmi-sand-bottom 6s ease-in-out infinite;
+}
+.murmi--animated .murmi-stream {
+  animation: murmi-stream 6s ease-in-out infinite;
+}
+@keyframes murmi-turn {
+  0%, 54% { transform: rotate(0deg); }
+  86%, 100% { transform: rotate(180deg); }
+}
+@keyframes murmi-sand {
+  0%, 50% { opacity: 1; }
+  55%, 86% { opacity: 0; }
+  96%, 100% { opacity: 1; }
+}
+@keyframes murmi-sand-top {
+  0% { transform: scaleY(1); }
+  50%, 56% { transform: scaleY(0.2); }
+  57%, 100% { transform: scaleY(1); }
+}
+@keyframes murmi-sand-bottom {
+  0% { transform: scaleY(1); }
+  50%, 56% { transform: scaleY(2.1); }
+  57%, 100% { transform: scaleY(1); }
+}
+@keyframes murmi-stream {
+  0%, 46% { opacity: 1; }
+  50%, 90% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+/* Letter (the usage period has ended, #616): the letter and the paws under it
+ * are held out with a small lift, a glint by the corner, then back. */
+.murmi--animated .murmi-hand {
+  animation: murmi-hand 3.2s ease-in-out infinite;
+}
+@keyframes murmi-hand {
+  0%, 100% { transform: translate(0, 0); }
+  30%, 65% { transform: translate(1px, -3px); }
+}
+
+/* ---- the entrance (`<Murmi entrance />`) ----------------------------------
+ * For a notice that appears: the figure pops up into place with it, plays its
+ * pose's movement once, and rests in the pose it is drawn in. Every animation
+ * here runs once (iteration count 1, fill both), never infinite; the poses
+ * without a one-shot of their own simply rise. About two seconds in all. */
+.murmi--entrance .murmi-part {
+  transform-box: fill-box;
+}
+.murmi--entrance .murmi-rise {
+  transform-origin: 50% 100%;
+  animation: murmi-rise 0.55s cubic-bezier(0.3, 1.5, 0.6, 1) 0s 1 both;
+}
+@keyframes murmi-rise {
+  0% { transform: translateY(14px) scale(0.7); opacity: 0; }
+  45% { opacity: 1; }
+  100% { transform: translateY(0) scale(1); opacity: 1; }
+}
+.murmi--entrance .murmi-turn {
+  transform-origin: 50% 50%;
+  animation: murmi-turn 1.8s ease-in-out 0.45s 1 both;
+}
+.murmi--entrance .murmi-sand {
+  animation: murmi-sand 1.8s ease-in-out 0.45s 1 both;
+}
+.murmi--entrance .murmi-sand-top {
+  transform-origin: 50% 100%;
+  animation: murmi-sand-top 1.8s ease-in-out 0.45s 1 both;
+}
+.murmi--entrance .murmi-sand-bottom {
+  transform-origin: 50% 100%;
+  animation: murmi-sand-bottom 1.8s ease-in-out 0.45s 1 both;
+}
+.murmi--entrance .murmi-stream {
+  animation: murmi-stream 1.8s ease-in-out 0.45s 1 both;
+}
+.murmi--entrance .murmi-hand {
+  animation: murmi-hand 1.4s ease-in-out 0.45s 1 both;
+}
+.murmi--entrance .murmi-glint {
+  transform-origin: 50% 50%;
+  animation: murmi-glint 1.4s ease-out 0.45s 1 both;
+}
+@keyframes murmi-glint {
+  0%, 25% { transform: scale(0); opacity: 0; }
+  45% { transform: scale(1.35); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .murmi--animated .murmi-part {
+  /* Still, in the resting pose: the entrance's figure is simply there. */
+  .murmi--animated .murmi-part,
+  .murmi--entrance .murmi-part {
     animation: none;
   }
 }

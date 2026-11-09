@@ -21,9 +21,12 @@
  * stay are thicker, so the small figure is a clean shape rather than mush.
  *
  * `animated` gives each pose a quiet idle loop in CSS (murmi.css): a blink,
- * breathing, an ear twitch, and the pose's own movement. Off by default, and
- * under `prefers-reduced-motion: reduce` the figure holds still whatever the
- * prop says.
+ * breathing, an ear twitch, and the pose's own movement. `entrance` is the
+ * one-shot instead: the figure pops up into place, plays its pose's movement
+ * once, and rests (for a notice that appears, such as the usage period
+ * banner, #616). Both are off by default, and under
+ * `prefers-reduced-motion: reduce` the figure holds still in its resting pose
+ * whatever the props say.
  *
  * It is decorative. Everything Murmi is used to say is also said in text, so
  * the figure carries `aria-hidden` and a reader who never sees it misses
@@ -67,6 +70,14 @@ export type MurmiMood =
   | 'offering'
   /** An apple in one paw, a ringed planet in the other, a bulb overhead: the `vivid` answer style (an analogy). */
   | 'storytelling'
+  /**
+   * A small hourglass held in both paws, looked at attentively (not worried):
+   * the usage period ends soon (#616). Moving, the sand runs down and the glass
+   * is turned over once.
+   */
+  | 'hourglass'
+  /** A sealed letter held out in both paws, smiling: the usage period has ended, ask to renew it (#616). */
+  | 'letter'
 
 /** Every mood, in the order the gallery shows them. */
 export const MURMI_MOODS = [
@@ -85,6 +96,8 @@ export const MURMI_MOODS = [
   'steps',
   'offering',
   'storytelling',
+  'hourglass',
+  'letter',
 ] as const satisfies readonly MurmiMood[]
 
 const FUR = 'var(--murmi-fur)'
@@ -133,6 +146,11 @@ function star(x: number, y: number, r: number) {
   return `M${points.join('L')}Z`
 }
 
+/** A box with rounded corners, as a path. */
+function roundedBox(x: number, y: number, w: number, h: number, r: number) {
+  return `M${x + r} ${y}h${w - 2 * r}a${r} ${r} 0 0 1 ${r} ${r}v${h - 2 * r}a${r} ${r} 0 0 1 ${-r} ${r}h${-(w - 2 * r)}a${r} ${r} 0 0 1 ${-r} ${-r}v${-(h - 2 * r)}a${r} ${r} 0 0 1 ${r} ${-r}z`
+}
+
 /* ---------------------------------------------------------------- head */
 
 /** How the head sits on the body, per pose. */
@@ -141,6 +159,8 @@ const HEAD_POSE: Partial<Record<MurmiMood, string>> = {
   sleeping: 'rotate(9 36 46)',
   pointing: 'rotate(4 36 46)',
   calling: 'translate(0 -2.5)',
+  hourglass: 'rotate(4 36 46)',
+  letter: 'rotate(-4 36 46)',
 }
 
 /** Where the eyes look, per pose. */
@@ -151,6 +171,7 @@ const GAZE: Partial<Record<MurmiMood, [number, number]>> = {
   reading: [0, 0.9],
   curious: [0, -0.3],
   clapping: [0, -0.4],
+  hourglass: [0.2, 0.9],
 }
 
 function Ears({ mood, full }: Part) {
@@ -502,6 +523,22 @@ function Arms({ mood, full }: Part) {
           <Limb d="M48.5 46 Q55.5 44.2 57 36.6" at={[57.2, 35]} r={[3, 3]} full={full} />
         </>
       )
+    case 'hourglass':
+      // A paw either side of the frame, at the glass's waist.
+      return (
+        <>
+          <Limb d="M23.5 46.5 Q24.2 52.8 28.6 53" at={[29.8, 52.6]} r={[2.4, 3]} full={full} />
+          <Limb d="M48.5 46.5 Q47.8 52.8 43.4 53" at={[42.2, 52.6]} r={[2.4, 3]} full={full} />
+        </>
+      )
+    case 'letter':
+      // Both paws under the letter's lower corners; they lift with it (murmi.css).
+      return (
+        <g className="murmi-part murmi-hand">
+          <Limb d="M23.5 46.5 Q23.4 55 28.4 57" at={[29.4, 57]} r={[3, 2.4]} angle={14} full={full} />
+          <Limb d="M48.5 46.5 Q48.6 55 43.6 57" at={[42.6, 57]} r={[3, 2.4]} angle={-14} full={full} />
+        </g>
+      )
     case 'calling':
       // Paws at the mouth.
       return (
@@ -790,6 +827,98 @@ function Analogy({ full }: { full: boolean }) {
   )
 }
 
+/** Where the hourglass's waist sits: the frame is symmetric about it, so turning it over leaves the same shape. */
+const HOURGLASS_Y = 52.4
+
+/**
+ * A small hourglass in scope blue with cream glass and gold sand. The frame and
+ * glass turn over as one group; the sand is a group of its own that fades out
+ * while the glass turns and back in as it was, so it never hangs the wrong way
+ * up. Below 40px the posts, the falling stream and the glint go.
+ */
+function Hourglass({ full }: { full: boolean }) {
+  const y = HOURGLASS_Y
+  const line = full ? 0.75 : 1.05
+  return (
+    <>
+      <g className="murmi-part murmi-turn">
+        <path
+          d={`M31.6 ${y - 5.6} h8.8 q0 3.4 -4 5.6 q4 2.2 4 5.6 h-8.8 q0 -3.4 4 -5.6 q-4 -2.2 -4 -5.6 z`}
+          fill={PAGE}
+          stroke={SCOPE}
+          strokeWidth={line}
+          strokeLinejoin="round"
+        />
+        {full && (
+          <>
+            <path
+              d={`M30.3 ${y - 5.6} V${y + 5.6} M41.7 ${y - 5.6} V${y + 5.6}`}
+              stroke={SCOPE}
+              strokeWidth="0.9"
+              strokeLinecap="round"
+              fill="none"
+            />
+            <path d={`M33 ${y - 4.6} q0.2 2 1.6 3.2`} stroke="#fff" strokeWidth="0.6" strokeLinecap="round" opacity="0.8" fill="none" />
+          </>
+        )}
+        {/* The two caps (paths, not rects: a rect is the telescope's tube). */}
+        <path d={roundedBox(29, y - 7.4, 14, 2, 0.9)} fill={SCOPE} />
+        <path d={roundedBox(29, y + 5.4, 14, 2, 0.9)} fill={SCOPE} />
+      </g>
+      <g className="murmi-part murmi-sand">
+        <path
+          className="murmi-part murmi-sand-top"
+          d={`M32.3 ${y - 3.4} h7.4 q-0.6 2.3 -3.7 3.2 q-3.1 -0.9 -3.7 -3.2 z`}
+          fill={MARK}
+        />
+        {full && (
+          <path
+            className="murmi-part murmi-stream"
+            d={`M36 ${y - 0.2} V${y + 4.4}`}
+            stroke={MARK}
+            strokeWidth="0.6"
+            strokeLinecap="round"
+            fill="none"
+          />
+        )}
+        <path className="murmi-part murmi-sand-bottom" d={`M32.2 ${y + 5.3} q3.8 -3.6 7.6 0 z`} fill={MARK} />
+      </g>
+    </>
+  )
+}
+
+/**
+ * A sealed letter, cream with a crown outline so it holds on paper as on the
+ * sky, and a red seal where the flap meets. The flap stays at every size (it is
+ * what makes it a letter rather than a card); the lower fold lines and the
+ * sparkle are full detail only.
+ */
+function Letter({ full }: { full: boolean }) {
+  const line = full ? 0.75 : 1.05
+  return (
+    <>
+      <g className="murmi-part murmi-hand">
+        <g transform="rotate(-6 36 52)">
+          <path d={roundedBox(26.6, 45.6, 18.8, 12.6, 1.2)} fill={PAGE} stroke={CROWN} strokeWidth={line} />
+          {full && (
+            <path
+              d="M27.4 57.4 L33.4 52.6 M44.6 57.4 L38.6 52.6"
+              stroke={CROWN}
+              strokeWidth="0.55"
+              strokeLinecap="round"
+              opacity="0.6"
+              fill="none"
+            />
+          )}
+          <path d="M27 46.2 L36 53 L45 46.2" stroke={CROWN} strokeWidth={line} strokeLinecap="round" strokeLinejoin="round" fill="none" />
+          <circle cx="36" cy="53" r={full ? 1.9 : 2.3} fill={APPLE} />
+        </g>
+      </g>
+      {full && <path className="murmi-part murmi-twinkle murmi-glint" d={sparkle(57.5, 41.5, 2.4)} fill={LIT} />}
+    </>
+  )
+}
+
 /* ---------------------------------------------------------------- figure */
 
 export function Murmi({
@@ -797,6 +926,7 @@ export function Murmi({
   size = 'var(--murmi-state)',
   animated = false,
   facing = 'right',
+  entrance = false,
   className,
 }: {
   mood?: MurmiMood
@@ -809,6 +939,13 @@ export function Murmi({
    * it on an inner group, so the box, its size and its data attributes stay.
    */
   facing?: 'left' | 'right'
+  /**
+   * A one-shot entrance for a notice that appears: the figure pops up into
+   * place, plays its pose's movement once, and rests in the pose it is drawn
+   * in (about two seconds). Never loops. Under reduced motion it is simply
+   * there, at rest. Replay it by remounting (a new `key`).
+   */
+  entrance?: boolean
   className?: string
 }) {
   const measured = typeof size === 'number'
@@ -826,6 +963,19 @@ export function Murmi({
   else if (mood === 'steps') front = <Slate full={full} />
   else if (mood === 'offering') front = <Offering full={full} />
   else if (mood === 'storytelling') front = <Analogy full={full} />
+  else if (mood === 'hourglass') front = <Hourglass full={full} />
+  else if (mood === 'letter') front = <Letter full={full} />
+
+  const figure = (
+    <g className={cn('murmi-part', mood === 'cheering' && 'murmi-bounce')}>
+      {atScope && <TripodLegs full={full} />}
+      <Body {...part} />
+      {mood === 'reading' && <Book full={full} animated={animated} />}
+      <Head {...part} />
+      {front}
+      <Arms {...part} />
+    </g>
+  )
 
   return (
     <svg
@@ -837,20 +987,15 @@ export function Murmi({
       data-murmi-detail={detail}
       data-murmi-animated={animated ? '' : undefined}
       data-murmi-facing={facing}
+      data-murmi-entrance={entrance ? '' : undefined}
       aria-hidden="true"
       focusable="false"
-      className={cn('shrink-0', animated && 'murmi--animated', className)}
+      className={cn('shrink-0', animated && 'murmi--animated', entrance && 'murmi--entrance', className)}
     >
       {/* The mirror is its own group: the part inside may take a CSS transform, which would replace it. */}
       <g transform={facing === 'left' ? 'matrix(-1 0 0 1 76 0)' : undefined}>
-        <g className={cn('murmi-part', mood === 'cheering' && 'murmi-bounce')}>
-          {atScope && <TripodLegs full={full} />}
-          <Body {...part} />
-          {mood === 'reading' && <Book full={full} animated={animated} />}
-          <Head {...part} />
-          {front}
-          <Arms {...part} />
-        </g>
+        {/* The entrance's rise is a group of its own too, outside the pose's own movement. */}
+        {entrance ? <g className="murmi-part murmi-rise">{figure}</g> : figure}
       </g>
     </svg>
   )

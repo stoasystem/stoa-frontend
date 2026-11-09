@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs'
+import path from 'node:path'
 import { render } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 import { Murmi, MURMI_MOODS, type MurmiMood } from '@/components/brand/Murmi'
@@ -26,6 +28,21 @@ const EVERY_MOOD: Record<MurmiMood, true> = {
   steps: true,
   offering: true,
   storytelling: true,
+  hourglass: true,
+  letter: true,
+}
+
+const MURMI_CSS = readFileSync(path.resolve(__dirname, '../../src/components/brand/murmi.css'), 'utf8')
+
+/** Every `selector { … }` rule in murmi.css whose selector mentions `needle`, outside @keyframes. */
+function rulesFor(needle: string) {
+  const rules: { selector: string; body: string }[] = []
+  const withoutKeyframes = MURMI_CSS.replace(/\/\*[\s\S]*?\*\//g, '').replace(/@keyframes[^{]+\{(?:[^{}]*\{[^{}]*\})*[^{}]*\}/g, '')
+  for (const match of withoutKeyframes.matchAll(/([^{}]+)\{([^{}]*)\}/g)) {
+    const selector = match[1].trim()
+    if (selector.includes(needle)) rules.push({ selector, body: match[2] })
+  }
+  return rules
 }
 
 describe('Murmi', () => {
@@ -90,6 +107,9 @@ describe('Murmi', () => {
     expect(eyes('steps')).toBe(2)
     expect(eyes('storytelling')).toBe(2)
     expect(eyes('offering')).toBe(0)
+    // The usage period (#616): attentive and friendly, eyes open.
+    expect(eyes('hourglass')).toBe(2)
+    expect(eyes('letter')).toBe(2)
   })
 
   it('never frowns: a wrong answer is looking again, not disappointment', () => {
@@ -229,6 +249,118 @@ describe('Murmi', () => {
         const moving = svg(mood, 56, true)
         expect(moving).toHaveClass('murmi--animated')
         expect(moving.querySelector(part)).toHaveClass('murmi-part')
+      }
+    })
+  })
+
+  describe('the usage period poses (#616)', () => {
+    const svg = (mood: MurmiMood, size: number | string = 56, props: { animated?: boolean; entrance?: boolean } = {}) =>
+      render(<Murmi mood={mood} size={size} {...props} />).container.querySelector('svg')!
+    const smiles = (node: Element) =>
+      [...node.querySelectorAll('path')].some((p) => (p.getAttribute('d') ?? '').includes('q2.1 1.9 4.2 0.5'))
+
+    it('hourglass: a frame that turns, sand in both bulbs; posts, stream and glint only at full detail', () => {
+      const full = svg('hourglass', 56)
+      expect(full).toHaveAttribute('data-murmi-detail', 'full')
+      const turn = full.querySelector('.murmi-turn')!
+      expect(turn).not.toBeNull()
+      expect(turn.querySelectorAll('[fill="var(--murmi-scope)"]')).toHaveLength(2) // the caps
+      expect(turn.querySelector('[fill="var(--murmi-page)"]')).not.toBeNull() // the glass
+      // The sand is its own group, not inside the turning frame.
+      const sand = full.querySelector('.murmi-sand')!
+      expect(turn.contains(sand)).toBe(false)
+      expect(sand.querySelector('.murmi-sand-top')).toHaveAttribute('fill', 'var(--murmi-mark)')
+      expect(sand.querySelector('.murmi-sand-bottom')).toHaveAttribute('fill', 'var(--murmi-mark)')
+      expect(full.querySelector('.murmi-stream')).not.toBeNull()
+      expect(full.querySelectorAll('[stroke="#fff"]').length).toBeGreaterThan(0)
+      // Attentive, not worried: the usual smile, no worried brows.
+      expect(smiles(full)).toBe(true)
+      expect(full.querySelectorAll('path[stroke="var(--murmi-crown)"]')).toHaveLength(0)
+
+      const simple = svg('hourglass', 32)
+      expect(simple).toHaveAttribute('data-murmi-detail', 'simple')
+      // The silhouette and both sands stay; the stream, the posts and the glints go.
+      expect(simple.querySelector('.murmi-turn [fill="var(--murmi-page)"]')).not.toBeNull()
+      expect(simple.querySelectorAll('.murmi-turn [fill="var(--murmi-scope)"]')).toHaveLength(2)
+      expect(simple.querySelector('.murmi-sand-top')).not.toBeNull()
+      expect(simple.querySelector('.murmi-sand-bottom')).not.toBeNull()
+      expect(simple.querySelector('.murmi-stream')).toBeNull()
+      expect(simple.querySelectorAll('.murmi-turn path[stroke="var(--murmi-scope)"][fill="none"]')).toHaveLength(0)
+      expect(simple.querySelectorAll('[stroke="#fff"]')).toHaveLength(0)
+    })
+
+    it('letter: a sealed letter held out with the paws, flap and seal at every size, folds and glint at full', () => {
+      const full = svg('letter', 56)
+      expect(smiles(full)).toBe(true)
+      const hands = full.querySelectorAll('.murmi-hand')
+      // The letter and the paws under it lift together.
+      expect(hands).toHaveLength(2)
+      expect([...hands].some((hand) => hand.querySelector('[fill="var(--murmi-paw)"]'))).toBe(true)
+      expect(full.querySelector('.murmi-hand path[fill="var(--murmi-page)"]')).toHaveAttribute('stroke', 'var(--murmi-crown)')
+      expect(full.querySelector('.murmi-hand circle[fill="var(--murmi-apple)"]')).not.toBeNull()
+      expect(full.querySelectorAll('.murmi-hand path[stroke="var(--murmi-crown)"][fill="none"]')).toHaveLength(2)
+      expect(full.querySelector('.murmi-glint')).not.toBeNull()
+
+      const simple = svg('letter', 32)
+      expect(simple.querySelector('.murmi-hand path[fill="var(--murmi-page)"]')).not.toBeNull()
+      expect(simple.querySelector('.murmi-hand circle[fill="var(--murmi-apple)"]')).not.toBeNull()
+      // The flap stays, the lower folds and the glint go.
+      expect(simple.querySelectorAll('.murmi-hand path[stroke="var(--murmi-crown)"][fill="none"]')).toHaveLength(1)
+      expect(simple.querySelector('.murmi-glint')).toBeNull()
+    })
+
+    it('entrance: a class and an attribute, a rise group inside the mirror, only when asked', () => {
+      for (const mood of MOODS) {
+        const still = svg(mood, 40)
+        expect(still).not.toHaveClass('murmi--entrance')
+        expect(still.hasAttribute('data-murmi-entrance')).toBe(false)
+        expect(still.querySelector('.murmi-rise')).toBeNull()
+
+        const entering = svg(mood, 40, { entrance: true })
+        expect(entering).toHaveClass('murmi--entrance')
+        expect(entering).not.toHaveClass('murmi--animated')
+        expect(entering.hasAttribute('data-murmi-entrance')).toBe(true)
+        const mirror = entering.querySelector(':scope > g')!
+        expect(mirror.querySelector(':scope > .murmi-rise')).not.toBeNull()
+      }
+      // Facing left still mirrors on the outer group, around the rise.
+      const left = svg('letter', 40, { entrance: true })
+      expect(left.querySelector(':scope > g > g')).toHaveClass('murmi-rise')
+      const mirrored = render(<Murmi mood="letter" size={40} entrance facing="left" />).container.querySelector('svg')!
+      expect(mirrored.querySelector(':scope > g')!.getAttribute('transform')).toBe('matrix(-1 0 0 1 76 0)')
+    })
+
+    it('entrance runs once: every entrance animation has an iteration count of 1 and fills both ways', () => {
+      const animated = rulesFor('.murmi--entrance').filter((rule) => /animation\s*:/.test(rule.body) && !rule.body.includes('none'))
+      // The rise, plus each one-shot part of both poses.
+      for (const part of ['rise', 'turn', 'sand', 'sand-top', 'sand-bottom', 'stream', 'hand', 'glint']) {
+        expect(animated.some((rule) => rule.selector.endsWith(`.murmi-${part}`)), part).toBe(true)
+      }
+      for (const rule of animated) {
+        expect(rule.body, rule.selector).not.toMatch(/infinite/)
+        expect(rule.body, rule.selector).toMatch(/\s1 both;/)
+      }
+    })
+
+    it('holds still under reduced motion, in its resting pose, for the loop and the entrance alike', () => {
+      const reduced = MURMI_CSS.slice(MURMI_CSS.indexOf('@media (prefers-reduced-motion: reduce)'))
+      expect(reduced).toMatch(/\.murmi--animated \.murmi-part/)
+      expect(reduced).toMatch(/\.murmi--entrance \.murmi-part/)
+      expect(reduced).toMatch(/animation:\s*none/)
+      // Every part that moves carries murmi-part, so the rule above reaches it.
+      for (const mood of ['hourglass', 'letter'] as const) {
+        const entering = svg(mood, 56, { entrance: true })
+        for (const part of entering.querySelectorAll('[class*="murmi-"]')) {
+          expect(part, part.getAttribute('class') ?? '').toHaveClass('murmi-part')
+        }
+      }
+    })
+
+    it('each moves when animated too, with a quiet loop', () => {
+      expect(svg('hourglass', 56, { animated: true }).querySelector('.murmi-turn')).toHaveClass('murmi-part')
+      expect(svg('letter', 56, { animated: true }).querySelector('.murmi-hand')).toHaveClass('murmi-part')
+      for (const part of ['turn', 'sand-top', 'hand']) {
+        expect(rulesFor(`.murmi--animated .murmi-${part}`).some((rule) => rule.body.includes('infinite')), part).toBe(true)
       }
     })
   })
