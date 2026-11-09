@@ -485,5 +485,17 @@
       "parent": "Chiedi a un genitore di rinnovarlo.",
       "contact": "Per rinnovarlo, scrivi a STOA: <email>{{email}}</email>"
     }
+  },
+  "usagePeriodBanner": {
+    "label": "Periodo di utilizzo",
+    "close": "Nascondi fino alla prossima volta",
+    "student": {
+      "endsSoon_one": "Il tuo periodo di utilizzo finisce tra {{count}} giorno (il {{date}}).",
+      "endsSoon_many": "Il tuo periodo di utilizzo finisce tra {{count}} giorni (il {{date}}).",
+      "endsSoon_other": "Il tuo periodo di utilizzo finisce tra {{count}} giorni (il {{date}}).",
+      "endsToday": "Oggi ({{date}}) è l’ultimo giorno del tuo periodo di utilizzo.",
+      "expired": "Il tuo periodo di utilizzo è terminato il {{date}}.",
+      "expiredNoDate": "Il tuo periodo di utilizzo è terminato."
+    }
   }
 }

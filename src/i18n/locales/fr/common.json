@@ -485,5 +485,17 @@
       "parent": "Demande à un parent de la renouveler.",
       "contact": "Pour la renouveler, écris à STOA : <email>{{email}}</email>"
     }
+  },
+  "usagePeriodBanner": {
+    "label": "Période d’utilisation",
+    "close": "Masquer jusqu’à la prochaine fois",
+    "student": {
+      "endsSoon_one": "Ta période d’utilisation se termine dans {{count}} jour (le {{date}}).",
+      "endsSoon_many": "Ta période d’utilisation se termine dans {{count}} jours (le {{date}}).",
+      "endsSoon_other": "Ta période d’utilisation se termine dans {{count}} jours (le {{date}}).",
+      "endsToday": "Aujourd’hui ({{date}}) est le dernier jour de ta période d’utilisation.",
+      "expired": "Ta période d’utilisation a pris fin le {{date}}.",
+      "expiredNoDate": "Ta période d’utilisation a pris fin."
+    }
   }
 }

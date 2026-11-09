@@ -482,5 +482,16 @@
       "parent": "Bitte deine Eltern, sie zu verlängern.",
       "contact": "Zum Verlängern schreib STOA: <email>{{email}}</email>"
     }
+  },
+  "usagePeriodBanner": {
+    "label": "Nutzungsdauer",
+    "close": "Bis zum nächsten Mal ausblenden",
+    "student": {
+      "endsSoon_one": "Deine Nutzungsdauer endet in {{count}} Tag (am {{date}}).",
+      "endsSoon_other": "Deine Nutzungsdauer endet in {{count}} Tagen (am {{date}}).",
+      "endsToday": "Heute ({{date}}) ist der letzte Tag deiner Nutzungsdauer.",
+      "expired": "Deine Nutzungsdauer ist am {{date}} abgelaufen.",
+      "expiredNoDate": "Deine Nutzungsdauer ist abgelaufen."
+    }
   }
 }

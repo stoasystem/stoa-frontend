@@ -319,6 +319,7 @@ export class StudentWorld {
     const b = this.backend
     b.on('GET', '/teacher-help/availability', () => ({ status: 200, body: { online: false, availableTeachers: 0 } }))
     // The student's plan and usage period, as stoa-backend#343 shapes it (no trial fields since).
+    // Every page reads it too, for the usage period reminder (#616).
     b.on('GET', '/students/me/entitlement', () => ({
       status: 200,
       body: {

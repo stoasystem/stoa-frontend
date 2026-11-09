@@ -168,7 +168,9 @@ test('once the usage period has ended, the question box is greyed and says why, 
   const docked = page.getByRole('textbox', { name: 'Your question' })
   await expect(docked).toBeDisabled()
   await expect(page.getByText('Your usage period has ended: asking questions and asking a teacher are paused.', { exact: false })).toBeVisible()
-  await expect(page.getByText('Ask a parent to renew it.')).toBeVisible()
+  await expect(page.locator('[data-usage-period-paused]').getByText('Ask a parent to renew it.')).toBeVisible()
+  // The usage period reminder at the top says it too (#616).
+  await expect(page.getByRole('complementary', { name: 'Usage period' })).toContainText('Ask a parent to renew it.')
 
   // Ask still opens, on the conversations, with its own composer greyed.
   await page.goto('/ask')

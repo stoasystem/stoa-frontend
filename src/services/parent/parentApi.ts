@@ -7,6 +7,7 @@ import type {
   ParentChild,
 } from '@/types/parent'
 import type { ParentAccountOperations } from '@/types/parentAccountOperations'
+import type { ParentUsagePeriods } from '@/types/usagePeriod'
 import type {
   CheckoutSession,
   CreateCheckoutSessionInput,
@@ -18,6 +19,12 @@ import type {
 
 export async function getParentChildren() {
   const response = await httpClient.get<{ items: ParentChild[] }>('/parents/me/children')
+  return response.data
+}
+
+/** The parent's own usage period and each linked child's (#616, stoa-backend#343). */
+export async function getParentUsagePeriod() {
+  const response = await httpClient.get<ParentUsagePeriods>('/parents/me/usage-period')
   return response.data
 }
 

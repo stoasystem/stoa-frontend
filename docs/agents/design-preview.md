@@ -26,6 +26,7 @@ npm run dev -- --host 127.0.0.1 --port 5173
 - `longNames=1`：星云用四语里最长的名字（经预览自己的星图覆盖，`withLongNebulaNames`）；全景只画悬停的那团星云名，放大后（#134 按星云屏上大小淡入）才看得到。
 - `newcomer=1`：新生的天空（`src/dev/demo/sky/newcomer.ts`）：零点亮、零进行中，所有星都可开始（ADR 0004）；每个在修学科按 #474 推荐外缘里课程顺序上的第一颗，数学是「Integers」（占位星，没有章节）。用来看首次落点（方案 A，`docs/research/user-onboarding-design.md`）。演示知识点跟着页面里完成的课时走：做完它的课时就点亮，推荐随之移动。新生的资料里没有年级、也没有勾科目，所以落点之前先出现「关于你」（#591）：年级下拉的选项和四语名称来自演示后端的 `choices.grade`（与后端 `message_catalog` 同一份，前端不另存），科目按星图的星系列出、在修的预先勾上；「Fertig / Done」写进演示后端的资料（`PATCH /students/me/profile`，年级只收列表里的码值，形如码值但不在列表里的答 422 `profile_choice_unknown`，与 stoa-backend#310 一致），之后按年级推荐：选初中年级（7–9 年级或「Sekundarstufe I」）时数学推荐换成演示知识点（reason `grade`），镜头落到三角函数星云，气泡说「For your year group, start here: Sine and cosine」，能直接「Start this star」；选小学年级时仍是「Integers」，气泡同样说按年级。勾了科目之后不再问「在学哪科」（方案 B）。「Später / Later」或 Esc 跳过：照旧落到「Integers」，修多科时照旧问在学哪科；本标签页内不再问。新生也没有问过任何问题：Ask 里没有演示对话（只有在页面里新建的），所以练习页会出现第一次的提示（#586）。`map-newcomer`、`onboarding`、`lesson-first` 界面自带这个参数。
 - `aboutYou=later`：本标签页里「关于你」（#591）已按过「Later」，新生直接看到后面的落点；`map-newcomer` 自带。
+- `period`：使用期限提示（#616，stoa-backend#343）。`soon` 剩 3 天（家长付）、`today` 最后一天、`expired` 已到期（自己付）；不给时期限在几个月后，不出横幅。`expired` 时提问框也停用（#615）。演示后端的 `GET /students/me/entitlement` 和 `GET /parents/me/usage-period` 都按它作答。
 - `fresh=1`：清掉演示后端在本标签页里记住的状态（已完成课时、点亮与确认、Ask 里新建的对话和发出的消息，见下文「演示后端的状态」），回到 #116 的开场状态。
 
 页面里一旦移动过，地址栏就始终写回 `path`；登出后写回 `signedIn=0`，在页面里改过语言后写回 `lang`。所以刷新总是回到离开时的那一页、那个登录状态和语言。

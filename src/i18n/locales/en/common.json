@@ -482,5 +482,16 @@
       "parent": "Ask a parent to renew it.",
       "contact": "To renew it, contact STOA: <email>{{email}}</email>"
     }
+  },
+  "usagePeriodBanner": {
+    "label": "Usage period",
+    "close": "Hide until next time",
+    "student": {
+      "endsSoon_one": "Your usage period ends in {{count}} day (on {{date}}).",
+      "endsSoon_other": "Your usage period ends in {{count}} days (on {{date}}).",
+      "endsToday": "Today ({{date}}) is the last day of your usage period.",
+      "expired": "Your usage period ended on {{date}}.",
+      "expiredNoDate": "Your usage period has ended."
+    }
   }
 }

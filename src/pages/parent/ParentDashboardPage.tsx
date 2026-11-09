@@ -5,6 +5,7 @@ import { PageContainer } from '@/components/common/PageContainer'
 import { PageHeader } from '@/components/common/PageHeader'
 import { NoLinkedChildrenNotice } from '@/components/parent/NoLinkedChildrenNotice'
 import { ParentDashboardSkeleton } from '@/components/parent/ParentDashboardSkeleton'
+import { ParentUsagePeriodGroup } from '@/components/parent/ParentUsagePeriodGroup'
 import { ParentValueCard } from '@/components/parent/ParentValueCard'
 // Card 007: payments and billing are frozen; the upgrade prompt and the
 // subscription operations card are withdrawn. Both components are kept.
@@ -19,7 +20,8 @@ import type { ParentChild } from '@/types/parent'
 /*
  * Parent board, Overview (#52): the children as a grouped list, each row the
  * way into that child's detail; then "More", where the account and family
- * row carries the account's state as its subtitle. Reports is the other
+ * row carries the account's state as its subtitle; between them the usage
+ * periods, the parent's own and each child's (#616). Reports is the other
  * segment; billing and payments are in the avatar menu (#46), while frozen
  * nowhere.
  */
@@ -44,6 +46,7 @@ export function ParentDashboardPage() {
             ))}
           </Group>
         )}
+        <ParentUsagePeriodGroup />
         <Group title={t('overview.more')}>
           <AccountRow />
         </Group>

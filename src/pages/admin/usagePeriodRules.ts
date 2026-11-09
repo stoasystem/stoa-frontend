@@ -3,47 +3,17 @@ import type {
   UsagePeriodState,
   UsagePeriodUnit,
 } from '@/services/admin/usagePeriodApi'
+import { formatDay, isDay, parseDay } from '@/lib/zurichDay'
 
 /*
  * The backend's period rules (stoa-backend `services/usage_period.py`), here
  * so the console can say what a write will do before it is sent. The server
  * computes the stored date itself; these only preview it.
  *
- * Every date is a Zurich calendar day, `YYYY-MM-DD`. The arithmetic runs on
- * UTC dates, which have no clock changes, so a day is always a day.
+ * Every date is a Zurich calendar day, `YYYY-MM-DD` (`@/lib/zurichDay`).
  */
 
-const DAY = /^(\d{4})-(\d{2})-(\d{2})$/
-const MS_PER_DAY = 86_400_000
-
-/** The day as a UTC midnight, or null for anything that is not a real day. */
-function parseDay(day: string): Date | null {
-  const match = DAY.exec(day)
-  if (!match) return null
-  const [year, month, date] = match.slice(1).map(Number)
-  const value = new Date(Date.UTC(year, month - 1, date))
-  return value.getUTCMonth() === month - 1 && value.getUTCDate() === date ? value : null
-}
-
-function formatDay(value: Date): string {
-  return value.toISOString().slice(0, 10)
-}
-
-export function isDay(value: string): boolean {
-  return parseDay(value) !== null
-}
-
-/** The calendar day it is in Zurich at `now`. */
-export function zurichToday(now: Date = new Date()): string {
-  const parts = new Intl.DateTimeFormat('en-CA', {
-    timeZone: 'Europe/Zurich',
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-  }).formatToParts(now)
-  const part = (type: string) => parts.find((item) => item.type === type)?.value ?? ''
-  return `${part('year')}-${part('month')}-${part('day')}`
-}
+export { daysBetween, isDay, zurichToday } from '@/lib/zurichDay'
 
 /** `months` calendar months after `start`, landing on the month's last day when shorter. */
 export function addMonths(start: string, months: number): string {
@@ -59,15 +29,7 @@ export function addMonths(start: string, months: number): string {
 export function addDays(start: string, days: number): string {
   const from = parseDay(start)
   if (!from) throw new RangeError(`not a day: ${start}`)
-  return formatDay(new Date(from.getTime() + days * MS_PER_DAY))
-}
-
-/** Whole days from `from` to `to`; negative when `to` is earlier. */
-export function daysBetween(from: string, to: string): number {
-  const a = parseDay(from)
-  const b = parseDay(to)
-  if (!a || !b) return Number.NaN
-  return Math.round((b.getTime() - a.getTime()) / MS_PER_DAY)
+  return formatDay(new Date(from.getTime() + days * 86_400_000))
 }
 
 /** Where an extension ends: counted from today or the current end, whichever is later. */

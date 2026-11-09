@@ -172,6 +172,33 @@ const learningHandlers = [
   ),
 ]
 
+// ── Usage period handlers ─────────────────────────────────────────────────
+
+// Every student and parent page reads the period for its reminder (#616), and
+// Ask reads the student's to know whether it takes questions (#615). By
+// default a parent's period ends years away: no reminder, Ask open. A suite
+// about the period answers these itself (`mswServer.use`).
+const usagePeriodHandlers = [
+  http.get(`${BASE}/students/me/entitlement`, () =>
+    HttpResponse.json({
+      effectivePlan: 'standard',
+      newUsageAllowed: true,
+      teacherSupportIncluded: true,
+      dailyAiQuestionLimit: null,
+      dailyChatMessageLimit: null,
+      usagePeriod: { endsAt: '2099-12-31', state: 'active', daysLeft: 9999, paidBy: 'parent' },
+      renewalContactEmail: 'info@stoaedu.ch',
+    })
+  ),
+  http.get(`${BASE}/parents/me/usage-period`, () =>
+    HttpResponse.json({
+      own: { endsAt: '2099-12-31', state: 'active', daysLeft: 9999 },
+      children: [],
+      renewalContactEmail: 'info@stoaedu.ch',
+    })
+  ),
+]
+
 // ── Exports ───────────────────────────────────────────────────────────────
 
 export const handlers = [
@@ -180,4 +207,5 @@ export const handlers = [
   ...teacherHelpHandlers,
   ...identityHandlers,
   ...learningHandlers,
+  ...usagePeriodHandlers,
 ]

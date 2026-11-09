@@ -267,6 +267,25 @@
       "usage_unreconciled": "Die Nutzung wird noch abgeglichen",
       "child_binding": "Eine Verknüpfung mit einem Kind muss geprüft werden",
       "billing_inactive": "Das Konto muss von der STOA-Administration geprüft werden"
+    },
+    "period": {
+      "title": "Nutzungsdauer",
+      "own": "Ihr Konto",
+      "loading": "Nutzungsdauer wird geladen…",
+      "loadFailed": "Die Nutzungsdauer konnte gerade nicht geladen werden.",
+      "none": "Keine Nutzungsdauer festgelegt",
+      "until": "Bis {{date}}",
+      "ended": "Abgelaufen am {{date}}",
+      "paidBy": {
+        "you": "Von Ihnen bezahlt",
+        "self": "Über das eigene Konto des Kindes",
+        "other_parent": "Von einem anderen Elternteil bezahlt"
+      },
+      "expired": "Abgelaufen",
+      "lastDay": "Heute letzter Tag",
+      "daysLeft_one": "Noch {{count}} Tag",
+      "daysLeft_other": "Noch {{count}} Tage",
+      "renew": "Für eine Verlängerung wenden Sie sich an STOA: <email>{{email}}</email>"
     }
   },
   "activityTypes": {
@@ -277,5 +296,24 @@
     "practice_mistake": "Übungsfehler",
     "report": "Bericht",
     "unknown": "Aktivität"
+  },
+  "usagePeriodBanner": {
+    "own": {
+      "endsSoon_one": "Ihre Nutzungsdauer endet in {{count}} Tag (am {{date}}).",
+      "endsSoon_other": "Ihre Nutzungsdauer endet in {{count}} Tagen (am {{date}}).",
+      "endsToday": "Heute ({{date}}) ist der letzte Tag Ihrer Nutzungsdauer.",
+      "expired": "Ihre Nutzungsdauer ist am {{date}} abgelaufen.",
+      "expiredNoDate": "Ihre Nutzungsdauer ist abgelaufen."
+    },
+    "child": {
+      "endsSoon_one": "Die Nutzungsdauer von {{name}} endet in {{count}} Tag (am {{date}}).",
+      "endsSoon_other": "Die Nutzungsdauer von {{name}} endet in {{count}} Tagen (am {{date}}).",
+      "endsToday": "Heute ({{date}}) ist der letzte Tag der Nutzungsdauer von {{name}}.",
+      "expired": "Die Nutzungsdauer von {{name}} ist am {{date}} abgelaufen.",
+      "expiredNoDate": "Die Nutzungsdauer von {{name}} ist abgelaufen.",
+      "paidBySelf": "Sie läuft über das eigene Konto des Kindes.",
+      "paidByOtherParent": "Sie wird von einem anderen Elternteil bezahlt."
+    },
+    "renew": "Für eine Verlängerung wenden Sie sich an STOA: <email>{{email}}</email>"
   }
 }
