@@ -1,5 +1,5 @@
 /*
- * The server behind Ask (#571): the eleven requests Ask makes, in one object.
+ * The server behind Ask (#571): the twelve requests Ask makes, in one object.
  *
  * The seam is at the service functions, in a React context, as the star map's
  * source is (`StarMapSourceContext`). Its default is the real services, so the
@@ -19,7 +19,7 @@ import { createContext, useContext } from 'react'
 import { createConversation, getConversation, getConversations } from '@/services/chat/chatApi'
 import { getGenerationProgress, streamConversationMessage } from '@/services/chat/chatStreamApi'
 import { getMyMemorySummary } from '@/services/learning/memoryApi'
-import { getStudentProfile } from '@/services/student/studentApi'
+import { getStudentEntitlement, getStudentProfile } from '@/services/student/studentApi'
 import {
   createTeacherHelpRequest,
   getTeacherAvailability,
@@ -46,9 +46,10 @@ export type AskServer = {
     createTeacherHelpRequest: typeof createTeacherHelpRequest
     withdrawTeacherHelpRequest: typeof withdrawTeacherHelpRequest
   }
-  /** The student's profile: their year group and subjects. */
+  /** The student's profile (their year group and subjects), and their entitlement (the usage period, #615). */
   student: {
     getStudentProfile: typeof getStudentProfile
+    getStudentEntitlement: typeof getStudentEntitlement
   }
   /** What the student's learning memory recommends. */
   memory: {
@@ -80,6 +81,7 @@ export const serverAskServer: AskServer = {
   },
   student: {
     getStudentProfile: () => getStudentProfile(),
+    getStudentEntitlement: () => getStudentEntitlement(),
   },
   memory: {
     getMyMemorySummary: (subject) => getMyMemorySummary(subject),

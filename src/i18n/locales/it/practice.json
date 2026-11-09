@@ -89,8 +89,6 @@
     "plan": {
       "perDay": "{{count}} al giorno",
       "notLimited": "Senza limite",
-      "trialEnds": "Termina il {{date}}",
-      "trialActive": "Attivo",
       "yourPlan": "Il tuo piano",
       "usagePaused": "Le nuove domande sono in pausa con questo piano. Chiedi a un genitore di rivedere il piano famiglia.",
       "usageCovered": "Questo piano copre le domande, gli esercizi e il supporto degli insegnanti mostrati sopra.",
@@ -233,7 +231,6 @@
   "ui": {
     "activeSubjects": "Materie attive",
     "chatMessages": "Messaggi in chat",
-    "freeTrial": "Prova gratuita",
     "teacherHelp": "Aiuto dell’insegnante"
   }
 }

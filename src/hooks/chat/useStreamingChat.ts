@@ -7,6 +7,8 @@ import { isUploadGone } from '@/features/uploads/uploadGone'
 import { trackEvent } from '@/services/analytics/analyticsClient'
 import { chatQueryKeys } from '@/services/chat/chatQueryKeys'
 import { toUserFacingError } from '@/lib/userFacingText'
+import { isUsagePeriodEnded, USAGE_PERIOD_ENDED } from '@/lib/usagePeriod'
+import { noteUsagePeriodEnded } from '@/hooks/student/useStudentEntitlementQuery'
 import type { ChatAttachment, ChatMessage, ChatStreamEvent, Conversation } from '@/types/chat'
 import type { AttachmentReference } from '@/types/file'
 import { commandMessageIds } from '@/services/chat/commandMessageIds'
@@ -133,6 +135,9 @@ function errorCode(error: unknown) {
 
 function getErrorMessage(error: unknown) {
   const code = errorCode(error)
+  // The usage period ended while Ask was open (#615): said as the paused
+  // composer says it, not as an answer that could not be prepared.
+  if (code === USAGE_PERIOD_ENDED) return i18n.t('common:usagePeriod.paused')
   // An upload it carried is no longer there: sending it again cannot help,
   // choosing the file again can (#507).
   if (isUploadGone(error)) return i18n.t('chat:ask.attachments.errors.sendExpired')
@@ -147,7 +152,9 @@ function getErrorMessage(error: unknown) {
  * and refuses in the same way (#581).
  */
 export function askRefusalWords(code: string): string {
-  return code === ALLOWANCE_EXHAUSTED ? i18n.t('chat:ask.thread.weeklyAllowance') : ''
+  if (code === ALLOWANCE_EXHAUSTED) return i18n.t('chat:ask.thread.weeklyAllowance')
+  if (code === USAGE_PERIOD_ENDED) return i18n.t('common:usagePeriod.paused')
+  return ''
 }
 
 /**
@@ -596,6 +603,8 @@ export function useStreamingChat(conversationId: string | null) {
 
         const retryPayload = sameMessageRetry(outcome.kind !== 'failed' || outcome.retryable)
         const limited = limitMarks(requestError)
+        // The period ended while Ask was open: Ask pauses, and reads it again (#615).
+        if (isUsagePeriodEnded(requestError)) noteUsagePeriodEnded(queryClient)
         // What the answer's place showed when it failed: the steps written so
         // far, or the failure in words.
         const shown = localMessagesRef.current.find((message) => message.id === settledAssistantId)

@@ -155,3 +155,24 @@ test('signing out ends the session here and on the backend', async ({ page, back
   await expect(page.locator('input[type=password]')).toBeVisible()
   await expect(page.getByRole('heading', { name: 'Mathematics' })).toHaveCount(0)
 })
+
+test('once the usage period has ended, the question box is greyed and says why, and conversations still open (#615)', async ({
+  page,
+  backend,
+}) => {
+  const world = new StudentWorld(backend)
+  world.usagePeriod = { endsAt: '2026-09-28', state: 'expired', daysLeft: 0, paidBy: 'parent' }
+  world.install()
+  await signInAsStudent(page)
+
+  const docked = page.getByRole('textbox', { name: 'Your question' })
+  await expect(docked).toBeDisabled()
+  await expect(page.getByText('Your usage period has ended: asking questions and asking a teacher are paused.', { exact: false })).toBeVisible()
+  await expect(page.getByText('Ask a parent to renew it.')).toBeVisible()
+
+  // Ask still opens, on the conversations, with its own composer greyed.
+  await page.goto('/ask')
+  const panel = page.getByRole('complementary', { name: 'Ask' })
+  await expect(panel.getByRole('textbox', { name: 'Your question' })).toBeDisabled()
+  expect(backend.callsTo('POST', '/conversations')).toHaveLength(0)
+})

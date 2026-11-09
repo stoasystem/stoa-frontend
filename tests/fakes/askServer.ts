@@ -4,8 +4,9 @@
  *
  * It holds what the real one holds -- conversations and their messages, the
  * list of them, each conversation's request for a teacher, the commands that
- * answer messages, whether teachers are online, the student's profile and
- * learning memory -- and answers the eleven requests of `AskServer` from it.
+ * answer messages, whether teachers are online, the student's profile,
+ * entitlement and learning memory -- and answers the twelve requests of
+ * `AskServer` from it.
  * Each test makes its own (`createFakeAskServer()`) and gives it only what that
  * test needs:
  *
@@ -21,7 +22,9 @@
  * - `refuseNextWith(error, request)` refuses the next call of one request.
  * - `holdNext(request)` holds the next call of one request until the test
  *   lets it go, and it then answers from what the server holds by then.
- * - `availability`, `profile` and `memorySummary` are read as they stand when asked.
+ * - `availability`, `profile`, `entitlement` and `memorySummary` are read as
+ *   they stand when asked. The entitlement's usage period is active, paid by
+ *   the student, unless a test says otherwise (#615).
  *
  * Every request is a `vi.fn`, so a test can count its calls and read their
  * arguments (`server.stream.streamConversationMessage.mock.calls`), and, for
@@ -38,7 +41,7 @@ import { ApiError } from '@/services/api/httpClient'
 import type { GenerationState, GenerationStatus, StreamOutcome } from '@/services/chat/chatStreamApi'
 import type { MemorySummaryResponse } from '@/services/learning/memoryApi'
 import type { ChatMessage, ChatStreamEvent, Conversation, ConversationSummary } from '@/types/chat'
-import type { StudentProfile } from '@/types/student'
+import type { StudentEntitlement, StudentProfile } from '@/types/student'
 import type { TeacherAvailability, TeacherHelpRequest } from '@/types/teacherHelp'
 
 /** Each request of the server, as the `vi.fn` it is here. */
@@ -50,7 +53,7 @@ export type MockedAskServer = {
   }
 }
 
-/** Any one of the eleven requests, by its name. */
+/** Any one of the twelve requests, by its name. */
 export type AskRequest = {
   [Group in keyof AskServer]: keyof AskServer[Group]
 }[keyof AskServer]
@@ -109,6 +112,7 @@ export type FakeAskServer = MockedAskServer & {
   holdNext(request: AskRequest): () => void
   availability: TeacherAvailability
   profile: StudentProfile
+  entitlement: StudentEntitlement
   memorySummary: MemorySummaryResponse
 }
 
@@ -225,6 +229,7 @@ export function createFakeAskServer(): FakeAskServer {
     },
     student: {
       getStudentProfile: async () => server.profile,
+      getStudentEntitlement: async () => server.entitlement,
     },
     memory: {
       getMyMemorySummary: async () => server.memorySummary,
@@ -262,6 +267,7 @@ export function createFakeAskServer(): FakeAskServer {
     },
     student: {
       getStudentProfile: gated('getStudentProfile', student.getStudentProfile),
+      getStudentEntitlement: gated('getStudentEntitlement', student.getStudentEntitlement),
     },
     memory: {
       getMyMemorySummary: gated('getMyMemorySummary', memory.getMyMemorySummary),
@@ -295,6 +301,15 @@ export function createFakeAskServer(): FakeAskServer {
     availability: { online: true, availableTeachers: 2 },
     // As much of them as Ask reads.
     profile: { grade: '8', primarySubjects: ['math'] } as StudentProfile,
+    entitlement: {
+      effectivePlan: 'standard',
+      newUsageAllowed: true,
+      teacherSupportIncluded: true,
+      dailyAiQuestionLimit: null,
+      dailyChatMessageLimit: null,
+      usagePeriod: { endsAt: '2027-06-30', state: 'active', daysLeft: 200, paidBy: 'self' },
+      renewalContactEmail: 'info@stoaedu.ch',
+    },
     memorySummary: { recommendations: [], weakTopics: [] } as unknown as MemorySummaryResponse,
   }
   return server

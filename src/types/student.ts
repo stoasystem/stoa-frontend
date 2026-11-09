@@ -65,12 +65,38 @@ export type LearningHistoryItem = {
   source?: LearningHistorySource
 }
 
+/** Where a usage period stands (stoa-backend#239): `none` is an account no period was ever set for. */
+export type UsagePeriodState = 'active' | 'expired' | 'none'
+
+/** Whose period covers the student: their own, or a parent's (never which parent). */
+export type StudentUsagePeriodPaidBy = 'self' | 'parent'
+
+/**
+ * The student's effective usage period, as `GET /students/me/entitlement`
+ * reports it (stoa-backend#343). Billing is offline: an admin sets each paying
+ * account's period, and a parent's covers their children.
+ *
+ * - `endsAt`: the last day it may be used, a Zurich date (`YYYY-MM-DD`; the
+ *   period ends 23:59:59 that day). Format it as a date, never parse it as a
+ *   UTC midnight. `null` without a period.
+ * - `daysLeft`: the Zurich days after today -- 0 on the end day (still
+ *   active) and once expired, `null` without a period.
+ * - `paidBy`: `null` without a period.
+ */
+export type StudentUsagePeriod = {
+  endsAt: string | null
+  state: UsagePeriodState
+  daysLeft: number | null
+  paidBy: StudentUsagePeriodPaidBy | null
+}
+
 export type StudentEntitlement = {
   effectivePlan: string
   newUsageAllowed: boolean
   teacherSupportIncluded: boolean
   dailyAiQuestionLimit?: number | null
   dailyChatMessageLimit?: number | null
-  freeTrialActive: boolean
-  freeTrialEndsAt?: string | null
+  usagePeriod: StudentUsagePeriod
+  /** Where a student who pays for themselves asks for more time. */
+  renewalContactEmail: string
 }

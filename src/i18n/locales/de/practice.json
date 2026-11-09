@@ -88,8 +88,6 @@
     "plan": {
       "perDay": "{{count}} pro Tag",
       "notLimited": "Unbegrenzt",
-      "trialEnds": "Endet am {{date}}",
-      "trialActive": "Aktiv",
       "yourPlan": "Dein Abo",
       "usagePaused": "Neue Fragen sind in diesem Abo pausiert. Bitte einen Elternteil, das Familienabo zu prüfen.",
       "usageCovered": "Dieses Abo umfasst die oben gezeigten Fragen, Übungen und Lehrerunterstützung.",
@@ -228,7 +226,6 @@
   "ui": {
     "activeSubjects": "Aktive Fächer",
     "chatMessages": "Chat-Nachrichten",
-    "freeTrial": "Testphase",
     "teacherHelp": "Hilfe von Lehrpersonen"
   }
 }

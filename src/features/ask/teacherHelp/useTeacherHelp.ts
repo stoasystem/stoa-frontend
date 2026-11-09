@@ -21,6 +21,10 @@
  *   the request and the week's allowance both; nothing is guessed from the
  *   answer to the POST. A refusal is said in the student's words: this module
  *   hands out translation keys (`chat` namespace), the view says them.
+ * - Once the student's usage period has ended (or none was set), "Ask a
+ *   teacher" is greyed and says so (#615). A request refused
+ *   `usage_period_ended` -- the period ended while Ask was open -- says the
+ *   same and has the entitlement read again; it is not "not in your plan".
  *
  * The status vocabulary is shared with the teacher's side
  * (`types/teacherHelp.ts`); this module reads it and repeats none of it.
@@ -28,8 +32,11 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useAskServer, type AskServer } from '@/features/ask/server/askServer'
+import { useAskUsagePeriod } from '@/features/ask/useAskUsagePeriod'
 import { useConversationQuery } from '@/hooks/chat/useConversationQuery'
 import { useTeacherAvailabilityQuery } from '@/hooks/chat/useTeacherAvailabilityQuery'
+import { noteUsagePeriodEnded } from '@/hooks/student/useStudentEntitlementQuery'
+import { USAGE_PERIOD_ENDED } from '@/lib/usagePeriod'
 import { trackEvent } from '@/services/analytics/analyticsClient'
 import { ApiError } from '@/services/api/httpClient'
 import { chatQueryKeys } from '@/services/chat/chatQueryKeys'
@@ -96,7 +103,12 @@ export type TeacherHelp = {
   withdraw: () => void
 }
 
+/** "Ask a teacher" while the usage period has ended: greyed, in these words (#615). */
+const USAGE_PERIOD_PAUSED_KEY = 'ask.help.usagePeriodPaused'
+
 const KEY_BY_CODE: Record<string, string> = {
+  // A 403 like "not in your plan", but its own words: read before the status.
+  [USAGE_PERIOD_ENDED]: USAGE_PERIOD_PAUSED_KEY,
   teacher_support_not_included: 'teacher.errors.planDenied',
   teacher_support_allowance_exhausted: 'teacher.errors.allowanceExhausted',
   teacher_support_admission_recoverable: 'teacher.errors.temporary',
@@ -144,7 +156,8 @@ function withdrawErrorKey(error: unknown): string {
 }
 
 /** Why "Ask a teacher" cannot be pressed, in the words a refusal would have used. */
-function blockedKeyOf(support: TeacherSupportStanding | null): string | null {
+function blockedKeyOf(support: TeacherSupportStanding | null, paused: boolean): string | null {
+  if (paused) return USAGE_PERIOD_PAUSED_KEY
   if (support?.canRequest !== false) return null
   return support.blockedReason === 'teacher_support_not_included'
     ? KEY_BY_CODE.teacher_support_not_included
@@ -219,6 +232,7 @@ export function useTeacherHelp({
   })
   const help = helpQuery.data ?? null
   const availability = useTeacherAvailabilityQuery().data
+  const { paused } = useAskUsagePeriod()
 
   // The conversation, read at the request's pace: one more reader of the same
   // query, which the thread draws from.
@@ -263,6 +277,8 @@ export function useTeacherHelp({
       const key = requestErrorKey(error)
       trackEvent('teacher_help_request_failed', { reason: key })
       setRequestError(key)
+      // The period ended while Ask was open: greyed now, and read again.
+      if (key === USAGE_PERIOD_PAUSED_KEY) noteUsagePeriodEnded(queryClient)
       // A refusal for the allowance or the plan may be news to the reading on screen.
       void queryClient.invalidateQueries({ queryKey: chatQueryKeys.teacherAvailability() })
     },
@@ -301,6 +317,7 @@ export function useTeacherHelp({
       },
     }
     const place = offerPlace(messages)
+    const blockedKey = blockedKeyOf(support, paused)
     // A conversation has one request: once asked, open or over, help is not
     // offered here again (#544); nor while an answer is being written.
     if (!place || (isStreaming && !isAsking)) return { kind: 'none' }
@@ -311,11 +328,12 @@ export function useTeacherHelp({
         suggested: place.suggested,
         teachersOnline,
         support,
-        blockedKey: blockedKeyOf(support),
-        errorKey: requestError,
+        blockedKey,
+        // Said once: a refusal in the words the greyed button already says is not said again.
+        errorKey: requestError === blockedKey ? null : requestError,
       },
     }
-  }, [help, isAsking, isStreaming, isWithdrawing, messages, requestError, support, teachersOnline, withdrawError])
+  }, [help, isAsking, isStreaming, isWithdrawing, messages, paused, requestError, support, teachersOnline, withdrawError])
 
   const { mutate: ask } = asking
   const { mutate: takeBack } = withdrawing

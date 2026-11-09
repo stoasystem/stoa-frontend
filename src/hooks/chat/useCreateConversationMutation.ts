@@ -1,5 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useAskServer } from '@/features/ask/server/askServer'
+import { noteUsagePeriodEnded } from '@/hooks/student/useStudentEntitlementQuery'
+import { isUsagePeriodEnded } from '@/lib/usagePeriod'
 import { chatQueryKeys } from '@/services/chat/chatQueryKeys'
 import { trackEvent } from '@/services/analytics/analyticsClient'
 import type { Conversation, ConversationListResponse, CreateConversationRequest } from '@/types/chat'
@@ -44,6 +46,11 @@ export function useCreateConversationMutation(
       )
       queryClient.setQueryData(chatQueryKeys.conversation(conversation.id), conversation)
       queryClient.invalidateQueries({ queryKey: chatQueryKeys.conversations(), exact: true })
+    },
+    // A first question refused because the usage period ended while Ask was
+    // open (#615): Ask pauses, and the period is read again.
+    onError: (error) => {
+      if (isUsagePeriodEnded(error)) noteUsagePeriodEnded(queryClient)
     },
   })
 }

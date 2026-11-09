@@ -475,5 +475,12 @@
       "body": "There is no page at this address.",
       "action": "Go to the start page"
     }
+  },
+  "usagePeriod": {
+    "paused": "Your usage period has ended: asking questions and asking a teacher are paused. Your history and practice work as usual.",
+    "renewal": {
+      "parent": "Ask a parent to renew it.",
+      "contact": "To renew it, contact STOA: <email>{{email}}</email>"
+    }
   }
 }

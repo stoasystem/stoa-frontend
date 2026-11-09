@@ -37,6 +37,7 @@ import { isSupportedLanguage } from '@/i18n/languages'
 import { commandMessageIds } from '@/services/chat/commandMessageIds'
 import type { ChatMessage, ConversationSummary, MessageQuote } from '@/types/chat'
 import type { NotificationPreferenceMatrix } from '@/types/notification'
+import type { StudentEntitlement } from '@/types/student'
 
 export type PreviewRequest = {
   method: string
@@ -217,6 +218,17 @@ const routes: Array<[method: string, pattern: string, handler: Handler]> = [
       : { conversationId: params.id, steps: [], updatedAt: now(), status: 'completed' }
   }],
   ['GET', '/teacher-help/availability', () => demoTeacherAvailability],
+  // The demo student's plan and usage period (stoa-backend#343): running, paid by a parent, so
+  // Ask takes questions (#615). Set `state` to `expired` here to see Ask paused.
+  ['GET', '/students/me/entitlement', (): StudentEntitlement => ({
+    effectivePlan: 'standard',
+    newUsageAllowed: true,
+    teacherSupportIncluded: true,
+    dailyAiQuestionLimit: null,
+    dailyChatMessageLimit: null,
+    usagePeriod: { endsAt: '2027-06-30', state: 'active', daysLeft: 200, paidBy: 'parent' },
+    renewalContactEmail: 'info@stoaedu.ch',
+  })],
   // Kept, as the backend keeps it: the card is drawn from the request read back, not from this answer (#183).
   ['POST', '/teacher-help/request', ({ body }) => {
     const request = {
