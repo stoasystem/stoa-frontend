@@ -87,6 +87,17 @@ function renderWithQuery(node: React.ReactNode) {
 
 const banner = () => screen.queryByRole('complementary', { name: 'Usage period' })
 
+/** The Murmi drawn in a banner (#616): one, decoration only, with the entrance. */
+function murmiIn(shown: HTMLElement) {
+  const figures = shown.querySelectorAll('[data-murmi]')
+  expect(figures).toHaveLength(1)
+  const figure = figures[0]
+  expect(figure).toHaveAttribute('aria-hidden', 'true')
+  expect(figure).toHaveAttribute('data-murmi-entrance')
+  expect(figure).not.toHaveAttribute('data-murmi-animated')
+  return figure.getAttribute('data-murmi')
+}
+
 beforeEach(async () => {
   vi.useFakeTimers({ toFake: ['Date'] })
   vi.setSystemTime(NOW)
@@ -156,6 +167,7 @@ describe('the student’s banner', () => {
     expect(shown).toHaveTextContent(`Your usage period ends in 7 days (on ${formatDayAndMonth('2026-11-16')}).`)
     expect(shown).toHaveTextContent('Ask a parent to renew it.')
     expect(shown).toHaveAttribute('data-usage-period-banner', 'endsSoon')
+    expect(murmiIn(shown)).toBe('hourglass')
   })
 
   it('on the last day itself, says it is today, and a student paying for themselves contacts STOA', async () => {
@@ -164,6 +176,7 @@ describe('the student’s banner', () => {
     renderWithQuery(<UsagePeriodBanner />)
     const shown = await screen.findByRole('complementary', { name: 'Usage period' })
     expect(shown).toHaveTextContent(`Today (${formatDayAndMonth(TODAY)}) is the last day of your usage period.`)
+    expect(murmiIn(shown)).toBe('hourglass')
     expect(shown).toHaveTextContent('To renew it, contact STOA: info@stoaedu.ch')
     expect(within(shown).getByRole('link', { name: 'info@stoaedu.ch' })).toHaveAttribute('href', 'mailto:info@stoaedu.ch')
   })
@@ -175,6 +188,7 @@ describe('the student’s banner', () => {
     const shown = await screen.findByRole('complementary', { name: 'Usage period' })
     expect(shown).toHaveTextContent(`Your usage period ended on ${formatDate('2026-11-05')}.`)
     expect(shown).toHaveAttribute('data-usage-period-banner', 'expired')
+    expect(murmiIn(shown)).toBe('letter')
   })
 
   it('says nothing without a period', async () => {
@@ -204,7 +218,9 @@ describe('the student’s banner', () => {
     // The period is over now: that is a new message.
     mockedEntitlement.mockResolvedValue(entitlement({ endsAt: '2026-11-12', state: 'expired', daysLeft: 0, paidBy: 'parent' }))
     renderWithQuery(<UsagePeriodBanner />)
-    expect(await screen.findByRole('complementary', { name: 'Usage period' })).toHaveTextContent('Your usage period ended on')
+    const again = await screen.findByRole('complementary', { name: 'Usage period' })
+    expect(again).toHaveTextContent('Your usage period ended on')
+    expect(murmiIn(again)).toBe('letter')
   })
 
   it('is not shown to a teacher, who has no period to read', async () => {
@@ -227,6 +243,7 @@ describe('the parent’s banner', () => {
     expect(shown).toHaveTextContent('To renew, contact STOA: info@stoaedu.ch')
     expect(within(shown).getByRole('link', { name: 'info@stoaedu.ch' })).toHaveAttribute('href', 'mailto:info@stoaedu.ch')
     expect(mockedEntitlement).not.toHaveBeenCalled()
+    expect(murmiIn(shown)).toBe('hourglass')
   })
 
   it('names the child whose period ends, and says only that another parent pays', async () => {
@@ -246,8 +263,24 @@ describe('the parent’s banner', () => {
     expect(shown).toHaveTextContent(`Ben's usage period ended on ${formatDate('2026-11-03')}. Another parent pays for it.`)
     expect(shown).not.toHaveTextContent('Cleo')
     expect(shown).not.toHaveTextContent('Your usage period')
-    // One expired is enough for the banner to read as expired.
+    // One expired is enough for the banner to read as expired, and for its one Murmi to hold out the letter.
     expect(shown).toHaveAttribute('data-usage-period-banner', 'expired')
+    expect(murmiIn(shown)).toBe('letter')
+  })
+
+  it('with several accounts ending soon and none over, draws one Murmi with the hourglass', async () => {
+    signIn('parent')
+    mockedParent.mockResolvedValue(
+      parentPeriods({
+        own: { endsAt: '2026-11-12', state: 'active', daysLeft: 3 },
+        children: [{ studentId: 's1', name: 'Ana', endsAt: TODAY, state: 'active', paidBy: 'you' }],
+      }),
+    )
+    renderWithQuery(<UsagePeriodBanner />)
+    const shown = await screen.findByRole('complementary', { name: 'Usage period' })
+    expect(shown).toHaveTextContent('Your usage period ends in 3 days')
+    expect(shown).toHaveTextContent(`Today (${formatDayAndMonth(TODAY)}) is the last day of Ana's usage period.`)
+    expect(murmiIn(shown)).toBe('hourglass')
   })
 
   it('says nothing when every period is more than a week away', async () => {

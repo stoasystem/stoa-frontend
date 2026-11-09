@@ -1,8 +1,9 @@
 import type { TFunction } from 'i18next'
-import { CalendarClock, CalendarX, X } from 'lucide-react'
+import { X } from 'lucide-react'
 import type { ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { ICON } from '@/components/base/sizes'
+import { Murmi } from '@/components/brand/Murmi'
 import { ParentRenewalLine } from '@/components/usagePeriod/ParentRenewalLine'
 import { UsagePeriodRenewalLine } from '@/components/usagePeriod/UsagePeriodRenewal'
 import {
@@ -125,7 +126,6 @@ function Banner({
   const dismissed = useUsagePeriodBannerStore((state) => Boolean(state.dismissed[dismissKey]))
   const dismiss = useUsagePeriodBannerStore((state) => state.dismiss)
   if (dismissed) return null
-  const Icon = tone === 'expired' ? CalendarX : CalendarClock
   const close = t('usagePeriodBanner.close')
 
   return (
@@ -141,9 +141,18 @@ function Banner({
       )}
     >
       <div className="mx-auto flex w-full max-w-6xl items-start gap-3 px-4 py-3">
-        <Icon
-          aria-hidden="true"
-          className={cn('mt-0.5 h-5 w-5 shrink-0', tone === 'expired' ? 'text-red' : sky ? 'text-lit' : 'text-gold')}
+        {/*
+          Murmi comes with the banner (#616): an hourglass while the period runs
+          out, a letter held out once it is over -- for a parent, the most urgent
+          account's. The entrance plays once on mount, so a new message (the key)
+          plays it again. Decoration: aria-hidden, the text says it all.
+        */}
+        <Murmi
+          key={dismissKey}
+          mood={tone === 'expired' ? 'letter' : 'hourglass'}
+          entrance
+          size={40}
+          className="-my-1"
         />
         <div className="min-w-0 flex-1 space-y-1 text-sm leading-6" role="status">
           {lines.map((line) => (
