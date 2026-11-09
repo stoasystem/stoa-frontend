@@ -3,12 +3,13 @@
  * (160), on a light page and on the sky, still and animated side by side: for
  * judging the figure and choosing where each pose goes. A row at the top runs
  * each answer style's code through its mapping at the sizes a selector card
- * might use. Dev server only: open
+ * might use, and a row plays the one-shot entrance at the usage period banner's
+ * sizes, with a button to play it again. Dev server only: open
  * /src/dev/murmi.html. `?surface=light` or `?surface=sky` shows one background.
  *
  * Not a product screen, so its words are not translated.
  */
-import { StrictMode } from 'react'
+import { StrictMode, useState } from 'react'
 import { createRoot } from 'react-dom/client'
 import '../index.css'
 import { Murmi, MURMI_MOODS, type MurmiMood } from '@/components/brand/Murmi'
@@ -32,6 +33,55 @@ const NOTES: Record<MurmiMood, string> = {
   steps: 'Answer style “concise”: glasses, a slate of 1 · 2 · 3.',
   offering: 'Answer style “encouraging”: a glowing star held out.',
   storytelling: 'Answer style “vivid”: apple ↔ planet, an idea lit.',
+  hourglass: 'Usage period ends soon (#616): sand runs, the glass turns once.',
+  letter: 'Usage period ended (#616): a letter held out, ask to renew.',
+}
+
+/** The banner's sizes (#616): the entrance plays once at each, and the button plays it again. */
+const ENTRANCE_MOODS = ['hourglass', 'letter'] as const satisfies readonly MurmiMood[]
+const ENTRANCE_SIZES = [32, 40, 48] as const
+
+function Entrance({ sky }: { sky: boolean }) {
+  const [run, setRun] = useState(0)
+  return (
+    <div
+      data-gallery-row="entrance"
+      className="flex flex-col gap-3 rounded-[12px] p-4"
+      style={{ border: `1px solid ${sky ? 'var(--sky-glass-border)' : 'var(--separator)'}` }}
+    >
+      <div className="flex items-baseline gap-2">
+        <strong className="text-[15px]">entrance</strong>
+        <span className="text-[13px] opacity-70">
+          Pops up with the usage period banner, plays its pose once, then rests (#616).
+        </span>
+        <button
+          type="button"
+          data-gallery-replay
+          onClick={() => setRun((n) => n + 1)}
+          className="ml-auto rounded-[8px] px-3 py-1 text-[13px]"
+          style={{ border: `1px solid ${sky ? 'var(--sky-glass-border)' : 'var(--separator)'}` }}
+        >
+          replay
+        </button>
+      </div>
+      <div className="flex flex-wrap gap-8 self-start">
+        {ENTRANCE_MOODS.map((mood) => (
+          <div key={mood} className="flex flex-col gap-1">
+            <span className="text-[12px] opacity-70">{mood}</span>
+            <div className="flex items-end gap-3">
+              {ENTRANCE_SIZES.map((size) => (
+                <div key={size} className="flex flex-col items-center gap-1">
+                  {/* A new key remounts the figure, which is how the one-shot plays again. */}
+                  <Murmi key={`${run}-${size}`} mood={mood} size={size} entrance />
+                  <span className="text-[11px] opacity-60">{size}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
 }
 
 /** The codes the backend sends (stoa-backend#314), plus one it might add later, which falls back to calm. */
@@ -96,6 +146,7 @@ function Board({ sky }: { sky: boolean }) {
     >
       <h2 className="m-0 text-[20px] font-semibold">{sky ? 'On the sky' : 'On a light page'}</h2>
       <AnswerStyles sky={sky} />
+      <Entrance sky={sky} />
       <div className="grid gap-4" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(560px, 1fr))' }}>
         {MURMI_MOODS.map((mood) => (
           <div
