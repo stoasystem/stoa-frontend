@@ -64,6 +64,30 @@ const now = () => new Date().toISOString()
 const pageStarCount = () => starCountFrom(new URLSearchParams(window.location.search).get('points'))
 
 /*
+ * The usage period (#616, stoa-backend#343), set by `?period=`: `soon` (three
+ * days left, a parent's), `today` (the last day), `expired` (over, the
+ * student's own); anything else is a parent's period months away, which
+ * shows no reminder. Days are Zurich days, as the backend counts.
+ */
+type DemoPeriod = { endsAt: string; state: 'active' | 'expired'; daysLeft: number }
+function demoPeriodSetting() {
+  return new URLSearchParams(window.location.search).get('period')
+}
+function zurichDayFromToday(offset: number) {
+  const today = new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Zurich', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date())
+  return new Date(Date.parse(`${today}T00:00:00Z`) + offset * 86_400_000).toISOString().slice(0, 10)
+}
+function demoPeriod(): DemoPeriod & { paidBy: 'self' | 'parent' } {
+  switch (demoPeriodSetting()) {
+    case 'soon': return { endsAt: zurichDayFromToday(3), state: 'active', daysLeft: 3, paidBy: 'parent' }
+    case 'today': return { endsAt: zurichDayFromToday(0), state: 'active', daysLeft: 0, paidBy: 'parent' }
+    case 'expired': return { endsAt: zurichDayFromToday(-2), state: 'expired', daysLeft: 0, paidBy: 'self' }
+    default: return { endsAt: zurichDayFromToday(120), state: 'active', daysLeft: 120, paidBy: 'parent' }
+  }
+}
+const RENEWAL_CONTACT_EMAIL = 'info@stoaedu.ch'
+
+/*
  * The notification preferences as the backend keeps them
  * (`notification_service.py`): every category, every channel; in the bell
  * and live on, digest and push off; what was saved laid over that.
@@ -158,6 +182,27 @@ const routes: Array<[method: string, pattern: string, handler: Handler]> = [
     })
     return demoProfileNow()
   }],
+  // The plan and the usage period (stoa-backend#343): every page reads it for the reminder (#616),
+  // and Ask takes questions only while it runs (#615). `?period=expired` shows both.
+  ['GET', '/students/me/entitlement', (): StudentEntitlement => ({
+    effectivePlan: 'standard',
+    newUsageAllowed: demoPeriod().state === 'active',
+    teacherSupportIncluded: true,
+    dailyAiQuestionLimit: null,
+    dailyChatMessageLimit: null,
+    usagePeriod: demoPeriod(),
+    renewalContactEmail: RENEWAL_CONTACT_EMAIL,
+  })],
+  // A parent's periods, the same `?period=` on the demo student as their child (no parent signs in here).
+  ['GET', '/parents/me/usage-period', () => {
+    const { endsAt, state, daysLeft } = demoPeriod()
+    const student = demo().demoStudent
+    return {
+      own: { endsAt: zurichDayFromToday(120), state: 'active', daysLeft: 120 },
+      children: [{ studentId: student.id, name: student.name, endsAt, state, paidBy: daysLeft >= 120 ? 'you' : 'other_parent' }],
+      renewalContactEmail: RENEWAL_CONTACT_EMAIL,
+    }
+  }],
   // The password change on /me (#184): the current password with the marker in
   // it is refused, a code with it is refused; anything else goes through.
   ['POST', '/auth/password-change/request', ({ body }) =>
@@ -218,17 +263,6 @@ const routes: Array<[method: string, pattern: string, handler: Handler]> = [
       : { conversationId: params.id, steps: [], updatedAt: now(), status: 'completed' }
   }],
   ['GET', '/teacher-help/availability', () => demoTeacherAvailability],
-  // The demo student's plan and usage period (stoa-backend#343): running, paid by a parent, so
-  // Ask takes questions (#615). Set `state` to `expired` here to see Ask paused.
-  ['GET', '/students/me/entitlement', (): StudentEntitlement => ({
-    effectivePlan: 'standard',
-    newUsageAllowed: true,
-    teacherSupportIncluded: true,
-    dailyAiQuestionLimit: null,
-    dailyChatMessageLimit: null,
-    usagePeriod: { endsAt: '2027-06-30', state: 'active', daysLeft: 200, paidBy: 'parent' },
-    renewalContactEmail: 'info@stoaedu.ch',
-  })],
   // Kept, as the backend keeps it: the card is drawn from the request read back, not from this answer (#183).
   ['POST', '/teacher-help/request', ({ body }) => {
     const request = {

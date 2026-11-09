@@ -25,6 +25,7 @@ import { InternalDebugPanel } from '@/components/internal/InternalDebugPanel'
 import { activeNavIndex, shellNavigationFor } from '@/components/shell/shellNavigation'
 import { SourceList } from '@/components/shell/SourceList'
 import { TopBar } from '@/components/shell/TopBar'
+import { UsagePeriodBanner } from '@/components/shell/UsagePeriodBanner'
 import { SOURCE_LIST_QUERY, WIDE_QUERY, useMediaQuery } from '@/hooks/layout/useMediaQuery'
 import { getDefaultRouteForRole } from '@/lib/authRoutes'
 import type { AppNavItem } from '@/lib/navigation'
@@ -132,6 +133,8 @@ export function AppLayout({
           }
           activeIndex={activeIndex}
         />
+        {/* A student's or parent's usage period nearing its end or over (#616). */}
+        {user && !forcedChange && <UsagePeriodBanner sky={surface === 'sky'} />}
         {navigation.kind === 'sourceList' ? (
           <div className={cn('flex flex-1', roomForSourceList ? 'flex-row' : 'flex-col')}>
             <SourceList

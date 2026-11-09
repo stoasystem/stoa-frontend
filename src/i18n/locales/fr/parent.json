@@ -271,6 +271,26 @@
       "usage_unreconciled": "L’utilisation est en cours de rapprochement",
       "child_binding": "Un lien avec un enfant est à vérifier",
       "billing_inactive": "Le compte doit être vérifié par l’administration STOA"
+    },
+    "period": {
+      "title": "Périodes d’utilisation",
+      "own": "Votre compte",
+      "loading": "Chargement des périodes d’utilisation…",
+      "loadFailed": "Les périodes d’utilisation n’ont pas pu être chargées pour le moment.",
+      "none": "Aucune période définie",
+      "until": "Jusqu’au {{date}}",
+      "ended": "Terminée le {{date}}",
+      "paidBy": {
+        "you": "Payée par vous",
+        "self": "Par le compte de l’enfant",
+        "other_parent": "Payée par un autre parent"
+      },
+      "expired": "Expirée",
+      "lastDay": "Dernier jour aujourd’hui",
+      "daysLeft_one": "Encore {{count}} jour",
+      "daysLeft_many": "Encore {{count}} jours",
+      "daysLeft_other": "Encore {{count}} jours",
+      "renew": "Pour prolonger une période d’utilisation, contactez STOA : <email>{{email}}</email>"
     }
   },
   "activityTypes": {
@@ -281,5 +301,26 @@
     "practice_mistake": "Erreur d’exercice",
     "report": "Rapport",
     "unknown": "Activité"
+  },
+  "usagePeriodBanner": {
+    "own": {
+      "endsSoon_one": "Votre période d’utilisation se termine dans {{count}} jour (le {{date}}).",
+      "endsSoon_many": "Votre période d’utilisation se termine dans {{count}} jours (le {{date}}).",
+      "endsSoon_other": "Votre période d’utilisation se termine dans {{count}} jours (le {{date}}).",
+      "endsToday": "Aujourd’hui ({{date}}) est le dernier jour de votre période d’utilisation.",
+      "expired": "Votre période d’utilisation a pris fin le {{date}}.",
+      "expiredNoDate": "Votre période d’utilisation a pris fin."
+    },
+    "child": {
+      "endsSoon_one": "La période d’utilisation de {{name}} se termine dans {{count}} jour (le {{date}}).",
+      "endsSoon_many": "La période d’utilisation de {{name}} se termine dans {{count}} jours (le {{date}}).",
+      "endsSoon_other": "La période d’utilisation de {{name}} se termine dans {{count}} jours (le {{date}}).",
+      "endsToday": "Aujourd’hui ({{date}}) est le dernier jour de la période d’utilisation de {{name}}.",
+      "expired": "La période d’utilisation de {{name}} a pris fin le {{date}}.",
+      "expiredNoDate": "La période d’utilisation de {{name}} a pris fin.",
+      "paidBySelf": "Elle passe par le compte de l’enfant.",
+      "paidByOtherParent": "Elle est payée par un autre parent."
+    },
+    "renew": "Pour la prolonger, contactez STOA : <email>{{email}}</email>"
   }
 }

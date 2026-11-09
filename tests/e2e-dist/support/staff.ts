@@ -19,14 +19,44 @@ export const ADMIN: StaffAccount = {
   role: 'admin',
 }
 
+export const PARENT: StaffAccount = {
+  id: 'e2e-parent-1',
+  name: 'Paula Meier',
+  email: 'paula.meier@example.test',
+  password: 'e2e-password-4',
+  role: 'parent',
+}
+
+/** `GET /parents/me/usage-period` (stoa-backend#343): `endsAt` a Zurich day; children carry no `daysLeft`. */
+export type ParentUsagePeriods = {
+  own: { endsAt: string | null; state: 'active' | 'expired' | 'none'; daysLeft: number | null }
+  children: {
+    studentId: string
+    name: string
+    endsAt: string | null
+    state: 'active' | 'expired' | 'none'
+    paidBy: 'you' | 'self' | 'other_parent' | null
+  }[]
+  renewalContactEmail: string
+}
+
 /**
  * One member of staff and the parts of the backend their pages touch here:
  * sign-in, the account and the bell; for a teacher, an empty request queue
  * with its counts. An administrator's home asks for more, so a test signs
- * them in at a page that asks for nothing (`/admin/system`).
+ * them in at a page that asks for nothing (`/admin/system`). A parent gets the
+ * Overview's reads: the children, the account and the usage periods (#616).
  */
 export class StaffWorld {
   private readonly accessToken: string
+  /** A parent's children, as `GET /parents/me/children` lists them. */
+  children: { id: string; userId: string; name: string; email: string; grade: string | null; subjects: string[] }[] = []
+  /** A parent's usage periods; by default their own months away and no children. */
+  usagePeriods: ParentUsagePeriods = {
+    own: { endsAt: '2027-06-30', state: 'active', daysLeft: 200 },
+    children: [],
+    renewalContactEmail: 'info@stoaedu.ch',
+  }
 
   constructor(
     private readonly backend: MockBackend,
@@ -65,6 +95,15 @@ export class StaffWorld {
     if (account.role === 'teacher') {
       b.on('GET', '/teachers/me/help-requests', answer({ items: [] }))
       b.on('GET', '/teachers/me/stats', answer({ pendingRequests: 0, resolvedToday: 0, averageResponseTimeMinutes: 0 }))
+    }
+    if (account.role === 'parent') {
+      b.on('GET', '/parents/me/children', ({ headers }) => answer({ items: this.children })({ headers }))
+      b.on('GET', '/parents/me/account-operations', answer({
+        parentId: account.id,
+        supportState: { state: 'ready', blockers: [], warnings: [] },
+        children: [],
+      }))
+      b.on('GET', '/parents/me/usage-period', ({ headers }) => answer(this.usagePeriods)({ headers }))
     }
   }
 }

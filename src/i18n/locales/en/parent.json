@@ -267,6 +267,25 @@
       "usage_unreconciled": "Usage is still being reconciled",
       "child_binding": "A child link needs review",
       "billing_inactive": "The account needs a check by STOA administration"
+    },
+    "period": {
+      "title": "Usage periods",
+      "own": "Your account",
+      "loading": "Reading the usage periods…",
+      "loadFailed": "The usage periods could not be loaded just now.",
+      "none": "No usage period set",
+      "until": "Until {{date}}",
+      "ended": "Ended on {{date}}",
+      "paidBy": {
+        "you": "Paid by you",
+        "self": "On the child's own account",
+        "other_parent": "Paid by another parent"
+      },
+      "expired": "Expired",
+      "lastDay": "Last day today",
+      "daysLeft_one": "{{count}} day left",
+      "daysLeft_other": "{{count}} days left",
+      "renew": "To renew a usage period, contact STOA: <email>{{email}}</email>"
     }
   },
   "activityTypes": {
@@ -277,5 +296,24 @@
     "practice_mistake": "Practice mistake",
     "report": "Report",
     "unknown": "Activity"
+  },
+  "usagePeriodBanner": {
+    "own": {
+      "endsSoon_one": "Your usage period ends in {{count}} day (on {{date}}).",
+      "endsSoon_other": "Your usage period ends in {{count}} days (on {{date}}).",
+      "endsToday": "Today ({{date}}) is the last day of your usage period.",
+      "expired": "Your usage period ended on {{date}}.",
+      "expiredNoDate": "Your usage period has ended."
+    },
+    "child": {
+      "endsSoon_one": "{{name}}'s usage period ends in {{count}} day (on {{date}}).",
+      "endsSoon_other": "{{name}}'s usage period ends in {{count}} days (on {{date}}).",
+      "endsToday": "Today ({{date}}) is the last day of {{name}}'s usage period.",
+      "expired": "{{name}}'s usage period ended on {{date}}.",
+      "expiredNoDate": "{{name}}'s usage period has ended.",
+      "paidBySelf": "It runs on the child's own account.",
+      "paidByOtherParent": "Another parent pays for it."
+    },
+    "renew": "To renew, contact STOA: <email>{{email}}</email>"
   }
 }

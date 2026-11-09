@@ -30,7 +30,17 @@ vi.mock('@/layouts/DashboardLayout', () => ({
 vi.mock('@/services/analytics/analyticsClient', () => ({ trackEvent: vi.fn() }))
 vi.mock('@/services/parent/parentApi', async () => {
   const actual = await vi.importActual<typeof import('@/services/parent/parentApi')>('@/services/parent/parentApi')
-  return { ...actual, getParentChildren: vi.fn(), getParentAccountOperations: vi.fn() }
+  return {
+    ...actual,
+    getParentChildren: vi.fn(),
+    getParentAccountOperations: vi.fn(),
+    // The usage periods on the Overview (#616) are not what this is about: none set.
+    getParentUsagePeriod: vi.fn(async () => ({
+      own: { endsAt: null, state: 'none', daysLeft: null },
+      children: [],
+      renewalContactEmail: 'info@stoaedu.ch',
+    })),
+  }
 })
 
 const mockedChildren = vi.mocked(getParentChildren)

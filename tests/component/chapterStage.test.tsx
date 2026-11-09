@@ -70,6 +70,14 @@ vi.mock('@/services/teacherHelp/teacherHelpApi', () => ({
 }))
 vi.mock('@/services/student/studentApi', () => ({
   getStudentProfile: vi.fn(async () => ({ grade: '8', primarySubjects: ['math'] })),
+  // The shell reads the usage period for its reminder (#616); not what this is about: years away.
+  getStudentEntitlement: vi.fn(async () => ({
+    effectivePlan: 'basic',
+    newUsageAllowed: true,
+    teacherSupportIncluded: true,
+    usagePeriod: { endsAt: '2099-12-31', state: 'active', daysLeft: 9999, paidBy: 'parent' },
+    renewalContactEmail: 'info@stoaedu.ch',
+  })),
 }))
 vi.mock('@/services/learning/memoryApi', () => ({
   getMyMemorySummary: vi.fn(async () => ({ recommendations: [], weakTopics: [] })),

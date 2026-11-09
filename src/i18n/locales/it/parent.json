@@ -271,6 +271,26 @@
       "usage_unreconciled": "L’utilizzo è ancora in fase di riconciliazione",
       "child_binding": "Un collegamento con un figlio va verificato",
       "billing_inactive": "L’account deve essere controllato dall’amministrazione STOA"
+    },
+    "period": {
+      "title": "Periodi di utilizzo",
+      "own": "Il suo account",
+      "loading": "Caricamento dei periodi di utilizzo…",
+      "loadFailed": "Non è stato possibile caricare i periodi di utilizzo in questo momento.",
+      "none": "Nessun periodo impostato",
+      "until": "Fino al {{date}}",
+      "ended": "Terminato il {{date}}",
+      "paidBy": {
+        "you": "Pagato da lei",
+        "self": "Tramite l’account dello studente",
+        "other_parent": "Pagato da un altro genitore"
+      },
+      "expired": "Scaduto",
+      "lastDay": "Oggi è l’ultimo giorno",
+      "daysLeft_one": "Ancora {{count}} giorno",
+      "daysLeft_many": "Ancora {{count}} giorni",
+      "daysLeft_other": "Ancora {{count}} giorni",
+      "renew": "Per rinnovare un periodo di utilizzo, contatti STOA: <email>{{email}}</email>"
     }
   },
   "activityTypes": {
@@ -281,5 +301,26 @@
     "practice_mistake": "Errore di esercizio",
     "report": "Report",
     "unknown": "Attività"
+  },
+  "usagePeriodBanner": {
+    "own": {
+      "endsSoon_one": "Il suo periodo di utilizzo finisce tra {{count}} giorno (il {{date}}).",
+      "endsSoon_many": "Il suo periodo di utilizzo finisce tra {{count}} giorni (il {{date}}).",
+      "endsSoon_other": "Il suo periodo di utilizzo finisce tra {{count}} giorni (il {{date}}).",
+      "endsToday": "Oggi ({{date}}) è l’ultimo giorno del suo periodo di utilizzo.",
+      "expired": "Il suo periodo di utilizzo è terminato il {{date}}.",
+      "expiredNoDate": "Il suo periodo di utilizzo è terminato."
+    },
+    "child": {
+      "endsSoon_one": "Il periodo di utilizzo di {{name}} finisce tra {{count}} giorno (il {{date}}).",
+      "endsSoon_many": "Il periodo di utilizzo di {{name}} finisce tra {{count}} giorni (il {{date}}).",
+      "endsSoon_other": "Il periodo di utilizzo di {{name}} finisce tra {{count}} giorni (il {{date}}).",
+      "endsToday": "Oggi ({{date}}) è l’ultimo giorno del periodo di utilizzo di {{name}}.",
+      "expired": "Il periodo di utilizzo di {{name}} è terminato il {{date}}.",
+      "expiredNoDate": "Il periodo di utilizzo di {{name}} è terminato.",
+      "paidBySelf": "Passa per l’account dello studente.",
+      "paidByOtherParent": "Lo paga un altro genitore."
+    },
+    "renew": "Per rinnovarlo, contatti STOA: <email>{{email}}</email>"
   }
 }
