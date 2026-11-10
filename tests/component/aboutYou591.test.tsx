@@ -288,6 +288,17 @@ describe('the screen', () => {
     expect(alert).toBeEmptyDOMElement()
   })
 
+  // #625: Tailwind's `space-y-*` loses to a child's own `m-0` (its selector weighs nothing), which
+  // glued the buttons to the subject chips; `gap` cannot be undone by a margin. And the card is
+  // stacked above the map's legend, which is drawn after it and would otherwise cover its foot.
+  it('spaces its rows with a gap, not margins, and sits above the legend (#625)', () => {
+    const { region } = show()
+    const form = region.querySelector('form')
+    expect(form).toHaveClass('flex', 'flex-col', 'gap-4')
+    expect(region.querySelectorAll('[class*="space-y-"]')).toHaveLength(0)
+    expect(document.querySelector('[data-about-you]')).toHaveClass('z-10')
+  })
+
   it('says so when the save failed', () => {
     show({ failed: true })
     expect(screen.getByRole('alert')).toHaveTextContent(copy.saveFailed)

@@ -349,6 +349,9 @@ describe('the question card', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Physics' }))
     expect(answers).toEqual([])
     expect(document.querySelector('[data-first-question] [data-leaving]')).not.toBeNull()
+    // Above the map's legend, spaced by a gap a child's margin cannot undo (#625).
+    expect(document.querySelector('[data-first-question]')).toHaveClass('z-10')
+    expect(document.querySelector('[data-first-question] section')).toHaveClass('flex', 'flex-col', 'gap-3')
     act(() => {
       vi.advanceTimersByTime(BUBBLE_EXIT_MS)
     })
