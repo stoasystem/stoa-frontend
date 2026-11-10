@@ -134,7 +134,7 @@ describe('the way back into Ask', () => {
   it('keeps clear of the controls the pages already put in the corners', () => {
     planet()
     const back = reopen()!
-    // The right edge's middle: the zoom pair, the legend, the "?" and the
+    // The right edge's middle: the zoom pair, the "?" and the
     // docked composer all live along the bottom, and the role switcher used for
     // testing is `fixed left-2 top-1/2` on the other side.
     expect(back).toHaveStyle({ right: `${ASK_REOPEN.inset}px`, width: '44px', height: '44px' })

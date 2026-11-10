@@ -21,7 +21,8 @@
     "body": "Jeder Stern ist etwas zum Lernen. Kannst du das schon? Sag mir, wo ihr in der Schule gerade seid, dann finde ich deinen Stern.",
     "start": "Mit diesem Stern beginnen",
     "later": "Erst umschauen",
-    "findOwn": "Meinen eigenen Stern finden"
+    "findOwn": "Meinen eigenen Stern finden",
+    "legendHint": "Farbe und Form eines Sterns zeigen, wo du bei ihm stehst – das ? unten links erklärt dir das jederzeit."
   },
   "findOwn": {
     "examples": {

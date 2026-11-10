@@ -21,7 +21,8 @@
     "body": "Chaque étoile est une chose à apprendre. Tu sais déjà tout ça ? Dis-moi où tu en es à l’école et je trouverai ton étoile.",
     "start": "Commencer cette étoile",
     "later": "D’abord explorer",
-    "findOwn": "Trouver ma propre étoile"
+    "findOwn": "Trouver ma propre étoile",
+    "legendHint": "La couleur et la forme d’une étoile montrent où tu en es – le ? en bas à gauche te l’explique à tout moment."
   },
   "findOwn": {
     "examples": {

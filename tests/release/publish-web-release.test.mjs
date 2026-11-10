@@ -98,6 +98,9 @@ test('publish uploads hashed assets, then the pointer documents, and refuses an 
   await writeFile(path.join(distDir, 'index.html'), '<html></html>')
   await writeFile(path.join(distDir, 'assets/app.js'), 'console.log(1)')
   await writeFile(path.join(distDir, 'runtime-config.json.template'), '{}')
+  await mkdir(path.join(distDir, 'email'), { recursive: true })
+  await writeFile(path.join(distDir, 'email/stoa-logo.png'), 'png')
+  await writeFile(path.join(distDir, 'email/README.md'), '# never move')
 
   const calls = []
   const runner = async (argv) => {
@@ -127,6 +130,7 @@ test('publish uploads hashed assets, then the pointer documents, and refuses an 
   assert.equal(result.runtimeConfigKey, runtimeConfigKeyFor(result.runtimeConfigSha256))
   assert.deepEqual(putKeys, [
     'assets/app.js',
+    'email/stoa-logo.png',
     result.runtimeConfigKey,
     'index.html',
     'served-release.json',
@@ -135,6 +139,10 @@ test('publish uploads hashed assets, then the pointer documents, and refuses an 
   const configPut = calls.find((argv) => argv.includes(result.runtimeConfigKey))
   assert.equal(configPut[configPut.indexOf('--cache-control') + 1], 'public,max-age=31536000,immutable')
   assert.equal(configPut[configPut.indexOf('--content-type') + 1], 'application/json')
+  // #624: the logo the backend's emails link to. Its README stays out of the bucket.
+  const logoPut = calls.find((argv) => argv.includes('email/stoa-logo.png'))
+  assert.equal(logoPut[logoPut.indexOf('--content-type') + 1], 'image/png')
+  assert.equal(logoPut[logoPut.indexOf('--cache-control') + 1], 'public,max-age=604800')
   assert.equal(calls.some((argv) => argv.includes('create-invalidation')), true)
 
   const unversioned = async (argv) => {

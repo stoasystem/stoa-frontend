@@ -21,7 +21,8 @@
     "body": "Ogni stella è una cosa da imparare. Sai già tutto questo? Dimmi a che punto siete a scuola e troverò la tua stella.",
     "start": "Inizia questa stella",
     "later": "Prima dai un’occhiata",
-    "findOwn": "Trova la mia stella"
+    "findOwn": "Trova la mia stella",
+    "legendHint": "Il colore e la forma di una stella mostrano a che punto sei – il ? in basso a sinistra te lo spiega quando vuoi."
   },
   "findOwn": {
     "examples": {

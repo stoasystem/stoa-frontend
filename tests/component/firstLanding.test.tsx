@@ -557,6 +557,39 @@ describe('the bubble', () => {
     expect([...bubble.querySelectorAll('button')].map((button) => button.textContent)).toEqual(['Look around first'])
   })
 
+  it('says once, on the first landing only, what a star’s look means and where the "?" is (#643), in all four languages', async () => {
+    const star = newcomerMap().stars.find((candidate) => candidate.unitId === KP)!
+    for (const lang of ['en', 'de', 'fr', 'it'] as const) {
+      await i18n.changeLanguage(lang)
+      const hint = i18n.getFixedT(lang, 'starmap')('firstLanding.legendHint')
+      expect(hint, lang).not.toBe('firstLanding.legendHint')
+      // One short sentence that points at the "?".
+      expect(hint, lang).toContain('?')
+      expect(hint.length, lang).toBeLessThan(130)
+      if (lang !== 'en') expect(hint, lang).not.toBe(i18n.getFixedT('en', 'starmap')('firstLanding.legendHint'))
+      const first = render(
+        <I18nextProvider i18n={i18n}>
+          <MemoryRouter>
+            <FirstLandingBubble star={star} locate={() => null} onDismiss={() => {}} scheduler={fakeClock()} />
+          </MemoryRouter>
+        </I18nextProvider>,
+      )
+      expect(document.querySelector('[data-first-landing] [data-bubble-note]')?.textContent, lang).toBe(hint)
+      first.unmount()
+      // After the first lighting (`next`), Murmi says something else: no hint again.
+      const reveal = render(
+        <I18nextProvider i18n={i18n}>
+          <MemoryRouter>
+            <FirstLandingBubble star={star} next={`/star/${KP}`} locate={() => null} onDismiss={() => {}} scheduler={fakeClock()} />
+          </MemoryRouter>
+        </I18nextProvider>,
+      )
+      expect(document.querySelector('[data-first-landing] [data-bubble-note]'), lang).toBeNull()
+      reveal.unmount()
+    }
+    await i18n.changeLanguage('en')
+  })
+
   it('arrives only once its star has stopped moving: never mid-flight', () => {
     const star = newcomerMap().stars.find((candidate) => candidate.unitId === KP)!
     const clock = fakeClock()
