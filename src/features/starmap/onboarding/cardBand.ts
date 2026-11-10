@@ -6,7 +6,9 @@
  *
  *   top     the where-you-are line and the subject switcher, and on a wide
  *           stage the tally: down to 95 px on a phone, 74 on a wide stage
- *           (the German tally wraps at 840). The band starts at 104 and 76.
+ *           (the German tally wraps at 840). The band starts at 104 and 76,
+ *           under the design preview's "Demo" line when the stage has one
+ *           (`--starmap-notice-height`, `DEMO_NOTICE_HEIGHT`).
  *   bottom  a phone's "?" (16 px up, 50 tall); a wide stage's key (24 px up,
  *           89 tall with its two rows); both over Ask's docked composer
  *           (`--page-bottom-inset`), the zoom pair beside them. The band ends
@@ -32,4 +34,4 @@ export const CARD_FRAME = 'pointer-events-none absolute inset-0 z-10 @container'
  * (`data-ask-reopen`).
  */
 export const CARD_BAND =
-  'absolute inset-x-0 top-[104px] bottom-[calc(1rem+var(--page-bottom-inset,0px)+62px)] flex items-center justify-center px-4 max-[559px]:pr-[72px] @min-[768px]:top-[76px] @min-[768px]:bottom-[calc(1.5rem+var(--page-bottom-inset,0px)+98px)]'
+  'absolute inset-x-0 top-[calc(104px+var(--starmap-notice-height,0px))] bottom-[calc(1rem+var(--page-bottom-inset,0px)+62px)] flex items-center justify-center px-4 max-[559px]:pr-[72px] @min-[768px]:top-[calc(76px+var(--starmap-notice-height,0px))] @min-[768px]:bottom-[calc(1.5rem+var(--page-bottom-inset,0px)+98px)]'

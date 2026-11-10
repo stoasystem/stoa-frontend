@@ -32,7 +32,7 @@
  */
 import * as Dialog from '@radix-ui/react-dialog'
 import { ArrowUp, ChevronLeft, Minus, Plus, X } from 'lucide-react'
-import { useCallback, useDeferredValue, useEffect, useLayoutEffect, useMemo, useRef, useState, type KeyboardEvent, type PointerEvent, type ReactNode } from 'react'
+import { useCallback, useDeferredValue, useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type KeyboardEvent, type PointerEvent, type ReactNode } from 'react'
 import { useTranslation, type UseTranslationResponse } from 'react-i18next'
 import { Link, useLocation } from 'react-router-dom'
 import { formattingLocale } from '@/i18n/languages'
@@ -139,9 +139,17 @@ export function canvasPixelRatio(): number {
  * buttons (phone) below. The whole map fits between them.
  */
 export function controlBands(wide: boolean, bottomInset = 0, demo = false): { top: number; bottom: number } {
-  const noticeHeight = demo ? 32 : 0
+  const noticeHeight = demo ? DEMO_NOTICE_HEIGHT : 0
   return wide ? { top: 76 + noticeHeight, bottom: 164 + bottomInset } : { top: 112 + noticeHeight, bottom: 72 + bottomInset }
 }
+
+/**
+ * The design preview's "Demo" line across the top of the stage, CSS px. The
+ * stage hands it to what it draws as `--starmap-notice-height` (unset, so 0,
+ * on a real map): the top line sits under it, and so do the onboarding cards
+ * (`onboarding/cardBand.ts`, #625).
+ */
+export const DEMO_NOTICE_HEIGHT = 32
 
 /** Whether `target` is in an element inside `stage` that has more to scroll than it shows. */
 function scrollsInStage(target: EventTarget | null, stage: Element): boolean {
@@ -766,6 +774,7 @@ export function StarMapView({ map, demo = false, target, path, marked, onNavigat
         className="absolute inset-0 touch-none overflow-hidden outline-none select-none [-webkit-touch-callout:none]"
         data-starmap-stage
         data-layer={target.layer}
+        style={demo ? ({ '--starmap-notice-height': `${DEMO_NOTICE_HEIGHT}px` } as CSSProperties) : undefined}
         // Focusable only from code: where focus goes when a choice removes the link it was on.
         tabIndex={-1}
         onFocus={() => {
@@ -790,14 +799,14 @@ export function StarMapView({ map, demo = false, target, path, marked, onNavigat
         {overlay?.(locateStar, watchMap)}
 
         {demo && (
-          <p className="absolute inset-x-0 top-0 m-0 flex h-8 items-center justify-center border-b border-white/10 px-2 text-[12px] text-[color:var(--on-sky-text-body)]">
+          <p className="absolute inset-x-0 top-0 m-0 flex h-[var(--starmap-notice-height)] items-center justify-center border-b border-white/10 px-2 text-[12px] text-[color:var(--on-sky-text-body)]">
             {t('demo.notice')}
           </p>
         )}
 
         {/* Top: where you are, the subject switcher (#72 point 7), and the tally. */}
         {wide ? (
-          <div data-starmap-overlay className={cn('pointer-events-none absolute inset-x-6 grid grid-cols-[1fr_auto_1fr] items-start gap-4', demo ? 'top-[52px]' : 'top-5')}>
+          <div data-starmap-overlay className="pointer-events-none absolute inset-x-6 top-[calc(1.25rem+var(--starmap-notice-height,0px))] grid grid-cols-[1fr_auto_1fr] items-start gap-4">
             <div className="pointer-events-auto min-w-0">{whereYouAre}</div>
             <div className="pointer-events-auto">{switcher}</div>
             <div
@@ -819,7 +828,7 @@ export function StarMapView({ map, demo = false, target, path, marked, onNavigat
             </div>
           </div>
         ) : (
-          <div data-starmap-overlay className={cn('absolute inset-x-4 flex flex-col items-start gap-1', demo ? 'top-10' : 'top-2')}>
+          <div data-starmap-overlay className="absolute inset-x-4 top-[calc(0.5rem+var(--starmap-notice-height,0px))] flex flex-col items-start gap-1">
             {switcher}
             {whereYouAre}
           </div>
