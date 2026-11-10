@@ -397,7 +397,8 @@ export function MurmiBubble({
             )}
           </div>
           {body && <p className="m-0 text-[13px] leading-5 text-[color:var(--on-sky-text-body)]">{body}</p>}
-          {note && <p data-bubble-note className="m-0 text-[12px] leading-4 text-[color:var(--on-sky-text-body)]">{note}</p>}
+          {/* Set apart from the body, a step quieter: the caption ink keeps 4.53:1 on the glass even over white. */}
+          {note && <p data-bubble-note className="m-0 pt-1 text-[12px] leading-4 text-[color:var(--on-sky-text-caption)]">{note}</p>}
           <div
             data-bubble-ways={stackDocked && docked ? 'stacked' : 'row'}
             className={cn('flex gap-x-2 gap-y-1 pt-0.5', stackDocked && docked ? 'flex-col items-stretch' : 'flex-wrap items-center')}
