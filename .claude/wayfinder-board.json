@@ -1,0 +1,9 @@
+{
+  "name": "stoa",
+  "title": "STOA 待办地图",
+  "repos": [
+    { "repo": "stoasystem/stoa-frontend", "label": "前端" },
+    { "repo": "stoasystem/stoa-backend", "label": "后端" }
+  ],
+  "architecture": "wayfinder-architecture.json"
+}
