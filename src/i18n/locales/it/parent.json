@@ -322,5 +322,15 @@
       "paidByOtherParent": "Lo paga un altro genitore."
     },
     "renew": "Per rinnovarlo, contatti STOA: <email>{{email}}</email>"
+  },
+  "notifications": {
+    "title": "Impostazioni delle notifiche",
+    "weeklyReportEmail": {
+      "title": "Report settimanale via e-mail",
+      "body": "Ogni settimana un’e-mail con il report settimanale. Se la disattivi, si ferma solo l’e-mail. Il report settimanale viene comunque preparato, e puoi leggerlo in qualsiasi momento in STOA."
+    },
+    "loading": "Caricamento delle impostazioni delle notifiche…",
+    "unavailable": "Non è stato possibile caricare le impostazioni delle notifiche.",
+    "saveFailed": "Non è stato possibile salvare l’impostazione. Riprova."
   }
 }

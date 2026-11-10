@@ -49,6 +49,10 @@ vi.mock('@/hooks/practice/useCurriculumCatalogQuery', () => ({
 vi.mock('@/hooks/parent/useParentAccountOperationsQuery', () => ({
   useParentAccountOperationsQuery: () => ({ data: fixtures.accountOps, isLoading: false, isError: false }),
 }))
+// The weekly report email switch reads its own query (#621); not what this is about.
+vi.mock('@/components/parent/ParentNotificationSettingsCard', () => ({
+  ParentNotificationSettingsCard: () => null,
+}))
 
 const PARENT = { de: deParent, en: enParent, fr: frParent, it: itParent }
 

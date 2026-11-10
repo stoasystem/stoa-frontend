@@ -68,7 +68,30 @@ export type NotificationPreferences = {
   preferences: NotificationPreferenceMatrix
   /** A teacher's reminder email for each help request offered to them (stoa-backend#141). */
   dispatchEmail: boolean
+  /**
+   * A parent's weekly report email (stoa-backend#363), on unless switched off.
+   * Off, only the email stops: the report is still made and readable in STOA.
+   */
+  weeklyReportEmail: boolean
   supportedCategories: string[]
   supportedChannels: string[]
   updatedAt?: string | null
+}
+
+/**
+ * The kinds of notification email that carry an unsubscribe link
+ * (stoa-backend#363, `email_unsubscribe.EmailKind`). The backend types the
+ * field as a plain string, so a kind added there later reaches the page as
+ * some other string.
+ */
+export type EmailKind = 'weekly_report' | 'dispatch_reminder' | 'notification_digest'
+
+/**
+ * `POST /notifications/email-unsubscribe` and `/email-resubscribe`: which
+ * kind of email the link was for, and whether it is now sent. Nothing names
+ * the person or their address.
+ */
+export type EmailSubscription = {
+  kind: string
+  subscribed: boolean
 }

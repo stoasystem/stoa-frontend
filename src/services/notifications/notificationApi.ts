@@ -2,6 +2,7 @@ import { apiPath } from '@/services/api/apiPath'
 import { httpClient } from '@/services/api/httpClient'
 
 import type {
+  EmailSubscription,
   NotificationEvent,
   NotificationListResponse,
   NotificationPreferenceMatrix,
@@ -76,5 +77,30 @@ export async function updateNotificationPreferences(preferences: NotificationPre
 // `preferences` is left out (stoa-backend#141).
 export async function updateDispatchEmail(dispatchEmail: boolean) {
   const response = await httpClient.patch<NotificationPreferences>('/notifications/preferences', { dispatchEmail })
+  return response.data
+}
+
+// A parent's weekly report email switch alone, written the same way (stoa-backend#363).
+export async function updateWeeklyReportEmail(weeklyReportEmail: boolean) {
+  const response = await httpClient.patch<NotificationPreferences>('/notifications/preferences', { weeklyReportEmail })
+  return response.data
+}
+
+/*
+ * The unsubscribe link in a notification email (stoa-backend#363). The signed
+ * token is the credential, so neither call needs a session; both answer
+ * `email_unsubscribe_link_invalid` for any token they will not act on.
+ */
+export async function unsubscribeFromEmail(token: string) {
+  const response = await httpClient.post<EmailSubscription>('/notifications/email-unsubscribe', null, {
+    params: { token },
+  })
+  return response.data
+}
+
+export async function resubscribeToEmail(token: string) {
+  const response = await httpClient.post<EmailSubscription>('/notifications/email-resubscribe', null, {
+    params: { token },
+  })
   return response.data
 }

@@ -322,5 +322,15 @@
       "paidByOtherParent": "Elle est payée par un autre parent."
     },
     "renew": "Pour la prolonger, contactez STOA : <email>{{email}}</email>"
+  },
+  "notifications": {
+    "title": "Paramètres de notification",
+    "weeklyReportEmail": {
+      "title": "Rapport hebdomadaire par e-mail",
+      "body": "Chaque semaine, un e-mail avec le rapport hebdomadaire. Désactivé, seul l’e-mail s’arrête. Le rapport hebdomadaire est toujours établi, et vous pouvez le consulter à tout moment dans STOA."
+    },
+    "loading": "Chargement des paramètres de notification…",
+    "unavailable": "Impossible de charger les paramètres de notification.",
+    "saveFailed": "Le réglage n’a pas pu être enregistré. Veuillez réessayer."
   }
 }

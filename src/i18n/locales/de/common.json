@@ -348,6 +348,9 @@
     },
     "endingUsagePeriods": {
       "title": "Bald ablaufende Nutzungsdauern"
+    },
+    "unsubscribe": {
+      "title": "E-Mails abbestellen"
     }
   },
   "state": {
@@ -493,5 +496,37 @@
       "expired": "Deine Nutzungsdauer ist am {{date}} abgelaufen.",
       "expiredNoDate": "Deine Nutzungsdauer ist abgelaufen."
     }
+  },
+  "unsubscribe": {
+    "eyebrow": "E-Mail-Einstellungen",
+    "heading": {
+      "working": "Einen Moment …",
+      "unsubscribed": "Sie sind abgemeldet",
+      "resubscribed": "Sie sind wieder angemeldet",
+      "invalid": "Dieser Link funktioniert nicht",
+      "unreachable": "STOA ist gerade nicht erreichbar"
+    },
+    "working": "Wir melden Sie von diesen E-Mails ab.",
+    "invalid": "Dieser Abmeldelink ist ungültig. Sie können die E-Mails in STOA in den Benachrichtigungseinstellungen abschalten.",
+    "unreachable": "Noch hat sich nichts geändert. Prüfen Sie die Verbindung und versuchen Sie es noch einmal.",
+    "stopped": {
+      "weekly_report": "Sie erhalten den Wochenbericht nicht mehr per E-Mail.",
+      "dispatch_reminder": "Sie erhalten keine E-Mail mehr, wenn Ihnen eine Hilfeanfrage zugewiesen wird. Die Anfragen erscheinen weiterhin in Ihren Mitteilungen in STOA.",
+      "notification_digest": "Sie erhalten die Zusammenfassung Ihrer Mitteilungen nicht mehr per E-Mail.",
+      "other": "Sie erhalten diese E-Mails nicht mehr."
+    },
+    "weeklyReportStillInApp": "Der Wochenbericht selbst wird weiterhin jede Woche erstellt, und Sie können ihn jederzeit in STOA lesen.",
+    "restored": {
+      "weekly_report": "Sie erhalten den Wochenbericht wieder per E-Mail.",
+      "dispatch_reminder": "Sie erhalten wieder eine E-Mail, wenn Ihnen eine Hilfeanfrage zugewiesen wird.",
+      "notification_digest": "Sie erhalten die Zusammenfassung Ihrer Mitteilungen wieder per E-Mail.",
+      "other": "Sie erhalten diese E-Mails wieder."
+    },
+    "undo": "Rückgängig machen",
+    "unsubscribeAgain": "Wieder abmelden",
+    "retry": "Erneut versuchen",
+    "openStoa": "STOA öffnen",
+    "changeFailed": "Das hat nicht geklappt. Bitte versuchen Sie es noch einmal.",
+    "settingsHint": "In STOA wählen Sie in den Benachrichtigungseinstellungen, welche E-Mails Sie erhalten."
   }
 }

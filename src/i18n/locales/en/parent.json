@@ -315,5 +315,15 @@
       "paidByOtherParent": "Another parent pays for it."
     },
     "renew": "To renew, contact STOA: <email>{{email}}</email>"
+  },
+  "notifications": {
+    "title": "Notification settings",
+    "weeklyReportEmail": {
+      "title": "Weekly report by email",
+      "body": "Every week, an email with the weekly report. Switched off, only the email stops: the weekly report is still made, and you can read it in STOA at any time."
+    },
+    "loading": "Loading notification settings…",
+    "unavailable": "Notification settings could not be loaded.",
+    "saveFailed": "The setting could not be saved. Please try again."
   }
 }

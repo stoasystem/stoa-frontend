@@ -348,6 +348,9 @@
     },
     "endingUsagePeriods": {
       "title": "Periods ending soon"
+    },
+    "unsubscribe": {
+      "title": "Unsubscribe from emails"
     }
   },
   "state": {
@@ -493,5 +496,37 @@
       "expired": "Your usage period ended on {{date}}.",
       "expiredNoDate": "Your usage period has ended."
     }
+  },
+  "unsubscribe": {
+    "eyebrow": "Email settings",
+    "heading": {
+      "working": "One moment…",
+      "unsubscribed": "You are unsubscribed",
+      "resubscribed": "You are subscribed again",
+      "invalid": "This link does not work",
+      "unreachable": "STOA cannot be reached right now"
+    },
+    "working": "Unsubscribing you from these emails.",
+    "invalid": "This unsubscribe link is not valid. You can turn these emails off in STOA's notification settings.",
+    "unreachable": "Nothing has changed yet. Check your connection and try again.",
+    "stopped": {
+      "weekly_report": "You will no longer receive the weekly report by email.",
+      "dispatch_reminder": "You will no longer receive an email for each help request assigned to you. The requests still appear in your notifications in STOA.",
+      "notification_digest": "You will no longer receive the summary of your notifications by email.",
+      "other": "You will no longer receive these emails."
+    },
+    "weeklyReportStillInApp": "The weekly report itself is still made every week, and you can read it in STOA at any time.",
+    "restored": {
+      "weekly_report": "You will receive the weekly report by email again.",
+      "dispatch_reminder": "You will again receive an email for each help request assigned to you.",
+      "notification_digest": "You will receive the summary of your notifications by email again.",
+      "other": "You will receive these emails again."
+    },
+    "undo": "Undo",
+    "unsubscribeAgain": "Unsubscribe again",
+    "retry": "Try again",
+    "openStoa": "Open STOA",
+    "changeFailed": "That did not work. Please try again.",
+    "settingsHint": "In STOA, your notification settings let you choose which emails you receive."
   }
 }

@@ -98,6 +98,9 @@ const GROUPS: Record<string, Record<string, Voice>> = {
     // Public activation pages: the sign-in page's own voice.
     'routes.activate.title': { de: 'informal', fr: 'formal' },
     'routes.teacherActivate.title': 'formal',
+    // The public unsubscribe page: only parents and teachers get the emails
+    // it answers (#621).
+    'unsubscribe.': 'formal',
   },
   support: {
     // The public getting-started guide's student section speaks to students

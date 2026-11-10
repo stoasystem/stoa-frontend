@@ -348,6 +348,9 @@
     },
     "endingUsagePeriods": {
       "title": "Periodi in scadenza"
+    },
+    "unsubscribe": {
+      "title": "Annulla l’iscrizione alle e-mail"
     }
   },
   "state": {
@@ -497,5 +500,37 @@
       "expired": "Il tuo periodo di utilizzo è terminato il {{date}}.",
       "expiredNoDate": "Il tuo periodo di utilizzo è terminato."
     }
+  },
+  "unsubscribe": {
+    "eyebrow": "Impostazioni e-mail",
+    "heading": {
+      "working": "Un momento…",
+      "unsubscribed": "Iscrizione annullata",
+      "resubscribed": "Iscrizione ripristinata",
+      "invalid": "Questo link non funziona",
+      "unreachable": "STOA non è raggiungibile al momento"
+    },
+    "working": "Stiamo annullando la tua iscrizione a queste e-mail.",
+    "invalid": "Questo link di disiscrizione non è valido. Puoi disattivare queste e-mail nelle impostazioni delle notifiche di STOA.",
+    "unreachable": "Non è ancora cambiato nulla. Controlla la connessione e riprova.",
+    "stopped": {
+      "weekly_report": "Non riceverai più il report settimanale via e-mail.",
+      "dispatch_reminder": "Non riceverai più un’e-mail per ogni richiesta di aiuto che ti viene assegnata. Le richieste compaiono comunque nelle tue notifiche in STOA.",
+      "notification_digest": "Non riceverai più il riepilogo delle tue notifiche via e-mail.",
+      "other": "Non riceverai più queste e-mail."
+    },
+    "weeklyReportStillInApp": "Il report settimanale viene comunque preparato ogni settimana, e puoi leggerlo in qualsiasi momento in STOA.",
+    "restored": {
+      "weekly_report": "Riceverai di nuovo il report settimanale via e-mail.",
+      "dispatch_reminder": "Riceverai di nuovo un’e-mail per ogni richiesta di aiuto che ti viene assegnata.",
+      "notification_digest": "Riceverai di nuovo il riepilogo delle tue notifiche via e-mail.",
+      "other": "Riceverai di nuovo queste e-mail."
+    },
+    "undo": "Annulla",
+    "unsubscribeAgain": "Annulla di nuovo l’iscrizione",
+    "retry": "Riprova",
+    "openStoa": "Apri STOA",
+    "changeFailed": "Non ha funzionato. Riprova.",
+    "settingsHint": "In STOA, nelle impostazioni delle notifiche, puoi scegliere quali e-mail ricevere."
   }
 }

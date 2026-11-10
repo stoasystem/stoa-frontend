@@ -110,10 +110,20 @@ function notificationPreferences() {
     preferences: withDefaults(demoNotificationPreferences()),
     // A teacher's switch; the demo student has no help requests offered to them.
     dispatchEmail: true,
+    // A parent's switch (stoa-backend#363), on by default.
+    weeklyReportEmail: true,
     supportedCategories: PREFERENCE_CATEGORIES,
     supportedChannels: PREFERENCE_CHANNELS,
     updatedAt: null as string | null,
   }
+}
+
+/** `POST /notifications/email-(un|re)subscribe`, as the backend answers it (stoa-backend#363). */
+function emailSubscription(query: URLSearchParams, subscribed: boolean) {
+  const [demoToken, kind] = (query.get('token') ?? '').split(':')
+  return demoToken === 'demo'
+    ? { kind: kind || 'weekly_report', subscribed }
+    : refuse(400, 'email_unsubscribe_link_invalid', 'This unsubscribe link is not valid.')
 }
 
 /** The address the code goes to, as the backend shows it: the first letter, then stars (`mask_recipient`). */
@@ -234,6 +244,9 @@ const routes: Array<[method: string, pattern: string, handler: Handler]> = [
     if (asked) saveDemoNotificationPreferences(withDefaults(asked))
     return { ...notificationPreferences(), updatedAt: now() }
   }],
+  // The unsubscribe link (#621): a token `demo` or `demo:<kind>` works, any other is the one refusal.
+  ['POST', '/notifications/email-unsubscribe', ({ query }) => emailSubscription(query, false)],
+  ['POST', '/notifications/email-resubscribe', ({ query }) => emailSubscription(query, true)],
 
   // Ask
   ['GET', '/conversations', () => demoConversationList()],
