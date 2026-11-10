@@ -53,6 +53,13 @@
     "body": "Murmi bringt dich dort zu einem guten ersten Stern.",
     "unsure": "Weiss nicht"
   },
+  "languageFirst": {
+    "title": "In welcher Sprache möchtest du lernen?",
+    "why": "In dieser Sprache rede ich mit dir und beantworte deine Fragen. Du kannst sie jederzeit unter «Ich» ändern.",
+    "choose": "Sprache",
+    "next": "Weiter",
+    "saving": "Wird gespeichert …"
+  },
   "aboutYou": {
     "title": "Über dich",
     "why": "Sag mir, in welcher Klasse du bist und was du gerade lernst, dann finde ich den richtigen Anfang für dich.",

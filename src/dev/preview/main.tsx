@@ -10,7 +10,8 @@
  * `points` (10 / 1000 / 2000) sizes the star map; `lang` (de / en / fr / it)
  * the language; `longNames=1` gives the star map's nebulae long names, to
  * check labels; `newcomer=1` gives the sky of a student who has not started
- * anything, to see the first landing; `fresh=1` forgets what the demo backend kept in this tab
+ * anything, to see the first landing; `languageFirst=1` an account that never
+ * stored a language, to see the language first (#627); `fresh=1` forgets what the demo backend kept in this tab
  * (completed lessons, the lighting and its acknowledgement, #51, and Ask's
  * messages). Moving around inside the page writes the route back to `path` (with
  * `signedIn=0` once signed out, and `lang` once the language changes), so a
@@ -36,11 +37,13 @@ const language = params.get('lang')
 const longNames = params.get('longNames') === '1'
 const newcomer = params.get('newcomer') === '1' || surface?.demo === 'newcomer'
 const aboutYouLater = params.get('aboutYou') === 'later' || surface?.aboutYou === 'later'
+const languageFirst = params.get('languageFirst') === '1' || surface?.languageFirst === true
 // Kept in the address: once the page moves, `path` replaces the surface, and a reload stays a newcomer's.
-if ((newcomer && !params.has('newcomer')) || (aboutYouLater && !params.has('aboutYou'))) {
+if ((newcomer && !params.has('newcomer')) || (aboutYouLater && !params.has('aboutYou')) || (languageFirst && !params.has('languageFirst'))) {
   const url = new URL(window.location.href)
   if (newcomer) url.searchParams.set('newcomer', '1')
   if (aboutYouLater) url.searchParams.set('aboutYou', 'later')
+  if (languageFirst) url.searchParams.set('languageFirst', '1')
   window.history.replaceState(null, '', url)
 }
 
@@ -56,7 +59,7 @@ async function start() {
   await installInterception()
   const { LANGUAGE_STORAGE_KEY, isSupportedLanguage } = await import('@/i18n/languages')
   if (language && isSupportedLanguage(language)) localStorage.setItem(LANGUAGE_STORAGE_KEY, language)
-  const [, { default: i18n, i18nReady }, { demo, setDemoLanguage, resetDemoServer, startAsNewcomer, finishDemoKnowledgePoint, makeReviewDue, makeReviewScheduled }] = await Promise.all([
+  const [, { default: i18n, i18nReady }, { demo, setDemoLanguage, resetDemoServer, startAsNewcomer, forgetDemoLanguage, finishDemoKnowledgePoint, makeReviewDue, makeReviewScheduled }] = await Promise.all([
     import('../../index.css'),
     import('@/i18n'),
     import('@/dev/preview/demoSource'),
@@ -68,6 +71,7 @@ async function start() {
   setDemoLanguage(isSupportedLanguage(reading) ? reading : 'en')
   if (params.get('fresh') === '1') resetDemoServer()
   if (newcomer) startAsNewcomer(params.get('fresh') === '1')
+  if (languageFirst) forgetDemoLanguage(params.get('fresh') === '1')
   if (aboutYouLater) {
     // "About you" put off in this tab (#591), as its "Later" leaves it: the page's storage is the preview's own.
     const [{ putAboutYouOff }, { DEMO_STUDENT_ID }] = await Promise.all([

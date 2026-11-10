@@ -53,6 +53,13 @@
     "body": "Murmi t’emmène vers une bonne première étoile.",
     "unsure": "Je ne sais pas"
   },
+  "languageFirst": {
+    "title": "Dans quelle langue veux-tu apprendre ?",
+    "why": "Je te parle et je réponds à tes questions dans cette langue. Tu peux la changer à tout moment dans « Moi ».",
+    "choose": "Langue",
+    "next": "Continuer",
+    "saving": "Enregistrement…"
+  },
   "aboutYou": {
     "title": "À propos de toi",
     "why": "Dis-moi en quelle année tu es et ce que tu étudies, et je te trouverai le bon point de départ.",

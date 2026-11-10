@@ -40,6 +40,8 @@ export type Surface = {
    * surface that shows what comes after it.
    */
   aboutYou?: 'later'
+  /** An account that never stored a language: the language first (#627) asks it before "About you". */
+  languageFirst?: true
   /** What must be on the page before it counts as ready, for the screenshot. */
   readyWhen?: string
   /** Why the surface cannot be shown yet, if it cannot. */
@@ -112,6 +114,17 @@ export const SURFACES: readonly Surface[] = [
     path: (points) => withPoints(`/map/physics/${DEMO_BRIDGE_TOPIC}/${DEMO_BRIDGE_STAR}`, points),
     signedIn: true,
     stars: true,
+  },
+  // #627: before "About you", a newcomer whose account never stored a language picks one.
+  {
+    id: 'language-first',
+    label: 'Star map · newcomer, language first',
+    path: (points) => withPoints('/', points),
+    signedIn: true,
+    stars: true,
+    demo: 'newcomer',
+    languageFirst: true,
+    readyWhen: '[data-language-first] [data-shown]',
   },
   // #591: before the first landing, a newcomer with no year group on the profile is asked it
   // and the subjects school is on. A lower-secondary year lands on the demo knowledge point.

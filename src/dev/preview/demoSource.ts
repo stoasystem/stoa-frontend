@@ -56,8 +56,11 @@ type AccountState = {
   notificationPreferences: NotificationPreferenceMatrix | null
 }
 
-/** `newcomer`: a student who has not started anything has not asked anything either (#586). */
-type ServerState = { completed: string[]; litAt: string | null; acknowledged: boolean; ask: AskState; reviewDue: boolean; reviewScheduled: boolean; account: AccountState; newcomer: boolean }
+/**
+ * `newcomer`: a student who has not started anything has not asked anything either (#586).
+ * `languageUnset`: the account never stored a language (#627); optional, as a tab saved before has none.
+ */
+type ServerState = { completed: string[]; litAt: string | null; acknowledged: boolean; ask: AskState; reviewDue: boolean; reviewScheduled: boolean; account: AccountState; newcomer: boolean; languageUnset?: boolean }
 
 function opening(): ServerState {
   return {
@@ -118,6 +121,24 @@ export function startAsNewcomer(again = false) {
   if (restored && !again) return
   server = { ...opening(), completed: [], newcomer: true }
   completed.clear()
+  changed()
+}
+
+/**
+ * An account that never stored a language (`&languageFirst=1`, #627): the language first asks it.
+ * As for the newcomer, only into a tab with no record yet (or `again`), so a reload keeps the one stored since.
+ */
+export function forgetDemoLanguage(again = false) {
+  if (restored && !again) return
+  server = { ...server, languageUnset: true }
+  changed()
+}
+
+/** A language stored (`PATCH /auth/me/preferences/locale`): the language first is answered. */
+export function storeDemoLanguage(next: SupportedLanguage) {
+  setDemoLanguage(next)
+  if (!server.languageUnset) return
+  server = { ...server, languageUnset: false }
   changed()
 }
 
@@ -307,6 +328,7 @@ export function demoProfileNow(): StudentProfile {
   const { grade, primarySubjects, answerStyle } = server.account
   return {
     ...data.demoProfile,
+    preferredAnswerLanguage: server.languageUnset ? null : data.demoProfile.preferredAnswerLanguage,
     answerStyle: answerStyle ?? data.demoProfile.answerStyle,
     grade: grade ?? (server.newcomer ? '' : data.demoProfile.grade),
     primarySubjects: primarySubjects ?? (server.newcomer ? [] : data.demoProfile.primarySubjects),
