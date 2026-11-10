@@ -228,14 +228,12 @@ describe('the screen', () => {
     return { onSave, onLater, region: screen.getByRole('region', { name: copy.title }) }
   }
 
-  it('says why it asks, and starts on the year group, offering the backend\'s list in its order', () => {
+  it('starts on the year group, offering the backend\'s list in its order', () => {
     const { region } = show()
-    expect(region).toHaveTextContent(copy.why)
     const grade = within(region).getByRole('combobox', { name: copy.grade })
     expect(grade).toHaveFocus()
     expect(grade).toHaveValue('')
     expect(within(grade).getAllByRole('option').map((option) => option.textContent)).toEqual([copy.gradePlaceholder, ...GRADES.map((choice) => choice.label)])
-    expect(region).toHaveTextContent(copy.laterNote)
   })
 
   it('ticks the subjects the student takes, or the ones the profile names', () => {

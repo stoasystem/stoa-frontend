@@ -63,7 +63,6 @@
   },
   "aboutYou": {
     "title": "Über dich",
-    "why": "Sag mir, in welcher Klasse du bist und was du gerade lernst, dann finde ich den richtigen Anfang für dich.",
     "grade": "Deine Klassenstufe",
     "gradePlaceholder": "Klassenstufe wählen",
     "gradeMissing": "Wähl zuerst deine Klassenstufe.",
@@ -71,7 +70,6 @@
     "done": "Fertig",
     "saving": "Wird gespeichert …",
     "later": "Später",
-    "laterNote": "Wenn du das überspringst, fängst du ganz bei den Grundlagen an. Du kannst es jederzeit unter «Ich» ändern.",
     "saveFailed": "Das wurde nicht gespeichert. Versuch es noch einmal oder mach mit «Später» weiter."
   },
   "firstReveal": {

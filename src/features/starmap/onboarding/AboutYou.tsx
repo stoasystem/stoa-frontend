@@ -1,11 +1,12 @@
 /*
  * "About you" (#591, `useAboutYou`): one screen before a student's first
- * landing, over the map. Murmi says why it asks; the year group from the
+ * landing, over the map. Murmi and a title, then the year group from the
  * backend's list (`ChoiceSelect`, the same dropdown as on /me), and the
  * subjects school is on this term, ticked from the sky's galaxies -- the ones
  * the profile already names, else the ones the student takes. "Done" saves
  * both; "Later" (or Escape) goes on to the map, the start then the very first
- * star, which the line under it says.
+ * star. The card says no more than that (#644: the line on why it asks and
+ * the note under the buttons made it too busy).
  *
  * Not a modal, as plan B's question is not: the map behind it still moves.
  * The year group takes the focus when it opens. A save that fails says so
@@ -31,6 +32,29 @@ export type AboutYouProps = {
   failed: boolean
   onSave: (answer: AboutYouAnswer) => void
   onLater: () => void
+}
+
+/*
+ * A subject chip (#644): the chips' glass over the sky. Not ticked, a faint
+ * fill under the 3:1 rule and the body colour; ticked, one step brighter, a
+ * thin light ring and the title colour, with a tick before the name. The mark
+ * takes the same room either way, so ticking never reflows the row.
+ */
+const CHIP = [
+  'relative inline-flex min-h-[38px] cursor-pointer select-none items-center gap-1.5 rounded-full border border-solid pr-3.5 pl-3 text-[14px]',
+  'transition-colors duration-[var(--motion-press)] ease-out',
+  'border-[color:var(--on-sky-field-rule)] bg-white/[0.04] text-[color:var(--on-sky-text-body)] hover:bg-[color:var(--on-sky-selected)]',
+  'has-[:checked]:border-[color:var(--on-sky-plain)] has-[:checked]:bg-white/[0.16] has-[:checked]:text-[color:var(--on-sky-text)] has-[:checked]:hover:bg-white/[0.2]',
+  'has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-ring',
+].join(' ')
+
+/** Before the name: a tick when the subject is ticked, a faint ring when not. Drawn only; the checkbox says it. */
+function ChipMark({ checked }: { checked: boolean }) {
+  return (
+    <svg aria-hidden="true" viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" className="shrink-0">
+      {checked ? <path d="M3.5 8.5l3 3 6-7" strokeWidth="1.75" /> : <circle cx="8" cy="8" r="4.5" strokeWidth="1.25" opacity="0.55" />}
+    </svg>
+  )
 }
 
 export function AboutYou({ grades, galaxies, ticked, saving, failed, onSave, onLater }: AboutYouProps) {
@@ -78,14 +102,11 @@ export function AboutYou({ grades, galaxies, ticked, saving, failed, onSave, onL
           style={{ background: 'var(--sky-glass)', backdropFilter: 'blur(var(--sky-glass-blur))', WebkitBackdropFilter: 'blur(var(--sky-glass-blur))' }}
         >
           <form className="flex flex-col gap-4" onSubmit={submit} noValidate>
-            <div className="flex items-start gap-3">
+            <div className="flex items-center gap-3">
               <Murmi mood="waving" size={40} />
-              <div className="flex min-w-0 flex-col gap-1">
-                <h2 id={titleId} className="m-0 text-[16px] font-semibold leading-snug text-[color:var(--on-sky-text)]">
-                  {t('aboutYou.title')}
-                </h2>
-                <p className="m-0 text-[13px] leading-5 text-[color:var(--on-sky-text-body)]">{t('aboutYou.why')}</p>
-              </div>
+              <h2 id={titleId} className="m-0 min-w-0 text-[16px] font-semibold leading-snug text-[color:var(--on-sky-text)]">
+                {t('aboutYou.title')}
+              </h2>
             </div>
             <ChoiceSelect
               ref={gradeRef}
@@ -101,25 +122,25 @@ export function AboutYou({ grades, galaxies, ticked, saving, failed, onSave, onL
               }}
             />
             {galaxies.length > 0 && (
-              <fieldset className="m-0 min-w-0 space-y-2 border-0 p-0">
-                <legend className="mb-1.5 p-0 text-[13px] leading-[1.3] font-medium text-[color:var(--on-sky-text)]">{t('aboutYou.subjects')}</legend>
+              // Still the group's name, read out with the chips; not drawn (#644: the chips say what they are).
+              <fieldset className="relative m-0 min-w-0 border-0 p-0">
+                <legend className="sr-only">{t('aboutYou.subjects')}</legend>
                 <ul className="m-0 flex list-none flex-wrap gap-2 p-0">
                   {galaxies.map((galaxy) => {
                     const checked = subjects.includes(galaxy.subjectId)
                     return (
                       <li key={galaxy.subjectId}>
-                        <label
-                          data-subject={galaxy.subjectId}
-                          className="inline-flex min-h-[38px] cursor-pointer items-center gap-2 rounded-full border border-solid border-[color:var(--on-sky-field-rule)] px-3 text-[14px] text-[color:var(--on-sky-text)] has-[:checked]:bg-[color:var(--on-sky-selected)] has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-ring"
-                        >
+                        <label data-subject={galaxy.subjectId} data-checked={checked || undefined} className={CHIP}>
+                          {/* The real checkbox, laid over the whole pill and not drawn: the pill is the toggle, Tab and Space reach it, a screen reader says "checked". */}
                           <input
                             type="checkbox"
-                            className="size-4 accent-[color:var(--on-sky-button)]"
+                            className="absolute inset-0 m-0 size-full cursor-pointer appearance-none rounded-full opacity-0"
                             checked={checked}
                             onChange={() =>
                               setSubjects((before) => (checked ? before.filter((id) => id !== galaxy.subjectId) : [...before, galaxy.subjectId]))
                             }
                           />
+                          <ChipMark checked={checked} />
                           {galaxy.name}
                         </label>
                       </li>
@@ -128,17 +149,18 @@ export function AboutYou({ grades, galaxies, ticked, saving, failed, onSave, onL
                 </ul>
               </fieldset>
             )}
-            <div className="flex flex-wrap items-center gap-2">
-              <Button type="submit" lift variant="onSky" size="regular" aria-disabled={saving || undefined}>
-                {saving ? t('aboutYou.saving') : t('aboutYou.done')}
-              </Button>
-              <Button type="button" variant="onSkyPlain" size="small" onClick={onLater}>
-                {t('aboutYou.later')}
-              </Button>
-            </div>
             <div>
-              <p className="m-0 text-[12px] leading-[1.4] text-[color:var(--on-sky-text-caption)]">{t('aboutYou.laterNote')}</p>
-              {/* Always mounted, only its text changes: a live region added together with its words is not announced (#410). */}
+              <div className="flex flex-wrap items-center gap-2">
+                {/* White and flat (#644): still the sky's one filled button, without the press edge that sat heavy on the card. */}
+                <Button type="submit" variant="onSky" size="regular" aria-disabled={saving || undefined}>
+                  {saving ? t('aboutYou.saving') : t('aboutYou.done')}
+                </Button>
+                <Button type="button" variant="onSkyPlain" size="small" onClick={onLater}>
+                  {t('aboutYou.later')}
+                </Button>
+              </div>
+              {/* Always mounted, only its text changes: a live region added together with its words is not announced (#410).
+                  In the buttons' block, so while empty it adds no gap under them. */}
               <p role="alert" className="m-0 text-[13px] leading-[1.35] text-red [&:not(:empty)]:mt-2">
                 {failed ? t('aboutYou.saveFailed') : null}
               </p>
