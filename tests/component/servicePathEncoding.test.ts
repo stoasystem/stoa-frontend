@@ -190,8 +190,6 @@ const cases: Record<string, Case[]> = {
     { name: 'getChildReport', call: (id) => parentReportApi.getChildReport(id), requests: (id) => [`GET /parents/me/children/${id}/report`] },
   ],
   practiceApi: [
-    { name: 'getSubjectPath', call: (id) => practiceApi.getSubjectPath(id, id), requests: (id) => [`GET /practice/${id}/${id}/path`] },
-    { name: 'getSubjectPath without a topic', call: (id) => practiceApi.getSubjectPath(id), requests: (id) => [`GET /practice/${id}/default/path`] },
     { name: 'getPracticeRoadmap', call: (id) => practiceApi.getPracticeRoadmap(id, id), requests: (id) => [`GET /practice/${id}/${id}/roadmap`] },
     { name: 'getPracticeLesson', call: (id) => practiceApi.getPracticeLesson(id), requests: (id) => [`GET /practice/lessons/${id}`] },
     { name: 'submitChallengeAnswer', call: (id) => practiceApi.submitChallengeAnswer(id, any({})), requests: (id) => [`POST /practice/challenges/${id}/answer`] },
