@@ -20,10 +20,7 @@ import type {
   PracticeLesson,
   PracticeLessonResult,
   PracticeMistake,
-  PracticeOverview,
-  PracticePath,
   PracticeRoadmap,
-  PracticeSubject,
   PracticeTeacherHelpRequest,
   PracticeTeacherHelpResponse,
   CurriculumCatalog,
@@ -31,23 +28,6 @@ import type {
   KnowledgeMapNeighbourhood,
   KnowledgeMapResponse,
 } from '@/types/practice'
-
-export async function getPracticeOverview() {
-  const response = await httpClient.get<PracticeOverview>('/practice/overview')
-  return response.data
-}
-
-export async function getPracticeSubjects() {
-  const response = await httpClient.get<{ items: PracticeSubject[] }>('/practice/subjects')
-  return response.data
-}
-
-export async function getSubjectPath(subjectId: string, topicId?: string) {
-  const response = await httpClient.get<PracticePath>(
-    apiPath`/practice/${subjectId}/${topicId ?? 'default'}/path`,
-  )
-  return response.data
-}
 
 export async function getPracticeRoadmap(subjectId: string, topicId: string) {
   const response = await httpClient.get<PracticeRoadmap>(
