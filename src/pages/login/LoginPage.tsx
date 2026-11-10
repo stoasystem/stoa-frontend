@@ -29,14 +29,16 @@ import type { SignOutReason, TabAccount } from '@/lib/tabAccount'
  * A tab whose session ended says whose it was and has the form ready for that
  * account, with a way out to another (#217). A tab that last showed somebody
  * else than the account the browser is signed in as now says who that is and
- * offers to continue as them, or to sign in as someone else (#320).
+ * offers to continue as them, or to sign in as someone else (#320). An
+ * account just activated arrives with its address already in the form (#626).
  *
  * As it opens, the page wakes the backend, so a cold start happens while the
  * visitor types rather than after Sign in (#601, backendPrewarm).
  */
 
 export type LoginMode =
-  | { kind: 'signIn' }
+  /** `email` opens the form on an address, as after an activation (#626). */
+  | { kind: 'signIn'; email?: string }
   | {
       kind: 'switched'
       /** Who the browser is signed in as now. */
@@ -161,7 +163,7 @@ export function LoginPage({ mode = { kind: 'signIn' } }: { mode?: LoginMode } = 
                 </Button>
               </div>
             ) : (
-              <LoginForm />
+              <LoginForm initialEmail={mode.email} />
             )}
           </div>
         </section>

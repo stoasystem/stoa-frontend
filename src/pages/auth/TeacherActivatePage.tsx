@@ -1,6 +1,7 @@
 import { type FormEvent, useEffect, useRef, useState } from 'react'
-import { Link, useSearchParams } from 'react-router-dom'
+import { Link, useLocation, useSearchParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import { ActivationSignIn, useSignedInAccount } from '@/components/auth/ActivationSignIn'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -11,6 +12,7 @@ import {
 import { AuthLayout } from '@/layouts/AuthLayout'
 import { isCompliantPassword } from '@/lib/validation'
 import { toUserFacingError } from '@/lib/userFacingText'
+import { useSignOut } from '@/hooks/auth/useSignOut'
 import { ApiError } from '@/services/api/httpClient'
 import { useAuthStore } from '@/store/authStore'
 
@@ -24,6 +26,10 @@ export function TeacherActivatePage() {
   const [searchParams] = useSearchParams()
   const token = (searchParams.get('token') || '').trim()
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
+  const userEmail = useAuthStore((state) => state.user?.email)
+  const location = useLocation()
+  const signedIn = useSignedInAccount()
+  const { signOut, isSigningOut } = useSignOut()
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [formError, setFormError] = useState<{ message: string; field?: ActivationField } | null>(null)
@@ -32,6 +38,10 @@ export function TeacherActivatePage() {
   const success = useRef<HTMLParagraphElement>(null)
 
   const succeeded = claimMutation.isSuccess || consumeMutation.isSuccess
+  const activation = claimMutation.data ?? consumeMutation.data
+  // Finishing while signed in activates the invitation for the address that
+  // sign-in verified, so that address is the teacher account's (#626).
+  const activatedEmail = activation?.email ?? (consumeMutation.isSuccess ? userEmail : undefined)
   const pending = claimMutation.isPending || consumeMutation.isPending
   const requestError = claimMutation.error || consumeMutation.error
   const requestCode = requestError instanceof ApiError ? requestError.code : undefined
@@ -110,18 +120,39 @@ export function TeacherActivatePage() {
             <p ref={success} tabIndex={-1} className="text-sm text-muted-foreground">
               {t('auth:activate.success')}
             </p>
-            <Button asChild className="rounded-full">
-              <Link to="/login">{t('auth:activate.signIn')}</Link>
-            </Button>
+            <ActivationSignIn
+              activated={{ userId: activation?.userId, email: activatedEmail }}
+              signInLabel={t('auth:activate.signIn')}
+            />
           </div>
         )}
 
         {!succeeded && token && isAuthenticated && (
           <div className="mt-6 space-y-4">
-            <p className="text-sm text-muted-foreground">{t('auth:activate.signedInHelp')}</p>
-            <Button type="button" disabled={pending} onClick={handleConsume}>
-              {pending ? t('common:actions.creatingAccount') : t('auth:activate.finish')}
-            </Button>
+            {/* Finishing works only for the address the invitation was sent
+                to, so the page says which account it would finish for, and
+                lets someone on another account sign out and claim the
+                invitation with a password instead, on this same link (#626). */}
+            <p className="text-sm text-muted-foreground">
+              {signedIn.name
+                ? t('auth:activationHandoff.beforeFinish', { current: signedIn.name })
+                : t('auth:activationHandoff.beforeFinishUnnamed')}
+            </p>
+            <div className="flex flex-wrap gap-3">
+              <Button type="button" disabled={pending || isSigningOut} onClick={handleConsume}>
+                {pending ? t('common:actions.creatingAccount') : t('auth:activate.finish')}
+              </Button>
+              <Button
+                type="button"
+                variant="plain"
+                disabled={pending || isSigningOut}
+                onClick={() => void signOut({ to: `${location.pathname}${location.search}` })}
+              >
+                {signedIn.name
+                  ? t('auth:activationHandoff.signOutFirst', { current: signedIn.name })
+                  : t('auth:activationHandoff.signOutFirstUnnamed')}
+              </Button>
+            </div>
           </div>
         )}
 

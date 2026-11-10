@@ -9,6 +9,7 @@ import { logout, type LogoutOutcome } from '@/services/auth/authApi'
 import { logoutRefused, logoutWithRefreshToken, type RefreshedLogout } from '@/services/auth/revokeSignIn'
 import { storedRefreshToken } from '@/services/auth/sessionRefresh'
 import { forgetCheckoutOperation } from '@/services/billing/billingApi'
+import { loginEmailState } from '@/lib/loginEmailState'
 import { logger } from '@/services/logging/logger'
 import { resetAsk } from '@/store/askStore'
 import { currentSessionToken, trackPendingLogout, useAuthStore } from '@/store/authStore'
@@ -77,6 +78,13 @@ async function endOnServer(accessToken: string, refreshToken: string | null): Pr
 // is sent once and never retried; only a refused one is followed by the refresh
 // token's sign-out (#399). Clearing ends the browser's sign-in, so every other
 // tab signs out with this one (#320).
+//
+// By default it leaves for the sign-in, empty. An activation page that signs
+// out the account the browser was still on asks for the form to open on the
+// address it just activated (`loginEmail`), or to stay on the activation link
+// (`to`) so the invitation can be claimed signed out (#626).
+export type SignOutOptions = { loginEmail?: string; to?: string }
+
 export function useSignOut() {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
@@ -86,7 +94,7 @@ export function useSignOut() {
   const runningRef = useRef(false)
   const [isSigningOut, setIsSigningOut] = useState(false)
 
-  const signOut = useCallback(async () => {
+  const signOut = useCallback(async (options: SignOutOptions = {}) => {
     if (runningRef.current) return
     runningRef.current = true
     setIsSigningOut(true)
@@ -124,7 +132,8 @@ export function useSignOut() {
       accessToken ? endOnServer(accessToken, refreshToken) : Promise.resolve(),
     )
     // Replacing the entry keeps Back from reopening the page just left.
-    navigate('/login', { replace: true })
+    const state = loginEmailState(options.loginEmail)
+    navigate(options.to ?? '/login', { replace: true, ...(state ? { state } : {}) })
 
     try {
       await pending
