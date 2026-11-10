@@ -24,7 +24,8 @@ import { cn } from '@/lib/utils'
  * pages keep the light bar.
  *
  * `seamless` leaves the separator out, for a page whose top is one surface
- * with the bar (the star map, #649).
+ * with the bar (the star map, #649). Over the sky it also lays the map's mist
+ * (--sky-mist) on the bar, since the map's canvas never shows bare --sky.
  */
 export function TopBar({
   homePath,
@@ -78,7 +79,11 @@ export function TopBar({
         !seamless && (sky ? 'border-[color:var(--sky-glass-border)]' : 'border-separator'),
       )}
       style={{
-        background: sky ? 'color-mix(in srgb, var(--sky) 86%, transparent)' : 'var(--bar)',
+        background: sky
+          ? seamless
+            ? 'linear-gradient(var(--sky-mist), var(--sky-mist)), color-mix(in srgb, var(--sky) 86%, transparent)'
+            : 'color-mix(in srgb, var(--sky) 86%, transparent)'
+          : 'var(--bar)',
         backdropFilter: 'blur(var(--bar-blur))',
         WebkitBackdropFilter: 'blur(var(--bar-blur))',
         paddingTop: 'env(safe-area-inset-top)',

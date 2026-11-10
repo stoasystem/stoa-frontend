@@ -77,8 +77,15 @@ describe('the shell on a sky page (#649)', () => {
     expect(borderClasses(bar)).toEqual([])
   })
 
+  it('on the star map the bar carries the map\'s mist over the sky, so the two are one colour', () => {
+    const { bar } = renderShell({ surface: 'sky', bleed: true, seamlessBar: true })
+    expect(bar.style.background).toContain('var(--sky-mist)')
+    expect(bar.style.background).toContain('var(--sky)')
+  })
+
   it('another sky page keeps the line, since its content scrolls under the bar', () => {
     const { shell, bar } = renderShell({ surface: 'sky' })
+    expect(bar.style.background).not.toContain('--sky-mist')
     expect(classes(shell)).toContain('bg-sky')
     expect(classes(bar)).toContain('border-b')
     expect(classes(bar)).toContain('border-[color:var(--sky-glass-border)]')

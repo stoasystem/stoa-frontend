@@ -265,6 +265,14 @@
   --sky-glass: rgba(22, 30, 52, 0.78);     /* cards over the sky, with --sky-glass-blur */
   --sky-glass-blur: 24px;
   --sky-glass-border: rgba(255, 255, 255, 0.12); /* Sizes: glass card border white 12% */
+  /*
+   * The faint mist the star map paints over --sky (render/galaxy.ts,
+   * paintGalaxy: GALAXY.mist to GALAXY.violet at SKY_MIST_ALPHA), taken at
+   * the top of the map as the mean of the two. The seamless bar lays it over
+   * the sky so bar and map are one colour (#649). The two must move together;
+   * a test keeps them equal.
+   */
+  --sky-mist: rgba(161, 161, 193, 0.04);
   --lit: #F2C572;                          /* stars, rings, rays */
   --lit-core: #FFF8EA;                     /* the white-hot core of a lit point */
   --lit-deep: rgb(214, 160, 70);           /* glow gradients */
