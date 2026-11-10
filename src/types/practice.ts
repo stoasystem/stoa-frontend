@@ -1,36 +1,13 @@
-export type PracticeSubject = {
-  id: string
-  name: string
-  description: string
-  gradeLevels: PracticeGradeLevel[]
-  progress: number
-  accent: string
-}
-
 export type PracticeGradeLevel = {
   id: string
   label: string
   order: number
 }
 
-export type PracticeTopicStatus = 'available' | 'coming_later'
-export type PracticeUnitStatus = 'locked' | 'available' | 'completed'
 export type PracticeLessonStatus = 'locked' | 'available' | 'completed'
 export type RoadmapLessonStatus = 'completed' | 'current' | 'available' | 'locked' | 'review'
 export type PracticeLessonDifficulty = 'intro' | 'practice' | 'review'
 export type PracticeChallengeType = 'multiple_choice' | 'text_input' | 'ordering' | 'explanation'
-
-export type PracticeTopic = {
-  id: string
-  subjectId: string
-  gradeLevel: string
-  title: string
-  description: string
-  order: number
-  status: PracticeTopicStatus
-  progress?: number
-  currentLessonId?: string
-}
 
 export type PracticeRoadmapTopic = {
   id: string
@@ -137,26 +114,6 @@ export type PracticeLesson = {
   status: PracticeLessonStatus
   estimatedMinutes: number
   challenges: PracticeChallenge[]
-}
-
-export type LearningUnit = {
-  id: string
-  subjectId: string
-  gradeLevel: string
-  topicId: string
-  title: string
-  description: string
-  order: number
-  status: PracticeUnitStatus
-  lessons: PracticeLesson[]
-}
-
-export type PracticePath = {
-  subjectId: string
-  gradeLevel: string
-  topicId: string
-  topicTitle: string
-  units: LearningUnit[]
 }
 
 export type PracticeProgress = {
@@ -278,26 +235,6 @@ export type PracticeMistake = {
   hint: string
   reviewed: boolean
   createdAt: string
-}
-
-export type PracticeOverview = {
-  subjects: PracticeSubject[]
-  topics: PracticeTopic[]
-  recommendedLesson: PracticeLesson
-  dailyGoal: {
-    completed: number
-    target: number
-    label: string
-  }
-  studyStreak: number
-  progressPoints: number
-  recentMistakes: PracticeMistake[]
-  weakTopics: Array<{
-    id: string
-    subject: string
-    topic: string
-    note: string
-  }>
 }
 
 /**
