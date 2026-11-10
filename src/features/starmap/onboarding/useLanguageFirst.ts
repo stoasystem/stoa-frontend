@@ -45,9 +45,14 @@ export type LanguageFirst = {
   confirm: () => void
 }
 
-/** Whether the account behind `profile` has never stored a language of its own. */
+/**
+ * Whether the account behind `profile` has never stored a language of its own:
+ * the backend sends the field, null then. A profile without the field at all
+ * (a backend or a stand-in that does not say) is not asked.
+ */
 export function asksLanguage(profile: Pick<StudentProfile, 'preferredAnswerLanguage'>): boolean {
-  return !isSupportedLanguage(profile.preferredAnswerLanguage)
+  const stored: string | null | undefined = profile.preferredAnswerLanguage
+  return stored !== undefined && !isSupportedLanguage(stored)
 }
 
 function readTab(key: string): string | null {

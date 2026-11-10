@@ -111,6 +111,10 @@ describe('who is asked', () => {
     expect(asksLanguage(profile({ preferredAnswerLanguage: 'fr' }))).toBe(false)
     expect(asksLanguage({ preferredAnswerLanguage: '' as never })).toBe(true)
   })
+
+  it('does not ask from a profile that does not say, as the backend always does', () => {
+    expect(asksLanguage({})).toBe(false)
+  })
 })
 
 describe('the language chosen to begin with', () => {
