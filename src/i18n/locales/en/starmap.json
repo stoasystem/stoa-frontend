@@ -21,7 +21,8 @@
     "body": "Every star is one thing to learn. Know all this already? Tell me where you are at school and I'll find your star.",
     "start": "Start this star",
     "later": "Look around first",
-    "findOwn": "Find my own star"
+    "findOwn": "Find my own star",
+    "legendHint": "A star’s colour and shape show where you are with it – the ? at the bottom left explains them any time."
   },
   "findOwn": {
     "examples": {

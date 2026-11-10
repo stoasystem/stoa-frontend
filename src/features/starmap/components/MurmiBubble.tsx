@@ -161,6 +161,8 @@ export type MurmiBubbleProps = {
   marker: `data-${string}`
   title: string
   body?: string
+  /** A quieter line under the body: an aside, not the point (#643). */
+  note?: string
   /** Said once when Murmi arrives; the title when absent. */
   announce?: string
   /** The ways on, under the line. */
@@ -188,6 +190,7 @@ export function MurmiBubble({
   marker,
   title,
   body,
+  note,
   announce,
   ways,
   stackDocked = false,
@@ -395,6 +398,8 @@ export function MurmiBubble({
             )}
           </div>
           {body && <p className="m-0 text-[13px] leading-5 text-[color:var(--on-sky-text-body)]">{body}</p>}
+          {/* Set apart from the body, a step quieter: the caption ink keeps 4.53:1 on the glass even over white. */}
+          {note && <p data-bubble-note className="m-0 pt-1 text-[12px] leading-4 text-[color:var(--on-sky-text-caption)]">{note}</p>}
           <div
             data-bubble-ways={stackDocked && docked ? 'stacked' : 'row'}
             className={cn('flex gap-x-2 gap-y-1 pt-0.5', stackDocked && docked ? 'flex-col items-stretch' : 'flex-wrap items-center')}

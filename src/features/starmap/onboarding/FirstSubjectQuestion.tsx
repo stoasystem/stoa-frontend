@@ -8,8 +8,8 @@
  * Over the map, in the middle, with the galaxy behind it. Not a modal: the
  * map still moves and every star is still reachable; its heading takes focus
  * when it opens, so a keyboard or a screen reader starts from the question.
- * Answered, it fades out first and the camera takes off as it goes; on a
- * phone it keeps clear of Ask's button on the map's right edge.
+ * Answered, it fades out first and the camera takes off as it goes. It sits
+ * in the band the map's controls leave free (`CARD_BAND`).
  */
 import { useEffect, useId, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'

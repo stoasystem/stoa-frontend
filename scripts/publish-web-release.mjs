@@ -35,6 +35,8 @@ const SKIP_NAMES = new Set([
   'served-release.json',
   'runtime-config.json.template',
   'served-release.json.template',
+  // Notes for whoever edits public/ (public/email/README.md, #624), not pages.
+  'README.md',
 ])
 
 export const PRODUCTION_DEFAULTS = Object.freeze({
@@ -219,6 +221,10 @@ export function cacheControlFor(relativePath) {
   if (RUNTIME_CONFIG_KEY_PATTERN.test(relativePath)) return 'public,max-age=31536000,immutable'
   if (relativePath === 'index.html' || relativePath.endsWith('.json')) return 'no-store'
   if (relativePath.startsWith('assets/')) return 'public,max-age=31536000,immutable'
+  // Images the backend's emails link to (#624). The path never changes and the
+  // bytes rarely do; a week, not immutable, so a replaced logo still reaches
+  // inboxes without a new name.
+  if (relativePath.startsWith('email/')) return 'public,max-age=604800'
   return 'public,max-age=300'
 }
 

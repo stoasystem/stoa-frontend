@@ -4,7 +4,9 @@
  * star's chapter, by the jump from where the star is drawn, or, for a student
  * who knows all this already, "Find my own star" (#586), which hands over to
  * Ask's docked composer with things to say -- and "Look around first", kept
- * as the quiet way out (Escape does the same).
+ * as the quiet way out (Escape does the same). Under the line, once, what a
+ * star's look means and where to read it again: the "?" bottom left, which
+ * replaced the wide screen's always-on legend (#643).
  *
  * How Murmi stands on the map -- following its star, arriving once the
  * camera has landed, docking on a phone, going on Escape -- is the star
@@ -60,6 +62,7 @@ export function FirstLandingBubble({ star, next, startable = true, avoid, onFind
             : t('firstLanding.title', { name: star.name })
       }
       body={next ? t('firstReveal.body', { name: star.name }) : t('firstLanding.body')}
+      note={next ? undefined : t('firstLanding.legendHint')}
       locate={locate}
       watch={watch}
       onDismiss={onDismiss}
