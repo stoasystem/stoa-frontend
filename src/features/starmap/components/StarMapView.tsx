@@ -1,7 +1,8 @@
 /*
  * The star map on screen (#47, #72): a canvas the engine draws, the parallel
  * DOM a screen reader and a keyboard use instead of it, and the controls
- * around it -- the subject switcher, where you are, zoom, the legend.
+ * around it -- the subject switcher, where you are, zoom, the "?" that
+ * explains the glyphs.
  *
  * The canvas is hidden from assistive technology. Every star on screen is an
  * `<a>` placed over its glyph, blurred or not (the blur is visual only), in
@@ -22,9 +23,11 @@
  * ring between nebulae, otherwise to the nearest star or nebula in that
  * direction (`view/keyboardOrder.ts`).
  *
- * What the glyphs mean and how to move (#141 B7, E5): a legend along the
- * bottom of a wide screen; on a phone, a "?" button that opens the same
- * words in a dialog (#146, round three C15 of #142).
+ * What the glyphs mean and how to move (#141 B7, E5): a "?" button, bottom
+ * left, opens them in a dialog (#146, round three C15 of #142) -- on every
+ * screen since #643: the wide screen's always-on legend took a corner the
+ * onboarding cards and the subject's title needed, and the first landing's
+ * Murmi says once where the "?" is.
  *
  * The zoom is continuous (#134): the wheel and trackpad scroll by how far
  * they scroll, the buttons and + / - keys by ×1.5, a pinch and a double tap
@@ -135,12 +138,18 @@ export function canvasPixelRatio(): number {
 
 /**
  * The bands the page keeps over the canvas for its own controls, CSS px: the
- * subject switcher and where-you-are line above; the legend (wide) or the zoom
- * buttons (phone) below. The whole map fits between them.
+ * subject switcher and where-you-are line above; the "?" and the zoom buttons
+ * below. The whole map fits between them.
+ *
+ * Below, measured (#643): a phone's "?" is 16 px up and 50 tall, its top at
+ * 66, and the band keeps 72. A wide stage's "?" is 24 px up and 50 tall (top
+ * at 74), its zoom pair 24 px up and about 74 tall (top at 98); the band keeps
+ * 110, 12 px over the taller of the two. (It kept 164 for the always-on legend,
+ * 89 tall with two rows.)
  */
 export function controlBands(wide: boolean, bottomInset = 0, demo = false): { top: number; bottom: number } {
   const noticeHeight = demo ? DEMO_NOTICE_HEIGHT : 0
-  return wide ? { top: 76 + noticeHeight, bottom: 164 + bottomInset } : { top: 112 + noticeHeight, bottom: 72 + bottomInset }
+  return wide ? { top: 76 + noticeHeight, bottom: 110 + bottomInset } : { top: 112 + noticeHeight, bottom: 72 + bottomInset }
 }
 
 /**
@@ -170,13 +179,13 @@ const GLASS = {
 
 /**
  * What the glyphs mean, how to move, and the keyboard's two orders (#141 B7,
- * E5): the wide screen's legend and the phone's help dialog (#146) say the
- * same words, from here.
+ * E5): the help dialog behind the "?" (#146, #643).
  */
 function LegendBody({ t }: { t: UseTranslationResponse<'starmap', undefined>['t'] }) {
   return (
     <>
       <LegendKey t={t} />
+      <h3 className="m-0 text-[13px] font-semibold text-on-sky">{t('legend.howLabel')}</h3>
       <LegendHow t={t} />
     </>
   )
@@ -704,8 +713,8 @@ export function StarMapView({ map, demo = false, target, path, marked, onNavigat
   const mapPath = here(pathForTarget(subjectId, { layer: 'map' }))
   const subjects = map.subjects
   const activeSubject = subjects.findIndex((subject) => subject.subjectId === subjectId)
-  const helpShown = !wide && target.layer !== 'star' && stars.length > 0
-  // Gone with the "?" (a wide screen, a chosen star): it comes back closed.
+  const helpShown = target.layer !== 'star' && stars.length > 0
+  // Gone with the "?" (a chosen star): it comes back closed.
   if (!helpShown && helpOpen) setHelpOpen(false)
 
   const whereYouAre = (
@@ -953,42 +962,23 @@ export function StarMapView({ map, demo = false, target, path, marked, onNavigat
         )}
 
         {/*
-          What the glyphs mean (wide screens, whole map).
-
-          The key is open; how to move is folded away. Five lines of
-          instructions took the whole bottom-left corner and were wider and
-          louder than the stars they explained — and they are read once,
-          while the key is read every visit.
-        */}
-        {wide && target.layer === 'map' && stars.length > 0 && (
-          <div
-            data-starmap-overlay
-            data-starmap-legend
-            className="absolute bottom-[calc(1.5rem+var(--page-bottom-inset,0px))] left-6 flex max-w-[640px] flex-col gap-2 rounded-[12px] border border-solid border-[color:var(--sky-glass-border)] px-3.5 py-2.5"
-            style={GLASS}
-          >
-            <h2 className="sr-only">{t('legend.label')}</h2>
-            <LegendKey t={t} />
-            <details data-starmap-legend-how className="m-0">
-              <summary className="cursor-pointer list-none text-[13px] text-[color:var(--on-sky-plain)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">
-                {t('legend.howLabel')}
-              </summary>
-              <LegendHow t={t} />
-            </details>
-          </div>
-        )}
-
-        {/*
-          On a phone the legend would cover the map: a "?" opens the same words
-          (#146), bottom left, across from the zoom buttons; not with a star
-          chosen, where the star's sheet has the bottom. A modal dialog: focus
-          stays in it, Escape or the close button or a tap outside closes it,
-          and focus goes back to the "?".
+          What the glyphs mean and how to move: a "?" (#146; wide screens too
+          since #643, where an always-on legend took the corner), bottom left,
+          on the zoom buttons' line; not with a star chosen, where the star's
+          card or sheet has the stage. A modal dialog: focus stays in it,
+          Escape or the close button or a tap outside closes it, and focus goes
+          back to the "?". On a phone the dialog is a sheet along the bottom;
+          on a wide stage a panel over the "?", never across the whole stage.
         */}
         {helpShown && (
           <div data-starmap-overlay data-starmap-help>
             <Dialog.Root open={helpOpen} onOpenChange={setHelpOpen}>
-              <div className="absolute bottom-[calc(1rem+var(--page-bottom-inset,0px))] left-4 rounded-[11px] border border-solid border-white/10 bg-white/10 p-[3px] backdrop-blur-[20px]">
+              <div
+                className={cn(
+                  'absolute rounded-[11px] border border-solid border-white/10 bg-white/10 p-[3px] backdrop-blur-[20px]',
+                  wide ? 'bottom-[calc(1.5rem+var(--page-bottom-inset,0px))] left-6' : 'bottom-[calc(1rem+var(--page-bottom-inset,0px))] left-4',
+                )}
+              >
                 <Dialog.Trigger asChild>
                   <button
                     type="button"
@@ -1006,7 +996,13 @@ export function StarMapView({ map, demo = false, target, path, marked, onNavigat
               <Dialog.Content
                 aria-describedby={undefined}
                 data-starmap-help-dialog
-                className="absolute inset-x-3 bottom-[calc(12px+var(--page-bottom-inset,0px))] z-20 flex max-h-[calc(100%-24px-var(--page-bottom-inset,0px))] touch-pan-y flex-col gap-2.5 overflow-y-auto overscroll-contain rounded-[16px] border border-solid border-[color:var(--sky-glass-border)] px-4 pt-2 pb-4 text-on-sky focus-visible:outline-none"
+                className={cn(
+                  'absolute z-20 flex touch-pan-y flex-col gap-2.5 overflow-y-auto overscroll-contain rounded-[16px] border border-solid border-[color:var(--sky-glass-border)] px-4 pt-2 pb-4 text-on-sky focus-visible:outline-none',
+                  // Wide: a panel just over the "?" (24 + 50 + 10 px up), as wide as reads well.
+                  wide
+                    ? 'bottom-[calc(84px+var(--page-bottom-inset,0px))] left-6 w-[min(460px,calc(100%-48px))] max-h-[calc(100%-108px-var(--page-bottom-inset,0px))]'
+                    : 'inset-x-3 bottom-[calc(12px+var(--page-bottom-inset,0px))] max-h-[calc(100%-24px-var(--page-bottom-inset,0px))]',
+                )}
                 style={{ ...GLASS, boxShadow: 'var(--shadow-glass)' }}
               >
                 <div className="flex items-center justify-between gap-2">

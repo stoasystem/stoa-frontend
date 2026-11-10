@@ -17,6 +17,10 @@ import { StudentWorld } from './support/student'
  * scrolls there: what is drawn of it (the card clipped by whatever clips it)
  * is what must keep clear, the wheel must scroll it (the map took every wheel
  * for its zoom), and "Done" must be reachable.
+ *
+ * Since #643 no key stays on the map at any width: a "?" bottom left, on the
+ * zoom pair's line, opens it. The cards keep clear of the "?" and the zoom
+ * pair as they kept clear of the key.
  */
 
 const VIEWPORTS = [
@@ -34,7 +38,6 @@ const LANGUAGES = [
 
 /** The map's controls the card must not cover, those drawn at this size. */
 const CONTROLS: Record<string, (page: Page) => Locator> = {
-  'the map key': (page) => page.locator('[data-starmap-legend]'),
   'the "?"': (page) => page.locator('[data-starmap-help-button]'),
   "Ask's button": (page) => page.locator('[data-ask-reopen]'),
   'the zoom pair': (page) => page.locator('[data-starmap-overlay][role=group]'),
@@ -118,6 +121,22 @@ async function expectClearOfControls(page: Page, cardSelector: string, when: str
   }
 }
 
+/** No key on the map; the "?" bottom left, its bottom on the zoom pair's (#643). */
+async function expectHelpInTheCorner(page: Page, viewport: { width: number; height: number }) {
+  await expect(page.locator('[data-starmap-legend]')).toHaveCount(0)
+  const help = page.locator('[data-starmap-help-button]')
+  await expect(help).toBeVisible()
+  const box = (await help.boundingBox())!
+  expect(box.width, 'the "?" keeps a 44 px target').toBeGreaterThanOrEqual(44)
+  expect(box.height, 'the "?" keeps a 44 px target').toBeGreaterThanOrEqual(44)
+  expect(box.x, 'the "?" is on the left').toBeLessThan(viewport.width / 2)
+  const zoom = await page.locator('[data-starmap-overlay][role=group]').boundingBox()
+  if (zoom) {
+    // The frames, not the buttons: each sits 3 px inside a 1 px border.
+    expect(Math.abs(box.y + box.height - (zoom.y + zoom.height)), 'the "?" on the zoom pair\'s line').toBeLessThanOrEqual(5)
+  }
+}
+
 /** `target` is scrolled into view and is what the page has at its centre. */
 async function expectHitAtCentre(page: Page, target: Locator, selector: string) {
   await target.scrollIntoViewIfNeeded()
@@ -153,6 +172,7 @@ for (const language of LANGUAGES) {
       const card = page.locator('[data-about-you] section')
       await expect(card).toBeVisible()
       await expect(card.getByRole('checkbox')).toHaveCount(4)
+      await expectHelpInTheCorner(page, viewport)
       await expectClearOfControls(page, '[data-about-you] section', 'as it opens')
 
       // The buttons keep a gap under the subjects (#625: "Done" touched the chips).
@@ -193,6 +213,7 @@ for (const language of LANGUAGES) {
 
       const card = page.locator('[data-first-question] section')
       await expect(card).toBeVisible()
+      await expectHelpInTheCorner(page, viewport)
       await expectClearOfControls(page, '[data-first-question] section', 'as it opens')
       const unsure = card.getByRole('button', { name: language.unsure })
       await expectHitAtCentre(page, unsure, '[data-first-question] section > button:last-child')

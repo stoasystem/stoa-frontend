@@ -1,15 +1,16 @@
 /**
  * The star map's legend (#141 B7): how to move today -- drag, scroll or
  * pinch, pick a star, press and drag a star (on touch, hold first) -- and
- * the keyboard's two orders (#141 E5), in de / en / fr / it. On a phone the
- * same words sit behind a "?" button, in a dialog (#146, round three C15).
+ * the keyboard's two orders (#141 E5), in de / en / fr / it. The words sit
+ * behind a "?" button, in a dialog (#146, round three C15) -- on a phone and,
+ * since #643, on a wide screen too: no legend stays on the map.
  */
 import { act, render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { I18nextProvider } from 'react-i18next'
 import { MemoryRouter } from 'react-router-dom'
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { StarMapView } from '@/features/starmap/components/StarMapView'
+import { controlBands, StarMapView } from '@/features/starmap/components/StarMapView'
 import type { LayerTarget } from '@/features/starmap/view/layers'
 import i18n from '@/i18n'
 import de from '@/i18n/locales/de/starmap.json'
@@ -73,12 +74,14 @@ describe('the legend (#141 B7)', () => {
     }
   })
 
-  it('shows both lines on a wide screen, in the reader’s language', async () => {
+  it('shows both lines behind the wide screen’s "?", in the reader’s language', async () => {
     for (const lang of ['en', 'de', 'fr', 'it'] as const) {
       await i18n.changeLanguage(lang)
       const view = showAt(1280, 776)
-      expect(view.container.querySelector('[data-legend-pointer]')?.textContent).toBe(locales[lang].legend.pointer)
-      expect(view.container.querySelector('[data-legend-keys]')?.textContent).toBe(locales[lang].legend.keys)
+      await userEvent.setup().click(screen.getByRole('button', { name: locales[lang].help.open }))
+      const dialog = screen.getByRole('dialog', { name: locales[lang].help.open })
+      expect(dialog.querySelector('[data-legend-pointer]')?.textContent).toBe(locales[lang].legend.pointer)
+      expect(dialog.querySelector('[data-legend-keys]')?.textContent).toBe(locales[lang].legend.keys)
       view.unmount()
       vi.restoreAllMocks()
     }
@@ -86,7 +89,7 @@ describe('the legend (#141 B7)', () => {
   })
 })
 
-describe('the phone’s "?" (#146 C15)', () => {
+describe('the "?" (#146 C15, wide screens too since #643)', () => {
   const locales = { en, de, fr, it: it_ }
   afterEach(async () => {
     vi.restoreAllMocks()
@@ -117,7 +120,7 @@ describe('the phone’s "?" (#146 C15)', () => {
       const user = userEvent.setup()
       await user.click(button)
       const dialog = screen.getByRole('dialog', { name: bundle.help.open })
-      // The same words as the wide screen's legend: states, markers, pointer, keys.
+      // The legend's words: states, markers, pointer, keys.
       for (const state of ['lit', 'in_progress', 'ready'] as const) expect(within(dialog).getByText(bundle.state[state])).toBeTruthy()
       expect(within(dialog).getByText(bundle.legend.waiting)).toBeTruthy()
       expect(within(dialog).getByText(bundle.marker.recommended)).toBeTruthy()
@@ -169,40 +172,91 @@ describe('the phone’s "?" (#146 C15)', () => {
     view.unmount()
   })
 
-  it('is not there on a wide screen (the legend is), nor with a star chosen (the sheet has the bottom)', () => {
-    const wide = showAt(1280, 776)
-    expect(screen.queryByRole('button', { name: en.help.open })).toBeNull()
-    expect(wide.container.querySelector('[data-legend-pointer]')).not.toBeNull()
-    wide.unmount()
-    vi.restoreAllMocks()
+  it('is not there with a star chosen, wide or phone (the card or the sheet has the stage)', () => {
     const star = skyMap(10).stars[0]
-    const phone = showAt(390, 844, { layer: 'star', nebulaId: star.nebulaId, unitId: star.unitId })
-    expect(screen.queryByRole('button', { name: en.help.open })).toBeNull()
-    phone.unmount()
+    for (const [width, height] of [[1280, 776], [390, 844]] as const) {
+      const view = showAt(width, height, { layer: 'star', nebulaId: star.nebulaId, unitId: star.unitId })
+      expect(screen.queryByRole('button', { name: en.help.open }), `${width}`).toBeNull()
+      view.unmount()
+      vi.restoreAllMocks()
+    }
   })
 })
 
-describe('how much of the legend is open', () => {
-  it('keeps the key open and folds the instructions away', () => {
-    // Five lines of instructions took the whole bottom-left corner and were
-    // louder than the stars they explained. The key is read on every visit;
-    // how to drag and zoom is read once.
-    const { container } = showAt(1280, 800)
-
-    const legend = container.querySelector('[data-starmap-legend]')!
-    expect(legend.querySelector('ul'), 'the key is not in the legend').not.toBeNull()
-    const how = legend.querySelector('[data-starmap-legend-how]') as HTMLDetailsElement
-    expect(how, 'the instructions are not folded away').not.toBeNull()
-    expect(how.open).toBe(false)
-    expect(how.querySelector('[data-legend-pointer]')).not.toBeNull()
-    expect(how.querySelector('[data-legend-keys]')).not.toBeNull()
+describe('the wide screen’s "?" (#643)', () => {
+  afterEach(async () => {
+    vi.restoreAllMocks()
+    await i18n.changeLanguage('en')
   })
 
-  it('names the fold in the reader’s language, never as a bare key', () => {
-    const { container } = showAt(1280, 800)
+  it('stands bottom left in place of the legend, on the zoom pair’s line, with a 44 px target', () => {
+    const view = showAt(1280, 800)
+    expect(view.container.querySelector('[data-starmap-legend]'), 'no always-on legend').toBeNull()
+    expect(view.container.querySelector('[data-legend-pointer]'), 'nothing of the legend on the map').toBeNull()
+    const button = screen.getByRole('button', { name: en.help.open })
+    expect(button.textContent).toBe('?')
+    expect(button.className).toContain('size-11')
+    const frame = button.parentElement!
+    expect(frame.className).toContain('left-6')
+    expect(frame.className).toContain('bottom-[calc(1.5rem+var(--page-bottom-inset,0px))]')
+    const zoom = screen.getByRole('group', { name: en.zoom.group })
+    expect(zoom.className).toContain('bottom-[calc(1.5rem+var(--page-bottom-inset,0px))]')
+    view.unmount()
+  })
 
-    const summary = container.querySelector('[data-starmap-legend-how] summary')!
-    expect(summary.textContent?.trim()).toBeTruthy()
-    expect(summary.textContent).not.toContain('legend.')
+  it('is there on a nebula too', () => {
+    const nebulaId = skyMap(10).nebulae[0].topicId
+    const view = showAt(1280, 800, { layer: 'nebula', nebulaId })
+    expect(screen.getByRole('button', { name: en.help.open })).toBeTruthy()
+    view.unmount()
+  })
+
+  it('opens the key and how to move, in a panel by the "?", not across the stage', async () => {
+    const view = showAt(1280, 800)
+    const user = userEvent.setup()
+    await user.click(screen.getByRole('button', { name: en.help.open }))
+    const dialog = screen.getByRole('dialog', { name: en.help.open })
+    for (const state of ['lit', 'in_progress', 'ready'] as const) expect(within(dialog).getByText(en.state[state])).toBeTruthy()
+    expect(within(dialog).getByText(en.legend.waiting)).toBeTruthy()
+    expect(within(dialog).getByText(en.legend.reviewDue)).toBeTruthy()
+    expect(within(dialog).getByRole('heading', { name: en.legend.label })).toBeTruthy()
+    expect(within(dialog).getByRole('heading', { name: en.legend.howLabel })).toBeTruthy()
+    expect(dialog.querySelector('[data-legend-pointer]')).not.toBeNull()
+    expect(dialog.className).toContain('left-6')
+    expect(dialog.className).toMatch(/w-\[min\(460px/)
+    expect(dialog.className).not.toContain('inset-x-3')
+    expect(dialog.className).toContain('overflow-y-auto')
+    view.unmount()
+  })
+
+  it('closes on Escape, on its close button and on a click outside, and gives the focus back to the "?"', async () => {
+    const view = showAt(1280, 800)
+    const user = userEvent.setup()
+    const button = screen.getByRole('button', { name: en.help.open })
+
+    await user.click(button)
+    await user.keyboard('{Escape}')
+    expect(screen.queryByRole('dialog')).toBeNull()
+    expect(document.activeElement).toBe(button)
+
+    await user.click(button)
+    await user.click(within(screen.getByRole('dialog')).getByRole('button', { name: en.help.close }))
+    expect(screen.queryByRole('dialog')).toBeNull()
+    expect(document.activeElement).toBe(button)
+
+    await user.click(button)
+    const overlay = view.container.querySelector('[data-starmap-help] .bg-black\\/40')!
+    expect(overlay).not.toBeNull()
+    await user.click(overlay)
+    expect(screen.queryByRole('dialog')).toBeNull()
+    expect(document.activeElement).toBe(button)
+    view.unmount()
+  })
+
+  it('leaves the map a band below that clears the "?" and the zoom pair, not the old legend’s', () => {
+    // "?" 24 px up and 50 tall; zoom pair 24 px up and about 74 tall.
+    const { bottom } = controlBands(true)
+    expect(bottom).toBeGreaterThanOrEqual(24 + 74 + 8)
+    expect(bottom).toBeLessThan(164)
   })
 })
