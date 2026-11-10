@@ -17,6 +17,7 @@ import { Button } from '@/components/base'
 import { Murmi } from '@/components/brand/Murmi'
 import type { Galaxy } from '@/features/starmap/model/starMap'
 import { usePrefersReducedMotion } from '@/features/starmap/motion/usePrefersReducedMotion'
+import { CARD_BAND, CARD_FRAME } from '@/features/starmap/onboarding/cardBand'
 import { BUBBLE_EXIT_MS, REDUCED_EXIT_MS } from '@/features/starmap/onboarding/FirstLandingBubble'
 import { cn } from '@/lib/utils'
 
@@ -50,39 +51,41 @@ export function FirstSubjectQuestion({ subjects, onChoose }: FirstSubjectQuestio
   }
 
   return (
-    // A phone keeps the right edge for Ask's button (`data-ask-reopen`), the card beside it.
-    <div data-first-question className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center p-4 max-[559px]:pr-[72px]">
-      <section
-        data-starmap-overlay
-        aria-labelledby={titleId}
-        className={cn(
-          'starmap-first-landing flex w-[min(380px,100%)] flex-col gap-3 rounded-[var(--corner-card)] border border-solid border-[color:var(--sky-glass-border)] px-5 py-4 text-on-sky',
-          answer ? 'pointer-events-none' : 'pointer-events-auto',
-        )}
-        data-shown
-        data-leaving={answer ? true : undefined}
-        style={{ background: 'var(--sky-glass)', backdropFilter: 'blur(var(--sky-glass-blur))', WebkitBackdropFilter: 'blur(var(--sky-glass-blur))' }}
-      >
-        <div className="flex items-center gap-3">
-          <Murmi mood="waving" size={40} animated />
-          <h2 id={titleId} ref={titleRef} tabIndex={-1} className="m-0 text-[16px] font-semibold leading-snug text-[color:var(--on-sky-text)] outline-none">
-            {t('firstQuestion.title')}
-          </h2>
-        </div>
-        <p className="m-0 text-[13px] leading-5 text-[color:var(--on-sky-text-body)]">{t('firstQuestion.body')}</p>
-        <ul className="m-0 flex list-none flex-wrap gap-2 p-0">
-          {subjects.map((galaxy) => (
-            <li key={galaxy.subjectId}>
-              <Button lift variant="onSky" size="regular" data-subject={galaxy.subjectId} onClick={() => pick(galaxy.subjectId)}>
-                {galaxy.name}
-              </Button>
-            </li>
-          ))}
-        </ul>
-        <Button variant="onSkyPlain" size="small" className="self-start" onClick={() => pick(null)}>
-          {t('firstQuestion.unsure')}
-        </Button>
-      </section>
+    // Between the map's controls, never over them (`cardBand.ts`, #625).
+    <div data-first-question className={CARD_FRAME}>
+      <div className={CARD_BAND}>
+        <section
+          data-starmap-overlay
+          aria-labelledby={titleId}
+          className={cn(
+            'starmap-first-landing flex max-h-full w-[min(380px,100%)] overflow-y-auto overscroll-contain flex-col gap-3 rounded-[var(--corner-card)] border border-solid border-[color:var(--sky-glass-border)] px-5 py-4 text-on-sky',
+            answer ? 'pointer-events-none' : 'pointer-events-auto',
+          )}
+          data-shown
+          data-leaving={answer ? true : undefined}
+          style={{ background: 'var(--sky-glass)', backdropFilter: 'blur(var(--sky-glass-blur))', WebkitBackdropFilter: 'blur(var(--sky-glass-blur))' }}
+        >
+          <div className="flex items-center gap-3">
+            <Murmi mood="waving" size={40} animated />
+            <h2 id={titleId} ref={titleRef} tabIndex={-1} className="m-0 text-[16px] font-semibold leading-snug text-[color:var(--on-sky-text)] outline-none">
+              {t('firstQuestion.title')}
+            </h2>
+          </div>
+          <p className="m-0 text-[13px] leading-5 text-[color:var(--on-sky-text-body)]">{t('firstQuestion.body')}</p>
+          <ul className="m-0 flex list-none flex-wrap gap-2 p-0">
+            {subjects.map((galaxy) => (
+              <li key={galaxy.subjectId}>
+                <Button lift variant="onSky" size="regular" data-subject={galaxy.subjectId} onClick={() => pick(galaxy.subjectId)}>
+                  {galaxy.name}
+                </Button>
+              </li>
+            ))}
+          </ul>
+          <Button variant="onSkyPlain" size="small" className="self-start" onClick={() => pick(null)}>
+            {t('firstQuestion.unsure')}
+          </Button>
+        </section>
+      </div>
     </div>
   )
 }

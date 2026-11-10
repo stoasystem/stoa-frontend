@@ -60,6 +60,8 @@ export class StudentWorld {
    */
   grade = 'grade_6_primary'
   primarySubjects: string[] = ['math']
+  /** The account's language (`preferredLocale` / `effectiveLocale`), which the app shows once signed in. */
+  locale: 'en' | 'de' | 'fr' | 'it' = 'en'
   /** The answer style preset (stoa-backend#314): a code from `choices.answerStyle`, "standard" when never chosen. */
   answerStyle = 'standard'
   /** What `PATCH /students/me/profile` was sent, in order. */
@@ -139,9 +141,9 @@ export class StudentWorld {
           },
         }
       }
-      return { status: 200, body: { accessToken: ACCESS_TOKEN, user: user() } }
+      return { status: 200, body: { accessToken: ACCESS_TOKEN, user: user(this.locale) } }
     })
-    b.on('GET', '/auth/me', ({ headers }) => (signedIn(headers) ? { status: 200, body: user() } : denied))
+    b.on('GET', '/auth/me', ({ headers }) => (signedIn(headers) ? { status: 200, body: user(this.locale) } : denied))
     b.on('POST', '/auth/logout', () => ({ status: 204 }))
     b.on('GET', '/notifications', ({ headers }) =>
       signedIn(headers) ? { status: 200, body: { items: [], count: 0 } } : denied,
@@ -468,14 +470,14 @@ export class StudentWorld {
   }
 }
 
-function user() {
+function user(locale: string) {
   return {
     id: STUDENT.id,
     name: STUDENT.name,
     email: STUDENT.email,
     role: 'student',
-    preferredLocale: 'en',
-    effectiveLocale: 'en',
+    preferredLocale: locale,
+    effectiveLocale: locale,
     mustChangePassword: false,
   }
 }

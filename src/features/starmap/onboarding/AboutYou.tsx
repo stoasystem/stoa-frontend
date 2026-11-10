@@ -17,6 +17,7 @@ import { Button } from '@/components/base'
 import { ChoiceSelect } from '@/components/base/ChoiceSelect'
 import { Murmi } from '@/components/brand/Murmi'
 import type { Galaxy } from '@/features/starmap/model/starMap'
+import { CARD_BAND, CARD_FRAME } from '@/features/starmap/onboarding/cardBand'
 import type { AboutYouAnswer } from '@/features/starmap/onboarding/useAboutYou'
 import type { ProfileChoice } from '@/types/student'
 
@@ -65,84 +66,86 @@ export function AboutYou({ grades, galaxies, ticked, saving, failed, onSave, onL
   }
 
   return (
-    // A phone keeps the right edge for Ask's button (`data-ask-reopen`), the card beside it.
-    <div data-about-you className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center overflow-y-auto p-4 max-[559px]:pr-[72px]">
-      <section
-        data-starmap-overlay
-        aria-labelledby={titleId}
-        onKeyDown={onKeyDown}
-        className="starmap-first-landing pointer-events-auto w-[min(400px,100%)] rounded-[var(--corner-card)] border border-solid border-[color:var(--sky-glass-border)] px-5 py-4 text-on-sky"
-        data-shown
-        style={{ background: 'var(--sky-glass)', backdropFilter: 'blur(var(--sky-glass-blur))', WebkitBackdropFilter: 'blur(var(--sky-glass-blur))' }}
-      >
-        <form className="flex flex-col gap-4" onSubmit={submit} noValidate>
-          <div className="flex items-start gap-3">
-            <Murmi mood="waving" size={40} />
-            <div className="flex min-w-0 flex-col gap-1">
-              <h2 id={titleId} className="m-0 text-[16px] font-semibold leading-snug text-[color:var(--on-sky-text)]">
-                {t('aboutYou.title')}
-              </h2>
-              <p className="m-0 text-[13px] leading-5 text-[color:var(--on-sky-text-body)]">{t('aboutYou.why')}</p>
+    // Between the map's controls, never over them (`cardBand.ts`, #625).
+    <div data-about-you className={CARD_FRAME}>
+      <div className={CARD_BAND}>
+        <section
+          data-starmap-overlay
+          aria-labelledby={titleId}
+          onKeyDown={onKeyDown}
+          className="starmap-first-landing pointer-events-auto max-h-full w-[min(400px,100%)] overflow-y-auto overscroll-contain rounded-[var(--corner-card)] border border-solid border-[color:var(--sky-glass-border)] px-5 py-4 text-on-sky"
+          data-shown
+          style={{ background: 'var(--sky-glass)', backdropFilter: 'blur(var(--sky-glass-blur))', WebkitBackdropFilter: 'blur(var(--sky-glass-blur))' }}
+        >
+          <form className="flex flex-col gap-4" onSubmit={submit} noValidate>
+            <div className="flex items-start gap-3">
+              <Murmi mood="waving" size={40} />
+              <div className="flex min-w-0 flex-col gap-1">
+                <h2 id={titleId} className="m-0 text-[16px] font-semibold leading-snug text-[color:var(--on-sky-text)]">
+                  {t('aboutYou.title')}
+                </h2>
+                <p className="m-0 text-[13px] leading-5 text-[color:var(--on-sky-text-body)]">{t('aboutYou.why')}</p>
+              </div>
             </div>
-          </div>
-          <ChoiceSelect
-            ref={gradeRef}
-            tone="sky"
-            label={t('aboutYou.grade')}
-            placeholder={t('aboutYou.gradePlaceholder')}
-            choices={grades}
-            value={grade}
-            error={missingGrade && !grade ? t('aboutYou.gradeMissing') : undefined}
-            onChange={(code) => {
-              setGrade(code)
-              setMissingGrade(false)
-            }}
-          />
-          {galaxies.length > 0 && (
-            <fieldset className="m-0 min-w-0 space-y-2 border-0 p-0">
-              <legend className="mb-1.5 p-0 text-[13px] leading-[1.3] font-medium text-[color:var(--on-sky-text)]">{t('aboutYou.subjects')}</legend>
-              <ul className="m-0 flex list-none flex-wrap gap-2 p-0">
-                {galaxies.map((galaxy) => {
-                  const checked = subjects.includes(galaxy.subjectId)
-                  return (
-                    <li key={galaxy.subjectId}>
-                      <label
-                        data-subject={galaxy.subjectId}
-                        className="inline-flex min-h-[38px] cursor-pointer items-center gap-2 rounded-full border border-solid border-[color:var(--on-sky-field-rule)] px-3 text-[14px] text-[color:var(--on-sky-text)] has-[:checked]:bg-[color:var(--on-sky-selected)] has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-ring"
-                      >
-                        <input
-                          type="checkbox"
-                          className="size-4 accent-[color:var(--on-sky-button)]"
-                          checked={checked}
-                          onChange={() =>
-                            setSubjects((before) => (checked ? before.filter((id) => id !== galaxy.subjectId) : [...before, galaxy.subjectId]))
-                          }
-                        />
-                        {galaxy.name}
-                      </label>
-                    </li>
-                  )
-                })}
-              </ul>
-            </fieldset>
-          )}
-          <div className="flex flex-wrap items-center gap-2">
-            <Button type="submit" lift variant="onSky" size="regular" aria-disabled={saving || undefined}>
-              {saving ? t('aboutYou.saving') : t('aboutYou.done')}
-            </Button>
-            <Button type="button" variant="onSkyPlain" size="small" onClick={onLater}>
-              {t('aboutYou.later')}
-            </Button>
-          </div>
-          <div>
-            <p className="m-0 text-[12px] leading-[1.4] text-[color:var(--on-sky-text-caption)]">{t('aboutYou.laterNote')}</p>
-            {/* Always mounted, only its text changes: a live region added together with its words is not announced (#410). */}
-            <p role="alert" className="m-0 text-[13px] leading-[1.35] text-red [&:not(:empty)]:mt-2">
-              {failed ? t('aboutYou.saveFailed') : null}
-            </p>
-          </div>
-        </form>
-      </section>
+            <ChoiceSelect
+              ref={gradeRef}
+              tone="sky"
+              label={t('aboutYou.grade')}
+              placeholder={t('aboutYou.gradePlaceholder')}
+              choices={grades}
+              value={grade}
+              error={missingGrade && !grade ? t('aboutYou.gradeMissing') : undefined}
+              onChange={(code) => {
+                setGrade(code)
+                setMissingGrade(false)
+              }}
+            />
+            {galaxies.length > 0 && (
+              <fieldset className="m-0 min-w-0 space-y-2 border-0 p-0">
+                <legend className="mb-1.5 p-0 text-[13px] leading-[1.3] font-medium text-[color:var(--on-sky-text)]">{t('aboutYou.subjects')}</legend>
+                <ul className="m-0 flex list-none flex-wrap gap-2 p-0">
+                  {galaxies.map((galaxy) => {
+                    const checked = subjects.includes(galaxy.subjectId)
+                    return (
+                      <li key={galaxy.subjectId}>
+                        <label
+                          data-subject={galaxy.subjectId}
+                          className="inline-flex min-h-[38px] cursor-pointer items-center gap-2 rounded-full border border-solid border-[color:var(--on-sky-field-rule)] px-3 text-[14px] text-[color:var(--on-sky-text)] has-[:checked]:bg-[color:var(--on-sky-selected)] has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-ring"
+                        >
+                          <input
+                            type="checkbox"
+                            className="size-4 accent-[color:var(--on-sky-button)]"
+                            checked={checked}
+                            onChange={() =>
+                              setSubjects((before) => (checked ? before.filter((id) => id !== galaxy.subjectId) : [...before, galaxy.subjectId]))
+                            }
+                          />
+                          {galaxy.name}
+                        </label>
+                      </li>
+                    )
+                  })}
+                </ul>
+              </fieldset>
+            )}
+            <div className="flex flex-wrap items-center gap-2">
+              <Button type="submit" lift variant="onSky" size="regular" aria-disabled={saving || undefined}>
+                {saving ? t('aboutYou.saving') : t('aboutYou.done')}
+              </Button>
+              <Button type="button" variant="onSkyPlain" size="small" onClick={onLater}>
+                {t('aboutYou.later')}
+              </Button>
+            </div>
+            <div>
+              <p className="m-0 text-[12px] leading-[1.4] text-[color:var(--on-sky-text-caption)]">{t('aboutYou.laterNote')}</p>
+              {/* Always mounted, only its text changes: a live region added together with its words is not announced (#410). */}
+              <p role="alert" className="m-0 text-[13px] leading-[1.35] text-red [&:not(:empty)]:mt-2">
+                {failed ? t('aboutYou.saveFailed') : null}
+              </p>
+            </div>
+          </form>
+        </section>
+      </div>
     </div>
   )
 }
