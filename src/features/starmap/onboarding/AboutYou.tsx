@@ -1,11 +1,12 @@
 /*
  * "About you" (#591, `useAboutYou`): one screen before a student's first
- * landing, over the map. Murmi says why it asks; the year group from the
+ * landing, over the map. Murmi and a title, then the year group from the
  * backend's list (`ChoiceSelect`, the same dropdown as on /me), and the
  * subjects school is on this term, ticked from the sky's galaxies -- the ones
  * the profile already names, else the ones the student takes. "Done" saves
  * both; "Later" (or Escape) goes on to the map, the start then the very first
- * star, which the line under it says.
+ * star. The card says no more than that (#644: the line on why it asks and
+ * the note under the buttons made it too busy).
  *
  * Not a modal, as plan B's question is not: the map behind it still moves.
  * The year group takes the focus when it opens. A save that fails says so
@@ -101,14 +102,11 @@ export function AboutYou({ grades, galaxies, ticked, saving, failed, onSave, onL
           style={{ background: 'var(--sky-glass)', backdropFilter: 'blur(var(--sky-glass-blur))', WebkitBackdropFilter: 'blur(var(--sky-glass-blur))' }}
         >
           <form className="flex flex-col gap-4" onSubmit={submit} noValidate>
-            <div className="flex items-start gap-3">
+            <div className="flex items-center gap-3">
               <Murmi mood="waving" size={40} />
-              <div className="flex min-w-0 flex-col gap-1">
-                <h2 id={titleId} className="m-0 text-[16px] font-semibold leading-snug text-[color:var(--on-sky-text)]">
-                  {t('aboutYou.title')}
-                </h2>
-                <p className="m-0 text-[13px] leading-5 text-[color:var(--on-sky-text-body)]">{t('aboutYou.why')}</p>
-              </div>
+              <h2 id={titleId} className="m-0 min-w-0 text-[16px] font-semibold leading-snug text-[color:var(--on-sky-text)]">
+                {t('aboutYou.title')}
+              </h2>
             </div>
             <ChoiceSelect
               ref={gradeRef}
@@ -150,18 +148,18 @@ export function AboutYou({ grades, galaxies, ticked, saving, failed, onSave, onL
                 </ul>
               </fieldset>
             )}
-            <div className="flex flex-wrap items-center gap-2">
-              {/* White and flat (#644): still the sky's one filled button, without the press edge that sat heavy on the card. */}
-              <Button type="submit" variant="onSky" size="regular" aria-disabled={saving || undefined}>
-                {saving ? t('aboutYou.saving') : t('aboutYou.done')}
-              </Button>
-              <Button type="button" variant="onSkyPlain" size="small" onClick={onLater}>
-                {t('aboutYou.later')}
-              </Button>
-            </div>
             <div>
-              <p className="m-0 text-[12px] leading-[1.4] text-[color:var(--on-sky-text-caption)]">{t('aboutYou.laterNote')}</p>
-              {/* Always mounted, only its text changes: a live region added together with its words is not announced (#410). */}
+              <div className="flex flex-wrap items-center gap-2">
+                {/* White and flat (#644): still the sky's one filled button, without the press edge that sat heavy on the card. */}
+                <Button type="submit" variant="onSky" size="regular" aria-disabled={saving || undefined}>
+                  {saving ? t('aboutYou.saving') : t('aboutYou.done')}
+                </Button>
+                <Button type="button" variant="onSkyPlain" size="small" onClick={onLater}>
+                  {t('aboutYou.later')}
+                </Button>
+              </div>
+              {/* Always mounted, only its text changes: a live region added together with its words is not announced (#410).
+                  In the buttons' block, so while empty it adds no gap under them. */}
               <p role="alert" className="m-0 text-[13px] leading-[1.35] text-red [&:not(:empty)]:mt-2">
                 {failed ? t('aboutYou.saveFailed') : null}
               </p>

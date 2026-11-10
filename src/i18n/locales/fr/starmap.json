@@ -55,7 +55,6 @@
   },
   "aboutYou": {
     "title": "À propos de toi",
-    "why": "Dis-moi en quelle année tu es et ce que tu étudies, et je te trouverai le bon point de départ.",
     "grade": "Ton année scolaire",
     "gradePlaceholder": "Choisis ton année scolaire",
     "gradeMissing": "Choisis d’abord ton année scolaire.",
@@ -63,7 +62,6 @@
     "done": "C’est bon",
     "saving": "Enregistrement…",
     "later": "Plus tard",
-    "laterNote": "Si tu passes cette étape, tu commenceras par les bases. Tu peux le changer à tout moment dans « Moi ».",
     "saveFailed": "Ça n’a pas été enregistré. Réessaie, ou choisis « Plus tard » pour continuer."
   },
   "firstReveal": {

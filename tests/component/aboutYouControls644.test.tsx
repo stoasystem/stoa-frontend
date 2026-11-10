@@ -9,6 +9,8 @@
  *     off and a drawn chevron in its place, marked invalid when "Done" finds
  *     it empty;
  *   - "Done" lost the press edge;
+ *   - the card says only its title and its controls' words, the save
+ *     error's live region still mounted (#410);
  *   - `ChoiceSelect` on a page (the account page's year group and answer
  *     style) is exactly what it was: same element tree, classes and style.
  */
@@ -110,6 +112,19 @@ describe('the year group on the sky', () => {
     await user.selectOptions(select, GRADES[4].code)
     expect(select).not.toHaveAttribute('aria-invalid')
     expect(select).toHaveClass('text-[color:var(--on-sky-text)]')
+  })
+})
+
+describe('the card\'s words', () => {
+  it('are the title and the controls\' own, with the save error\'s live region mounted and empty', () => {
+    const region = show()
+    // The line on why it asks and the note under the buttons were taken off (#644: too busy).
+    const paragraphs = [...region.querySelectorAll('p')]
+    expect(paragraphs).toHaveLength(1)
+    expect(paragraphs[0]).toHaveAttribute('role', 'alert')
+    expect(paragraphs[0]).toBeEmptyDOMElement()
+    expect(copy).not.toHaveProperty('why')
+    expect(copy).not.toHaveProperty('laterNote')
   })
 })
 

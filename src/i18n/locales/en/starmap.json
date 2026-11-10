@@ -55,7 +55,6 @@
   },
   "aboutYou": {
     "title": "About you",
-    "why": "Tell me which year you’re in and what you’re learning, and I’ll find the right place for you to start.",
     "grade": "Your year group",
     "gradePlaceholder": "Choose your year group",
     "gradeMissing": "Choose your year group first.",
@@ -63,7 +62,6 @@
     "done": "Done",
     "saving": "Saving…",
     "later": "Later",
-    "laterNote": "If you skip this, you’ll start with the very basics. You can change it any time under Me.",
     "saveFailed": "That wasn’t saved. Try again, or choose “Later” and carry on."
   },
   "firstReveal": {
