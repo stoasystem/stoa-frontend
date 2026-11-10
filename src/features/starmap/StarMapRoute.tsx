@@ -25,7 +25,9 @@ import { FirstLandingBubble } from '@/features/starmap/onboarding/FirstLandingBu
 import { findOwnExamples } from '@/features/starmap/onboarding/findOwnStar'
 import { FirstSubjectQuestion } from '@/features/starmap/onboarding/FirstSubjectQuestion'
 import { AboutYou } from '@/features/starmap/onboarding/AboutYou'
+import { LanguageFirst } from '@/features/starmap/onboarding/LanguageFirst'
 import { useAboutYou } from '@/features/starmap/onboarding/useAboutYou'
+import { useLanguageFirst } from '@/features/starmap/onboarding/useLanguageFirst'
 import { useFirstLanding } from '@/features/starmap/onboarding/useFirstLanding'
 import { useFirstReveal } from '@/features/starmap/onboarding/useFirstReveal'
 import { ReviewReminderBubble, ReviewReminderCorner } from '@/features/starmap/reviewReminder/ReviewReminderMurmi'
@@ -66,12 +68,15 @@ export function StarMapRoute({ relations = false, longNames = false }: { relatio
   // A point waiting for its lighting moment is drawn in progress until it, and its star's route
   // (or a tap on it) opens on its nebula (#140, #145).
   const stage = useLightingStage(map, routeTarget)
+  // A student whose account never stored a language picks one first (#627): "About you" and the landing wait.
+  const language = useLanguageFirst(student, ownerId)
   // A student whose profile has no year group is asked it and their subjects first (#591): the landing waits.
   const aboutYou = useAboutYou(student, ownerId)
+  const aboutYouUp = !language.hold && aboutYou.grades
   // A student who has not started anything is asked which subject school is on (plan B), unless the
   // profile says, lands on its recommended star with Murmi beside it, and after the first lighting sees
   // the galaxy (plan A).
-  const first = useFirstLanding(map, stage.target, ownerId, { hold: aboutYou.hold, subjects: aboutYou.subjects })
+  const first = useFirstLanding(map, stage.target, ownerId, { hold: language.hold || aboutYou.hold, subjects: aboutYou.subjects })
   const firstReveal = useFirstReveal(map, first.target, stage.reveal)
   // A star found from Ask with stars missing on the way: the path to it, and Murmi beside it (#489).
   const findStar = useFindStar(map)
@@ -113,7 +118,7 @@ export function StarMapRoute({ relations = false, longNames = false }: { relatio
 
   // Neither a skeleton nor an error is the first screen a student signing in waits for: the clock runs on.
   // One Murmi bubble on the map at a time: the reminder gives way to the first landing and to finding a star.
-  const firstLandingUp = Boolean(aboutYou.grades || first.asking || (first.star && !findStar.path) || (firstReveal.star && firstReveal.next))
+  const firstLandingUp = Boolean(language.open || aboutYouUp || first.asking || (first.star && !findStar.path) || (firstReveal.star && firstReveal.next))
   const findStarUp = Boolean(findStar.star && findStar.first && !firstReveal.target)
   const reminderBubble = !firstLandingUp && !findStarUp ? reminder.star : null
   // Not with a star chosen either: its card or sheet has that side of the map.
@@ -128,9 +133,10 @@ export function StarMapRoute({ relations = false, longNames = false }: { relatio
       overlay={(locate, watch) => (
         <>
           <LightingOverlay map={map} locate={locate} watch={watch} onReveal={firstReveal.onReveal} />
-          {aboutYou.grades && (
+          {language.open && <LanguageFirst chosen={language.chosen} saving={language.saving} onPick={language.pick} onConfirm={language.confirm} />}
+          {aboutYouUp && (
             <AboutYou
-              grades={aboutYou.grades}
+              grades={aboutYouUp}
               galaxies={map.subjects}
               ticked={aboutYou.subjects}
               saving={aboutYou.saving}

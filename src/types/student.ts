@@ -32,7 +32,13 @@ export type StudentProfile = {
    */
   answerStyle?: string
   schoolSystem?: string
-  preferredAnswerLanguage: SupportedLanguage
+  /**
+   * The language the account stored (`preferred_locale`), null when it never
+   * stored one: opening an account stores none, only the student's own choice
+   * does. The language first (#627) asks then. The backend always sends it;
+   * a profile without it says nothing, and is not asked.
+   */
+  preferredAnswerLanguage?: SupportedLanguage | null
   guardianStatus: 'linked' | 'not_linked'
   createdAt: string
   updatedAt: string

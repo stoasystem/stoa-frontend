@@ -28,7 +28,7 @@ import {
   recordDemoExchange,
   saveDemoProfile,
   saveDemoNotificationPreferences,
-  setDemoLanguage,
+  storeDemoLanguage,
 } from '@/dev/preview/demoSource'
 import { starCountFrom } from '@/dev/preview/surfaces'
 import { DEMO_BRIDGE_STAR, DEMO_KNOWLEDGE_POINT } from '@/dev/demo/data'
@@ -158,7 +158,8 @@ const routes: Array<[method: string, pattern: string, handler: Handler]> = [
   ['POST', '/auth/logout', () => ({ ok: true })],
   ['PATCH', '/auth/me/preferences/locale', ({ body }) => {
     const asked = field<string>(body, 'preferredLocale')
-    if (isSupportedLanguage(asked)) setDemoLanguage(asked)
+    // Stored: an account that had none is no longer asked it (#627).
+    if (isSupportedLanguage(asked)) storeDemoLanguage(asked)
     const { preferredLocale, effectiveLocale, supportedLocales } = demo().demoStudent
     return { preferredLocale, effectiveLocale, supportedLocales, updatedAt: now() }
   }],

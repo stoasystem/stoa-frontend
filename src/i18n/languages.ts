@@ -111,6 +111,22 @@ export function getInitialLanguage(): SupportedLanguage {
 }
 
 /**
+ * The first language the browser asks for that the app has, read by its base
+ * code ("fr-CH" is French); null when it asks for none of them. The browser's
+ * whole list, not only its first entry: a browser asking for Romansh first and
+ * German second gets German (#627).
+ */
+export function browserLanguage(): SupportedLanguage | null {
+  if (typeof window === 'undefined') return null
+  const { languages, language } = window.navigator
+  for (const tag of languages?.length ? languages : [language]) {
+    const code = tag?.slice(0, 2).toLowerCase()
+    if (isSupportedLanguage(code)) return code
+  }
+  return null
+}
+
+/**
  * The locale every date, number and currency is formatted in (#280).
  *
  * Every reader is in Switzerland, so each UI language formats the Swiss way:

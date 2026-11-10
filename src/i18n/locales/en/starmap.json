@@ -54,6 +54,13 @@
     "body": "Murmi will take you to a good first star there.",
     "unsure": "Not sure"
   },
+  "languageFirst": {
+    "title": "Which language do you want to learn in?",
+    "why": "I’ll talk to you and answer your questions in this language. You can change it any time under Me.",
+    "choose": "Language",
+    "next": "Continue",
+    "saving": "Saving…"
+  },
   "aboutYou": {
     "title": "About you",
     "why": "Tell me which year you’re in and what you’re learning, and I’ll find the right place for you to start.",

@@ -54,6 +54,13 @@
     "body": "Murmi ti porta a una buona prima stella.",
     "unsure": "Non lo so"
   },
+  "languageFirst": {
+    "title": "In che lingua vuoi imparare?",
+    "why": "Ti parlo e rispondo alle tue domande in questa lingua. Puoi cambiarla quando vuoi in «Io».",
+    "choose": "Lingua",
+    "next": "Avanti",
+    "saving": "Salvataggio…"
+  },
   "aboutYou": {
     "title": "Su di te",
     "why": "Dimmi in che anno sei e cosa stai studiando, e troverò il punto di partenza giusto per te.",
