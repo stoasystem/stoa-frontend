@@ -69,15 +69,27 @@ export type AppSurface = 'light' | 'sky'
  * `bleed` hands the page area to the page whole: no padding, exactly the height
  * under the bar, nothing scrolls. The planet uses it, with Ask beside or over
  * it (#49); the page then paints its own surfaces.
+ *
+ * On a sky page the whole shell is the sky, not only the page area: the bar is
+ * the sky at 86%, and what showed through the rest was the light ground, so
+ * the bar came out a shade lighter than the sky under it (#649).
+ *
+ * `seamlessBar` drops the line under the bar, so bar and page read as one
+ * sky. Only the star map asks for it: nothing scrolls under its bar, and the
+ * subject row below is part of the same sky (#649). The other sky pages keep
+ * the line, because their content scrolls under the sticky bar.
  */
 export function AppLayout({
   children,
   surface = 'light',
   bleed = false,
+  seamlessBar = false,
 }: {
   children: ReactNode
   surface?: AppSurface
   bleed?: boolean
+  /** No separator under the bar (the star map, #649). */
+  seamlessBar?: boolean
 }) {
   const { t } = useTranslation('common')
   const location = useLocation()
@@ -118,10 +130,19 @@ export function AppLayout({
 
   return (
     <ShellCoverContext.Provider value={setCovered}>
-      <div className={cn('flex flex-col bg-ground text-ink', bleed ? 'h-dvh overflow-hidden' : 'min-h-screen')}>
+      <div
+        data-app-shell
+        data-surface={surface === 'sky' ? 'sky' : undefined}
+        className={cn(
+          'flex flex-col',
+          surface === 'sky' ? 'bg-sky text-on-sky' : 'bg-ground text-ink',
+          bleed ? 'h-dvh overflow-hidden' : 'min-h-screen',
+        )}
+      >
         <TopBar
           covered={covered}
           sky={surface === 'sky'}
+          seamless={seamlessBar}
           homePath={homePath}
           homeState={forcedChange ? location.state : undefined}
           wide={wide}

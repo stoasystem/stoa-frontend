@@ -808,7 +808,8 @@ export function StarMapView({ map, demo = false, target, path, marked, onNavigat
         {overlay?.(locateStar, watchMap)}
 
         {demo && (
-          <p className="absolute inset-x-0 top-0 m-0 flex h-[var(--starmap-notice-height)] items-center justify-center border-b border-white/10 px-2 text-[12px] text-[color:var(--on-sky-text-body)]">
+          // A line of text on the sky, no rule under it: bar, notice and subject row are one sky (#649).
+          <p data-starmap-notice className="absolute inset-x-0 top-0 m-0 flex h-[var(--starmap-notice-height)] items-center justify-center px-2 text-[12px] text-[color:var(--on-sky-text-body)]">
             {t('demo.notice')}
           </p>
         )}
