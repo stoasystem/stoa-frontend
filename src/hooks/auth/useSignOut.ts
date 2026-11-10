@@ -83,7 +83,12 @@ async function endOnServer(accessToken: string, refreshToken: string | null): Pr
 // out the account the browser was still on asks for the form to open on the
 // address it just activated (`loginEmail`), or to stay on the activation link
 // (`to`) so the invitation can be claimed signed out (#626).
-export type SignOutOptions = { loginEmail?: string; to?: string }
+//
+// An account that has just deleted itself (#651) has nothing left to sign out
+// on the backend: the deletion ends its sign-ins, and a logout for it would
+// only be refused. `endedOnServer` clears this device the same way and sends
+// nothing.
+export type SignOutOptions = { loginEmail?: string; to?: string; endedOnServer?: boolean }
 
 export function useSignOut() {
   const navigate = useNavigate()
@@ -129,7 +134,7 @@ export function useSignOut() {
     // account's, and a logout of one landing after the next sign-in would end
     // that one too. Server work may outlive the wait.
     const pending = trackPendingLogout(
-      accessToken ? endOnServer(accessToken, refreshToken) : Promise.resolve(),
+      accessToken && !options.endedOnServer ? endOnServer(accessToken, refreshToken) : Promise.resolve(),
     )
     // Replacing the entry keeps Back from reopening the page just left.
     const state = loginEmailState(options.loginEmail)

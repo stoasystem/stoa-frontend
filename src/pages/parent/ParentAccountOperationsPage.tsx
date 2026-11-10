@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { ParentNotificationSettingsCard } from '@/components/parent/ParentNotificationSettingsCard'
 import { VerificationRecoveryEvidence } from '@/components/parent/VerificationRecoveryEvidence'
+import { DeleteAccountGroup } from '@/features/account/DeleteAccountGroup'
 import {
   getAccountStateLabel,
   getIssueLabel,
@@ -37,6 +38,8 @@ export function ParentAccountOperationsPage() {
 
         {/* Its own read: shown whether or not the account's status loads (#621). */}
         <ParentNotificationSettingsCard />
+        {/* A parent's account page: deleting the account sits last, as on /me (#651). */}
+        <DeleteAccountGroup />
       </PageContainer>
     </DashboardLayout>
   )

@@ -126,6 +126,22 @@
       "managed": "Your name and email address come with your account. To change them, ask an administrator.",
       "managed_formal": "Your name and email address come with your account. To change them, ask an administrator.",
       "name": "Name"
+    },
+    "deleteAccount": {
+      "heading": "Delete account",
+      "consequences": "Deleting your account can't be undone. Your learning history, your progress and your conversations are deleted with it.",
+      "consequences_formal": "Deleting your account can't be undone. Your learning history, your progress and your conversations are deleted with it.",
+      "parentLinks": "The links to your children end as well.",
+      "parentLinks_formal": "The links to your children end as well.",
+      "confirmLabel": "To confirm, type {{word}}",
+      "confirmLabel_formal": "To confirm, type {{word}}",
+      "fallbackWord": "delete",
+      "submit": "Delete account",
+      "deleting": "Deleting…",
+      "accepted": "Your account deletion has been accepted. You are now signed out.",
+      "accepted_formal": "Your account deletion has been accepted. You are now signed out.",
+      "failed": "Your account could not be deleted. Try again later.",
+      "failed_formal": "Your account could not be deleted. Try again later."
     }
   },
   "navigation": {
