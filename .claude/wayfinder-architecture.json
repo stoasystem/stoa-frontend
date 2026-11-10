@@ -1,0 +1,793 @@
+{
+  "version": 1,
+  "title": "STOA 代码架构",
+  "generatedAt": "2026-11-10",
+  "basedOn": {
+    "stoasystem/stoa-frontend": "3b1daf8e9307a894c451c1dc464488f068f77885",
+    "stoasystem/stoa-backend": "2e7ab8993e10f237750bff393ea52758d9da5af8"
+  },
+  "groups": [
+    {
+      "id": "fe-ui",
+      "label": "前端页面与功能",
+      "note": "React 页面与功能模块：星图、章节、Ask、老师/家长/管理后台"
+    },
+    {
+      "id": "fe-data",
+      "label": "前端数据层",
+      "note": "按后端路由族划分的 API 封装、TanStack Query hooks 与 Zustand 状态"
+    },
+    {
+      "id": "be-api",
+      "label": "后端 API 路由",
+      "note": "FastAPI 路由族（Mangum 跑在 Lambda 上），每条路由声明授权"
+    },
+    {
+      "id": "be-domain",
+      "label": "后端领域服务",
+      "note": "学习会话、提问、真人求助、星图、额度、身份等业务规则"
+    },
+    {
+      "id": "data-ext",
+      "label": "数据与外部服务",
+      "note": "DynamoDB 单表、Bedrock 模型及 S3/SES/Cognito 等 AWS 客户端"
+    },
+    {
+      "id": "be-jobs",
+      "label": "后台任务",
+      "note": "异步回答生成 worker 与定时 Lambda"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "fe-shell",
+      "label": "外壳、登录与账号",
+      "group": "fe-ui",
+      "repo": "stoasystem/stoa-frontend",
+      "paths": [
+        "src/app/",
+        "src/layouts/",
+        "src/components/shell/",
+        "src/components/common/",
+        "src/components/base/",
+        "src/components/ui/",
+        "src/i18n/",
+        "src/features/account/",
+        "src/components/auth/",
+        "src/components/notifications/",
+        "src/pages/auth/",
+        "src/pages/login/",
+        "src/pages/me/",
+        "src/pages/entry/",
+        "src/pages/onboarding/",
+        "src/pages/support/",
+        "src/pages/legal/",
+        "src/pages/error/",
+        "src/pages/not-found/"
+      ],
+      "note": "路由与角色守卫、布局与基础组件、四语 i18n、登录注册、我的账号与通知中心"
+    },
+    {
+      "id": "fe-starmap",
+      "label": "星图",
+      "group": "fe-ui",
+      "repo": "stoasystem/stoa-frontend",
+      "paths": [
+        "src/features/starmap/",
+        "src/pages/map/",
+        "src/pages/review/"
+      ],
+      "note": "画出学生的星图（星系/星云/知识点）、学习状态与推荐标记、点亮动画、新生引导与待复习"
+    },
+    {
+      "id": "fe-chapter",
+      "label": "章节与课时",
+      "group": "fe-ui",
+      "repo": "stoasystem/stoa-frontend",
+      "paths": [
+        "src/features/chapter/",
+        "src/pages/chapter/",
+        "src/components/practice/"
+      ],
+      "note": "点开知识点进入章节：课时题目作答、课时测验与星级测验、复习会话"
+    },
+    {
+      "id": "fe-ask",
+      "label": "Ask 对话与上传",
+      "group": "fe-ui",
+      "repo": "stoasystem/stoa-frontend",
+      "paths": [
+        "src/features/ask/",
+        "src/pages/ask/",
+        "src/features/uploads/",
+        "src/features/attachments/",
+        "src/pages/upload/",
+        "src/components/chat/",
+        "src/components/brand/"
+      ],
+      "note": "Ask 面板：学习会话列表、提问与 Ask 回答展示、真人求助入口、附件上传与手机扫码上传"
+    },
+    {
+      "id": "fe-teacher",
+      "label": "老师工作台",
+      "group": "fe-ui",
+      "repo": "stoasystem/stoa-frontend",
+      "paths": [
+        "src/pages/teacher/",
+        "src/components/teacher/",
+        "src/features/teacherReply/"
+      ],
+      "note": "老师处理真人求助：求助列表与详情、回复编辑器、可接单状态与每周时段、AI 助教工具"
+    },
+    {
+      "id": "fe-parent",
+      "label": "家长与账单页",
+      "group": "fe-ui",
+      "repo": "stoasystem/stoa-frontend",
+      "paths": [
+        "src/pages/parent/",
+        "src/components/parent/",
+        "src/pages/billing/",
+        "src/components/billing/",
+        "src/components/pricing/",
+        "src/components/dashboard/"
+      ],
+      "note": "家长看子女进度、学习历史与报告；套餐、结账与付款设置"
+    },
+    {
+      "id": "fe-admin",
+      "label": "管理后台",
+      "group": "fe-ui",
+      "repo": "stoasystem/stoa-frontend",
+      "paths": [
+        "src/pages/admin/",
+        "src/components/admin/",
+        "src/components/moderation/",
+        "src/pages/learning/",
+        "src/pages/organization/"
+      ],
+      "note": "管理员的账号运营、课程发布、内容审核、老师申请、订阅请求与学习运营看板"
+    },
+    {
+      "id": "fe-core",
+      "label": "请求、认证与状态",
+      "group": "fe-data",
+      "repo": "stoasystem/stoa-frontend",
+      "paths": [
+        "src/services/api/",
+        "src/services/auth/",
+        "src/services/notifications/",
+        "src/services/analytics/",
+        "src/services/logging/",
+        "src/services/monitoring/",
+        "src/store/",
+        "src/hooks/auth/",
+        "src/hooks/notifications/",
+        "src/lib/",
+        "src/types/"
+      ],
+      "note": "httpClient 与会话刷新、登录、通知轮询与实时推送、埋点与错误监控、Zustand 全局状态（auth/ask/星图）"
+    },
+    {
+      "id": "fe-learning-api",
+      "label": "学习数据接口",
+      "group": "fe-data",
+      "repo": "stoasystem/stoa-frontend",
+      "paths": [
+        "src/services/practice/",
+        "src/services/student/",
+        "src/services/learning/",
+        "src/hooks/practice/",
+        "src/hooks/student/",
+        "src/hooks/learning/"
+      ],
+      "note": "星图读模型、课程/课时/作答/复习、学生资料与权益、自适应作业的请求与 query hooks"
+    },
+    {
+      "id": "fe-chat-api",
+      "label": "对话与文件接口",
+      "group": "fe-data",
+      "repo": "stoasystem/stoa-frontend",
+      "paths": [
+        "src/services/chat/",
+        "src/services/teacherHelp/",
+        "src/services/files/",
+        "src/hooks/chat/"
+      ],
+      "note": "学习会话与提问、回答生成轮询、真人求助、分片上传与上传码的请求封装"
+    },
+    {
+      "id": "fe-teacher-api",
+      "label": "老师接口",
+      "group": "fe-data",
+      "repo": "stoasystem/stoa-frontend",
+      "paths": [
+        "src/services/teacher/",
+        "src/hooks/teacher/"
+      ],
+      "note": "老师求助队列、回复、可接单设置与老师申请的请求封装"
+    },
+    {
+      "id": "fe-parent-api",
+      "label": "家长与账单接口",
+      "group": "fe-data",
+      "repo": "stoasystem/stoa-frontend",
+      "paths": [
+        "src/services/parent/",
+        "src/services/billing/",
+        "src/hooks/parent/",
+        "src/hooks/billing/"
+      ],
+      "note": "家长绑定、子女进度与报告、订阅与结账的请求封装（都走 /parents）"
+    },
+    {
+      "id": "fe-admin-api",
+      "label": "管理接口",
+      "group": "fe-data",
+      "repo": "stoasystem/stoa-frontend",
+      "paths": [
+        "src/services/admin/",
+        "src/hooks/admin/",
+        "src/hooks/moderation/"
+      ],
+      "note": "管理员账号、课程、账单与审核操作的请求封装"
+    },
+    {
+      "id": "r-ask",
+      "label": "对话与文件路由",
+      "group": "be-api",
+      "repo": "stoasystem/stoa-backend",
+      "paths": [
+        "src/stoa/routers/conversations.py",
+        "src/stoa/routers/questions.py",
+        "src/stoa/routers/files.py",
+        "src/stoa/routers/upload_codes.py"
+      ],
+      "note": "/conversations、/teacher-help、/questions、/files、/upload-codes：开会话、提问、求助、上传与举报"
+    },
+    {
+      "id": "r-learning",
+      "label": "学习与星图路由",
+      "group": "be-api",
+      "repo": "stoasystem/stoa-backend",
+      "paths": [
+        "src/stoa/routers/practice.py",
+        "src/stoa/routers/students.py",
+        "src/stoa/routers/adaptive.py"
+      ],
+      "note": "/practice（课程、星图、作答、复习）、/students（资料、权益、家长请求）、/adaptive（作业与推荐）"
+    },
+    {
+      "id": "r-teacher",
+      "label": "老师路由",
+      "group": "be-api",
+      "repo": "stoasystem/stoa-backend",
+      "paths": [
+        "src/stoa/routers/teachers.py",
+        "src/stoa/routers/teacher_applications.py"
+      ],
+      "note": "/teachers 求助处理与回复、可接单状态；/teacher-applications 老师申请与激活"
+    },
+    {
+      "id": "r-parent",
+      "label": "家长与账单路由",
+      "group": "be-api",
+      "repo": "stoasystem/stoa-backend",
+      "paths": [
+        "src/stoa/routers/parents.py",
+        "src/stoa/routers/billing.py"
+      ],
+      "note": "/parents 家长绑定、子女进度、报告、Stripe 结账；/billing 支付回调"
+    },
+    {
+      "id": "r-account",
+      "label": "入口、认证与通知",
+      "group": "be-api",
+      "repo": "stoasystem/stoa-backend",
+      "paths": [
+        "src/stoa/main.py",
+        "src/stoa/rule_violation.py",
+        "src/stoa/routers/auth.py",
+        "src/stoa/routers/notifications.py",
+        "src/stoa/routers/analytics.py"
+      ],
+      "note": "FastAPI 应用与中间件；/auth 注册登录、/notifications 通知、/analytics 埋点"
+    },
+    {
+      "id": "r-admin",
+      "label": "管理路由",
+      "group": "be-api",
+      "repo": "stoasystem/stoa-backend",
+      "paths": [
+        "src/stoa/routers/admin.py"
+      ],
+      "note": "/admin：账号运营、课程运维、审核、额度与使用期限、报告恢复"
+    },
+    {
+      "id": "s-identity",
+      "label": "身份、鉴权与账号",
+      "group": "be-domain",
+      "repo": "stoasystem/stoa-backend",
+      "paths": [
+        "src/stoa/security/",
+        "src/stoa/deps.py",
+        "src/stoa/services/account_deletion_service.py",
+        "src/stoa/services/account_errors.py",
+        "src/stoa/services/account_lifecycle.py",
+        "src/stoa/services/account_numbering_service.py",
+        "src/stoa/services/account_operations_service.py",
+        "src/stoa/services/account_provisioning_service.py",
+        "src/stoa/services/account_verification_service.py",
+        "src/stoa/services/parent_link_service.py",
+        "src/stoa/services/current_relationship.py",
+        "src/stoa/services/public_identity_service.py",
+        "src/stoa/services/privileged_identity_service.py",
+        "src/stoa/services/teacher_identity_provider.py",
+        "src/stoa/services/teacher_application_service.py",
+        "src/stoa/services/password_change_code_service.py"
+      ],
+      "note": "令牌校验与路由授权、账号开通/验证/删除、家长绑定与当前关系、老师申请"
+    },
+    {
+      "id": "s-ask",
+      "label": "学习会话与提问",
+      "group": "be-domain",
+      "repo": "stoasystem/stoa-backend",
+      "paths": [
+        "src/stoa/services/ask_question/",
+        "src/stoa/services/ask_question_errors.py",
+        "src/stoa/services/ask_answer.py",
+        "src/stoa/services/star_map_candidates.py",
+        "src/stoa/services/learning_session/",
+        "src/stoa/services/practice_context_service.py"
+      ],
+      "note": "学习会话的记录与消息；提问的准入、Ask 回答（对照星图候选清单）、重放与派给生成 worker"
+    },
+    {
+      "id": "s-help",
+      "label": "真人求助与派单",
+      "group": "be-domain",
+      "repo": "stoasystem/stoa-backend",
+      "paths": [
+        "src/stoa/services/help_requests.py",
+        "src/stoa/services/teacher_dispatch_service.py",
+        "src/stoa/services/teacher_reply_service.py",
+        "src/stoa/services/teacher_assistance_service.py",
+        "src/stoa/services/ai_teacher_tools_service.py",
+        "src/stoa/services/ai_teacher_tools_errors.py",
+        "src/stoa/services/teacher_support_allowance_service.py"
+      ],
+      "note": "真人求助的唯一持有者：老师分配与重派、老师回复、求助次数额度、AI 助教工具"
+    },
+    {
+      "id": "s-curriculum",
+      "label": "星图、课程与证据",
+      "group": "be-domain",
+      "repo": "stoasystem/stoa-backend",
+      "paths": [
+        "src/stoa/services/curriculum_service.py",
+        "src/stoa/services/curriculum_ops_service.py",
+        "src/stoa/services/curriculum_migration_service.py",
+        "src/stoa/services/curriculum_analytics_service.py",
+        "src/stoa/services/curriculum_translations.py",
+        "src/stoa/services/curriculum_issues.py",
+        "src/stoa/services/knowledge_map_service.py",
+        "src/stoa/services/knowledge_base_catalog.py",
+        "src/stoa/services/knowledge_mastery_service.py",
+        "src/stoa/services/student_evidence.py",
+        "src/stoa/services/practice_projection_service.py",
+        "src/stoa/services/answer_judging.py",
+        "src/stoa/services/answer_recording.py",
+        "src/stoa/services/quiz/",
+        "src/stoa/services/review_service.py",
+        "src/stoa/services/review_scheduler.py",
+        "src/stoa/services/adaptive_learning_service.py",
+        "src/stoa/services/learning_profile_service.py",
+        "src/stoa/services/exercise_localization.py",
+        "src/stoa/services/figure_svg.py"
+      ],
+      "note": "课程与知识库、星图读模型（学习状态/推荐标记）、学生证据、作答判定、测验、复习调度与自适应"
+    },
+    {
+      "id": "s-uploads",
+      "label": "上传、附件与审核",
+      "group": "be-domain",
+      "repo": "stoasystem/stoa-backend",
+      "paths": [
+        "src/stoa/services/uploads/",
+        "src/stoa/services/attachment_service.py",
+        "src/stoa/services/upload_code_service.py",
+        "src/stoa/services/file_validation_service.py",
+        "src/stoa/services/document_extraction_service.py",
+        "src/stoa/services/document_parser_worker.py",
+        "src/stoa/services/moderation_service.py",
+        "src/stoa/services/image_moderation_service.py",
+        "src/stoa/services/moderation_errors.py"
+      ],
+      "note": "上传的签发、分片直传、校验审核与清理；附件、手机上传码与内容审核"
+    },
+    {
+      "id": "s-billing",
+      "label": "额度、期限与订阅",
+      "group": "be-domain",
+      "repo": "stoasystem/stoa-backend",
+      "paths": [
+        "src/stoa/services/subscription_service.py",
+        "src/stoa/services/billing_callback_service.py",
+        "src/stoa/services/billing_reconciliation_service.py",
+        "src/stoa/services/billing_errors.py",
+        "src/stoa/services/entitlement_service.py",
+        "src/stoa/services/paid_entitlement_service.py",
+        "src/stoa/services/allowance_service.py",
+        "src/stoa/services/usage_period.py",
+        "src/stoa/services/usage_ledger_service.py"
+      ],
+      "note": "使用期限、每日条数与每周计数、用量凭据结算、套餐权益与 Stripe 订阅"
+    },
+    {
+      "id": "s-notify",
+      "label": "通知与学习报告",
+      "group": "be-domain",
+      "repo": "stoasystem/stoa-backend",
+      "paths": [
+        "src/stoa/services/notification_service.py",
+        "src/stoa/services/notify_service.py",
+        "src/stoa/services/notification_errors.py",
+        "src/stoa/services/websocket_service.py",
+        "src/stoa/services/message_catalog/",
+        "src/stoa/services/report_service.py",
+        "src/stoa/services/report_artifact_service.py",
+        "src/stoa/services/report_recovery_service.py",
+        "src/stoa/services/report_recovery_job_service.py",
+        "src/stoa/services/report_recovery_errors.py"
+      ],
+      "note": "站内通知与 WebSocket 推送、邮件发送与文案目录、家长学习报告的生成与恢复"
+    },
+    {
+      "id": "d-dynamodb",
+      "label": "DynamoDB",
+      "group": "data-ext",
+      "repo": "stoasystem/stoa-backend",
+      "paths": [
+        "src/stoa/db/"
+      ],
+      "note": "单表网关（条件写、事务、分页）、每周计数与各领域的 repository"
+    },
+    {
+      "id": "d-bedrock",
+      "label": "Bedrock 模型",
+      "group": "data-ext",
+      "repo": "stoasystem/stoa-backend",
+      "paths": [
+        "src/stoa/services/ai_service.py",
+        "src/stoa/services/bedrock_token_count_service.py"
+      ],
+      "note": "调用 Bedrock 生成回答与报告，并计 token 用量"
+    },
+    {
+      "id": "d-aws",
+      "label": "AWS 客户端与配置",
+      "group": "data-ext",
+      "repo": "stoasystem/stoa-backend",
+      "paths": [
+        "src/stoa/aws.py",
+        "src/stoa/config.py"
+      ],
+      "note": "S3、SES、Cognito、Rekognition、Lambda、WebSocket 管理 API 等客户端的唯一入口与环境配置"
+    },
+    {
+      "id": "j-jobs",
+      "label": "后台任务",
+      "group": "be-jobs",
+      "repo": "stoasystem/stoa-backend",
+      "paths": [
+        "src/stoa/jobs/"
+      ],
+      "note": "回答生成 worker 与 sweep、派单对账、过期上传清理、账号删除、审核图片与审计保留、周报"
+    }
+  ],
+  "edges": [
+    {
+      "from": "fe-shell",
+      "to": "fe-core",
+      "label": "登录与会话"
+    },
+    {
+      "from": "fe-starmap",
+      "to": "fe-learning-api",
+      "label": "读星图"
+    },
+    {
+      "from": "fe-starmap",
+      "to": "fe-chapter",
+      "label": "进入章节"
+    },
+    {
+      "from": "fe-starmap",
+      "to": "fe-core",
+      "label": "星图状态"
+    },
+    {
+      "from": "fe-chapter",
+      "to": "fe-learning-api",
+      "label": "课时与作答"
+    },
+    {
+      "from": "fe-chapter",
+      "to": "fe-ask",
+      "label": "课时内提问"
+    },
+    {
+      "from": "fe-ask",
+      "to": "fe-chat-api",
+      "label": "提问与上传"
+    },
+    {
+      "from": "fe-ask",
+      "to": "fe-starmap",
+      "label": "星图上下文"
+    },
+    {
+      "from": "fe-ask",
+      "to": "fe-core",
+      "label": "Ask 状态"
+    },
+    {
+      "from": "fe-teacher",
+      "to": "fe-teacher-api"
+    },
+    {
+      "from": "fe-teacher",
+      "to": "fe-ask",
+      "label": "复用上传/附件"
+    },
+    {
+      "from": "fe-parent",
+      "to": "fe-parent-api"
+    },
+    {
+      "from": "fe-admin",
+      "to": "fe-admin-api"
+    },
+    {
+      "from": "fe-admin",
+      "to": "fe-teacher-api",
+      "label": "老师资料"
+    },
+    {
+      "from": "fe-core",
+      "to": "r-account",
+      "label": "/auth /notifications"
+    },
+    {
+      "from": "fe-learning-api",
+      "to": "r-learning",
+      "label": "/practice /students /adaptive"
+    },
+    {
+      "from": "fe-chat-api",
+      "to": "r-ask",
+      "label": "/conversations /files"
+    },
+    {
+      "from": "fe-teacher-api",
+      "to": "r-teacher",
+      "label": "/teachers"
+    },
+    {
+      "from": "fe-parent-api",
+      "to": "r-parent",
+      "label": "/parents"
+    },
+    {
+      "from": "fe-admin-api",
+      "to": "r-admin",
+      "label": "/admin"
+    },
+    {
+      "from": "r-ask",
+      "to": "s-ask",
+      "label": "提交提问"
+    },
+    {
+      "from": "r-ask",
+      "to": "s-help",
+      "label": "发起求助"
+    },
+    {
+      "from": "r-ask",
+      "to": "s-uploads",
+      "label": "上传与附件"
+    },
+    {
+      "from": "r-ask",
+      "to": "s-identity",
+      "label": "授权"
+    },
+    {
+      "from": "r-learning",
+      "to": "s-curriculum",
+      "label": "星图与作答"
+    },
+    {
+      "from": "r-learning",
+      "to": "s-billing",
+      "label": "权益"
+    },
+    {
+      "from": "r-teacher",
+      "to": "s-help",
+      "label": "回复求助"
+    },
+    {
+      "from": "r-teacher",
+      "to": "s-uploads",
+      "label": "回复附件"
+    },
+    {
+      "from": "r-parent",
+      "to": "s-identity",
+      "label": "家长绑定"
+    },
+    {
+      "from": "r-parent",
+      "to": "s-billing",
+      "label": "订阅与额度"
+    },
+    {
+      "from": "r-account",
+      "to": "s-identity",
+      "label": "注册登录"
+    },
+    {
+      "from": "r-account",
+      "to": "s-notify",
+      "label": "通知"
+    },
+    {
+      "from": "r-admin",
+      "to": "s-identity",
+      "label": "账号运营"
+    },
+    {
+      "from": "r-admin",
+      "to": "s-billing",
+      "label": "期限与额度"
+    },
+    {
+      "from": "r-admin",
+      "to": "s-curriculum",
+      "label": "课程运维"
+    },
+    {
+      "from": "r-admin",
+      "to": "s-uploads",
+      "label": "审核"
+    },
+    {
+      "from": "r-admin",
+      "to": "s-notify",
+      "label": "报告恢复"
+    },
+    {
+      "from": "s-ask",
+      "to": "s-curriculum",
+      "label": "星图候选清单"
+    },
+    {
+      "from": "s-ask",
+      "to": "s-billing",
+      "label": "准入与结算"
+    },
+    {
+      "from": "s-ask",
+      "to": "s-uploads",
+      "label": "附件"
+    },
+    {
+      "from": "s-ask",
+      "to": "d-bedrock",
+      "label": "生成回答"
+    },
+    {
+      "from": "s-ask",
+      "to": "d-dynamodb",
+      "label": "读写"
+    },
+    {
+      "from": "s-ask",
+      "to": "j-jobs",
+      "label": "异步调用生成 Lambda"
+    },
+    {
+      "from": "s-help",
+      "to": "s-notify",
+      "label": "发通知"
+    },
+    {
+      "from": "s-help",
+      "to": "s-billing",
+      "label": "使用期限"
+    },
+    {
+      "from": "s-help",
+      "to": "d-dynamodb",
+      "label": "读写"
+    },
+    {
+      "from": "s-curriculum",
+      "to": "d-dynamodb",
+      "label": "读写"
+    },
+    {
+      "from": "s-uploads",
+      "to": "d-aws",
+      "label": "S3 / Rekognition"
+    },
+    {
+      "from": "s-uploads",
+      "to": "d-dynamodb",
+      "label": "读写"
+    },
+    {
+      "from": "s-identity",
+      "to": "d-aws",
+      "label": "Cognito"
+    },
+    {
+      "from": "s-identity",
+      "to": "d-dynamodb",
+      "label": "读写"
+    },
+    {
+      "from": "s-billing",
+      "to": "s-notify",
+      "label": "订阅通知"
+    },
+    {
+      "from": "s-billing",
+      "to": "d-dynamodb",
+      "label": "读写"
+    },
+    {
+      "from": "s-notify",
+      "to": "d-aws",
+      "label": "SES / WebSocket"
+    },
+    {
+      "from": "s-notify",
+      "to": "d-bedrock",
+      "label": "生成报告"
+    },
+    {
+      "from": "s-notify",
+      "to": "d-dynamodb",
+      "label": "读写"
+    },
+    {
+      "from": "j-jobs",
+      "to": "s-ask",
+      "label": "回答生成与 sweep"
+    },
+    {
+      "from": "j-jobs",
+      "to": "s-help",
+      "label": "派单对账"
+    },
+    {
+      "from": "j-jobs",
+      "to": "s-uploads",
+      "label": "清理过期上传"
+    },
+    {
+      "from": "j-jobs",
+      "to": "s-notify",
+      "label": "周报"
+    },
+    {
+      "from": "j-jobs",
+      "to": "s-identity",
+      "label": "账号删除"
+    }
+  ]
+}
