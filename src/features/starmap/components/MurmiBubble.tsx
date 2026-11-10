@@ -105,8 +105,8 @@ export function dockedPlace(
   controls: readonly Rect[],
   strict: Rect | null = null,
 ) {
-  // Along the bottom: below 60% of the map; along the top: above 40%. Between them (Ask's button
-  // on the edge) a control is beside the bubble, which stops short of it.
+  // Along the bottom: below 60% of the map; along the top: above 40%. A control between them
+  // is beside the bubble, which stops short of it.
   const floor = Math.min(layer.height, ...controls.filter((rect) => rect.y0 > 0.6 * layer.height).map((rect) => rect.y0)) - GUTTER_PX
   const ceiling = Math.max(0, ...controls.filter((rect) => rect.y1 < 0.4 * layer.height).map((rect) => rect.y1)) + GUTTER_PX
   const low = floor - box.height
@@ -120,15 +120,16 @@ export function dockedPlace(
 
 /**
  * The map's own controls over the canvas (the switcher, the way back, zoom,
- * help) and Ask's button on the map's edge, in the layer's CSS px: the
- * bubble keeps clear of them, or on a phone it lands under the switcher.
+ * help) and Ask's docked row (its composer and the button that calls it back,
+ * #645), in the layer's CSS px: the bubble keeps clear of them, or on a
+ * phone it lands under the switcher.
  */
 function controlsOver(root: HTMLElement, own: HTMLElement): Rect[] {
   const stage = root.parentElement
   if (!stage) return []
   const origin = root.getBoundingClientRect()
   const rects: Rect[] = []
-  const controls = [...stage.querySelectorAll<HTMLElement>('[data-starmap-overlay]'), ...document.querySelectorAll<HTMLElement>('[data-ask-reopen]')]
+  const controls = [...stage.querySelectorAll<HTMLElement>('[data-starmap-overlay]'), ...document.querySelectorAll<HTMLElement>('[data-ask-docked]')]
   for (const control of controls) {
     if (control === own || own.contains(control) || control.contains(own)) continue
     const box = control.getBoundingClientRect()

@@ -8,6 +8,7 @@ import { AskReopen } from '@/features/ask/AskReopen'
 import { useClearOfControls } from '@/features/ask/clearOfControls'
 import {
   ASK_PANEL,
+  ASK_REOPEN,
   ASK_SHEET,
   ASK_SURFACE_BACKGROUND,
   DOCKED_COMPOSER,
@@ -42,7 +43,8 @@ import '@/features/ask/askGuide.css'
  * `data-surface="sky"` and `data-ask-surface`, which brand-tokens.css turns
  * into the sky's colours, so they hold inside them and Ask no longer reads as a white card from another product.
  *
- * Closed, `AskReopen` on the right edge calls the same conversation back.
+ * Closed, `AskReopen` at the end of the docked composer's row calls the same
+ * conversation back (#125); it stood on the right edge until #645.
  *
  * After "Find my own star" on the first landing (#586) the docked composer
  * takes the focus, is highlighted once, and offers two or three things the
@@ -72,6 +74,7 @@ export function AskHost({
   const wasOpen = useRef(open)
   const layout = wide ? 'panel' : 'sheet'
   const sheet = open && !wide
+  const reopenRoom = ASK_REOPEN.size + ASK_REOPEN.gap
   // From the planet the phone sheet is a modal over it: the planet and the bar
   // are dimmed and inert, and the keyboard stays in the sheet. Opened at /ask
   // the full-screen sheet is the page itself, so the bar stays usable.
@@ -165,18 +168,29 @@ export function AskHost({
           <div
             ref={docked}
             data-ask-docked
-            className="absolute flex justify-center"
+            // The composer, then Ask's way back at the end of its row (#645). Wide, the
+            // composer stays centred: the row keeps the button's room on both sides.
+            className={wide ? 'absolute grid items-center' : 'absolute flex items-center'}
             style={
               wide
-                ? { left: 24, right: 24, bottom: DOCKED_COMPOSER.desktop.bottom }
-                : { left: DOCKED_COMPOSER.phone.inset, right: DOCKED_COMPOSER.phone.inset, bottom: DOCKED_COMPOSER.phone.bottom }
+                ? {
+                    left: 24,
+                    right: 24,
+                    bottom: DOCKED_COMPOSER.desktop.bottom,
+                    gridTemplateColumns: `minmax(${reopenRoom}px, 1fr) minmax(0, ${DOCKED_COMPOSER.desktop.width}px) minmax(${reopenRoom}px, 1fr)`,
+                  }
+                : {
+                    left: DOCKED_COMPOSER.phone.inset,
+                    right: DOCKED_COMPOSER.phone.inset,
+                    bottom: DOCKED_COMPOSER.phone.bottom,
+                    gap: ASK_REOPEN.gap,
+                  }
             }
           >
             <div
-              className="relative w-full"
+              className={wide ? 'relative col-start-2 min-w-0' : 'relative min-w-0 flex-1'}
               data-ask-guide={offering || undefined}
               onKeyDown={onDockedKeyDown}
-              style={{ maxWidth: wide ? DOCKED_COMPOSER.desktop.width : undefined }}
             >
               {offering && (
                 // Out of the flow, so the dock's box stays the composer's; the
@@ -231,9 +245,11 @@ export function AskHost({
                 placeholder={wide ? t('ask.dockedPlaceholder') : t('ask.dockedPlaceholderPhone')}
               />
             </div>
+            <div className="flex" style={wide ? { paddingLeft: ASK_REOPEN.gap } : undefined}>
+              <AskReopen onOpen={controller.reopen} resuming={controller.conversationId !== null} />
+            </div>
           </div>
         )}
-        {!open && <AskReopen onOpen={controller.reopen} resuming={controller.conversationId !== null} />}
       </div>
 
       {modal && (

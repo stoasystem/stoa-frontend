@@ -39,28 +39,24 @@ export const ASK_SHEET = {
 } as const
 
 export const DOCKED_COMPOSER = {
-  /** Placement: "bottom 22, width 640, centred". */
+  /** Placement: "bottom 22, width 640, centred"; Ask's way back beside it (`ASK_REOPEN`). */
   desktop: { bottom: 22, width: 640 },
-  /** Placement: "inset 12, bottom 34, full width". */
+  /** Placement: "inset 12, bottom 34, full width", less Ask's way back at its end. */
   phone: { inset: 12, bottom: 34 },
 } as const
 
 /**
- * The button that calls Ask back after it was closed (#125).
+ * The button that calls Ask back after it was closed (#125), at the end of the
+ * docked composer's row (#180 on the practice stage, #645 on the star map).
+ * 44 is the smallest touch target the Sizes board allows; `gap` is the room
+ * between it and the composer.
  *
- * Every other corner is taken, measured on the pages Ask sits on:
- *   bottom centre  the docked composer (640 wide, 46 high, 22 or 34 up)
- *   bottom right   the star map's zoom pair, at 24 (wide) or 16 (phone) in
- *                  from both edges, over the composer's reserved band
- *   bottom left    the legend on a wide screen (up to 640 wide), the "?" on a
- *                  phone, both at the same offsets as the zoom pair
- *   left edge,     the role switcher used for testing, `fixed left-2 top-1/2`
- *     middle
- * The right edge's middle is the one band none of them reaches, and it mirrors
- * the role switcher across the page. 44 is the smallest touch target the Sizes
- * board allows.
+ * On a wide star map the composer stays centred, 640 at most, and the button
+ * stands outside it on its right: the row keeps `size + gap` free on both
+ * sides of the composer, so it narrows evenly before the button ever reaches
+ * the page's edge. On a phone the composer takes the row less the button.
  */
-export const ASK_REOPEN = { size: 44, inset: 16 } as const
+export const ASK_REOPEN = { size: 44, gap: 8 } as const
 
 export function sheetHeightFor(entry: AskEntry): string {
   return entry === 'direct' ? ASK_SHEET.directHeight : ASK_SHEET.planetHeight

@@ -222,7 +222,7 @@ export function StageWithAsk({
                 placeholder={t('ask.practice.placeholder')}
               />
               </div>
-              {!off && <AskReopen placement="inline" onOpen={controller.reopen} resuming={controller.conversationId !== null} />}
+              {!off && <AskReopen onOpen={controller.reopen} resuming={controller.conversationId !== null} />}
               </div>
             </div>
           </div>

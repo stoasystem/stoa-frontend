@@ -566,7 +566,6 @@ describe('the practice stage', () => {
     open('/chapter/u-5/l-2', { width: 375 })
     await screen.findByRole('heading', { level: 2, name: '3x + 5 = 20' })
     const back = document.querySelector<HTMLElement>('[data-ask-reopen]')!
-    expect(back).toHaveAttribute('data-ask-reopen-placement', 'inline')
     expect(document.querySelector('[data-ask-docked]')!.contains(back)).toBe(true)
     expect(back.className).not.toContain('absolute')
   })
