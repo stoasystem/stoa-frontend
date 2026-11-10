@@ -15,8 +15,9 @@
  *           (`--page-bottom-inset`). The band ends 12 px over the "?". The
  *           zoom pair, bottom right, is taller on a wide stage (about 74), but
  *           a card (at most 400 wide, centred on a stage at least 768 wide)
- *           ends 120 px or more short of it; on a phone the band's right
- *           padding keeps Ask's button clear.
+ *           ends 120 px or more short of it. Under 560 the card is wide
+ *           enough to reach the phone's zoom pair (98 tall): the band ends
+ *           12 px over the pair there (#645).
  *
  * The card is at most the band's height and scrolls inside itself when it is
  * taller (375 x 667, a laptop at 1280 x 640). The card, not the band: the band
@@ -34,8 +35,12 @@ export const CARD_FRAME = 'pointer-events-none absolute inset-0 z-10 @container'
 
 /**
  * The band between the controls, the card in its middle (the card takes
- * `max-h-full overflow-y-auto`); a phone keeps the right edge for Ask's button
- * (`data-ask-reopen`).
+ * `max-h-full overflow-y-auto`), the same room on both sides (#645).
+ *
+ * A phone kept 72 px on the right, for Ask's button on the right edge and the
+ * zoom pair under it; the button is in the docked composer's row now. Under
+ * 560 the card (400 at most) is wide enough to reach the zoom pair, so the
+ * band ends 12 px over the pair (98 tall) rather than over the "?".
  */
 export const CARD_BAND =
-  'absolute inset-x-0 top-[calc(104px+var(--starmap-notice-height,0px))] bottom-[calc(1rem+var(--page-bottom-inset,0px)+62px)] flex items-center justify-center px-4 max-[559px]:pr-[72px] @min-[768px]:top-[calc(76px+var(--starmap-notice-height,0px))] @min-[768px]:bottom-[calc(1.5rem+var(--page-bottom-inset,0px)+62px)]'
+  'absolute inset-x-0 top-[calc(104px+var(--starmap-notice-height,0px))] bottom-[calc(1rem+var(--page-bottom-inset,0px)+62px)] max-[559px]:bottom-[calc(1rem+var(--page-bottom-inset,0px)+110px)] flex items-center justify-center px-4 @min-[768px]:top-[calc(76px+var(--starmap-notice-height,0px))] @min-[768px]:bottom-[calc(1.5rem+var(--page-bottom-inset,0px)+62px)]'

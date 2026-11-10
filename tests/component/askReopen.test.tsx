@@ -3,8 +3,9 @@
  *
  * Closing the panel left the docked composer -- a new question could still be
  * asked -- but the conversation just read had no entry anywhere on the page.
- * The way back is a button on the right edge, and it goes back to the
- * conversation that was open, not to an empty new one.
+ * The way back is a button at the end of the docked composer's row (#645; it
+ * stood on the right edge before), and it goes back to the conversation that
+ * was open, not to an empty new one.
  */
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { render, screen, within } from '@testing-library/react'
@@ -131,15 +132,37 @@ describe('the way back into Ask', () => {
     expect(surface()).toHaveAttribute('data-ask-conversation', '')
   })
 
-  it('keeps clear of the controls the pages already put in the corners', () => {
-    planet()
-    const back = reopen()!
-    // The right edge's middle: the zoom pair, the "?" and the
-    // docked composer all live along the bottom, and the role switcher used for
-    // testing is `fixed left-2 top-1/2` on the other side.
-    expect(back).toHaveStyle({ right: `${ASK_REOPEN.inset}px`, width: '44px', height: '44px' })
-    expect(back.className).toContain('top-1/2')
-    expect(back.className).toContain('-translate-y-1/2')
-    expect(back.className).not.toContain('bottom-')
+  // #645: on the star map the edge button and the composer read as two ways
+  // into Ask. The button is at the end of the composer's row, as on the
+  // practice stage (#180), and nothing floats on the map's edge.
+  for (const width of [375, 1280]) {
+    it(`sits at the end of the docked composer's row, not on the edge, at ${width}`, async () => {
+      planet(width)
+      const back = reopen()!
+      const docked = document.querySelector<HTMLElement>('[data-ask-docked]')!
+      const composer = docked.querySelector<HTMLElement>('[data-composer="docked"]')!
+      expect(docked.contains(back)).toBe(true)
+      // After the composer, in the flow: nothing positions it over the page.
+      expect(composer.compareDocumentPosition(back) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+      expect(back.className).not.toContain('absolute')
+      expect(back.className).not.toContain('top-1/2')
+      expect(back).toHaveStyle({ width: `${ASK_REOPEN.size}px`, height: `${ASK_REOPEN.size}px` })
+      expect(back.style.right).toBe('')
+      expect(document.querySelectorAll('[data-ask-reopen]')).toHaveLength(1)
+
+      await userEvent.click(back)
+      expect(surface()).not.toBeNull()
+    })
+  }
+
+  it('keeps the composer centred and 640 at most on a wide screen, the button outside it', () => {
+    planet(1280)
+    const docked = document.querySelector<HTMLElement>('[data-ask-docked]')!
+    // The button's room on both sides of the composer, so the composer stays in the middle.
+    const room = ASK_REOPEN.size + ASK_REOPEN.gap
+    expect(docked.style.gridTemplateColumns).toBe(`minmax(${room}px, 1fr) minmax(0, 640px) minmax(${room}px, 1fr)`)
+    const column = docked.querySelector('[data-composer="docked"]')!.closest<HTMLElement>('[data-ask-docked] > *')!
+    expect(column.className).toContain('col-start-2')
+    expect(column.contains(reopen())).toBe(false)
   })
 })

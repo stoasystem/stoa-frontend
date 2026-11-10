@@ -154,6 +154,17 @@ async function expectNoSidewaysScroll(page: Page, width: number) {
   expect(await page.locator('html').evaluate((root) => root.scrollWidth), 'the page does not scroll sideways').toBeLessThanOrEqual(width)
 }
 
+/**
+ * The card has the same room on both sides (#645): a phone kept the right
+ * edge for Ask's button there, which is in the composer's row now.
+ */
+async function expectCentred(page: Page, cardSelector: string, width: number) {
+  const card = (await page.locator(cardSelector).boundingBox())!
+  const left = card.x
+  const right = width - (card.x + card.width)
+  expect(Math.abs(left - right), `the card's room left (${left}) and right (${right})`).toBeLessThanOrEqual(1)
+}
+
 for (const language of LANGUAGES) {
   for (const viewport of VIEWPORTS) {
     const size = `${viewport.width} x ${viewport.height}`
@@ -174,6 +185,7 @@ for (const language of LANGUAGES) {
       await expect(card.getByRole('checkbox')).toHaveCount(4)
       await expectHelpInTheCorner(page, viewport)
       await expectClearOfControls(page, '[data-about-you] section', 'as it opens')
+      await expectCentred(page, '[data-about-you] section', viewport.width)
 
       // The buttons keep a gap under the subjects (#625: "Done" touched the chips).
       const done = card.getByRole('button', { name: language.done, exact: true })
@@ -215,6 +227,7 @@ for (const language of LANGUAGES) {
       await expect(card).toBeVisible()
       await expectHelpInTheCorner(page, viewport)
       await expectClearOfControls(page, '[data-first-question] section', 'as it opens')
+      await expectCentred(page, '[data-first-question] section', viewport.width)
       const unsure = card.getByRole('button', { name: language.unsure })
       await expectHitAtCentre(page, unsure, '[data-first-question] section > button:last-child')
       await expectClearOfControls(page, '[data-first-question] section', '"Not sure" in view')
