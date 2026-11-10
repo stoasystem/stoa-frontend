@@ -51,12 +51,12 @@ export function FirstSubjectQuestion({ subjects, onChoose }: FirstSubjectQuestio
 
   return (
     // A phone keeps the right edge for Ask's button (`data-ask-reopen`), the card beside it.
-    <div data-first-question className="pointer-events-none absolute inset-0 flex items-center justify-center p-4 max-[559px]:pr-[72px]">
+    <div data-first-question className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center p-4 max-[559px]:pr-[72px]">
       <section
         data-starmap-overlay
         aria-labelledby={titleId}
         className={cn(
-          'starmap-first-landing w-[min(380px,100%)] space-y-3 rounded-[var(--corner-card)] border border-solid border-[color:var(--sky-glass-border)] px-5 py-4 text-on-sky',
+          'starmap-first-landing flex w-[min(380px,100%)] flex-col gap-3 rounded-[var(--corner-card)] border border-solid border-[color:var(--sky-glass-border)] px-5 py-4 text-on-sky',
           answer ? 'pointer-events-none' : 'pointer-events-auto',
         )}
         data-shown
@@ -79,7 +79,7 @@ export function FirstSubjectQuestion({ subjects, onChoose }: FirstSubjectQuestio
             </li>
           ))}
         </ul>
-        <Button variant="onSkyPlain" size="small" onClick={() => pick(null)}>
+        <Button variant="onSkyPlain" size="small" className="self-start" onClick={() => pick(null)}>
           {t('firstQuestion.unsure')}
         </Button>
       </section>

@@ -66,7 +66,7 @@ export function AboutYou({ grades, galaxies, ticked, saving, failed, onSave, onL
 
   return (
     // A phone keeps the right edge for Ask's button (`data-ask-reopen`), the card beside it.
-    <div data-about-you className="pointer-events-none absolute inset-0 flex items-center justify-center overflow-y-auto p-4 max-[559px]:pr-[72px]">
+    <div data-about-you className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center overflow-y-auto p-4 max-[559px]:pr-[72px]">
       <section
         data-starmap-overlay
         aria-labelledby={titleId}
@@ -75,10 +75,10 @@ export function AboutYou({ grades, galaxies, ticked, saving, failed, onSave, onL
         data-shown
         style={{ background: 'var(--sky-glass)', backdropFilter: 'blur(var(--sky-glass-blur))', WebkitBackdropFilter: 'blur(var(--sky-glass-blur))' }}
       >
-        <form className="space-y-4" onSubmit={submit} noValidate>
+        <form className="flex flex-col gap-4" onSubmit={submit} noValidate>
           <div className="flex items-start gap-3">
             <Murmi mood="waving" size={40} />
-            <div className="space-y-1">
+            <div className="flex min-w-0 flex-col gap-1">
               <h2 id={titleId} className="m-0 text-[16px] font-semibold leading-snug text-[color:var(--on-sky-text)]">
                 {t('aboutYou.title')}
               </h2>
