@@ -5,6 +5,7 @@ import { TOP_BAR, TOP_BAR_PHONE, TOUCH_TARGET } from '@/components/base/sizes'
 import { StoaLogo } from '@/components/common/StoaLogo'
 import { NotificationCenter } from '@/components/notifications/NotificationCenter'
 import { AccountMenu } from '@/components/shell/AccountMenu'
+import { cn } from '@/lib/utils'
 
 /*
  * The one top bar (Sizes: 56 high; logo 30, bell 36, avatar 30, gap 6, side
@@ -21,6 +22,9 @@ import { AccountMenu } from '@/components/shell/AccountMenu'
  * with the logo in white and the bell and avatar in their sky values: a white
  * bar over the night sky read as a different product (#183 review). The light
  * pages keep the light bar.
+ *
+ * `seamless` leaves the separator out, for a page whose top is one surface
+ * with the bar (the star map, #649).
  */
 export function TopBar({
   homePath,
@@ -31,6 +35,7 @@ export function TopBar({
   bell,
   covered = false,
   sky = false,
+  seamless = false,
 }: {
   homePath: string
   /** The state the logo's link carries (a forced password change keeps its page in it). */
@@ -45,6 +50,8 @@ export function TopBar({
   covered?: boolean
   /** Over a sky page: the bar is the sky as well. */
   sky?: boolean
+  /** No separator under the bar: the page below continues its surface. */
+  seamless?: boolean
 }) {
   const { t } = useTranslation('common')
   const bar = wide ? TOP_BAR : TOP_BAR_PHONE
@@ -65,7 +72,11 @@ export function TopBar({
       data-top-bar
       data-surface={sky ? 'sky' : undefined}
       inert={covered || undefined}
-      className={sky ? 'sticky top-0 z-30 border-b border-[color:var(--sky-glass-border)]' : 'sticky top-0 z-30 border-b border-separator'}
+      className={cn(
+        'sticky top-0 z-30',
+        !seamless && 'border-b',
+        !seamless && (sky ? 'border-[color:var(--sky-glass-border)]' : 'border-separator'),
+      )}
       style={{
         background: sky ? 'color-mix(in srgb, var(--sky) 86%, transparent)' : 'var(--bar)',
         backdropFilter: 'blur(var(--bar-blur))',
