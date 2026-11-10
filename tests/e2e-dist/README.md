@@ -116,6 +116,14 @@ policy violations and the test fails.
 the shell, reloads it, changes the password, and "Continue" opens `/ask`; the
 backend is asked for nothing it would refuse during the reset but the sky (#412).
 
+`aboutYouLayout.spec.ts`: "About you" and the first subject question, at
+375 x 812, 375 x 667, 840 x 760, 1280 x 800 and 1280 x 640, in English and
+German, with four subjects: no part of the card is drawn over the map key, the
+"?", Ask's button or docked composer, the zoom pair or the top line; the
+buttons keep 12 px under the subjects; a card taller than its room scrolls
+under the wheel; "Done" is what is at its own centre; nothing scrolls sideways
+(#625). `StudentWorld.locale` signs the student in German.
+
 `accountMenu.spec.ts`: at 375 px, the account menu's language and switch-account
 lists open on the screen and can be tapped where they are drawn (#162: they
 opened at x = -152).

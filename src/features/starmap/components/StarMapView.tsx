@@ -143,6 +143,16 @@ export function controlBands(wide: boolean, bottomInset = 0, demo = false): { to
   return wide ? { top: 76 + noticeHeight, bottom: 164 + bottomInset } : { top: 112 + noticeHeight, bottom: 72 + bottomInset }
 }
 
+/** Whether `target` is in an element inside `stage` that has more to scroll than it shows. */
+function scrollsInStage(target: EventTarget | null, stage: Element): boolean {
+  for (let node = target instanceof Element ? target : null; node && node !== stage; node = node.parentElement) {
+    if (node.scrollHeight <= node.clientHeight) continue
+    const { overflowY } = getComputedStyle(node)
+    if (overflowY === 'auto' || overflowY === 'scroll') return true
+  }
+  return false
+}
+
 /** Glass over the sky: words on it keep 4.5:1 over any nebula behind them. */
 const GLASS = {
   background: 'var(--sky-glass)',
@@ -322,6 +332,9 @@ export function StarMapView({ map, demo = false, target, path, marked, onNavigat
     watchRatio()
 
     const onWheel = (event: WheelEvent) => {
+      // Over something on the map that scrolls -- "About you" on a short screen (#625) --
+      // the wheel scrolls it; a pinch still zooms.
+      if (!event.ctrlKey && scrollsInStage(event.target, stage)) return
       const rect = stage.getBoundingClientRect()
       // Trackpad pinch arrives as a ctrl+wheel; both zoom the map, not the page,
       // by as far as they scrolled (#134), around the pointer.
