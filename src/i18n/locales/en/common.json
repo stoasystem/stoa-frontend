@@ -348,6 +348,9 @@
     },
     "endingUsagePeriods": {
       "title": "Periods ending soon"
+    },
+    "unsubscribe": {
+      "title": "Email notifications"
     }
   },
   "state": {
@@ -493,5 +496,27 @@
       "expired": "Your usage period ended on {{date}}.",
       "expiredNoDate": "Your usage period has ended."
     }
+  },
+  "emailUnsubscribe": {
+    "title": "Email notifications",
+    "working": "Unsubscribing …",
+    "unsubscribed": {
+      "title": "Unsubscribed",
+      "kinds": {
+        "weekly_report": "The weekly report will no longer be sent by email. It is still in the app, under Reports.",
+        "dispatch_reminder": "Help requests offered to you will no longer come with a reminder email. They still appear in the app’s notifications.",
+        "notification_digest": "The notification digest will no longer be sent by email. Notifications still appear in the app.",
+        "other": "These emails will no longer be sent."
+      }
+    },
+    "resubscribed": {
+      "title": "Subscribed again",
+      "body": "These emails will be sent again, as before."
+    },
+    "undo": "Undo",
+    "again": "Unsubscribe again",
+    "invalid": "This link is not valid. Use the link in the most recent email, or change your email settings in the app after signing in.",
+    "failed": "That did not work. Check the connection and try again.",
+    "retry": "Try again"
   }
 }

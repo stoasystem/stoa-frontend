@@ -104,6 +104,16 @@ export class StaffWorld {
         children: [],
       }))
       b.on('GET', '/parents/me/usage-period', ({ headers }) => answer(this.usagePeriods)({ headers }))
+      // The weekly report email switch on the account page (#621).
+      b.on('GET', '/notifications/preferences', answer({
+        userId: account.id,
+        preferences: {},
+        dispatchEmail: true,
+        weeklyReportEmail: true,
+        supportedCategories: [],
+        supportedChannels: [],
+        updatedAt: null,
+      }))
     }
   }
 }

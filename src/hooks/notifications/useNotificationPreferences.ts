@@ -3,6 +3,7 @@ import {
   getNotificationPreferences,
   updateDispatchEmail,
   updateNotificationPreferences,
+  updateWeeklyReportEmail,
 } from '@/services/notifications/notificationApi'
 import { notificationQueryKeys } from '@/services/notifications/notificationQueryKeys'
 import type { NotificationPreferenceMatrix } from '@/types/notification'
@@ -53,6 +54,18 @@ export function useUpdateDispatchEmailMutation() {
   return useMutation({
     scope: { id: 'notification-preferences' },
     mutationFn: updateDispatchEmail,
+    onSuccess: (saved) => {
+      queryClient.setQueryData(notificationQueryKeys.preferences(), saved)
+    },
+  })
+}
+
+/** A parent's weekly report email switch (#621), written on its own like the dispatch email. */
+export function useUpdateWeeklyReportEmailMutation() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    scope: { id: 'notification-preferences' },
+    mutationFn: updateWeeklyReportEmail,
     onSuccess: (saved) => {
       queryClient.setQueryData(notificationQueryKeys.preferences(), saved)
     },

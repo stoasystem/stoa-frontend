@@ -322,5 +322,15 @@
       "paidByOtherParent": "Lo paga un altro genitore."
     },
     "renew": "Per rinnovarlo, contatti STOA: <email>{{email}}</email>"
+  },
+  "notificationSettings": {
+    "title": "Notifiche via e-mail",
+    "weeklyReportEmail": {
+      "title": "Report settimanale via e-mail",
+      "body": "Ogni settimana ricevi il report di tuo figlio o tua figlia via e-mail. Se disattivato, si ferma solo l’e-mail: il report resta disponibile nell’app, sotto «Report»."
+    },
+    "loading": "Caricamento delle impostazioni e-mail …",
+    "unavailable": "Le impostazioni e-mail non sono disponibili al momento.",
+    "saveFailed": "Questa modifica non è stata salvata. Riprova."
   }
 }

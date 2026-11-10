@@ -322,5 +322,15 @@
       "paidByOtherParent": "Elle est payée par un autre parent."
     },
     "renew": "Pour la prolonger, contactez STOA : <email>{{email}}</email>"
+  },
+  "notificationSettings": {
+    "title": "Notifications par e-mail",
+    "weeklyReportEmail": {
+      "title": "Rapport hebdomadaire par e-mail",
+      "body": "Chaque semaine, vous recevez le rapport de votre enfant par e-mail. Désactivé, seul l’e-mail s’arrête : le rapport reste disponible dans l’app, sous « Rapports »."
+    },
+    "loading": "Chargement des réglages e-mail …",
+    "unavailable": "Les réglages e-mail ne sont pas disponibles pour le moment.",
+    "saveFailed": "Cette modification n’a pas été enregistrée. Veuillez réessayer."
   }
 }

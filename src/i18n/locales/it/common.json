@@ -348,6 +348,9 @@
     },
     "endingUsagePeriods": {
       "title": "Periodi in scadenza"
+    },
+    "unsubscribe": {
+      "title": "Notifiche via e-mail"
     }
   },
   "state": {
@@ -497,5 +500,27 @@
       "expired": "Il tuo periodo di utilizzo è terminato il {{date}}.",
       "expiredNoDate": "Il tuo periodo di utilizzo è terminato."
     }
+  },
+  "emailUnsubscribe": {
+    "title": "Notifiche via e-mail",
+    "working": "Disiscrizione in corso …",
+    "unsubscribed": {
+      "title": "Disiscrizione effettuata",
+      "kinds": {
+        "weekly_report": "Il report settimanale non verrà più inviato via e-mail. Resta disponibile nell’app, sotto «Report».",
+        "dispatch_reminder": "Le richieste di aiuto proposte non saranno più accompagnate da un’e-mail di promemoria. Restano visibili nelle notifiche dell’app.",
+        "notification_digest": "Il riepilogo delle notifiche non verrà più inviato via e-mail. Le notifiche restano visibili nell’app.",
+        "other": "Queste e-mail non verranno più inviate."
+      }
+    },
+    "resubscribed": {
+      "title": "Iscrizione ripristinata",
+      "body": "Queste e-mail verranno di nuovo inviate, come prima."
+    },
+    "undo": "Annulla",
+    "again": "Disiscriviti di nuovo",
+    "invalid": "Questo link non è valido. Usa il link dell’e-mail più recente, oppure modifica le impostazioni e-mail nell’app dopo aver effettuato l’accesso.",
+    "failed": "Non ha funzionato. Controlla la connessione e riprova.",
+    "retry": "Riprova"
   }
 }
