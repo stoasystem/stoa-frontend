@@ -68,7 +68,19 @@ export type NotificationPreferences = {
   preferences: NotificationPreferenceMatrix
   /** A teacher's reminder email for each help request offered to them (stoa-backend#141). */
   dispatchEmail: boolean
+  /** A parent's weekly report by email, on by default; off stops only the email (stoa-backend#363). */
+  weeklyReportEmail: boolean
   supportedCategories: string[]
   supportedChannels: string[]
   updatedAt?: string | null
+}
+
+/** The kinds of email an unsubscribe link can stop (stoa-backend#363). */
+export type EmailSubscriptionKind = 'weekly_report' | 'dispatch_reminder' | 'notification_digest'
+
+/** `EmailSubscriptionResponse`: which email the link names, and whether it is sent now. */
+export type EmailSubscription = {
+  /** One of `EmailSubscriptionKind`; a string, since a newer backend may name another. */
+  kind: string
+  subscribed: boolean
 }

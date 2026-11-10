@@ -2,6 +2,7 @@ import { apiPath } from '@/services/api/apiPath'
 import { httpClient } from '@/services/api/httpClient'
 
 import type {
+  EmailSubscription,
   NotificationEvent,
   NotificationListResponse,
   NotificationPreferenceMatrix,
@@ -65,7 +66,7 @@ export async function getNotificationPreferences() {
  * The backend rebuilds the whole matrix from its defaults and the body, so a
  * category or channel left out of `preferences` goes back to its default.
  * Always send the full matrix the last GET returned, with the change applied.
- * `dispatchEmail`, left out, keeps what is stored.
+ * `dispatchEmail` and `weeklyReportEmail`, left out, keep what is stored.
  */
 export async function updateNotificationPreferences(preferences: NotificationPreferenceMatrix) {
   const response = await httpClient.patch<NotificationPreferences>('/notifications/preferences', { preferences })
@@ -76,5 +77,28 @@ export async function updateNotificationPreferences(preferences: NotificationPre
 // `preferences` is left out (stoa-backend#141).
 export async function updateDispatchEmail(dispatchEmail: boolean) {
   const response = await httpClient.patch<NotificationPreferences>('/notifications/preferences', { dispatchEmail })
+  return response.data
+}
+
+// A parent's weekly report email alone, as the dispatch email above (stoa-backend#363).
+export async function updateWeeklyReportEmail(weeklyReportEmail: boolean) {
+  const response = await httpClient.patch<NotificationPreferences>('/notifications/preferences', { weeklyReportEmail })
+  return response.data
+}
+
+/*
+ * The link at the foot of a notification email (#621, stoa-backend#363). The
+ * token in its query is the credential: it names one person and one kind of
+ * email, so these go out without a session (`isPublicAuthPath`). The same
+ * token undoes it. No body: the one-click POST a mail client sends has a form
+ * body the backend does not read, and this one needs none.
+ */
+export async function unsubscribeFromEmail(token: string) {
+  const response = await httpClient.post<EmailSubscription>('/notifications/email-unsubscribe', undefined, { params: { token } })
+  return response.data
+}
+
+export async function resubscribeToEmail(token: string) {
+  const response = await httpClient.post<EmailSubscription>('/notifications/email-resubscribe', undefined, { params: { token } })
   return response.data
 }

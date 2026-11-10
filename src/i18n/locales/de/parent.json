@@ -315,5 +315,15 @@
       "paidByOtherParent": "Sie wird von einem anderen Elternteil bezahlt."
     },
     "renew": "Für eine Verlängerung wenden Sie sich an STOA: <email>{{email}}</email>"
+  },
+  "notificationSettings": {
+    "title": "E-Mail-Benachrichtigungen",
+    "weeklyReportEmail": {
+      "title": "Wochenbericht per E-Mail",
+      "body": "Jede Woche erhalten Sie den Bericht Ihres Kindes per E-Mail. Ausgeschaltet entfällt nur die E-Mail: Der Bericht bleibt in der App unter «Berichte» abrufbar."
+    },
+    "loading": "E-Mail-Einstellungen werden geladen …",
+    "unavailable": "Die E-Mail-Einstellungen sind gerade nicht verfügbar.",
+    "saveFailed": "Diese Änderung wurde nicht gespeichert. Bitte versuchen Sie es noch einmal."
   }
 }

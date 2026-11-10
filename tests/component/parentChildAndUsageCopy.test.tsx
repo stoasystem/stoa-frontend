@@ -46,6 +46,8 @@ vi.mock('@/hooks/parent/useChildLearningProfileQuery', () => ({
 vi.mock('@/hooks/practice/useCurriculumCatalogQuery', () => ({
   useCurriculumCatalogQuery: () => ({ data: undefined, isLoading: false, isError: false }),
 }))
+// Its own read and its own test (weeklyReportEmail621).
+vi.mock('@/components/parent/ParentNotificationSettingsCard', () => ({ ParentNotificationSettingsCard: () => null }))
 vi.mock('@/hooks/parent/useParentAccountOperationsQuery', () => ({
   useParentAccountOperationsQuery: () => ({ data: fixtures.accountOps, isLoading: false, isError: false }),
 }))

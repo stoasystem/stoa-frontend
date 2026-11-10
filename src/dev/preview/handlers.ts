@@ -110,6 +110,8 @@ function notificationPreferences() {
     preferences: withDefaults(demoNotificationPreferences()),
     // A teacher's switch; the demo student has no help requests offered to them.
     dispatchEmail: true,
+    // A parent's switch (#621).
+    weeklyReportEmail: true,
     supportedCategories: PREFERENCE_CATEGORIES,
     supportedChannels: PREFERENCE_CHANNELS,
     updatedAt: null as string | null,

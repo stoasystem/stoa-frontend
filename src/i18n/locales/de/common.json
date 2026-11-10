@@ -348,6 +348,9 @@
     },
     "endingUsagePeriods": {
       "title": "Bald ablaufende Nutzungsdauern"
+    },
+    "unsubscribe": {
+      "title": "E-Mail-Benachrichtigungen"
     }
   },
   "state": {
@@ -493,5 +496,27 @@
       "expired": "Deine Nutzungsdauer ist am {{date}} abgelaufen.",
       "expiredNoDate": "Deine Nutzungsdauer ist abgelaufen."
     }
+  },
+  "emailUnsubscribe": {
+    "title": "E-Mail-Benachrichtigungen",
+    "working": "Abmeldung läuft …",
+    "unsubscribed": {
+      "title": "Abgemeldet",
+      "kinds": {
+        "weekly_report": "Der Wochenbericht kommt nicht mehr per E-Mail. In der App ist er weiterhin unter «Berichte» zu finden.",
+        "dispatch_reminder": "Für angebotene Hilfeanfragen kommen keine Erinnerungs-E-Mails mehr. In der App erscheinen sie weiterhin in den Mitteilungen.",
+        "notification_digest": "Die Zusammenfassung der Mitteilungen kommt nicht mehr per E-Mail. In der App sind die Mitteilungen weiterhin zu sehen.",
+        "other": "Diese E-Mails werden nicht mehr verschickt."
+      }
+    },
+    "resubscribed": {
+      "title": "Wieder angemeldet",
+      "body": "Diese E-Mails werden wieder verschickt, wie bisher."
+    },
+    "undo": "Rückgängig machen",
+    "again": "Wieder abmelden",
+    "invalid": "Dieser Link ist ungültig. Am besten den Link aus der neusten E-Mail verwenden oder die E-Mail-Einstellungen nach der Anmeldung in der App ändern.",
+    "failed": "Das hat nicht geklappt. Bitte die Verbindung prüfen und noch einmal versuchen.",
+    "retry": "Noch einmal versuchen"
   }
 }

@@ -111,6 +111,9 @@ function isPublicAuthPath(url?: string, method?: string) {
   // token, are the credential. A phone signed in as anyone -- a parent, say --
   // sends no session with them, and a refusal there signs nobody out.
   if (/^\/upload-codes\/(redeem|complete|parts\/\d+)$/.test(path) && verb === 'post') return true
+  // An email's unsubscribe link (#621): its token is the credential, and the
+  // tab it opens in may be signed in as someone else, or as no one.
+  if ((path === '/notifications/email-unsubscribe' || path === '/notifications/email-resubscribe') && verb === 'post') return true
   return false
 }
 

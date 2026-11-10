@@ -4,6 +4,7 @@ import { PageContainer } from '@/components/common/PageContainer'
 import { PageHeader } from '@/components/common/PageHeader'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { ParentNotificationSettingsCard } from '@/components/parent/ParentNotificationSettingsCard'
 import { VerificationRecoveryEvidence } from '@/components/parent/VerificationRecoveryEvidence'
 import {
   getAccountStateLabel,
@@ -33,6 +34,9 @@ export function ParentAccountOperationsPage() {
         {query.isLoading && <LoadingPanel />}
         {query.isError && <ErrorPanel />}
         {query.data && <AccountOperationsContent data={query.data} />}
+
+        {/* Its own read: shown whether or not the account's status loads (#621). */}
+        <ParentNotificationSettingsCard />
       </PageContainer>
     </DashboardLayout>
   )

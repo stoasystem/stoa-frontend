@@ -233,6 +233,7 @@ const UnauthorizedPage = lazyPage('UnauthorizedPage', () => import('@/pages/erro
 const ForbiddenPage = lazyPage('ForbiddenPage', () => import('@/pages/error/ForbiddenPage'))
 const NotFoundPage = lazyPage('NotFoundPage', () => import('@/pages/not-found/NotFoundPage'))
 const PhoneUploadPage = lazyPage('PhoneUploadPage', () => import('@/pages/upload/PhoneUploadPage'))
+const UnsubscribePage = lazyPage('UnsubscribePage', () => import('@/pages/notifications/UnsubscribePage'))
 
 // Student: the planet redesign (#13), whose map is a star map since #72.
 const MapHomePage = lazyPage('MapHomePage', () => import('@/pages/map/MapPages'))
@@ -333,6 +334,8 @@ export const pageRoutes: readonly PageRoute[] = [
   { path: '/support', access: PUBLIC, page: SupportPage, titleKey: 'routes.support.title', meta: { module: 'Support', status: 'core', purpose: 'Support request entry.' } },
   // Public: the phone a QR in Ask opens is not signed in; the code after the `#` is the credential (#514).
   { path: PHONE_UPLOAD_PATH, access: PUBLIC, page: PhoneUploadPage, titleKey: 'routes.phoneUpload.title', meta: { module: 'Uploads', status: 'core', purpose: 'A phone sends one photo into Ask on the computer, by the QR shown there.' } },
+  // The link at the foot of a notification email (#621): the token in its query is the credential.
+  { path: '/unsubscribe', access: PUBLIC, page: UnsubscribePage, titleKey: 'routes.unsubscribe.title', meta: { module: 'Notifications', status: 'core', purpose: 'Stops one kind of notification email from its link, with an undo; no sign-in.' } },
   { path: UNAUTHORIZED_PATH, access: PUBLIC, page: UnauthorizedPage, titleKey: 'routes.unauthorized.title', meta: { module: 'Errors', status: 'core', purpose: 'Sign-in required.' } },
   { path: FORBIDDEN_PATH, access: PUBLIC, page: ForbiddenPage, titleKey: 'routes.forbidden.title', meta: { module: 'Errors', status: 'core', purpose: 'Where a guard sends a role the route is not for.' } },
   // The catch-all is a page a visitor really lands on, so it is named like one.

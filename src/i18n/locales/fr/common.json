@@ -348,6 +348,9 @@
     },
     "endingUsagePeriods": {
       "title": "Périodes bientôt échues"
+    },
+    "unsubscribe": {
+      "title": "Notifications par e-mail"
     }
   },
   "state": {
@@ -497,5 +500,27 @@
       "expired": "Ta période d’utilisation a pris fin le {{date}}.",
       "expiredNoDate": "Ta période d’utilisation a pris fin."
     }
+  },
+  "emailUnsubscribe": {
+    "title": "Notifications par e-mail",
+    "working": "Désabonnement en cours …",
+    "unsubscribed": {
+      "title": "Désabonnement effectué",
+      "kinds": {
+        "weekly_report": "Le rapport hebdomadaire ne sera plus envoyé par e-mail. Il reste disponible dans l’app, sous « Rapports ».",
+        "dispatch_reminder": "Les demandes d’aide proposées ne seront plus suivies d’un e-mail de rappel. Elles restent visibles dans les notifications de l’app.",
+        "notification_digest": "Le résumé des notifications ne sera plus envoyé par e-mail. Les notifications restent visibles dans l’app.",
+        "other": "Ces e-mails ne seront plus envoyés."
+      }
+    },
+    "resubscribed": {
+      "title": "Abonnement rétabli",
+      "body": "Ces e-mails seront de nouveau envoyés, comme avant."
+    },
+    "undo": "Annuler",
+    "again": "Se désabonner à nouveau",
+    "invalid": "Ce lien n’est pas valide. Le lien du dernier e-mail reçu fonctionne, et les réglages e-mail se modifient aussi dans l’app, après connexion.",
+    "failed": "Cela n’a pas fonctionné. Vérifier la connexion, puis réessayer.",
+    "retry": "Réessayer"
   }
 }
