@@ -122,8 +122,9 @@ export function AboutYou({ grades, galaxies, ticked, saving, failed, onSave, onL
               }}
             />
             {galaxies.length > 0 && (
-              <fieldset className="m-0 min-w-0 space-y-2 border-0 p-0">
-                <legend className="mb-1.5 p-0 text-[13px] leading-[1.3] font-medium text-[color:var(--on-sky-text)]">{t('aboutYou.subjects')}</legend>
+              // Still the group's name, read out with the chips; not drawn (#644: the chips say what they are).
+              <fieldset className="relative m-0 min-w-0 border-0 p-0">
+                <legend className="sr-only">{t('aboutYou.subjects')}</legend>
                 <ul className="m-0 flex list-none flex-wrap gap-2 p-0">
                   {galaxies.map((galaxy) => {
                     const checked = subjects.includes(galaxy.subjectId)

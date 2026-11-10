@@ -128,6 +128,16 @@ describe('the card\'s words', () => {
   })
 })
 
+describe('the subjects\' heading', () => {
+  it('still names the group of chips, but is not drawn', () => {
+    const region = show()
+    const group = within(region).getByRole('group', { name: copy.subjects })
+    const legend = group.querySelector('legend')
+    expect(legend).toHaveTextContent(copy.subjects)
+    expect(legend).toHaveClass('sr-only')
+  })
+})
+
 describe('"Done"', () => {
   it('is the filled sky button without the press edge', () => {
     const region = show()
