@@ -20,12 +20,17 @@
  * says whose it was and offers that account again (#217). Signing in again as
  * that same account goes back to the page the tab was on; signing in as
  * anyone else goes to that account's home.
+ *
+ * Signed in, this page always goes in, so a link here is no way to sign in
+ * as somebody else: the activation pages sign the browser out first when it
+ * is on another account than the one just activated (#626).
  */
 import { useCallback, useEffect, useState, useSyncExternalStore } from 'react'
 import { Navigate, useLocation } from 'react-router-dom'
 import { AccountLoadStatus } from '@/app/router/AccountLoadStatus'
 import { LoginPage } from '@/pages/login/LoginPage'
 import { getPostLoginTarget, getReturnTarget } from '@/lib/authRoutes'
+import { loginEmailFromState } from '@/lib/loginEmailState'
 import {
   browserSignInSnapshot,
   isSameAccount,
@@ -93,5 +98,7 @@ export function EntryPage() {
       <LoginPage mode={{ kind: 'reauth', reason: ended.reason, account: ended.account, onSignInOther: signInOther }} />
     )
   }
-  return <LoginPage />
+  // An activation page sends the account it just activated here with its
+  // address, so the form opens on it rather than empty (#626).
+  return <LoginPage mode={{ kind: 'signIn', email: loginEmailFromState(location.state) }} />
 }

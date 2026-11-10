@@ -355,6 +355,11 @@ export type InvitationClaimResponse = {
   userId: string
   role: AccountRole
   accountNumber: string
+  /**
+   * The activated account's sign-in address. Not sent yet; once it is, the
+   * activation page opens the sign-in form on it (#626).
+   */
+  email?: string
 }
 
 /** Public counterpart of the invitation command: unauthenticated and rate limited. */

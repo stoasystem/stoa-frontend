@@ -1,6 +1,7 @@
 import { type FormEvent, useEffect, useRef, useState } from 'react'
-import { Link, useSearchParams } from 'react-router-dom'
+import { useSearchParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import { ActivationSignIn, ActivationSignedInNotice } from '@/components/auth/ActivationSignIn'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -96,14 +97,24 @@ export function ActivateAccountPage() {
           </p>
         )}
 
+        {/* The claim does not touch the browser's sign-in; said before it,
+            so nobody takes the link for one about the account they are on,
+            and after it, with a way to switch (#626). */}
+        {!claimMutation.isSuccess && token ? <ActivationSignedInNotice /> : null}
+
         {claimMutation.isSuccess ? (
           <div className="mt-6 space-y-4">
             <p ref={success} tabIndex={-1} className="text-sm text-muted-foreground">
               {t('admin:activation.success')}
             </p>
-            <Button asChild className="rounded-full">
-              <Link to="/login">{t('admin:activation.signIn')}</Link>
-            </Button>
+            <ActivationSignIn
+              activated={{
+                userId: claimMutation.data.userId,
+                email: claimMutation.data.email,
+                label: claimMutation.data.accountNumber,
+              }}
+              signInLabel={t('admin:activation.signIn')}
+            />
           </div>
         ) : null}
 

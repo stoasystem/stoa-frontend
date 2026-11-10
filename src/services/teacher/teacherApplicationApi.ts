@@ -45,6 +45,11 @@ export type TeacherActivationResponse = {
   applicationId: string
   applicationVersion: number
   evidenceReference?: string
+  /**
+   * The teacher account's sign-in address. Not sent yet; once it is, the
+   * activation page opens the sign-in form on it (#626).
+   */
+  email?: string
 }
 
 export async function claimTeacherInvitation(invitationToken: string, password: string) {
