@@ -7,9 +7,11 @@ import { AskPanel } from '@/features/ask/AskPanel'
 import { AskRecent, recentFieldKeys } from '@/features/ask/AskRecent'
 import { AskReopen } from '@/features/ask/AskReopen'
 import { useClearOfControls } from '@/features/ask/clearOfControls'
+import { AskMakeWayContext } from '@/features/ask/askMakeWay'
 import {
   ASK_PANEL,
   ASK_REOPEN,
+  ASK_RISE,
   ASK_SHEET,
   ASK_SURFACE_BACKGROUND,
   DOCKED_COMPOSER,
@@ -33,14 +35,22 @@ import '@/features/ask/askGuide.css'
  * `children` is the planet (or its placeholder), drawn on the sky. Below it
  * sits the docked composer; typing in it opens Ask:
  *
- * - desktop: a 420 panel slides in from the right, over the sky; the page area
- *   narrows to what is left, so the planet re-centres and stays usable.
+ * - desktop: the conversation rises from the composer (#660), as wide as it
+ *   and centred, up to near the top of the page (`ASK_RISE`); the planet
+ *   behind it dims and is inert; tap the dim or press Esc to close it, and
+ *   the focus is back in the docked composer.
  * - phone: a sheet rises to 72%; the planet behind it dims and is inert; drag
  *   the sheet down, tap the dim or press Esc to close it.
  *
+ * On a desktop, a star followed from Ask (`AskMakeWayContext`) moves Ask into
+ * a 420 panel on the right instead (#660): the map flies to the star in what
+ * is left beside it, and the conversation goes on there -- asking on keeps it
+ * there. Its expand button raises it over the map again; closing Ask ends it,
+ * so the next question from the dock rises again.
+ *
  * With `route` (the pages `/ask` and `/ask/:id`) Ask is open from the start:
- * the same panel on a desktop, a full-screen sheet on a phone, and closing it
- * goes to `/`.
+ * risen over the planet on a desktop, a full-screen sheet on a phone, and
+ * closing it goes to `/`.
  *
  * The panel and the sheet are dark surfaces of their own (#125): each carries
  * `data-surface="sky"` and `data-ask-surface`, which brand-tokens.css turns
@@ -87,11 +97,15 @@ export function AskHost({
   const wasOpen = useRef(open)
   const layout = wide ? 'panel' : 'sheet'
   const sheet = open && !wide
+  // Wide, Ask rises over the map unless a star followed from it put it beside (#660).
+  const beside = open && wide && controller.beside
+  const rise = open && wide && !beside
   const reopenRoom = ASK_REOPEN.size + ASK_REOPEN.gap
   // From the planet the phone sheet is a modal over it: the planet and the bar
   // are dimmed and inert, and the keyboard stays in the sheet. Opened at /ask
-  // the full-screen sheet is the page itself, so the bar stays usable.
-  const modal = sheet && entry === 'planet'
+  // the full-screen sheet is the page itself, so the bar stays usable. Risen
+  // over the map on a desktop, Ask is a modal however it was opened (#660).
+  const modal = (sheet && entry === 'planet') || rise
   const reducedMotion = useMediaQuery('(prefers-reduced-motion: reduce)')
   const composing = useRef(false)
   useCoverShell(modal)
@@ -134,14 +148,16 @@ export function AskHost({
 
   // Opened: the cursor is in Ask's own composer, after what was typed -- and
   // after a picture chosen from the docked +, where the question comes next.
+  // Raised again from beside the map (#660), the same: the expand button is
+  // gone. Moved beside the map, it is the star's card that takes the focus.
   useEffect(() => {
-    if (!open) return
+    if (!open || beside) return
     const field = surface.current?.querySelector<HTMLTextAreaElement>('[data-composer-field]')
     if (!field || surface.current?.contains(document.activeElement)) return
     field.focus()
     const end = field.value.length
     field.setSelectionRange?.(end, end)
-  }, [open, layout])
+  }, [open, layout, beside])
 
   const onKeyDown = useAskKeyboard(surface, { trap: modal, active: open, onEscape: close })
   const drag = useSheetDrag(surface, close)
@@ -202,6 +218,9 @@ export function AskHost({
     [ownerId, addFromDock, reopen],
   )
   const dockChosen = useCallback((files: File[]) => handOver({ kind: 'files', files }), [handOver])
+  // A star followed from Ask (#660): on a desktop, Ask moves beside the map.
+  const { moveBeside, expand } = controller
+  const makeWay = wide ? moveBeside : null
   const onDockedCompositionEnd = useCallback(
     (value: string) => {
       composing.current = false
@@ -211,207 +230,241 @@ export function AskHost({
   )
 
   return (
-    <div data-ask-host className="relative min-h-0 flex-1 overflow-hidden">
-      <div
-        ref={page}
-        data-surface="sky"
-        data-ask-page
-        inert={sheet || undefined}
-        className="absolute inset-y-0 left-0 bg-sky text-on-sky"
-        // Reserve the dock's space for the page's own controls, including while
-        // the panel is open, so closing it never covers a control.
-        style={{
-          right: open && wide ? ASK_PANEL.width : 0,
-          '--page-bottom-inset': `${(wide ? DOCKED_COMPOSER.desktop.bottom : DOCKED_COMPOSER.phone.bottom) + COMPOSER.docked.height}px`,
-        } as CSSProperties}
-      >
-        {children}
-        {!open && (
-          <div
-            ref={docked}
-            data-ask-docked
-            // The composer, centred and 640 at most (wide) or the full row (phone).
-            // Only while the period is paused does Ask's way back stand at the end
-            // of its row; wide, the row then keeps the button's room on both sides
-            // so the composer stays centred.
-            className={wide ? 'absolute grid items-center' : 'absolute flex items-center'}
-            style={
-              wide
-                ? {
-                    left: 24,
-                    right: 24,
-                    bottom: DOCKED_COMPOSER.desktop.bottom,
-                    gridTemplateColumns: paused
-                      ? `minmax(${reopenRoom}px, 1fr) minmax(0, ${DOCKED_COMPOSER.desktop.width}px) minmax(${reopenRoom}px, 1fr)`
-                      : `1fr minmax(0, ${DOCKED_COMPOSER.desktop.width}px) 1fr`,
-                  }
-                : {
-                    left: DOCKED_COMPOSER.phone.inset,
-                    right: DOCKED_COMPOSER.phone.inset,
-                    bottom: DOCKED_COMPOSER.phone.bottom,
-                    gap: paused ? ASK_REOPEN.gap : undefined,
-                  }
-            }
-          >
+    <AskMakeWayContext.Provider value={makeWay}>
+      <div data-ask-host className="relative min-h-0 flex-1 overflow-hidden">
+        <div
+          ref={page}
+          data-surface="sky"
+          data-ask-page
+          inert={sheet || rise || undefined}
+          className="absolute inset-y-0 left-0 bg-sky text-on-sky"
+          // Reserve the dock's space for the page's own controls, including while
+          // Ask is open, so closing it never covers a control. Only the panel
+          // beside the map narrows it (#660); risen, Ask stands over it.
+          style={{
+            right: beside ? ASK_PANEL.width : 0,
+            '--page-bottom-inset': `${(wide ? DOCKED_COMPOSER.desktop.bottom : DOCKED_COMPOSER.phone.bottom) + COMPOSER.docked.height}px`,
+          } as CSSProperties}
+        >
+          {children}
+          {!open && (
             <div
-              className={wide ? 'relative col-start-2 min-w-0' : 'relative min-w-0 flex-1'}
-              data-ask-guide={offering || undefined}
-              onKeyDown={onDockedKeyDown}
+              ref={docked}
+              data-ask-docked
+              // The composer, centred and 640 at most (wide) or the full row (phone).
+              // Only while the period is paused does Ask's way back stand at the end
+              // of its row; wide, the row then keeps the button's room on both sides
+              // so the composer stays centred.
+              className={wide ? 'absolute grid items-center' : 'absolute flex items-center'}
+              style={
+                wide
+                  ? {
+                      left: 24,
+                      right: 24,
+                      bottom: DOCKED_COMPOSER.desktop.bottom,
+                      gridTemplateColumns: paused
+                        ? `minmax(${reopenRoom}px, 1fr) minmax(0, ${DOCKED_COMPOSER.desktop.width}px) minmax(${reopenRoom}px, 1fr)`
+                        : `1fr minmax(0, ${DOCKED_COMPOSER.desktop.width}px) 1fr`,
+                    }
+                  : {
+                      left: DOCKED_COMPOSER.phone.inset,
+                      right: DOCKED_COMPOSER.phone.inset,
+                      bottom: DOCKED_COMPOSER.phone.bottom,
+                      gap: paused ? ASK_REOPEN.gap : undefined,
+                    }
+              }
             >
-              {offering && (
-                // Out of the flow, so the dock's box stays the composer's; the
-                // band itself lets taps through to the map, its examples take them.
-                <div
-                  ref={examplesArea}
-                  data-ask-examples
-                  data-ask-guide-in
-                  className="pointer-events-none absolute inset-x-0 bottom-full mb-2 flex flex-col items-center gap-1.5"
-                >
-                  <p id={examplesLabel} role="status" className="m-0 text-[13px] text-[color:var(--on-sky-text-body)]">
-                    {t('ask.examples.label')}
-                  </p>
-                  <ul aria-labelledby={examplesLabel} className="m-0 flex max-w-full list-none flex-wrap justify-center gap-2 p-0">
-                    {examples.map((example) => (
-                      <li key={example} className="pointer-events-auto max-w-full">
-                        <Button
-                          variant="onSky"
-                          size="small"
-                          // Narrowed between the map's controls, an example wraps rather than lose its end.
-                          className="max-w-full whitespace-normal text-center leading-snug"
-                          style={{ height: 'auto', minHeight: 32, paddingBlock: 7 }}
-                          onClick={() => ownerId && askNow(ownerId, example)}
-                        >
-                          <span className="min-w-0">{example}</span>
-                        </Button>
-                      </li>
-                    ))}
-                  </ul>
+              <div
+                className={wide ? 'relative col-start-2 min-w-0' : 'relative min-w-0 flex-1'}
+                data-ask-guide={offering || undefined}
+                onKeyDown={onDockedKeyDown}
+              >
+                {offering && (
+                  // Out of the flow, so the dock's box stays the composer's; the
+                  // band itself lets taps through to the map, its examples take them.
+                  <div
+                    ref={examplesArea}
+                    data-ask-examples
+                    data-ask-guide-in
+                    className="pointer-events-none absolute inset-x-0 bottom-full mb-2 flex flex-col items-center gap-1.5"
+                  >
+                    <p id={examplesLabel} role="status" className="m-0 text-[13px] text-[color:var(--on-sky-text-body)]">
+                      {t('ask.examples.label')}
+                    </p>
+                    <ul aria-labelledby={examplesLabel} className="m-0 flex max-w-full list-none flex-wrap justify-center gap-2 p-0">
+                      {examples.map((example) => (
+                        <li key={example} className="pointer-events-auto max-w-full">
+                          <Button
+                            variant="onSky"
+                            size="small"
+                            // Narrowed between the map's controls, an example wraps rather than lose its end.
+                            className="max-w-full whitespace-normal text-center leading-snug"
+                            style={{ height: 'auto', minHeight: 32, paddingBlock: 7 }}
+                            onClick={() => ownerId && askNow(ownerId, example)}
+                          >
+                            <span className="min-w-0">{example}</span>
+                          </Button>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+                {recentShown && (
+                  <AskRecent id={recentId} field={dockedField} onSelect={openRecent} onClose={closeRecent} />
+                )}
+                {paused && usagePeriod.entitlement && (
+                  // Out of the flow, as the examples are, so the dock's box stays the composer's.
+                  <UsagePeriodPausedNotice
+                    id={pausedNoticeId}
+                    entitlement={usagePeriod.entitlement}
+                    className="absolute inset-x-0 bottom-full m-0 mb-2 text-center text-[13px] text-[color:var(--on-sky-text-body)] [&_a]:text-[color:var(--on-sky-plain)]"
+                  />
+                )}
+                <Composer
+                  disabled={paused}
+                  describedBy={paused ? pausedNoticeId : undefined}
+                  value={controller.draft}
+                  onChange={onDockedChange}
+                  onCompositionStart={() => {
+                    composing.current = true
+                  }}
+                  onCompositionEnd={onDockedCompositionEnd}
+                  onSubmit={(value) => controller.openWithDraft(value)}
+                  onFieldClick={() => {
+                    if (!offering) setRecentOpen(true)
+                  }}
+                  onFieldKeyDown={(event) => {
+                    if (recentShown) recentFieldKeys(event, recentId, () => setRecentOpen(false))
+                  }}
+                  fieldPopup={{ id: recentId, expanded: recentShown }}
+                  onAttach={() => dockPicker.current?.click()}
+                  onCapture={offered.camera ? () => dockCamera.current?.click() : undefined}
+                  onPhone={offered.phone ? () => handOver({ kind: 'phone' }) : undefined}
+                  dictation
+                  label={t('ask.composerLabel')}
+                  placeholder={wide ? t('ask.dockedPlaceholder') : t('ask.dockedPlaceholderPhone')}
+                />
+                <ChooserInputs
+                  picker={dockPicker}
+                  cameraInput={offered.camera ? dockCamera : undefined}
+                  onChosen={dockChosen}
+                />
+              </div>
+              {paused && (
+                <div className="flex" style={wide ? { paddingLeft: ASK_REOPEN.gap } : undefined}>
+                  <AskReopen onOpen={controller.reopen} resuming={controller.conversationId !== null} />
                 </div>
               )}
-              {recentShown && (
-                <AskRecent id={recentId} field={dockedField} onSelect={openRecent} onClose={closeRecent} />
-              )}
-              {paused && usagePeriod.entitlement && (
-                // Out of the flow, as the examples are, so the dock's box stays the composer's.
-                <UsagePeriodPausedNotice
-                  id={pausedNoticeId}
-                  entitlement={usagePeriod.entitlement}
-                  className="absolute inset-x-0 bottom-full m-0 mb-2 text-center text-[13px] text-[color:var(--on-sky-text-body)] [&_a]:text-[color:var(--on-sky-plain)]"
-                />
-              )}
-              <Composer
-                disabled={paused}
-                describedBy={paused ? pausedNoticeId : undefined}
-                value={controller.draft}
-                onChange={onDockedChange}
-                onCompositionStart={() => {
-                  composing.current = true
-                }}
-                onCompositionEnd={onDockedCompositionEnd}
-                onSubmit={(value) => controller.openWithDraft(value)}
-                onFieldClick={() => {
-                  if (!offering) setRecentOpen(true)
-                }}
-                onFieldKeyDown={(event) => {
-                  if (recentShown) recentFieldKeys(event, recentId, () => setRecentOpen(false))
-                }}
-                fieldPopup={{ id: recentId, expanded: recentShown }}
-                onAttach={() => dockPicker.current?.click()}
-                onCapture={offered.camera ? () => dockCamera.current?.click() : undefined}
-                onPhone={offered.phone ? () => handOver({ kind: 'phone' }) : undefined}
-                dictation
-                label={t('ask.composerLabel')}
-                placeholder={wide ? t('ask.dockedPlaceholder') : t('ask.dockedPlaceholderPhone')}
-              />
-              <ChooserInputs
-                picker={dockPicker}
-                cameraInput={offered.camera ? dockCamera : undefined}
-                onChosen={dockChosen}
-              />
             </div>
-            {paused && (
-              <div className="flex" style={wide ? { paddingLeft: ASK_REOPEN.gap } : undefined}>
-                <AskReopen onOpen={controller.reopen} resuming={controller.conversationId !== null} />
-              </div>
-            )}
-          </div>
+          )}
+        </div>
+
+        {modal && (
+          <div
+            data-ask-backdrop
+            data-ask-motion="dim"
+            aria-hidden="true"
+            onClick={close}
+            className="absolute inset-0"
+            style={{ background: `rgba(0, 0, 0, ${rise ? ASK_RISE.dim : ASK_SHEET.dim})` }}
+          />
         )}
-      </div>
 
-      {modal && (
-        <div
-          data-ask-backdrop
-          data-ask-motion="dim"
-          aria-hidden="true"
-          onClick={close}
-          className="absolute inset-0"
-          style={{ background: `rgba(0, 0, 0, ${ASK_SHEET.dim})` }}
-        />
-      )}
-
-      {open &&
-        (wide ? (
-          <aside
-            ref={surface}
-            aria-label={t('ask.title')}
-            data-ask-surface="panel"
-            data-ask-entry={entry}
-            data-ask-conversation={controller.conversationId ?? ''}
-            data-ask-motion="panel"
-            onKeyDown={onKeyDown}
-            data-surface="sky"
-            className="absolute inset-y-0 right-0 border-l border-[color:var(--float-border)] text-ink backdrop-blur-[var(--sky-glass-blur)]"
-            style={{
-              width: ASK_PANEL.width,
-              background: ASK_SURFACE_BACKGROUND.panel,
-              boxShadow: '-12px 0 40px rgba(0, 0, 0, 0.25)',
-            } as CSSProperties}
-          >
-            <AskPanel controller={controller} layout="panel" subjectId={subjectId} />
-          </aside>
-        ) : (
-          <section
-            ref={surface}
-            role={modal ? 'dialog' : undefined}
-            aria-modal={modal || undefined}
-            aria-label={t('ask.title')}
-            data-ask-surface="sheet"
-            data-ask-entry={entry}
-            data-ask-conversation={controller.conversationId ?? ''}
-            data-ask-motion="sheet"
-            onKeyDown={onKeyDown}
-            data-surface="sky"
-            className="absolute inset-x-0 bottom-0 flex flex-col overflow-hidden text-ink backdrop-blur-[var(--sky-glass-blur)]"
-            style={{
-              background: ASK_SURFACE_BACKGROUND.sheet,
-              height: sheetHeightFor(entry),
-              borderRadius: entry === 'direct' ? 0 : `${ASK_SHEET.radius}px ${ASK_SHEET.radius}px 0 0`,
-              boxShadow: '0 -10px 40px rgba(0, 0, 0, 0.35)',
-              transform: drag.offset ? `translateY(${drag.offset}px)` : undefined,
-              transition:
-                drag.dragging || reducedMotion ? 'none' : `transform var(--motion-sheet) var(--ease-standard)`,
-            } as CSSProperties}
-          >
-            {entry === 'planet' && (
-              <div {...drag.handle} className="flex shrink-0 touch-none justify-center pt-2">
-                <span
-                  aria-hidden="true"
-                  title={t('ask.grabber')}
-                  className="rounded-[3px] bg-tertiary"
-                  style={{ width: ASK_SHEET.grabber.width, height: ASK_SHEET.grabber.height }}
-                />
-              </div>
-            )}
-            <div className="min-h-0 flex-1">
+        {open &&
+          (wide ? (
+            // One element whether risen or beside the map (#660), so moving
+            // between them keeps the conversation as it is: what is being
+            // typed, a picture still going up, where it was scrolled to.
+            <section
+              ref={surface}
+              role={rise ? 'dialog' : 'complementary'}
+              aria-modal={rise || undefined}
+              aria-label={t('ask.title')}
+              data-ask-surface={rise ? 'rise' : 'panel'}
+              data-ask-entry={entry}
+              data-ask-conversation={controller.conversationId ?? ''}
+              data-ask-motion={rise ? 'rise' : 'panel'}
+              onKeyDown={onKeyDown}
+              data-surface="sky"
+              className={
+                rise
+                  ? 'absolute overflow-hidden border border-[color:var(--float-border)] text-ink backdrop-blur-[var(--sky-glass-blur)]'
+                  : 'absolute inset-y-0 right-0 border-l border-[color:var(--float-border)] text-ink backdrop-blur-[var(--sky-glass-blur)]'
+              }
+              style={
+                rise
+                  ? ({
+                      // Centred, the composer's width at most: left and right
+                      // hold the least room, and auto margins centre what is left.
+                      top: ASK_RISE.top,
+                      bottom: ASK_RISE.bottom,
+                      left: ASK_RISE.inset,
+                      right: ASK_RISE.inset,
+                      maxWidth: ASK_RISE.width,
+                      marginLeft: 'auto',
+                      marginRight: 'auto',
+                      borderRadius: ASK_RISE.radius,
+                      background: ASK_SURFACE_BACKGROUND.panel,
+                      boxShadow: '0 16px 48px rgba(0, 0, 0, 0.35)',
+                    } as CSSProperties)
+                  : ({
+                      width: ASK_PANEL.width,
+                      background: ASK_SURFACE_BACKGROUND.panel,
+                      boxShadow: '-12px 0 40px rgba(0, 0, 0, 0.25)',
+                    } as CSSProperties)
+              }
+            >
               <AskPanel
                 controller={controller}
-                layout="sheet"
+                layout="panel"
                 subjectId={subjectId}
-                headerHandle={entry === 'planet' ? drag.handle : undefined}
+                onExpand={beside ? expand : undefined}
               />
-            </div>
-          </section>
-        ))}
-    </div>
+            </section>
+          ) : (
+            <section
+              ref={surface}
+              role={modal ? 'dialog' : undefined}
+              aria-modal={modal || undefined}
+              aria-label={t('ask.title')}
+              data-ask-surface="sheet"
+              data-ask-entry={entry}
+              data-ask-conversation={controller.conversationId ?? ''}
+              data-ask-motion="sheet"
+              onKeyDown={onKeyDown}
+              data-surface="sky"
+              className="absolute inset-x-0 bottom-0 flex flex-col overflow-hidden text-ink backdrop-blur-[var(--sky-glass-blur)]"
+              style={{
+                background: ASK_SURFACE_BACKGROUND.sheet,
+                height: sheetHeightFor(entry),
+                borderRadius: entry === 'direct' ? 0 : `${ASK_SHEET.radius}px ${ASK_SHEET.radius}px 0 0`,
+                boxShadow: '0 -10px 40px rgba(0, 0, 0, 0.35)',
+                transform: drag.offset ? `translateY(${drag.offset}px)` : undefined,
+                transition:
+                  drag.dragging || reducedMotion ? 'none' : `transform var(--motion-sheet) var(--ease-standard)`,
+              } as CSSProperties}
+            >
+              {entry === 'planet' && (
+                <div {...drag.handle} className="flex shrink-0 touch-none justify-center pt-2">
+                  <span
+                    aria-hidden="true"
+                    title={t('ask.grabber')}
+                    className="rounded-[3px] bg-tertiary"
+                    style={{ width: ASK_SHEET.grabber.width, height: ASK_SHEET.grabber.height }}
+                  />
+                </div>
+              )}
+              <div className="min-h-0 flex-1">
+                <AskPanel
+                  controller={controller}
+                  layout="sheet"
+                  subjectId={subjectId}
+                  headerHandle={entry === 'planet' ? drag.handle : undefined}
+                />
+              </div>
+            </section>
+          ))}
+      </div>
+    </AskMakeWayContext.Provider>
   )
 }

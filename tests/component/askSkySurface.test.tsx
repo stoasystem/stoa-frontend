@@ -111,7 +111,7 @@ function openAsk() {
       </QueryClientProvider>
     </I18nextProvider>,
   )
-  return screen.getByRole('complementary', { name: 'Ask' })
+  return screen.getByRole('dialog', { name: 'Ask' })
 }
 
 const originalMatchMedia = window.matchMedia

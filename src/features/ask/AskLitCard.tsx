@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 import { ASK_STAR_LINK_CLASS, AskStarFrame } from '@/features/ask/AskStarFrame'
+import { useAskMakeWay } from '@/features/ask/askMakeWay'
 import { pathForTarget } from '@/features/starmap/view/layers'
 import type { LitMoment } from '@/store/litMomentsStore'
 
@@ -10,15 +11,20 @@ import type { LitMoment } from '@/store/litMomentsStore'
  * messages -- progress flowing back into the conversation. Neither the
  * student's nor an answer: centred, with the lit star, and a way back to it
  * on the map.
+ *
+ * On a wide screen Ask over the map moves beside it as the map goes to the
+ * star, as it does for a star an answer found (#660): over the map, the
+ * flight would happen behind the dim.
  */
 export function AskLitCard({ moment }: { moment: LitMoment }) {
   const { t } = useTranslation('chat')
+  const makeWay = useAskMakeWay()
   const to = pathForTarget(moment.subjectId, { layer: 'star', nebulaId: moment.nebulaId, unitId: moment.unitId })
   return (
     <AskStarFrame state="lit" data-message-role="lit" data-lit-unit={moment.unitId} aria-label={t('ask.lit.label')} className="self-center">
       <p className="m-0 text-[15px] font-semibold text-ink">{t('ask.lit.title', { name: moment.name })}</p>
       <p className="m-0 text-[13px] text-caption">{t('ask.lit.body')}</p>
-      <Link to={to} className={ASK_STAR_LINK_CLASS}>
+      <Link to={to} onClick={makeWay ?? undefined} className={ASK_STAR_LINK_CLASS}>
         {t('ask.lit.link')}
       </Link>
     </AskStarFrame>

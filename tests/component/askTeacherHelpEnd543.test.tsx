@@ -106,7 +106,7 @@ function openAsk() {
       </QueryClientProvider>
     </I18nextProvider>,
   )
-  return within(screen.getByRole('complementary', { name: tr('ask.title') }))
+  return within(screen.getByRole('dialog', { name: tr('ask.title') }))
 }
 
 async function card(ask: ReturnType<typeof openAsk>) {

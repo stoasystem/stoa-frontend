@@ -53,6 +53,7 @@
   "ask": {
     "title": "Ask",
     "close": "Close",
+    "expand": "Show bigger",
     "back": "All conversations",
     "listSubtitle": "Your conversations",
     "composerLabel": "Your question",

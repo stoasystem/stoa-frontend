@@ -1,14 +1,20 @@
 /**
- * Where Ask opens and how it closes (#49; #12 point 6; #13 point 1):
+ * Where Ask opens and how it closes (#49; #12 point 6; #13 point 1; #660):
  *
- * - from the planet, typing in the docked composer opens a 420 panel on a
- *   desktop, with the page area narrowed beside it and still usable, or a 72%
- *   sheet on a phone, over a dimmed planet that cannot be used;
- * - `/ask` and `/ask/:id` opened directly are the same panel on a desktop and
- *   a full-screen sheet on a phone;
- * - the phone sheet keeps the keyboard inside it; Esc closes Ask either way and
- *   the focus goes back to the docked composer; dragging the sheet down closes it.
+ * - from the planet, typing in the docked composer raises Ask from the
+ *   composer on a desktop -- centred, as wide as the composer, over a dimmed
+ *   planet that cannot be used (#660) -- or a 72% sheet on a phone, over a
+ *   dimmed planet too;
+ * - `/ask` and `/ask/:id` opened directly rise the same way on a desktop, and
+ *   are a full-screen sheet on a phone;
+ * - a star followed from Ask on a desktop moves it into the 420 panel beside
+ *   the map, where it stays as the student asks on, until its expand button
+ *   raises it again or it is closed (#660);
+ * - risen and the phone sheet keep the keyboard inside them; Esc closes Ask
+ *   either way and the focus goes back to the docked composer; dragging the
+ *   sheet down closes it.
  */
+import { readFileSync } from 'node:fs'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { act, fireEvent, render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
@@ -154,21 +160,30 @@ describe('Ask from the planet', () => {
     expect(dockedField()).toHaveAccessibleName('Your question')
   })
 
-  it('opens a 420 panel on a desktop, and the planet beside it stays usable', async () => {
+  it('rises from the docked composer on a desktop, centred and as wide as it, over a dimmed planet (#660)', async () => {
     show({ width: 1280 })
 
     await userEvent.type(dockedField(), 'W')
 
-    const panel = screen.getByRole('complementary', { name: 'Ask' })
-    expect(panel).toHaveAttribute('data-ask-surface', 'panel')
-    expect(panel.style.width).toBe('420px')
-    // The page area is what is left beside the panel, so the planet re-centres there.
-    expect(page().style.right).toBe('420px')
-    expect(page()).not.toHaveAttribute('inert')
-    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
-    expect(document.querySelector('[data-ask-backdrop]')).toBeNull()
+    const risen = screen.getByRole('dialog', { name: 'Ask' })
+    expect(risen).toHaveAttribute('aria-modal', 'true')
+    expect(risen).toHaveAttribute('data-ask-surface', 'rise')
+    expect(risen).toHaveAttribute('data-ask-motion', 'rise')
+    // The composer's width and line: 640 at most, centred, its bottom where the composer stood.
+    expect(risen.style.maxWidth).toBe('640px')
+    expect(risen.style.marginLeft).toBe('auto')
+    expect(risen.style.marginRight).toBe('auto')
+    expect(risen.style.bottom).toBe('22px')
+    expect(risen.style.top).toBe('24px')
+    // Over the planet, not beside it: the page keeps its width, dimmed and out of reach.
+    expect(page().style.right).toBe('0px')
+    expect(page()).toHaveAttribute('inert')
+    expect(document.querySelector('[data-ask-backdrop]')).not.toBeNull()
+    expect(screen.queryByRole('complementary')).not.toBeInTheDocument()
+    // No way to the side from here: only a star followed from Ask puts it there.
+    expect(within(risen).queryByRole('button', { name: 'Show bigger' })).toBeNull()
     // What was typed carries on in Ask's own composer.
-    const field = within(panel).getByRole('textbox', { name: 'Your question' })
+    const field = within(risen).getByRole('textbox', { name: 'Your question' })
     expect(field).toHaveValue('W')
     expect(field).toHaveFocus()
     await userEvent.type(field, 'hy?')
@@ -190,7 +205,7 @@ describe('Ask from the planet', () => {
   it('shows the conversation list when none is open, and a back arrow once one is', async () => {
     show({ width: 1280 })
     await userEvent.type(dockedField(), 'W')
-    const panel = screen.getByRole('complementary', { name: 'Ask' })
+    const panel = screen.getByRole('dialog', { name: 'Ask' })
 
     await userEvent.click(await within(panel).findByRole('button', { name: /Linear equations/ }))
 
@@ -244,7 +259,7 @@ describe('Ask says how to dictate, behind a microphone (#515, #553)', () => {
 
   it("in Ask's own composer, with no line over it any more", async () => {
     show({ width: 1280, direct: null })
-    const panel = screen.getByRole('complementary', { name: 'Ask' })
+    const panel = screen.getByRole('dialog', { name: 'Ask' })
     const field = within(panel).getByRole('textbox', { name: 'Your question' })
     await userEvent.click(field)
     expect(dictation()).toBeNull()
@@ -266,11 +281,23 @@ describe('Ask opened directly at /ask or /ask/:id', () => {
     expect(document.querySelector('[data-ask-backdrop]')).toBeNull()
   })
 
-  it('is the panel over the planet on a desktop', () => {
+  it('rises over the planet on a desktop, as it does from the docked composer (#660)', () => {
+    show({ width: 1280, direct: 'c1' })
+
+    const risen = screen.getByRole('dialog', { name: 'Ask' })
+    expect(risen).toHaveAttribute('data-ask-surface', 'rise')
+    expect(risen).toHaveAttribute('data-ask-conversation', 'c1')
+    expect(risen.style.maxWidth).toBe('640px')
+    expect(page().style.right).toBe('0px')
+    expect(page()).toHaveAttribute('inert')
+  })
+
+  it('rises over the planet even when the planet’s Ask was left beside the map (#660)', () => {
+    useAskStore.getState().moveBeside('u-1', 'c1')
     show({ width: 1280, direct: null })
 
-    expect(screen.getByRole('complementary', { name: 'Ask' }).style.width).toBe('420px')
-    expect(page().style.right).toBe('420px')
+    expect(screen.getByRole('dialog', { name: 'Ask' })).toHaveAttribute('data-ask-surface', 'rise')
+    expect(screen.queryByRole('button', { name: 'Show bigger' })).toBeNull()
   })
 
   it('goes to the conversation’s own address when one is chosen, and to / when closed', async () => {
@@ -314,11 +341,48 @@ describe('the keyboard', () => {
     expect(dockedField()).toHaveFocus()
   })
 
-  it('closes the desktop panel on Esc, and does not trap Tab there', async () => {
+  it('closes risen Ask on Esc and gives the focus back to the docked composer (#660)', async () => {
     show({ width: 1280 })
     await userEvent.type(dockedField(), 'W')
+    expect(screen.getByRole('dialog', { name: 'Ask' })).toBeInTheDocument()
+
+    await userEvent.keyboard('{Escape}')
+
+    expect(surface()).toBeNull()
+    expect(page()).not.toHaveAttribute('inert')
+    expect(dockedField()).toHaveFocus()
+  })
+
+  it('closes risen Ask on a tap on the dim, the focus back in the docked composer (#660)', async () => {
+    show({ width: 1280 })
+    await userEvent.type(dockedField(), 'W')
+
+    await userEvent.click(document.querySelector<HTMLElement>('[data-ask-backdrop]')!)
+
+    expect(surface()).toBeNull()
+    expect(document.querySelector('[data-ask-backdrop]')).toBeNull()
+    expect(dockedField()).toHaveFocus()
+  })
+
+  it('keeps Tab inside risen Ask, never onto the planet behind the dim (#660)', async () => {
+    show({ width: 1280 })
+    await userEvent.type(dockedField(), 'W')
+    const risen = screen.getByRole('dialog', { name: 'Ask' })
+
+    for (let press = 0; press < 12; press += 1) {
+      await userEvent.tab()
+      expect(risen.contains(document.activeElement)).toBe(true)
+    }
+    expect(screen.getByRole('button', { name: 'Rotate the planet', hidden: true })).not.toHaveFocus()
+  })
+
+  it('closes the panel beside the map on Esc, and does not trap Tab there (#660)', async () => {
+    show({ width: 1280 })
+    await userEvent.type(dockedField(), 'W')
+    act(() => useAskStore.getState().moveBeside('u-1', null))
     expect(screen.getByRole('complementary', { name: 'Ask' })).toBeInTheDocument()
 
+    within(surface()!).getByRole('textbox', { name: 'Your question' }).focus()
     await userEvent.keyboard('{Escape}')
 
     expect(surface()).toBeNull()
@@ -555,5 +619,88 @@ describe('Esc while an input method is composing', () => {
 
     fireEvent.keyDown(field, { key: 'Escape' })
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+  })
+})
+
+describe('beside the map, after a star was followed from Ask (#660)', () => {
+  it('is the 420 panel on the right, with the planet usable beside it', async () => {
+    show({ width: 1280 })
+    await userEvent.type(dockedField(), 'W')
+
+    act(() => useAskStore.getState().moveBeside('u-1', 'c1'))
+
+    const panel = screen.getByRole('complementary', { name: 'Ask' })
+    expect(panel).toHaveAttribute('data-ask-surface', 'panel')
+    expect(panel).toHaveAttribute('data-ask-motion', 'panel')
+    expect(panel).toHaveAttribute('data-ask-conversation', 'c1')
+    expect(panel.style.width).toBe('420px')
+    // The page area is what is left beside the panel, so the map re-centres there.
+    expect(page().style.right).toBe('420px')
+    expect(page()).not.toHaveAttribute('inert')
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+    expect(document.querySelector('[data-ask-backdrop]')).toBeNull()
+    // The same element moved, so what was typed is still there.
+    expect(within(panel).getByRole('textbox', { name: 'Your question' })).toHaveValue('W')
+  })
+
+  it('stays beside the map as the student asks on', async () => {
+    useAskStore.getState().moveBeside('u-1', 'c1')
+    show({ width: 1280 })
+    const panel = screen.getByRole('complementary', { name: 'Ask' })
+
+    await userEvent.type(within(panel).getByRole('textbox', { name: 'Your question' }), 'And then?{Enter}')
+
+    await vi.waitFor(() => expect(server.stream.streamConversationMessage).toHaveBeenCalledTimes(1))
+    expect(screen.getByRole('complementary', { name: 'Ask' })).toBe(panel)
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+  })
+
+  it('rises over the map again from its expand button, the cursor in the composer', async () => {
+    useAskStore.getState().moveBeside('u-1', 'c1')
+    show({ width: 1280 })
+
+    await userEvent.click(within(screen.getByRole('complementary', { name: 'Ask' })).getByRole('button', { name: 'Show bigger' }))
+
+    const risen = screen.getByRole('dialog', { name: 'Ask' })
+    expect(risen).toHaveAttribute('data-ask-surface', 'rise')
+    expect(risen).toHaveAttribute('data-ask-conversation', 'c1')
+    expect(page().style.right).toBe('0px')
+    expect(page()).toHaveAttribute('inert')
+    expect(within(risen).getByRole('textbox', { name: 'Your question' })).toHaveFocus()
+  })
+
+  it('rises from the docked composer again once Ask was closed', async () => {
+    useAskStore.getState().moveBeside('u-1', 'c1')
+    show({ width: 1280 })
+
+    await userEvent.click(within(screen.getByRole('complementary', { name: 'Ask' })).getByRole('button', { name: 'Close' }))
+    await userEvent.type(dockedField(), 'W')
+
+    expect(screen.getByRole('dialog', { name: 'Ask' })).toHaveAttribute('data-ask-surface', 'rise')
+    expect(screen.queryByRole('complementary')).not.toBeInTheDocument()
+  })
+
+  it('leaves the phone sheet as it is', () => {
+    useAskStore.getState().moveBeside('u-1', 'c1')
+    show({ width: 375 })
+
+    const sheet = screen.getByRole('dialog', { name: 'Ask' })
+    expect(sheet).toHaveAttribute('data-ask-surface', 'sheet')
+    expect(sheet.style.height).toBe('72%')
+    expect(screen.queryByRole('button', { name: 'Show bigger' })).toBeNull()
+  })
+})
+
+describe('the rise from the docked composer, in motion (#660)', () => {
+  const css = readFileSync('src/index.css', 'utf8')
+
+  it('grows up from the composer and fades in', () => {
+    expect(css).toMatch(/\[data-ask-motion="rise"\]\s*\{\s*animation: ask-rise-in /)
+    expect(css).toMatch(/@keyframes ask-rise-in \{\s*from \{\s*opacity: 0;\s*clip-path: inset\(calc\(100% - 46px\)/)
+  })
+
+  it('is a crossfade under reduced motion, as the panel and the sheet are', () => {
+    const reduced = css.slice(css.indexOf('@media (prefers-reduced-motion: reduce)', css.indexOf('ask-rise-in')))
+    expect(reduced).toMatch(/^@media \(prefers-reduced-motion: reduce\) \{\s*\[data-ask-motion\] \{\s*animation: ask-fade-in /)
   })
 })

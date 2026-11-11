@@ -86,7 +86,7 @@ function openAsk() {
       </QueryClientProvider>
     </I18nextProvider>,
   )
-  return within(screen.getByRole('complementary', { name: 'Ask' }))
+  return within(screen.getByRole('dialog', { name: 'Ask' }))
 }
 
 /** The messages themselves, without the live region that reads replies out. */
@@ -431,7 +431,7 @@ describe('reading the conversation again', () => {
         </QueryClientProvider>
       </I18nextProvider>,
     )
-    const ask = within(screen.getByRole('complementary', { name: 'Ask' }))
+    const ask = within(screen.getByRole('dialog', { name: 'Ask' }))
     await ask.findByText('Yes.')
     await advance(5_100)
     expect(getConversationMock.mock.calls.length).toBeGreaterThan(1)

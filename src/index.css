@@ -264,6 +264,22 @@ pre {
     transform: translateY(100%);
   }
 }
+/*
+ * Risen over the map on a desktop (#660): Ask grows up from the docked
+ * composer's height (`COMPOSER.docked`, 46) to its own and fades in, on the
+ * sheet's timing. Clipped rather than scaled, so nothing in it is drawn
+ * squashed on the way. Reduced motion: the crossfade below.
+ */
+@keyframes ask-rise-in {
+  from {
+    opacity: 0;
+    clip-path: inset(calc(100% - 46px) 0 0 0 round 20px);
+  }
+  to {
+    opacity: 1;
+    clip-path: inset(0 0 0 0 round 20px);
+  }
+}
 @keyframes ask-fade-in {
   from {
     opacity: 0;
@@ -274,6 +290,9 @@ pre {
 }
 [data-ask-motion="sheet"] {
   animation: ask-sheet-in var(--motion-sheet) var(--ease-standard);
+}
+[data-ask-motion="rise"] {
+  animation: ask-rise-in var(--motion-sheet) var(--ease-standard);
 }
 [data-ask-motion="dim"] {
   animation: ask-fade-in var(--motion-sheet) var(--ease-standard);

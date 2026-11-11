@@ -78,7 +78,7 @@ function openAsk() {
       </QueryClientProvider>
     </I18nextProvider>,
   )
-  return within(screen.getByRole('complementary', { name: 'Ask' }))
+  return within(screen.getByRole('dialog', { name: 'Ask' }))
 }
 
 function thread(ask: ReturnType<typeof openAsk>) {

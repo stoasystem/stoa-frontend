@@ -53,6 +53,7 @@
   "ask": {
     "title": "Fragen",
     "close": "Schliessen",
+    "expand": "Grösser zeigen",
     "back": "Alle Unterhaltungen",
     "listSubtitle": "Deine Unterhaltungen",
     "composerLabel": "Deine Frage",
