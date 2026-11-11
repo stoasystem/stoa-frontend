@@ -143,7 +143,9 @@ export const AskMessage = memo(function AskMessage({
             onKnowledgePoint={onKnowledgePoint}
           />
         ) : message.content ? (
-          failed ? message.content : <MathRenderer>{message.content}</MathRenderer>
+          // A failed answer too: what it had written before it failed is
+          // typeset like any answer, never shown as raw Markdown or LaTeX (#637).
+          <MathRenderer>{message.content}</MathRenderer>
         ) : streaming ? (
           <span className="text-caption">{t('ask.thread.thinking')}</span>
         ) : null}

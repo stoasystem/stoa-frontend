@@ -83,7 +83,9 @@ export function watchGeneration({
       try {
         const state = await read(conversationId, signal, idempotencyKey)
         failures = 0
-        if (state.steps.length > 0 && (state.status != null || state.updatedAt >= askedAt)) {
+        // A failed command's steps are not an answer, even when it still
+        // carries some (#637): nothing of them is shown.
+        if (state.status !== 'failed' && state.steps.length > 0 && (state.status != null || state.updatedAt >= askedAt)) {
           onSteps(state.steps)
         }
         if (state.status === 'completed') return { kind: 'completed' }

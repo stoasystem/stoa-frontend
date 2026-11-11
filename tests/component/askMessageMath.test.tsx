@@ -60,3 +60,18 @@ describe('a person’s message in Ask', () => {
     expect(bubble.textContent).not.toContain('$')
   })
 })
+
+describe('an answer that failed in Ask (#637)', () => {
+  it('typesets what it had written before it failed, never the raw Markdown and LaTeX', async () => {
+    const { container } = show(message({
+      role: 'assistant',
+      status: 'failed',
+      content: '**Schritt 1** Also: $\\frac{3}{5} \\cdot 20 = 12$',
+    }))
+    const bubble = container.querySelector('[data-message-role="assistant"]')!
+
+    await waitFor(() => expect(bubble.querySelector('.katex')).not.toBeNull())
+    expect(bubble.textContent).not.toContain('$')
+    expect(bubble.textContent).not.toContain('**')
+  })
+})

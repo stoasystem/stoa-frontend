@@ -251,6 +251,23 @@ describe('where the message stands', () => {
     expect(keys[1]).toBe(keys[0])
   })
 
+  it('drops the steps of a generation that failed, keeping only the failure in words (#637)', async () => {
+    // The command failed as malformed_response yet still carried its steps:
+    // half a sentence and raw $\frac{3}{5}$ stood above "Nicht gesendet".
+    mockedStream.mockRejectedValueOnce(new Error('Request failed with status code 503'))
+    const steps = ['eine Multiplikation. Also: $\\frac{3}{5}$', '**Schritt 2** $$\\frac{3}{5} \\cdot 20 = 12$$']
+    mockedProgress
+      .mockResolvedValueOnce(state({ steps }))
+      .mockResolvedValue(state({ steps, status: 'failed', failureCategory: 'malformed_response', retryable: false }))
+    const { result } = render()
+
+    await failOnce(result)
+    const answer = result.current.localMessages.find((message) => message.status === 'failed' && message.role === 'assistant')
+    expect(answer?.content).toBe('The explanation could not be prepared right now. Please try again or ask a teacher.')
+    expect(answer?.content).not.toContain('$')
+    expect(answer?.content).not.toContain('**')
+  })
+
   it('sends an answer that was paid for but unusable as a new message', async () => {
     mockedStream.mockRejectedValueOnce(new Error('Request failed with status code 503'))
     mockedProgress.mockResolvedValue(
