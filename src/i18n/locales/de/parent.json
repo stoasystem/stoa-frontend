@@ -140,7 +140,9 @@
       "contact_support": "STOA-Support kontaktieren",
       "wait_for_resend_cooldown": "Bitte vor dem nächsten Versand warten",
       "review_account_verification": "Kontobestätigung prüfen",
-      "unknown": "Unbekannt"
+      "unknown": "Unbekannt",
+      "legacy_or_verified": "Älteres Konto oder bereits bestätigt",
+      "cognito_sign_up_confirm_sign_up": "Bestätigungscode per E-Mail"
     },
     "evidence": {
       "title": "Bestätigung und Wiederherstellung",
@@ -195,7 +197,19 @@
       "unknown": "Wenden Sie sich an den STOA-Support, falls etwas nicht stimmt"
     },
     "quotaPeriodDay": "Tageslimit für den {{date}}",
-    "quotaPeriodUnknown": "Aktueller Zeitraum"
+    "quotaPeriodUnknown": "Aktueller Zeitraum",
+    "usageExplanations": {
+      "counter_matches_ledger": "Zähler und Nutzungsprotokoll stimmen für diesen Kontingentzeitraum überein.",
+      "no_usage": "Für diese Aktion und diesen Kontingentzeitraum wurde keine Nutzung erfasst.",
+      "ledger_only": "Diese Aktion wird nur im Nutzungsprotokoll erfasst und hat keinen Kontingentzähler.",
+      "counter_over_limit": "Der Zählerstand {{counter}} liegt über dem Kontingent {{limit}}; prüfen Sie die Kontingentdurchsetzung und die letzten Wiederholungen, bevor Sie den Zugang ändern.",
+      "counter_stale": "Der Zählereintrag scheint für diesen Kontingentzeitraum veraltet zu sein; prüfen Sie das TTL-Verhalten, bevor Sie ihn für Support-Entscheidungen verwenden.",
+      "counter_without_ledger": "Der Zähler zeigt {{counter}} verbraucht, aber es wurden keine passenden Protokolleinträge gefunden.",
+      "ledger_without_counter": "Das Nutzungsprotokoll zeigt {{ledger}} verbraucht, aber es wurde kein passender Zählereintrag gefunden.",
+      "count_mismatch": "Der Zählerstand {{counter}} und die Protokollsumme {{ledger}} stimmen nicht überein.",
+      "unknown": "Zum Abgleich dieses Zeitraums liegt keine Erklärung vor.",
+      "limitUnknown": "unbekannt"
+    }
   },
   "progress": {
     "eyebrow": "Elternfortschritt",

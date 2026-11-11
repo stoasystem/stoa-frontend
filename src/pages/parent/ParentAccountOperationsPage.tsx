@@ -12,6 +12,7 @@ import {
   getIssueLabel,
   getQuotaPeriodLabel,
   getUsageActionLabel,
+  getUsageExplanation,
   getUsageSupportActionLabel,
   supportStateTone,
 } from '@/components/parent/accountOperationsView'
@@ -220,8 +221,8 @@ function UsageSection({ usage, children }: { usage: AccountOperationsUsage[]; ch
                   {t('accountOps.support', { action: getUsageSupportActionLabel(item.supportAction, t) })}
                 </p>
               )}
-              {item.explanation && (
-                <p className="mt-1 text-sm text-muted-foreground">{item.explanation}</p>
+              {getUsageExplanation(item, t) && (
+                <p className="mt-1 text-sm text-muted-foreground">{getUsageExplanation(item, t)}</p>
               )}
             </CardContent>
           </Card>

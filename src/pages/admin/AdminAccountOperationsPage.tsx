@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next'
 import { useSearchParams } from 'react-router-dom'
 import { PageContainer } from '@/components/common/PageContainer'
 import { PageHeader } from '@/components/common/PageHeader'
-import { describeIssueCode, getAccountStateLabel, supportStateTone } from '@/components/parent/accountOperationsView'
+import { describeIssueCode, getAccountStateLabel, getUsageExplanation, supportStateTone } from '@/components/parent/accountOperationsView'
 import { VerificationRecoveryEvidence } from '@/components/parent/VerificationRecoveryEvidence'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -182,7 +182,11 @@ function ParentLinkAssignment({ parentId, lookedUp }: { parentId: string; looked
   }
   const [confirming, setConfirming] = useState(false)
   const [studentChoice, setStudentChoice] = useState('')
-  const [relationship, setRelationship] = useState('child')
+  // Stored as typed, and "child" when left empty: the field used to open
+  // holding the code `child`, in English on every page (#641).
+  const [relationship, setRelationship] = useState('')
+  const relationshipCode = relationship.trim() || 'child'
+  const relationshipLabel = relationship.trim() || t('parentLinks.relationshipDefault')
   const [notice, setNotice] = useState<string | null>(null)
   const [failure, setFailure] = useState<string | null>(null)
   // #407: confirming leaves the submit button disabled, so focus comes back here.
@@ -214,7 +218,7 @@ function ParentLinkAssignment({ parentId, lookedUp }: { parentId: string; looked
     : parentRows.find((row) => row.userId === selectedParent)
       ?? (lookedUpParent?.userId === selectedParent ? lookedUpParent : undefined)
   const studentPick = studentsSearching ? undefined : studentRows.find((row) => row.userId === studentChoice)
-  const ready = Boolean(parentPick && studentPick && relationship.trim())
+  const ready = Boolean(parentPick && studentPick)
   const revokable = Boolean(parentPick && studentPick) && !revocation.pending
 
   function submit(event: FormEvent<HTMLFormElement>) {
@@ -234,7 +238,7 @@ function ParentLinkAssignment({ parentId, lookedUp }: { parentId: string; looked
       {
         parentId: parent.userId,
         studentId: student.userId,
-        relationship: relationship.trim(),
+        relationship: relationshipCode,
       },
       {
         onSuccess: () => {
@@ -302,6 +306,7 @@ function ParentLinkAssignment({ parentId, lookedUp }: { parentId: string; looked
             <Input
               id="parent-link-relationship"
               value={relationship}
+              placeholder={t('parentLinks.relationshipDefault')}
               onChange={(event) => setRelationship(event.target.value)}
             />
             <span className="block text-xs font-normal text-muted-foreground">
@@ -343,7 +348,7 @@ function ParentLinkAssignment({ parentId, lookedUp }: { parentId: string; looked
                 {t('parentLinks.confirm.body', {
                   student: studentPick ? accountOptionLabel(studentPick) : '',
                   parent: parentPick ? accountOptionLabel(parentPick) : '',
-                  relationship: relationship.trim(),
+                  relationship: relationshipLabel,
                 })}
               </DialogDescription>
             </DialogHeader>
@@ -1097,8 +1102,8 @@ function UsageSummary({ usage }: { usage: AccountOperationsUsage[] }) {
                   {t('accountOperations.usage.support', { action: codeLabel(item.supportAction, t, 'usageSupport') })}
                 </p>
               )}
-              {item.explanation && (
-                <p className="mt-1 text-sm text-muted-foreground">{item.explanation}</p>
+              {getUsageExplanation(item, t) && (
+                <p className="mt-1 text-sm text-muted-foreground">{getUsageExplanation(item, t)}</p>
               )}
             </CardContent>
           </Card>

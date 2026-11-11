@@ -538,5 +538,18 @@
     "invalid": "Ce lien n’est pas valide. Le lien du dernier e-mail reçu fonctionne, et les réglages e-mail se modifient aussi dans l’app, après connexion.",
     "failed": "Cela n’a pas fonctionné. Vérifier la connexion, puis réessayer.",
     "retry": "Réessayer"
+  },
+  "grades": {
+    "grade_1_primary": "3e année primaire (3P)",
+    "grade_2_primary": "4e année primaire (4P)",
+    "grade_3_primary": "5e année primaire (5P)",
+    "grade_4_primary": "6e année primaire (6P)",
+    "grade_5_primary": "7e année primaire (7P)",
+    "grade_6_primary": "8e année primaire (8P)",
+    "grade_7_secondary": "9e année (secondaire I)",
+    "grade_8_secondary": "10e année (secondaire I)",
+    "grade_9_secondary": "11e année (secondaire I)",
+    "grade_secondary_i": "Secondaire I (année non précisée)",
+    "notSet": "Année non précisée"
   }
 }

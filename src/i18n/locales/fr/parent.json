@@ -141,7 +141,9 @@
       "contact_support": "Contacter le support STOA",
       "wait_for_resend_cooldown": "Patientez avant un nouvel envoi",
       "review_account_verification": "Vérifier la validation du compte",
-      "unknown": "Inconnu"
+      "unknown": "Inconnu",
+      "legacy_or_verified": "Ancien compte ou déjà vérifié",
+      "cognito_sign_up_confirm_sign_up": "Code de confirmation par e-mail"
     },
     "evidence": {
       "title": "Vérification et récupération",
@@ -196,7 +198,19 @@
       "unknown": "Contactez le support STOA si quelque chose vous semble incorrect"
     },
     "quotaPeriodDay": "Limite quotidienne du {{date}}",
-    "quotaPeriodUnknown": "Période en cours"
+    "quotaPeriodUnknown": "Période en cours",
+    "usageExplanations": {
+      "counter_matches_ledger": "Le compteur et le journal d’utilisation concordent pour cette période de quota.",
+      "no_usage": "Aucune utilisation n’a été enregistrée pour cette action et cette période de quota.",
+      "ledger_only": "Cette action n’est suivie que dans le journal d’utilisation et n’a pas de compteur de quota.",
+      "counter_over_limit": "La valeur du compteur {{counter}} dépasse la limite du droit d’accès {{limit}} ; vérifiez l’application du quota et les tentatives récentes avant de modifier l’accès.",
+      "counter_stale": "La ligne du compteur semble périmée pour cette période de quota ; vérifiez le comportement du TTL avant de l’utiliser pour des décisions de support.",
+      "counter_without_ledger": "Le compteur indique {{counter}} consommé(s), mais aucun événement correspondant n’a été trouvé dans le journal.",
+      "ledger_without_counter": "Le journal indique {{ledger}} consommé(s), mais aucune ligne de compteur correspondante n’a été trouvée.",
+      "count_mismatch": "La valeur du compteur {{counter}} et le total du journal {{ledger}} ne concordent pas.",
+      "unknown": "Aucune explication n’est disponible pour ce rapprochement.",
+      "limitUnknown": "inconnue"
+    }
   },
   "progress": {
     "eyebrow": "Progrès parents",

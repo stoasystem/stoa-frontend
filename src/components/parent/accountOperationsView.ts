@@ -86,3 +86,31 @@ export function getQuotaPeriodLabel(period: string | null | undefined, t: TFunct
   }
   return t('parent:accountOps.quotaPeriodUnknown')
 }
+
+/*
+ * Why the usage counter and the ledger agree or not. The summary sends a code
+ * (`explanationCode`, stoa-backend#114) with its numbers (`explanationParams`)
+ * beside an English sentence (`explanation`); the cards printed the sentence,
+ * so a German page read "No usage was recorded for this action and quota
+ * period." (#641). The sentences are the backend catalog's
+ * (`message_catalog/usage_reconciliation.py`); a code without one reads as a
+ * generic phrase in the reader's language, never as the English sentence.
+ * Null when the summary says nothing at all.
+ */
+export function getUsageExplanation(
+  usage: { explanationCode?: string | null; explanationParams?: Record<string, unknown> | null; explanation?: string | null },
+  t: TFunction,
+) {
+  const code = usage.explanationCode
+  if (!code) return usage.explanation ? t('parent:accountOps.usageExplanations.unknown') : null
+  const params = Object.fromEntries(
+    Object.entries(usage.explanationParams ?? {}).map(([name, value]) => [
+      name,
+      value === 'unknown' ? t('parent:accountOps.usageExplanations.limitUnknown') : String(value),
+    ]),
+  )
+  const translated = /^[a-z_]+$/.test(code)
+    ? t(`parent:accountOps.usageExplanations.${code}`, { ...params, defaultValue: '' })
+    : ''
+  return translated || t('parent:accountOps.usageExplanations.unknown')
+}

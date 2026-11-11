@@ -165,7 +165,7 @@
     "filterLabel": "Filtra per nome, e-mail o numero",
     "choose": "Seleziona un account",
     "relationshipLabel": "Relazione",
-    "relationshipHint": "Viene salvata con il collegamento e registrata nel log di audit.",
+    "relationshipHint": "Viene salvata con il collegamento e registrata nel log di audit. Lascia vuoto per «Figlio/a».",
     "submit": "Crea il collegamento",
     "submitExplainer": "Collega subito i due account. A nessuno dei due viene chiesta conferma.",
     "assigned": "{{student}} ora è collegato a {{parent}}.",
@@ -195,7 +195,8 @@
         "cancel": "Annulla",
         "submit": "Revoca ora"
       }
-    }
+    },
+    "relationshipDefault": "Figlio/a"
   },
   "activation": {
     "eyebrow": "Invito all'account",

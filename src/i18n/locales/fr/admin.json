@@ -165,7 +165,7 @@
     "filterLabel": "Filtrer par nom, e-mail ou numéro",
     "choose": "Sélectionner un compte",
     "relationshipLabel": "Lien de parenté",
-    "relationshipHint": "Enregistré avec la liaison et inscrit au journal d’audit.",
+    "relationshipHint": "Enregistré avec la liaison et inscrit au journal d’audit. Laissez vide pour « Enfant ».",
     "submit": "Créer la liaison",
     "submitExplainer": "Lie les deux comptes immédiatement. Aucun des deux n’a à confirmer.",
     "assigned": "{{student}} est désormais lié à {{parent}}.",
@@ -195,7 +195,8 @@
         "cancel": "Annuler",
         "submit": "Révoquer maintenant"
       }
-    }
+    },
+    "relationshipDefault": "Enfant"
   },
   "activation": {
     "eyebrow": "Invitation de compte",

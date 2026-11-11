@@ -164,7 +164,7 @@
     "filterLabel": "Nach Name, E-Mail oder Nummer filtern",
     "choose": "Konto auswählen",
     "relationshipLabel": "Beziehung",
-    "relationshipHint": "Wird mit der Verknüpfung gespeichert und protokolliert.",
+    "relationshipHint": "Wird mit der Verknüpfung gespeichert und protokolliert. Leer lassen für „Kind“.",
     "submit": "Verknüpfung anlegen",
     "submitExplainer": "Verknüpft die beiden Konten sofort. Keines der Konten wird um Bestätigung gebeten.",
     "assigned": "{{student}} ist jetzt mit {{parent}} verknüpft.",
@@ -194,7 +194,8 @@
         "cancel": "Abbrechen",
         "submit": "Jetzt aufheben"
       }
-    }
+    },
+    "relationshipDefault": "Kind"
   },
   "activation": {
     "eyebrow": "Kontoeinladung",
