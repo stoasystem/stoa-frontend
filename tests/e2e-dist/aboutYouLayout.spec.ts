@@ -9,8 +9,9 @@ import { StudentWorld } from './support/student'
  * (#625). "About you" lay over the map key at 840 x 760 (by 38 px) and
  * 1280 x 640 (89 px), over the phone's "?" at 375 x 667, and over the
  * where-you-are line there in German; #628 only painted the card on top.
- * jsdom lays nothing out, so this is checked in the built app, in English and
- * in German (longer words, a taller card).
+ * jsdom lays nothing out, so this is checked in the built app, in all four
+ * languages (German's longer words make a taller card; French wraps a
+ * nebula's top line on a wide stage).
  *
  * Four subjects, so the chips wrap to two rows and the card is at its
  * tallest. Where the card is taller than the room between the controls it
@@ -34,7 +35,39 @@ const VIEWPORTS = [
 const LANGUAGES = [
   { locale: 'en', done: 'Done', unsure: 'Not sure' },
   { locale: 'de', done: 'Fertig', unsure: 'Weiss nicht' },
+  { locale: 'fr', done: 'C’est bon', unsure: 'Je ne sais pas' },
+  { locale: 'it', done: 'Fatto', unsure: 'Non lo so' },
 ] as const
+
+/**
+ * In a nebula the wide top line says "Star map / <nebula> · 0 of 1 lit"
+ * beside four subjects' switcher, and wraps where that leaves it too little
+ * room: in French at 768-900 it ended at 83, under the card band's 76. Short
+ * enough that the card fills its band, so a band starting too high shows.
+ */
+const NEBULA_VIEWPORTS = [
+  { width: 768, height: 560 },
+  { width: 840, height: 560 },
+  { width: 840, height: 760 },
+]
+
+/** The view of one nebula, as its link on the map goes there. */
+async function intoNebula(page: Page) {
+  await page.evaluate(`history.pushState({}, '', '/map/math/math-basics'); dispatchEvent(new PopStateEvent('popstate'))`)
+  await expect(page.locator('[data-starmap-stage]')).toHaveAttribute('data-layer', 'nebula')
+}
+
+/** The card starts at least 12 px under the top line as drawn (`TOP_LINE_GAP`). */
+async function expectUnderTheTopLine(page: Page, cardSelector: string) {
+  const card = await drawnBox(page, cardSelector)
+  let bottom = 0
+  for (const part of await CONTROLS['the top line'](page).all()) {
+    const box = await part.boundingBox()
+    if (box) bottom = Math.max(bottom, box.y + box.height)
+  }
+  expect(bottom, 'the top line is drawn').toBeGreaterThan(0)
+  expect(card.y - bottom, 'the room between the top line and the card').toBeGreaterThanOrEqual(11.5)
+}
 
 /** The map's controls the card must not cover, those drawn at this size. */
 const CONTROLS: Record<string, (page: Page) => Locator> = {
@@ -302,5 +335,29 @@ for (const language of LANGUAGES) {
       await expectClearOfControls(page, '[data-first-question] section', '"Not sure" in view')
       await expectNoSidewaysScroll(page, viewport.width)
     })
+  }
+
+  for (const viewport of NEBULA_VIEWPORTS) {
+    const size = `${viewport.width} x ${viewport.height}`
+
+    test(`"About you" starts under the top line however it wraps, in a nebula at ${size}, in ${language.locale}`, async ({ page, backend }) => {
+      const world = new StudentWorld(backend)
+      world.newcomer = true
+      world.grade = ''
+      world.primarySubjects = []
+      world.locale = language.locale
+      world.install()
+      fourSubjects(backend)
+      await page.setViewportSize(viewport)
+      await signInAsStudent(page)
+      await expect(page.locator('[data-about-you] section')).toBeVisible()
+      await intoNebula(page)
+
+      await expect(page.locator('[data-about-you] section')).toBeVisible()
+      await expectUnderTheTopLine(page, '[data-about-you] section')
+      await expectClearOfControls(page, '[data-about-you] section', 'in a nebula')
+    })
+    // The first question is asked on the whole map only (`useFirstLanding`):
+    // it goes when a nebula is chosen, so it never meets a nebula's top line.
   }
 }

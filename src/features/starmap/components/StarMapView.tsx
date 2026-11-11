@@ -147,11 +147,25 @@ export function canvasPixelRatio(): number {
  * zoom pair 24 px up and about 74 tall (top at 98); the band keeps 110, 12 px
  * over the taller of the two. (It kept 164 for the always-on legend, 89 tall
  * with two rows.)
+ *
+ * Above, on a wide stage: 76, 12 px under the top line where it is one line
+ * (64), or 12 px under the top line as drawn (`topLine`, its bottom measured
+ * from the stage's top, `--starmap-top-line`) when that is lower. The line
+ * wraps where the subject switcher leaves its column too little room: a
+ * nebula's "Carte du ciel / … · 0 sur 1 allumées" ended at 83 in French at
+ * 768-900, and a longer subject or nebula name can do it in any language. On
+ * a phone the switcher and the where-you-are line stack (down to 100) and the
+ * band keeps 112.
  */
-export function controlBands(wide: boolean, bottomInset = 0, demo = false): { top: number; bottom: number } {
+export function controlBands(wide: boolean, bottomInset = 0, demo = false, topLine = 0): { top: number; bottom: number } {
   const noticeHeight = demo ? DEMO_NOTICE_HEIGHT : 0
-  return wide ? { top: 76 + noticeHeight, bottom: 110 + bottomInset } : { top: 112 + noticeHeight, bottom: 68 + bottomInset }
+  return wide
+    ? { top: Math.max(76 + noticeHeight, topLine > 0 ? topLine + TOP_LINE_GAP : 0), bottom: 110 + bottomInset }
+    : { top: 112 + noticeHeight, bottom: 68 + bottomInset }
 }
+
+/** The room under a wide stage's top line, CSS px: the map and the onboarding cards (`onboarding/cardBand.ts`) start this far under it. */
+export const TOP_LINE_GAP = 12
 
 /**
  * The phone's touch targets for the "?" and the zoom pair. Each is drawn 32 px
@@ -172,7 +186,8 @@ const PHONE_HIT = {
  * The design preview's "Demo" line across the top of the stage, CSS px. The
  * stage hands it to what it draws as `--starmap-notice-height` (unset, so 0,
  * on a real map): the top line sits under it, and so do the onboarding cards
- * (`onboarding/cardBand.ts`, #625).
+ * (`onboarding/cardBand.ts`, #625). The stage hands them the wide top line's
+ * measured bottom as `--starmap-top-line` too (see `controlBands`).
  */
 export const DEMO_NOTICE_HEIGHT = 32
 
@@ -276,6 +291,12 @@ export function StarMapView({ map, demo = false, target, path, marked, onNavigat
   const [focusPill, setFocusPill] = useState<{ id: string; width: number; height: number } | null>(null)
   // The phone's help dialog: the legend's words behind a "?" (#146).
   const [helpOpen, setHelpOpen] = useState(false)
+  // A wide stage's top line as drawn: its bottom, CSS px from the stage's top
+  // (0 on a phone, or before it is measured). See `controlBands`.
+  const topLineRef = useRef<HTMLDivElement>(null)
+  const [topLine, setTopLine] = useState(0)
+  const topLineNow = useRef(0)
+  const remeasure = useRef<(() => void) | null>(null)
 
   // Keep the latest callbacks without rebuilding the engine.
   const navigateRef = useRef(onNavigate)
@@ -340,13 +361,14 @@ export function StarMapView({ map, demo = false, target, path, marked, onNavigat
       const bottomInset = parseFloat(getComputedStyle(stage).getPropertyValue('--page-bottom-inset')) || 0
       // On a phone a chosen star is framed above its collapsed sheet (#139).
       engine.setViewport(Math.round(rect.width), Math.round(rect.height), canvasPixelRatio(), {
-        ...controlBands(isWideNow, bottomInset, demo),
+        ...controlBands(isWideNow, bottomInset, demo, topLineNow.current),
         sheet: isWideNow ? undefined : sheetBand(bottomInset),
       })
       setWide(isWideNow)
       setStageSize({ width: Math.round(rect.width), height: Math.round(rect.height), bottomInset })
     }
     measure()
+    remeasure.current = measure
     const observer = new ResizeObserver(measure)
     observer.observe(stage)
 
@@ -396,11 +418,36 @@ export function StarMapView({ map, demo = false, target, path, marked, onNavigat
       inertWatch.disconnect()
       stage.removeEventListener('wheel', onWheel)
       observer.disconnect()
+      remeasure.current = null
       engine.destroy()
       engineRef.current = null
     }
     // The engine is built once per canvas; data, target and motion arrive below.
   }, [])
+
+  // Follow the wide top line's height: it wraps to a second line where the
+  // switcher leaves it too little room, and the map and the onboarding cards
+  // move down under it (`controlBands`, `--starmap-top-line`).
+  useLayoutEffect(() => {
+    const stage = stageRef.current
+    const line = wide ? topLineRef.current : null
+    const settle = (bottom: number) => {
+      if (bottom === topLineNow.current) return
+      topLineNow.current = bottom
+      setTopLine(bottom)
+      remeasure.current?.()
+    }
+    if (!stage || !line) {
+      settle(0)
+      return
+    }
+    // Nothing laid out (jsdom, a hidden stage): no height to keep clear of.
+    const measure = () => settle(line.offsetHeight > 0 ? Math.ceil(line.getBoundingClientRect().bottom - stage.getBoundingClientRect().top) : 0)
+    measure()
+    const observer = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(measure)
+    observer?.observe(line)
+    return () => observer?.disconnect()
+  }, [wide])
 
   useEffect(() => {
     engineRef.current?.setData(map, target)
@@ -689,7 +736,7 @@ export function StarMapView({ map, demo = false, target, path, marked, onNavigat
       setHint(null)
       return
     }
-    const bands = controlBands(wide, stageSize.bottomInset, demo)
+    const bands = controlBands(wide, stageSize.bottomInset, demo, topLine)
     const area = { left: 16, top: bands.top, right: stageSize.width - 16, bottom: stageSize.height - bands.bottom }
     const card = cardRef.current?.querySelector('article')
     if (card && wide && card.offsetWidth > 0) area.right = Math.min(area.right, card.offsetLeft - 16)
@@ -701,7 +748,7 @@ export function StarMapView({ map, demo = false, target, path, marked, onNavigat
     let next = starHintSpot(spot, area, 16)
     if (next && !wide && sheetRest > SHEET.collapsedPx) next = starHintSpot(spot, { ...area, bottom: Math.min(area.bottom, sheetTop(sheetRest)) }, 16) ?? next
     setHint((old) => (old && next && old.x === next.x && old.y === next.y && old.angle === next.angle ? old : next))
-  }, [visible, stageSize, wide, demo, target, sheetRest])
+  }, [visible, stageSize, wide, demo, topLine, target, sheetRest])
 
   // The parallel DOM goes when a star is chosen, a render after the card or
   // sheet comes (#139): two short commits during the flight, not one long one.
@@ -799,7 +846,14 @@ export function StarMapView({ map, demo = false, target, path, marked, onNavigat
         className="absolute inset-0 touch-none overflow-hidden outline-none select-none [-webkit-touch-callout:none]"
         data-starmap-stage
         data-layer={target.layer}
-        style={demo ? ({ '--starmap-notice-height': `${DEMO_NOTICE_HEIGHT}px` } as CSSProperties) : undefined}
+        style={
+          demo || topLine > 0
+            ? ({
+                ...(demo ? { '--starmap-notice-height': `${DEMO_NOTICE_HEIGHT}px` } : {}),
+                ...(topLine > 0 ? { '--starmap-top-line': `${topLine}px` } : {}),
+              } as CSSProperties)
+            : undefined
+        }
         // Focusable only from code: where focus goes when a choice removes the link it was on.
         tabIndex={-1}
         onFocus={() => {
@@ -834,7 +888,7 @@ export function StarMapView({ map, demo = false, target, path, marked, onNavigat
           * The lit count is the where-you-are line's alone: it follows the view
           * (the whole map or a nebula), and the tally said the same number again. */}
         {wide ? (
-          <div data-starmap-overlay className="pointer-events-none absolute inset-x-6 top-[calc(1.25rem+var(--starmap-notice-height,0px))] grid grid-cols-[1fr_auto_1fr] items-start gap-4">
+          <div ref={topLineRef} data-starmap-overlay className="pointer-events-none absolute inset-x-6 top-[calc(1.25rem+var(--starmap-notice-height,0px))] grid grid-cols-[1fr_auto_1fr] items-start gap-4">
             <div className="pointer-events-auto min-w-0">{whereYouAre}</div>
             <div className="pointer-events-auto">{switcher}</div>
             <div
@@ -869,7 +923,7 @@ export function StarMapView({ map, demo = false, target, path, marked, onNavigat
                 const isCurrent = currentNebula?.topicId === nebula.topicId
                 const disc = visible.nebulae[nebulaIndex]
                 const pill = focusPill?.id === nebula.topicId ? focusPill : undefined
-                const spot = disc ? nebulaFocusSpot(disc, stageSize, controlBands(wide, stageSize.bottomInset, demo), pill) : null
+                const spot = disc ? nebulaFocusSpot(disc, stageSize, controlBands(wide, stageSize.bottomInset, demo, topLine), pill) : null
                 return (
                   <li key={nebula.topicId} data-nebula={nebula.topicId}>
                     {isCurrent ? (
