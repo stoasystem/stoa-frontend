@@ -162,14 +162,20 @@ export function AskPanel({
   // The files chosen for the next question, uploaded as they are picked
   // (#125): from the chooser, the camera (#509) or a phone by QR (#514).
   const attachments = useAttachments({ camera: true, phone: conversationId })
-  // Opened from the docked composer's +: the add menu is open here, so the
-  // camera, a file or the phone is chosen with a press of the student's own
-  // (a file chooser opens only from one). Read once as the panel appears, then
-  // let go, so the next opening is a plain one.
-  const [addMenuAtOpen] = useState(() => askFor(useAskStore.getState(), ownerId).addMenu)
+  // Opened from the docked composer's +, where the student already chose: the
+  // files picked there join this tray, through the same checks and upload as
+  // any chosen here, and wait for the question; or the phone's code starts, as
+  // this composer's own item starts it. Taken from the store once. The phone's
+  // card has said where its start is by now: a child's effects run first.
+  const added = useAskStore((state) => askFor(state, ownerId).added)
+  const { add: addFiles } = attachments.view
+  const startPhone = attachments.sources.usePhone
   useEffect(() => {
-    if (addMenuAtOpen) useAskStore.getState().endAddMenu()
-  }, [addMenuAtOpen])
+    if (!added || !ownerId) return
+    const taken = useAskStore.getState().takeAdded(ownerId)
+    if (taken?.kind === 'files') addFiles(taken.files)
+    else if (taken?.kind === 'phone') startPhone?.()
+  }, [added, ownerId, addFiles, startPhone])
 
   function send(content: string, files: AttachmentBatch) {
     // Sent is sent: the question leaves the composer now, so closing Ask while
@@ -377,7 +383,6 @@ export function AskPanel({
           onAttach={attachments.sources.pickFile}
           onCapture={attachments.sources.takePhoto}
           onPhone={attachments.sources.usePhone}
-          addMenuOpen={addMenuAtOpen && !paused}
           dictation
           label={t('ask.composerLabel')}
           placeholder={practice ? t('ask.practice.placeholder') : t('ask.placeholder')}

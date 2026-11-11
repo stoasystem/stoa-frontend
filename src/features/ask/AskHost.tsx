@@ -21,7 +21,9 @@ import { useAskUsagePeriod } from '@/features/ask/useAskUsagePeriod'
 import { useSheetDrag } from '@/features/ask/useSheetDrag'
 import { WIDE_QUERY, useMediaQuery } from '@/hooks/layout/useMediaQuery'
 import { useCoverShell } from '@/layouts/shellCover'
-import { askFor, useAskStore } from '@/store/askStore'
+import { ChooserInputs } from '@/features/uploads/Attachments'
+import { useOfferedSources } from '@/features/uploads/useAttachments'
+import { askFor, useAskStore, type AddedFromDock } from '@/store/askStore'
 import { useAuthStore } from '@/store/authStore'
 import '@/features/ask/askGuide.css'
 
@@ -46,8 +48,12 @@ import '@/features/ask/askGuide.css'
  *
  * Closed, the docked composer is the one way back in. A press on its field
  * offers the three latest conversations and the way to all of them
- * (`AskRecent`); its + opens Ask with the add menu open, where the camera, a
- * file or the phone is chosen. `AskReopen` stood at the end of its row (#125,
+ * (`AskRecent`). Its + opens the same add menu as Ask's own composer, right
+ * there on the dock: a photo or a file, the camera on a phone or tablet, the
+ * phone's code on a computer. Ask opens only once something is chosen, with
+ * the picture in its composer waiting for the question; the + itself opens
+ * nothing more, so a student who meant to add a picture is not taken into a
+ * conversation first. `AskReopen` stood at the end of its row (#125,
  * #645) and went: the button and the composer were two ways into the same
  * thread (typing opened the last conversation, and so did the button). It
  * stays only while the usage period is paused (#615), when the field is shut
@@ -126,16 +132,10 @@ export function AskHost({
     wasOpen.current = open
   }, [open])
 
-  // Opened: the cursor is in Ask's own composer, after what was typed -- unless
-  // it opened from the docked +, where the add menu takes it (moving it to the
-  // field would put the menu away).
-  const openingToAdd = useRef(false)
+  // Opened: the cursor is in Ask's own composer, after what was typed -- and
+  // after a picture chosen from the docked +, where the question comes next.
   useEffect(() => {
     if (!open) return
-    if (openingToAdd.current) {
-      openingToAdd.current = false
-      return
-    }
     const field = surface.current?.querySelector<HTMLTextAreaElement>('[data-composer-field]')
     if (!field || surface.current?.contains(document.activeElement)) return
     field.focus()
@@ -180,18 +180,28 @@ export function AskHost({
     },
     [controller],
   )
-  // The docked +: a file chooser opens only from the student's own press, and
-  // the files are the panel's, so Ask opens with its add menu already open and
-  // the camera, a file or the phone is chosen there.
-  const wantAddMenu = useAskStore((state) => state.wantAddMenu)
+  // The docked +: its menu opens right on the dock, the same as Ask's own
+  // composer offers, and Ask opens only once something is chosen. The chooser
+  // and the camera open from the menu press itself (a browser opens them only
+  // from a press of the student's own); the files picked are handed to Ask's
+  // composer (`addFromDock`), whose one pipeline checks, uploads and shows
+  // them. A chooser put away with nothing picked opens nothing. The phone's
+  // code has no file to wait for: Ask opens and starts it there.
+  const addFromDock = useAskStore((state) => state.addFromDock)
   const { reopen } = controller
-  const openToAdd = useCallback(() => {
-    if (!ownerId) return
-    setRecentOpen(false)
-    openingToAdd.current = true
-    wantAddMenu(ownerId)
-    reopen()
-  }, [ownerId, wantAddMenu, reopen])
+  const dockPicker = useRef<HTMLInputElement>(null)
+  const dockCamera = useRef<HTMLInputElement>(null)
+  const offered = useOfferedSources({ camera: true, phone: true })
+  const handOver = useCallback(
+    (added: AddedFromDock) => {
+      if (!ownerId) return
+      setRecentOpen(false)
+      addFromDock(ownerId, added)
+      reopen()
+    },
+    [ownerId, addFromDock, reopen],
+  )
+  const dockChosen = useCallback((files: File[]) => handOver({ kind: 'files', files }), [handOver])
   const onDockedCompositionEnd = useCallback(
     (value: string) => {
       composing.current = false
@@ -306,10 +316,17 @@ export function AskHost({
                   if (recentShown) recentFieldKeys(event, recentId, () => setRecentOpen(false))
                 }}
                 fieldPopup={{ id: recentId, expanded: recentShown }}
-                onAdd={openToAdd}
+                onAttach={() => dockPicker.current?.click()}
+                onCapture={offered.camera ? () => dockCamera.current?.click() : undefined}
+                onPhone={offered.phone ? () => handOver({ kind: 'phone' }) : undefined}
                 dictation
                 label={t('ask.composerLabel')}
                 placeholder={wide ? t('ask.dockedPlaceholder') : t('ask.dockedPlaceholderPhone')}
+              />
+              <ChooserInputs
+                picker={dockPicker}
+                cameraInput={offered.camera ? dockCamera : undefined}
+                onChosen={dockChosen}
               />
             </div>
             {paused && (

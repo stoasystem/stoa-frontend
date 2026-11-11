@@ -1,4 +1,4 @@
-import { useEffect, type ChangeEvent } from 'react'
+import { useEffect, type ChangeEvent, type RefObject } from 'react'
 import { useTranslation } from 'react-i18next'
 import { AttachmentTray, type TrayCopy } from '@/features/uploads/AttachmentTray'
 import { PhoneUploadCard } from '@/features/uploads/PhoneUploadCard'
@@ -49,18 +49,52 @@ export function Attachments({
           />
         </>
       ) : (
+        <ChooserInputs picker={view.picker} imagesOnly={view.imagesOnly} onChosen={add} />
+      )}
+      {view.camera && <ChooserInputs cameraInput={view.cameraInput} onChosen={add} />}
+    </>
+  )
+}
+
+/**
+ * The hidden inputs a student's file chooser and camera open: given `picker`,
+ * the chooser (files and the photo gallery); given `cameraInput`, the camera
+ * (#509). Here, under the tray, and on Ask's docked + (`AskHost`), which
+ * opens them before Ask is open and hands what was chosen to Ask's composer.
+ * What they take is checked once, where the files are added.
+ */
+export function ChooserInputs({
+  picker,
+  cameraInput,
+  imagesOnly = false,
+  onChosen,
+}: {
+  picker?: RefObject<HTMLInputElement | null>
+  cameraInput?: RefObject<HTMLInputElement | null>
+  imagesOnly?: boolean
+  onChosen: (chosen: File[]) => void
+}) {
+  const chosen = (event: ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(event.target.files ?? [])
+    // Cleared, so choosing the same file twice in a row still fires.
+    event.target.value = ''
+    if (files.length > 0) onChosen(files)
+  }
+  return (
+    <>
+      {picker && (
         <input
-          ref={view.picker}
+          ref={picker}
           type="file"
           multiple
-          accept={view.imagesOnly ? IMAGE_ACCEPT_ATTRIBUTE : ACCEPT_ATTRIBUTE}
+          accept={imagesOnly ? IMAGE_ACCEPT_ATTRIBUTE : ACCEPT_ATTRIBUTE}
           className="hidden"
           onChange={chosen}
         />
       )}
-      {view.camera && (
+      {cameraInput && (
         <input
-          ref={view.cameraInput}
+          ref={cameraInput}
           type="file"
           accept={CAMERA_ACCEPT_ATTRIBUTE}
           capture="environment"

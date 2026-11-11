@@ -31,11 +31,18 @@ type AskState = {
   /** A question to send as soon as Ask is open on its list: an example the student chose (#586). */
   pending: string | null
   /**
-   * The docked composer's + was pressed: Ask opens with its own add menu open,
-   * where the camera, a file or the phone is chosen. Memory only, taken once.
+   * What the docked composer's + chose, for Ask's own composer to take as it
+   * opens: the files picked there, or the phone's code to start. Memory only,
+   * taken once.
    */
-  addMenu: boolean
+  added: AddedFromDock | null
 }
+
+/**
+ * The docked + chooses on the dock itself, and the files are Ask's: they go
+ * through Ask's one attachment pipeline (checks, upload, tray) once it is open.
+ */
+export type AddedFromDock = { kind: 'files'; files: File[] } | { kind: 'phone' }
 
 type AskActions = {
   /** Typing in the docked composer: open with what was typed. */
@@ -51,17 +58,17 @@ type AskActions = {
   askNow: (ownerId: string, question: string) => void
   /** The question waiting to be sent, taken once: the panel that sends it. */
   takePending: (ownerId: string) => string | null
-  /** The docked +: the next Ask to open shows its add menu. */
-  wantAddMenu: (ownerId: string) => void
-  /** The add menu was shown; the next opening is a plain one. */
-  endAddMenu: () => void
+  /** The docked + chose something: Ask's composer takes it once open. */
+  addFromDock: (ownerId: string, added: AddedFromDock) => void
+  /** What the docked + chose, taken once: the panel that adds it. */
+  takeAdded: (ownerId: string) => AddedFromDock | null
 }
 
 export const ASK_STORAGE_KEY = 'stoa_ask_panel'
 
 type Persisted = Pick<AskState, 'ownerId' | 'open' | 'conversationId'>
 
-const CLOSED: AskState = { ownerId: null, open: false, conversationId: null, draft: '', examples: null, pending: null, addMenu: false }
+const CLOSED: AskState = { ownerId: null, open: false, conversationId: null, draft: '', examples: null, pending: null, added: null }
 
 /** What a reload restores: which account's Ask was open, and on which conversation. */
 export function readPersistedAsk(): Persisted {
@@ -108,7 +115,7 @@ export const useAskStore = create<AskState & AskActions>((set, get) => ({
   select: (ownerId, conversationId) =>
     set((state) => ({ ...forOwner(state, ownerId), open: true, conversationId })),
   setDraft: (ownerId, draft) => set((state) => ({ ...forOwner(state, ownerId), draft })),
-  close: () => set({ open: false, addMenu: false }),
+  close: () => set({ open: false, added: null }),
   offerExamples: (ownerId, examples) => set((state) => ({ ...forOwner(state, ownerId), examples })),
   endExamples: () => set({ examples: null }),
   askNow: (ownerId, question) =>
@@ -119,8 +126,13 @@ export const useAskStore = create<AskState & AskActions>((set, get) => ({
     set({ pending: null })
     return pending
   },
-  wantAddMenu: (ownerId) => set((state) => ({ ...forOwner(state, ownerId), addMenu: true })),
-  endAddMenu: () => set({ addMenu: false }),
+  addFromDock: (ownerId, added) => set((state) => ({ ...forOwner(state, ownerId), added })),
+  takeAdded: (ownerId) => {
+    const { ownerId: owner, added } = get()
+    if (owner !== ownerId || added === null) return null
+    set({ added: null })
+    return added
+  },
 }))
 
 useAskStore.subscribe((state, previous) => {
@@ -155,6 +167,6 @@ export function askFor(state: AskState, ownerId: string | null) {
     draft: mine ? state.draft : '',
     examples: mine ? state.examples : null,
     pending: mine ? state.pending : null,
-    addMenu: mine && state.addMenu,
+    added: mine ? state.added : null,
   }
 }
