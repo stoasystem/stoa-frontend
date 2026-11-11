@@ -237,7 +237,9 @@ export function AskHost({
           data-surface="sky"
           data-ask-page
           inert={sheet || rise || undefined}
-          className="absolute inset-y-0 left-0 bg-sky text-on-sky"
+          // Its own stacking context: what the page lifts over itself (the
+          // map's galaxy switch) stays under the dim and Ask risen over it (#660).
+          className="absolute inset-y-0 left-0 isolate bg-sky text-on-sky"
           // Reserve the dock's space for the page's own controls, including while
           // Ask is open, so closing it never covers a control. Only the panel
           // beside the map narrows it (#660); risen, Ask stands over it.
