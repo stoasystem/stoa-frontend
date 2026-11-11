@@ -189,18 +189,30 @@ describe('the wide screen’s "?" (#643)', () => {
     await i18n.changeLanguage('en')
   })
 
-  it('stands bottom left in place of the legend, on the zoom pair’s line, with a 44 px target', () => {
+  it('stands bottom left in place of the legend, on the zoom pair’s line, as large as a zoom button', () => {
     const view = showAt(1280, 800)
     expect(view.container.querySelector('[data-starmap-legend]'), 'no always-on legend').toBeNull()
     expect(view.container.querySelector('[data-legend-pointer]'), 'nothing of the legend on the map').toBeNull()
     const button = screen.getByRole('button', { name: en.help.open })
     expect(button.textContent).toBe('?')
-    expect(button.className).toContain('size-11')
+    expect(button.className).toContain('size-8')
+    expect(button.className).not.toContain('size-11')
+    for (const zoomButton of within(screen.getByRole('group', { name: en.zoom.group })).getAllByRole('button')) {
+      expect(zoomButton.className).toContain('size-8')
+    }
     const frame = button.parentElement!
     expect(frame.className).toContain('left-6')
     expect(frame.className).toContain('bottom-[calc(1.5rem+var(--page-bottom-inset,0px))]')
     const zoom = screen.getByRole('group', { name: en.zoom.group })
     expect(zoom.className).toContain('bottom-[calc(1.5rem+var(--page-bottom-inset,0px))]')
+    view.unmount()
+  })
+
+  it('keeps a 44 px touch target on a phone, as the phone’s zoom buttons do', () => {
+    const view = showAt(390, 844)
+    const button = screen.getByRole('button', { name: en.help.open })
+    expect(button.className).toContain('size-11')
+    expect(button.className).not.toContain('size-8')
     view.unmount()
   })
 
@@ -254,7 +266,7 @@ describe('the wide screen’s "?" (#643)', () => {
   })
 
   it('leaves the map a band below that clears the "?" and the zoom pair, not the old legend’s', () => {
-    // "?" 24 px up and 50 tall; zoom pair 24 px up and about 74 tall.
+    // "?" 24 px up and 40 tall (a zoom button's size); zoom pair 24 px up and about 74 tall.
     const { bottom } = controlBands(true)
     expect(bottom).toBeGreaterThanOrEqual(24 + 74 + 8)
     expect(bottom).toBeLessThan(164)
