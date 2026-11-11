@@ -121,15 +121,28 @@ async function expectClearOfControls(page: Page, cardSelector: string, when: str
   }
 }
 
-/** No key on the map; the "?" bottom left, its bottom on the zoom pair's (#643). */
+/**
+ * No key on the map; the "?" bottom left, its bottom on the zoom pair's
+ * (#643), as large as one zoom button: 32 px on a wide stage, a 44 px touch
+ * target on a phone. "Wide" is the stage's own width (768); these viewports
+ * leave the stage the whole width, so a viewport under 768 is a phone.
+ */
 async function expectHelpInTheCorner(page: Page, viewport: { width: number; height: number }) {
   await expect(page.locator('[data-starmap-legend]')).toHaveCount(0)
   const help = page.locator('[data-starmap-help-button]')
   await expect(help).toBeVisible()
   const box = (await help.boundingBox())!
-  expect(box.width, 'the "?" keeps a 44 px target').toBeGreaterThanOrEqual(44)
-  expect(box.height, 'the "?" keeps a 44 px target').toBeGreaterThanOrEqual(44)
+  if (viewport.width < 768) {
+    expect(box.width, 'the "?" keeps a 44 px target on a phone').toBeGreaterThanOrEqual(44)
+    expect(box.height, 'the "?" keeps a 44 px target on a phone').toBeGreaterThanOrEqual(44)
+  }
   expect(box.x, 'the "?" is on the left').toBeLessThan(viewport.width / 2)
+  const zoomButton = page.locator('[data-starmap-overlay][role=group] button').first()
+  if (await zoomButton.isVisible()) {
+    const button = (await zoomButton.boundingBox())!
+    expect(Math.abs(box.width - button.width), 'the "?" as wide as a zoom button').toBeLessThanOrEqual(0.5)
+    expect(Math.abs(box.height - button.height), 'the "?" as tall as a zoom button').toBeLessThanOrEqual(0.5)
+  }
   const zoom = await page.locator('[data-starmap-overlay][role=group]').boundingBox()
   if (zoom) {
     // The frames, not the buttons: each sits 3 px inside a 1 px border.

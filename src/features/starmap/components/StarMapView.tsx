@@ -142,10 +142,10 @@ export function canvasPixelRatio(): number {
  * below. The whole map fits between them.
  *
  * Below, measured (#643): a phone's "?" is 16 px up and 50 tall, its top at
- * 66, and the band keeps 72. A wide stage's "?" is 24 px up and 50 tall (top
- * at 74), its zoom pair 24 px up and about 74 tall (top at 98); the band keeps
- * 110, 12 px over the taller of the two. (It kept 164 for the always-on legend,
- * 89 tall with two rows.)
+ * 66, and the band keeps 72. A wide stage's "?" is 24 px up and 40 tall (top
+ * at 64; a zoom button's size), its zoom pair 24 px up and about 74 tall (top
+ * at 98); the band keeps 110, 12 px over the taller of the two. (It kept 164
+ * for the always-on legend, 89 tall with two rows.)
  */
 export function controlBands(wide: boolean, bottomInset = 0, demo = false): { top: number; bottom: number } {
   const noticeHeight = demo ? DEMO_NOTICE_HEIGHT : 0
@@ -986,7 +986,11 @@ export function StarMapView({ map, demo = false, target, path, marked, onNavigat
                     data-starmap-help-button
                     aria-label={t('help.open')}
                     title={t('help.open')}
-                    className="inline-flex size-11 cursor-pointer items-center justify-center rounded-[8px] border-0 bg-transparent p-0 text-[20px] font-bold leading-none text-[color:var(--on-sky-plain)] hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+                    className={cn(
+                      'inline-flex cursor-pointer items-center justify-center rounded-[8px] border-0 bg-transparent p-0 font-bold leading-none text-[color:var(--on-sky-plain)] hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring',
+                      // As large as one zoom button: 32 px on a wide stage, a 44 px touch target on a phone.
+                      wide ? 'size-8 text-[16px]' : 'size-11 text-[20px]',
+                    )}
                   >
                     <span aria-hidden="true">?</span>
                   </button>
@@ -999,9 +1003,9 @@ export function StarMapView({ map, demo = false, target, path, marked, onNavigat
                 data-starmap-help-dialog
                 className={cn(
                   'absolute z-20 flex touch-pan-y flex-col gap-2.5 overflow-y-auto overscroll-contain rounded-[16px] border border-solid border-[color:var(--sky-glass-border)] px-4 pt-2 pb-4 text-on-sky focus-visible:outline-none',
-                  // Wide: a panel just over the "?" (24 + 50 + 10 px up), as wide as reads well.
+                  // Wide: a panel just over the "?" (24 + 40 + 10 px up), as wide as reads well.
                   wide
-                    ? 'bottom-[calc(84px+var(--page-bottom-inset,0px))] left-6 w-[min(460px,calc(100%-48px))] max-h-[calc(100%-108px-var(--page-bottom-inset,0px))]'
+                    ? 'bottom-[calc(74px+var(--page-bottom-inset,0px))] left-6 w-[min(460px,calc(100%-48px))] max-h-[calc(100%-98px-var(--page-bottom-inset,0px))]'
                     : 'inset-x-3 bottom-[calc(12px+var(--page-bottom-inset,0px))] max-h-[calc(100%-24px-var(--page-bottom-inset,0px))]',
                 )}
                 style={{ ...GLASS, boxShadow: 'var(--shadow-glass)' }}
