@@ -33,7 +33,7 @@ test('an answer comes back after a reload in the middle of it, and the question 
   // The first question starts a conversation; its answer is read to the end.
   const first = 'Why is a negative times a negative positive?'
   await page.getByRole('textbox', { name: 'Your question' }).fill(first)
-  const panel = page.getByRole('complementary', { name: 'Ask' })
+  const panel = page.getByRole('dialog', { name: 'Ask' })
   await panel.getByRole('textbox', { name: 'Your question' }).press('Enter')
   const thread = panel.getByRole('log', { name: 'Messages' })
   await expect(thread.getByText(world.answerFor(first))).toBeVisible()
@@ -73,7 +73,7 @@ test('a message that failed retryably is sent again as the same message, and ans
 
   const first = 'What is a prime number?'
   await page.getByRole('textbox', { name: 'Your question' }).fill(first)
-  const panel = page.getByRole('complementary', { name: 'Ask' })
+  const panel = page.getByRole('dialog', { name: 'Ask' })
   await panel.getByRole('textbox', { name: 'Your question' }).press('Enter')
   const thread = panel.getByRole('log', { name: 'Messages' })
   await expect(thread.getByText(world.answerFor(first))).toBeVisible()
@@ -115,7 +115,7 @@ test('an answer in sections shows its steps, and a step is asked about as that p
   await signInAsStudent(page)
 
   await page.getByRole('textbox', { name: 'Your question' }).fill(question)
-  const panel = page.getByRole('complementary', { name: 'Ask' })
+  const panel = page.getByRole('dialog', { name: 'Ask' })
   await panel.getByRole('textbox', { name: 'Your question' }).press('Enter')
   const thread = panel.getByRole('log', { name: 'Messages' })
   const steps = thread.getByRole('list', { name: 'Steps' })
@@ -174,7 +174,7 @@ test('once the usage period has ended, the question box is greyed and says why, 
 
   // Ask still opens, on the conversations, with its own composer greyed.
   await page.goto('/ask')
-  const panel = page.getByRole('complementary', { name: 'Ask' })
+  const panel = page.getByRole('dialog', { name: 'Ask' })
   await expect(panel.getByRole('textbox', { name: 'Your question' })).toBeDisabled()
   expect(backend.callsTo('POST', '/conversations')).toHaveLength(0)
 })

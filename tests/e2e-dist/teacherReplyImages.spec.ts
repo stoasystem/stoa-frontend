@@ -141,7 +141,7 @@ test('the student sees the picture a teacher replied with, read through their ow
   await signInAsStudent(page)
   await page.goto(`/ask/${conversationId}`)
 
-  const panel = page.getByRole('complementary', { name: 'Ask' })
+  const panel = page.getByRole('dialog', { name: 'Ask' })
   const pictures = panel.getByRole('list', { name: 'Pictures from the teacher' })
   const open = pictures.getByRole('button', { name: 'Enlarge picture: sketch.jpg' })
   await expect(open).toBeVisible()

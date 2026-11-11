@@ -28,7 +28,7 @@ test('a photo goes up straight to S3, and the question carries it by its upload 
   await signInAsStudent(page)
   await page.goto('/ask')
 
-  const panel = page.getByRole('complementary', { name: 'Ask' })
+  const panel = page.getByRole('dialog', { name: 'Ask' })
   await choosePhoto(page, panel, exercise())
   const tray = panel.getByRole('list', { name: 'Attached files' })
   // Shrunk and written again as a JPEG in the browser before it went (#508).
@@ -72,7 +72,7 @@ test('a picture image moderation refuses is said to be refused, and the question
   await signInAsStudent(page)
   await page.goto('/ask')
 
-  const panel = page.getByRole('complementary', { name: 'Ask' })
+  const panel = page.getByRole('dialog', { name: 'Ask' })
   await choosePhoto(page, panel, exercise())
   const row = panel.getByRole('list', { name: 'Attached files' }).getByRole('listitem')
   await expect(row.getByRole('alert')).toHaveText(
