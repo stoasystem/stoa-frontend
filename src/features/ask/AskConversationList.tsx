@@ -5,7 +5,8 @@ import { conversationDisplayTitle } from '@/components/chat/conversationTitle'
 import { formatDayAndMonth, formatTimeOfDay } from '@/lib/formatDateTime'
 import type { ConversationSummary } from '@/types/chat'
 
-function when(updatedAt: string) {
+/** A conversation's "when": the time today, else the day and month. */
+export function when(updatedAt: string) {
   const date = new Date(updatedAt)
   if (Number.isNaN(date.getTime())) return ''
   return date.toDateString() === new Date().toDateString() ? formatTimeOfDay(date) : formatDayAndMonth(date)

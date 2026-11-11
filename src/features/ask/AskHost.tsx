@@ -1,9 +1,10 @@
-import { useCallback, useEffect, useId, useRef, type CSSProperties, type KeyboardEvent, type ReactNode } from 'react'
+import { useCallback, useEffect, useId, useRef, useState, type CSSProperties, type KeyboardEvent, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Button, Composer } from '@/components/base'
 import { COMPOSER } from '@/components/base/sizes'
 import { UsagePeriodPausedNotice } from '@/components/usagePeriod/UsagePeriodRenewal'
 import { AskPanel } from '@/features/ask/AskPanel'
+import { AskRecent, recentFieldKeys } from '@/features/ask/AskRecent'
 import { AskReopen } from '@/features/ask/AskReopen'
 import { useClearOfControls } from '@/features/ask/clearOfControls'
 import {
@@ -43,8 +44,14 @@ import '@/features/ask/askGuide.css'
  * `data-surface="sky"` and `data-ask-surface`, which brand-tokens.css turns
  * into the sky's colours, so they hold inside them and Ask no longer reads as a white card from another product.
  *
- * Closed, `AskReopen` at the end of the docked composer's row calls the same
- * conversation back (#125); it stood on the right edge until #645.
+ * Closed, the docked composer is the one way back in. A press on its field
+ * offers the three latest conversations and the way to all of them
+ * (`AskRecent`); its + opens Ask with the add menu open, where the camera, a
+ * file or the phone is chosen. `AskReopen` stood at the end of its row (#125,
+ * #645) and went: the button and the composer were two ways into the same
+ * thread (typing opened the last conversation, and so did the button). It
+ * stays only while the usage period is paused (#615), when the field is shut
+ * and the button is the one way to read the old conversations.
  *
  * After "Find my own star" on the first landing (#586) the docked composer
  * takes the focus, is highlighted once, and offers two or three things the
@@ -89,7 +96,8 @@ export function AskHost({
   const askNow = useAskStore((state) => state.askNow)
   const endExamples = useAskStore((state) => state.endExamples)
   // The usage period has ended (#615): the docked composer is greyed and says
-  // why; Ask still opens on its conversations, from the reopen button.
+  // why; Ask still opens on its conversations, from the reopen button, which
+  // is drawn only then.
   const usagePeriod = useAskUsagePeriod()
   const paused = usagePeriod.paused
   const pausedNoticeId = useId()
@@ -118,9 +126,16 @@ export function AskHost({
     wasOpen.current = open
   }, [open])
 
-  // Opened: the cursor is in Ask's own composer, after what was typed.
+  // Opened: the cursor is in Ask's own composer, after what was typed -- unless
+  // it opened from the docked +, where the add menu takes it (moving it to the
+  // field would put the menu away).
+  const openingToAdd = useRef(false)
   useEffect(() => {
     if (!open) return
+    if (openingToAdd.current) {
+      openingToAdd.current = false
+      return
+    }
     const field = surface.current?.querySelector<HTMLTextAreaElement>('[data-composer-field]')
     if (!field || surface.current?.contains(document.activeElement)) return
     field.focus()
@@ -130,16 +145,53 @@ export function AskHost({
 
   const onKeyDown = useAskKeyboard(surface, { trap: modal, active: open, onEscape: close })
   const drag = useSheetDrag(surface, close)
+  // A press on the docked field: the latest conversations, and the way to all
+  // of them (`AskRecent`). Not on focus alone: the examples (#586) put the
+  // cursor there by script, and Tab passes through.
+  const [recentOpen, setRecentOpen] = useState(false)
+  const recentId = useId()
+  const dockedField = useCallback(() => docked.current?.querySelector<HTMLElement>('[data-composer-field]') ?? null, [])
+  const { select } = controller
+  const openRecent = useCallback(
+    (conversationId: string | null) => {
+      setRecentOpen(false)
+      select(conversationId)
+    },
+    [select],
+  )
+  const closeRecent = useCallback(
+    (refocus: boolean) => {
+      setRecentOpen(false)
+      if (refocus) dockedField()?.focus()
+    },
+    [dockedField],
+  )
+  // Gone with Ask open, or with the period paused (the field is shut then).
+  const recentShown = recentOpen && !open && !paused
+
   // An input method (Chinese, Japanese, a dead key for an accent) is still
   // composing while its first characters arrive; opening Ask then would move
   // the field from under it. Ask opens once the composition ends.
   const onDockedChange = useCallback(
     (value: string) => {
+      setRecentOpen(false)
       if (value.trim().length > 0 && !composing.current) controller.openWithDraft(value)
       else controller.setDraft(value)
     },
     [controller],
   )
+  // The docked +: a file chooser opens only from the student's own press, and
+  // the files are the panel's, so Ask opens with its add menu already open and
+  // the camera, a file or the phone is chosen there.
+  const wantAddMenu = useAskStore((state) => state.wantAddMenu)
+  const { reopen } = controller
+  const openToAdd = useCallback(() => {
+    if (!ownerId) return
+    setRecentOpen(false)
+    openingToAdd.current = true
+    wantAddMenu(ownerId)
+    reopen()
+  }, [ownerId, wantAddMenu, reopen])
   const onDockedCompositionEnd = useCallback(
     (value: string) => {
       composing.current = false
@@ -168,8 +220,10 @@ export function AskHost({
           <div
             ref={docked}
             data-ask-docked
-            // The composer, then Ask's way back at the end of its row (#645). Wide, the
-            // composer stays centred: the row keeps the button's room on both sides.
+            // The composer, centred and 640 at most (wide) or the full row (phone).
+            // Only while the period is paused does Ask's way back stand at the end
+            // of its row; wide, the row then keeps the button's room on both sides
+            // so the composer stays centred.
             className={wide ? 'absolute grid items-center' : 'absolute flex items-center'}
             style={
               wide
@@ -177,13 +231,15 @@ export function AskHost({
                     left: 24,
                     right: 24,
                     bottom: DOCKED_COMPOSER.desktop.bottom,
-                    gridTemplateColumns: `minmax(${reopenRoom}px, 1fr) minmax(0, ${DOCKED_COMPOSER.desktop.width}px) minmax(${reopenRoom}px, 1fr)`,
+                    gridTemplateColumns: paused
+                      ? `minmax(${reopenRoom}px, 1fr) minmax(0, ${DOCKED_COMPOSER.desktop.width}px) minmax(${reopenRoom}px, 1fr)`
+                      : `1fr minmax(0, ${DOCKED_COMPOSER.desktop.width}px) 1fr`,
                   }
                 : {
                     left: DOCKED_COMPOSER.phone.inset,
                     right: DOCKED_COMPOSER.phone.inset,
                     bottom: DOCKED_COMPOSER.phone.bottom,
-                    gap: ASK_REOPEN.gap,
+                    gap: paused ? ASK_REOPEN.gap : undefined,
                   }
             }
           >
@@ -222,6 +278,9 @@ export function AskHost({
                   </ul>
                 </div>
               )}
+              {recentShown && (
+                <AskRecent id={recentId} field={dockedField} onSelect={openRecent} onClose={closeRecent} />
+              )}
               {paused && usagePeriod.entitlement && (
                 // Out of the flow, as the examples are, so the dock's box stays the composer's.
                 <UsagePeriodPausedNotice
@@ -240,14 +299,24 @@ export function AskHost({
                 }}
                 onCompositionEnd={onDockedCompositionEnd}
                 onSubmit={(value) => controller.openWithDraft(value)}
+                onFieldClick={() => {
+                  if (!offering) setRecentOpen(true)
+                }}
+                onFieldKeyDown={(event) => {
+                  if (recentShown) recentFieldKeys(event, recentId, () => setRecentOpen(false))
+                }}
+                fieldPopup={{ id: recentId, expanded: recentShown }}
+                onAdd={openToAdd}
                 dictation
                 label={t('ask.composerLabel')}
                 placeholder={wide ? t('ask.dockedPlaceholder') : t('ask.dockedPlaceholderPhone')}
               />
             </div>
-            <div className="flex" style={wide ? { paddingLeft: ASK_REOPEN.gap } : undefined}>
-              <AskReopen onOpen={controller.reopen} resuming={controller.conversationId !== null} />
-            </div>
+            {paused && (
+              <div className="flex" style={wide ? { paddingLeft: ASK_REOPEN.gap } : undefined}>
+                <AskReopen onOpen={controller.reopen} resuming={controller.conversationId !== null} />
+              </div>
+            )}
           </div>
         )}
       </div>

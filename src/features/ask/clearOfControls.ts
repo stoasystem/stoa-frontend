@@ -38,8 +38,8 @@ export function sidePads(box: Box, controls: Box[], gap = CLEAR_GAP): { left: nu
 
 /**
  * The page's controls the examples keep clear of: the star map's overlays
- * (`data-starmap-overlay`). Ask's own button that calls it back is in the
- * composer's row, under the examples, never beside them (#645). A wrapper with
+ * (`data-starmap-overlay`). Ask's own way back is the composer under the
+ * examples (its button, drawn only while paused, has no examples to clear). A wrapper with
  * no size of its own (the "?" sits in one) stands for what is drawn inside it.
  */
 export function controlBoxes(page: HTMLElement): Box[] {
