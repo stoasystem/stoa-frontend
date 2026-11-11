@@ -29,14 +29,6 @@ export interface ComposerProps {
    * where there is no camera to open.
    */
   onPhone?: () => void
-  /**
-   * A + that only says "I want to add something", with no menu of its own:
-   * Ask's docked composer, which opens Ask with the add menu there (`addMenuOpen`).
-   * Ignored when any of the add actions above is given.
-   */
-  onAdd?: () => void
-  /** The add menu is open as the composer appears (Ask opened from the docked +). */
-  addMenuOpen?: boolean
   /** A press on the field itself, by pointer: not focus, which a script or Tab also gives. */
   onFieldClick?: () => void
   /** Keys on the field, before the composer's own; `preventDefault` keeps them from it. */
@@ -99,8 +91,6 @@ export function Composer({
   onAttach,
   onCapture,
   onPhone,
-  onAdd,
-  addMenuOpen = false,
   onFieldClick,
   onFieldKeyDown,
   fieldPopup,
@@ -190,7 +180,9 @@ export function Composer({
    * One + for every way to add a picture (#553): a child pressing it expects
    * the choice, and found a file dialog with no word of the phone. A phone or
    * tablet takes a photo or chooses one; a computer chooses one or has the
-   * phone take it, a new question as much as one already asked (#554).
+   * phone take it, a new question as much as one already asked (#554). Ask's
+   * docked composer offers the same menu on the star map, before Ask is open:
+   * what is chosen there is handed to Ask's own composer (`AskHost`).
    */
   const actions = [
     onCapture && { key: 'capture', icon: Camera, label: t('composer.capture'), run: onCapture },
@@ -205,12 +197,11 @@ export function Composer({
       glyph={spec.attachGlyph}
       variant="tinted"
       disabled={disabled}
-      onClick={actions.length > 0 ? undefined : onAdd}
       data-composer-add
     />
   )
-  const add = actions.length === 0 ? onAdd && addButton : (
-    <Menu.Root modal={false} defaultOpen={addMenuOpen}>
+  const add = actions.length > 0 && (
+    <Menu.Root modal={false}>
       <Menu.Trigger asChild disabled={disabled}>
         {addButton}
       </Menu.Trigger>

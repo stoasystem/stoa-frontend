@@ -93,6 +93,20 @@ export type AttachmentsView = {
   remove: (localId: string) => void
 }
 
+/**
+ * Which of the camera and the phone this device is offered, of those asked
+ * for. Taking a photo and choosing one are two entries (#509): with `capture`
+ * a phone opens the camera and offers no gallery, without it the gallery and
+ * files. Only where the camera opens is there a camera to offer; there the
+ * camera is also right at hand, so no QR is offered to send a phone's photo
+ * (#514). Shared with Ask's docked +, which offers the same menu before Ask's
+ * own composer is there.
+ */
+export function useOfferedSources({ camera, phone }: { camera: boolean; phone: boolean }) {
+  const touch = useMediaQuery(TOUCH_QUERY)
+  return { camera: camera && touch, phone: phone && !touch }
+}
+
 /** Time enough for a message to reach the server once it is sent. */
 const EXPIRY_MARGIN_MS = 2 * 60 * 1000
 
@@ -375,11 +389,7 @@ export function useAttachments({
   const picker = useRef<HTMLInputElement>(null)
   const cameraInput = useRef<HTMLInputElement>(null)
   const phoneStart = useRef<(() => void) | null>(null)
-  // Taking a photo and choosing one are two entries (#509): with `capture` a
-  // phone opens the camera and offers no gallery, without it the gallery and
-  // files. Only where the camera opens is there a camera to offer; there the
-  // camera is also right at hand, so no QR is offered to send a phone's photo.
-  const touch = useMediaQuery(TOUCH_QUERY)
+  const offered = useOfferedSources({ camera, phone: phone !== false })
   const pickFile = useCallback(() => picker.current?.click(), [])
   const takePhoto = useCallback(() => cameraInput.current?.click(), [])
   const usePhone = useCallback(() => phoneStart.current?.(), [])
@@ -399,8 +409,8 @@ export function useAttachments({
   }
   const sources: AttachmentSources = {
     pickFile,
-    takePhoto: camera && touch ? takePhoto : undefined,
-    usePhone: phone !== false && !touch ? usePhone : undefined,
+    takePhoto: offered.camera ? takePhoto : undefined,
+    usePhone: offered.phone ? usePhone : undefined,
   }
 
   return {

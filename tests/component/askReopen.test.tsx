@@ -6,8 +6,8 @@
  * A round button at the end of the composer's row was the way back (#645),
  * and it read as a second way into the same thread: typing opened the last
  * conversation, and so did the button. Now a press on the composer's field
- * offers the latest conversations and the whole list, and its + opens Ask with
- * the add menu open. The button stays only while the usage period is paused
+ * offers the latest conversations and the whole list, and its + offers the
+ * ways to add a picture right there, opening Ask only once one is chosen. The button stays only while the usage period is paused
  * (#615), when the field is shut.
  */
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
@@ -24,6 +24,21 @@ import { resetAsk, useAskStore } from '@/store/askStore'
 import { type CurrentUser, useAuthStore } from '@/store/authStore'
 import { createFakeAskServer, type FakeAskServer } from '../fakes/askServer'
 
+// What a picked file goes through on its way up is askAttachments'; here it
+// only has to arrive in Ask's tray, so the upload is answered and held.
+vi.mock('@/services/files/fileApi', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@/services/files/fileApi')>()),
+  uploadFile: vi.fn(() => new Promise(() => {})),
+}))
+vi.mock('@/services/files/prepareImage', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@/services/files/prepareImage')>()),
+  prepareImage: vi.fn(async (file: File) => file),
+}))
+vi.mock('@/services/files/uploadCodeApi', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@/services/files/uploadCodeApi')>()),
+  createUploadCode: vi.fn(() => new Promise(() => {})),
+}))
+
 const summary = (id: string, title: string, updatedAt: string) => ({ id, title, subject: 'math', grade: '8', updatedAt })
 
 /** Five conversations, listed out of order: the dock must pick the three newest itself. */
@@ -38,11 +53,12 @@ const CONVERSATIONS = [
 /** The server behind Ask, in memory (#571), and no teacher online. */
 let server: FakeAskServer
 
-function emulateWidth(width: number) {
+/** A width, and a touch screen (a coarse pointer) below a tablet's unless said otherwise. */
+function emulateWidth(width: number, touch = width < 768) {
   window.matchMedia = ((query: string) => {
     const min = query.match(/min-width:\s*(\d+)px/)
     return {
-      matches: !min || width >= Number(min[1]),
+      matches: query.includes('pointer: coarse') ? touch : !min || width >= Number(min[1]),
       media: query,
       onchange: null,
       addEventListener: () => {},
@@ -54,8 +70,8 @@ function emulateWidth(width: number) {
   }) as typeof window.matchMedia
 }
 
-function planet(width = 1280) {
-  emulateWidth(width)
+function planet(width = 1280, touch?: boolean) {
+  emulateWidth(width, touch)
   const client = new QueryClient({ defaultOptions: { queries: { retry: false } } })
   render(
     <I18nextProvider i18n={i18n}>
@@ -223,26 +239,87 @@ describe('the docked composer is the one way back into Ask', () => {
 })
 
 describe('the docked +', () => {
+  const add = () => within(docked()).getByRole('button', { name: 'Add a photo' })
+  const actions = (menu: Element) =>
+    [...menu.querySelectorAll<HTMLElement>('[data-composer-action]')].map((item) => item.dataset.composerAction)
+  const dockedPicker = () => docked().querySelector<HTMLInputElement>('input[type=file]:not([capture])')!
+  const photo = () => new File([new Uint8Array(2000)], 'triangle.png', { type: 'image/png' })
+
+  it('opens its menu right on the dock, and Ask stays closed (phone)', async () => {
+    planet(375)
+    await userEvent.click(add())
+
+    const menu = await waitFor(() => {
+      const found = docked().querySelector('[data-composer-menu]')
+      expect(found).not.toBeNull()
+      return found!
+    })
+    // A phone or tablet: the camera, or a photo already on it.
+    expect(actions(menu)).toEqual(['capture', 'attach'])
+    expect(surface()).toBeNull()
+  })
+
+  it('opens its menu right on the dock, and Ask stays closed (computer)', async () => {
+    planet(1280)
+    await userEvent.click(add())
+
+    const menu = await waitFor(() => {
+      const found = docked().querySelector('[data-composer-menu]')
+      expect(found).not.toBeNull()
+      return found!
+    })
+    // A computer: a file on it, or a photo from the phone.
+    expect(actions(menu)).toEqual(['attach', 'phone'])
+    expect(surface()).toBeNull()
+  })
+
   for (const width of [375, 1280]) {
-    it(`opens Ask with its add menu already open, the menu not on the dock, at ${width}`, async () => {
+    it(`a file picked from it opens Ask with the file in Ask's composer, not sent, at ${width}`, async () => {
       planet(width)
-      const add = within(docked()).getByRole('button', { name: 'Add a photo' })
-      expect(docked().querySelector('[data-composer-menu]')).toBeNull()
-      await userEvent.click(add)
+      const click = vi.spyOn(dockedPicker(), 'click')
+      await userEvent.click(add())
+      await userEvent.click(await screen.findByRole('menuitem', { name: 'Choose a photo or file' }))
+      // The chooser opened from the press itself, and Ask waits for a file.
+      expect(click).toHaveBeenCalledTimes(1)
+      expect(surface()).toBeNull()
+
+      await userEvent.upload(dockedPicker(), photo())
 
       expect(surface()).not.toBeNull()
-      const menu = await waitFor(() => {
-        const found = surface()!.querySelector('[data-composer-menu]')
+      const tray = await waitFor(() => {
+        const found = surface()!.querySelector<HTMLElement>('[data-ask-attachments]')
         expect(found).not.toBeNull()
         return found!
       })
-      expect(menu.querySelectorAll('[data-composer-action]').length).toBeGreaterThan(0)
-      // The keyboard is in the menu, not in the field (which would put the menu away).
-      await waitFor(() => expect(menu.contains(document.activeElement)).toBe(true))
-      // Taken once: the next opening is a plain one.
-      expect(useAskStore.getState().addMenu).toBe(false)
+      expect(within(tray).getByText('triangle.png')).toBeInTheDocument()
+      // Waiting for the question: the cursor in Ask's field, nothing sent.
+      const field = surface()!.querySelector<HTMLTextAreaElement>('[data-composer-field]')!
+      await waitFor(() => expect(field).toHaveFocus())
+      expect(server.stream.streamConversationMessage).not.toHaveBeenCalled()
+      expect(server.conversations.createConversation).not.toHaveBeenCalled()
+      expect(useAskStore.getState().added).toBeNull()
     })
   }
+
+  it('a chooser put away with nothing picked opens nothing', async () => {
+    planet()
+    await userEvent.click(add())
+    await userEvent.click(await screen.findByRole('menuitem', { name: 'Choose a photo or file' }))
+    fireEvent.change(dockedPicker(), { target: { files: [] } })
+
+    expect(surface()).toBeNull()
+    expect(useAskStore.getState().added).toBeNull()
+  })
+
+  it('"Send a photo from your phone" opens Ask and starts the phone there', async () => {
+    planet(1280)
+    await userEvent.click(add())
+    await userEvent.click(await screen.findByRole('menuitem', { name: 'Send a photo from your phone' }))
+
+    expect(surface()).not.toBeNull()
+    await waitFor(() => expect(surface()!.querySelector('[data-phone-upload]')).not.toBeNull())
+    expect(useAskStore.getState().added).toBeNull()
+  })
 
   it('a plain opening shows no add menu', async () => {
     planet()
