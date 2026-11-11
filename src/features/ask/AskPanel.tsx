@@ -537,7 +537,12 @@ function AskThread({
         // finished, by the announcer below -- not token by token.
         aria-live="off"
         onScroll={onScroll}
-        className="flex min-h-0 flex-1 flex-col overflow-y-auto"
+        // Positioned, so the words only screen readers get ("(Step N)",
+        // `sr-only`, placed absolutely) are held and scrolled by the thread.
+        // Otherwise they hung off the star map's shell at their unscrolled
+        // place, made it taller than the screen, and anything brought into
+        // view in the thread scrolled the whole page up (#636).
+        className="relative flex min-h-0 flex-1 flex-col overflow-y-auto"
         style={{ gap: layout === 'sheet' ? 10 : 12, padding: layout === 'sheet' ? '12px 14px' : '16px 18px' }}
       >
         <div className="flex-1" />
