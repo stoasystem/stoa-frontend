@@ -39,15 +39,16 @@ export const ASK_SHEET = {
 } as const
 
 export const DOCKED_COMPOSER = {
-  /** Placement: "bottom 22, width 640, centred"; Ask's way back beside it (`ASK_REOPEN`). */
+  /** Placement: "bottom 22, width 640, centred" (`ASK_REOPEN` beside it only while paused, #615). */
   desktop: { bottom: 22, width: 640 },
-  /** Placement: "inset 12, bottom 34, full width", less Ask's way back at its end. */
+  /** Placement: "inset 12, bottom 34, full width" (less `ASK_REOPEN` while paused). */
   phone: { inset: 12, bottom: 34 },
 } as const
 
 /**
  * The button that calls Ask back after it was closed (#125), at the end of the
- * docked composer's row (#180 on the practice stage, #645 on the star map).
+ * docked composer's row: on the practice stage (#180), and on the star map only
+ * while the usage period is paused (#615), when the composer is shut.
  * 44 is the smallest touch target the Sizes board allows; `gap` is the room
  * between it and the composer.
  *

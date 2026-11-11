@@ -29,6 +29,20 @@ export interface ComposerProps {
    * where there is no camera to open.
    */
   onPhone?: () => void
+  /**
+   * A + that only says "I want to add something", with no menu of its own:
+   * Ask's docked composer, which opens Ask with the add menu there (`addMenuOpen`).
+   * Ignored when any of the add actions above is given.
+   */
+  onAdd?: () => void
+  /** The add menu is open as the composer appears (Ask opened from the docked +). */
+  addMenuOpen?: boolean
+  /** A press on the field itself, by pointer: not focus, which a script or Tab also gives. */
+  onFieldClick?: () => void
+  /** Keys on the field, before the composer's own; `preventDefault` keeps them from it. */
+  onFieldKeyDown?: (event: KeyboardEvent<HTMLTextAreaElement>) => void
+  /** A popup the field opens (`onFieldClick`): its id and whether it is open. */
+  fieldPopup?: { id: string; expanded: boolean }
   /** Full composer only: between + and send, e.g. the subject picker. */
   footerStart?: ReactNode
   disabled?: boolean
@@ -85,6 +99,11 @@ export function Composer({
   onAttach,
   onCapture,
   onPhone,
+  onAdd,
+  addMenuOpen = false,
+  onFieldClick,
+  onFieldKeyDown,
+  fieldPopup,
   footerStart,
   disabled = false,
   describedBy,
@@ -157,6 +176,8 @@ export function Composer({
   }
 
   function onKeyDown(event: KeyboardEvent<HTMLTextAreaElement>) {
+    onFieldKeyDown?.(event)
+    if (event.defaultPrevented) return
     // keyCode 229 is how Safari reports the Enter that ends a composition.
     const composing = event.nativeEvent.isComposing || event.keyCode === 229
     if (event.key === 'Enter' && !event.shiftKey && !composing) {
@@ -176,18 +197,22 @@ export function Composer({
     onAttach && { key: 'attach', icon: ImageGlyph, label: t('composer.attach'), run: onAttach },
     onPhone && { key: 'phone', icon: Smartphone, label: t('composer.phone'), run: onPhone },
   ].filter(Boolean) as AddAction[]
-  const add = actions.length > 0 && (
-    <Menu.Root modal={false}>
+  const addButton = (
+    <IconButton
+      label={t('composer.add')}
+      icon={Plus}
+      size={spec.attach}
+      glyph={spec.attachGlyph}
+      variant="tinted"
+      disabled={disabled}
+      onClick={actions.length > 0 ? undefined : onAdd}
+      data-composer-add
+    />
+  )
+  const add = actions.length === 0 ? onAdd && addButton : (
+    <Menu.Root modal={false} defaultOpen={addMenuOpen}>
       <Menu.Trigger asChild disabled={disabled}>
-        <IconButton
-          label={t('composer.add')}
-          icon={Plus}
-          size={spec.attach}
-          glyph={spec.attachGlyph}
-          variant="tinted"
-          disabled={disabled}
-          data-composer-add
-        />
+        {addButton}
       </Menu.Trigger>
       {/* Not in a portal: in the composer's own surface, so it takes the
         * panel's colours (on the sky, dark) rather than the page's. The sky's
@@ -293,8 +318,12 @@ export function Composer({
         placeholder={placeholder}
         disabled={disabled}
         aria-describedby={fieldDescribedBy}
+        aria-haspopup={fieldPopup ? 'menu' : undefined}
+        aria-expanded={fieldPopup ? fieldPopup.expanded : undefined}
+        aria-controls={fieldPopup?.expanded ? fieldPopup.id : undefined}
         onChange={(event) => change(event.target.value)}
         onKeyDown={onKeyDown}
+        onClick={onFieldClick}
         onCompositionStart={onCompositionStart}
         onCompositionEnd={onCompositionEnd && ((event) => onCompositionEnd(event.currentTarget.value))}
         className={cn(

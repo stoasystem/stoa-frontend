@@ -30,6 +30,11 @@ type AskState = {
   examples: string[] | null
   /** A question to send as soon as Ask is open on its list: an example the student chose (#586). */
   pending: string | null
+  /**
+   * The docked composer's + was pressed: Ask opens with its own add menu open,
+   * where the camera, a file or the phone is chosen. Memory only, taken once.
+   */
+  addMenu: boolean
 }
 
 type AskActions = {
@@ -46,13 +51,17 @@ type AskActions = {
   askNow: (ownerId: string, question: string) => void
   /** The question waiting to be sent, taken once: the panel that sends it. */
   takePending: (ownerId: string) => string | null
+  /** The docked +: the next Ask to open shows its add menu. */
+  wantAddMenu: (ownerId: string) => void
+  /** The add menu was shown; the next opening is a plain one. */
+  endAddMenu: () => void
 }
 
 export const ASK_STORAGE_KEY = 'stoa_ask_panel'
 
 type Persisted = Pick<AskState, 'ownerId' | 'open' | 'conversationId'>
 
-const CLOSED: AskState = { ownerId: null, open: false, conversationId: null, draft: '', examples: null, pending: null }
+const CLOSED: AskState = { ownerId: null, open: false, conversationId: null, draft: '', examples: null, pending: null, addMenu: false }
 
 /** What a reload restores: which account's Ask was open, and on which conversation. */
 export function readPersistedAsk(): Persisted {
@@ -99,7 +108,7 @@ export const useAskStore = create<AskState & AskActions>((set, get) => ({
   select: (ownerId, conversationId) =>
     set((state) => ({ ...forOwner(state, ownerId), open: true, conversationId })),
   setDraft: (ownerId, draft) => set((state) => ({ ...forOwner(state, ownerId), draft })),
-  close: () => set({ open: false }),
+  close: () => set({ open: false, addMenu: false }),
   offerExamples: (ownerId, examples) => set((state) => ({ ...forOwner(state, ownerId), examples })),
   endExamples: () => set({ examples: null }),
   askNow: (ownerId, question) =>
@@ -110,6 +119,8 @@ export const useAskStore = create<AskState & AskActions>((set, get) => ({
     set({ pending: null })
     return pending
   },
+  wantAddMenu: (ownerId) => set((state) => ({ ...forOwner(state, ownerId), addMenu: true })),
+  endAddMenu: () => set({ addMenu: false }),
 }))
 
 useAskStore.subscribe((state, previous) => {
@@ -144,5 +155,6 @@ export function askFor(state: AskState, ownerId: string | null) {
     draft: mine ? state.draft : '',
     examples: mine ? state.examples : null,
     pending: mine ? state.pending : null,
+    addMenu: mine && state.addMenu,
   }
 }

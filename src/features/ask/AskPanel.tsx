@@ -162,6 +162,14 @@ export function AskPanel({
   // The files chosen for the next question, uploaded as they are picked
   // (#125): from the chooser, the camera (#509) or a phone by QR (#514).
   const attachments = useAttachments({ camera: true, phone: conversationId })
+  // Opened from the docked composer's +: the add menu is open here, so the
+  // camera, a file or the phone is chosen with a press of the student's own
+  // (a file chooser opens only from one). Read once as the panel appears, then
+  // let go, so the next opening is a plain one.
+  const [addMenuAtOpen] = useState(() => askFor(useAskStore.getState(), ownerId).addMenu)
+  useEffect(() => {
+    if (addMenuAtOpen) useAskStore.getState().endAddMenu()
+  }, [addMenuAtOpen])
 
   function send(content: string, files: AttachmentBatch) {
     // Sent is sent: the question leaves the composer now, so closing Ask while
@@ -369,6 +377,7 @@ export function AskPanel({
           onAttach={attachments.sources.pickFile}
           onCapture={attachments.sources.takePhoto}
           onPhone={attachments.sources.usePhone}
+          addMenuOpen={addMenuAtOpen && !paused}
           dictation
           label={t('ask.composerLabel')}
           placeholder={practice ? t('ask.practice.placeholder') : t('ask.placeholder')}

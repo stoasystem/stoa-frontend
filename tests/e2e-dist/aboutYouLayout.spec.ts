@@ -39,6 +39,7 @@ const LANGUAGES = [
 /** The map's controls the card must not cover, those drawn at this size. */
 const CONTROLS: Record<string, (page: Page) => Locator> = {
   'the "?"': (page) => page.locator('[data-starmap-help-button]'),
+  // Drawn on the map only while the usage period is paused (#615); a press on the composer is the way back otherwise.
   "Ask's button": (page) => page.locator('[data-ask-reopen]'),
   'the zoom pair': (page) => page.locator('[data-starmap-overlay][role=group]'),
   "Ask's docked composer": (page) => page.locator('[data-composer=docked]'),

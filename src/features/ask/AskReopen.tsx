@@ -21,6 +21,14 @@ import { ASK_REOPEN } from '@/features/ask/askLayout'
  * on the star map the edge button and the composer read as two ways into Ask
  * (#645), so it went beside the composer there too, and the edge is the
  * map's again.
+ *
+ * On the star map it then went from the row as well, except while the usage
+ * period is paused (#615): the button and the composer were still two ways into
+ * the same thread -- typing opened the last conversation, and so did this. A
+ * press on the composer's field now offers the latest conversations and the
+ * whole list (`AskRecent`). Paused, the field is shut, and this is the one way
+ * to read the old conversations, so it stays for that. Beside the practice
+ * stage's composer (`StageAsk`) it is unchanged.
  */
 export function AskReopen({
   onOpen,
