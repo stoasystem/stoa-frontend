@@ -16,6 +16,7 @@ import { PageHeader } from '@/components/common/PageHeader'
 import { PageSkeleton } from '@/components/common/PageSkeleton'
 import { Badge } from '@/components/ui/badge'
 import { TeacherNotificationSettingsCard } from '@/components/teacher/TeacherNotificationSettingsCard'
+import { DeleteAccountGroup } from '@/features/account/DeleteAccountGroup'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { useTeacherProfileQuery } from '@/hooks/teacher/useTeacherProfileQuery'
 import { DashboardLayout } from '@/layouts/DashboardLayout'
@@ -49,6 +50,8 @@ export function TeacherProfilePage() {
         )}
         {/* Not behind the profile: the settings are read on their own. */}
         <TeacherNotificationSettingsCard />
+        {/* A teacher's account page: deleting the account sits last, as on /me (#651). */}
+        <DeleteAccountGroup />
       </PageContainer>
     </DashboardLayout>
   )

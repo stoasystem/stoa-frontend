@@ -126,6 +126,22 @@
       "managed": "Name und E-Mail-Adresse gehören zu deinem Konto. Für eine Änderung wende dich an eine Administratorin oder einen Administrator.",
       "managed_formal": "Name und E-Mail-Adresse gehören zu Ihrem Konto. Für eine Änderung wenden Sie sich an eine Administratorin oder einen Administrator.",
       "name": "Name"
+    },
+    "deleteAccount": {
+      "heading": "Konto löschen",
+      "consequences": "Das Löschen deines Kontos lässt sich nicht rückgängig machen. Dein Lernverlauf, dein Fortschritt und deine Gespräche werden mit ihm gelöscht.",
+      "consequences_formal": "Das Löschen Ihres Kontos lässt sich nicht rückgängig machen. Ihr Lernverlauf, Ihr Fortschritt und Ihre Gespräche werden mit ihm gelöscht.",
+      "parentLinks": "Auch die Verknüpfungen mit deinen Kindern werden aufgehoben.",
+      "parentLinks_formal": "Auch die Verknüpfungen mit Ihren Kindern werden aufgehoben.",
+      "confirmLabel": "Gib zur Bestätigung {{word}} ein",
+      "confirmLabel_formal": "Geben Sie zur Bestätigung {{word}} ein",
+      "fallbackWord": "löschen",
+      "submit": "Konto löschen",
+      "deleting": "Wird gelöscht…",
+      "accepted": "Die Löschung deines Kontos ist angenommen. Du bist jetzt abgemeldet.",
+      "accepted_formal": "Die Löschung Ihres Kontos ist angenommen. Sie sind jetzt abgemeldet.",
+      "failed": "Dein Konto konnte nicht gelöscht werden. Versuch es später noch einmal.",
+      "failed_formal": "Ihr Konto konnte nicht gelöscht werden. Versuchen Sie es später noch einmal."
     }
   },
   "navigation": {

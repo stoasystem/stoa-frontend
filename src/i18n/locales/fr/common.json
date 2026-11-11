@@ -126,6 +126,22 @@
       "managed": "Ton nom et ton adresse e-mail sont liés à ton compte. Pour les modifier, adresse-toi à un administrateur.",
       "managed_formal": "Votre nom et votre adresse e-mail sont liés à votre compte. Pour les modifier, adressez-vous à un administrateur.",
       "name": "Nom"
+    },
+    "deleteAccount": {
+      "heading": "Supprimer le compte",
+      "consequences": "La suppression de ton compte est définitive. Ton historique d’apprentissage, ta progression et tes conversations sont supprimés avec lui.",
+      "consequences_formal": "La suppression de votre compte est définitive. Votre historique d’apprentissage, votre progression et vos conversations sont supprimés avec lui.",
+      "parentLinks": "Les liens avec tes enfants prennent fin eux aussi.",
+      "parentLinks_formal": "Les liens avec vos enfants prennent fin eux aussi.",
+      "confirmLabel": "Pour confirmer, saisis {{word}}",
+      "confirmLabel_formal": "Pour confirmer, saisissez {{word}}",
+      "fallbackWord": "supprimer",
+      "submit": "Supprimer le compte",
+      "deleting": "Suppression…",
+      "accepted": "La suppression de ton compte a été acceptée. Tu es maintenant déconnecté·e.",
+      "accepted_formal": "La suppression de votre compte a été acceptée. Vous êtes maintenant déconnecté·e.",
+      "failed": "Ton compte n’a pas pu être supprimé. Réessaie plus tard.",
+      "failed_formal": "Votre compte n’a pas pu être supprimé. Réessayez plus tard."
     }
   },
   "navigation": {

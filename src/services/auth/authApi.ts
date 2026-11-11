@@ -149,6 +149,27 @@ export async function getCurrentUser() {
   }
 }
 
+/**
+ * The receipt `DELETE /auth/me` answers with (202, stoa-backend `delete_me`).
+ * The deletion runs on the backend after the answer; `completedAt` is set once
+ * it has finished, which a replay of the same request may already report.
+ */
+export type AccountDeletionReceipt = {
+  commandId: string
+  status: string
+  acceptedAt: string
+  completedAt?: string | null
+}
+
+// The signed-in account deletes itself. The backend reads nothing but the
+// verified token, so no body is sent, and a replay answers with the same
+// receipt. No demo fallback: a deletion must never be shown as accepted when
+// the backend did not accept it.
+export async function deleteAccount() {
+  const response = await httpClient.delete<AccountDeletionReceipt>('/auth/me')
+  return response.data
+}
+
 export async function updateLocalePreference(preferredLocale: SupportedLanguage) {
   try {
     const response = await httpClient.patch<LocalePreferenceResponse>('/auth/me/preferences/locale', {

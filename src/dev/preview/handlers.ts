@@ -156,6 +156,8 @@ const routes: Array<[method: string, pattern: string, handler: Handler]> = [
   // The invitation link's page (/activate?token=...): any token is the demo student's invitation.
   ['POST', '/auth/invitations/claim', () => ({ status: 'claimed', userId: demo().demoStudent.id, role: 'student', accountNumber: 'S-DEMO-0001' })],
   ['POST', '/auth/logout', () => ({ ok: true })],
+  // Deleting the demo account (#651): accepted, nothing is deleted.
+  ['DELETE', '/auth/me', () => ({ commandId: 'design-preview-deletion', status: 'deletion_pending', acceptedAt: now() })],
   ['PATCH', '/auth/me/preferences/locale', ({ body }) => {
     const asked = field<string>(body, 'preferredLocale')
     // Stored: an account that had none is no longer asked it (#627).

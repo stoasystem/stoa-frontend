@@ -126,6 +126,22 @@
       "managed": "Nome e indirizzo e-mail fanno parte del tuo account. Per modificarli, rivolgiti a un amministratore.",
       "managed_formal": "Nome e indirizzo e-mail fanno parte del tuo account. Per modificarli, rivolgiti a un amministratore.",
       "name": "Nome"
+    },
+    "deleteAccount": {
+      "heading": "Elimina account",
+      "consequences": "L’eliminazione del tuo account è definitiva. Il tuo storico di apprendimento, i tuoi progressi e le tue conversazioni vengono eliminati insieme all’account.",
+      "consequences_formal": "L’eliminazione del tuo account è definitiva. Il tuo storico di apprendimento, i tuoi progressi e le tue conversazioni vengono eliminati insieme all’account.",
+      "parentLinks": "Anche i collegamenti con i tuoi figli vengono rimossi.",
+      "parentLinks_formal": "Anche i collegamenti con i tuoi figli vengono rimossi.",
+      "confirmLabel": "Per confermare, digita {{word}}",
+      "confirmLabel_formal": "Per confermare, digita {{word}}",
+      "fallbackWord": "elimina",
+      "submit": "Elimina account",
+      "deleting": "Eliminazione…",
+      "accepted": "L’eliminazione del tuo account è stata accettata e la sessione è stata chiusa.",
+      "accepted_formal": "L’eliminazione del tuo account è stata accettata e la sessione è stata chiusa.",
+      "failed": "Non è stato possibile eliminare il tuo account. Riprova più tardi.",
+      "failed_formal": "Non è stato possibile eliminare il tuo account. Riprova più tardi."
     }
   },
   "navigation": {
