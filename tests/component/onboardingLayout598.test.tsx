@@ -33,11 +33,15 @@ const box = ([left, top, right, bottom]: [number, number, number, number]): Box 
 const rect = ({ left, top, right, bottom }: Box) =>
   ({ left, top, right, bottom, x: left, y: top, width: right - left, height: bottom - top, toJSON: () => ({}) }) as DOMRect
 
-/** Measured at 375x812 before the fix: the examples' band, the "?" and the zoom pair. */
+/**
+ * Measured at 375x812: the examples' band (before the fix), the "?" and the
+ * zoom pair (since they are drawn on a phone as on a wide stage: a 32 px "?",
+ * a zoom pair 40 x 74).
+ */
 const PHONE = {
   examples: box([12, 588, 363, 724]),
-  help: box([20, 668, 64, 712]),
-  zoom: box([308, 618, 359, 716]),
+  help: box([20, 680, 52, 712]),
+  zoom: box([319, 642, 359, 716]),
 }
 
 /** Lays the page out: each element found by `match` gets its rectangle; the rest have none. */
@@ -89,8 +93,8 @@ afterEach(() => {
 
 describe('1. the examples keep clear of the map controls on a phone', () => {
   it('pads each side past the control beside it', () => {
-    // "?" ends at 64: 64 - 12 + 8. The zoom pair starts at 308: 363 - 308 + 8.
-    expect(sidePads(PHONE.examples, [PHONE.help, PHONE.zoom])).toEqual({ left: 60, right: 63 })
+    // "?" ends at 52: 52 - 12 + 8. The zoom pair starts at 319: 363 - 319 + 8.
+    expect(sidePads(PHONE.examples, [PHONE.help, PHONE.zoom])).toEqual({ left: 48, right: 52 })
   })
 
   it('leaves alone a control above or below the examples, or across their middle', () => {
@@ -125,8 +129,8 @@ describe('1. the examples keep clear of the map controls on a phone', () => {
     act(() => useAskStore.getState().offerExamples(OWNER, ['I want to practise quadratic equations', 'We are learning derivatives']))
 
     const examples = document.querySelector<HTMLElement>('[data-ask-examples]')!
-    expect(examples.style.paddingLeft).toBe('60px')
-    expect(examples.style.paddingRight).toBe('63px')
+    expect(examples.style.paddingLeft).toBe('48px')
+    expect(examples.style.paddingRight).toBe('52px')
     // The band is out of the flow and lets taps through; the examples take them.
     expect(examples.className).toContain('pointer-events-none')
     expect(examples.className).toContain('absolute')

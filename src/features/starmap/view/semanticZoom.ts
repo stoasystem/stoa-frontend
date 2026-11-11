@@ -177,12 +177,13 @@ export const REVEAL = {
   keyName: { keyStarCost: 1000, starCost: 3, lineCost: 8, nearerStarCost: 4, backing: 0.78, farGap: 14, maxWidthPx: 240, sideMarginPx: 48 },
   /**
    * The phone's zoom buttons, bottom right over the map (StarMapView: 16 px
-   * from the right and above the bottom inset, two 44 px buttons): no name is
+   * from the right and above the bottom inset, a frame 40 wide and 74 tall
+   * around two 32 px buttons): no name is
    * placed in this corner, `width` x `height` px up from the bottom inset,
    * while the stage is narrow (the viewport has a `sheet` band) and no star
    * is chosen (then the buttons sit in the top band).
    */
-  phoneZoomCorner: { width: 72, height: 118 },
+  phoneZoomCorner: { width: 62, height: 94 },
 } as const
 
 /**
