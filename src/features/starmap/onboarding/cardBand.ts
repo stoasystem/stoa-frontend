@@ -9,15 +9,15 @@
  *           (the German tally wraps at 840). The band starts at 104 and 76,
  *           under the design preview's "Demo" line when the stage has one
  *           (`--starmap-notice-height`, `DEMO_NOTICE_HEIGHT`).
- *   bottom  the "?" bottom left: 16 px up and 50 tall on a phone, 24 px up
- *           and 40 tall on a wide stage (a zoom button's size; no always-on
- *           legend there since #643, it was 89 tall); both over Ask's docked composer
+ *   bottom  the "?" bottom left, 40 tall (a zoom button's size): 16 px up on
+ *           a phone, 24 px up on a wide stage (no always-on legend there
+ *           since #643, it was 89 tall); both over Ask's docked composer
  *           (`--page-bottom-inset`). The band ends 12 px over the "?". The
- *           zoom pair, bottom right, is taller on a wide stage (about 74), but
- *           a card (at most 400 wide, centred on a stage at least 768 wide)
- *           ends 120 px or more short of it. Under 560 the card is wide
- *           enough to reach the phone's zoom pair (98 tall): the band ends
- *           12 px over the pair there (#645).
+ *           zoom pair, bottom right, is taller (about 74), but on a wide
+ *           stage a card (at most 400 wide, centred on a stage at least 768
+ *           wide) ends 120 px or more short of it. Under 560 the card is wide
+ *           enough to reach the phone's zoom pair: the band ends 12 px over
+ *           the pair there (#645).
  *
  * The card is at most the band's height and scrolls inside itself when it is
  * taller (375 x 667, a laptop at 1280 x 640). The card, not the band: the band
@@ -40,7 +40,7 @@ export const CARD_FRAME = 'pointer-events-none absolute inset-0 z-10 @container'
  * A phone kept 72 px on the right, for Ask's button on the right edge and the
  * zoom pair under it; the button is in the docked composer's row now. Under
  * 560 the card (400 at most) is wide enough to reach the zoom pair, so the
- * band ends 12 px over the pair (98 tall) rather than over the "?".
+ * band ends 12 px over the pair (74 tall) rather than over the "?".
  */
 export const CARD_BAND =
-  'absolute inset-x-0 top-[calc(104px+var(--starmap-notice-height,0px))] bottom-[calc(1rem+var(--page-bottom-inset,0px)+62px)] max-[559px]:bottom-[calc(1rem+var(--page-bottom-inset,0px)+110px)] flex items-center justify-center px-4 @min-[768px]:top-[calc(76px+var(--starmap-notice-height,0px))] @min-[768px]:bottom-[calc(1.5rem+var(--page-bottom-inset,0px)+52px)]'
+  'absolute inset-x-0 top-[calc(104px+var(--starmap-notice-height,0px))] bottom-[calc(1rem+var(--page-bottom-inset,0px)+52px)] max-[559px]:bottom-[calc(1rem+var(--page-bottom-inset,0px)+86px)] flex items-center justify-center px-4 @min-[768px]:top-[calc(76px+var(--starmap-notice-height,0px))] @min-[768px]:bottom-[calc(1.5rem+var(--page-bottom-inset,0px)+52px)]'

@@ -141,16 +141,32 @@ export function canvasPixelRatio(): number {
  * subject switcher and where-you-are line above; the "?" and the zoom buttons
  * below. The whole map fits between them.
  *
- * Below, measured (#643): a phone's "?" is 16 px up and 50 tall, its top at
- * 66, and the band keeps 72. A wide stage's "?" is 24 px up and 40 tall (top
- * at 64; a zoom button's size), its zoom pair 24 px up and about 74 tall (top
- * at 98); the band keeps 110, 12 px over the taller of the two. (It kept 164
- * for the always-on legend, 89 tall with two rows.)
+ * Below, measured (#643): a phone's "?" is 16 px up and 40 tall (a zoom
+ * button's size, as on a wide stage), its top at 56, and the band keeps 68,
+ * 12 px over it. A wide stage's "?" is 24 px up and 40 tall (top at 64), its
+ * zoom pair 24 px up and about 74 tall (top at 98); the band keeps 110, 12 px
+ * over the taller of the two. (It kept 164 for the always-on legend, 89 tall
+ * with two rows.)
  */
 export function controlBands(wide: boolean, bottomInset = 0, demo = false): { top: number; bottom: number } {
   const noticeHeight = demo ? DEMO_NOTICE_HEIGHT : 0
-  return wide ? { top: 76 + noticeHeight, bottom: 110 + bottomInset } : { top: 112 + noticeHeight, bottom: 72 + bottomInset }
+  return wide ? { top: 76 + noticeHeight, bottom: 110 + bottomInset } : { top: 112 + noticeHeight, bottom: 68 + bottomInset }
 }
+
+/**
+ * The phone's touch targets for the "?" and the zoom pair. Each is drawn 32 px
+ * square, as on a wide stage, and reaches 44 x 44 for a finger (`TOUCH_TARGET`
+ * in components/base/sizes.ts) through an invisible `::before` around it, as
+ * the star sheet's name does. The "?" reaches 6 px out on every side. The zoom
+ * buttons stand 2 px apart, so between them each reaches only to the middle of
+ * the gap (1 px) and makes up the rest on its outer side (11 px): a tap goes to
+ * the button whose drawn part is nearer, never across to the other.
+ */
+const PHONE_HIT = {
+  help: "before:absolute before:-inset-1.5 before:content-['']",
+  in: "before:absolute before:-inset-x-1.5 before:-top-[11px] before:-bottom-px before:content-['']",
+  out: "before:absolute before:-inset-x-1.5 before:-top-px before:-bottom-[11px] before:content-['']",
+} as const
 
 /**
  * The design preview's "Demo" line across the top of the stage, CSS px. The
@@ -987,9 +1003,9 @@ export function StarMapView({ map, demo = false, target, path, marked, onNavigat
                     aria-label={t('help.open')}
                     title={t('help.open')}
                     className={cn(
-                      'inline-flex cursor-pointer items-center justify-center rounded-[8px] border-0 bg-transparent p-0 font-bold leading-none text-[color:var(--on-sky-plain)] hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring',
-                      // As large as one zoom button: 32 px on a wide stage, a 44 px touch target on a phone.
-                      wide ? 'size-8 text-[16px]' : 'size-11 text-[20px]',
+                      // As large as one zoom button: 32 px, a phone too; there it reaches 44 px for a finger.
+                      'relative inline-flex size-8 cursor-pointer items-center justify-center rounded-[8px] border-0 bg-transparent p-0 text-[16px] font-bold leading-none text-[color:var(--on-sky-plain)] hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring',
+                      !wide && PHONE_HIT.help,
                     )}
                   >
                     <span aria-hidden="true">?</span>
@@ -1050,9 +1066,9 @@ export function StarMapView({ map, demo = false, target, path, marked, onNavigat
                 disabled={direction === 'in' ? visible.zoom.atMax : visible.zoom.atMin}
                 onClick={() => engineRef.current?.step(direction)}
                 className={cn(
-                  'inline-flex cursor-pointer items-center justify-center rounded-[8px] border-0 bg-transparent p-0 text-[color:var(--on-sky-plain)]',
+                  'relative inline-flex size-8 cursor-pointer items-center justify-center rounded-[8px] border-0 bg-transparent p-0 text-[color:var(--on-sky-plain)]',
                   'hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring disabled:cursor-default disabled:opacity-40 disabled:hover:bg-transparent',
-                  wide ? 'size-8' : 'size-11',
+                  !wide && PHONE_HIT[direction],
                 )}
               >
                 {direction === 'in' ? (

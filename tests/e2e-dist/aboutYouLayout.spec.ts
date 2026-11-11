@@ -121,27 +121,68 @@ async function expectClearOfControls(page: Page, cardSelector: string, when: str
   }
 }
 
+/** A phone's touch target (`TOUCH_TARGET`, components/base/sizes.ts). */
+const TAP = 44
+
+/**
+ * What a tap takes as `selector`'s button, in whole pixels: along the row and
+ * the column through the middle of its drawn box, how many pixels hit it
+ * (itself or what is inside it, its invisible `::before` included), the first
+ * and past-the-last row that do, and the drawn box. Probed pixel by pixel
+ * with `elementFromPoint` (Chrome hit-tests a point at its whole pixel).
+ */
+async function hitSpan(page: Page, selector: string) {
+  return page.evaluate(`(() => {
+    const button = document.querySelector(${JSON.stringify(selector)})
+    const r = button.getBoundingClientRect()
+    const cx = Math.round(r.left + r.width / 2), cy = Math.round(r.top + r.height / 2)
+    const hits = (x, y) => { const at = document.elementFromPoint(x, y); return Boolean(at && button.contains(at)) }
+    const reach = (dx, dy) => { let d = 1; while (d < 60 && hits(cx + dx * d, cy + dy * d)) d += 1; return d - 1 }
+    const left = reach(-1, 0), right = reach(1, 0), up = reach(0, -1), down = reach(0, 1)
+    return { width: left + right + 1, height: up + down + 1, top: cy - up, bottom: cy + down + 1, drawn: { top: r.top, bottom: r.bottom, width: r.width, height: r.height } }
+  })()`) as Promise<{ width: number; height: number; top: number; bottom: number; drawn: { top: number; bottom: number; width: number; height: number } }>
+}
+
 /**
  * No key on the map; the "?" bottom left, its bottom on the zoom pair's
- * (#643), as large as one zoom button: 32 px on a wide stage, a 44 px touch
- * target on a phone. "Wide" is the stage's own width (768); these viewports
- * leave the stage the whole width, so a viewport under 768 is a phone.
+ * (#643), drawn as large as one zoom button (32 px) at every width. On a
+ * phone each of them reaches 44 px for a finger all the same, the zoom pair's
+ * two splitting the gap between them. "Wide" is the stage's own width (768);
+ * these viewports leave the stage the whole width, so a viewport under 768 is
+ * a phone.
  */
 async function expectHelpInTheCorner(page: Page, viewport: { width: number; height: number }) {
   await expect(page.locator('[data-starmap-legend]')).toHaveCount(0)
   const help = page.locator('[data-starmap-help-button]')
   await expect(help).toBeVisible()
   const box = (await help.boundingBox())!
-  if (viewport.width < 768) {
-    expect(box.width, 'the "?" keeps a 44 px target on a phone').toBeGreaterThanOrEqual(44)
-    expect(box.height, 'the "?" keeps a 44 px target on a phone').toBeGreaterThanOrEqual(44)
-  }
   expect(box.x, 'the "?" is on the left').toBeLessThan(viewport.width / 2)
   const zoomButton = page.locator('[data-starmap-overlay][role=group] button').first()
   if (await zoomButton.isVisible()) {
     const button = (await zoomButton.boundingBox())!
     expect(Math.abs(box.width - button.width), 'the "?" as wide as a zoom button').toBeLessThanOrEqual(0.5)
     expect(Math.abs(box.height - button.height), 'the "?" as tall as a zoom button').toBeLessThanOrEqual(0.5)
+  }
+  if (viewport.width < 768) {
+    const reach = await hitSpan(page, '[data-starmap-help-button]')
+    expect(reach.width, 'the "?" takes a tap 44 px wide on a phone').toBeGreaterThanOrEqual(TAP)
+    expect(reach.height, 'the "?" takes a tap 44 px tall on a phone').toBeGreaterThanOrEqual(TAP)
+    if (await zoomButton.isVisible()) {
+      const zoomIn = await hitSpan(page, '[data-starmap-overlay][role=group] button:first-child')
+      const zoomOut = await hitSpan(page, '[data-starmap-overlay][role=group] button:last-child')
+      for (const [name, span] of [['zoom in', zoomIn], ['zoom out', zoomOut]] as const) {
+        expect(span.width, `${name} takes a tap 44 px wide on a phone`).toBeGreaterThanOrEqual(TAP)
+        expect(span.height, `${name} takes a tap 44 px tall on a phone`).toBeGreaterThanOrEqual(TAP)
+      }
+      // Between the two, a tap goes to the nearer drawn button: they meet in the middle of the gap.
+      const middle = (zoomIn.drawn.bottom + zoomOut.drawn.top) / 2
+      expect(Math.abs(zoomIn.bottom - middle), 'zoom in reaches the middle of the gap').toBeLessThanOrEqual(0.5)
+      expect(Math.abs(zoomOut.top - middle), 'zoom out reaches the middle of the gap').toBeLessThanOrEqual(0.5)
+    }
+  } else {
+    const reach = await hitSpan(page, '[data-starmap-help-button]')
+    expect(reach.width, 'a mouse finds the "?" where it is drawn').toBeLessThanOrEqual(box.width + 1)
+    expect(reach.height, 'a mouse finds the "?" where it is drawn').toBeLessThanOrEqual(box.height + 1)
   }
   const zoom = await page.locator('[data-starmap-overlay][role=group]').boundingBox()
   if (zoom) {
@@ -177,6 +218,20 @@ async function expectCentred(page: Page, cardSelector: string, width: number) {
   const right = width - (card.x + card.width)
   expect(Math.abs(left - right), `the card's room left (${left}) and right (${right})`).toBeLessThanOrEqual(1)
 }
+
+test('a tap 6 px outside the phone\'s drawn "?" still opens what the map\'s glyphs mean, at 375 x 812', async ({ page, backend }) => {
+  new StudentWorld(backend).install()
+  await page.setViewportSize({ width: 375, height: 812 })
+  await signInAsStudent(page)
+  const help = page.locator('[data-starmap-help-button]')
+  await expect(help).toBeVisible()
+  const box = (await help.boundingBox())!
+  expect(box.width, 'drawn as on a wide stage').toBeCloseTo(32, 0)
+  expect(box.height, 'drawn as on a wide stage').toBeCloseTo(32, 0)
+  await expect(page.locator('[data-starmap-help-dialog]')).toHaveCount(0)
+  await page.mouse.click(box.x + box.width / 2, box.y - 6)
+  await expect(page.locator('[data-starmap-help-dialog]')).toBeVisible()
+})
 
 for (const language of LANGUAGES) {
   for (const viewport of VIEWPORTS) {

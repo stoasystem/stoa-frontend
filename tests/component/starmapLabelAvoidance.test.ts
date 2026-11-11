@@ -53,7 +53,7 @@ function textContext(log: { text: string; x: number; y: number; alpha: number }[
 }
 
 /** The page's bands as StarMapView sets them (no Demo notice): a phone also has its sheet band. */
-const bandsFor = (width: number) => (width < 768 ? { top: 112, bottom: 72, sheet: sheetBand(0) } : { top: 76, bottom: 164 })
+const bandsFor = (width: number) => (width < 768 ? { top: 112, bottom: 68, sheet: sheetBand(0) } : { top: 76, bottom: 164 })
 
 /** The real renderer and engine over the one sky with its prerequisites. */
 function session(width: number, height: number, { map = skyMap(1000, 'math', { relations: true }) as StarMap } = {}) {

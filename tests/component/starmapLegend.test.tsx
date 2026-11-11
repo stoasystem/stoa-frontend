@@ -39,6 +39,22 @@ function showAt(width: number, height: number, target: LayerTarget = { layer: 'm
   return { ...view, navigate }
 }
 
+/**
+ * How far a button's invisible `::before` reaches past its drawn box, px, read
+ * off its Tailwind classes (`before:-inset-1.5`, `before:-top-[11px]`, ...).
+ */
+function reach(element: HTMLElement): { top: number; right: number; bottom: number; left: number } {
+  const out = { top: 0, right: 0, bottom: 0, left: 0 }
+  const px = (value: string) => (value === 'px' ? 1 : value.startsWith('[') ? Number.parseFloat(value.slice(1)) : Number(value) * 4)
+  for (const name of element.className.split(/\s+/)) {
+    const match = /^before:-(inset|inset-x|inset-y|top|right|bottom|left)-(px|[\d.]+|\[\d+px\])$/.exec(name)
+    if (!match) continue
+    const sides = { inset: ['top', 'right', 'bottom', 'left'], 'inset-x': ['left', 'right'], 'inset-y': ['top', 'bottom'] }[match[1]] ?? [match[1]]
+    for (const side of sides) out[side as keyof typeof out] = px(match[2])
+  }
+  return out
+}
+
 /** Every string in a locale bundle, with its key. */
 function strings(bundle: unknown, prefix = ''): [string, string][] {
   if (typeof bundle === 'string') return [[prefix, bundle]]
@@ -197,8 +213,10 @@ describe('the wide screen’s "?" (#643)', () => {
     expect(button.textContent).toBe('?')
     expect(button.className).toContain('size-8')
     expect(button.className).not.toContain('size-11')
+    expect(button.className, 'no reach past what is drawn for a mouse').not.toContain('before:')
     for (const zoomButton of within(screen.getByRole('group', { name: en.zoom.group })).getAllByRole('button')) {
       expect(zoomButton.className).toContain('size-8')
+      expect(zoomButton.className).not.toContain('before:')
     }
     const frame = button.parentElement!
     expect(frame.className).toContain('left-6')
@@ -208,11 +226,27 @@ describe('the wide screen’s "?" (#643)', () => {
     view.unmount()
   })
 
-  it('keeps a 44 px touch target on a phone, as the phone’s zoom buttons do', () => {
+  it('is drawn on a phone as on a wide stage, with the zoom pair, and each reaches 44 px for a finger', () => {
     const view = showAt(390, 844)
     const button = screen.getByRole('button', { name: en.help.open })
-    expect(button.className).toContain('size-11')
-    expect(button.className).not.toContain('size-8')
+    const [zoomIn, zoomOut] = within(screen.getByRole('group', { name: en.zoom.group })).getAllByRole('button')
+    for (const control of [button, zoomIn, zoomOut]) {
+      expect(control.className).toContain('size-8')
+      expect(control.className).not.toContain('size-11')
+    }
+    expect(button.className).toContain('text-[16px]')
+    // The invisible reach around each 32 px button (jsdom lays nothing out, so read it off the classes).
+    expect(reach(button)).toEqual({ top: 6, right: 6, bottom: 6, left: 6 })
+    // The zoom pair stands 2 px apart: each reaches to the middle of the gap and makes up the rest outside.
+    expect(reach(zoomIn)).toEqual({ top: 11, right: 6, bottom: 1, left: 6 })
+    expect(reach(zoomOut)).toEqual({ top: 1, right: 6, bottom: 11, left: 6 })
+    for (const control of [button, zoomIn, zoomOut]) {
+      const r = reach(control)
+      expect(32 + r.left + r.right, control.getAttribute('aria-label')!).toBeGreaterThanOrEqual(44)
+      expect(32 + r.top + r.bottom, control.getAttribute('aria-label')!).toBeGreaterThanOrEqual(44)
+      expect(control.className).toContain('relative')
+      expect(control.className).toContain("before:content-['']")
+    }
     view.unmount()
   })
 
