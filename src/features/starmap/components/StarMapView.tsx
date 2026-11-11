@@ -151,11 +151,12 @@ export function canvasPixelRatio(): number {
  * Above, on a wide stage: 76, 12 px under the top line where it is one line
  * (64), or 12 px under the top line as drawn (`topLine`, its bottom measured
  * from the stage's top, `--starmap-top-line`) when that is lower. The line
- * wraps where the subject switcher leaves its column too little room: a
- * nebula's "Carte du ciel / … · 0 sur 1 allumées" ended at 83 in French at
- * 768-900, and a longer subject or nebula name can do it in any language. On
- * a phone the switcher and the where-you-are line stack (down to 100) and the
- * band keeps 112.
+ * takes a second row where the subject switcher leaves its column too little
+ * room: a nebula's name and lit count go under "Star map /", down to 104 at
+ * 768-840 beside four subjects (in French and Italian at 900 too), and a
+ * longer subject or nebula name can do it at other widths. On a phone the
+ * switcher and the where-you-are line stack (down to 100) and the band keeps
+ * 112.
  */
 export function controlBands(wide: boolean, bottomInset = 0, demo = false, topLine = 0): { top: number; bottom: number } {
   const noticeHeight = demo ? DEMO_NOTICE_HEIGHT : 0
@@ -781,7 +782,7 @@ export function StarMapView({ map, demo = false, target, path, marked, onNavigat
   if (!helpShown && helpOpen) setHelpOpen(false)
 
   const whereYouAre = (
-    <div className="flex min-w-0 items-center gap-2.5">
+    <div className="flex min-w-0 flex-wrap items-center gap-x-2.5">
       {target.layer === 'map' ? (
         <div className="flex flex-col">
           <h1 className="m-0 text-[17px] font-bold leading-tight text-on-sky">{map.subject.name}</h1>
@@ -789,10 +790,19 @@ export function StarMapView({ map, demo = false, target, path, marked, onNavigat
         </div>
       ) : (
         <>
+          {/* "Star map" and the "/" never break or give way ("Carte du ciel"
+            * stood on three lines beside four subjects' switcher, French at
+            * 768-900). The nebula's name and its lit count go on the next line
+            * when less than 7rem is left beside them (a wide stage's narrow
+            * first column, 768-900, beside four subjects), rather than the
+            * name being cut to a letter or two; the count goes under the name
+            * when the two do not fit on one line, and is never cut. The name
+            * gives way last: cut short, its whole name in its title. */}
           <Link
             to={mapPath}
             aria-label={t('nav.backToMap')}
-            className={cn(OVERLAY_LINK, 'gap-1.5 text-[15px] font-semibold')}
+            data-starmap-map-link
+            className={cn(OVERLAY_LINK, 'shrink-0 gap-1.5 whitespace-nowrap text-[15px] font-semibold')}
             // Back to the map flies out to the galaxy's panorama; other ways of letting go keep the zoom.
             onClick={() => engineRef.current?.expectTarget({ layer: 'map' }, 'fly')}
           >
@@ -801,22 +811,27 @@ export function StarMapView({ map, demo = false, target, path, marked, onNavigat
           </Link>
           {currentNebula && (
             <>
-              <span aria-hidden="true" className="text-[color:var(--on-sky-text-caption)]">
+              <span aria-hidden="true" className="shrink-0 text-[color:var(--on-sky-text-caption)]">
                 /
               </span>
-              {target.layer === 'nebula' ? (
-                <h1 className="m-0 truncate text-[17px] font-bold leading-tight text-on-sky">{currentNebula.name}</h1>
-              ) : (
-                <Link
-                  to={here(pathForTarget(subjectOfNebula(map, currentNebula.topicId), { layer: 'nebula', nebulaId: currentNebula.topicId }))}
-                  className={cn(OVERLAY_LINK, 'truncate text-[17px] font-bold')}
-                >
-                  {currentNebula.name}
-                </Link>
-              )}
-              <span className="shrink-0 text-[13px] text-[color:var(--on-sky-text-caption)]">
-                · {t('summary.lit', nebulaCounts(stars, currentNebula.topicId))}
-              </span>
+              <div className="flex min-w-0 max-w-full flex-[1_1_7rem] flex-wrap items-baseline gap-x-2.5">
+                {target.layer === 'nebula' ? (
+                  <h1 title={currentNebula.name} className="m-0 min-w-0 max-w-full truncate text-[17px] font-bold leading-tight text-on-sky">
+                    {currentNebula.name}
+                  </h1>
+                ) : (
+                  <Link
+                    to={here(pathForTarget(subjectOfNebula(map, currentNebula.topicId), { layer: 'nebula', nebulaId: currentNebula.topicId }))}
+                    title={currentNebula.name}
+                    className={cn(OVERLAY_LINK, 'min-w-0 max-w-full text-[17px] font-bold')}
+                  >
+                    <span className="truncate">{currentNebula.name}</span>
+                  </Link>
+                )}
+                <span data-starmap-lit className="shrink-0 whitespace-nowrap text-[13px] text-[color:var(--on-sky-text-caption)]">
+                  · {t('summary.lit', nebulaCounts(stars, currentNebula.topicId))}
+                </span>
+              </div>
             </>
           )}
         </>

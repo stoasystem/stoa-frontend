@@ -9,14 +9,17 @@
  *           down to 95 px on a phone (100 in a nebula), 64 on a wide stage.
  *           The band starts at 104 and 76, under the design preview's "Demo"
  *           line when the stage has one (`--starmap-notice-height`,
- *           `DEMO_NOTICE_HEIGHT`). On a wide stage the line can wrap: a
- *           nebula's "Carte du ciel / … · 0 sur 1 allumées" ended at 83 in
- *           French at 768-900, beside four subjects' switcher, and a longer
- *           name wraps it in any language. So the wide band starts 12 px
- *           (`TOP_LINE_GAP`) under the line as drawn when that is lower than
- *           76: the stage measures it and hands it down as
- *           `--starmap-top-line` (`controlBands`, which keeps the map itself
- *           under it the same way).
+ *           `DEMO_NOTICE_HEIGHT`). On a wide stage a nebula's line takes a
+ *           second row where its first column is narrow (beside four
+ *           subjects' switcher): "Star map /" above, the nebula's name and
+ *           its lit count under it, down to 104 in every language at 768-840
+ *           and in French and Italian at 900 (one line, 64, from 900 or
+ *           1000 up; the whole map, 60, never wraps). It ended at 83 in French at
+ *           768-900 when "Carte du ciel" itself broke onto three lines. So the
+ *           wide band starts 12 px (`TOP_LINE_GAP`) under the line as drawn
+ *           when that is lower than 76: the stage measures it and hands it
+ *           down as `--starmap-top-line` (`controlBands`, which keeps the map
+ *           itself under it the same way).
  *   bottom  the "?" bottom left, 40 tall (a zoom button's size): 16 px up on
  *           a phone, 24 px up on a wide stage (no always-on legend there
  *           since #643, it was 89 tall); both over Ask's docked composer

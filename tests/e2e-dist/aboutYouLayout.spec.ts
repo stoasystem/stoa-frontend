@@ -42,8 +42,10 @@ const LANGUAGES = [
 /**
  * In a nebula the wide top line says "Star map / <nebula> · 0 of 1 lit"
  * beside four subjects' switcher, and wraps where that leaves it too little
- * room: in French at 768-900 it ended at 83, under the card band's 76. Short
- * enough that the card fills its band, so a band starting too high shows.
+ * room: in French at 768-900 it ended at 83, under the card band's 76, with
+ * "Carte du ciel" on three lines; it now takes a second row (down to 104) in
+ * every language at 768-840. Short enough that the card fills its band, so
+ * a band starting too high shows.
  */
 const NEBULA_VIEWPORTS = [
   { width: 768, height: 560 },
@@ -55,6 +57,38 @@ const NEBULA_VIEWPORTS = [
 async function intoNebula(page: Page) {
   await page.evaluate(`history.pushState({}, '', '/map/math/math-basics'); dispatchEvent(new PopStateEvent('popstate'))`)
   await expect(page.locator('[data-starmap-stage]')).toHaveAttribute('data-layer', 'nebula')
+}
+
+/**
+ * A nebula's where-you-are line reads whole: "Star map" on one line (it
+ * stood as "Carte / du / ciel" in French at 768-900), the lit count neither
+ * cut nor under the subject switcher, and the nebula's whole name in its
+ * title when it is cut short.
+ */
+async function expectTopLineReads(page: Page) {
+  const line = (await page.evaluate(`(() => {
+    const stage = document.querySelector('[data-starmap-stage]')
+    const cell = stage.querySelector(':scope > [data-starmap-overlay] > *')
+    const label = stage.querySelector('[data-starmap-map-link] span')
+    const lit = stage.querySelector('[data-starmap-lit]')
+    const name = stage.querySelector(':scope > [data-starmap-overlay] h1')
+    const switcher = cell.nextElementSibling.getBoundingClientRect()
+    return {
+      label: label.getBoundingClientRect().height,
+      lineHeight: parseFloat(getComputedStyle(label).lineHeight),
+      litClipped: lit.scrollWidth > lit.clientWidth + 0.5,
+      litRight: lit.getBoundingClientRect().right,
+      cellRight: cell.getBoundingClientRect().right,
+      litOverSwitcher: lit.getBoundingClientRect().right > switcher.left && lit.getBoundingClientRect().bottom > switcher.top && lit.getBoundingClientRect().top < switcher.bottom,
+      title: name.getAttribute('title'),
+      name: name.textContent,
+    }
+  })()`)) as { label: number; lineHeight: number; litClipped: boolean; litRight: number; cellRight: number; litOverSwitcher: boolean; title: string | null; name: string }
+  expect(Math.abs(line.label - line.lineHeight), `"Star map" on one line (${line.label} tall, a line is ${line.lineHeight})`).toBeLessThanOrEqual(1)
+  expect(line.litClipped, 'the lit count is not cut').toBe(false)
+  expect(line.litRight, 'the lit count stays in its column').toBeLessThanOrEqual(line.cellRight + 0.5)
+  expect(line.litOverSwitcher, 'the lit count is not under the subject switcher').toBe(false)
+  expect(line.title, 'the whole name in the title').toBe(line.name)
 }
 
 /** The card starts at least 12 px under the top line as drawn (`TOP_LINE_GAP`). */
@@ -354,6 +388,7 @@ for (const language of LANGUAGES) {
       await intoNebula(page)
 
       await expect(page.locator('[data-about-you] section')).toBeVisible()
+      await expectTopLineReads(page)
       await expectUnderTheTopLine(page, '[data-about-you] section')
       await expectClearOfControls(page, '[data-about-you] section', 'in a nebula')
     })
