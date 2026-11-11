@@ -6,12 +6,20 @@
  *
  *   top     the where-you-are line and the subject switcher, and on a wide
  *           stage the tally (the streak, and the score when there is one):
- *           down to 95 px on a phone, 64 on a wide stage (but 83 in French at
- *           768-840, where a nebula's where-you-are line wraps). The tally
- *           wrapped to 74 at 768-840 while it also held the lit count; without
- *           it it is one line at every width, down to 56. The band starts at 104 and 76,
- *           under the design preview's "Demo" line when the stage has one
- *           (`--starmap-notice-height`, `DEMO_NOTICE_HEIGHT`).
+ *           down to 95 px on a phone (100 in a nebula), 64 on a wide stage.
+ *           The band starts at 104 and 76, under the design preview's "Demo"
+ *           line when the stage has one (`--starmap-notice-height`,
+ *           `DEMO_NOTICE_HEIGHT`). On a wide stage a nebula's line takes a
+ *           second row where its first column is narrow (beside four
+ *           subjects' switcher): "Star map /" above, the nebula's name and
+ *           its lit count under it, down to 104 in every language at 768-840
+ *           and in French and Italian at 900 (one line, 64, from 900 or
+ *           1000 up; the whole map, 60, never wraps). It ended at 83 in French at
+ *           768-900 when "Carte du ciel" itself broke onto three lines. So the
+ *           wide band starts 12 px (`TOP_LINE_GAP`) under the line as drawn
+ *           when that is lower than 76: the stage measures it and hands it
+ *           down as `--starmap-top-line` (`controlBands`, which keeps the map
+ *           itself under it the same way).
  *   bottom  the "?" bottom left, 40 tall (a zoom button's size): 16 px up on
  *           a phone, 24 px up on a wide stage (no always-on legend there
  *           since #643, it was 89 tall); both over Ask's docked composer
@@ -46,4 +54,4 @@ export const CARD_FRAME = 'pointer-events-none absolute inset-0 z-10 @container'
  * band ends 12 px over the pair (74 tall) rather than over the "?".
  */
 export const CARD_BAND =
-  'absolute inset-x-0 top-[calc(104px+var(--starmap-notice-height,0px))] bottom-[calc(1rem+var(--page-bottom-inset,0px)+52px)] max-[559px]:bottom-[calc(1rem+var(--page-bottom-inset,0px)+86px)] flex items-center justify-center px-4 @min-[768px]:top-[calc(76px+var(--starmap-notice-height,0px))] @min-[768px]:bottom-[calc(1.5rem+var(--page-bottom-inset,0px)+52px)]'
+  'absolute inset-x-0 top-[calc(104px+var(--starmap-notice-height,0px))] bottom-[calc(1rem+var(--page-bottom-inset,0px)+52px)] max-[559px]:bottom-[calc(1rem+var(--page-bottom-inset,0px)+86px)] flex items-center justify-center px-4 @min-[768px]:top-[max(calc(76px+var(--starmap-notice-height,0px)),calc(var(--starmap-top-line,0px)+12px))] @min-[768px]:bottom-[calc(1.5rem+var(--page-bottom-inset,0px)+52px)]'
