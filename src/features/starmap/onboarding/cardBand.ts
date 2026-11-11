@@ -5,8 +5,11 @@
  * wide, in all four languages:
  *
  *   top     the where-you-are line and the subject switcher, and on a wide
- *           stage the tally: down to 95 px on a phone, 74 on a wide stage
- *           (the German tally wraps at 840). The band starts at 104 and 76,
+ *           stage the tally (the streak, and the score when there is one):
+ *           down to 95 px on a phone, 64 on a wide stage (but 83 in French at
+ *           768-840, where a nebula's where-you-are line wraps). The tally
+ *           wrapped to 74 at 768-840 while it also held the lit count; without
+ *           it it is one line at every width, down to 56. The band starts at 104 and 76,
  *           under the design preview's "Demo" line when the stage has one
  *           (`--starmap-notice-height`, `DEMO_NOTICE_HEIGHT`).
  *   bottom  the "?" bottom left, 40 tall (a zoom button's size): 16 px up on
