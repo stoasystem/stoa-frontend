@@ -814,18 +814,17 @@ export function StarMapView({ map, demo = false, target, path, marked, onNavigat
           </p>
         )}
 
-        {/* Top: where you are, the subject switcher (#72 point 7), and the tally. */}
+        {/* Top: where you are, the subject switcher (#72 point 7), and the tally.
+          * The lit count is the where-you-are line's alone: it follows the view
+          * (the whole map or a nebula), and the tally said the same number again. */}
         {wide ? (
           <div data-starmap-overlay className="pointer-events-none absolute inset-x-6 top-[calc(1.25rem+var(--starmap-notice-height,0px))] grid grid-cols-[1fr_auto_1fr] items-start gap-4">
             <div className="pointer-events-auto min-w-0">{whereYouAre}</div>
             <div className="pointer-events-auto">{switcher}</div>
             <div
+              data-starmap-tally
               className="pointer-events-auto flex items-center gap-5 justify-self-end rounded-[12px] border border-solid border-white/8 bg-white/10 px-3.5 py-2 text-[13px] backdrop-blur-[20px]"
             >
-              <span className="inline-flex items-center gap-1.5 font-semibold text-on-sky">
-                <span aria-hidden="true" className="inline-block size-2 rounded-full bg-lit" />
-                {t('summary.lit', { lit: map.summary.lit, total: map.summary.total })}
-              </span>
               <span className="text-[color:var(--on-sky-text-body)]">{t('summary.streak', { count: map.summary.streakDays })}</span>
               {/* A score only when there is one to show. The read model has no
                 * source for it yet (stoa-backend#59), and "0 Punkte" reads as
