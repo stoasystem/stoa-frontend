@@ -8,9 +8,9 @@ import { AccountMenu } from '@/components/shell/AccountMenu'
 import { cn } from '@/lib/utils'
 
 /*
- * The one top bar (Sizes: 56 high; logo 30, bell 36, avatar 30, gap 6, side
+ * The one top bar (Sizes: 56 high; logo 48, bell 36, avatar 30, gap 6, side
  * padding 20. Placement, phone: 44 below the safe area, 16 / 8 from the edges,
- * logo 26, avatar 28). Surface at 86% under a blur, a separator underneath.
+ * logo 40, avatar 28). The logo's box is taller than its drawing (37, phone 31). Surface at 86% under a blur, a separator underneath.
  * The logo is the home button; there is no separate Home (canvas rule 6).
  *
  * On a phone every control is a 44 target (Sizes) while drawn at its board
@@ -105,7 +105,7 @@ export function TopBar({
           aria-label={t('navigation.logoHome')}
           data-logo-link
           className="flex items-center justify-self-start"
-          // The logo is narrower than 44 at 26 high, so its target is widened.
+          // A target at least 44 wide whatever the logo's width.
           style={{ height: bar.height, minWidth: touch ? TOUCH_TARGET : undefined }}
         >
           <StoaLogo height={bar.logo} variant={sky ? 'light' : 'dark'} />

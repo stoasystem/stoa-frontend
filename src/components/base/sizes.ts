@@ -58,13 +58,17 @@ export const ICON = {
 /** Sizes: "Touch targets never fall under 44 on phone; the visible control may be smaller." */
 export const TOUCH_TARGET = 44
 
-/** Top bar (Sizes: "Logo 30 h · bell 36 · avatar 30 · gap 6 · side padding 20"); a 1 px separator under it. */
-export const TOP_BAR = { height: 56, logo: 30, bell: 36, avatar: 30, gap: 6, paddingX: 20, border: 1 } as const
+/**
+ * Top bar (Sizes: "Logo 30 h · bell 36 · avatar 30 · gap 6 · side padding 20"); a 1 px separator under it.
+ * The logo is the website's SVG at 48 (phone 40): it draws 37 x 75 (phone 31 x 62), half
+ * again the 25 x 44 (21 x 38) the old 30 (26) high PNG drew.
+ */
+export const TOP_BAR = { height: 56, logo: 48, bell: 36, avatar: 30, gap: 6, paddingX: 20, border: 1 } as const
 
 /** Phone top bar (Placement: "44 below a 54 safe area · 16 / 8 from edges"). */
 export const TOP_BAR_PHONE = {
   height: 44,
-  logo: 26,
+  logo: 40,
   bell: 36,
   avatar: 28,
   gap: 2,

@@ -75,11 +75,11 @@ const bar = () => document.querySelector('[data-top-bar]') as HTMLElement
 const barRow = () => document.querySelector('[data-top-bar-row]') as HTMLElement
 
 describe('the top bar', () => {
-  it('is 56 high on a desktop: logo 30, bell 36 with a 22 glyph, avatar 30, side padding 20, gap 6', () => {
+  it('is 56 high on a desktop: logo 48, bell 36 with a 22 glyph, avatar 30, side padding 20, gap 6', () => {
     renderShell('student', '/', 1280)
 
     expect(barRow()).toHaveStyle({ height: '56px', paddingLeft: '20px', paddingRight: '20px' })
-    expect(within(bar()).getByRole('img', { name: 'STOA' })).toHaveStyle({ height: '30px' })
+    expect(within(bar()).getByRole('img', { name: 'STOA' })).toHaveStyle({ height: '48px' })
     const bell = within(bar()).getByRole('button', { name: 'notifications.openLabel' })
     expect(bell).toHaveStyle({ width: '36px', height: '36px' })
     expect(bell.querySelector('svg')).toHaveAttribute('width', '22')
@@ -88,13 +88,13 @@ describe('the top bar', () => {
     expect(account.parentElement).toHaveStyle({ gap: '6px' })
   })
 
-  it('is 44 high on a phone, 16 / 8 from the edges: logo 26, avatar 28', () => {
+  it('is 44 high on a phone, 16 / 8 from the edges: logo 40, avatar 28', () => {
     renderShell('student', '/', 375)
 
     // The avatar's 44 target reaches 8 into the edge padding, so the drawn
     // 28 avatar still sits 8 from the edge.
     expect(barRow()).toHaveStyle({ height: '44px', paddingLeft: '16px', paddingRight: '0px' })
-    expect(within(bar()).getByRole('img', { name: 'STOA' })).toHaveStyle({ height: '26px' })
+    expect(within(bar()).getByRole('img', { name: 'STOA' })).toHaveStyle({ height: '40px' })
     const account = within(bar()).getByRole('button', { name: 'accountMenu.open' })
     expect(account.querySelector('[data-avatar]')).toHaveStyle({ width: '28px' })
     expect(account).toHaveStyle({ width: '44px' })
@@ -332,7 +332,7 @@ describe('the sky', () => {
     expect(header).toHaveAttribute('data-surface', 'sky')
     expect(header.style.background).toContain('var(--sky)')
     // The logo is the white one, the bell and the avatar read the bar's sky values …
-    expect(header.querySelector('img[alt="STOA"]')?.className).toContain('invert')
+    expect(header.querySelector('img[alt="STOA"]')).toHaveAttribute('data-logo-variant', 'light')
     expect(header.querySelector('[data-account-trigger]')).toHaveAttribute('data-bar-control')
   })
 
@@ -341,6 +341,8 @@ describe('the sky', () => {
     expect(document.querySelector('[data-surface="sky"]')).toBeNull()
     const header = bar().closest('[data-top-bar]') as HTMLElement
     expect(header.style.background).toBe('var(--bar)')
+    // The website's logo is white; on the light bar it is taken to black.
+    expect(header.querySelector('img[alt="STOA"]')).toHaveAttribute('data-logo-variant', 'dark')
     expect(header.querySelector('[data-bar-control]')).toBeNull()
   })
 })
