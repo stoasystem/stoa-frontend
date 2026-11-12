@@ -546,6 +546,7 @@
     "grade_8_secondary": "8. Klasse (Sekundarstufe I)",
     "grade_9_secondary": "9. Klasse (Sekundarstufe I)",
     "grade_secondary_i": "Sekundarstufe I (Schuljahr nicht angegeben)",
+    "grade_secondary_ii": "Sekundarstufe II (Gymnasium, Mittelschule)",
     "notSet": "Klasse nicht angegeben"
   }
 }
