@@ -606,15 +606,19 @@ export function useStreamingChat(conversationId: string | null) {
         // The period ended while Ask was open: Ask pauses, and reads it again (#615).
         if (isUsagePeriodEnded(requestError)) noteUsagePeriodEnded(queryClient)
         // What the answer's place showed when it failed: the steps written so
-        // far, or the failure in words.
+        // far, or the failure in words. A command the server ended as failed
+        // has no answer, whatever steps it still carries -- half a sentence,
+        // a malformed response -- so only the failure in words stands (#637).
         const shown = localMessagesRef.current.find((message) => message.id === settledAssistantId)
+        const answerFailed = outcome.kind === 'failed'
+        const keptSteps = answerFailed ? '' : shown?.content
         const failedAnswer: ChatMessage = {
           id: settledAssistantId,
           conversationId,
           role: 'assistant',
           createdAt: pending.askedAt,
           ...shown,
-          content: shown?.content || getErrorMessage(requestError),
+          content: keptSteps || getErrorMessage(requestError),
           status: 'failed',
         }
         const student: LocalChatMessage = {
@@ -631,7 +635,9 @@ export function useStreamingChat(conversationId: string | null) {
         setLocalMessages((messages) =>
           messages.map((message) => {
             if (message.id === studentMessageId) return { ...message, ...student }
-            if (message.id === settledAssistantId) return { ...message, content: message.content || failedAnswer.content, status: 'failed' }
+            if (message.id === settledAssistantId) {
+              return { ...message, content: answerFailed ? failedAnswer.content : message.content || failedAnswer.content, status: 'failed' }
+            }
             return message
           }),
         )

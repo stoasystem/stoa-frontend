@@ -260,11 +260,13 @@ const routes: Array<[method: string, pattern: string, handler: Handler]> = [
     id: params.id, title: '…', subject: 'math', grade: demoProfileNow().grade, updatedAt: now(), messages: [],
   }],
   // A command failed on purpose (#183) says so, as the backend does, and may be sent again with its key.
+  // Like the backend (stoa-backend#389), it still carries the broken steps it got
+  // so far, which the app must not show (#637).
   ['GET', '/conversations/:id/generation', ({ params, query }) => {
     const key = query.get('idempotencyKey')
     const failed = key !== null && failedOnce.has(key) && !answeredAfterFailing.has(key)
     return failed
-      ? { conversationId: params.id, steps: [], updatedAt: now(), status: 'failed', retryable: true, failureCategory: 'provider_unavailable' }
+      ? { conversationId: params.id, steps: DEMO_BROKEN_STEPS, updatedAt: now(), status: 'failed', retryable: true, failureCategory: 'provider_unavailable' }
       : { conversationId: params.id, steps: [], updatedAt: now(), status: 'completed' }
   }],
   ['GET', '/teacher-help/availability', () => demoTeacherAvailability],
@@ -408,6 +410,11 @@ async function exchange(
 
 /** A question with this in it fails its first send, so the failed state and its retry can be seen (#183). */
 export const DEMO_FAIL_ONCE = '#fail'
+/** What a failed command still carried in production (#637): half a sentence, raw Markdown and LaTeX. */
+const DEMO_BROKEN_STEPS = [
+  'eine Multiplikation. Also: $\\frac{3}{5} \\cdot 20$',
+  '**Schritt 2 – Rechnen:** $$\\frac{3 \\cdot 20}{5} = 12$$',
+]
 const failedOnce = new Set<string>()
 const answeredAfterFailing = new Set<string>()
 
