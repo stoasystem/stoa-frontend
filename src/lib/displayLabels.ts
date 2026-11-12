@@ -96,7 +96,7 @@ export function getSubjectLabel(subject: string, t: TFunction) {
 
 /*
  * The year groups the backend stores (`learning_profile_service.GRADE_LEVEL_CODES`,
- * stoa-backend#310), and the two older free-text spellings it reads as one of
+ * stoa-backend#310; upper secondary since stoa-backend#419), and the two older free-text spellings it reads as one of
  * them (`LEGACY_GRADE_SPELLINGS`). A student's own screens get the names from
  * `choices.grade`; a parent's or a teacher's screen gets only the code, and
  * printed it as sent: "grade_6_primary", or "Grade 6" on a German page (#641).
@@ -112,6 +112,7 @@ const gradeCodes = new Set([
   'grade_8_secondary',
   'grade_9_secondary',
   'grade_secondary_i',
+  'grade_secondary_ii',
 ])
 
 const legacyGradeSpellings: LabelMap = {

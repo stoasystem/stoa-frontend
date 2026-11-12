@@ -546,6 +546,7 @@
     "grade_8_secondary": "Year 8 (lower secondary)",
     "grade_9_secondary": "Year 9 (lower secondary)",
     "grade_secondary_i": "Lower secondary (year not given)",
+    "grade_secondary_ii": "Upper secondary (Gymnasium)",
     "notSet": "Year not given"
   }
 }
