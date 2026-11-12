@@ -95,7 +95,7 @@ function renderAsk(conversationId: string | null = 'c1') {
 
 function openAsk(conversationId: string | null = 'c1') {
   renderAsk(conversationId)
-  return within(screen.getByRole('complementary', { name: 'Ask' }))
+  return within(screen.getByRole('dialog', { name: 'Ask' }))
 }
 
 const picker = () => document.querySelector<HTMLInputElement>('input[type="file"]:not([data-ask-camera])')!

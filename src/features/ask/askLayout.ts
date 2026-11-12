@@ -46,6 +46,33 @@ export const DOCKED_COMPOSER = {
 } as const
 
 /**
+ * Ask rising from the docked composer on a wide screen (#660): typing on the
+ * star map, or opening `/ask` and `/ask/:id`, grows the conversation upward
+ * from where the composer stood -- as wide as the composer
+ * (`DOCKED_COMPOSER.desktop.width`, narrower only with less than `inset` on
+ * either side), centred, its bottom on the composer's own line, and up to
+ * `top` from the top of the page. The map behind it dims and cannot be used:
+ * a tap on the dim or Esc closes Ask.
+ *
+ * The 420 panel beside the map (`ASK_PANEL`) is where Ask goes once the student
+ * follows a star from it, so map and conversation are read side by side.
+ *
+ * Motion: grows up from the composer's height and fades in; under reduced
+ * motion the same crossfade as the panel and the sheet.
+ */
+export const ASK_RISE = {
+  width: DOCKED_COMPOSER.desktop.width,
+  bottom: DOCKED_COMPOSER.desktop.bottom,
+  /** The room left above it, under the page's top edge. */
+  top: 24,
+  /** The least room on either side, on a screen narrower than the composer plus this. */
+  inset: 24,
+  radius: 20,
+  /** Heavier than the phone sheet's dim: the map is not being read now. */
+  dim: 0.35,
+} as const
+
+/**
  * The button that calls Ask back after it was closed (#125), at the end of the
  * docked composer's row: on the practice stage (#180), and on the star map only
  * while the usage period is paused (#615), when the composer is shut.

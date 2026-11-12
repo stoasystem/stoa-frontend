@@ -3,8 +3,8 @@ import { create } from 'zustand'
 /**
  * Ask opened from the planet (#12 points 1 and 6, #49).
  *
- * On the planet pages Ask is not a route: typing in the docked composer opens
- * the panel (desktop) or the sheet (phone) over whichever layer of the planet
+ * On the planet pages Ask is not a route: typing in the docked composer raises
+ * Ask (desktop, #660) or the sheet (phone) over whichever layer of the planet
  * the student is on, and the address stays where it is. What is open lives
  * here, and in session storage, so a reload brings the same conversation back
  * and `useStreamingChat` can pick up a message that was still being answered.
@@ -36,6 +36,14 @@ type AskState = {
    * taken once.
    */
   added: AddedFromDock | null
+  /**
+   * On a wide screen, Ask stands in the 420 panel beside the map instead of
+   * rising over it from the docked composer (#660): the student followed a
+   * star from Ask ("show on the map") and reads on beside it. Asking on keeps
+   * it there; its expand button, or closing Ask, ends it. Memory only: a
+   * reload, like every new opening, rises from the composer again.
+   */
+  beside: boolean
 }
 
 /**
@@ -62,13 +70,17 @@ type AskActions = {
   addFromDock: (ownerId: string, added: AddedFromDock) => void
   /** What the docked + chose, taken once: the panel that adds it. */
   takeAdded: (ownerId: string) => AddedFromDock | null
+  /** Ask makes way for the map (#660): open beside it, on `conversationId`. */
+  moveBeside: (ownerId: string, conversationId: string | null) => void
+  /** Back over the map from the panel beside it (#660). */
+  expand: () => void
 }
 
 export const ASK_STORAGE_KEY = 'stoa_ask_panel'
 
 type Persisted = Pick<AskState, 'ownerId' | 'open' | 'conversationId'>
 
-const CLOSED: AskState = { ownerId: null, open: false, conversationId: null, draft: '', examples: null, pending: null, added: null }
+const CLOSED: AskState = { ownerId: null, open: false, conversationId: null, draft: '', examples: null, pending: null, added: null, beside: false }
 
 /** What a reload restores: which account's Ask was open, and on which conversation. */
 export function readPersistedAsk(): Persisted {
@@ -115,7 +127,7 @@ export const useAskStore = create<AskState & AskActions>((set, get) => ({
   select: (ownerId, conversationId) =>
     set((state) => ({ ...forOwner(state, ownerId), open: true, conversationId })),
   setDraft: (ownerId, draft) => set((state) => ({ ...forOwner(state, ownerId), draft })),
-  close: () => set({ open: false, added: null }),
+  close: () => set({ open: false, added: null, beside: false }),
   offerExamples: (ownerId, examples) => set((state) => ({ ...forOwner(state, ownerId), examples })),
   endExamples: () => set({ examples: null }),
   askNow: (ownerId, question) =>
@@ -133,6 +145,9 @@ export const useAskStore = create<AskState & AskActions>((set, get) => ({
     set({ added: null })
     return added
   },
+  moveBeside: (ownerId, conversationId) =>
+    set((state) => ({ ...forOwner(state, ownerId), open: true, conversationId, beside: true })),
+  expand: () => set({ beside: false }),
 }))
 
 useAskStore.subscribe((state, previous) => {
@@ -168,5 +183,6 @@ export function askFor(state: AskState, ownerId: string | null) {
     examples: mine ? state.examples : null,
     pending: mine ? state.pending : null,
     added: mine ? state.added : null,
+    beside: mine && state.open && state.beside,
   }
 }

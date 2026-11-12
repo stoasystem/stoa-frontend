@@ -27,6 +27,19 @@ export type AskController = {
   /** Open a conversation, or `null` to go back to the list. */
   select: (conversationId: string | null) => void
   close: () => void
+  /**
+   * On a wide screen, whether Ask stands in the panel beside the map rather
+   * than over it (#660). Never at `/ask`, which always opens over the map.
+   */
+  beside: boolean
+  /**
+   * Ask makes way for the map (#660): a star followed from it. Ask stays open
+   * on this conversation, in the panel beside the map; from `/ask` that is
+   * the map's own Ask the student lands on.
+   */
+  moveBeside: () => void
+  /** Back over the map from the panel beside it (#660). */
+  expand: () => void
 }
 
 /**
@@ -49,6 +62,9 @@ export function useAskController(route?: AskRoute): AskController {
   const storeOpenWithDraft = useAskStore((state) => state.openWithDraft)
   const storeSelect = useAskStore((state) => state.select)
   const storeClose = useAskStore((state) => state.close)
+  const planetBeside = useAskStore((state) => askFor(state, ownerId).beside)
+  const storeMoveBeside = useAskStore((state) => state.moveBeside)
+  const expand = useAskStore((state) => state.expand)
   const direct = route !== undefined
   const directId = route?.conversationId ?? null
 
@@ -88,10 +104,15 @@ export function useAskController(route?: AskRoute): AskController {
     if (direct) navigate(roleHomePaths.student)
   }, [direct, navigate, storeClose])
 
+  const moveBeside = useCallback(() => {
+    if (ownerId) storeMoveBeside(ownerId, direct ? directId : askFor(useAskStore.getState(), ownerId).conversationId)
+  }, [direct, directId, ownerId, storeMoveBeside])
+
   // The same object until something in it changes, so what is built on it --
   // the stage's controller, the hosts' callbacks -- changes only then (#416).
   const open = direct ? true : planetOpen
   const conversationId = direct ? directId : planetConversationId
+  const beside = !direct && planetBeside
   return useMemo<AskController>(
     () => ({
       entry: direct ? 'direct' : 'planet',
@@ -104,7 +125,10 @@ export function useAskController(route?: AskRoute): AskController {
       reopen,
       select,
       close,
+      beside,
+      moveBeside,
+      expand,
     }),
-    [close, conversationId, direct, draft, open, openWithDraft, readDraft, reopen, select, setDraft],
+    [beside, close, conversationId, direct, draft, expand, moveBeside, open, openWithDraft, readDraft, reopen, select, setDraft],
   )
 }

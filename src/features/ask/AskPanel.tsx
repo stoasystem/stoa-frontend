@@ -1,4 +1,4 @@
-import { ChevronLeft, X } from 'lucide-react'
+import { ChevronLeft, Maximize2, X } from 'lucide-react'
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type HTMLAttributes } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
@@ -62,6 +62,7 @@ export function AskPanel({
   subjectId,
   headerHandle,
   practice,
+  onExpand,
 }: {
   controller: AskController
   layout: AskLayout
@@ -73,6 +74,11 @@ export function AskPanel({
    * the question as `practiceContext` (#56). Nothing of its wording does.
    */
   practice?: AskPractice
+  /**
+   * In the panel beside the map (#660): back over the map, where Ask rises
+   * from the docked composer. A button in the header, beside the close.
+   */
+  onExpand?: () => void
 }) {
   const { t } = useTranslation('chat')
   const { conversationId, draft, setDraft, select, close } = controller
@@ -285,6 +291,7 @@ export function AskPanel({
               : t('ask.presence.offline')}
           </span>
         )}
+        {onExpand && <IconButton label={t('ask.expand')} icon={Maximize2} size={30} variant="gray" onClick={onExpand} />}
         <IconButton label={t('ask.close')} icon={X} size={30} hitSize={phone ? 44 : undefined} variant="gray" onClick={close} />
       </header>
 

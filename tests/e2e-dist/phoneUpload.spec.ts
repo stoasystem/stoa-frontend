@@ -104,7 +104,7 @@ test('Ask shows the code as a QR, and adds the phone’s photo only once the stu
 
   // A new question: there is no conversation yet, and the phone's way is there all the same (#554).
   await page.goto('/ask')
-  const panel = page.getByRole('complementary', { name: 'Ask' })
+  const panel = page.getByRole('dialog', { name: 'Ask' })
   const field = panel.getByRole('textbox', { name: 'Your question' })
   await expect(field).toBeVisible()
 

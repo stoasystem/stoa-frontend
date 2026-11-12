@@ -4,10 +4,12 @@
  * An answer that recognised the star the student wants to go to carries it
  * (`targetUnit`, stoa-backend#124), streamed (`message_done`) and read back
  * (`GET /conversations/{id}`) alike. Under that answer sits one card; followed,
- * Ask closes and the map flies to the star -- in whichever galaxy it is, a
- * dimmed one included, lit or not -- and opens its card, which takes the
- * focus. An answer without a star, a failed answer, and a star the sky does
- * not hold (or a sky that could not be read) show nothing more.
+ * the map flies to the star -- in whichever galaxy it is, a dimmed one
+ * included, lit or not -- and opens its card, which takes the focus. On a
+ * wide screen Ask moves into the panel beside the map, on the conversation
+ * (#660); on a phone it closes. An answer without a star, a failed answer, and
+ * a star the sky does not hold (or a sky that could not be read) show nothing
+ * more.
  *
  * Since #489 that is a star with nothing missing on the way (lit, or its
  * prerequisites all lit); one with stars missing shows the path to it
@@ -75,9 +77,9 @@ const answered = (unitId: string) => [
   message('m2', 'assistant', 'It is on your star map.', { unitId }),
 ]
 
-function wide() {
+function wide(isWide = true) {
   window.matchMedia = ((query: string) => ({
-    matches: !/reduce/.test(query),
+    matches: /reduce/.test(query) ? false : /min-width/.test(query) ? isWide : !isWide,
     media: query,
     onchange: null,
     addEventListener() {},
@@ -281,20 +283,42 @@ describe('the card under an answer that found a star (#487)', () => {
   it.each([
     ['opened on the map', '/map/math'],
     ['opened at /ask/c-1', '/ask/c-1'],
-  ])('closes Ask (%s) and flies to the star in another galaxy, its card open and focused', async (_, at) => {
+  ])('moves Ask (%s) beside the map and flies to the star in another galaxy, its card open and focused (#660)', async (_, at) => {
     readBack(answered(MECHANICS.unitId))
     // On the map, Ask is open over it on the conversation, as the docked composer leaves it.
     if (at.startsWith('/map')) useAskStore.getState().select('student-a', 'c-1')
     mount(at)
     await waitFor(() => expect(cards()).toHaveLength(1))
-    expect(document.querySelector('[data-ask-surface]')).not.toBeNull()
+    // Risen over the map, as it opens on a wide screen.
+    expect(document.querySelector('[data-ask-surface]')).toHaveAttribute('data-ask-surface', 'rise')
 
     await follow()
 
     // The star's own route, under its own galaxy: the map flies there and opens its card.
     expect(screen.getByTestId('where')).toHaveTextContent(MECHANICS.path)
     await expectStarCardFocused(MECHANICS.name)
+    // Ask stays open on the conversation, in the panel beside the map, with its way back over it.
+    const panel = screen.getByRole('complementary', { name: i18n.t('chat:ask.title') })
+    expect(panel).toHaveAttribute('data-ask-surface', 'panel')
+    expect(panel).toHaveAttribute('data-ask-conversation', 'c-1')
+    expect(document.querySelector<HTMLElement>('[data-ask-page]')!.style.right).toBe('420px')
+    expect(document.querySelector('[data-ask-page]')).not.toHaveAttribute('inert')
+    expect(within(panel).getByRole('button', { name: i18n.t('chat:ask.expand') })).toBeInTheDocument()
+  })
+
+  it('closes Ask on a phone and flies to the star, as before (#660)', async () => {
+    wide(false)
+    readBack(answered(MECHANICS.unitId))
+    useAskStore.getState().select('student-a', 'c-1')
+    mount('/map/math')
+    await waitFor(() => expect(cards()).toHaveLength(1))
+    expect(document.querySelector('[data-ask-surface]')).toHaveAttribute('data-ask-surface', 'sheet')
+
+    await follow()
+
+    expect(screen.getByTestId('where')).toHaveTextContent(MECHANICS.path)
     expect(document.querySelector('[data-ask-surface]')).toBeNull()
+    expect(useAskStore.getState().beside).toBe(false)
   })
 
   it('Ask, closed by a way out that took the focus, leaves the focus there', async () => {

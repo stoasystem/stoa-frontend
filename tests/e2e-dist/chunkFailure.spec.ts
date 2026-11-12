@@ -99,7 +99,7 @@ test('formulas whose KaTeX chunk cannot be fetched stay as written, and the tab 
 
   const first = 'What is $x^2$?'
   await page.getByRole('textbox', { name: 'Your question' }).fill(first)
-  const panel = page.getByRole('complementary', { name: 'Ask' })
+  const panel = page.getByRole('dialog', { name: 'Ask' })
   await panel.getByRole('textbox', { name: 'Your question' }).press('Enter')
   const thread = panel.getByRole('log', { name: 'Messages' })
   await expect(thread.getByText(world.answerFor(first))).toBeVisible()
@@ -141,7 +141,7 @@ test('a KaTeX chunk refused once is asked for under a new address, and the next 
   // answer's, which comes a moment later, is the next one.
   const question = 'What is $x^2$?'
   await page.getByRole('textbox', { name: 'Your question' }).fill(question)
-  const panel = page.getByRole('complementary', { name: 'Ask' })
+  const panel = page.getByRole('dialog', { name: 'Ask' })
   await panel.getByRole('textbox', { name: 'Your question' }).press('Enter')
   const thread = panel.getByRole('log', { name: 'Messages' })
   await expect.poll(() => refused.length, { message: 'KaTeX was asked for' }).toBe(1)
@@ -168,7 +168,7 @@ test('KaTeX and its stylesheet come in one file, and a formula is typeset with i
 
   const question = 'What is $x^2$?'
   await page.getByRole('textbox', { name: 'Your question' }).fill(question)
-  const panel = page.getByRole('complementary', { name: 'Ask' })
+  const panel = page.getByRole('dialog', { name: 'Ask' })
   await panel.getByRole('textbox', { name: 'Your question' }).press('Enter')
   const formula = panel.getByRole('log', { name: 'Messages' }).locator('.katex').first()
   await expect(formula).toBeVisible()

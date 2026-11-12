@@ -192,7 +192,7 @@ describe('a quote chosen beside an exercise', () => {
 
     act(() => useAskStore.getState().openWithDraft('u-1', 'What is a prime number?'))
     const { container } = mount(<AskHost />)
-    await screen.findByRole('complementary', { name: 'Ask' })
+    await screen.findByRole('dialog', { name: 'Ask' })
     expect(container.querySelector('[data-ask-pending-quote]')).toBeNull()
   })
 
@@ -224,7 +224,7 @@ describe('a quote chosen beside an exercise', () => {
     useAskQuoteStore.setState({ quote: makeQuote('Subtract 3 from both sides.', { kind: 'message', id: 'a1' }, 'conv-a') })
     act(() => useAskStore.getState().select('u-1', 'conv-b'))
     const { container } = mount(<AskHost />)
-    const panel = within(await screen.findByRole('complementary', { name: 'Ask' }))
+    const panel = within(await screen.findByRole('dialog', { name: 'Ask' }))
     await waitFor(() => expect(getConversation.mock.calls[0]?.[0]).toBe('conv-b'))
     expect(container.querySelector('[data-ask-pending-quote]')).toBeNull()
 

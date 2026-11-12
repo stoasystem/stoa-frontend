@@ -102,7 +102,7 @@ function openAsk(conversationId: string | null = 'c1') {
       </QueryClientProvider>
     </I18nextProvider>,
   )
-  return within(screen.getByRole('complementary'))
+  return within(screen.getByRole('dialog'))
 }
 
 /** The QR's modules for `text`, drawn the way the card draws them. */

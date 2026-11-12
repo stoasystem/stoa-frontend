@@ -177,7 +177,7 @@ describe('2. finding my own star', () => {
 
     await userEvent.click(offered.getByRole('button', { name: examples[2] }))
     // Ask opens on its list and the example goes out at once, as a new conversation's first question.
-    await screen.findByRole('complementary', { name: 'Ask' })
+    await screen.findByRole('dialog', { name: 'Ask' })
     await waitFor(() => expect(server.conversations.createConversation).toHaveBeenCalledTimes(1))
     expect(server.conversations.createConversation.mock.calls[0][0]).toMatchObject({ initialMessage: examples[2] })
     expect(useAskStore.getState().examples).toBeNull()

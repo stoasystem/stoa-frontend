@@ -65,7 +65,7 @@ function openAsk() {
       </QueryClientProvider>
     </I18nextProvider>,
   )
-  return within(screen.getByRole('complementary', { name: i18n.t('chat:ask.title') }))
+  return within(screen.getByRole('dialog', { name: i18n.t('chat:ask.title') }))
 }
 
 type Ask = ReturnType<typeof openAsk>
