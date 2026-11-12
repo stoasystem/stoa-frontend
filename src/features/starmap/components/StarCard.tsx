@@ -297,6 +297,25 @@ function StarQuizEntry({ star }: { star: Star }) {
   )
 }
 
+/**
+ * Where the wide card stands, CSS px (#638). It was centred on the stage at 48
+ * px from the right, as tall as its details: at 1280 x 800 its "Continue" went
+ * under the docked Ask composer (a press on its left half sent the draft), and
+ * the zoom pair (24 px from the right, 40 wide) sat over its lower corner.
+ *
+ * Now it keeps to the band between the page's controls: 12 px under the top
+ * line (as `controlBands` does: 76, or the measured line when that is lower,
+ * and under the demo line), 12 px over the docked composer
+ * (`--page-bottom-inset`), and 12 px left of the zoom pair. Centred in that
+ * band; taller than it, the card scrolls, so its action is always reachable.
+ */
+export const STAR_CARD_PLACE = {
+  /** The zoom pair's right edge (24) and width (40), and 12 px between. */
+  right: 24 + 40 + 12,
+  top: 'max(calc(76px + var(--starmap-notice-height, 0px)), calc(var(--starmap-top-line, 0px) + 12px))',
+  bottom: 'calc(var(--page-bottom-inset, 0px) + 12px)',
+} as const
+
 /** The star's card on a wide screen: beside the map, every detail at once. */
 export function StarCard({ map, demo = false, star, nebula, reducedMotion }: StarCardProps) {
   const { t } = useTranslation('starmap')
@@ -308,41 +327,54 @@ export function StarCard({ map, demo = false, star, nebula, reducedMotion }: Sta
       aria-labelledby={STAR_TITLE_ID}
       // Focusable from code: a star asked for from Ask opens with its card focused (#487).
       tabIndex={-1}
-      className="pointer-events-auto absolute right-12 top-1/2 flex w-[340px] -translate-y-1/2 flex-col gap-3 rounded-[16px] border border-[color:var(--sky-glass-border)] p-[18px] text-on-sky"
+      data-star-card
+      // Inset on both sides, as tall as its content at most: the auto margins centre it in the band.
+      className="pointer-events-auto absolute my-auto flex h-fit w-[340px] flex-col gap-3 rounded-[16px] border border-[color:var(--sky-glass-border)] p-[18px] text-on-sky"
       style={{
+        right: STAR_CARD_PLACE.right,
+        top: STAR_CARD_PLACE.top,
+        bottom: STAR_CARD_PLACE.bottom,
+        // A fit-content height is not held to the band by its insets: the band's height, said outright.
+        maxHeight: `calc(100% - ${STAR_CARD_PLACE.top} - ${STAR_CARD_PLACE.bottom})`,
         background: 'var(--sky-glass)',
         backdropFilter: 'blur(var(--sky-glass-blur))',
         WebkitBackdropFilter: 'blur(var(--sky-glass-blur))',
         boxShadow: 'var(--shadow-glass)',
       }}
     >
-      <StarCardBack map={map} nebula={nebula} />
+      {/*
+        Taller than the band, the details scroll and the action stays in sight
+        under them. The padding reaches the card's edge, so a focus ring is not clipped.
+      */}
+      <div data-star-card-scroll className="-mx-[18px] -mt-[18px] flex min-h-0 flex-col gap-3 overflow-y-auto overscroll-contain px-[18px] pt-[18px] pb-1">
+        <StarCardBack map={map} nebula={nebula} />
 
-      <div className="flex items-center gap-4">
-        <div ref={glyph} className="shrink-0">
-          <StarGlyph
-            state={starLook(star)}
-            size={96}
-            progress={star.progress}
-            recommended={Boolean(star.recommendation)}
-            reviewDue={star.reviewDue > 0}
-            breathe={!reducedMotion && Boolean(star.recommendation)}
-          />
+        <div className="flex items-center gap-4">
+          <div ref={glyph} className="shrink-0">
+            <StarGlyph
+              state={starLook(star)}
+              size={96}
+              progress={star.progress}
+              recommended={Boolean(star.recommendation)}
+              reviewDue={star.reviewDue > 0}
+              breathe={!reducedMotion && Boolean(star.recommendation)}
+            />
+          </div>
+          <div className="flex min-w-0 flex-col gap-0.5">
+            <h1 id={STAR_TITLE_ID} className="m-0 text-[18px] font-semibold leading-tight tracking-[-0.3px] text-on-sky">
+              {star.name}
+            </h1>
+            <p className="m-0 text-[13px] text-[color:var(--on-sky-text-body)]">
+              {t('star.inNebula', { nebula: nebula.name, state: t(`state.${star.state}`) })}
+            </p>
+          </div>
         </div>
-        <div className="flex min-w-0 flex-col gap-0.5">
-          <h1 id={STAR_TITLE_ID} className="m-0 text-[18px] font-semibold leading-tight tracking-[-0.3px] text-on-sky">
-            {star.name}
-          </h1>
-          <p className="m-0 text-[13px] text-[color:var(--on-sky-text-body)]">
-            {t('star.inNebula', { nebula: nebula.name, state: t(`state.${star.state}`) })}
-          </p>
-        </div>
+
+        <StarCardDetails map={map} demo={demo} star={star} />
       </div>
 
-      <StarCardDetails map={map} demo={demo} star={star} />
-
       {action && (
-        <div className="pt-1">
+        <div data-star-card-action className="shrink-0 pt-1">
           <Button asChild lift variant="onSky" size="regular">
             <Link to={chapterTo} onClick={jump}>{action}</Link>
           </Button>
