@@ -42,8 +42,14 @@ const SKY_SELECT = [
   'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring',
   'aria-invalid:border-red',
 ].join(' ')
-/** The open list is the platform's (drawn dark): its rows keep the title colour whatever the closed field shows. */
-const SKY_OPTION = 'text-[color:var(--on-sky-text)]'
+/*
+ * The open list is the platform's: its rows keep the title colour whatever the
+ * closed field shows, on a solid raised-sky fill. Chromium on Windows draws the
+ * list from the options' / select's own background, not from `color-scheme`,
+ * so the closed field's near-clear glass came out as a white list with white
+ * text. The fallback is --sky-2 itself, for a card outside `data-surface="sky"`.
+ */
+const SKY_OPTION = 'bg-[color:var(--sky-2,#131C33)] text-[color:var(--on-sky-text)]'
 const CHIP_PADDING_X = 14
 const CHEVRON_ROOM = 40
 

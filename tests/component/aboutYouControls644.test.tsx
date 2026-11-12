@@ -99,6 +99,17 @@ describe('the year group on the sky', () => {
     expect(chevron).toHaveClass('pointer-events-none')
   })
 
+  it('opens onto a solid dark list, not the glass', () => {
+    // Windows Chromium painted the open list from the options' own background, ignoring
+    // color-scheme: the near-clear glass came out as a white list of white text.
+    const region = show()
+    const select = within(region).getByRole('combobox', { name: copy.grade })
+    for (const option of within(select).getAllByRole('option')) {
+      expect(option).toHaveClass('bg-[color:var(--sky-2,#131C33)]')
+      expect(option).toHaveClass('text-[color:var(--on-sky-text)]')
+    }
+  })
+
   it('reads as the placeholder until a year is chosen, and is marked invalid when "Done" finds it empty', async () => {
     const user = userEvent.setup()
     const region = show()
