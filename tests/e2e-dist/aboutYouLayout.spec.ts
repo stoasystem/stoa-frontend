@@ -212,8 +212,9 @@ async function hitSpan(page: Page, selector: string) {
 }
 
 /**
- * No key on the map; the "?" bottom left, its bottom on the zoom pair's
- * (#643), drawn as large as one zoom button (32 px) at every width. On a
+ * No key on the map; the help star bottom left (#643; it was a "?"), level
+ * with the lower zoom button, its target as large as one zoom button (32 px)
+ * at every width, the star drawn smaller inside it. On a
  * phone each of them reaches 44 px for a finger all the same, the zoom pair's
  * two splitting the gap between them. "Wide" is the stage's own width (768);
  * these viewports leave the stage the whole width, so a viewport under 768 is
@@ -228,8 +229,10 @@ async function expectHelpInTheCorner(page: Page, viewport: { width: number; heig
   const zoomButton = page.locator('[data-starmap-overlay][role=group] button').first()
   if (await zoomButton.isVisible()) {
     const button = (await zoomButton.boundingBox())!
-    expect(Math.abs(box.width - button.width), 'the "?" as wide as a zoom button').toBeLessThanOrEqual(0.5)
-    expect(Math.abs(box.height - button.height), 'the "?" as tall as a zoom button').toBeLessThanOrEqual(0.5)
+    expect(Math.abs(box.width - button.width), 'the help star\'s target as wide as a zoom button').toBeLessThanOrEqual(0.5)
+    expect(Math.abs(box.height - button.height), 'the help star\'s target as tall as a zoom button').toBeLessThanOrEqual(0.5)
+    const star = (await help.locator('svg').boundingBox())!
+    expect(star.width, 'the star drawn smaller than its target').toBeLessThan(box.width)
   }
   if (viewport.width < 768) {
     const reach = await hitSpan(page, '[data-starmap-help-button]')
@@ -252,10 +255,11 @@ async function expectHelpInTheCorner(page: Page, viewport: { width: number; heig
     expect(reach.width, 'a mouse finds the "?" where it is drawn').toBeLessThanOrEqual(box.width + 1)
     expect(reach.height, 'a mouse finds the "?" where it is drawn').toBeLessThanOrEqual(box.height + 1)
   }
-  const zoom = await page.locator('[data-starmap-overlay][role=group]').boundingBox()
-  if (zoom) {
-    // The frames, not the buttons: each sits 3 px inside a 1 px border.
-    expect(Math.abs(box.y + box.height - (zoom.y + zoom.height)), 'the "?" on the zoom pair\'s line').toBeLessThanOrEqual(5)
+  const lower = page.locator('[data-starmap-overlay][role=group] button').last()
+  if (await lower.isVisible()) {
+    // No frame of its own: the star stands level with the lower zoom button inside the pair's frame.
+    const button = (await lower.boundingBox())!
+    expect(Math.abs(box.y + box.height / 2 - (button.y + button.height / 2)), 'the help star level with the lower zoom button').toBeLessThanOrEqual(1)
   }
 }
 

@@ -128,10 +128,11 @@ describe('the "?" (#146 C15, wide screens too since #643)', () => {
       await i18n.changeLanguage(lang)
       const bundle = locales[lang]
       const view = showAt(390, 844)
-      // No legend on the map; a "?" named for what it opens.
+      // No legend on the map; a help star named for what it opens.
       expect(view.container.querySelector('[data-legend-pointer]')).toBeNull()
       const button = screen.getByRole('button', { name: bundle.help.open })
-      expect(button.textContent).toBe('?')
+      expect(button.textContent).toBe('')
+      expect(button.querySelector('svg[data-starmap-help-star]')).not.toBeNull()
       expect(button.getAttribute('aria-expanded')).toBe('false')
       const user = userEvent.setup()
       await user.click(button)
@@ -205,12 +206,18 @@ describe('the wide screen’s "?" (#643)', () => {
     await i18n.changeLanguage('en')
   })
 
-  it('stands bottom left in place of the legend, on the zoom pair’s line, as large as a zoom button', () => {
+  it('stands bottom left in place of the legend, on the zoom pair’s line, a pale-gold star in a target as large as a zoom button', () => {
     const view = showAt(1280, 800)
     expect(view.container.querySelector('[data-starmap-legend]'), 'no always-on legend').toBeNull()
     expect(view.container.querySelector('[data-legend-pointer]'), 'nothing of the legend on the map').toBeNull()
     const button = screen.getByRole('button', { name: en.help.open })
-    expect(button.textContent).toBe('?')
+    // A star, not a "?" in a glass box: drawn smaller than its 32 px target, in the paler lit gold.
+    const star = button.querySelector('svg[data-starmap-help-star]')!
+    expect(star).not.toBeNull()
+    expect(star.getAttribute('aria-hidden')).toBe('true')
+    expect(star.getAttribute('class')).toContain('size-[21px]')
+    expect(button.className).toContain('text-[color:var(--lit-soft)]')
+    expect(button.parentElement!.className, 'no glass box around it').not.toContain('backdrop-blur')
     expect(button.className).toContain('size-8')
     expect(button.className).not.toContain('size-11')
     expect(button.className, 'no reach past what is drawn for a mouse').not.toContain('before:')
@@ -218,9 +225,10 @@ describe('the wide screen’s "?" (#643)', () => {
       expect(zoomButton.className).toContain('size-8')
       expect(zoomButton.className).not.toContain('before:')
     }
+    // 4 px higher than the zoom pair's frame (its 1 px border and 3 px padding): level with the lower zoom button.
     const frame = button.parentElement!
     expect(frame.className).toContain('left-6')
-    expect(frame.className).toContain('bottom-[calc(1.5rem+var(--page-bottom-inset,0px))]')
+    expect(frame.className).toContain('bottom-[calc(1.5rem+4px+var(--page-bottom-inset,0px))]')
     const zoom = screen.getByRole('group', { name: en.zoom.group })
     expect(zoom.className).toContain('bottom-[calc(1.5rem+var(--page-bottom-inset,0px))]')
     view.unmount()
@@ -234,7 +242,7 @@ describe('the wide screen’s "?" (#643)', () => {
       expect(control.className).toContain('size-8')
       expect(control.className).not.toContain('size-11')
     }
-    expect(button.className).toContain('text-[16px]')
+    expect(button.querySelector('svg[data-starmap-help-star]')?.getAttribute('class')).toContain('size-[21px]')
     // The invisible reach around each 32 px button (jsdom lays nothing out, so read it off the classes).
     expect(reach(button)).toEqual({ top: 6, right: 6, bottom: 6, left: 6 })
     // The zoom pair stands 2 px apart: each reaches to the middle of the gap and makes up the rest outside.
