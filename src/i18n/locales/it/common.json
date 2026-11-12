@@ -538,5 +538,18 @@
     "invalid": "Questo link non è valido. Usa il link dell’e-mail più recente, oppure modifica le impostazioni e-mail nell’app dopo aver effettuato l’accesso.",
     "failed": "Non ha funzionato. Controlla la connessione e riprova.",
     "retry": "Riprova"
+  },
+  "grades": {
+    "grade_1_primary": "1ª elementare",
+    "grade_2_primary": "2ª elementare",
+    "grade_3_primary": "3ª elementare",
+    "grade_4_primary": "4ª elementare",
+    "grade_5_primary": "5ª elementare",
+    "grade_6_primary": "1ª media",
+    "grade_7_secondary": "2ª media",
+    "grade_8_secondary": "3ª media",
+    "grade_9_secondary": "4ª media",
+    "grade_secondary_i": "Scuola media (anno non indicato)",
+    "notSet": "Anno non indicato"
   }
 }

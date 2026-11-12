@@ -534,5 +534,18 @@
     "invalid": "This link is not valid. Use the link in the most recent email, or change your email settings in the app after signing in.",
     "failed": "That did not work. Check the connection and try again.",
     "retry": "Try again"
+  },
+  "grades": {
+    "grade_1_primary": "Year 1 (primary school)",
+    "grade_2_primary": "Year 2 (primary school)",
+    "grade_3_primary": "Year 3 (primary school)",
+    "grade_4_primary": "Year 4 (primary school)",
+    "grade_5_primary": "Year 5 (primary school)",
+    "grade_6_primary": "Year 6 (primary school)",
+    "grade_7_secondary": "Year 7 (lower secondary)",
+    "grade_8_secondary": "Year 8 (lower secondary)",
+    "grade_9_secondary": "Year 9 (lower secondary)",
+    "grade_secondary_i": "Lower secondary (year not given)",
+    "notSet": "Year not given"
   }
 }

@@ -63,6 +63,10 @@ export type AccountOperationsUsage = {
   billingState?: string | null
   reconciliation?: Record<string, unknown>
   supportAction?: string | null
+  /** Why counter and ledger agree or not, a code to translate (stoa-backend#114). */
+  explanationCode?: string | null
+  explanationParams?: Record<string, unknown> | null
+  /** The same in English, for older clients; the cards no longer print it (#641). */
   explanation?: string | null
   partial?: boolean
   stale?: boolean

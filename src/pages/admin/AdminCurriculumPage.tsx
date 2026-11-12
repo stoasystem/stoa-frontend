@@ -10,6 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Textarea } from '@/components/ui/textarea'
 import { PageContainer } from '@/components/common/PageContainer'
 import { PageHeader } from '@/components/common/PageHeader'
+import { useAdminAccountsQuery } from '@/hooks/admin/useAdminAccounts'
 import { DashboardLayout } from '@/layouts/DashboardLayout'
 import { formatDateTime } from '@/lib/formatDateTime'
 import type { CurriculumAction, CurriculumReviewStep } from '@/pages/admin/CurriculumActionDialog'
@@ -510,6 +511,24 @@ function CapabilityStrip() {
   )
 }
 
+// Only an administrator writes a curriculum version (the routes are /admin's),
+// so the author of one is among these accounts.
+const ADMIN_ACCOUNTS = { role: 'admin' }
+
+/*
+ * A version names its author by account id; the list printed the id, so the
+ * administrator read "by 79d7cf6b-e1ee-…" (#641). Named from the administrator
+ * accounts; an id that is not among them reads as unknown, never as the id.
+ */
+function useAuthorName() {
+  const admins = useAdminAccountsQuery(ADMIN_ACCOUNTS)
+  const names = useMemo(
+    () => new Map((admins.data?.items ?? []).map((row) => [row.userId, row.name || row.email || ''])),
+    [admins.data],
+  )
+  return (userId: string | null | undefined) => (userId ? names.get(userId) || null : null)
+}
+
 function WorklistPanel({
   isLoading,
   failed,
@@ -529,6 +548,7 @@ function WorklistPanel({
   onSelect: (version: CurriculumListedVersion) => void
 }) {
   const { t } = useTranslation('admin')
+  const authorName = useAuthorName()
   if (isLoading) return <Card><CardContent className="p-5 text-sm text-muted-foreground">{t('curriculum.worklist.loading')}</CardContent></Card>
   if (failed) return null
   if (items.length === 0) {
@@ -548,7 +568,7 @@ function WorklistPanel({
               <p className="mt-2 text-sm text-muted-foreground">
                 {item.versionId} · {t('curriculum.worklist.updated', {
                   at: item.updatedAt ? formatDateTime(item.updatedAt) : t('curriculum.worklist.unknown'),
-                  by: item.updatedBy ?? t('curriculum.worklist.unknown'),
+                  by: authorName(item.updatedBy) ?? t('curriculum.worklist.unknown'),
                 })}
               </p>
             </div>

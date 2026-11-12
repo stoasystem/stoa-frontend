@@ -8,7 +8,7 @@ import { PageSkeleton } from '@/components/common/PageSkeleton'
 import { NoLinkedChildrenNotice } from '@/components/parent/NoLinkedChildrenNotice'
 import { useParentChildrenQuery } from '@/hooks/parent/useParentChildrenQuery'
 import { fromReports } from '@/hooks/parent/useReportsTrail'
-import { getSubjectLabel } from '@/lib/displayLabels'
+import { getGradeLabel, getSubjectLabel } from '@/lib/displayLabels'
 import { DashboardLayout } from '@/layouts/DashboardLayout'
 import type { ParentChild } from '@/types/parent'
 
@@ -70,7 +70,7 @@ function ChildReports({ child }: { child: ParentChild }) {
   const { t } = useTranslation('parent')
   // The profile stores subject ids; the rest of the app says Mathematik.
   const subjects = child.subjects.map((subject) => getSubjectLabel(subject, t)).join(', ')
-  const about = `${child.grade ?? t('reports.gradeNotSet')} · ${subjects || t('reports.noSubjects')}`
+  const about = `${getGradeLabel(child.grade, t) ?? t('reports.gradeNotSet')} · ${subjects || t('reports.noSubjects')}`
 
   return (
     <Group title={t('reports.childReports', { name: child.name })}>

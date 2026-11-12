@@ -115,7 +115,8 @@ describe('A8: a parent link is confirmed, naming both accounts', () => {
     const dialog = await screen.findByRole('dialog')
     expect(dialog).toHaveTextContent('Nina Vogt · S26-0044')
     expect(dialog).toHaveTextContent('Rita Vogt · E26-0001')
-    expect(dialog).toHaveTextContent('child')
+    // The dialog names the relationship in words; the code `child` is what is sent (#641).
+    expect(dialog).toHaveTextContent(enAdmin.parentLinks.relationshipDefault)
     expect(mockedAssign).not.toHaveBeenCalled()
 
     await user.click(within(dialog).getByRole('button', { name: enAdmin.parentLinks.confirm.submit }))

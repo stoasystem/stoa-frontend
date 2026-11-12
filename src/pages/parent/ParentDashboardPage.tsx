@@ -13,7 +13,7 @@ import { ParentValueCard } from '@/components/parent/ParentValueCard'
 // import { ParentSubscriptionOperationsCard } from '@/components/parent/ParentSubscriptionOperationsCard'
 import { useParentAccountOperationsQuery } from '@/hooks/parent/useParentAccountOperationsQuery'
 import { useParentChildrenQuery } from '@/hooks/parent/useParentChildrenQuery'
-import { getSubjectLabel } from '@/lib/displayLabels'
+import { getGradeLabel, getSubjectLabel } from '@/lib/displayLabels'
 import { DashboardLayout } from '@/layouts/DashboardLayout'
 import type { ParentChild } from '@/types/parent'
 
@@ -64,7 +64,7 @@ function ChildRow({ child }: { child: ParentChild }) {
       leading={{ kind: 'avatar', name: child.name, tone: 'accent' }}
       title={child.name}
       subtitle={t('overview.childSubtitle', {
-        grade: child.grade ?? t('reports.gradeNotSet'),
+        grade: getGradeLabel(child.grade, t) ?? t('reports.gradeNotSet'),
         subjects:
           child.subjects.length > 0
             ? child.subjects.map((subject) => getSubjectLabel(subject, t)).join(', ')

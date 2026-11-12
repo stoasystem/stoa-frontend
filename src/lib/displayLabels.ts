@@ -94,6 +94,48 @@ export function getSubjectLabel(subject: string, t: TFunction) {
   return t(`chat:subjects.${id}`, { defaultValue: subjectLabels[id] })
 }
 
+/*
+ * The year groups the backend stores (`learning_profile_service.GRADE_LEVEL_CODES`,
+ * stoa-backend#310), and the two older free-text spellings it reads as one of
+ * them (`LEGACY_GRADE_SPELLINGS`). A student's own screens get the names from
+ * `choices.grade`; a parent's or a teacher's screen gets only the code, and
+ * printed it as sent: "grade_6_primary", or "Grade 6" on a German page (#641).
+ */
+const gradeCodes = new Set([
+  'grade_1_primary',
+  'grade_2_primary',
+  'grade_3_primary',
+  'grade_4_primary',
+  'grade_5_primary',
+  'grade_6_primary',
+  'grade_7_secondary',
+  'grade_8_secondary',
+  'grade_9_secondary',
+  'grade_secondary_i',
+])
+
+const legacyGradeSpellings: LabelMap = {
+  'grade 6': 'grade_6_primary',
+  sek1: 'grade_secondary_i',
+}
+
+/**
+ * A student's year group in the reader's language, or null when none was
+ * said. Other old free text ("14") is what the student typed, and is shown as
+ * typed rather than guessed at.
+ */
+export function getGradeLabel(grade: string | null | undefined, t: TFunction): string | null {
+  const value = (grade ?? '').trim()
+  if (!value) return null
+  const code = gradeCodes.has(value) ? value : legacyGradeSpellings[value.toLowerCase().split(/\s+/).join(' ')]
+  return code ? t(`common:grades.${code}`) : value
+}
+
+/** A year group, or "year not given" in the reader's language. */
+export function getGradeLabelOrNotSet(grade: string | null | undefined, t: TFunction): string {
+  return getGradeLabel(grade, t) ?? t('common:grades.notSet')
+}
+
 /** Turn a curriculum topic slug into a readable title, keeping unknown labels as sent. */
 export function getCurriculumTopicLabel(label: string, t: TFunction) {
   const slug = subjectSlug(label)

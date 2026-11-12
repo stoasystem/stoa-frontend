@@ -6,7 +6,7 @@ import { ModerationReportDialog } from '@/components/moderation/ModerationReport
 import { TeacherSlaBadge } from '@/components/teacher/TeacherSlaBadge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { MathRenderer } from '@/components/ui/MathRenderer'
-import { getSubjectLabel } from '@/lib/displayLabels'
+import { getGradeLabelOrNotSet, getSubjectLabel } from '@/lib/displayLabels'
 import type { TeacherHelpMessage, TeacherHelpRequestDetail } from '@/types/teacher'
 import { isOpenHelpRequest } from '@/types/teacherHelp'
 
@@ -32,7 +32,7 @@ export function HelpRequestDetailCard({ request }: { request: TeacherHelpRequest
             <p className="mt-1 text-sm text-muted-foreground">
               {t('requests.row', {
                 subject: getSubjectLabel(request.subject, t),
-                grade: request.student.grade,
+                grade: getGradeLabelOrNotSet(request.student.grade, t),
               })}
             </p>
             {/* The request list leaves this out of its rows; it lives here. */}

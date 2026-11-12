@@ -164,7 +164,7 @@
     "filterLabel": "Filter by name, email or number",
     "choose": "Select an account",
     "relationshipLabel": "Relationship",
-    "relationshipHint": "Stored with the link and written to the audit log.",
+    "relationshipHint": "Stored with the link and written to the audit log. Leave empty for “Child”.",
     "submit": "Create the link",
     "submitExplainer": "Links the two accounts immediately. Neither account is asked to confirm.",
     "assigned": "{{student}} is now linked to {{parent}}.",
@@ -194,7 +194,8 @@
         "cancel": "Cancel",
         "submit": "Revoke now"
       }
-    }
+    },
+    "relationshipDefault": "Child"
   },
   "activation": {
     "eyebrow": "Account invitation",

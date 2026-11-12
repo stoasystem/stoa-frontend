@@ -140,7 +140,9 @@
       "contact_support": "Contact STOA support",
       "wait_for_resend_cooldown": "Wait before sending again",
       "review_account_verification": "Review the account verification",
-      "unknown": "Unknown"
+      "unknown": "Unknown",
+      "legacy_or_verified": "Older account or already verified",
+      "cognito_sign_up_confirm_sign_up": "Confirmation code by email"
     },
     "evidence": {
       "title": "Verification and recovery",
@@ -195,7 +197,19 @@
       "unknown": "Contact STOA support if anything looks wrong"
     },
     "quotaPeriodDay": "Daily limit for {{date}}",
-    "quotaPeriodUnknown": "Current period"
+    "quotaPeriodUnknown": "Current period",
+    "usageExplanations": {
+      "counter_matches_ledger": "Counter and usage ledger match for this quota period.",
+      "no_usage": "No usage was recorded for this action and quota period.",
+      "ledger_only": "This support-visible action is tracked only in the ledger and has no quota counter.",
+      "counter_over_limit": "Counter value {{counter}} is above the entitlement limit {{limit}}; review quota enforcement and recent retries before changing access.",
+      "counter_stale": "The counter row appears stale for this quota period; verify TTL behavior before using it for support decisions.",
+      "counter_without_ledger": "Counter shows {{counter}} consumed but no matching ledger events were found.",
+      "ledger_without_counter": "Ledger shows {{ledger}} consumed but no matching counter row was found.",
+      "count_mismatch": "Counter value {{counter}} and ledger total {{ledger}} do not match.",
+      "unknown": "No explanation is available for this reconciliation.",
+      "limitUnknown": "unknown"
+    }
   },
   "progress": {
     "eyebrow": "Parent progress",

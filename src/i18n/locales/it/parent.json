@@ -141,7 +141,9 @@
       "contact_support": "Contatta il supporto STOA",
       "wait_for_resend_cooldown": "Attendi prima di inviare di nuovo",
       "review_account_verification": "Controlla la verifica dell’account",
-      "unknown": "Sconosciuto"
+      "unknown": "Sconosciuto",
+      "legacy_or_verified": "Account precedente o già verificato",
+      "cognito_sign_up_confirm_sign_up": "Codice di conferma via e-mail"
     },
     "evidence": {
       "title": "Verifica e recupero",
@@ -196,7 +198,19 @@
       "unknown": "Contatta il supporto STOA se qualcosa non ti sembra giusto"
     },
     "quotaPeriodDay": "Limite giornaliero del {{date}}",
-    "quotaPeriodUnknown": "Periodo attuale"
+    "quotaPeriodUnknown": "Periodo attuale",
+    "usageExplanations": {
+      "counter_matches_ledger": "Contatore e registro d’uso coincidono per questo periodo di quota.",
+      "no_usage": "Nessun utilizzo è stato registrato per questa azione e questo periodo di quota.",
+      "ledger_only": "Questa azione è registrata solo nel registro d’uso e non ha un contatore di quota.",
+      "counter_over_limit": "Il valore del contatore {{counter}} supera il limite del diritto d’accesso {{limit}}; verifica l’applicazione della quota e i tentativi recenti prima di modificare l’accesso.",
+      "counter_stale": "La riga del contatore sembra scaduta per questo periodo di quota; verifica il comportamento del TTL prima di usarla per decisioni di supporto.",
+      "counter_without_ledger": "Il contatore indica {{counter}} consumati, ma non è stato trovato alcun evento corrispondente nel registro.",
+      "ledger_without_counter": "Il registro indica {{ledger}} consumati, ma non è stata trovata alcuna riga del contatore corrispondente.",
+      "count_mismatch": "Il valore del contatore {{counter}} e il totale del registro {{ledger}} non coincidono.",
+      "unknown": "Non è disponibile alcuna spiegazione per questa riconciliazione.",
+      "limitUnknown": "sconosciuto"
+    }
   },
   "progress": {
     "eyebrow": "Progressi genitori",

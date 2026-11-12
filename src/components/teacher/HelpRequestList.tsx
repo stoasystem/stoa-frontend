@@ -2,7 +2,7 @@ import { useTranslation } from 'react-i18next'
 import { formattingLocale } from '@/i18n/languages'
 import { Group, Pill, Row, type PillTone } from '@/components/base'
 import { SafeStatusLabel } from '@/components/common/SafeStatusLabel'
-import { getSubjectLabel } from '@/lib/displayLabels'
+import { getGradeLabelOrNotSet, getSubjectLabel } from '@/lib/displayLabels'
 import { isOpenHelpRequest, type TeacherHelpStatus } from '@/types/teacherHelp'
 import type { TeacherHelpRequestSummary } from '@/types/teacher'
 
@@ -68,7 +68,7 @@ export function HelpRequestList({
     <Group label={t('requests.listLabel')}>
       {requests.map((request) => {
         // The subject arrives as its id; the detail page names it the same way.
-        const where = t('requests.row', { subject: getSubjectLabel(request.subject, t), grade: request.grade })
+        const where = t('requests.row', { subject: getSubjectLabel(request.subject, t), grade: getGradeLabelOrNotSet(request.grade, t) })
         const sla = isOpenHelpRequest(request.status) ? request.sla?.status : undefined
         const priority = request.priority
           ? t('requests.priority', { priority: t(priorityLabelKeys[request.priority]) })

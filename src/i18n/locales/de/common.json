@@ -534,5 +534,18 @@
     "invalid": "Dieser Link ist ungültig. Am besten den Link aus der neusten E-Mail verwenden oder die E-Mail-Einstellungen nach der Anmeldung in der App ändern.",
     "failed": "Das hat nicht geklappt. Bitte die Verbindung prüfen und noch einmal versuchen.",
     "retry": "Noch einmal versuchen"
+  },
+  "grades": {
+    "grade_1_primary": "1. Primarklasse",
+    "grade_2_primary": "2. Primarklasse",
+    "grade_3_primary": "3. Primarklasse",
+    "grade_4_primary": "4. Primarklasse",
+    "grade_5_primary": "5. Primarklasse",
+    "grade_6_primary": "6. Primarklasse",
+    "grade_7_secondary": "7. Klasse (Sekundarstufe I)",
+    "grade_8_secondary": "8. Klasse (Sekundarstufe I)",
+    "grade_9_secondary": "9. Klasse (Sekundarstufe I)",
+    "grade_secondary_i": "Sekundarstufe I (Schuljahr nicht angegeben)",
+    "notSet": "Klasse nicht angegeben"
   }
 }
