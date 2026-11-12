@@ -60,6 +60,7 @@
     "placeholder": "Message…",
     "dockedPlaceholder": "Ask about anything on the planet…",
     "dockedPlaceholderPhone": "Ask anything…",
+    "pausedPlaceholder": "Asking is paused",
     "grabber": "Drag down to close",
     "list": {
       "label": "Conversations",

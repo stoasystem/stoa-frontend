@@ -60,6 +60,7 @@
     "placeholder": "Nachricht…",
     "dockedPlaceholder": "Frag nach allem auf dem Planeten…",
     "dockedPlaceholderPhone": "Frag, was du willst…",
+    "pausedPlaceholder": "Fragen ist pausiert",
     "grabber": "Nach unten ziehen zum Schliessen",
     "list": {
       "label": "Unterhaltungen",

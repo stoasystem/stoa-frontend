@@ -55,7 +55,7 @@ export const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(functio
       className={cn(
         // The ring goes on the drawn face, not on a larger hit box around it.
         'group relative inline-flex shrink-0 cursor-pointer items-center justify-center border-0 bg-transparent p-0 focus-visible:outline-none',
-        'disabled:pointer-events-none disabled:opacity-40',
+        'disabled:pointer-events-none disabled:opacity-[var(--disabled-opacity)]',
         className,
       )}
       style={{ width: hit, height: hit, ...style }}
