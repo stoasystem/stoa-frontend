@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto'
 import { expect, test, type PlaywrightWorkerArgs, type TestInfo } from '@playwright/test'
 import {
   ANSWER_WAIT_LIMIT_MS,
@@ -52,13 +53,15 @@ function isCreate(method: string, url: string): boolean {
   return method === 'POST' && isApiUrl(url) && CREATE.test(pathOf(url))
 }
 
-// agent@ is the account the blank-grade path is read on, but a student can set
-// a year group on /me (#154), and agent@'s is set for other work. So item 5
-// blanks it first and puts back what it found, even when a test fails. The
-// value it found is in the run record, in case the run is killed in between.
+// agent@ is the account the blank-grade path is read on, and #27 (item 5) says
+// its year group stays blank. A student can still set one on /me (#154), so
+// item 5 blanks a grade it finds and records what it was -- and does not put
+// it back. Blank is the state the account is meant to be in, and the value it
+// used to hold ("14", free text from before the list) is no longer a choice
+// the backend takes (422 `profile_choice_unknown`, #591): writing it back is
+// what left the account half-restored. Afterwards it only reads that the
+// grade is still blank.
 test.describe('item 5: a student with no year group (#50)', { tag: ['@item5'] }, () => {
-  let found: string | null = null
-
   async function agentApi(playwright: PlaywrightWorkerArgs['playwright'], testInfo: TestInfo) {
     const request = await playwright.request.newContext()
     const api = await SmokeApi.signIn(request, testInfo.project.use.baseURL!, 'agent')
@@ -68,28 +71,24 @@ test.describe('item 5: a student with no year group (#50)', { tag: ['@item5'] },
   test.beforeAll(async ({ playwright }, testInfo) => {
     const { request, api } = await agentApi(playwright, testInfo)
     try {
-      found = (await studentGrade(api)) ?? ''
-      await record(testInfo, 'item5-grade-before', { grade: found })
-      if (found.trim() !== '') {
+      const found = (await studentGrade(api)) ?? ''
+      const blanked = found.trim() !== ''
+      if (blanked) {
         await api.call('PATCH', '/students/me/profile', { data: { grade: '' }, expect: 200 })
       }
-      expect((await studentGrade(api) ?? '').trim(), 'agent@ grade blanked for item 5').toBe('')
+      await record(testInfo, 'item5-grade-before', { grade: found, blanked })
+      expect((await studentGrade(api) ?? '').trim(), 'agent@ grade blank for item 5').toBe('')
     } finally {
       await request.dispose()
     }
   })
 
   test.afterAll(async ({ playwright }, testInfo) => {
-    if (found === null) return
     const { request, api } = await agentApi(playwright, testInfo)
     try {
-      // A grade that was blank already needs no write, only the reading.
-      if (found.trim() !== '') {
-        await api.call('PATCH', '/students/me/profile', { data: { grade: found }, expect: 200 })
-      }
-      const restored = (await studentGrade(api)) ?? ''
-      await record(testInfo, 'item5-grade-after', { grade: restored })
-      expect(restored, 'agent@ grade put back').toBe(found)
+      const after = (await studentGrade(api)) ?? ''
+      await record(testInfo, 'item5-grade-after', { grade: after, keptBlank: true })
+      expect(after.trim(), 'agent@ grade left blank, as #27 wants it').toBe('')
     } finally {
       await request.dispose()
     }
@@ -149,7 +148,9 @@ test.describe('item 5: a student with no year group (#50)', { tag: ['@item5'] },
     await expect(hint, 'the blank-grade hint').toBeVisible({ timeout: 15_000 })
     await hint.click()
     await expect(page).toHaveURL((url) => url.pathname === '/me' && url.hash === '#me-grade')
-    await expect(page.getByRole('textbox', { name: anyLanguage('common', 'me.grade.label') })).toBeFocused()
+    // The grade is chosen from the backend's list since #591: a native select
+    // (ChoiceSelect, `me-grade-field`), which reads as a combobox.
+    await expect(page.getByRole('combobox', { name: anyLanguage('common', 'me.grade.label') })).toBeFocused()
   })
 })
 
@@ -169,14 +170,31 @@ test('item 4: a PDF with a 4 MiB object header is refused as upload_invalid (E08
   })
   const { uploadId, chunkBytes, maxBytes } = intent.body
   expect(pdf.length, 'the fixture fits the intent').toBeLessThanOrEqual(maxBytes)
+  // The app's own protocol (src/services/files/fileApi.ts, #516): the API signs
+  // one S3 URL per part for its exact length and SHA-256, and the bytes go
+  // straight to S3 with exactly the headers the URL was signed with -- never
+  // through the API, and without the student's token.
   const partCount = Math.max(1, Math.ceil(pdf.length / chunkBytes))
-  for (let part = 1; part <= partCount; part += 1) {
-    await api.call('PUT', `/files/${uploadId}/chunks/${part}`, {
-      data: pdf.subarray((part - 1) * chunkBytes, part * chunkBytes),
-      headers: { 'Content-Type': 'application/octet-stream' },
-      expect: 200,
+  const partStatuses: number[] = []
+  for (let partNumber = 1; partNumber <= partCount; partNumber += 1) {
+    const chunk = pdf.subarray((partNumber - 1) * chunkBytes, partNumber * chunkBytes)
+    const signed = await api.call<{ url: string; method: string; headers: Record<string, string> }>(
+      'POST',
+      `/files/${uploadId}/parts/${partNumber}`,
+      {
+        data: { sizeBytes: chunk.length, checksumSha256: createHash('sha256').update(chunk).digest('hex') },
+        expect: 200,
+      },
+    )
+    const put = await request.fetch(signed.body.url, {
+      method: 'PUT',
+      headers: signed.body.headers,
+      data: chunk,
+      failOnStatusCode: false,
       timeout: 60_000,
     })
+    partStatuses.push(put.status())
+    expect(put.ok(), `S3 took part ${partNumber} (${put.status()})`).toBe(true)
   }
   const completed = await api.call('POST', `/files/${uploadId}/complete`, {
     data: { partCount },
@@ -188,6 +206,7 @@ test('item 4: a PDF with a 4 MiB object header is refused as upload_invalid (E08
     uploadId,
     sizeBytes: pdf.length,
     partCount,
+    partStatuses,
     status: completed.status,
     completeMs: completed.ms,
     codePath: code?.path ?? null,
@@ -231,8 +250,8 @@ async function recordAnswer(
 test.describe('answers', { tag: ['@generation'] }, () => {
   // A create carrying Accept-Language writes the account's preferred locale, so
   // this item leaves student@ answering in English -- and the next item reads
-  // the same account expecting German. It puts back what it found, the way
-  // item 5 does with agent@'s year group, and does so even when the test fails.
+  // the same account expecting German. It puts back what it found, and does so
+  // even when the test fails.
   test.describe('item 2: the header decides the answer language', () => {
     let found: string | null = null
 

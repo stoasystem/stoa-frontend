@@ -122,7 +122,7 @@ test.describe('preflight', { tag: ['@preflight', '@readonly'] }, () => {
     expect(body.primarySubjects, 'student@ subjects').toEqual(expect.arrayContaining(['math', 'physics']))
   })
 
-  test('agent@\'s grade, which item 5 blanks and puts back (#50, #154)', async ({ request, baseURL }, testInfo) => {
+  test('agent@\'s grade, which item 5 keeps blank (#50, #154)', async ({ request, baseURL }, testInfo) => {
     const api = await SmokeApi.signIn(request, baseURL!, 'agent')
     const { body } = await api.call<{ grade: string | null }>('GET', '/students/me/profile', { expect: 200 })
     await record(testInfo, 'preflight-agent-profile', { grade: body.grade })
