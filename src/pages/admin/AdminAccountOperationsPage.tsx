@@ -1083,11 +1083,13 @@ function UsageSummary({ usage }: { usage: AccountOperationsUsage[] }) {
           <Card key={`${item.studentId}-${item.quotaPeriod}-${item.action}`}>
             <CardContent className="p-5">
               <div className="flex items-start justify-between gap-3">
-                <div>
+                <div className="min-w-0">
                   <p className="font-semibold text-foreground">{codeLabel(item.action, t, 'usageAction')}</p>
-                  <p className="mt-1 text-sm text-muted-foreground">{item.studentId} / {item.quotaPeriod}</p>
+                  <p className="mt-1 break-all text-sm text-muted-foreground" data-testid="usage-key">
+                    {item.studentId} / {item.quotaPeriod}
+                  </p>
                 </div>
-                <Badge variant={item.unreconciled ? 'outline' : 'secondary'}>
+                <Badge className="shrink-0" variant={item.unreconciled ? 'outline' : 'secondary'}>
                   {item.unreconciled ? t('accountOperations.usage.reconciling') : t('accountOperations.usage.matched')}
                 </Badge>
               </div>

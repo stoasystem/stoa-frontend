@@ -102,6 +102,12 @@ with the administrator's token from `/admin/moderation/cases/{id}/image`, drawn
 from an object URL and blurred until "Show image"; the case names what it was
 blocked for. A deleted image is said to be deleted, and not asked for.
 
+`adminNarrow.spec.ts`: account support's usage card (in German) and the
+moderation queue and case, at 375 and 1280 (#640). The page is no wider than
+the window, the "Abgeglichen" badge is whole, and the queue's truncated case id
+keeps its full value in a title. `STOA_E2E_SHOTS=<dir>` also saves a full-page
+screenshot of each.
+
 `exerciseFigures.spec.ts`: an exercise with a question's figure and a drawing
 per option, on the practice stage at 1280 and 375 px (#504). The figures are
 drawn (an svg with a size, under the question, named by it), the student

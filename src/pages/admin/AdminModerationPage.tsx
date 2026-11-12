@@ -102,8 +102,10 @@ export function AdminModerationPage() {
             )
           }
         />
+        {/* min-w-0: a grid item is as wide as its longest unbreakable word by
+            default, and a case id is one long word (#640). */}
         <div className="grid gap-4 lg:grid-cols-[22rem_1fr]">
-          <section className="space-y-4">
+          <section className="min-w-0 space-y-4">
             <ModerationFilters
               status={status}
               severity={severity}
@@ -142,7 +144,7 @@ export function AdminModerationPage() {
               </CardContent>
             </Card>
           </section>
-          <section>
+          <section className="min-w-0">
             {selectedCase ? (
               // Keyed by case: the note, the assignee and the outcome of the
               // last action belong to one case and must not follow the admin
@@ -253,8 +255,10 @@ function ModerationCaseDetail({
     <Card>
       <CardHeader>
         <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
-          <div>
-            <CardTitle className="text-lg">{t('moderation.caseTitle', { id: item.case_id })}</CardTitle>
+          <div className="min-w-0">
+            <CardTitle className="break-all text-lg" data-testid="moderation-case-title">
+              {t('moderation.caseTitle', { id: item.case_id })}
+            </CardTitle>
             <p className="mt-1 text-sm text-muted-foreground">
               {surfaceLabel(item.surface, t)} - {reasonLabel(item.reason, t)}
             </p>
@@ -429,7 +433,7 @@ function FilterSelect<T extends string>({
       <select
         value={value}
         onChange={(event) => onChange(event.target.value as T)}
-        className="h-10 rounded-md border bg-background px-3 text-sm"
+        className="h-10 w-full min-w-0 rounded-md border bg-background px-3 text-sm"
       >
         {values.map((option) => (
           <option key={option || 'all'} value={option}>
@@ -465,7 +469,7 @@ function ModerationQueueItem({
       <div className="flex items-center justify-between gap-2">
         <span className="flex min-w-0 items-center gap-1.5 text-sm font-medium">
           {selected && <Check data-selected-mark className="h-4 w-4 shrink-0 text-primary" aria-hidden="true" />}
-          <span className="truncate">{item.case_id}</span>
+          <span className="truncate" title={item.case_id}>{item.case_id}</span>
         </span>
         <SeverityBadge severity={item.severity} />
       </div>
