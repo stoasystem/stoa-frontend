@@ -254,7 +254,9 @@
       "retryNamed": "Ricarica: {{name}}"
     },
     "examples": {
-      "label": "Per esempio:"
+      "title": "Dimmi qui su cosa vuoi esercitarti",
+      "body": "Oppure chiedimi qualsiasi altra cosa su quello che stai imparando. Per esempio:",
+      "placeholder": "Su cosa vuoi esercitarti?"
     },
     "stageTip": {
       "title": "Non sai come andare avanti? Chiedimi qui.",

@@ -24,6 +24,7 @@ const NOTES: Record<MurmiMood, string> = {
   thinking: 'A wrong answer: looking again, paw at the chin.',
   waving: 'Greeting: one paw raised.',
   pointing: 'Toward the star it suggests.',
+  guiding: '“Tell me here” (#586): a paw pointing down at the composer, the other at the chin.',
   cheering: 'A whole set finished.',
   clapping: 'A star quiz passed with a slip: well done, not the big one.',
   reading: 'Loading, a lesson in progress.',

@@ -254,7 +254,9 @@
       "retryNamed": "Recharger : {{name}}"
     },
     "examples": {
-      "label": "Par exemple :"
+      "title": "Dis-moi ici sur quoi tu veux t’entraîner",
+      "body": "Ou pose-moi n’importe quelle autre question sur ce que tu apprends. Par exemple :",
+      "placeholder": "Sur quoi veux-tu t’entraîner ?"
     },
     "stageTip": {
       "title": "Tu bloques ? Demande-moi ici.",

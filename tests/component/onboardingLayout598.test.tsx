@@ -135,6 +135,11 @@ describe('1. the examples keep clear of the map controls on a phone', () => {
     expect(examples.className).toContain('pointer-events-none')
     expect(examples.className).toContain('absolute')
     for (const item of examples.querySelectorAll('li')) expect(item.className).toContain('pointer-events-auto')
+    // Murmi and the guide beside it take no tap, and the guide wraps beside Murmi rather than overflow.
+    const murmi = examples.querySelector('[data-murmi="guiding"]')!
+    expect(murmi.closest('.pointer-events-auto')).toBeNull()
+    expect(murmi.getAttribute('width')).toBe('36')
+    expect(examples.querySelector('[role="status"]')!.className).toContain('min-w-0')
     // An example narrowed this far wraps rather than lose its end.
     const example = screen.getByRole('button', { name: 'I want to practise quadratic equations' })
     expect(example.className).toContain('whitespace-normal')

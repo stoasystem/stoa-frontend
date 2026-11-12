@@ -49,6 +49,12 @@ export type MurmiMood =
   | 'waving'
   /** A paw pointing to the side, toward the star it suggests next. */
   | 'pointing'
+  /**
+   * One paw pointing down at what is under it, the other at the chin, eyes
+   * on the place it points to: "tell me here" over Ask's composer (#586).
+   * `thinking`'s face, `pointing`'s paw turned down.
+   */
+  | 'guiding'
   /** Both paws up: a whole set finished. Bigger than `delighted`; rarer still. */
   | 'cheering'
   /** A star quiz passed with a slip: well done, not the big one. Paws clapping at the chest. */
@@ -87,6 +93,7 @@ export const MURMI_MOODS = [
   'thinking',
   'waving',
   'pointing',
+  'guiding',
   'cheering',
   'clapping',
   'reading',
@@ -158,6 +165,7 @@ const HEAD_POSE: Partial<Record<MurmiMood, string>> = {
   curious: 'rotate(-10 36 46)',
   sleeping: 'rotate(9 36 46)',
   pointing: 'rotate(4 36 46)',
+  guiding: 'rotate(5 36 46)',
   calling: 'translate(0 -2.5)',
   hourglass: 'rotate(4 36 46)',
   letter: 'rotate(-4 36 46)',
@@ -168,6 +176,7 @@ const GAZE: Partial<Record<MurmiMood, [number, number]>> = {
   watching: [0.6, -0.6],
   thinking: [-0.6, -0.7],
   pointing: [0.9, 0],
+  guiding: [0.7, 0.9],
   reading: [0, 0.9],
   curious: [0, -0.3],
   clapping: [0, -0.4],
@@ -247,7 +256,7 @@ function Brows({ mood, full }: Part) {
   const brow = (d: string) => (
     <path d={d} stroke={CROWN} strokeWidth={full ? 1.2 : 1.6} fill="none" strokeLinecap="round" />
   )
-  if (mood === 'thinking') return <>{brow('M26.6 24.4 q3.2 -2 6.6 -0.6')}{brow('M38.8 24.6 q3.2 -0.6 6.6 0.2')}</>
+  if (mood === 'thinking' || mood === 'guiding') return <>{brow('M26.6 24.4 q3.2 -2 6.6 -0.6')}{brow('M38.8 24.6 q3.2 -0.6 6.6 0.2')}</>
   if (mood === 'curious') return brow('M38.8 23.6 q3.4 -2.2 6.8 -0.4')
   if (mood === 'calling') return <>{brow('M26.4 23.8 q3.4 -2 6.8 -0.6')}{brow('M45.6 23.8 q-3.4 -2 -6.8 -0.6')}</>
   return null
@@ -297,7 +306,7 @@ function Mouth({ mood, full }: Part) {
     )
   }
   if (mood === 'sleeping') return line('M34.2 38.6 q1.8 1.2 3.6 0')
-  if (mood === 'thinking') {
+  if (mood === 'thinking' || mood === 'guiding') {
     // A small sideways mouth: considering it, not sad. Nothing here frowns.
     return (
       <>
@@ -436,6 +445,17 @@ function Arms({ mood, full }: Part) {
           <Limb {...REST_LEFT} full={full} />
           {/* Paw at the chin. */}
           <Limb d="M48.6 46.6 Q48.5 44.5 43.2 43.6" at={[42.2, 43.4]} full={full} />
+        </>
+      )
+    case 'guiding':
+      // The thinking paw at the chin on the tail's side; the other points down, at the side away from the tail.
+      return (
+        <>
+          <Limb d="M23.4 46.6 Q23.5 44.5 28.8 43.6" at={[29.8, 43.4]} full={full} />
+          <g className="murmi-part murmi-point-down">
+            <Limb d="M48.5 46.5 Q57 49 58.4 56" at={[58.6, 57.8]} r={[2.4, 3]} angle={-8} full={full} />
+            <path d="M58.9 60.8 l0.3 4.2" stroke={PAW} strokeWidth="1.9" strokeLinecap="round" fill="none" />
+          </g>
         </>
       )
     case 'watching':

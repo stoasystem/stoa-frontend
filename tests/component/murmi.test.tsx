@@ -19,6 +19,7 @@ const EVERY_MOOD: Record<MurmiMood, true> = {
   thinking: true,
   waving: true,
   pointing: true,
+  guiding: true,
   cheering: true,
   clapping: true,
   reading: true,
@@ -110,6 +111,8 @@ describe('Murmi', () => {
     // The usage period (#616): attentive and friendly, eyes open.
     expect(eyes('hourglass')).toBe(2)
     expect(eyes('letter')).toBe(2)
+    // Pointing at the composer after "Find my own star" (#586): eyes open, on it.
+    expect(eyes('guiding')).toBe(2)
   })
 
   it('never frowns: a wrong answer is looking again, not disappointment', () => {

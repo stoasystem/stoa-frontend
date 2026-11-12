@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useId, useRef, useState, type CSSProperties, type KeyboardEvent, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Button, Composer } from '@/components/base'
+import { Murmi } from '@/components/brand/Murmi'
 import { COMPOSER } from '@/components/base/sizes'
 import { UsagePeriodPausedNotice } from '@/components/usagePeriod/UsagePeriodRenewal'
 import { AskPanel } from '@/features/ask/AskPanel'
@@ -70,7 +71,11 @@ import '@/features/ask/askGuide.css'
  * and the button is the one way to read the old conversations.
  *
  * After "Find my own star" on the first landing (#586) the docked composer
- * takes the focus, is highlighted once, and offers two or three things the
+ * takes the focus, is highlighted once, and says what it is for: Murmi
+ * (`guiding`, a paw pointing down at it, the other at the chin) beside a line
+ * over it ("Tell me here what you want to practise"), a sentence that it takes any
+ * other question about their learning too, and its placeholder asks what they
+ * want to practise. Under that sentence come two or three things the
  * student could say: one tap sends it, in a conversation of its own, and the
  * answer finds the star as any other does (#489). They are offered for that
  * moment only: opening Ask, Escape, or leaving the map ends it. They stand
@@ -290,9 +295,19 @@ export function AskHost({
                     data-ask-guide-in
                     className="pointer-events-none absolute inset-x-0 bottom-full mb-2 flex flex-col items-center gap-1.5"
                   >
-                    <p id={examplesLabel} role="status" className="m-0 text-[13px] text-[color:var(--on-sky-text-body)]">
-                      {t('ask.examples.label')}
-                    </p>
+                    {/* Murmi beside what the box is for, its paw down at the composer; then the examples. */}
+                    <div className="flex max-w-full items-end gap-2">
+                      <Murmi mood="guiding" size={wide ? 48 : 36} entrance />
+                      {/* Said aloud as it appears. */}
+                      <div role="status" className="flex min-w-0 flex-col gap-0.5 text-left">
+                        <p data-ask-guide-title className="m-0 text-[15px] font-semibold leading-snug text-[color:var(--on-sky-text)]">
+                          {t('ask.examples.title')}
+                        </p>
+                        <p id={examplesLabel} className="m-0 text-[13px] leading-snug text-[color:var(--on-sky-text-body)]">
+                          {t('ask.examples.body')}
+                        </p>
+                      </div>
+                    </div>
                     <ul aria-labelledby={examplesLabel} className="m-0 flex max-w-full list-none flex-wrap justify-center gap-2 p-0">
                       {examples.map((example) => (
                         <li key={example} className="pointer-events-auto max-w-full">
@@ -344,7 +359,13 @@ export function AskHost({
                   onPhone={offered.phone ? () => handOver({ kind: 'phone' }) : undefined}
                   dictation
                   label={t('ask.composerLabel')}
-                  placeholder={wide ? t('ask.dockedPlaceholder') : t('ask.dockedPlaceholderPhone')}
+                  placeholder={
+                    offering
+                      ? t('ask.examples.placeholder')
+                      : wide
+                        ? t('ask.dockedPlaceholder')
+                        : t('ask.dockedPlaceholderPhone')
+                  }
                 />
                 <ChooserInputs
                   picker={dockPicker}
