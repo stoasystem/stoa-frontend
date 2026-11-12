@@ -550,6 +550,7 @@
     "grade_8_secondary": "10e année (secondaire I)",
     "grade_9_secondary": "11e année (secondaire I)",
     "grade_secondary_i": "Secondaire I (année non précisée)",
+    "grade_secondary_ii": "Secondaire II (gymnase, collège, lycée)",
     "notSet": "Année non précisée"
   }
 }

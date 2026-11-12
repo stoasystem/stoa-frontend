@@ -550,6 +550,7 @@
     "grade_8_secondary": "3ª media",
     "grade_9_secondary": "4ª media",
     "grade_secondary_i": "Scuola media (anno non indicato)",
+    "grade_secondary_ii": "Scuola media superiore (liceo)",
     "notSet": "Anno non indicato"
   }
 }
