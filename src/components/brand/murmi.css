@@ -62,6 +62,15 @@
   50% { transform: translate(1.6px, -0.6px); }
 }
 
+/* Guiding: the paw that points down taps toward what is under it. */
+.murmi--animated .murmi-point-down {
+  animation: murmi-point-down 1.8s ease-in-out infinite;
+}
+@keyframes murmi-point-down {
+  0%, 100% { transform: translate(0, 0); }
+  50% { transform: translate(0.3px, 1.6px); }
+}
+
 .murmi--animated .murmi-bounce {
   transform-origin: 50% 100%;
   animation: murmi-bounce 0.9s ease-in-out infinite;
@@ -306,6 +315,14 @@
 }
 .murmi--entrance .murmi-hand {
   animation: murmi-hand 1.4s ease-in-out 0.45s 1 both;
+}
+.murmi--entrance .murmi-point-down {
+  animation: murmi-point-down-twice 1.4s ease-in-out 0.45s 1 both;
+}
+/* Two taps down, then the paw rests where it is drawn. */
+@keyframes murmi-point-down-twice {
+  0%, 50%, 100% { transform: translate(0, 0); }
+  25%, 75% { transform: translate(0.3px, 1.6px); }
 }
 .murmi--entrance .murmi-glint {
   transform-origin: 50% 50%;

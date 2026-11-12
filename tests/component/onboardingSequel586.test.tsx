@@ -172,7 +172,17 @@ describe('2. finding my own star', () => {
     expect(document.activeElement?.hasAttribute('data-composer-field')).toBe(true)
     expect(docked.contains(document.activeElement)).toBe(true)
     expect(docked.querySelector('[data-ask-guide] [data-composer="docked"]')).not.toBeNull()
-    const offered = within(screen.getByRole('list', { name: 'For example:' }))
+    // It says what the box is for, and its placeholder asks what to practise.
+    const guide = docked.querySelector<HTMLElement>('[data-ask-examples] [role="status"]')!
+    expect(within(guide).getByText('Tell me here what you want to practise')).toBeTruthy()
+    expect(within(guide).getByText('Or ask me anything else about your learning. For example:')).toBeTruthy()
+    expect(docked.querySelector('textarea')!.placeholder).toBe('What do you want to practise?')
+    // Murmi points down at the composer beside it, decorative.
+    const murmi = docked.querySelector('[data-ask-examples] svg[data-murmi]')!
+    expect(murmi).toHaveAttribute('data-murmi', 'guiding')
+    expect(murmi).toHaveAttribute('aria-hidden', 'true')
+    expect(murmi).toHaveAttribute('data-murmi-entrance')
+    const offered = within(screen.getByRole('list', { name: 'Or ask me anything else about your learning. For example:' }))
     expect(offered.getAllByRole('button').map((button) => button.textContent)).toEqual(examples)
 
     await userEvent.click(offered.getByRole('button', { name: examples[2] }))
@@ -188,8 +198,15 @@ describe('2. finding my own star', () => {
     mount(<AskHost subjectId="math"><p>sky</p></AskHost>)
     act(() => useAskStore.getState().offerExamples(OWNER, ['One', 'Two']))
     expect(document.querySelector('[data-ask-examples]')).not.toBeNull()
+    const field = document.querySelector<HTMLTextAreaElement>('[data-ask-docked] textarea')!
+    expect(field.placeholder).toBe('What do you want to practise?')
     fireEvent.keyDown(document.activeElement!, { key: 'Escape' })
     expect(document.querySelector('[data-ask-examples]')).toBeNull()
+    expect(screen.queryByText('Tell me here what you want to practise')).toBeNull()
+    expect(document.querySelector('[data-murmi="guiding"]')).toBeNull()
+    // Back to the docked composer's own placeholder.
+    expect(field.placeholder).not.toBe('What do you want to practise?')
+    expect([i18n.t('chat:ask.dockedPlaceholder'), i18n.t('chat:ask.dockedPlaceholderPhone')]).toContain(field.placeholder)
     expect(document.querySelector('[data-ask-guide]')).toBeNull()
     expect(useAskStore.getState().open).toBe(false)
   })

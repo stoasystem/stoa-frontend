@@ -252,7 +252,10 @@
       "retryNamed": "Load again: {{name}}"
     },
     "examples": {
-      "label": "For example:"
+      "title": "Tell me here what you want to practise",
+      "body": "Or ask me anything else about your learning. For example:",
+      "placeholder": "What do you want to practise?",
+      "placeholderPhone": "What to practise?"
     },
     "stageTip": {
       "title": "Stuck? Ask me here.",
