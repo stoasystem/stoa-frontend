@@ -391,6 +391,12 @@ describe("the design preview's newcomer sky, by year group", () => {
     expect(map.stars.find((star) => star.unitId === START)?.recommendation).toBeNull()
   })
 
+  it('starts an upper-secondary year there too: it is older than lower secondary (stoa-backend#419)', () => {
+    const map = newcomerMap('grade_secondary_ii')
+    expect(map.stars.find((star) => star.unitId === KP)?.recommendation).toEqual({ source: 'system', reason: 'grade', relatedUnitId: null })
+    expect(map.stars.find((star) => star.unitId === START)?.recommendation).toBeNull()
+  })
+
   it('keeps "Integers" for a primary year, said to be for that year, and "start" with no year group', () => {
     expect(newcomerMap('grade_4_primary').stars.find((star) => star.unitId === START)?.recommendation?.reason).toBe('grade')
     expect(newcomerMap('').stars.find((star) => star.unitId === START)?.recommendation?.reason).toBe('start')

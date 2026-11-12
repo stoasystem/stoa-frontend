@@ -22,9 +22,10 @@
  *
  * A year group on the profile (`grade`, saved by "About you", #591) moves
  * mathematics' recommendation as the backend does (stoa-backend#310, reason
- * `grade`): a lower-secondary year starts on the demo knowledge point, the
- * one star of the demo with a chapter, so the walk-through goes on from
- * there; a primary year keeps "Integers", now said to be for that year.
+ * `grade`): a secondary year, lower or upper (`grade_secondary_ii`,
+ * stoa-backend#419), starts on the demo knowledge point, the one star of the
+ * demo with a chapter, so the walk-through goes on from there; a primary year
+ * keeps "Integers", now said to be for that year.
  *
  * Arrays are kept per input, so the same map gives the same sky (the engine
  * compares by identity).
@@ -75,7 +76,7 @@ function newcomerParts(map: StarMap): Made {
   return parts
 }
 
-/** Where the demo's mathematics starts for a year group: secondary on the demo knowledge point. */
+/** Where the demo's mathematics starts for a year group: secondary (lower or upper) on the demo knowledge point. */
 function gradeStart(grade: string): 'knowledge-point' | 'first' | null {
   if (!grade.startsWith('grade_')) return null
   return grade.includes('secondary') ? 'knowledge-point' : 'first'
