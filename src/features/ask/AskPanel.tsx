@@ -1,4 +1,4 @@
-import { ChevronLeft, Maximize2, X } from 'lucide-react'
+import { ChevronLeft, Maximize2, Minimize2, X } from 'lucide-react'
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type HTMLAttributes } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
@@ -63,6 +63,7 @@ export function AskPanel({
   headerHandle,
   practice,
   onExpand,
+  fullScreen,
 }: {
   controller: AskController
   layout: AskLayout
@@ -79,6 +80,11 @@ export function AskPanel({
    * from the docked composer. A button in the header, beside the close.
    */
   onExpand?: () => void
+  /**
+   * Ask given the whole screen, and back (#676): risen over the map, or the
+   * phone sheet from the planet. A button in the header, beside the close.
+   */
+  fullScreen?: { on: boolean; onToggle: () => void }
 }) {
   const { t } = useTranslation('chat')
   const { conversationId, draft, setDraft, select, close } = controller
@@ -292,6 +298,18 @@ export function AskPanel({
           </span>
         )}
         {onExpand && <IconButton label={t('ask.expand')} icon={Maximize2} size={30} variant="gray" onClick={onExpand} />}
+        {fullScreen && (
+          // One button whose name says what a press does, so the focus stays on it either way.
+          <IconButton
+            label={fullScreen.on ? t('ask.fullScreen.leave') : t('ask.fullScreen.enter')}
+            icon={fullScreen.on ? Minimize2 : Maximize2}
+            size={30}
+            hitSize={phone ? 44 : undefined}
+            variant="gray"
+            onClick={fullScreen.onToggle}
+            data-ask-full-screen-toggle
+          />
+        )}
         <IconButton label={t('ask.close')} icon={X} size={30} hitSize={phone ? 44 : undefined} variant="gray" onClick={close} />
       </header>
 

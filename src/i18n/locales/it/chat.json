@@ -54,6 +54,10 @@
     "title": "Domanda",
     "close": "Chiudi",
     "expand": "Mostra in grande",
+    "fullScreen": {
+      "enter": "Schermo intero",
+      "leave": "Esci dallo schermo intero"
+    },
     "back": "Tutte le conversazioni",
     "listSubtitle": "Le tue conversazioni",
     "composerLabel": "La tua domanda",

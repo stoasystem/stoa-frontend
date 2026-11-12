@@ -54,6 +54,10 @@
     "title": "Question",
     "close": "Fermer",
     "expand": "Afficher en grand",
+    "fullScreen": {
+      "enter": "Plein écran",
+      "leave": "Quitter le plein écran"
+    },
     "back": "Toutes les conversations",
     "listSubtitle": "Tes conversations",
     "composerLabel": "Ta question",

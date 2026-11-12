@@ -73,6 +73,20 @@ export const ASK_RISE = {
 } as const
 
 /**
+ * Ask given the whole screen from the button in its header (#676).
+ *
+ * Wide, risen Ask fills the whole window, the top bar too (it sits at z-30),
+ * so the map is fully covered; the panel keeps its own sky. On a phone the
+ * sheet from the planet goes to `ASK_SHEET.directHeight`, the height the `/ask`
+ * route's sheet has; dragged down from there it goes back to 72% first.
+ * Beside the map (#660) there is no full screen: its expand button raises Ask.
+ */
+export const ASK_FULL_SCREEN = {
+  /** Over the top bar (z-30) and its dim. */
+  zIndex: 40,
+} as const
+
+/**
  * The button that calls Ask back after it was closed (#125), at the end of the
  * docked composer's row: on the practice stage (#180), and on the star map only
  * while the usage period is paused (#615), when the composer is shut.
@@ -86,8 +100,8 @@ export const ASK_RISE = {
  */
 export const ASK_REOPEN = { size: 44, gap: 8 } as const
 
-export function sheetHeightFor(entry: AskEntry): string {
-  return entry === 'direct' ? ASK_SHEET.directHeight : ASK_SHEET.planetHeight
+export function sheetHeightFor(entry: AskEntry, fullScreen = false): string {
+  return entry === 'direct' || fullScreen ? ASK_SHEET.directHeight : ASK_SHEET.planetHeight
 }
 
 /**
