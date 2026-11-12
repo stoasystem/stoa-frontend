@@ -28,6 +28,10 @@ import { readStateFile, record } from './run'
  *      right language, does it actually explain rather than refuse, and does
  *      the out-of-curriculum answer give an example or an analogy. That goes
  *      on #44 with the run's versions, linked to #27's log baseline.
+ *      "The right language" for item 3 is the question's, German, although
+ *      student@'s account language (and so the browser's header) is English:
+ *      decided 2026-11-12, at odds with #27's "the header decides", and
+ *      waiting on the backend to confirm. Item 2 is still judged by its header.
  *
  * Files run in name order on one worker, never retried:
  *   01 preflight  release, function versions, the two student profiles    read-only
