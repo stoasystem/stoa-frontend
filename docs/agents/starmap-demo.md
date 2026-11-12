@@ -41,7 +41,7 @@ npm run dev -- --host 127.0.0.1 --port 5173
 | 内容 | 阈值（`REVEAL`） |
 | --- | --- |
 | 星名淡入（关键星） | `starNameIn` 14 → 18 px，只给关键星（#138 B2：推荐星、进行中的星、金色路径 ① 档经过的星，即推荐星的前置）、键盘聚焦的星、悬停的星、正被拖的星与它的相连星；先给离视野焦点近的：可得名的半径 = 视口短边 × 0.18 → 1.2（随星形 14 → 32 px 增大），最外 0.12 渐隐；同屏最多 80 个 |
-| 关键星名必有位置（#144 B5） | `keyName`：关键星（及键盘聚焦 / 选中的星、拖动时的相连星）的名字先找身边 8 个空位（同 #138 B2）；都被占时可压在非关键星上（每颗记 3）或跨线（每条记 8），带一层天空色 0.78 的细暗底（有暗底时不再描边），再找不到就往外 14 px 的同样 8 个位置；中点离别的星比离自己还近的位置每颗另记 4，不被读成别人的名字；不压已放的名字，不压别的关键星（除非别无他处）。星名超过 `maxWidthPx` 240 px（或屏宽 − 48）用省略号截断（#76） |
+| 关键星名必有位置（#144 B5） | `keyName`：关键星（及键盘聚焦 / 选中的星、拖动时的相连星）的名字先找身边 8 个空位（同 #138 B2）；都被占时可压在非关键星上（每颗记 3）或跨线（每条记 8），带一层天空色 0.78 的细暗底（有暗底时不再描边），再找不到就往外 14 px 的同样 8 个位置；中点离别的星比离自己还近的位置每颗另记 4，不被读成别人的名字；不压已放的名字，不压别的关键星（除非别无他处）。也不压星系名的字（见 A3「星名避开星系名」）：有别的空位就换位，只剩压字的位置时（每个星系名记 12，比跨线重，所以往外 14 px 的空位先胜出）同样带那层暗底。星名超过 `maxWidthPx` 240 px（或屏宽 − 48）用省略号截断（#76） |
 | 其余星名淡入 | `starNamesRest` 31 → 37 px（#138 B2）：点星云飞到的 28 px 时为 0，点星飞到的 34 px 时约一半，最近 40 px 时全有。悬停一颗星（鼠标，能点到单颗星时）随时给它名字，按 `labelFadeMs` 淡入淡出 |
 | 星云名淡入 | 星云屏上半径 `nebulaNameIn` 150 → 230 px，且缩放已离开全景 `nebulaNamePastPanorama` ×1.15 → ×1.45（全景仍只给悬停 / 聚焦的那团，#123） |
 | 星云名让位 | `nebulaNameOut` 星形 18 → 24 px 淡出 |
@@ -118,6 +118,7 @@ npm run dev -- --host 127.0.0.1 --port 5173
 
   三者饱和度 ≤ 0.75、亮度 0.5–0.75（不做霓虹），彼此色相差 ≥ 40°。每团星云在所属基色上按 topicId 散列微调色相 ±9°、亮度 ±0.06（`nebulaShade`），离自己星系的色相总比离别的星系近 25° 以上。没修的学科仍整片 ×0.4（雾、云、星点、名字）。点亮星的暖金（`--lit`）不变，所以化学的琥珀与「点亮」靠深浅和饱和度区分；化学在演示里没修，整片暗。
 - **token 与门禁**：基色与名字墨色是天空 token `--starmap-galaxy-math|physics|chemistry` 与 `--starmap-galaxy-name-math|physics|chemistry`（`brand-tokens.css`），`GALAXY_COLOURS` 是它们的镜像（测试保证一致，名字墨色的透明度 = `--starmap-galaxy-name` 的）。三条名字的配对在 `scripts/contrast-pairs.json` 以 `gate: false` 记为装饰（1.28 / 1.32 / 1.33:1），理由同 #137。星名、连线、锁定星的对比度上界按白色光算（`KNOWLEDGE_GLOW_ALPHA`），换色不影响。
+- **A3 星系名的字不被星名压住**（用户报告：全景里「Volume and surface area」正好写在「MATHEMATICS」的字上，读不出）：星系名画到它满墨的 `PANORAMA.galaxyName.keepClear`（0.35）以上时（按可见度、偏离中心的淡出与没修学科的变暗算，不算为悬停星云的退让，所以悬停不会让别的名字挪位），它的字所在的框（缓存图里量好的字宽 × 字号的 `inkHeight` 0.8 em，四边各加 `pad` 4 px；`galaxyNameBoxes`，每帧在 `stats.galaxyNameBoxes`）就是星名与星云名放置时的障碍（`Obstacles.covers`）：有别的空位就换位；关键星的名字只剩压字的位置时（`REVEAL.keyName.galaxyNameCost` 12）、悬停或拖动的星的名字压上去时，带天空色 0.78 的暗底；星云名同样先找不压字的位置，找不到才压上去并带同样的暗底。字更淡时不算障碍，名字压上去也读得出。不另量字：字宽来自每个字号档只量一次的缓存图。测试：`tests/component/starmapGalaxyNameClear.test.ts`。
 - **A3 星系名退让**：悬停、键盘聚焦或选中一团星云时（`hoveredNebula` / `highlightNebula` / `chosenNebula`），它所在星系的名字透明度降到 0.3 倍（`galaxyNameYield.to`），位置不变；按帧时钟在 260 ms 内 smoothstep 过去、离开时同样回来（`render/galaxyNames.ts` 自己记每个星系的进度，进行中让 `stats.settling` 为真，引擎继续出帧）；减少动态时（`labelFadeMs` 为 0）立即到位。
 - **测试**：`tests/component/starmapGalaxyColours.test.ts`（三色色相区间与间距、饱和度与亮度上限、按 id / 四语名字 / 位置取色、每团星云不出所属色相、微调有界且连续、引擎场景里的基色与没修 ×0.4、雾按基色画且不混入别的星系色、token 与常量一致、三条名字配对为装饰、名字墨色、退让目标只落在该星系、退让是缓动量的连续单调函数、逐帧缓下去再缓回来、引擎在缓动期间持续出帧、减少动态时立即）。
 - **截图**：`npm run design-preview:capture -- --base http://127.0.0.1:5211 --label after-143 --surfaces map,map-focus-optics --points 1000,2000`，对照 `before-143`（`2f834fb`）：`/src/dev/preview-compare.html?mode=shots&surface=map-focus-optics&before=before-143&after=after-143`。

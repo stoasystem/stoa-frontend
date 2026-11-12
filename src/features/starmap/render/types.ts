@@ -280,6 +280,8 @@ export type RenderStats = {
   path?: { lines: number; glows: number }
   /** Galaxy names drawn in the last frame (#137; one sky, far out). */
   galaxyNames?: number
+  /** Where star and nebula names kept off the galaxy names' letters in the last frame (CSS px; `galaxyNameBoxes`). */
+  galaxyNameBoxes?: readonly { x0: number; y0: number; x1: number; y1: number }[]
   /** Names drawn in the last frame, star and nebula (#134). */
   names?: { stars: number; nebulae: number }
   /** A name is still fading in or out: the renderer wants another frame. */

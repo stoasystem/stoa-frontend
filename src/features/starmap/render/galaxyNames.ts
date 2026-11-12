@@ -10,6 +10,9 @@
  * name is in its galaxy's own colour, lifted towards white (#143,
  * `GALAXY_COLOURS`), and steps back while one of its nebulae is hovered,
  * keyboard-focused or chosen (`galaxyNameYields`), easing there and back.
+ * While a name is clearly drawn, the star and nebula names keep off its
+ * letters (`galaxyNameBoxes`; canvas2d.ts places them), so no name is
+ * written across it.
  *
  * Decorative text (WCAG 1.4.3 "incidental"): the same name is the page's
  * heading and the switcher's segment, both readable; the canvas name is
@@ -18,6 +21,7 @@
  * galaxy's `--starmap-galaxy-name-*` token's; all recorded with
  * `gate: false` in scripts/contrast-pairs.json.
  */
+import type { Box } from '@/features/starmap/render/labels'
 import type { SceneData, SceneFrame, StarMapTheme } from '@/features/starmap/render/types'
 import { galaxyNameAlpha, PANORAMA, ramp, type Rgb } from '@/features/starmap/view/semanticZoom'
 
@@ -35,8 +39,13 @@ export function galaxyNameAside(offsetPx: number, width: number): number {
   return width > 0 ? 1 - ramp(Math.abs(offsetPx) / width, PANORAMA.galaxyName.aside) : 1
 }
 
-/** Where, in what colour and how strongly one galaxy's name is drawn this frame. */
-export type GalaxyNamePlacement = { galaxy: number; text: string; x: number; y: number; px: number; alpha: number; colour: Rgb }
+/**
+ * Where, in what colour and how strongly one galaxy's name is drawn this
+ * frame; `clear` is its share of its full ink before it steps back for a
+ * nebula of its own (visibility, aside share, dimming), which decides whether
+ * other names keep off it (`PANORAMA.galaxyName.keepClear`).
+ */
+export type GalaxyNamePlacement = { galaxy: number; text: string; x: number; y: number; px: number; alpha: number; clear: number; colour: Rgb }
 
 /**
  * Which galaxy names step back this frame (#143, round three A3 of #142): 1
@@ -81,10 +90,29 @@ export function galaxyNamePlacements(scene: SceneData, frame: SceneFrame, theme:
     // A rough reach (the measured width is not needed to skip a galaxy far off screen).
     const reach = (px * (0.62 + tracking) * text.length) / 2
     const x = (x0 + x1) / 2
-    const alpha = inkAlpha * visibility * galaxy.dim * galaxyNameAside(x - width / 2, width) * galaxyNameYield(yields?.[g] ?? 0)
+    const clear = visibility * galaxy.dim * galaxyNameAside(x - width / 2, width)
+    const alpha = inkAlpha * clear * galaxyNameYield(yields?.[g] ?? 0)
     if (alpha < 0.002 || x + reach < 0 || x - reach > width || y + px < 0 || y - px > height) return
-    out.push({ galaxy: g, text, x, y, px, alpha, colour: galaxy.colour.name })
+    out.push({ galaxy: g, text, x, y, px, alpha, clear, colour: galaxy.colour.name })
   })
+  return out
+}
+
+/**
+ * The boxes star and nebula names keep off (CSS px): each name drawn at
+ * `keepClear` of its full ink or more, around its letters -- `inkWidth(name)`
+ * wide (as set in its sprite), `inkHeight` ems tall about its middle, `pad`
+ * px more each side. A fainter name is no obstacle: a name over it reads.
+ */
+export function galaxyNameBoxes(placements: readonly GalaxyNamePlacement[], inkWidth: (name: GalaxyNamePlacement) => number): Box[] {
+  const { keepClear, inkHeight, pad } = PANORAMA.galaxyName
+  const out: Box[] = []
+  for (const name of placements) {
+    if (name.clear < keepClear) continue
+    const half = inkWidth(name) / 2 + pad
+    const rise = (name.px * inkHeight) / 2 + pad
+    out.push({ x0: name.x - half, y0: name.y - rise, x1: name.x + half, y1: name.y + rise })
+  }
   return out
 }
 
@@ -107,7 +135,9 @@ const SPRITES_KEPT = 24
  * is resampled.
  */
 export function createGalaxyNames(makeCanvas: MakeCanvas) {
-  const sprites = new Map<string, { canvas: HTMLCanvasElement; size: number; width: number; height: number }>()
+  const sprites = new Map<string, { canvas: HTMLCanvasElement; size: number; width: number; height: number; ink: number }>()
+  // The boxes the last frame's names keep other names off (`galaxyNameBoxes`).
+  let boxes: Box[] = []
   // Each galaxy's eased step back (#143), and the time it was last moved.
   let yields: number[] = []
   let lastTime: number | null = null
@@ -143,7 +173,8 @@ export function createGalaxyNames(makeCanvas: MakeCanvas) {
       // Letter spacing adds a trailing space after the last letter: shift by half of it to stay centred.
       c.fillText(text, width / 2 + spacing / 2, height / 2)
     }
-    const sprite = { canvas, size, width: width / scale, height: height / scale }
+    // The letters' own width, CSS px at `size`: the measure less the space after the last letter.
+    const sprite = { canvas, size, width: width / scale, height: height / scale, ink: Math.max(0, measured - spacing) / scale }
     sprites.set(key, sprite)
     return sprite
   }
@@ -151,6 +182,10 @@ export function createGalaxyNames(makeCanvas: MakeCanvas) {
     /** A name is still stepping back or coming forward: the renderer wants another frame. */
     get settling() {
       return settling
+    },
+    /** Where the names drawn last frame keep star and nebula names off their letters. */
+    get boxes(): readonly Box[] {
+      return boxes
     },
     /** Draws every name in view; returns how many. */
     draw(ctx: CanvasRenderingContext2D, scene: SceneData, frame: SceneFrame, theme: StarMapTheme, dpr: number): number {
@@ -168,6 +203,10 @@ export function createGalaxyNames(makeCanvas: MakeCanvas) {
         return next
       })
       const placements = galaxyNamePlacements(scene, frame, theme, yields)
+      boxes = galaxyNameBoxes(placements, (name) => {
+        const sprite = spriteFor(name.text, name.px, name.colour, dpr, theme.fontFamily)
+        return sprite.ink * (name.px / sprite.size)
+      })
       for (const name of placements) {
         const sprite = spriteFor(name.text, name.px, name.colour, dpr, theme.fontFamily)
         const k = name.px / sprite.size
@@ -179,6 +218,7 @@ export function createGalaxyNames(makeCanvas: MakeCanvas) {
     },
     clear() {
       sprites.clear()
+      boxes = []
       yields = []
       lastTime = null
       settling = false

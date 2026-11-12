@@ -9,7 +9,7 @@
  * the focus are never drawn one by one, and nothing is blurred per frame.
  */
 import { CHOSEN, DOT_CUT, dotBoxFor, GLOW_STOPS, GLYPH_LARGE, GLYPH_SMALL, HOVER, LINE_GLOW, ORB_TURN, RAY_STOPS, rayPath, STAR_INK, WAITING_RING_ALPHA, PRESS, SMALL_CUT_BELOW, type DotCut, type GlyphCut, type StarLight } from '@/features/starmap/render/glyph'
-import { aroundDisc, aroundDiscWide, belongsTo, boxHitsCircle, boxHitsSegment, keyStars, nearerStars, placeInsisting, placeLabel, type Box, type Circle, type Segment } from '@/features/starmap/render/labels'
+import { aroundDisc, aroundDiscWide, belongsTo, boxHitsCircle, boxHitsSegment, coversAny, keyStars, nearerStars, placeInsisting, placeLabel, type Box, type Circle, type Segment } from '@/features/starmap/render/labels'
 import { DRAG, panoramaDot, panoramaLook, ramp, reachFade, REVEAL, type Ramp } from '@/features/starmap/view/semanticZoom'
 import { createTileCache, nebulaStateKeys, tileKey, tileSizeFor, TILE_REACH, type TileCache } from '@/features/starmap/render/nebulaTiles'
 import { CLOUD_REACH, galaxyHazeAlpha, galaxyHazeBox, nebulaGlowAlpha, paintGalaxy, paintGalaxyHaze, paintNebulaCloud } from '@/features/starmap/render/galaxy'
@@ -983,6 +983,11 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
       // that gains or loses its place fades in or out (`labelFadeMs`) instead
       // of blinking, and keeps its place and side while it can.
       const labelArea: Box = { x0: 0, y0: viewport.top ?? 0, x1: width, y1: height - (viewport.bottom ?? 0) }
+      // The galaxy names' letters, while clearly drawn: a name keeps off them if it has
+      // anywhere else to go, and sits on its dark backing if it must sit there.
+      const galaxyCovers: readonly Box[] = scene.galaxy ? galaxyNames.boxes : []
+      stats.galaxyNameBoxes = galaxyCovers
+      const onGalaxyName = (b: Box) => galaxyCovers.length > 0 && coversAny(b, galaxyCovers)
       const names = { stars: 0, nebulae: 0 }
       const fadeOf = (key: string): LabelFade => {
         let entry = labelFades.get(key)
@@ -1099,20 +1104,25 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
             // A name that insists keeps to the side of its own star: nearer it than any other (#144 B5).
             const own = { x: x[i], y: y[i] }
             const theirs = insist ? (b: Box) => nearerStars(b, own, circles) * REVEAL.keyName.nearerStarCost : undefined
-            // First the eight spots beside the star, free of stars and lines...
+            // A held name may sit on a galaxy name too (on its backing), but rather not.
+            const heldCost = (b: Box) => (theirs ? theirs(b) : 0) + (onGalaxyName(b) ? REVEAL.keyName.galaxyNameCost : 0)
+            // First the eight spots beside the star, free of stars, lines and galaxy names...
             const beside = insist ? preferred.filter((b) => boxes.indexOf(b) < 8) : preferred
-            const found = placeLabel(beside, { boxes: placed, circles, segments: held ? [] : lines }, labelArea, theirs)
+            const found = held
+              ? placeLabel(beside, { boxes: placed, circles, segments: [] }, labelArea, heldCost)
+              : placeLabel(beside, { boxes: placed, circles, segments: lines, covers: galaxyCovers }, labelArea, theirs)
             // A star's name may not sit on another star at all...
             box = found && (held || !circles.some((c) => boxHitsCircle(found, c))) ? found : null
             entry.backed = false
             if (box && held) {
               const at = box
-              entry.backed = circles.some((c) => boxHitsCircle(at, c)) || lines.some((s) => boxHitsSegment(at, s))
+              entry.backed = circles.some((c) => boxHitsCircle(at, c)) || lines.some((s) => boxHitsSegment(at, s)) || onGalaxyName(at)
             } else if (!box && insist) {
-              // ...unless it insists (#144 B5, B8): then over other stars or across lines, on a dark backing.
-              box = placeInsisting(preferred, placed, around.others, around.keys, lines, labelArea, theirs)
+              // ...unless it insists (#144 B5, B8): then over other stars, across lines or on a
+              // galaxy name, on a dark backing.
+              box = placeInsisting(preferred, placed, around.others, around.keys, lines, labelArea, theirs, galaxyCovers)
               const at = box
-              if (at) entry.backed = circles.some((c) => boxHitsCircle(at, c)) || lines.some((s) => boxHitsSegment(at, s))
+              if (at) entry.backed = circles.some((c) => boxHitsCircle(at, c)) || lines.some((s) => boxHitsSegment(at, s)) || onGalaxyName(at)
             }
           }
           settle(entry, box !== null)
@@ -1179,16 +1189,26 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
           const others = cores.filter((_, m) => m !== n)
           const candidates = aroundDisc(own.x, own.y, Math.min(own.r * 0.95, NEBULA_NAME_RING), nameWidth, 16, 6)
           let box: Box | null = null
+          entry.backed = false
           if (base >= 0.01 && (labelled < limit || n === priority)) {
-            const obstacles = { boxes: placed, circles: others, segments }
             const preferred = preferring(candidates, entry.slot)
-            box =
-              placeLabel(preferred, obstacles, labelArea,
-                (candidate) => belongsTo(candidate, own, others) && !others.some((c) => boxHitsCircle(candidate, c)) ? 0 : Infinity) ??
-              // The hovered or focused name far out on one sky: a nebula packed
-              // among others has no side nearer itself than its neighbours, so
-              // there being nearer is a preference, not a rule -- the pointer says whose name it is.
-              (scene.galaxy && wholeMap && n === priority ? placeLabel(preferred, obstacles, labelArea, (candidate) => (belongsTo(candidate, own, others) ? 0 : 20)) : null)
+            const find = (covers: readonly Box[]) => {
+              const obstacles = { boxes: placed, circles: others, segments, covers }
+              return (
+                placeLabel(preferred, obstacles, labelArea,
+                  (candidate) => belongsTo(candidate, own, others) && !others.some((c) => boxHitsCircle(candidate, c)) ? 0 : Infinity) ??
+                // The hovered or focused name far out on one sky: a nebula packed
+                // among others has no side nearer itself than its neighbours, so
+                // there being nearer is a preference, not a rule -- the pointer says whose name it is.
+                (scene.galaxy && wholeMap && n === priority ? placeLabel(preferred, obstacles, labelArea, (candidate) => (belongsTo(candidate, own, others) ? 0 : 20)) : null)
+              )
+            }
+            // Off the galaxy names' letters if it can be; else on them, on a dark backing.
+            box = find(galaxyCovers)
+            if (!box && galaxyCovers.length > 0) {
+              box = find([])
+              entry.backed = box !== null
+            }
           }
           settle(entry, box !== null)
           if (box) {
@@ -1199,6 +1219,15 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
           const at = box ?? (entry.slot >= 0 ? candidates[entry.slot] : null)
           if (!at || entry.alpha <= 0.001) continue
           const nameAlpha = Math.min(1, frame.nebulaLabelAlpha * base * entry.alpha * INK.nebulaName.alpha * nebulaDim(n))
+          if (entry.backed) {
+            // On a galaxy name: the star names' thin dark backing, so the letters under it do not show through.
+            ctx.globalAlpha = nameAlpha * REVEAL.keyName.backing
+            ctx.fillStyle = colours.sky
+            ctx.beginPath()
+            if (typeof ctx.roundRect === 'function') ctx.roundRect(at.x0, at.y0, at.x1 - at.x0, at.y1 - at.y0, 4)
+            else ctx.rect(at.x0, at.y0, at.x1 - at.x0, at.y1 - at.y0)
+            ctx.fill()
+          }
           ctx.globalAlpha = nameAlpha
           outlinedText(text, (at.x0 + at.x1) / 2, at.y0 + 2, colours.textBody, colours.sky, INK.nebulaName.outline)
           nebulaNameBoxes.push({ nebula: n, x0: at.x0, y0: at.y0, x1: at.x1, y1: at.y1, alpha: nameAlpha })

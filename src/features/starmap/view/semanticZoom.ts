@@ -172,9 +172,12 @@ export const REVEAL = {
    * for each such star, so it is not read as theirs. A drag's
    * linked stars (B8) insist the same way. Star names longer than
    * `maxWidthPx` (or the screen's width less `sideMarginPx`) are cut with an
-   * ellipsis, so the longest of four languages still fits (#76).
+   * ellipsis, so the longest of four languages still fits (#76). A name is
+   * never put on a galaxy name's letters while a spot off them is free; one
+   * that insists may sit there (`galaxyNameCost` a galaxy name, more than a
+   * line, so a free spot further out wins) on the same backing.
    */
-  keyName: { keyStarCost: 1000, starCost: 3, lineCost: 8, nearerStarCost: 4, backing: 0.78, farGap: 14, maxWidthPx: 240, sideMarginPx: 48 },
+  keyName: { keyStarCost: 1000, starCost: 3, lineCost: 8, galaxyNameCost: 12, nearerStarCost: 4, backing: 0.78, farGap: 14, maxWidthPx: 240, sideMarginPx: 48 },
   /**
    * The phone's zoom buttons, bottom right over the map (StarMapView: 16 px
    * from the right and above the bottom inset, a frame 40 wide and 74 tall
@@ -337,9 +340,25 @@ export const PANORAMA = {
    * under the galaxy's lowest star. A neighbour's name fades out as its
    * middle moves away from the view's (`aside`: its distance from the view's
    * centre as a share of the screen's width), so its cut-off letters never
-   * linger at an edge.
+   * linger at an edge. While a name is drawn at `keepClear` of its full ink
+   * or more (its visibility, aside share and dimming; not its step back for
+   * a hovered nebula, so a hover never moves other names), star and nebula
+   * names keep off its letters: a box `inkHeight` ems tall around its
+   * middle, `pad` px wider each side (`galaxyNameBoxes`).
    */
-  galaxyName: { out: [1.1, 1.8] as Ramp, size: 0.085, minPx: 26, maxPx: 96, tracking: 0.42, weight: 300, below: 0.9, aside: [0.28, 0.5] as Ramp },
+  galaxyName: {
+    out: [1.1, 1.8] as Ramp,
+    size: 0.085,
+    minPx: 26,
+    maxPx: 96,
+    tracking: 0.42,
+    weight: 300,
+    below: 0.9,
+    aside: [0.28, 0.5] as Ramp,
+    keepClear: 0.35,
+    inkHeight: 0.8,
+    pad: 4,
+  },
   /**
    * While a nebula is hovered or keyboard-focused (or chosen), its galaxy's
    * name steps back to `to` of its alpha (#143, round three A3 of #142), so
