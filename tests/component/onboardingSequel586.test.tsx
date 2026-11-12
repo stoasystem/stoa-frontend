@@ -228,16 +228,33 @@ const Stage = ({ off }: { off?: string }) => (
 )
 const TIP = 'Stuck? Ask me here.'
 
+/**
+ * Beside the exercise on a wide screen Ask is open on arrival, and its own
+ * first-time tour (#677) comes first; the tip comes after it, without the
+ * photo point (askTour677.test.tsx). The tests of the tip beside the exercise
+ * start from a tour already over in this tab.
+ */
+const tourOver = () => sessionStorage.setItem(`stoa.ask.tour.${OWNER}`, 'done')
+
 describe('3. the first time on the practice stage', () => {
   it('points at Ask and its way to add a photo for a student with no conversation, and says so once', async () => {
+    emulate({ wide: false })
     mount(<Stage />)
     const tip = await screen.findByRole('complementary', { name: TIP })
-    // Beside the exercise on a wide screen: in Ask's panel, over its composer.
-    expect(screen.getByRole('complementary', { name: 'Ask' }).contains(tip)).toBe(true)
     expect(within(tip).getByText(/take a photo of your working/)).toBeTruthy()
-    expect(document.querySelector('[data-stage-ask-tip-status]')!.textContent).toContain(TIP)
-    expect(document.querySelector('[data-stage-host][data-ask-guide] [data-ask-surface] [data-composer-add]')).not.toBeNull()
+    expect(document.querySelector('[data-stage-ask-tip-status]')!.textContent).toBe(
+      `${TIP} ${i18n.t('chat:ask.stageTip.body')}`,
+    )
+    expect(document.querySelector('[data-stage-host][data-ask-guide] [data-composer="docked"]')).not.toBeNull()
     // Not a modal: it took no focus.
+    expect(tip.contains(document.activeElement)).toBe(false)
+  })
+
+  it('stands in Ask’s panel beside the exercise on a wide screen, over its composer', async () => {
+    tourOver()
+    mount(<Stage />)
+    const tip = await screen.findByRole('complementary', { name: TIP })
+    expect(screen.getByRole('complementary', { name: 'Ask' }).contains(tip)).toBe(true)
     expect(tip.contains(document.activeElement)).toBe(false)
   })
 
@@ -281,6 +298,7 @@ describe('3. the first time on the practice stage', () => {
   })
 
   it('goes on "Got it" or Escape, and stays away in this tab', async () => {
+    tourOver()
     const first = mount(<Stage />)
     await userEvent.click(within(await screen.findByRole('complementary', { name: TIP })).getByRole('button', { name: 'Got it' }))
     expect(screen.queryByRole('complementary', { name: TIP })).toBeNull()
@@ -295,6 +313,7 @@ describe('3. the first time on the practice stage', () => {
   })
 
   it('goes on Escape wherever focus is, leaving Ask open', async () => {
+    tourOver()
     mount(<Stage />)
     await screen.findByRole('complementary', { name: TIP })
     fireEvent.keyDown(document.body, { key: 'Escape' })

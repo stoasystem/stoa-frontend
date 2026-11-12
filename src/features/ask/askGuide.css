@@ -1,7 +1,8 @@
 /*
  * The onboarding's brief highlight on Ask (#586): the docked composer after
  * "Find my own star", and the composer (with its way to add a photo) beside
- * the practice stage the first time. Played once, as the mark appears.
+ * the practice stage the first time; and the control Ask's first-time tour
+ * points at (#677). Played once, as the mark appears.
  *
  * With motion: a ring that swells out once and settles. Reduced motion
  * (`--motion-reduced`): nothing moves or pulses, the ring only fades in and
@@ -63,6 +64,14 @@
   animation: ask-guide-in var(--motion-panel) var(--ease-standard) both;
 }
 
+/* Ask's first-time tour (#677): the control Murmi points at, ringed once as the step comes. */
+[data-ask-tour='mic'] [data-ask-composer-area] [data-composer-mic],
+[data-ask-tour='add'] [data-ask-composer-area] [data-composer-add],
+[data-ask-tour='teacher'] [data-help-action] button {
+  outline: 2px solid transparent;
+  animation: ask-guide-ring 1400ms var(--ease-standard) 1 both;
+}
+
 @media (prefers-reduced-motion: reduce) {
   [data-ask-guide] [data-composer='docked'],
   [data-ask-guide] [data-ask-surface] [data-composer-add] {
@@ -71,5 +80,11 @@
 
   [data-ask-guide-in] {
     animation: ask-guide-fade-in var(--motion-reduced) linear both;
+  }
+
+  [data-ask-tour='mic'] [data-ask-composer-area] [data-composer-mic],
+  [data-ask-tour='add'] [data-ask-composer-area] [data-composer-add],
+  [data-ask-tour='teacher'] [data-help-action] button {
+    animation: ask-guide-ring-fade 1600ms linear 1 both;
   }
 }

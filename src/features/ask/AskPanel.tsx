@@ -11,6 +11,7 @@ import { AskConversationList, AskEmptyState } from '@/features/ask/AskConversati
 import { hasSections, quoteCaption, sectionsSpokenText, type AnswerStep } from '@/features/ask/AskAnswerSections'
 import { AskLitCard } from '@/features/ask/AskLitCard'
 import { AskMessage } from '@/features/ask/AskMessage'
+import { AskTourBubble, AskTourStatus, useAskTour } from '@/features/ask/AskTour'
 import { ASK_PANEL } from '@/features/ask/askLayout'
 import { TeacherHelpAction, TeacherHelpStatusCard } from '@/features/ask/teacherHelp/TeacherHelp'
 import { useTeacherHelp } from '@/features/ask/teacherHelp/useTeacherHelp'
@@ -212,6 +213,8 @@ export function AskPanel({
       }
       // Gone with the question -- unless another was chosen meanwhile.
       if (quote && useAskQuoteStore.getState().quote === quote) clearQuote()
+      // Started here: it does not make the student "not new" to Ask (#677).
+      tour.started(outcome.conversationId)
       // Opened only in the panel that asked, and only if the student is still
       // on the list: a closed Ask stays closed, and a conversation the student
       // opened meanwhile stays open.
@@ -257,6 +260,12 @@ export function AskPanel({
     if (taken) askPending.current(taken)
   }, [pending, takesPending, ownerId])
 
+  // The first time Ask opens for a student new to it (#677): Murmi points at
+  // the microphone, the + and "Ask a teacher", one at a time (`AskTour.tsx`).
+  const root = useRef<HTMLDivElement>(null)
+  const tour = useAskTour({ root, ownerId, conversations: conversationsQuery.data?.items, draft, off: paused })
+  const camera = Boolean(attachments.sources.takePhoto)
+
   // Named as the list names it until it is read itself, so the title the
   // keyboard lands on says which conversation opened, not "Ask" (#452).
   const named = conversation ?? conversationsQuery.data?.items.find((item) => item.id === conversationId)
@@ -271,7 +280,7 @@ export function AskPanel({
       : t('ask.listSubtitle')
 
   return (
-    <div className="flex h-full min-h-0 flex-col">
+    <div ref={root} data-ask-tour={tour.step ?? undefined} className="relative flex h-full min-h-0 flex-col">
       <header
         {...headerHandle}
         className={cn('flex shrink-0 items-center gap-2.5 border-b border-separator', phone && 'touch-none')}
@@ -364,7 +373,10 @@ export function AskPanel({
           ) : (conversationsQuery.data?.items.length ?? 0) === 0 ? (
             <RecommendedEmptyState
               subject={subject}
-              onAsk={askRecommended}
+              onAsk={(recommended) => {
+                tour.composerUsed()
+                askRecommended(recommended)
+              }}
               disabled={question.starting || paused}
             />
           ) : (
@@ -441,6 +453,8 @@ export function AskPanel({
           }
         />
       </div>
+      <AskTourStatus step={tour.step} camera={camera} />
+      {tour.step && <AskTourBubble root={root} step={tour.step} camera={camera} onNext={tour.next} onSkip={tour.skip} />}
     </div>
   )
 }
