@@ -295,9 +295,17 @@ export function AskHost({
                     data-ask-guide-in
                     className="pointer-events-none absolute inset-x-0 bottom-full mb-2 flex flex-col items-center gap-1.5"
                   >
-                    {/* Murmi beside what the box is for, its paw down at the composer; then the examples. */}
-                    <div className="flex max-w-full items-end gap-2">
-                      <Murmi mood="guiding" size={wide ? 48 : 36} entrance />
+                    {/*
+                      Murmi beside what the box is for, its paw down at the composer; then the examples.
+                      On the sky's glass (as Murmi's bubbles are), so the constellation lines do not
+                      run through the words; the pointing paw hangs over the glass's edge.
+                    */}
+                    <div
+                      data-ask-guide-card
+                      className="flex max-w-full items-end gap-2 rounded-[var(--corner-card)] border border-solid border-[color:var(--sky-glass-border)] py-2 pl-1 pr-3"
+                      style={{ background: 'var(--sky-glass)', backdropFilter: 'blur(var(--sky-glass-blur))', WebkitBackdropFilter: 'blur(var(--sky-glass-blur))' }}
+                    >
+                      <Murmi mood="guiding" size={wide ? 64 : 48} entrance className="-mb-3" />
                       {/* Said aloud as it appears. */}
                       <div role="status" className="flex min-w-0 flex-col gap-0.5 text-left">
                         <p data-ask-guide-title className="m-0 text-[15px] font-semibold leading-snug text-[color:var(--on-sky-text)]">
@@ -361,7 +369,9 @@ export function AskHost({
                   label={t('ask.composerLabel')}
                   placeholder={
                     offering
-                      ? t('ask.examples.placeholder')
+                      ? wide
+                        ? t('ask.examples.placeholder')
+                        : t('ask.examples.placeholderPhone')
                       : wide
                         ? t('ask.dockedPlaceholder')
                         : t('ask.dockedPlaceholderPhone')

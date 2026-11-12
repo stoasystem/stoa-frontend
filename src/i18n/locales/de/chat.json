@@ -254,7 +254,8 @@
     "examples": {
       "title": "Sag mir hier, was du üben möchtest",
       "body": "Oder frag mich alles andere rund ums Lernen. Zum Beispiel:",
-      "placeholder": "Was möchtest du üben?"
+      "placeholder": "Was möchtest du üben?",
+      "placeholderPhone": "Was willst du üben?"
     },
     "stageTip": {
       "title": "Kommst du nicht weiter? Frag mich hier.",

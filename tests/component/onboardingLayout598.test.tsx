@@ -138,7 +138,14 @@ describe('1. the examples keep clear of the map controls on a phone', () => {
     // Murmi and the guide beside it take no tap, and the guide wraps beside Murmi rather than overflow.
     const murmi = examples.querySelector('[data-murmi="guiding"]')!
     expect(murmi.closest('.pointer-events-auto')).toBeNull()
-    expect(murmi.getAttribute('width')).toBe('36')
+    expect(murmi.getAttribute('width')).toBe('48')
+    // On the sky's glass, which takes no tap either.
+    const card = examples.querySelector<HTMLElement>('[data-ask-guide-card]')!
+    expect(card.contains(murmi)).toBe(true)
+    expect(card.style.background).toBe('var(--sky-glass)')
+    expect(card.closest('.pointer-events-auto')).toBeNull()
+    // The phone's narrower field gets the shorter question.
+    expect(document.querySelector<HTMLTextAreaElement>('[data-ask-docked] textarea')!.placeholder).toBe('What to practise?')
     expect(examples.querySelector('[role="status"]')!.className).toContain('min-w-0')
     // An example narrowed this far wraps rather than lose its end.
     const example = screen.getByRole('button', { name: 'I want to practise quadratic equations' })
