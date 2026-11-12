@@ -275,6 +275,7 @@
   --sky-mist: rgba(161, 161, 193, 0.04);
   --lit: #F2C572;                          /* stars, rings, rays */
   --lit-core: #FFF8EA;                     /* the white-hot core of a lit point */
+  --lit-soft: color-mix(in oklab, var(--lit) 70%, white); /* a paler lit: the star map's help star, not a knowledge point */
   --lit-deep: rgb(214, 160, 70);           /* glow gradients */
   --node-fill: #141E38;                    /* hollow node interiors */
   --sphere-0: #2A3A64;                     /* sphere highlight */

@@ -1,7 +1,7 @@
 /*
  * The star map on screen (#47, #72): a canvas the engine draws, the parallel
  * DOM a screen reader and a keyboard use instead of it, and the controls
- * around it -- the subject switcher, where you are, zoom, the "?" that
+ * around it -- the subject switcher, where you are, zoom, the help star that
  * explains the glyphs.
  *
  * The canvas is hidden from assistive technology. Every star on screen is an
@@ -23,11 +23,11 @@
  * ring between nebulae, otherwise to the nearest star or nebula in that
  * direction (`view/keyboardOrder.ts`).
  *
- * What the glyphs mean and how to move (#141 B7, E5): a "?" button, bottom
- * left, opens them in a dialog (#146, round three C15 of #142) -- on every
- * screen since #643: the wide screen's always-on legend took a corner the
- * onboarding cards and the subject's title needed, and the first landing's
- * Murmi says once where the "?" is.
+ * What the glyphs mean and how to move (#141 B7, E5): a small pale-gold star
+ * button (it was a "?"), bottom left, opens them in a dialog (#146, round
+ * three C15 of #142) -- on every screen since #643: the wide screen's
+ * always-on legend took a corner the onboarding cards and the subject's
+ * title needed, and the first landing's Murmi says once where it is.
  *
  * The zoom is continuous (#134): the wheel and trackpad scroll by how far
  * they scroll, the buttons and + / - keys by ×1.5, a pinch and a double tap
@@ -138,14 +138,15 @@ export function canvasPixelRatio(): number {
 
 /**
  * The bands the page keeps over the canvas for its own controls, CSS px: the
- * subject switcher and where-you-are line above; the "?" and the zoom buttons
- * below. The whole map fits between them.
+ * subject switcher and where-you-are line above; the help star and the zoom
+ * buttons below. The whole map fits between them.
  *
- * Below, measured (#643): a phone's "?" is 16 px up and 40 tall (a zoom
- * button's size, as on a wide stage), its top at 56, and the band keeps 68,
- * 12 px over it. A wide stage's "?" is 24 px up and 40 tall (top at 64), its
- * zoom pair 24 px up and about 74 tall (top at 98); the band keeps 110, 12 px
- * over the taller of the two. (It kept 164 for the always-on legend, 89 tall
+ * Below, measured (#643): the help star is a 32 px button (a zoom button's
+ * size; the star drawn in it 21 px) set 4 px higher than the zoom pair, so it
+ * stands level with the lower zoom button. On a phone it is 20 px up, its top
+ * at 52, and the band keeps 68, 16 px over it. On a wide stage it is 28 px up
+ * (top at 60), its zoom pair 24 px up and about 74 tall (top at 98); the band
+ * keeps 110, 12 px over the taller of the two. (It kept 164 for the always-on legend, 89 tall
  * with two rows.)
  *
  * Above, on a wide stage: 76, 12 px under the top line where it is one line
@@ -169,10 +170,11 @@ export function controlBands(wide: boolean, bottomInset = 0, demo = false, topLi
 export const TOP_LINE_GAP = 12
 
 /**
- * The phone's touch targets for the "?" and the zoom pair. Each is drawn 32 px
- * square, as on a wide stage, and reaches 44 x 44 for a finger (`TOUCH_TARGET`
- * in components/base/sizes.ts) through an invisible `::before` around it, as
- * the star sheet's name does. The "?" reaches 6 px out on every side. The zoom
+ * The phone's touch targets for the help star and the zoom pair. Each is a
+ * 32 px square button, as on a wide stage (the help star drawn 21 px inside
+ * its own), and reaches 44 x 44 for a finger (`TOUCH_TARGET` in
+ * components/base/sizes.ts) through an invisible `::before` around it, as the
+ * star sheet's name does. The help star's button reaches 6 px out on every side. The zoom
  * buttons stand 2 px apart, so between them each reaches only to the middle of
  * the gap (1 px) and makes up the rest on its outer side (11 px): a tap goes to
  * the button whose drawn part is nearer, never across to the other.
@@ -211,7 +213,7 @@ const GLASS = {
 
 /**
  * What the glyphs mean, how to move, and the keyboard's two orders (#141 B7,
- * E5): the help dialog behind the "?" (#146, #643).
+ * E5): the help dialog behind the help star (#146, #643).
  */
 function LegendBody({ t }: { t: UseTranslationResponse<'starmap', undefined>['t'] }) {
   return (
@@ -290,7 +292,7 @@ export function StarMapView({ map, demo = false, target, path, marked, onNavigat
   const [wide, setWide] = useState(true)
   const [announcement, setAnnouncement] = useState('')
   const [focusPill, setFocusPill] = useState<{ id: string; width: number; height: number } | null>(null)
-  // The phone's help dialog: the legend's words behind a "?" (#146).
+  // The phone's help dialog: the legend's words behind the help star (#146).
   const [helpOpen, setHelpOpen] = useState(false)
   // A wide stage's top line as drawn: its bottom, CSS px from the stage's top
   // (0 on a phone, or before it is measured). See `controlBands`.
@@ -778,7 +780,7 @@ export function StarMapView({ map, demo = false, target, path, marked, onNavigat
   const subjects = map.subjects
   const activeSubject = subjects.findIndex((subject) => subject.subjectId === subjectId)
   const helpShown = target.layer !== 'star' && stars.length > 0
-  // Gone with the "?" (a chosen star): it comes back closed.
+  // Gone with the help star (a chosen star): it comes back closed.
   if (!helpShown && helpOpen) setHelpOpen(false)
 
   const whereYouAre = (
@@ -1047,21 +1049,27 @@ export function StarMapView({ map, demo = false, target, path, marked, onNavigat
         )}
 
         {/*
-          What the glyphs mean and how to move: a "?" (#146; wide screens too
-          since #643, where an always-on legend took the corner), bottom left,
-          on the zoom buttons' line; not with a star chosen, where the star's
-          card or sheet has the stage. A modal dialog: focus stays in it,
-          Escape or the close button or a tap outside closes it, and focus goes
-          back to the "?". On a phone the dialog is a sheet along the bottom;
-          on a wide stage a panel over the "?", never across the whole stage.
+          What the glyphs mean and how to move: a small pale-gold star (a "?"
+          in a glass box until the star; #146, wide screens too since #643,
+          where an always-on legend took the corner), bottom left, on the zoom
+          buttons' line; not with a star chosen, where the star's card or sheet
+          has the stage. A modal dialog: focus stays in it, Escape or the close
+          button or a tap outside closes it, and focus goes back to the star.
+          On a phone the dialog is a sheet along the bottom; on a wide stage a
+          panel over the star, never across the whole stage.
         */}
         {helpShown && (
           <div data-starmap-overlay data-starmap-help>
             <Dialog.Root open={helpOpen} onOpenChange={setHelpOpen}>
+              {/*
+                No glass box: the button is a pale-gold star (--lit-soft) on the
+                sky, 4 px higher than the zoom pair's frame so it stands level
+                with the lower zoom button (whose frame adds 1 + 3 px under it).
+              */}
               <div
                 className={cn(
-                  'absolute rounded-[11px] border border-solid border-white/10 bg-white/10 p-[3px] backdrop-blur-[20px]',
-                  wide ? 'bottom-[calc(1.5rem+var(--page-bottom-inset,0px))] left-6' : 'bottom-[calc(1rem+var(--page-bottom-inset,0px))] left-4',
+                  'absolute',
+                  wide ? 'bottom-[calc(1.5rem+4px+var(--page-bottom-inset,0px))] left-6' : 'bottom-[calc(1rem+4px+var(--page-bottom-inset,0px))] left-4',
                 )}
               >
                 <Dialog.Trigger asChild>
@@ -1071,12 +1079,25 @@ export function StarMapView({ map, demo = false, target, path, marked, onNavigat
                     aria-label={t('help.open')}
                     title={t('help.open')}
                     className={cn(
-                      // As large as one zoom button: 32 px, a phone too; there it reaches 44 px for a finger.
-                      'relative inline-flex size-8 cursor-pointer items-center justify-center rounded-[8px] border-0 bg-transparent p-0 text-[16px] font-bold leading-none text-[color:var(--on-sky-plain)] hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring',
+                      // A 32 px target, as large as one zoom button, the star drawn 21 px in it; on a phone it reaches 44 px for a finger.
+                      'group relative inline-flex size-8 cursor-pointer items-center justify-center rounded-[8px] border-0 bg-transparent p-0 text-[color:var(--lit-soft)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring',
                       !wide && PHONE_HIT.help,
                     )}
                   >
-                    <span aria-hidden="true">?</span>
+                    <svg
+                      data-starmap-help-star
+                      aria-hidden="true"
+                      viewBox="0 0 24 24"
+                      className="size-[21px] opacity-85 transition-[opacity,filter] duration-150 [filter:drop-shadow(0_0_3px_color-mix(in_srgb,var(--lit-soft)_55%,transparent))] group-hover:opacity-100 group-hover:[filter:drop-shadow(0_0_5px_color-mix(in_srgb,var(--lit-soft)_80%,transparent))] group-focus-visible:opacity-100"
+                    >
+                      <path
+                        d="M12 2.6l2.83 5.95 6.54.86-4.79 4.53 1.21 6.48L12 17.27l-5.79 3.15 1.21-6.48-4.79-4.53 6.54-.86z"
+                        fill="currentColor"
+                        stroke="currentColor"
+                        strokeWidth={1.6}
+                        strokeLinejoin="round"
+                      />
+                    </svg>
                   </button>
                 </Dialog.Trigger>
               </div>
@@ -1087,9 +1108,9 @@ export function StarMapView({ map, demo = false, target, path, marked, onNavigat
                 data-starmap-help-dialog
                 className={cn(
                   'absolute z-20 flex touch-pan-y flex-col gap-2.5 overflow-y-auto overscroll-contain rounded-[16px] border border-solid border-[color:var(--sky-glass-border)] px-4 pt-2 pb-4 text-on-sky focus-visible:outline-none',
-                  // Wide: a panel just over the "?" (24 + 40 + 10 px up), as wide as reads well.
+                  // Wide: a panel just over the help star (28 + 32 + 10 px up), as wide as reads well.
                   wide
-                    ? 'bottom-[calc(74px+var(--page-bottom-inset,0px))] left-6 w-[min(460px,calc(100%-48px))] max-h-[calc(100%-98px-var(--page-bottom-inset,0px))]'
+                    ? 'bottom-[calc(70px+var(--page-bottom-inset,0px))] left-6 w-[min(460px,calc(100%-48px))] max-h-[calc(100%-94px-var(--page-bottom-inset,0px))]'
                     : 'inset-x-3 bottom-[calc(12px+var(--page-bottom-inset,0px))] max-h-[calc(100%-24px-var(--page-bottom-inset,0px))]',
                 )}
                 style={{ ...GLASS, boxShadow: 'var(--shadow-glass)' }}

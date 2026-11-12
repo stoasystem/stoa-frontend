@@ -22,7 +22,7 @@
     "start": "Start this star",
     "later": "Look around first",
     "findOwn": "Find my own star",
-    "legendHint": "A star’s colour and shape show where you are with it – the ? at the bottom left explains them any time."
+    "legendHint": "A star’s colour and shape show where you are with it – the little star at the bottom left explains them any time."
   },
   "findOwn": {
     "examples": {

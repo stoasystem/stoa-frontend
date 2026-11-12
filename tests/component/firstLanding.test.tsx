@@ -557,14 +557,14 @@ describe('the bubble', () => {
     expect([...bubble.querySelectorAll('button')].map((button) => button.textContent)).toEqual(['Look around first'])
   })
 
-  it('says once, on the first landing only, what a star’s look means and where the "?" is (#643), in all four languages', async () => {
+  it('says once, on the first landing only, what a star’s look means and where the help star is (#643), in all four languages', async () => {
     const star = newcomerMap().stars.find((candidate) => candidate.unitId === KP)!
     for (const lang of ['en', 'de', 'fr', 'it'] as const) {
       await i18n.changeLanguage(lang)
       const hint = i18n.getFixedT(lang, 'starmap')('firstLanding.legendHint')
       expect(hint, lang).not.toBe('firstLanding.legendHint')
-      // One short sentence that points at the "?".
-      expect(hint, lang).toContain('?')
+      // One short sentence that points at the help star, bottom left; no longer a "?".
+      expect(hint, lang).not.toContain('?')
       expect(hint.length, lang).toBeLessThan(130)
       if (lang !== 'en') expect(hint, lang).not.toBe(i18n.getFixedT('en', 'starmap')('firstLanding.legendHint'))
       const first = render(
