@@ -57,7 +57,8 @@ import '@/features/ask/askGuide.css'
  *
  * Risen, and as the sheet from the planet, Ask's header has a full-screen
  * button (#676, `useAskFullScreen`): wide, Ask fills the whole window, the
- * top bar too; on a phone the sheet goes to 100%, as at `/ask`, and dragged
+ * top bar too, and what is read keeps to a centred column
+ * (`ASK_FULL_SCREEN.column`); on a phone the sheet goes to 100%, as at `/ask`, and dragged
  * down from there goes back to 72% before a second drag closes it. Pressed
  * again it goes back. Esc still closes Ask, and closing it ends full screen,
  * so the next open rises at the normal size. Beside the map there is none
@@ -483,6 +484,7 @@ export function AskHost({
                 subjectId={subjectId}
                 onExpand={beside ? expand : undefined}
                 fullScreen={fullScreenToggle}
+                column={fullScreen ? ASK_FULL_SCREEN.column : undefined}
               />
             </section>
           ) : (

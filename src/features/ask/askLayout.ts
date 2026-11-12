@@ -84,6 +84,14 @@ export const ASK_RISE = {
 export const ASK_FULL_SCREEN = {
   /** Over the top bar (z-30) and its dim. */
   zIndex: 40,
+  /**
+   * Wide, what is read keeps to one centred column this wide: the thread and
+   * its cards, "Ask a teacher", the list and the composer. Across the whole
+   * window a long answer ran to lines too long to follow. No layout token was
+   * near this width; 760 holds the risen width (640) and a little more, about
+   * 80-90 characters of an answer to a line.
+   */
+  column: 760,
 } as const
 
 /**

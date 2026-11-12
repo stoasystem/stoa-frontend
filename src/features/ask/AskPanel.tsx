@@ -1,5 +1,5 @@
 import { ChevronLeft, Maximize2, Minimize2, X } from 'lucide-react'
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type HTMLAttributes } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type HTMLAttributes } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 import { Button, Composer, IconButton, PresenceDot } from '@/components/base'
@@ -64,6 +64,7 @@ export function AskPanel({
   practice,
   onExpand,
   fullScreen,
+  column,
 }: {
   controller: AskController
   layout: AskLayout
@@ -85,6 +86,13 @@ export function AskPanel({
    * phone sheet from the planet. A button in the header, beside the close.
    */
   fullScreen?: { on: boolean; onToggle: () => void }
+  /**
+   * Full screen on a wide screen (#676): the conversation, the list and the
+   * composer keep to one centred column this wide, so a long answer is not
+   * read across the whole window; the back arrow and the title start on its
+   * left edge. The panel's sky still fills the window.
+   */
+  column?: number
 }) {
   const { t } = useTranslation('chat')
   const { conversationId, draft, setDraft, select, close } = controller
@@ -270,7 +278,7 @@ export function AskPanel({
         style={
           phone
             ? { padding: '6px 12px 8px 16px' }
-            : { height: ASK_PANEL.headerHeight, padding: '0 12px 0 18px' }
+            : { height: ASK_PANEL.headerHeight, ...columnPadding(column, 0, 18, 0, { right: 12 }) }
         }
       >
         {conversationId && (
@@ -320,11 +328,16 @@ export function AskPanel({
           ask={ask}
           paused={paused}
           layout={layout}
+          column={column}
           onAskAboutStep={askAboutStep}
           onNewConversation={() => select(null)}
         />
       ) : (
-        <div ref={listArea} className="flex min-h-0 flex-1 flex-col overflow-y-auto" style={{ padding: phone ? '8px 6px' : '10px 8px' }}>
+        <div
+          ref={listArea}
+          className="flex min-h-0 flex-1 flex-col overflow-y-auto"
+          style={phone ? { padding: '8px 6px' } : columnPadding(column, 10, 8)}
+        >
           {/* A list on screen stays when a read behind it fails: the reads that
               follow a conversation (#405, #452), a language switch (#457). */}
           {conversationsQuery.isError && conversationsQuery.data && (
@@ -371,7 +384,12 @@ export function AskPanel({
         </div>
       )}
 
-      <div ref={composerArea} data-ask-composer-area className="shrink-0" style={{ padding: phone ? '0 12px 34px' : '0 14px 16px' }}>
+      <div
+        ref={composerArea}
+        data-ask-composer-area
+        className="shrink-0"
+        style={phone ? { padding: '0 12px 34px' } : columnPadding(column, 0, 14, 16)}
+      >
         {isStreaming && (
           <div className="flex justify-end pb-1">
             <Button variant="plain" size="small" onClick={ask.stopStreaming}>
@@ -427,6 +445,26 @@ export function AskPanel({
   )
 }
 
+/**
+ * An area's padding on a wide screen: `top` and `bottom`, and `gutter` at
+ * either side -- or, in the centred column of wide full screen (#676),
+ * whatever is left either side of `column`, never less than `gutter`. `right`
+ * keeps that side apart (the header's buttons stay at the window's edge).
+ * A percentage in padding is of the panel's width, so each area still spans
+ * the window: the thread's scrollbar stays at the window's edge, and the wheel
+ * scrolls it from anywhere on the screen. Longhands, which jsdom reads too.
+ */
+function columnPadding(
+  column: number | undefined,
+  top: number,
+  gutter: number,
+  bottom = top,
+  { right = gutter }: { right?: number } = {},
+): CSSProperties {
+  const side = column ? `max(${gutter}px, calc((100% - ${column}px) / 2))` : gutter
+  return { paddingTop: top, paddingBottom: bottom, paddingLeft: side, paddingRight: right === gutter ? side : right }
+}
+
 /** The line under which the composer is paused once the usage period has ended (#615). */
 const USAGE_PERIOD_NOTICE_ID = 'ask-usage-period-paused'
 
@@ -477,6 +515,7 @@ function AskThread({
   ask,
   paused,
   layout,
+  column,
   onAskAboutStep,
   onNewConversation,
 }: {
@@ -485,6 +524,8 @@ function AskThread({
   /** The usage period has ended (#615): nothing is sent again either. */
   paused: boolean
   layout: AskLayout
+  /** The centred column of wide full screen (#676), as `AskPanel`'s. */
+  column?: number
   onAskAboutStep: (step: AnswerStep) => void
   /** Back to the list, where the next question starts a new conversation. */
   onNewConversation: () => void
@@ -545,7 +586,7 @@ function AskThread({
   return (
     <>
       {card && (
-        <div className="shrink-0" style={{ padding: layout === 'sheet' ? '10px 14px 0' : '12px 18px 0' }}>
+        <div className="shrink-0" style={layout === 'sheet' ? { padding: '10px 14px 0' } : columnPadding(column, 12, 18, 0)}>
           <TeacherHelpStatusCard
             request={card.request}
             teachersOnline={card.teachersOnline}
@@ -568,7 +609,7 @@ function AskThread({
         // place, made it taller than the screen, and anything brought into
         // view in the thread scrolled the whole page up (#636).
         className="relative flex min-h-0 flex-1 flex-col overflow-y-auto"
-        style={{ gap: layout === 'sheet' ? 10 : 12, padding: layout === 'sheet' ? '12px 14px' : '16px 18px' }}
+        style={layout === 'sheet' ? { gap: 10, padding: '12px 14px' } : { gap: 12, ...columnPadding(column, 16, 18) }}
       >
         <div className="flex-1" />
         {conversationQuery.isLoading ? (

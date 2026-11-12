@@ -738,6 +738,65 @@ describe('full screen (#676)', () => {
     expect(toggle(risen, 'Full screen')).toHaveFocus()
   })
 
+  it('keeps what is read to a centred column in wide full screen only', async () => {
+    show({ width: 1280 })
+    await userEvent.type(dockedField(), 'W')
+    const risen = screen.getByRole('dialog', { name: 'Ask' })
+    await userEvent.click(await within(risen).findByRole('button', { name: /Linear equations/ }))
+    const thread = within(risen).getByRole('log')
+    const composer = risen.querySelector<HTMLElement>('[data-ask-composer-area]')!
+    const header = risen.querySelector('header')!
+    // Half of what is left beside a 760 column, never less than the gutter (jsdom writes the calc out).
+    const column = (gutter: number) => new RegExp(`^max\\(${gutter}px, .*100% - 760px`)
+    const sides = (element: HTMLElement) => [element.style.paddingLeft, element.style.paddingRight]
+    // Risen: the panel's own gutters.
+    expect(sides(thread)).toEqual(['18px', '18px'])
+    expect(sides(composer)).toEqual(['14px', '14px'])
+    expect(sides(header)).toEqual(['18px', '12px'])
+
+    await userEvent.click(toggle(risen, 'Full screen'))
+
+    // Full screen: the thread and the composer in one 760 column; the header's
+    // title starts on its left edge, its buttons stay at the window's.
+    expect(thread.style.paddingLeft).toMatch(column(18))
+    expect(thread.style.paddingRight).toMatch(column(18))
+    expect(composer.style.paddingLeft).toMatch(column(14))
+    expect(composer.style.paddingRight).toMatch(column(14))
+    expect(header.style.paddingLeft).toMatch(column(18))
+    expect(header.style.paddingRight).toBe('12px')
+
+    await userEvent.click(toggle(risen, 'Leave full screen'))
+
+    expect(sides(thread)).toEqual(['18px', '18px'])
+    expect(sides(composer)).toEqual(['14px', '14px'])
+    expect(sides(header)).toEqual(['18px', '12px'])
+  })
+
+  it('keeps the list to the column too, and the panel beside the map to its gutters', async () => {
+    show({ width: 1280 })
+    await userEvent.type(dockedField(), 'W')
+    const risen = screen.getByRole('dialog', { name: 'Ask' })
+    const list = (await within(risen).findByRole('button', { name: /Linear equations/ })).closest<HTMLElement>('.overflow-y-auto')!
+    expect(list.style.paddingLeft).toBe('8px')
+
+    await userEvent.click(toggle(risen, 'Full screen'))
+    expect(list.style.paddingLeft).toMatch(/^max\(8px, .*100% - 760px/)
+
+    act(() => useAskStore.getState().moveBeside('u-1', 'c1'))
+    const panel = screen.getByRole('complementary', { name: 'Ask' })
+    expect(within(panel).getByRole('log').style.paddingLeft).toBe('18px')
+  })
+
+  it('leaves the phone sheet in full screen at its own padding, with no column', async () => {
+    show({ width: 375 })
+    await userEvent.type(dockedField(), 'W')
+    const sheet = screen.getByRole('dialog', { name: 'Ask' })
+
+    await userEvent.click(toggle(sheet, 'Full screen'))
+
+    expect(sheet.querySelector<HTMLElement>('[data-ask-composer-area]')!.style.padding).toBe('0px 12px 34px')
+  })
+
   it('takes the phone sheet to 100% and back to 72%', async () => {
     show({ width: 375 })
     await userEvent.type(dockedField(), 'W')
