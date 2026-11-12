@@ -1,13 +1,12 @@
 import type { TFunction } from 'i18next'
 import { useTranslation } from 'react-i18next'
 import { BookOpenCheck, CircleAlert, Gauge, HelpCircle } from 'lucide-react'
-import i18n from '@/i18n'
 import { formattingLocale } from '@/i18n/languages'
 import { SectionHeader } from '@/components/common/SectionHeader'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
 import { formatDayAndMonth } from '@/lib/formatDateTime'
-import type { LearningProfile } from '@/types/learningProfile'
+import { learningSubjectLabelKey, type LearningProfile, type LearningSubjectDefinition } from '@/types/learningProfile'
 
 type LearningProfileSignalsProps = {
   title: string
@@ -58,7 +57,7 @@ export function LearningProfileSignals({
                   <CardContent className="p-4">
                     <div className="flex items-start justify-between gap-3">
                       <div>
-                        <p className="text-sm font-medium">{tChat(subject.labelKey)}</p>
+                        <p className="text-sm font-medium">{learningSubjectName(subject, tChat)}</p>
                         <p className="mt-1 text-xs text-muted-foreground">
                           {formatRolloutState(subject.rolloutState, tPractice)}
                         </p>
@@ -113,7 +112,7 @@ export function LearningProfileSignals({
                           <div>
                             <p className="text-sm font-medium">{topic.label}</p>
                             <p className="mt-1 text-xs text-muted-foreground">
-                              {formatSubjectLabel(profile, topic.subject)}
+                              {formatSubjectLabel(profile, topic.subject, tChat)}
                               {topic.latestEvidenceAt
                                 ? ` · ${formatDayAndMonth(topic.latestEvidenceAt)}`
                                 : ''}
@@ -177,9 +176,21 @@ export function formatFeedback(value: number | null | undefined, t: TFunction) {
   return `${score}/5`
 }
 
-function formatSubjectLabel(profile: LearningProfile, subjectId: string) {
+/**
+ * A subject's name in the reader's language. The profile endpoints send
+ * `{ id, label }` without `labelKey`, so the key comes from the id; a subject
+ * we have no key for shows the backend's label (#639).
+ */
+export function learningSubjectName(
+  subject: Pick<LearningSubjectDefinition, 'id' | 'labelKey' | 'label'>,
+  tChat: TFunction,
+) {
+  return tChat(learningSubjectLabelKey(subject), { ns: 'chat', defaultValue: subject.label ?? subject.id })
+}
+
+function formatSubjectLabel(profile: LearningProfile, subjectId: string, tChat: TFunction) {
   const subject = profile.subjects.find((item) => item.id === subjectId)
-  return subject ? i18n.t(subject.labelKey, { ns: 'chat' }) : subjectId
+  return learningSubjectName(subject ?? { id: subjectId }, tChat)
 }
 
 
