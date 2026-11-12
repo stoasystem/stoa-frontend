@@ -28,6 +28,10 @@ import { readStateFile, record } from './run'
  *      right language, does it actually explain rather than refuse, and does
  *      the out-of-curriculum answer give an example or an analogy. That goes
  *      on #44 with the run's versions, linked to #27's log baseline.
+ *      "The right language" for item 3 is the question's, German, although
+ *      student@'s account language (and so the browser's header) is English:
+ *      decided 2026-11-12, at odds with #27's "the header decides", and
+ *      waiting on the backend to confirm. Item 2 is still judged by its header.
  *
  * Files run in name order on one worker, never retried:
  *   01 preflight  release, function versions, the two student profiles    read-only
@@ -122,7 +126,7 @@ test.describe('preflight', { tag: ['@preflight', '@readonly'] }, () => {
     expect(body.primarySubjects, 'student@ subjects').toEqual(expect.arrayContaining(['math', 'physics']))
   })
 
-  test('agent@\'s grade, which item 5 blanks and puts back (#50, #154)', async ({ request, baseURL }, testInfo) => {
+  test('agent@\'s grade, which item 5 keeps blank (#50, #154)', async ({ request, baseURL }, testInfo) => {
     const api = await SmokeApi.signIn(request, baseURL!, 'agent')
     const { body } = await api.call<{ grade: string | null }>('GET', '/students/me/profile', { expect: 200 })
     await record(testInfo, 'preflight-agent-profile', { grade: body.grade })

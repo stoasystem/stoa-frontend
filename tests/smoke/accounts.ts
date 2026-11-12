@@ -2,8 +2,11 @@
  * The five accounts this platform is tested with, and where each one lands.
  *
  * `agent@` is the student the blank-grade path (stoasystem/stoa-backend#50) is
- * read on. Its grade may be set for other work; item 5 blanks it for the run
- * and puts it back. `student@` is Grade 6 with math and physics.
+ * read on. Its grade stays blank (#27, item 5); item 5 blanks one it finds and
+ * does not put it back. `student@` is Grade 6 with math and physics; its
+ * account language is English, so the app shows it in English, and item 3
+ * asks it German questions, whose answers follow the question's language
+ * (decided 2026-11-12; see item 3 in 03-writes.spec.ts).
  *
  * The password is not in the repository. Set `STOA_SMOKE_PASSWORD` before
  * running, and the suite refuses to run without it rather than signing in as
