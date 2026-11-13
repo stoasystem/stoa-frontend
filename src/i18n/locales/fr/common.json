@@ -244,6 +244,11 @@
       "read": "Lu"
     },
     "loading": "Chargement des notifications...",
+    "offerState": {
+      "expired": "Expirée",
+      "reassigned": "Transmise à un autre enseignant",
+      "withdrawn": "Retirée par l’élève"
+    },
     "openLabel": "Notifications",
     "openLabelUnread": "Notifications, {{count}} non lue(s)",
     "subtitle": "Les nouveautés sur tes questions, tes entraînements et tes demandes d’enseignant.",
@@ -550,6 +555,7 @@
     "grade_8_secondary": "10e année (secondaire I)",
     "grade_9_secondary": "11e année (secondaire I)",
     "grade_secondary_i": "Secondaire I (année non précisée)",
+    "grade_secondary_ii": "Secondaire II (gymnase, collège, lycée)",
     "notSet": "Année non précisée"
   }
 }

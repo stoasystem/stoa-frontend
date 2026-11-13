@@ -54,6 +54,10 @@
     "title": "Ask",
     "close": "Close",
     "expand": "Show bigger",
+    "fullScreen": {
+      "enter": "Full screen",
+      "leave": "Leave full screen"
+    },
     "back": "All conversations",
     "listSubtitle": "Your conversations",
     "composerLabel": "Your question",
@@ -262,6 +266,16 @@
       "title": "Stuck? Ask me here.",
       "body": "You can also take a photo of your working or a homework problem and send it to me.",
       "close": "Got it"
+    },
+    "tour": {
+      "label": "Murmi’s tip",
+      "mic": "Rather talk than type? The microphone shows you how to dictate your question.",
+      "add": "With + you can send me a photo or a file of your problem.",
+      "addCamera": "With + you can send me a photo or a file of your problem, or take one with the camera.",
+      "teacher": "Want a real teacher to look at it? Tap “{{action}}” under my answer.",
+      "next": "Next",
+      "skip": "Skip",
+      "done": "Got it"
     }
   }
 }

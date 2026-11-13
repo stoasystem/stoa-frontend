@@ -54,6 +54,10 @@
     "title": "Domanda",
     "close": "Chiudi",
     "expand": "Mostra in grande",
+    "fullScreen": {
+      "enter": "Schermo intero",
+      "leave": "Esci dallo schermo intero"
+    },
     "back": "Tutte le conversazioni",
     "listSubtitle": "Le tue conversazioni",
     "composerLabel": "La tua domanda",
@@ -264,6 +268,16 @@
       "title": "Non sai come andare avanti? Chiedimi qui.",
       "body": "Puoi anche fotografare la tua brutta copia o un esercizio dei compiti e mandarmelo.",
       "close": "Ho capito"
+    },
+    "tour": {
+      "label": "Consiglio di Murmi",
+      "mic": "Preferisci parlare invece di scrivere? Il microfono ti mostra come dettare la tua domanda.",
+      "add": "Con + puoi mandarmi una foto o un file del tuo esercizio.",
+      "addCamera": "Con + puoi mandarmi una foto o un file del tuo esercizio, oppure fotografarlo con la fotocamera.",
+      "teacher": "Vuoi che un vero insegnante ci dia un’occhiata? Tocca «{{action}}» sotto la mia risposta.",
+      "next": "Avanti",
+      "skip": "Salta",
+      "done": "Ho capito"
     }
   }
 }

@@ -46,6 +46,11 @@
     "breadcrumbRoot": "Lehrperson",
     "breadcrumbFallback": "Anfragedetails",
     "loadFailed": "Anfrage konnte nicht geladen werden.",
+    "outOfReach": {
+      "title": "Diese Anfrage ist für Sie nicht mehr offen",
+      "body": "Sie ist abgelaufen, oder eine andere Lehrperson hat sie übernommen.",
+      "back": "Zurück zu den Anfragen"
+    },
     "resolutionNote": "Abschlussnotiz",
     "resolutionNotePlaceholder": "Erforderlich, bevor als gelöst markiert werden kann.",
     "updateFailed": "Status konnte nicht aktualisiert werden.",

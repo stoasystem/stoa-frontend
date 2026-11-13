@@ -54,6 +54,10 @@
     "title": "Question",
     "close": "Fermer",
     "expand": "Afficher en grand",
+    "fullScreen": {
+      "enter": "Plein écran",
+      "leave": "Quitter le plein écran"
+    },
     "back": "Toutes les conversations",
     "listSubtitle": "Tes conversations",
     "composerLabel": "Ta question",
@@ -264,6 +268,16 @@
       "title": "Tu bloques ? Demande-moi ici.",
       "body": "Tu peux aussi prendre en photo ton brouillon ou un exercice de devoirs et me l’envoyer.",
       "close": "Compris"
+    },
+    "tour": {
+      "label": "Astuce de Murmi",
+      "mic": "Tu préfères parler plutôt qu’écrire ? Le micro te montre comment dicter ta question.",
+      "add": "Avec +, tu peux m’envoyer une photo ou un fichier de ton exercice.",
+      "addCamera": "Avec +, tu peux m’envoyer une photo ou un fichier de ton exercice, ou le prendre en photo avec l’appareil.",
+      "teacher": "Tu veux qu’un vrai enseignant y jette un œil ? Appuie sur « {{action}} » sous ma réponse.",
+      "next": "Suivant",
+      "skip": "Passer",
+      "done": "Compris"
     }
   }
 }

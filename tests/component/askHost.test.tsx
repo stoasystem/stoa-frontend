@@ -704,3 +704,220 @@ describe('the rise from the docked composer, in motion (#660)', () => {
     expect(reduced).toMatch(/^@media \(prefers-reduced-motion: reduce\) \{\s*\[data-ask-motion\] \{\s*animation: ask-fade-in /)
   })
 })
+
+describe('full screen (#676)', () => {
+  const toggle = (within_: HTMLElement, name: 'Full screen' | 'Leave full screen') =>
+    within(within_).getByRole('button', { name })
+
+  it('fills the whole window from risen Ask on a desktop, and goes back to the risen size', async () => {
+    show({ width: 1280, shell: true })
+    await userEvent.type(dockedField(), 'W')
+    const risen = screen.getByRole('dialog', { name: 'Ask' })
+
+    await userEvent.click(toggle(risen, 'Full screen'))
+
+    // The same dialog, over everything, the top bar too; its own sky still.
+    expect(screen.getByRole('dialog', { name: 'Ask' })).toBe(risen)
+    expect(risen).toHaveAttribute('data-ask-full-screen')
+    expect(risen).toHaveClass('fixed')
+    expect(risen.style.inset).toBe('0px')
+    expect(Number(risen.style.zIndex)).toBeGreaterThan(30)
+    expect(risen.style.maxWidth).toBe('')
+    expect(risen).toHaveAttribute('data-surface', 'sky')
+    // The button says what a press does now, and keeps the focus.
+    const leave = toggle(risen, 'Leave full screen')
+    expect(leave).toHaveFocus()
+    expect(within(risen).getByRole('textbox', { name: 'Your question' })).toHaveValue('W')
+
+    await userEvent.click(leave)
+
+    expect(risen).not.toHaveAttribute('data-ask-full-screen')
+    expect(risen).toHaveClass('absolute')
+    expect(risen.style.maxWidth).toBe('640px')
+    expect(risen.style.top).toBe('24px')
+    expect(toggle(risen, 'Full screen')).toHaveFocus()
+  })
+
+  it('keeps what is read to a centred column in wide full screen only', async () => {
+    show({ width: 1280 })
+    await userEvent.type(dockedField(), 'W')
+    const risen = screen.getByRole('dialog', { name: 'Ask' })
+    await userEvent.click(await within(risen).findByRole('button', { name: /Linear equations/ }))
+    const thread = within(risen).getByRole('log')
+    const composer = risen.querySelector<HTMLElement>('[data-ask-composer-area]')!
+    const header = risen.querySelector('header')!
+    // Half of what is left beside a 760 column, never less than the gutter (jsdom writes the calc out).
+    const column = (gutter: number) => new RegExp(`^max\\(${gutter}px, .*100% - 760px`)
+    const sides = (element: HTMLElement) => [element.style.paddingLeft, element.style.paddingRight]
+    // Risen: the panel's own gutters.
+    expect(sides(thread)).toEqual(['18px', '18px'])
+    expect(sides(composer)).toEqual(['14px', '14px'])
+    expect(sides(header)).toEqual(['18px', '12px'])
+
+    await userEvent.click(toggle(risen, 'Full screen'))
+
+    // Full screen: the thread and the composer in one 760 column; the header's
+    // title starts on its left edge, its buttons stay at the window's.
+    expect(thread.style.paddingLeft).toMatch(column(18))
+    expect(thread.style.paddingRight).toMatch(column(18))
+    expect(composer.style.paddingLeft).toMatch(column(14))
+    expect(composer.style.paddingRight).toMatch(column(14))
+    expect(header.style.paddingLeft).toMatch(column(18))
+    expect(header.style.paddingRight).toBe('12px')
+
+    await userEvent.click(toggle(risen, 'Leave full screen'))
+
+    expect(sides(thread)).toEqual(['18px', '18px'])
+    expect(sides(composer)).toEqual(['14px', '14px'])
+    expect(sides(header)).toEqual(['18px', '12px'])
+  })
+
+  it('keeps the list to the column too, and the panel beside the map to its gutters', async () => {
+    show({ width: 1280 })
+    await userEvent.type(dockedField(), 'W')
+    const risen = screen.getByRole('dialog', { name: 'Ask' })
+    const list = (await within(risen).findByRole('button', { name: /Linear equations/ })).closest<HTMLElement>('.overflow-y-auto')!
+    expect(list.style.paddingLeft).toBe('8px')
+
+    await userEvent.click(toggle(risen, 'Full screen'))
+    expect(list.style.paddingLeft).toMatch(/^max\(8px, .*100% - 760px/)
+
+    act(() => useAskStore.getState().moveBeside('u-1', 'c1'))
+    const panel = screen.getByRole('complementary', { name: 'Ask' })
+    expect(within(panel).getByRole('log').style.paddingLeft).toBe('18px')
+  })
+
+  it('leaves the phone sheet in full screen at its own padding, with no column', async () => {
+    show({ width: 375 })
+    await userEvent.type(dockedField(), 'W')
+    const sheet = screen.getByRole('dialog', { name: 'Ask' })
+
+    await userEvent.click(toggle(sheet, 'Full screen'))
+
+    expect(sheet.querySelector<HTMLElement>('[data-ask-composer-area]')!.style.padding).toBe('0px 12px 34px')
+  })
+
+  it('takes the phone sheet to 100% and back to 72%', async () => {
+    show({ width: 375 })
+    await userEvent.type(dockedField(), 'W')
+    const sheet = screen.getByRole('dialog', { name: 'Ask' })
+    expect(sheet.style.height).toBe('72%')
+
+    await userEvent.click(toggle(sheet, 'Full screen'))
+
+    expect(sheet.style.height).toBe('100%')
+    expect(sheet.style.borderRadius).toBe('0px')
+    expect(sheet.style.transition).toContain('height')
+    expect(toggle(sheet, 'Leave full screen')).toHaveFocus()
+
+    await userEvent.click(toggle(sheet, 'Leave full screen'))
+
+    expect(sheet.style.height).toBe('72%')
+    expect(toggle(sheet, 'Full screen')).toHaveFocus()
+  })
+
+  it('eases nothing on the phone under reduced motion', async () => {
+    show({ width: 375, reducedMotion: true })
+    await userEvent.type(dockedField(), 'W')
+    const sheet = screen.getByRole('dialog', { name: 'Ask' })
+
+    await userEvent.click(toggle(sheet, 'Full screen'))
+
+    expect(sheet.style.height).toBe('100%')
+    expect(sheet.style.transition).toBe('none')
+  })
+
+  it('goes back to 72% on a drag down from full screen, and closes on a second', async () => {
+    show({ width: 375 })
+    await userEvent.type(dockedField(), 'W')
+    const sheet = screen.getByRole('dialog', { name: 'Ask' })
+    sheet.getBoundingClientRect = () => ({ height: 800 }) as DOMRect
+    await userEvent.click(toggle(sheet, 'Full screen'))
+    const handle = sheet.firstElementChild as HTMLElement
+    async function drag() {
+      act(() => {
+        fireEvent.pointerDown(handle, { pointerId: 1, clientY: 100 })
+        fireEvent.pointerMove(handle, { pointerId: 1, clientY: 400 })
+      })
+      await act(() => new Promise((resolve) => setTimeout(resolve, 300)))
+      act(() => {
+        fireEvent.pointerUp(handle, { pointerId: 1, clientY: 400 })
+      })
+    }
+
+    await drag()
+
+    expect(screen.getByRole('dialog', { name: 'Ask' })).toBe(sheet)
+    expect(sheet.style.height).toBe('72%')
+
+    await drag()
+
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+  })
+
+  it('ends when Ask closes, so the next open rises at the normal size', async () => {
+    show({ width: 1280 })
+    await userEvent.type(dockedField(), 'W')
+    await userEvent.click(toggle(screen.getByRole('dialog', { name: 'Ask' }), 'Full screen'))
+
+    // Esc closes Ask, full screen or not.
+    await userEvent.keyboard('{Escape}')
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+    await userEvent.type(dockedField(), 'W')
+
+    const risen = screen.getByRole('dialog', { name: 'Ask' })
+    expect(risen).not.toHaveAttribute('data-ask-full-screen')
+    expect(risen.style.maxWidth).toBe('640px')
+    expect(toggle(risen, 'Full screen')).toBeInTheDocument()
+  })
+
+  it('ends when the phone sheet closes, so it opens at 72% again', async () => {
+    show({ width: 375 })
+    await userEvent.type(dockedField(), 'W')
+    const sheet = screen.getByRole('dialog', { name: 'Ask' })
+    await userEvent.click(toggle(sheet, 'Full screen'))
+
+    await userEvent.click(within(sheet).getByRole('button', { name: 'Close' }))
+    await userEvent.type(dockedField(), 'W')
+
+    expect(screen.getByRole('dialog', { name: 'Ask' }).style.height).toBe('72%')
+  })
+
+  it('is not offered beside the map, where the expand button raises Ask', async () => {
+    show({ width: 1280 })
+    await userEvent.type(dockedField(), 'W')
+    await userEvent.click(toggle(screen.getByRole('dialog', { name: 'Ask' }), 'Full screen'))
+
+    act(() => useAskStore.getState().moveBeside('u-1', 'c1'))
+
+    const panel = screen.getByRole('complementary', { name: 'Ask' })
+    expect(panel).not.toHaveAttribute('data-ask-full-screen')
+    expect(panel.style.width).toBe('420px')
+    expect(within(panel).queryByRole('button', { name: /full screen/i })).toBeNull()
+    expect(within(panel).getByRole('button', { name: 'Show bigger' })).toBeInTheDocument()
+
+    // Raised again, at the normal size.
+    await userEvent.click(within(panel).getByRole('button', { name: 'Show bigger' }))
+    const risen = screen.getByRole('dialog', { name: 'Ask' })
+    expect(risen).not.toHaveAttribute('data-ask-full-screen')
+    expect(toggle(risen, 'Full screen')).toBeInTheDocument()
+  })
+
+  it('is offered at /ask on a desktop, not on a phone, where the sheet is already full screen', () => {
+    show({ width: 1280, direct: null })
+    expect(toggle(screen.getByRole('dialog', { name: 'Ask' }), 'Full screen')).toBeInTheDocument()
+  })
+
+  it('is not offered at /ask on a phone', () => {
+    show({ width: 375, direct: null })
+    expect(screen.queryByRole('button', { name: /full screen/i })).toBeNull()
+  })
+
+  it('is named in all four languages', () => {
+    for (const language of ['de', 'en', 'fr', 'it']) {
+      const chat = JSON.parse(readFileSync(`src/i18n/locales/${language}/chat.json`, 'utf8'))
+      expect(chat.ask.fullScreen.enter, language).toBeTruthy()
+      expect(chat.ask.fullScreen.leave, language).toBeTruthy()
+    }
+  })
+})

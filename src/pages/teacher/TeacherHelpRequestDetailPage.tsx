@@ -69,6 +69,8 @@ export function TeacherHelpRequestDetailPage() {
   // failure may pass at the next poll: keep everything, the reply draft above
   // all, but take nothing until a read succeeds again (#331).
   const canAct = !isHelpRequestOutOfReach(requestQuery.error)
+  // Refused before any copy was read: there is nothing to keep (#670).
+  const gone = !canAct && requestQuery.data === undefined
   const readFailed = requestQuery.isError && canAct
   const statusActions = canAct ? teacherStatusActions(requestQuery.data?.status) : []
   const changedElsewhere = isHelpRequestConflict(updateStatus.error) || reply.conflict
@@ -90,7 +92,30 @@ export function TeacherHelpRequestDetailPage() {
           ]}
         />
         {requestQuery.isLoading && <TeacherDashboardSkeleton showHeader={false} />}
-        {requestQuery.isError && <p role="alert" className="text-sm text-destructive">{tTeacher('detail.loadFailed')}</p>}
+        {/* Refused with nothing on screen: an offer that lapsed or went to
+            someone else, opened from an old notification or a saved link.
+            That is no failure, and it says so, with the way back (#670). */}
+        {gone && (
+          <section
+            role="status"
+            aria-labelledby="request-out-of-reach"
+            data-request-out-of-reach
+            className="rounded-lg border bg-card p-5"
+          >
+            <h2 id="request-out-of-reach" className="m-0 text-base font-semibold text-foreground">
+              {tTeacher('detail.outOfReach.title')}
+            </h2>
+            <p className="mb-0 mt-1 text-sm leading-6 text-muted-foreground">{tTeacher('detail.outOfReach.body')}</p>
+            <div className="mt-4">
+              <Button asChild variant="outline">
+                <Link to="/teacher">{tTeacher('detail.outOfReach.back')}</Link>
+              </Button>
+            </div>
+          </section>
+        )}
+        {requestQuery.isError && !gone && (
+          <p role="alert" className="text-sm text-destructive">{tTeacher('detail.loadFailed')}</p>
+        )}
         {requestQuery.data && (
           <div className="space-y-6">
             {requestQuery.data.practiceContext && (
