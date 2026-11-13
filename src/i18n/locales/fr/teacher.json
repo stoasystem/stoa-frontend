@@ -46,6 +46,11 @@
     "breadcrumbRoot": "Enseignant",
     "breadcrumbFallback": "Détail de la demande",
     "loadFailed": "Impossible de charger la demande.",
+    "outOfReach": {
+      "title": "Cette demande ne vous est plus ouverte",
+      "body": "Elle a expiré, ou un autre enseignant l’a prise en charge.",
+      "back": "Retour aux demandes"
+    },
     "resolutionNote": "Note de résolution",
     "resolutionNotePlaceholder": "Obligatoire avant de marquer comme résolu.",
     "updateFailed": "Impossible de mettre à jour le statut.",

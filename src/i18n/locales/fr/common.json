@@ -244,6 +244,11 @@
       "read": "Lu"
     },
     "loading": "Chargement des notifications...",
+    "offerState": {
+      "expired": "Expirée",
+      "reassigned": "Transmise à un autre enseignant",
+      "withdrawn": "Retirée par l’élève"
+    },
     "openLabel": "Notifications",
     "openLabelUnread": "Notifications, {{count}} non lue(s)",
     "subtitle": "Les nouveautés sur tes questions, tes entraînements et tes demandes d’enseignant.",
