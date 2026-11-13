@@ -244,6 +244,11 @@
       "read": "Read"
     },
     "loading": "Loading notifications...",
+    "offerState": {
+      "expired": "Expired",
+      "reassigned": "Passed to another teacher",
+      "withdrawn": "Withdrawn by the student"
+    },
     "openLabel": "Notifications",
     "openLabelUnread": "Notifications, {{count}} unread",
     "subtitle": "Updates about your questions, practice, and teacher requests.",

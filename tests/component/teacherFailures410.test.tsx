@@ -117,10 +117,13 @@ describe('a status change that fails', () => {
 })
 
 describe('a read that fails', () => {
+  // A 404 with nothing on screen is no failure: the request is no longer the
+  // teacher's, and the page says so (#670, teacherBellOfferState670).
   it('is an alert on the request page', async () => {
-    vi.mocked(teacherApi.getTeacherHelpRequestDetail).mockRejectedValue(new ApiError('gone', { status: 404 }))
+    vi.mocked(teacherApi.getTeacherHelpRequestDetail).mockRejectedValue(new ApiError('boom', { status: 500 }))
     renderDetail()
-    expect(await screen.findByRole('alert')).toHaveTextContent(de.detail.loadFailed)
+    // After the hook's one retry.
+    expect(await screen.findByRole('alert', {}, { timeout: 4000 })).toHaveTextContent(de.detail.loadFailed)
   })
 
   it('is an alert on the dashboard', async () => {

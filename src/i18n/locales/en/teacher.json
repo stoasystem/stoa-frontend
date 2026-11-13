@@ -46,6 +46,11 @@
     "breadcrumbRoot": "Teacher",
     "breadcrumbFallback": "Request detail",
     "loadFailed": "Failed to load request.",
+    "outOfReach": {
+      "title": "This request is no longer open to you",
+      "body": "It expired, or another teacher has taken it.",
+      "back": "Back to requests"
+    },
     "resolutionNote": "Resolution note",
     "resolutionNotePlaceholder": "Required before marking resolved.",
     "updateFailed": "Failed to update status.",

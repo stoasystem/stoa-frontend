@@ -46,6 +46,11 @@
     "breadcrumbRoot": "Insegnante",
     "breadcrumbFallback": "Dettaglio richiesta",
     "loadFailed": "Impossibile caricare la richiesta.",
+    "outOfReach": {
+      "title": "Questa richiesta non è più aperta per te",
+      "body": "È scaduta, oppure l’ha presa un altro insegnante.",
+      "back": "Torna alle richieste"
+    },
     "resolutionNote": "Nota di risoluzione",
     "resolutionNotePlaceholder": "Obbligatoria prima di segnare come risolta.",
     "updateFailed": "Impossibile aggiornare lo stato.",
