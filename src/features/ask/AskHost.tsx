@@ -10,6 +10,7 @@ import { AskReopen } from '@/features/ask/AskReopen'
 import { useClearOfControls } from '@/features/ask/clearOfControls'
 import { AskMakeWayContext } from '@/features/ask/askMakeWay'
 import {
+  ASK_FULL_SCREEN,
   ASK_PANEL,
   ASK_REOPEN,
   ASK_RISE,
@@ -19,6 +20,7 @@ import {
   sheetHeightFor,
 } from '@/features/ask/askLayout'
 import { useAskController, type AskRoute } from '@/features/ask/useAskController'
+import { useAskFullScreen } from '@/features/ask/useAskFullScreen'
 import { useAskKeyboard } from '@/features/ask/useAskKeyboard'
 import { useAskUsagePeriod } from '@/features/ask/useAskUsagePeriod'
 import { useSheetDrag } from '@/features/ask/useSheetDrag'
@@ -52,6 +54,15 @@ import '@/features/ask/askGuide.css'
  * With `route` (the pages `/ask` and `/ask/:id`) Ask is open from the start:
  * risen over the planet on a desktop, a full-screen sheet on a phone, and
  * closing it goes to `/`.
+ *
+ * Risen, and as the sheet from the planet, Ask's header has a full-screen
+ * button (#676, `useAskFullScreen`): wide, Ask fills the whole window, the
+ * top bar too, and what is read keeps to a centred column
+ * (`ASK_FULL_SCREEN.column`); on a phone the sheet goes to 100%, as at `/ask`, and dragged
+ * down from there goes back to 72% before a second drag closes it. Pressed
+ * again it goes back. Esc still closes Ask, and closing it ends full screen,
+ * so the next open rises at the normal size. Beside the map there is none
+ * (its expand button raises it), nor on the phone at `/ask`, already full.
  *
  * The panel and the sheet are dark surfaces of their own (#125): each carries
  * `data-surface="sky"` and `data-ask-surface`, which brand-tokens.css turns
@@ -164,8 +175,18 @@ export function AskHost({
     field.setSelectionRange?.(end, end)
   }, [open, layout, beside])
 
+  // Full screen (#676): risen, or the sheet from the planet; ended by closing
+  // Ask, and by a move beside the map, so it comes back at the normal size.
+  const fullScreenOffered = rise || (sheet && entry === 'planet')
+  const fullScreenState = useAskFullScreen({ surface, reset: !open || beside, wide, reducedMotion })
+  const fullScreen = fullScreenOffered && fullScreenState.full
+  const fullScreenToggle = fullScreenOffered
+    ? { on: fullScreen, onToggle: fullScreenState.toggle }
+    : undefined
+
   const onKeyDown = useAskKeyboard(surface, { trap: modal, active: open, onEscape: close })
-  const drag = useSheetDrag(surface, close)
+  // Dragged down from full screen, the sheet goes back to 72% first.
+  const drag = useSheetDrag(surface, fullScreen ? fullScreenState.leave : close)
   // A press on the docked field: the latest conversations, and the way to all
   // of them (`AskRecent`). Not on focus alone: the examples (#586) put the
   // cursor there by script, and Tab passes through.
@@ -417,15 +438,25 @@ export function AskHost({
               data-ask-entry={entry}
               data-ask-conversation={controller.conversationId ?? ''}
               data-ask-motion={rise ? 'rise' : 'panel'}
+              data-ask-full-screen={fullScreen || undefined}
               onKeyDown={onKeyDown}
               data-surface="sky"
               className={
-                rise
-                  ? 'absolute overflow-hidden border border-[color:var(--float-border)] text-ink backdrop-blur-[var(--sky-glass-blur)]'
-                  : 'absolute inset-y-0 right-0 border-l border-[color:var(--float-border)] text-ink backdrop-blur-[var(--sky-glass-blur)]'
+                fullScreen
+                  ? 'fixed overflow-hidden text-ink backdrop-blur-[var(--sky-glass-blur)]'
+                  : rise
+                    ? 'absolute overflow-hidden border border-[color:var(--float-border)] text-ink backdrop-blur-[var(--sky-glass-blur)]'
+                    : 'absolute inset-y-0 right-0 border-l border-[color:var(--float-border)] text-ink backdrop-blur-[var(--sky-glass-blur)]'
               }
               style={
-                rise
+                fullScreen
+                  ? ({
+                      // The whole window, over the top bar: the map is fully covered.
+                      inset: 0,
+                      zIndex: ASK_FULL_SCREEN.zIndex,
+                      background: ASK_SURFACE_BACKGROUND.panel,
+                    } as CSSProperties)
+                  : rise
                   ? ({
                       // Centred, the composer's width at most: left and right
                       // hold the least room, and auto margins centre what is left.
@@ -452,6 +483,8 @@ export function AskHost({
                 layout="panel"
                 subjectId={subjectId}
                 onExpand={beside ? expand : undefined}
+                fullScreen={fullScreenToggle}
+                column={fullScreen ? ASK_FULL_SCREEN.column : undefined}
               />
             </section>
           ) : (
@@ -464,17 +497,21 @@ export function AskHost({
               data-ask-entry={entry}
               data-ask-conversation={controller.conversationId ?? ''}
               data-ask-motion="sheet"
+              data-ask-full-screen={fullScreen || undefined}
               onKeyDown={onKeyDown}
               data-surface="sky"
               className="absolute inset-x-0 bottom-0 flex flex-col overflow-hidden text-ink backdrop-blur-[var(--sky-glass-blur)]"
               style={{
                 background: ASK_SURFACE_BACKGROUND.sheet,
-                height: sheetHeightFor(entry),
-                borderRadius: entry === 'direct' ? 0 : `${ASK_SHEET.radius}px ${ASK_SHEET.radius}px 0 0`,
+                height: sheetHeightFor(entry, fullScreen),
+                borderRadius: entry === 'direct' || fullScreen ? 0 : `${ASK_SHEET.radius}px ${ASK_SHEET.radius}px 0 0`,
                 boxShadow: '0 -10px 40px rgba(0, 0, 0, 0.35)',
                 transform: drag.offset ? `translateY(${drag.offset}px)` : undefined,
+                // It springs back from a drag, and eases between 72% and full screen (#676).
                 transition:
-                  drag.dragging || reducedMotion ? 'none' : `transform var(--motion-sheet) var(--ease-standard)`,
+                  drag.dragging || reducedMotion
+                    ? 'none'
+                    : 'transform var(--motion-sheet) var(--ease-standard), height var(--motion-sheet) var(--ease-standard), border-radius var(--motion-sheet) var(--ease-standard)',
               } as CSSProperties}
             >
               {entry === 'planet' && (
@@ -493,6 +530,7 @@ export function AskHost({
                   layout="sheet"
                   subjectId={subjectId}
                   headerHandle={entry === 'planet' ? drag.handle : undefined}
+                  fullScreen={fullScreenToggle}
                 />
               </div>
             </section>

@@ -54,6 +54,10 @@
     "title": "Ask",
     "close": "Close",
     "expand": "Show bigger",
+    "fullScreen": {
+      "enter": "Full screen",
+      "leave": "Leave full screen"
+    },
     "back": "All conversations",
     "listSubtitle": "Your conversations",
     "composerLabel": "Your question",

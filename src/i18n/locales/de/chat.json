@@ -54,6 +54,10 @@
     "title": "Fragen",
     "close": "Schliessen",
     "expand": "Grösser zeigen",
+    "fullScreen": {
+      "enter": "Vollbild",
+      "leave": "Vollbild verlassen"
+    },
     "back": "Alle Unterhaltungen",
     "listSubtitle": "Deine Unterhaltungen",
     "composerLabel": "Deine Frage",
