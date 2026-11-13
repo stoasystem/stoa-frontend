@@ -64,6 +64,7 @@
     "placeholder": "Message…",
     "dockedPlaceholder": "Pose une question sur tout ce qui est sur la planète…",
     "dockedPlaceholderPhone": "Demande ce que tu veux…",
+    "pausedPlaceholder": "Les questions sont en pause",
     "grabber": "Glisse vers le bas pour fermer",
     "list": {
       "label": "Conversations",

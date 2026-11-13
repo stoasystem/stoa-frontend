@@ -207,6 +207,9 @@ export function StageWithAsk({
               <div className="min-w-0 flex-1">
               <Composer
                 disabled={Boolean(off) || paused}
+                // A quiz in progress keeps its own line and placeholder; only the
+                // ended usage period says so in the field (#615).
+                disabledPlaceholder={!off && paused ? t('ask.pausedPlaceholder') : undefined}
                 describedBy={off ? 'stage-ask-off' : paused ? 'stage-ask-paused' : undefined}
                 value={controller.draft}
                 onChange={onDockedChange}

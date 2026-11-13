@@ -368,6 +368,7 @@ export function AskHost({
                 )}
                 <Composer
                   disabled={paused}
+                  disabledPlaceholder={paused ? t('ask.pausedPlaceholder') : undefined}
                   describedBy={paused ? pausedNoticeId : undefined}
                   value={controller.draft}
                   onChange={onDockedChange}

@@ -453,6 +453,7 @@ export function AskPanel({
           placeholder={practice ? t('ask.practice.placeholder') : t('ask.placeholder')}
           busy={isStreaming || question.starting || attachments.busy}
           disabled={paused}
+          disabledPlaceholder={paused ? t('ask.pausedPlaceholder') : undefined}
           describedBy={
             [
               paused && usagePeriod.entitlement ? USAGE_PERIOD_NOTICE_ID : null,

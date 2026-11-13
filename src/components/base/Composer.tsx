@@ -38,6 +38,12 @@ export interface ComposerProps {
   /** Full composer only: between + and send, e.g. the subject picker. */
   footerStart?: ReactNode
   disabled?: boolean
+  /**
+   * Said in the field instead of `placeholder` while `disabled`, e.g. that
+   * asking is paused once the usage period has ended (#615). Without it the
+   * field keeps its own placeholder, as during a quiz.
+   */
+  disabledPlaceholder?: string
   /** The id of a line saying more about the field, e.g. why it is disabled. */
   describedBy?: string
   /** Sending: the field stays editable, send is held. */
@@ -96,6 +102,7 @@ export function Composer({
   fieldPopup,
   footerStart,
   disabled = false,
+  disabledPlaceholder,
   describedBy,
   busy = false,
   onCompositionStart,
@@ -116,6 +123,16 @@ export function Composer({
   const spec = COMPOSER[variant]
   const empty = value.trim().length === 0
   const canSend = !disabled && !busy && !empty
+  const shownPlaceholder = disabled && disabledPlaceholder ? disabledPlaceholder : placeholder
+  /*
+   * Shut, it has to look shut (#615). The white floating pill with its shadow
+   * and inviting placeholder read as a field that was broken, not one that was
+   * closed: so it sinks to the quiet --fill, loses the floating shadow, and the
+   * pointer says no. The +, the microphone and send all carry IconButton's
+   * disabled opacity (--disabled-opacity).
+   */
+  const surface = disabled ? 'bg-fill cursor-not-allowed' : 'bg-surface'
+  const shadow = disabled ? 'none' : 'var(--shadow-float)'
 
   // The way to dictate stays until it is put away: Esc, the microphone again,
   // or a press anywhere else. Esc gives the keyboard back to the microphone.
@@ -306,7 +323,7 @@ export function Composer({
         data-composer-field
         rows={variant === 'docked' ? 1 : 3}
         value={value}
-        placeholder={placeholder}
+        placeholder={shownPlaceholder}
         disabled={disabled}
         aria-describedby={fieldDescribedBy}
         aria-haspopup={fieldPopup ? 'menu' : undefined}
@@ -318,7 +335,7 @@ export function Composer({
         onCompositionStart={onCompositionStart}
         onCompositionEnd={onCompositionEnd && ((event) => onCompositionEnd(event.currentTarget.value))}
         className={cn(
-          'min-w-0 resize-none border-0 bg-transparent text-ink outline-none placeholder:text-caption',
+          'min-w-0 resize-none border-0 bg-transparent text-ink outline-none placeholder:text-caption disabled:cursor-not-allowed',
           // One line: no scrollbar. Its arrows stood beside an empty field on
           // Windows, a pixel taller than its box, and meant nothing (#553).
           variant === 'docked'
@@ -334,16 +351,18 @@ export function Composer({
     return (
       <form
         data-composer="docked"
+        data-composer-disabled={disabled || undefined}
         onSubmit={submit}
         className={cn(
-          'relative flex w-full items-center gap-2 border border-[color:var(--float-border)] bg-surface',
+          'relative flex w-full items-center gap-2 border border-[color:var(--float-border)]',
+          surface,
           className,
         )}
         style={{
           height: COMPOSER.docked.height,
           borderRadius: COMPOSER.docked.radius,
           padding: '6px 6px 6px 8px',
-          boxShadow: 'var(--shadow-float)',
+          boxShadow: shadow,
         }}
       >
         {hint}
@@ -359,13 +378,14 @@ export function Composer({
   return (
     <form
       data-composer="full"
+      data-composer-disabled={disabled || undefined}
       onSubmit={submit}
-      className={cn('relative flex w-full flex-col gap-3 border border-[color:var(--float-border)] bg-surface', className)}
+      className={cn('relative flex w-full flex-col gap-3 border border-[color:var(--float-border)]', surface, className)}
       style={{
         minHeight: COMPOSER.full.minHeight,
         borderRadius: COMPOSER.full.radius,
         padding: '16px 16px 12px',
-        boxShadow: 'var(--shadow-float)',
+        boxShadow: shadow,
       }}
     >
       {hint}

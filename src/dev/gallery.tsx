@@ -59,13 +59,15 @@ async function start() {
     )
   }
 
-  function ComposerDemo({ variant }: { variant: 'docked' | 'full' }) {
+  function ComposerDemo({ variant, disabled = false }: { variant: 'docked' | 'full'; disabled?: boolean }) {
     const [value, setValue] = useState('')
     return (
       <Composer
         variant={variant}
         label="Ask"
         placeholder={variant === 'docked' ? 'Ask about anything on the planet…' : 'Ask anything about your schoolwork…'}
+        disabled={disabled}
+        disabledPlaceholder="Asking is paused"
         value={value}
         onChange={setValue}
         onSubmit={() => setValue('')}
@@ -225,6 +227,11 @@ async function start() {
                 <ComposerDemo variant="docked" />
               </div>
               <ComposerDemo variant="full" />
+              {/* Paused: the usage period has ended (#615). */}
+              <ComposerDemo variant="docked" disabled />
+              <div data-surface="sky" className="rounded-[12px] bg-sky px-3 py-2.5">
+                <ComposerDemo variant="docked" disabled />
+              </div>
             </Section>
           </div>
         </div>
