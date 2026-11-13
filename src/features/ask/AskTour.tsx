@@ -19,6 +19,9 @@
  *   pointed at ends those two (the teacher's step still comes with the first
  *   answer), typing while "Ask a teacher" is pointed at ends the tour, and
  *   sending a question offered on the empty list ends the composer's two too.
+ *   Nothing in the thread or the list is left under the bubble: the one above
+ *   the composer is given room at its end as tall as the bubble, so its newest
+ *   answer and that answer's "Ask a teacher" scroll clear of it (`onRoom`).
  * - Each step is read out once as it arrives (`role="status"`, always there).
  *   The bubble fades in; the control it points at is ringed once
  *   (`askGuide.css`); with reduced motion, only fades.
@@ -243,10 +246,20 @@ function placeFor(root: HTMLElement, target: HTMLElement, bubble: HTMLElement, p
   return { left, top, pointer, side }
 }
 
+/** The room the area above the composer keeps at its end for a bubble this tall: the bubble, its pointer and gaps. */
+export function roomFor(bubbleHeight: number): number {
+  return Math.ceil(bubbleHeight + GAP + POINTER + EDGE)
+}
+
 /**
  * Murmi's line beside the control it points at, with "Next" and "Skip" (on the
  * last step, "Got it" alone). Stands in Ask's panel (`root`, positioned), over what
  * is there, and follows the control as the panel scrolls or changes size.
+ *
+ * It leaves the student nothing in the thread they cannot reach (#677): `onRoom`
+ * says how much room the thread or list above the composer keeps at its end, so
+ * the newest answer and its "Ask a teacher" stand clear of the bubble (on a
+ * phone it stood over them), and 0 once the bubble goes.
  */
 export function AskTourBubble({
   root,
@@ -254,18 +267,25 @@ export function AskTourBubble({
   camera,
   onNext,
   onSkip,
+  onRoom,
 }: {
   root: RefObject<HTMLElement | null>
   step: AskTourStep
   camera: boolean
   onNext: () => void
   onSkip: () => void
+  onRoom: (room: number) => void
 }) {
   const { t } = useTranslation('chat')
   const line = useLine(step, camera)
   const lineId = useId()
   const own = useRef<HTMLDivElement>(null)
   const [place, setPlace] = useState<Place | null>(null)
+  const roomRef = useRef(onRoom)
+  useLayoutEffect(() => {
+    roomRef.current = onRoom
+  })
+  useLayoutEffect(() => () => roomRef.current(0), [])
 
   useLayoutEffect(() => {
     const panel = root.current
@@ -275,6 +295,7 @@ export function AskTourBubble({
     // Under an answer the control may be out of the thread's view: brought into it, without the focus.
     if (step === 'teacher') target.scrollIntoView?.({ block: 'nearest' })
     const measure = () => {
+      roomRef.current(roomFor(bubble.offsetHeight))
       const now = panel.querySelector<HTMLElement>(ASK_TOUR_TARGETS[step])
       if (now) setPlace(placeFor(panel, now, bubble, step === 'teacher'))
     }

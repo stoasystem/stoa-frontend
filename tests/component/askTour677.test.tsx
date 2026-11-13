@@ -23,6 +23,7 @@ import { I18nextProvider } from 'react-i18next'
 import { MemoryRouter } from 'react-router-dom'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { AskHost } from '@/features/ask/AskHost'
+import { roomFor } from '@/features/ask/AskTour'
 import { askTourProgress } from '@/features/ask/askGuide'
 import { AskServerProvider } from '@/features/ask/server/askServer'
 import { StageWithAsk } from '@/features/chapter/StageAsk'
@@ -273,6 +274,37 @@ describe('getting out of its way', () => {
     expect(sheet).toHaveAttribute('data-ask-surface', 'sheet')
     await waitFor(() => expect(bubble()).not.toBeNull())
     expect(sheet.contains(bubble())).toBe(true)
+  })
+
+  it('leaves nothing in the thread under its bubble on a phone: the thread keeps room at its end as tall as the bubble', async () => {
+    emulate({ wide: false })
+    // jsdom lays nothing out: the bubble is given a phone's height.
+    const height = Object.getOwnPropertyDescriptor(HTMLElement.prototype, 'offsetHeight')!
+    Object.defineProperty(HTMLElement.prototype, 'offsetHeight', {
+      configurable: true,
+      get(this: HTMLElement) {
+        return this.hasAttribute('data-ask-tour-bubble') ? 120 : 0
+      },
+    })
+    try {
+      server.seed({ newConversationIds: ['found-1'] })
+      answeredOnCreate()
+      await askExample()
+      const thread = await screen.findByRole('log', { name: 'Messages' })
+      await within(thread).findByRole('button', { name: 'Ask a teacher' })
+      await waitFor(() => expect(bubble()?.dataset.askTourBubble).toBe('mic'))
+      // The answer's end, "Ask a teacher" with it, scrolls clear of the bubble, and what is brought into view stops above it.
+      const room = roomFor(120)
+      await waitFor(() => expect(thread.style.paddingBottom).toBe(`${12 + room}px`))
+      expect(thread.style.scrollPaddingBottom).toBe(`${room}px`)
+
+      // The bubble gone, the room goes with it.
+      await userEvent.click(within(bubble()!).getByRole('button', { name: 'Skip' }))
+      expect(thread.style.paddingBottom).toBe('12px')
+      expect(thread.style.scrollPaddingBottom).toBe('')
+    } finally {
+      Object.defineProperty(HTMLElement.prototype, 'offsetHeight', height)
+    }
   })
 
   it('stays with Ask in full screen (#676)', async () => {
