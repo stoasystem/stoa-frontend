@@ -54,6 +54,10 @@
     "title": "Fragen",
     "close": "Schliessen",
     "expand": "Grösser zeigen",
+    "fullScreen": {
+      "enter": "Vollbild",
+      "leave": "Vollbild verlassen"
+    },
     "back": "Alle Unterhaltungen",
     "listSubtitle": "Deine Unterhaltungen",
     "composerLabel": "Deine Frage",
@@ -261,6 +265,16 @@
       "title": "Kommst du nicht weiter? Frag mich hier.",
       "body": "Du kannst auch deine Notizen oder eine Hausaufgabe fotografieren und mir schicken.",
       "close": "Verstanden"
+    },
+    "tour": {
+      "label": "Tipp von Murmi",
+      "mic": "Lieber sprechen als tippen? Das Mikrofon zeigt dir, wie du deine Frage diktierst.",
+      "add": "Mit + schickst du mir ein Foto oder eine Datei von deiner Aufgabe.",
+      "addCamera": "Mit + schickst du mir ein Foto oder eine Datei von deiner Aufgabe – oder du fotografierst sie gleich mit der Kamera.",
+      "teacher": "Soll eine echte Lehrperson draufschauen? Tippe unter meiner Antwort auf «{{action}}».",
+      "next": "Weiter",
+      "skip": "Überspringen",
+      "done": "Verstanden"
     }
   }
 }

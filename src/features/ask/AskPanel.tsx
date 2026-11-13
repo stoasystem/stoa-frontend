@@ -1,5 +1,5 @@
-import { ChevronLeft, Maximize2, X } from 'lucide-react'
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type HTMLAttributes } from 'react'
+import { ChevronLeft, Maximize2, Minimize2, X } from 'lucide-react'
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type HTMLAttributes } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 import { Button, Composer, IconButton, PresenceDot } from '@/components/base'
@@ -11,6 +11,7 @@ import { AskConversationList, AskEmptyState } from '@/features/ask/AskConversati
 import { hasSections, quoteCaption, sectionsSpokenText, type AnswerStep } from '@/features/ask/AskAnswerSections'
 import { AskLitCard } from '@/features/ask/AskLitCard'
 import { AskMessage } from '@/features/ask/AskMessage'
+import { AskTourBubble, AskTourStatus, useAskTour } from '@/features/ask/AskTour'
 import { ASK_PANEL } from '@/features/ask/askLayout'
 import { TeacherHelpAction, TeacherHelpStatusCard } from '@/features/ask/teacherHelp/TeacherHelp'
 import { useTeacherHelp } from '@/features/ask/teacherHelp/useTeacherHelp'
@@ -63,6 +64,8 @@ export function AskPanel({
   headerHandle,
   practice,
   onExpand,
+  fullScreen,
+  column,
 }: {
   controller: AskController
   layout: AskLayout
@@ -79,6 +82,18 @@ export function AskPanel({
    * from the docked composer. A button in the header, beside the close.
    */
   onExpand?: () => void
+  /**
+   * Ask given the whole screen, and back (#676): risen over the map, or the
+   * phone sheet from the planet. A button in the header, beside the close.
+   */
+  fullScreen?: { on: boolean; onToggle: () => void }
+  /**
+   * Full screen on a wide screen (#676): the conversation, the list and the
+   * composer keep to one centred column this wide, so a long answer is not
+   * read across the whole window; the back arrow and the title start on its
+   * left edge. The panel's sky still fills the window.
+   */
+  column?: number
 }) {
   const { t } = useTranslation('chat')
   const { conversationId, draft, setDraft, select, close } = controller
@@ -198,6 +213,8 @@ export function AskPanel({
       }
       // Gone with the question -- unless another was chosen meanwhile.
       if (quote && useAskQuoteStore.getState().quote === quote) clearQuote()
+      // Started here: it does not make the student "not new" to Ask (#677).
+      tour.started(outcome.conversationId)
       // Opened only in the panel that asked, and only if the student is still
       // on the list: a closed Ask stays closed, and a conversation the student
       // opened meanwhile stays open.
@@ -243,6 +260,16 @@ export function AskPanel({
     if (taken) askPending.current(taken)
   }, [pending, takesPending, ownerId])
 
+  // The first time Ask opens for a student new to it (#677): Murmi points at
+  // the microphone, the + and "Ask a teacher", one at a time (`AskTour.tsx`).
+  const root = useRef<HTMLDivElement>(null)
+  const tour = useAskTour({ root, ownerId, conversations: conversationsQuery.data?.items, draft, off: paused })
+  const camera = Boolean(attachments.sources.takePhoto)
+  // The room the thread or the list keeps at its end while Murmi's bubble
+  // stands over it, so nothing in them is left under the bubble.
+  const [bubbleRoom, setBubbleRoom] = useState(0)
+  const tourRoom = tour.step ? bubbleRoom : 0
+
   // Named as the list names it until it is read itself, so the title the
   // keyboard lands on says which conversation opened, not "Ask" (#452).
   const named = conversation ?? conversationsQuery.data?.items.find((item) => item.id === conversationId)
@@ -257,14 +284,14 @@ export function AskPanel({
       : t('ask.listSubtitle')
 
   return (
-    <div className="flex h-full min-h-0 flex-col">
+    <div ref={root} data-ask-tour={tour.step ?? undefined} className="relative flex h-full min-h-0 flex-col">
       <header
         {...headerHandle}
         className={cn('flex shrink-0 items-center gap-2.5 border-b border-separator', phone && 'touch-none')}
         style={
           phone
             ? { padding: '6px 12px 8px 16px' }
-            : { height: ASK_PANEL.headerHeight, padding: '0 12px 0 18px' }
+            : { height: ASK_PANEL.headerHeight, ...columnPadding(column, 0, 18, 0, { right: 12 }) }
         }
       >
         {conversationId && (
@@ -292,6 +319,18 @@ export function AskPanel({
           </span>
         )}
         {onExpand && <IconButton label={t('ask.expand')} icon={Maximize2} size={30} variant="gray" onClick={onExpand} />}
+        {fullScreen && (
+          // One button whose name says what a press does, so the focus stays on it either way.
+          <IconButton
+            label={fullScreen.on ? t('ask.fullScreen.leave') : t('ask.fullScreen.enter')}
+            icon={fullScreen.on ? Minimize2 : Maximize2}
+            size={30}
+            hitSize={phone ? 44 : undefined}
+            variant="gray"
+            onClick={fullScreen.onToggle}
+            data-ask-full-screen-toggle
+          />
+        )}
         <IconButton label={t('ask.close')} icon={X} size={30} hitSize={phone ? 44 : undefined} variant="gray" onClick={close} />
       </header>
 
@@ -302,11 +341,22 @@ export function AskPanel({
           ask={ask}
           paused={paused}
           layout={layout}
+          column={column}
+          room={tourRoom}
           onAskAboutStep={askAboutStep}
           onNewConversation={() => select(null)}
         />
       ) : (
-        <div ref={listArea} className="flex min-h-0 flex-1 flex-col overflow-y-auto" style={{ padding: phone ? '8px 6px' : '10px 8px' }}>
+        <div
+          ref={listArea}
+          className="flex min-h-0 flex-1 flex-col overflow-y-auto"
+          style={{
+            ...(phone
+              ? { paddingTop: 8, paddingBottom: 8 + tourRoom, paddingLeft: 6, paddingRight: 6 }
+              : columnPadding(column, 10, 8, 10 + tourRoom)),
+            scrollPaddingBottom: tourRoom || undefined,
+          }}
+        >
           {/* A list on screen stays when a read behind it fails: the reads that
               follow a conversation (#405, #452), a language switch (#457). */}
           {conversationsQuery.isError && conversationsQuery.data && (
@@ -333,7 +383,10 @@ export function AskPanel({
           ) : (conversationsQuery.data?.items.length ?? 0) === 0 ? (
             <RecommendedEmptyState
               subject={subject}
-              onAsk={askRecommended}
+              onAsk={(recommended) => {
+                tour.composerUsed()
+                askRecommended(recommended)
+              }}
               disabled={question.starting || paused}
             />
           ) : (
@@ -353,7 +406,12 @@ export function AskPanel({
         </div>
       )}
 
-      <div ref={composerArea} data-ask-composer-area className="shrink-0" style={{ padding: phone ? '0 12px 34px' : '0 14px 16px' }}>
+      <div
+        ref={composerArea}
+        data-ask-composer-area
+        className="shrink-0"
+        style={phone ? { padding: '0 12px 34px' } : columnPadding(column, 0, 14, 16)}
+      >
         {isStreaming && (
           <div className="flex justify-end pb-1">
             <Button variant="plain" size="small" onClick={ask.stopStreaming}>
@@ -405,8 +463,32 @@ export function AskPanel({
           }
         />
       </div>
+      <AskTourStatus step={tour.step} camera={camera} />
+      {tour.step && (
+        <AskTourBubble root={root} step={tour.step} camera={camera} onNext={tour.next} onSkip={tour.skip} onRoom={setBubbleRoom} />
+      )}
     </div>
   )
+}
+
+/**
+ * An area's padding on a wide screen: `top` and `bottom`, and `gutter` at
+ * either side -- or, in the centred column of wide full screen (#676),
+ * whatever is left either side of `column`, never less than `gutter`. `right`
+ * keeps that side apart (the header's buttons stay at the window's edge).
+ * A percentage in padding is of the panel's width, so each area still spans
+ * the window: the thread's scrollbar stays at the window's edge, and the wheel
+ * scrolls it from anywhere on the screen. Longhands, which jsdom reads too.
+ */
+function columnPadding(
+  column: number | undefined,
+  top: number,
+  gutter: number,
+  bottom = top,
+  { right = gutter }: { right?: number } = {},
+): CSSProperties {
+  const side = column ? `max(${gutter}px, calc((100% - ${column}px) / 2))` : gutter
+  return { paddingTop: top, paddingBottom: bottom, paddingLeft: side, paddingRight: right === gutter ? side : right }
 }
 
 /** The line under which the composer is paused once the usage period has ended (#615). */
@@ -459,6 +541,8 @@ function AskThread({
   ask,
   paused,
   layout,
+  column,
+  room,
   onAskAboutStep,
   onNewConversation,
 }: {
@@ -467,6 +551,10 @@ function AskThread({
   /** The usage period has ended (#615): nothing is sent again either. */
   paused: boolean
   layout: AskLayout
+  /** The centred column of wide full screen (#676), as `AskPanel`'s. */
+  column?: number
+  /** Kept at the thread's end while Ask's tour stands over it (#677), so its newest answer scrolls clear of it. */
+  room: number
   onAskAboutStep: (step: AnswerStep) => void
   /** Back to the list, where the next question starts a new conversation. */
   onNewConversation: () => void
@@ -510,12 +598,13 @@ function AskThread({
   const card = 'card' in view ? view.card : null
 
   // Keep the latest message in view as the thread grows -- unless the student
-  // has scrolled up to read something earlier.
+  // has scrolled up to read something earlier. "Ask a teacher" coming under
+  // the answer, and room made for the tour's bubble, are the thread growing too.
   const atBottom = useRef(true)
   useLayoutEffect(() => {
     const node = scroller.current
     if (node && atBottom.current) node.scrollTop = node.scrollHeight
-  }, [messages])
+  }, [messages, offered, room])
   const onScroll = () => {
     const node = scroller.current
     if (node) atBottom.current = node.scrollHeight - node.scrollTop - node.clientHeight < STICK_TO_BOTTOM_PX
@@ -527,7 +616,7 @@ function AskThread({
   return (
     <>
       {card && (
-        <div className="shrink-0" style={{ padding: layout === 'sheet' ? '10px 14px 0' : '12px 18px 0' }}>
+        <div className="shrink-0" style={layout === 'sheet' ? { padding: '10px 14px 0' } : columnPadding(column, 12, 18, 0)}>
           <TeacherHelpStatusCard
             request={card.request}
             teachersOnline={card.teachersOnline}
@@ -550,7 +639,13 @@ function AskThread({
         // place, made it taller than the screen, and anything brought into
         // view in the thread scrolled the whole page up (#636).
         className="relative flex min-h-0 flex-1 flex-col overflow-y-auto"
-        style={{ gap: layout === 'sheet' ? 10 : 12, padding: layout === 'sheet' ? '12px 14px' : '16px 18px' }}
+        style={{
+          ...(layout === 'sheet'
+            ? { gap: 10, paddingTop: 12, paddingBottom: 12 + room, paddingLeft: 14, paddingRight: 14 }
+            : { gap: 12, ...columnPadding(column, 16, 18, 16 + room) }),
+          // What is brought into view stops above the bubble, not under it.
+          scrollPaddingBottom: room || undefined,
+        }}
       >
         <div className="flex-1" />
         {conversationQuery.isLoading ? (
