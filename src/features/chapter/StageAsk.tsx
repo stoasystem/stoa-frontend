@@ -98,7 +98,8 @@ export function useStageAskController(side: boolean, off = false): AskController
  *
  * The first time a student new to Ask is here (#586), Murmi points at Ask
  * once, and its way to add a photo is highlighted (`StageAskTip.tsx`); not
- * during a quiz, nor over the phone's sheet.
+ * during a quiz, nor over the phone's sheet, nor while Ask's own first-time
+ * tour (#677) is on its composer -- after it, without the photo point.
  */
 export function StageWithAsk({
   children,
@@ -177,7 +178,7 @@ export function StageWithAsk({
   )
 
   return (
-    <div ref={host} data-stage-host data-ask-guide={tipShown || undefined} className="relative flex min-h-0 flex-1 overflow-hidden">
+    <div ref={host} data-stage-host data-ask-guide={(tipShown && tip.photo) || undefined} className="relative flex min-h-0 flex-1 overflow-hidden">
       <div
         data-surface="sky"
         data-stage-page
@@ -185,11 +186,11 @@ export function StageWithAsk({
         className="relative flex min-w-0 flex-1 flex-col bg-sky text-on-sky"
       >
         <div className="flex min-h-0 flex-1 flex-col">{children}</div>
-        <StageAskTipStatus shown={tipShown} />
+        <StageAskTipStatus shown={tipShown} photo={tip.photo} />
         {!open && (
           <div ref={docked} data-ask-docked className="flex shrink-0 justify-center px-3 pt-2 pb-[34px] sm:px-6 sm:pb-[22px]">
             <div className="flex w-full max-w-[640px] flex-col gap-1.5">
-              {tipShown && <StageAskTipBubble beside={false} onDismiss={tip.dismiss} />}
+              {tipShown && <StageAskTipBubble beside={false} onDismiss={tip.dismiss} photo={tip.photo} />}
               {off && (
                 <p data-ask-off id="stage-ask-off" className="m-0 text-center text-[13px] text-[color:var(--on-sky-text-body)]">
                   {off}
@@ -258,7 +259,7 @@ export function StageWithAsk({
             } as CSSProperties}
           >
             <AskPanel controller={controller} layout="panel" subjectId={subjectId} practice={practice} />
-            {tipShown && <StageAskTipBubble beside onDismiss={tip.dismiss} />}
+            {tipShown && <StageAskTipBubble beside onDismiss={tip.dismiss} photo={tip.photo} />}
           </aside>
         ) : (
           <section

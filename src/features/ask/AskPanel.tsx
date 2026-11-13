@@ -11,6 +11,7 @@ import { AskConversationList, AskEmptyState } from '@/features/ask/AskConversati
 import { hasSections, quoteCaption, sectionsSpokenText, type AnswerStep } from '@/features/ask/AskAnswerSections'
 import { AskLitCard } from '@/features/ask/AskLitCard'
 import { AskMessage } from '@/features/ask/AskMessage'
+import { AskTourBubble, AskTourStatus, useAskTour } from '@/features/ask/AskTour'
 import { ASK_PANEL } from '@/features/ask/askLayout'
 import { TeacherHelpAction, TeacherHelpStatusCard } from '@/features/ask/teacherHelp/TeacherHelp'
 import { useTeacherHelp } from '@/features/ask/teacherHelp/useTeacherHelp'
@@ -212,6 +213,8 @@ export function AskPanel({
       }
       // Gone with the question -- unless another was chosen meanwhile.
       if (quote && useAskQuoteStore.getState().quote === quote) clearQuote()
+      // Started here: it does not make the student "not new" to Ask (#677).
+      tour.started(outcome.conversationId)
       // Opened only in the panel that asked, and only if the student is still
       // on the list: a closed Ask stays closed, and a conversation the student
       // opened meanwhile stays open.
@@ -257,6 +260,16 @@ export function AskPanel({
     if (taken) askPending.current(taken)
   }, [pending, takesPending, ownerId])
 
+  // The first time Ask opens for a student new to it (#677): Murmi points at
+  // the microphone, the + and "Ask a teacher", one at a time (`AskTour.tsx`).
+  const root = useRef<HTMLDivElement>(null)
+  const tour = useAskTour({ root, ownerId, conversations: conversationsQuery.data?.items, draft, off: paused })
+  const camera = Boolean(attachments.sources.takePhoto)
+  // The room the thread or the list keeps at its end while Murmi's bubble
+  // stands over it, so nothing in them is left under the bubble.
+  const [bubbleRoom, setBubbleRoom] = useState(0)
+  const tourRoom = tour.step ? bubbleRoom : 0
+
   // Named as the list names it until it is read itself, so the title the
   // keyboard lands on says which conversation opened, not "Ask" (#452).
   const named = conversation ?? conversationsQuery.data?.items.find((item) => item.id === conversationId)
@@ -271,7 +284,7 @@ export function AskPanel({
       : t('ask.listSubtitle')
 
   return (
-    <div className="flex h-full min-h-0 flex-col">
+    <div ref={root} data-ask-tour={tour.step ?? undefined} className="relative flex h-full min-h-0 flex-col">
       <header
         {...headerHandle}
         className={cn('flex shrink-0 items-center gap-2.5 border-b border-separator', phone && 'touch-none')}
@@ -329,6 +342,7 @@ export function AskPanel({
           paused={paused}
           layout={layout}
           column={column}
+          room={tourRoom}
           onAskAboutStep={askAboutStep}
           onNewConversation={() => select(null)}
         />
@@ -336,7 +350,12 @@ export function AskPanel({
         <div
           ref={listArea}
           className="flex min-h-0 flex-1 flex-col overflow-y-auto"
-          style={phone ? { padding: '8px 6px' } : columnPadding(column, 10, 8)}
+          style={{
+            ...(phone
+              ? { paddingTop: 8, paddingBottom: 8 + tourRoom, paddingLeft: 6, paddingRight: 6 }
+              : columnPadding(column, 10, 8, 10 + tourRoom)),
+            scrollPaddingBottom: tourRoom || undefined,
+          }}
         >
           {/* A list on screen stays when a read behind it fails: the reads that
               follow a conversation (#405, #452), a language switch (#457). */}
@@ -364,7 +383,10 @@ export function AskPanel({
           ) : (conversationsQuery.data?.items.length ?? 0) === 0 ? (
             <RecommendedEmptyState
               subject={subject}
-              onAsk={askRecommended}
+              onAsk={(recommended) => {
+                tour.composerUsed()
+                askRecommended(recommended)
+              }}
               disabled={question.starting || paused}
             />
           ) : (
@@ -441,6 +463,10 @@ export function AskPanel({
           }
         />
       </div>
+      <AskTourStatus step={tour.step} camera={camera} />
+      {tour.step && (
+        <AskTourBubble root={root} step={tour.step} camera={camera} onNext={tour.next} onSkip={tour.skip} onRoom={setBubbleRoom} />
+      )}
     </div>
   )
 }
@@ -516,6 +542,7 @@ function AskThread({
   paused,
   layout,
   column,
+  room,
   onAskAboutStep,
   onNewConversation,
 }: {
@@ -526,6 +553,8 @@ function AskThread({
   layout: AskLayout
   /** The centred column of wide full screen (#676), as `AskPanel`'s. */
   column?: number
+  /** Kept at the thread's end while Ask's tour stands over it (#677), so its newest answer scrolls clear of it. */
+  room: number
   onAskAboutStep: (step: AnswerStep) => void
   /** Back to the list, where the next question starts a new conversation. */
   onNewConversation: () => void
@@ -569,12 +598,13 @@ function AskThread({
   const card = 'card' in view ? view.card : null
 
   // Keep the latest message in view as the thread grows -- unless the student
-  // has scrolled up to read something earlier.
+  // has scrolled up to read something earlier. "Ask a teacher" coming under
+  // the answer, and room made for the tour's bubble, are the thread growing too.
   const atBottom = useRef(true)
   useLayoutEffect(() => {
     const node = scroller.current
     if (node && atBottom.current) node.scrollTop = node.scrollHeight
-  }, [messages])
+  }, [messages, offered, room])
   const onScroll = () => {
     const node = scroller.current
     if (node) atBottom.current = node.scrollHeight - node.scrollTop - node.clientHeight < STICK_TO_BOTTOM_PX
@@ -609,7 +639,13 @@ function AskThread({
         // place, made it taller than the screen, and anything brought into
         // view in the thread scrolled the whole page up (#636).
         className="relative flex min-h-0 flex-1 flex-col overflow-y-auto"
-        style={layout === 'sheet' ? { gap: 10, padding: '12px 14px' } : { gap: 12, ...columnPadding(column, 16, 18) }}
+        style={{
+          ...(layout === 'sheet'
+            ? { gap: 10, paddingTop: 12, paddingBottom: 12 + room, paddingLeft: 14, paddingRight: 14 }
+            : { gap: 12, ...columnPadding(column, 16, 18, 16 + room) }),
+          // What is brought into view stops above the bubble, not under it.
+          scrollPaddingBottom: room || undefined,
+        }}
       >
         <div className="flex-1" />
         {conversationQuery.isLoading ? (

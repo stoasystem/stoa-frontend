@@ -10,6 +10,12 @@
  * away -- "Got it" or Escape -- it stays away in this tab only, as the first
  * landing does. Never during a quiz, where Ask is off.
  *
+ * It does not stack with Ask's first-time tour (#677, `AskTour.tsx`), which
+ * points at the + too. Beside the exercise on a wide screen both would come at
+ * once: the tour wins, and the tip waits while the tour is on Ask's composer
+ * (the microphone, the +). Once the tour has begun in this tab, the tip says
+ * only "ask me here" -- not the photo point again -- and highlights nothing.
+ *
  * Not a modal: it takes no focus, the exercise stays usable, and what it says
  * is read out once (`role="status"`). It fades in; nothing moves with reduced
  * motion (`askGuide.css`).
@@ -19,6 +25,7 @@ import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/base'
 import { Murmi } from '@/components/brand/Murmi'
 import { dismissStageTip, stageTipDismissed } from '@/features/ask/askGuide'
+import { useAskTourProgress } from '@/features/ask/AskTour'
 import { useConversationsQuery } from '@/hooks/chat/useConversationsQuery'
 import { cn } from '@/lib/utils'
 import { useAuthStore } from '@/store/authStore'
@@ -27,31 +34,38 @@ import '@/features/ask/askGuide.css'
 export type StageAskTip = {
   /** Whether Murmi points at Ask now. */
   shown: boolean
+  /** Whether it makes the photo point too: not once Ask's tour has (#677). */
+  photo: boolean
   dismiss: () => void
 }
 
-/** Whether the tip is due: Ask on, no Ask conversation on the server, not waved away in this tab. */
+/**
+ * Whether the tip is due: Ask on, no Ask conversation on the server, not
+ * waved away in this tab, and Ask's tour not on the composer now.
+ */
 export function useStageAskTip(off: boolean): StageAskTip {
   const ownerId = useAuthStore((state) => state.user?.id ?? null)
   const conversations = useConversationsQuery()
   const [dismissed, setDismissed] = useState(() => ownerId === null || stageTipDismissed(ownerId))
   const newToAsk = conversations.isSuccess && conversations.data.items.length === 0
+  const tour = useAskTourProgress(ownerId)
+  const touring = tour === 'mic' || tour === 'add'
   const dismiss = useCallback(() => {
     if (ownerId) dismissStageTip(ownerId)
     setDismissed(true)
   }, [ownerId])
-  return { shown: !off && !dismissed && newToAsk, dismiss }
+  return { shown: !off && !dismissed && !touring && newToAsk, photo: tour === null, dismiss }
 }
 
 /**
  * What Murmi says, read out once as it arrives: a live region that is always
  * there, so the words arriving in it are announced.
  */
-export function StageAskTipStatus({ shown }: { shown: boolean }) {
+export function StageAskTipStatus({ shown, photo = true }: { shown: boolean; photo?: boolean }) {
   const { t } = useTranslation('chat')
   return (
     <p role="status" data-stage-ask-tip-status className="sr-only">
-      {shown ? `${t('ask.stageTip.title')} ${t('ask.stageTip.body')}` : ''}
+      {shown ? (photo ? `${t('ask.stageTip.title')} ${t('ask.stageTip.body')}` : t('ask.stageTip.title')) : ''}
     </p>
   )
 }
@@ -97,7 +111,16 @@ function useAboveComposerArea(tip: RefObject<HTMLElement | null>, beside: boolea
  * stands in it, just above its composer area -- tray and all, as tall as it
  * is now; otherwise it sits over the docked composer, in the flow.
  */
-export function StageAskTipBubble({ beside, onDismiss }: { beside: boolean; onDismiss: () => void }) {
+export function StageAskTipBubble({
+  beside,
+  onDismiss,
+  photo = true,
+}: {
+  beside: boolean
+  onDismiss: () => void
+  /** The photo point too; not once Ask's tour has made it in this tab (#677). */
+  photo?: boolean
+}) {
   const { t } = useTranslation('chat')
   const titleId = useId()
   const own = useRef<HTMLElement>(null)
@@ -135,7 +158,7 @@ export function StageAskTipBubble({ beside, onDismiss }: { beside: boolean; onDi
           {t('ask.stageTip.title')}
         </h2>
       </div>
-      <p className="m-0 text-[13px] leading-5 text-[color:var(--on-sky-text-body)]">{t('ask.stageTip.body')}</p>
+      {photo && <p className="m-0 text-[13px] leading-5 text-[color:var(--on-sky-text-body)]">{t('ask.stageTip.body')}</p>}
       <div className="flex justify-end">
         <Button variant="onSkyPlain" size="small" onClick={onDismiss}>
           {t('ask.stageTip.close')}

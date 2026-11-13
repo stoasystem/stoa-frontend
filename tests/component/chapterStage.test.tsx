@@ -781,6 +781,13 @@ describe('Ask beside the stage', () => {
     expectPracticeContext(body.practiceContext, 'ch-1')
     expectNoExerciseWords(JSON.stringify(body))
 
+    // A student new to Ask: with the question sent and the composer empty,
+    // Ask's first-time tour (#677) points at the +. The first Escape ends it,
+    // the next closes Ask.
+    await waitFor(() => expect(sheet.querySelector('[data-ask-tour-bubble="add"]')).not.toBeNull())
+    await userEvent.keyboard('{Escape}')
+    expect(sheet.querySelector('[data-ask-tour-bubble]')).toBeNull()
+    expect(screen.getByRole('dialog', { name: 'Ask' })).toBeInTheDocument()
     await userEvent.keyboard('{Escape}')
     expect(screen.queryByRole('dialog', { name: 'Ask' })).not.toBeInTheDocument()
     expect(stage()).not.toHaveAttribute('inert')
