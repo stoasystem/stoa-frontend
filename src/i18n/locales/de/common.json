@@ -244,6 +244,11 @@
       "read": "Gelesen"
     },
     "loading": "Mitteilungen werden geladen ...",
+    "offerState": {
+      "expired": "Abgelaufen",
+      "reassigned": "An andere Lehrperson weitergegeben",
+      "withdrawn": "Von der lernenden Person zurückgezogen"
+    },
     "openLabel": "Mitteilungen",
     "openLabelUnread": "Mitteilungen, {{count}} ungelesen",
     "subtitle": "Neues zu deinen Fragen, Übungen und Anfragen an Lehrpersonen.",

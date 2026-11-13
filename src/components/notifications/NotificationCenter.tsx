@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom'
 import { IconButton } from '@/components/base/IconButton'
 import { ICON } from '@/components/base/sizes'
 import { notificationText } from '@/lib/notificationCopy'
-import { notificationTargetPath } from '@/components/notifications/notificationTargets'
+import { helpOfferState, notificationTargetPath } from '@/components/notifications/notificationTargets'
 import { Badge } from '@/components/ui/badge'
 import {
   useArchiveNotificationMutation,
@@ -220,6 +220,9 @@ export function NotificationCenter({
             {items.map((event) => {
               const target = targetOf(event)
               const text = notificationText(event, t)
+              // A help-request offer that closed says how (#670); one in a
+              // state this app does not know says nothing, but opens nothing.
+              const offer = helpOfferState(event)
               return (
                 <div
                   key={event.eventId}
@@ -239,6 +242,11 @@ export function NotificationCenter({
                     <span className="flex min-w-0 flex-1 flex-col">
                       <span className="text-sm font-medium">{text.title}</span>
                       <span className="mt-1 text-xs leading-5 text-muted-foreground">{text.summary}</span>
+                      {offer && offer !== 'unknown' && (
+                        <Badge variant="outline" data-offer-state={offer} className="mt-1.5 self-start">
+                          {t(`notifications.offerState.${offer}`)}
+                        </Badge>
+                      )}
                     </span>
                     {event.status === 'created' && (
                       <Badge variant="default">{t('notifications.itemStatus.created')}</Badge>

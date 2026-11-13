@@ -244,6 +244,11 @@
       "read": "Letta"
     },
     "loading": "Caricamento delle notifiche...",
+    "offerState": {
+      "expired": "Scaduta",
+      "reassigned": "Passata a un altro insegnante",
+      "withdrawn": "Ritirata dallo studente"
+    },
     "openLabel": "Notifiche",
     "openLabelUnread": "Notifiche, {{count}} da leggere",
     "subtitle": "Novità sulle tue domande, sugli esercizi e sulle richieste agli insegnanti.",
