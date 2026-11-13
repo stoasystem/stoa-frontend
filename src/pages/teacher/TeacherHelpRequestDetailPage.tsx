@@ -100,15 +100,17 @@ export function TeacherHelpRequestDetailPage() {
             role="status"
             aria-labelledby="request-out-of-reach"
             data-request-out-of-reach
-            className="space-y-3 rounded-lg border bg-card p-5"
+            className="rounded-lg border bg-card p-5"
           >
             <h2 id="request-out-of-reach" className="m-0 text-base font-semibold text-foreground">
               {tTeacher('detail.outOfReach.title')}
             </h2>
-            <p className="m-0 text-sm leading-6 text-muted-foreground">{tTeacher('detail.outOfReach.body')}</p>
-            <Button asChild variant="outline">
-              <Link to="/teacher">{tTeacher('detail.outOfReach.back')}</Link>
-            </Button>
+            <p className="mb-0 mt-1 text-sm leading-6 text-muted-foreground">{tTeacher('detail.outOfReach.body')}</p>
+            <div className="mt-4">
+              <Button asChild variant="outline">
+                <Link to="/teacher">{tTeacher('detail.outOfReach.back')}</Link>
+              </Button>
+            </div>
           </section>
         )}
         {requestQuery.isError && !gone && (
