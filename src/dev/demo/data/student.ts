@@ -52,6 +52,7 @@ const GRADE_LABELS: Record<string, Record<SupportedLanguage, string>> = {
     fr: 'Secondaire I, je ne sais pas quelle année',
     it: 'Scuola media, non so quale anno',
   },
+  // Upper secondary, last (stoa-backend#419, #420).
   grade_secondary_ii: {
     de: 'Sekundarstufe II (Gymnasium, Mittelschule)',
     en: 'Upper secondary (Gymnasium)',

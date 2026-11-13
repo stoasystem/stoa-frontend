@@ -127,7 +127,7 @@ export const SURFACES: readonly Surface[] = [
     readyWhen: '[data-language-first] [data-shown]',
   },
   // #591: before the first landing, a newcomer with no year group on the profile is asked it
-  // and the subjects school is on. A lower-secondary year lands on the demo knowledge point.
+  // and the subjects school is on. A secondary year (lower or upper) lands on the demo knowledge point.
   {
     id: 'about-you',
     label: 'Star map · newcomer, About you',

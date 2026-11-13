@@ -5,6 +5,7 @@
  * the backend does, so each state of the form can be seen.
  */
 import { beforeEach, describe, expect, it } from 'vitest'
+import { demoGradeChoicesFor } from '@/dev/demo/data/student'
 import { resetDemoServer, startAsNewcomer } from '@/dev/preview/demoSource'
 import { answer, DEMO_FAIL_ONCE } from '@/dev/preview/handlers'
 
@@ -21,6 +22,16 @@ describe('what /me saves in the design preview', () => {
     expect(before.choices.grade.map((choice) => choice.code)).toContain('grade_8_secondary')
     await call('PATCH', '/students/me/profile', { grade: 'grade_8_secondary', primarySubjects: ['math'] })
     expect((await call('GET', '/students/me/profile'))?.data).toMatchObject({ grade: 'grade_8_secondary', primarySubjects: ['math'] })
+  })
+
+  it('offers upper secondary last, named as the backend names it (stoa-backend#419, #420)', async () => {
+    const choices = ((await call('GET', '/students/me/profile'))?.data as { choices: { grade: { code: string; label: string }[] } }).choices.grade
+    expect(choices[choices.length - 1]).toEqual({ code: 'grade_secondary_ii', label: 'Upper secondary (Gymnasium)' })
+    expect(demoGradeChoicesFor('de').slice(-1)[0]?.label).toBe('Sekundarstufe II (Gymnasium, Mittelschule)')
+    expect(demoGradeChoicesFor('fr').slice(-1)[0]?.label).toBe('Secondaire II (gymnase, collège, lycée)')
+    expect(demoGradeChoicesFor('it').slice(-1)[0]?.label).toBe('Scuola media superiore (liceo)')
+    await call('PATCH', '/students/me/profile', { grade: 'grade_secondary_ii' })
+    expect((await call('GET', '/students/me/profile'))?.data).toMatchObject({ grade: 'grade_secondary_ii' })
   })
 
   it('refuses a code-shaped year group that is not in its list, as the backend does (stoa-backend#310)', async () => {

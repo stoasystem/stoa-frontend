@@ -6,6 +6,8 @@
  * Two kinds of name insist (#144): a key star's may sit over other stars and
  * lines, on a thin dark backing (`placeInsisting`), and a name at the
  * screen's edge slides along it (`edgeSpots`) to keep clear of the key stars.
+ * No name sits on a galaxy name's letters while it has a free spot off them
+ * (`Obstacles.covers`); one that must sit there anyway gets the same backing.
  */
 import { REVEAL } from '@/features/starmap/view/semanticZoom'
 
@@ -50,6 +52,13 @@ export type Obstacles = {
   boxes: Box[]
   circles: readonly Circle[]
   segments: readonly Segment[]
+  /** Text no name may cover, unlike `boxes` not added to: the galaxy names' letters. */
+  covers?: readonly Box[]
+}
+
+/** Whether `box` lies on any of `covers` (a galaxy name's letters). */
+export function coversAny(box: Box, covers: readonly Box[]): boolean {
+  return covers.some((cover) => boxesOverlap(box, cover))
 }
 
 /**
@@ -72,6 +81,7 @@ export function placeLabel(
   candidates.forEach((box, order) => {
     if (box.x0 < area.x0 || box.y0 < area.y0 || box.x1 > area.x1 || box.y1 > area.y1) return
     if (obstacles.boxes.some((placed) => boxesOverlap(box, placed))) return
+    if (obstacles.covers && coversAny(box, obstacles.covers)) return
     if (obstacles.segments.some((segment) => boxHitsSegment(box, segment))) return
     let cost = order * 0.5
     for (const circle of obstacles.circles) if (boxHitsCircle(box, circle)) cost += 10
@@ -142,7 +152,8 @@ export function edgeSpots(x: number, y: number, half: number, area: Box, horizon
  * other stars (`circles`) and cross lines, on a thin dark backing, but never
  * over a placed name, over a key star (`keyCircles`) while another spot is
  * clear of them, or outside `area`. Over a star weighs less than across a
- * line; the nearer spots win. Null only if every spot is under a placed name.
+ * line, a line less than a galaxy name's letters (`covers`); the nearer spots
+ * win. Null only if every spot is under a placed name.
  */
 export function placeInsisting(
   candidates: readonly Box[],
@@ -153,13 +164,16 @@ export function placeInsisting(
   area: Box,
   /** Extra cost for a spot, as `placeLabel`'s. */
   extraCost: (box: Box) => number = () => 0,
+  /** Galaxy names' letters: `galaxyNameCost` each a spot lies on. */
+  covers: readonly Box[] = [],
 ): Box | null {
-  const { keyStarCost, starCost, lineCost } = REVEAL.keyName
+  const { keyStarCost, starCost, lineCost, galaxyNameCost } = REVEAL.keyName
   return placeLabel(candidates, { boxes: [...boxes], circles: [], segments: [] }, area, (box) => {
     let cost = extraCost(box)
     for (const c of keyCircles) if (boxHitsCircle(box, c)) cost += keyStarCost
     for (const c of circles) if (boxHitsCircle(box, c)) cost += starCost
     for (const s of segments) if (boxHitsSegment(box, s)) cost += lineCost
+    for (const g of covers) if (boxesOverlap(box, g)) cost += galaxyNameCost
     return cost
   })
 }
