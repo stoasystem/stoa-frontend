@@ -68,6 +68,10 @@
     "answerPlaceholder": "Scrivi la tua risposta",
     "backToChapter": "Torna a {{chapter}}",
     "backToLessons": "Torna al capitolo",
+    "cards": {
+      "start": "Vai agli esercizi",
+      "title": "Prima, la spiegazione"
+    },
     "check": "Verifica la risposta",
     "checkFailed": "Non è stato possibile verificare la tua risposta. Riprova.",
     "checking": "Verifica in corso…",

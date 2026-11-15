@@ -657,6 +657,60 @@ describe('the practice stage', () => {
   })
 })
 
+describe('a lesson with explanation cards (#692)', () => {
+  const sections = [
+    { id: 'card-1', title: 'What balancing means', body: 'Do the same to both sides.\nThen $3x = 15$ still holds.' },
+    { id: 'card-2', title: 'Undo in reverse', body: 'Take away first, then divide.' },
+  ]
+
+  it('shows the cards in their order before the first exercise, then the exercise', async () => {
+    vi.mocked(getPracticeLesson).mockResolvedValue({ ...lesson, sections })
+    open('/chapter/u-5/l-2', { width: 375 })
+
+    const cards = await screen.findByRole('region', { name: 'First, the idea' })
+    const titles = within(cards).getAllByRole('heading', { level: 3 }).map((heading) => heading.textContent)
+    expect(titles).toEqual(['What balancing means', 'Undo in reverse'])
+    expect(within(cards).getByText(/Do the same to both sides\./)).toBeInTheDocument()
+    // No exercise yet, and Ask is told of none.
+    expect(screen.queryByRole('heading', { level: 2, name: '3x + 5 = 20' })).not.toBeInTheDocument()
+    expect(document.querySelector('[data-stage-exercise]')).toBeNull()
+
+    await userEvent.click(screen.getByRole('button', { name: 'On to the exercises' }))
+
+    // The keyboard goes on to the first question; the cards are gone.
+    expect(await screen.findByRole('heading', { level: 2, name: '3x + 5 = 20' })).toHaveFocus()
+    expect(document.querySelector('[data-stage-cards]')).toBeNull()
+  })
+
+  it('sets the formulas in a card as maths', async () => {
+    vi.mocked(getPracticeLesson).mockResolvedValue({ ...lesson, sections })
+    open('/chapter/u-5/l-2')
+    await screen.findByRole('heading', { level: 3, name: 'What balancing means' })
+    const card = document.querySelector<HTMLElement>('[data-stage-card="card-1"]')!
+    await waitFor(() => expect(card.querySelector('.katex')).not.toBeNull())
+    expect(card.textContent).not.toContain('$3x = 15$')
+  })
+
+  it('opens on the exercise as before when the lesson has no cards', async () => {
+    vi.mocked(getPracticeLesson).mockResolvedValue({ ...lesson, sections: [] })
+    open('/chapter/u-5/l-2', { width: 375 })
+
+    expect(await screen.findByRole('heading', { level: 2, name: '3x + 5 = 20' })).toBeInTheDocument()
+    expect(document.querySelector('[data-stage-cards]')).toBeNull()
+    expect(screen.queryByRole('button', { name: 'On to the exercises' })).not.toBeInTheDocument()
+  })
+
+  it('opens on the exercise when a backend from before sends no sections at all', async () => {
+    const before: PracticeLesson = { ...lesson }
+    delete before.sections
+    vi.mocked(getPracticeLesson).mockResolvedValue(before)
+    open('/chapter/u-5/l-2')
+
+    expect(await screen.findByRole('heading', { level: 2, name: '3x + 5 = 20' })).toBeInTheDocument()
+    expect(document.querySelector('[data-stage-cards]')).toBeNull()
+  })
+})
+
 describe('a lesson a backend from before ADR 0004 still calls locked', () => {
   const lockedRoadmap = () => {
     const served = roadmap()
