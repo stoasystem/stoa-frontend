@@ -398,10 +398,10 @@ describe('the path drawn (#488 point 2)', () => {
     const s = drawnSky()
     s.engine.setTarget({ layer: 'map', fly: true, frame: [s.path.target, ...s.path.missing] })
     s.clock.advance(400)
-    expect(s.real.stats.path).toEqual({ lines: 0, glows: 0, curves: 0 })
+    expect(s.real.stats.path).toEqual({ lines: 0, glows: 0, curves: 0, sides: 0 })
     s.engine.setPath(s.path)
     s.clock.advance(400)
-    expect(s.real.stats.path!.lines).toBe(s.path.edges.length)
+    expect(s.real.stats.path!.lines).toBe(s.path.edges.filter((edge) => edge.main).length)
     expect(s.real.stats.path!.glows).toBe(s.path.missing.length)
     s.engine.destroy()
   })
@@ -416,7 +416,7 @@ describe('the path drawn (#488 point 2)', () => {
     s.engine.setPath(s.path)
     s.clock.advance(400)
     expect(s.real.stats.links!.lines).toBe(0)
-    expect(s.real.stats.path!.lines).toBe(s.path.edges.length)
+    expect(s.real.stats.path!.lines).toBe(s.path.edges.filter((edge) => edge.main).length)
     s.engine.destroy()
   })
 
@@ -434,7 +434,7 @@ describe('the path drawn (#488 point 2)', () => {
     s.engine.setPath(null)
     s.clock.advance(400)
     expect(s.frame().path).toBeUndefined()
-    expect(s.real.stats.path).toEqual({ lines: 0, glows: 0, curves: 0 })
+    expect(s.real.stats.path).toEqual({ lines: 0, glows: 0, curves: 0, sides: 0 })
     s.engine.destroy()
   })
 
@@ -495,7 +495,7 @@ describe('the path drawn (#488 point 2)', () => {
     }) as unknown as CanvasRenderingContext2D
     const drawn = drawPath(ctx, scene, frame, THEME, { segments: [] })
     // Two nebulae: one curve, bundled between them.
-    expect(drawn).toEqual({ lines: 1, glows: 1, curves: 1 })
+    expect(drawn).toEqual({ lines: 1, glows: 1, curves: 1, sides: 0 })
     const line = strokes.find((stroke) => stroke.width === PATH.main.width)!
     // From just off the missing star (x 300) to just off the target (x 700): the whole way, the way to walk.
     expect(line.from[0]).toBeGreaterThan(300)
@@ -508,10 +508,12 @@ describe('the path drawn (#488 point 2)', () => {
     expect(PATH.main.width).toBeLessThan(LINE.width[1])
     expect(PATH.main.halo).toBeLessThan(LINE.glow.width / 2)
     expect(PATH.main.haloAlpha).toBeLessThan(LINE.glow.alpha)
-    // A side branch: one thin dim line, no halo.
+    // A side branch: not drawn at rest; for the star in focus one thin line, no halo.
     strokes.length = 0
     frame.path!.edges = [{ from: 0, to: 1, main: false }]
     drawPath(ctx, scene, frame, THEME, { segments: [] })
+    expect(strokes).toEqual([])
+    drawPath(ctx, scene, { ...frame, focusStar: 1 } as SceneFrame, THEME, { segments: [] })
     expect(strokes.map(({ width, alpha }) => ({ width, alpha }))).toEqual([{ width: PATH.side.width, alpha: PATH.side.alpha }])
     expect(PATH.side.width).toBeLessThan(PATH.main.width)
   })

@@ -52,6 +52,7 @@ import {
   bundleCubic,
   bundlePoint,
   cubicBounds,
+  cubicLength,
   cubicSegments,
   pointAt,
   shiftCubic,
@@ -797,18 +798,22 @@ export const PATH = {
   glowAlpha: 0.55,
   /** The chain from the first missing star to the target: gold, a little under tier 1's width, over a narrow faint halo. */
   main: { width: 2, halo: 4.5, haloAlpha: 0.14 },
-  /** The side branches leading into it: hairlines, no halo, dim enough to read as behind the chain. */
-  side: { width: 1.2, alpha: 0.38 },
-  /** A side branch of the star in focus or under the pointer: brighter, so its end inside a trunk can be followed. */
-  sideFocused: { width: 1.5, alpha: 0.8 },
-  /** The arrowhead halfway along each line of the chain, pointing the way to walk: half its length (px) and its stroke. */
-  arrow: { size: 5, width: 1.8 },
+  /**
+   * The side branches leading into it: not drawn at rest -- the glow round
+   * each missing star already says which are missing. Only the star in focus
+   * or under the pointer shows its own, at this width and strength, eased in
+   * and out with the pointer's lift.
+   */
+  side: { width: 1.5, alpha: 0.8 },
+  /**
+   * The arrowhead halfway along each line of the chain, pointing the way to
+   * walk: half its length (px) and its stroke; none on a line drawn shorter
+   * than `minLength` px, where it would sit on the glows at both ends.
+   */
+  arrow: { size: 5, width: 1.8, minLength: 40 },
   /** A curve is kept clear of names as this many straight pieces. */
   pieces: 6,
 } as const
-
-/** One line of the path on screen, prerequisite to dependent: straight inside a nebula, a bundled curve between two. */
-export type PathLine = { from: number; to: number; main: boolean; curve: Cubic; straight: boolean }
 
 /**
  * The line of a path's prerequisite `from -> to` on screen (#489), whole,
@@ -869,8 +874,9 @@ function strokeArrow(ctx: CanvasRenderingContext2D, curve: Cubic) {
  *               narrow warm halo, an arrowhead halfway along each line
  *               pointing the way to walk; its steps are numbered beside the
  *               stars (`render/pathSteps.ts`, placed with the names).
- *   the sides   the branches leading into it: thin and dim, under the chain;
- *               those of the star in focus or under the pointer brighter.
+ *   the sides   the branches leading into it: hidden at rest; the star in
+ *               focus or under the pointer shows its own (`reveal`), under
+ *               the chain. Each missing star's glow says it is missing.
  *
  * A line inside one nebula is straight; one between two nebulae is a curve
  * bundled with the others between the same two (`pathCurve`), so a far
@@ -885,9 +891,15 @@ export function drawPath(
   frame: SceneFrame,
   theme: StarMapTheme,
   obstacles: Pick<LinkObstacles, 'segments'> & { chain?: Segment[] },
-  options: Pick<LinkOptions, 'wrap'> = {},
-): { lines: number; glows: number; curves: number } {
-  const stats = { lines: 0, glows: 0, curves: 0 }
+  options: Pick<LinkOptions, 'wrap'> & {
+    /**
+     * How far star `i`'s side branches are shown, 0..1: the renderer's eased
+     * hover lift. Absent: 1 for the star in focus or under the pointer, else 0.
+     */
+    reveal?: (i: number) => number
+  } = {},
+): { lines: number; glows: number; curves: number; sides: number } {
+  const stats = { lines: 0, glows: 0, curves: 0, sides: 0 }
   const path = frame.path
   const amount = Math.max(0, Math.min(1, path?.amount ?? 0))
   if (!path || amount <= 0.001) return stats
@@ -931,22 +943,22 @@ export function drawPath(
     if (seen) stats.glows += 1
   }
 
-  // The side branches first, those of the star in focus or under the pointer over them, the chain over all.
-  const focus = (i: number) => i >= 0 && (i === frame.focusStar || i === (frame.hoveredStar ?? -1))
-  const lit = (edge: { from: number; to: number; main: boolean }) => !edge.main && (focus(edge.from) || focus(edge.to))
-  const rank = (edge: { from: number; to: number; main: boolean }) => (edge.main ? 2 : lit(edge) ? 1 : 0)
-  const edges = [...path.edges].sort((a, b) => rank(a) - rank(b))
+  // The side branches of the star in focus or under the pointer first, the chain over them.
+  const shown = options.reveal ?? ((i: number) => (i >= 0 && (i === frame.focusStar || i === (frame.hoveredStar ?? -1)) ? 1 : 0))
+  const revealed = (edge: { from: number; to: number }) => Math.max(0, Math.min(1, Math.max(shown(edge.from), shown(edge.to))))
+  const edges = [...path.edges.filter((edge) => !edge.main), ...path.edges.filter((edge) => edge.main)]
   const stroke = fade(ink, 1)
   ctx.strokeStyle = stroke
   for (const edge of edges) {
+    const side = edge.main ? 1 : revealed(edge)
+    if (side <= 0.001) continue
     const { curve, straight } = pathCurve(scene, frame, edge.from, edge.to)
     const part = trimCubic(curve, trim)
     if (!part) continue
     const passes = edge.main
       ? [[PATH.main.halo, PATH.main.haloAlpha], [PATH.main.width, 1]] as const
-      : lit(edge)
-        ? [[PATH.sideFocused.width, PATH.sideFocused.alpha]] as const
-        : [[PATH.side.width, PATH.side.alpha]] as const
+      : [[PATH.side.width, PATH.side.alpha * side]] as const
+    const arrowed = edge.main && cubicLength(part) >= PATH.arrow.minLength
     let seen = false
     for (const k of periods) {
       const shape = shiftCubic(part, k * band)
@@ -957,7 +969,7 @@ export function drawPath(
         ctx.lineWidth = lineWidth
         strokeShape(ctx, shape, straight)
       }
-      if (edge.main) {
+      if (arrowed) {
         ctx.globalAlpha = amount
         strokeArrow(ctx, shape)
       }
@@ -970,6 +982,7 @@ export function drawPath(
     if (seen) {
       stats.lines += 1
       if (!straight) stats.curves += 1
+      if (!edge.main) stats.sides += 1
     }
   }
 

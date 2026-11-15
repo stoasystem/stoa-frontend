@@ -704,6 +704,24 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
        */
       const insists = (i: number) => keyStar[i] === 1 || i === frame.focusStar || Boolean(drag && drag.amount > 0.01 && drag.related[i] === 1)
 
+      const fadeStep = !(frame.labelFadeMs && frame.labelFadeMs > 0) || frame.time === undefined || lastLabelTime === null
+        ? 1
+        : Math.max(0, frame.time - lastLabelTime) / frame.labelFadeMs
+      lastLabelTime = frame.time ?? null
+      labelFrame += 1
+      let settling = false
+
+      // A hovered star's name fades in, and out once the pointer leaves it (#138 B2); so do its
+      // side branches on a found path (#489, `drawPath` below), so this comes before the lines.
+      const hovered = frame.hoveredStar ?? -1
+      if (hovered >= 0 && !hoverFades.has(hovered)) hoverFades.set(hovered, 0)
+      for (const [i, amount] of hoverFades) {
+        const next = i === hovered ? Math.min(1, amount + fadeStep) : Math.max(0, amount - fadeStep)
+        if (next <= 0 && i !== hovered) hoverFades.delete(i)
+        else hoverFades.set(i, next)
+        if (next > 0 && next < 1) settling = true
+      }
+
       // Connection lines (#121): by layer and tier, in their own module. Names keep clear of what it lists.
       const segments: Segment[] = []
       const cores: Circle[] = []
@@ -743,7 +761,11 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
       })
       // A path found (#489): its own layer over the lines, under the stars.
       const chainSegments: Segment[] = []
-      stats.path = drawPath(ctx, scene, frame, colours, { segments, chain: chainSegments }, { wrap: frame.galaxyShift !== undefined })
+      // Its side branches only for the star in focus, or under the pointer as far as it is lifted.
+      stats.path = drawPath(ctx, scene, frame, colours, { segments, chain: chainSegments }, {
+        wrap: frame.galaxyShift !== undefined,
+        reveal: (i) => (i >= 0 && i === frame.focusStar ? 1 : hoverFades.get(i) ?? 0),
+      })
       // Where the edge names went this frame, for the page's own overlays (#145 keeps its labels clear of them).
       stats.edgeLabels = edgeLabels.map(({ text, box, alpha }) => ({ text, x0: box.x0, y0: box.y0, x1: box.x1, y1: box.y1, alpha }))
 
@@ -775,23 +797,6 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
       const grown = (i: number) => (drag && drag.star === i ? drag.grow : 1)
       const pressedStar = frame.pressedStar ?? -1
       const sunk = (i: number) => (i === pressedStar ? PRESS.scale : 1)
-
-      const fadeStep = !(frame.labelFadeMs && frame.labelFadeMs > 0) || frame.time === undefined || lastLabelTime === null
-        ? 1
-        : Math.max(0, frame.time - lastLabelTime) / frame.labelFadeMs
-      lastLabelTime = frame.time ?? null
-      labelFrame += 1
-      let settling = false
-
-      // A hovered star's name fades in, and out once the pointer leaves it (#138 B2).
-      const hovered = frame.hoveredStar ?? -1
-      if (hovered >= 0 && !hoverFades.has(hovered)) hoverFades.set(hovered, 0)
-      for (const [i, amount] of hoverFades) {
-        const next = i === hovered ? Math.min(1, amount + fadeStep) : Math.max(0, amount - fadeStep)
-        if (next <= 0 && i !== hovered) hoverFades.delete(i)
-        else hoverFades.set(i, next)
-        if (next > 0 && next < 1) settling = true
-      }
 
       /** How far star `i` is lifted by the pointer, 0..1. */
       const lifted = (i: number) => hoverFades.get(i) ?? 0
@@ -1187,7 +1192,7 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
         })
         const painted = paintStepBadges(ctx, badges, colours, (colours.links ?? LINK_INK).recommended, Math.min(1, frame.path!.amount))
         if (stats.path) stats.path.steps = painted
-        stats.stepBadges = badges.map(({ star, step, box }) => ({ star, step, x0: box.x0, y0: box.y0, x1: box.x1, y1: box.y1 }))
+        stats.stepBadges = badges.map(({ star, step, box, leader }) => ({ star, step, x0: box.x0, y0: box.y0, x1: box.x1, y1: box.y1, leader: leader !== null }))
       }
 
       // Nebula names, by their own nebula: by its size on screen (#134), and

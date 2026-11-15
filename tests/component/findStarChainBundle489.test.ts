@@ -19,7 +19,7 @@ import { createCanvas2DRenderer } from '@/features/starmap/render/canvas2d'
 import { boxesOverlap, boxHitsSegment, type Box } from '@/features/starmap/render/labels'
 import { drawLinks, drawPath, PATH, pathCurve } from '@/features/starmap/render/links'
 import { BUNDLE_FACING, BUNDLE_STRENGTH, bundleCubic, bundlePoint, pointAt, straightCubic, trimCubic } from '@/features/starmap/render/pathShapes'
-import { placeStepBadges, STEP, stepSpots } from '@/features/starmap/render/pathSteps'
+import { leaderTo, ownsBadge, placeStepBadges, STEP, stepSpots } from '@/features/starmap/render/pathSteps'
 import { STATE_READY, type SceneData, type SceneFrame, type StarMapRenderer } from '@/features/starmap/render/types'
 import { fakeCanvas, fakeClock, fakeContext, skyMap, THEME, type CanvasCounter } from './starmapHarness'
 
@@ -153,9 +153,12 @@ describe('the path drawn as a chain and bundles', () => {
     expect(between.curve[0].y).toBeCloseTo(300)
     expect(between.curve[3]).toEqual({ x: 600, y: 350 })
     const { ctx, strokes } = strokeRecorder()
-    const stats = drawPath(ctx, scene, frame, THEME, { segments: [] })
-    expect(stats).toEqual({ lines: 3, glows: 3, curves: 2 })
-    expect(strokes.filter((s) => s.curve)).toHaveLength(3) // the side curve, and the chain's halo and core
+    // At rest the chain alone, and a glow round every missing star; star 0 in focus adds its two side branches.
+    expect(drawPath(ctx, scene, frame, THEME, { segments: [] })).toEqual({ lines: 1, glows: 3, curves: 1, sides: 0 })
+    expect(strokes.filter((s) => s.curve)).toHaveLength(2) // the chain's halo and core
+    strokes.length = 0
+    expect(drawPath(ctx, scene, { ...frame, focusStar: 0 }, THEME, { segments: [] })).toEqual({ lines: 3, glows: 3, curves: 2, sides: 2 })
+    expect(strokes.filter((s) => s.curve)).toHaveLength(3) // the side curve too; the side line inside nebula 0 is straight
   })
 
   it('bundles the lines between the same two nebulae: their middles closer than the straight lines’', () => {
@@ -178,25 +181,47 @@ describe('the path drawn as a chain and bundles', () => {
     expect(curve[0].x).toBeCloseTo(200 - 220, 0)
   })
 
-  it('puts an arrowhead on the chain, and brightens the side branches of the star in focus', () => {
+  it('puts an arrowhead on the chain, and draws no side branch at rest', () => {
     const { scene, frame } = twoNebulae()
-    let rec = strokeRecorder()
+    const rec = strokeRecorder()
     drawPath(rec.ctx, scene, frame, THEME, { segments: [] })
     expect(rec.strokes.filter((s) => s.width === PATH.arrow.width)).toHaveLength(1)
-    expect(rec.strokes.filter((s) => s.width === PATH.side.width).map((s) => s.alpha)).toEqual([PATH.side.alpha, PATH.side.alpha])
-    // Star 2 in focus: its own side branch (0 -> 2) brightens, the other stays dim.
-    rec = strokeRecorder()
+    expect(rec.strokes.filter((s) => s.width === PATH.side.width)).toEqual([])
+  })
+
+  it('shows the side branches of the star in focus or under the pointer, and only its own', () => {
+    const { scene, frame } = twoNebulae()
+    // Star 2 in focus: its own side branch (0 -> 2), not 0 -> 1.
+    let rec = strokeRecorder()
     drawPath(rec.ctx, scene, { ...frame, focusStar: 2 }, THEME, { segments: [] })
-    expect(rec.strokes.filter((s) => s.width === PATH.sideFocused.width).map((s) => s.alpha)).toEqual([PATH.sideFocused.alpha])
+    expect(rec.strokes.filter((s) => s.width === PATH.side.width).map((s) => s.alpha)).toEqual([PATH.side.alpha])
+    // Star 1 under the pointer: 0 -> 1.
+    rec = strokeRecorder()
+    drawPath(rec.ctx, scene, { ...frame, hoveredStar: 1 }, THEME, { segments: [] })
     expect(rec.strokes.filter((s) => s.width === PATH.side.width)).toHaveLength(1)
+    // Eased: half lifted, half as strong.
+    rec = strokeRecorder()
+    drawPath(rec.ctx, scene, frame, THEME, { segments: [] }, { reveal: (i) => (i === 2 ? 0.5 : 0) })
+    expect(rec.strokes.filter((s) => s.width === PATH.side.width).map((s) => s.alpha)).toEqual([PATH.side.alpha * 0.5])
+  })
+
+  it('leaves the arrowhead off a chain line too short to carry one', () => {
+    const { scene, frame } = twoNebulae()
+    // 0 -> 1 inside nebula 0, made short: 30 px apart.
+    frame.y[1] = frame.y[0] + 30
+    frame.x[1] = frame.x[0]
+    const rec = strokeRecorder()
+    drawPath(rec.ctx, scene, { ...frame, path: { ...frame.path!, edges: [{ from: 0, to: 1, main: true }] } }, THEME, { segments: [] })
+    expect(rec.strokes.filter((s) => s.width === PATH.main.width)).toHaveLength(1)
+    expect(rec.strokes.filter((s) => s.width === PATH.arrow.width)).toEqual([])
   })
 
   it('hands the chain’s pieces apart, for the step badges', () => {
     const { scene, frame } = twoNebulae()
     const segments: { x0: number; y0: number; x1: number; y1: number }[] = []
     const chain: typeof segments = []
-    drawPath(strokeRecorder().ctx, scene, frame, THEME, { segments, chain })
-    // The chain's one curve as `PATH.pieces` pieces; the side curve's and the straight line's too, in `segments`.
+    drawPath(strokeRecorder().ctx, scene, { ...frame, focusStar: 0 }, THEME, { segments, chain })
+    // The chain's one curve as `PATH.pieces` pieces; the shown side curve's and straight line's too, in `segments`.
     expect(chain).toHaveLength(PATH.pieces)
     expect(segments).toHaveLength(PATH.pieces * 2 + 1)
   })
@@ -259,6 +284,30 @@ describe('the step badges', () => {
     expect(placed).toHaveLength(3)
   })
 
+  it('sit where their own star is the nearest, not on a neighbour', () => {
+    // A neighbour up and to the left: the up-left spot reads as its badge, so the badge goes elsewhere.
+    const where = { ...at([]), starsNear: () => [{ x: 488, y: 486, r: 5 }] }
+    const [badge] = placeStepBadges(fakeContext({ drawImage: 0, filterSets: 0 }), THEME, [0], [500], [500], where)
+    expect(ownsBadge(stepSpots(500, 500, 5, STEP.height, STEP.height)[0], { x: 500, y: 500 }, [{ x: 488, y: 486 }])).toBe(false)
+    expect(ownsBadge(badge.box, { x: 500, y: 500 }, [{ x: 488, y: 486 }])).toBe(true)
+    expect(badge.leader).toBeNull()
+  })
+
+  it('get a leader to their star where no spot is their own, or they sit on the outer ring', () => {
+    // Stars all round, closer than any spot: nothing is its own, so a leader says whose it is.
+    const ring = Array.from({ length: 8 }, (_, k) => ({ x: 500 + 12 * Math.cos((k * Math.PI) / 4), y: 500 + 12 * Math.sin((k * Math.PI) / 4), r: 3 }))
+    const crowded = { ...at([]), starsNear: () => ring }
+    const [badge] = placeStepBadges(fakeContext({ drawImage: 0, filterSets: 0 }), THEME, [0], [500], [500], crowded)
+    expect(badge.leader).not.toBeNull()
+    expect(Math.hypot(badge.leader!.x0 - 500, badge.leader!.y0 - 500)).toBeCloseTo(6)
+    // Long enough to be seen: the badge went to the outer ring.
+    expect(Math.hypot(badge.leader!.x1 - badge.leader!.x0, badge.leader!.y1 - badge.leader!.y0)).toBeGreaterThan(STEP.far - 2)
+    // On the outer ring, its own: a leader too, as it sits apart.
+    const spots = stepSpots(500, 500, 5, STEP.height, STEP.height)
+    expect(leaderTo(500, 500, 5, spots[8])).not.toBeNull()
+    expect(leaderTo(500, 500, 5, spots[0])).toBeNull()
+  })
+
   it('stay where they were while that spot is free', () => {
     const where = at([])
     where.slots.set(0, 2)
@@ -291,6 +340,9 @@ describe('the badges on the real sky', () => {
     const steps = chainSteps(path.edges, path.target)
     expect(badges.length).toBe(steps.length)
     expect(real.stats.path!.steps).toBe(steps.length)
+    // At rest no side branch is drawn: only the chain.
+    expect(real.stats.path!.sides).toBe(0)
+    expect(real.stats.path!.lines).toBe(path.edges.filter((edge) => edge.main).length)
     expect(badges.map((b) => b.step)).toEqual(steps.map((_, k) => k + 1))
     for (let i = 0; i < badges.length; i += 1) {
       for (let j = i + 1; j < badges.length; j += 1) expect(boxesOverlap(badges[i], badges[j])).toBe(false)

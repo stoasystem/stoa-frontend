@@ -4,10 +4,12 @@
  * (`chainSteps`), the target left out. Placed by the renderer with the
  * names, after the star names: each tries a few spots round its own star
  * (the corners first, then the sides, then a little further out) and takes
- * the nearest clear of every placed name and badge and of the main chain's
- * lines, crossing as few other lines and stars as it can (a dim line under a
- * badge reads; a badge pushed far from its star does not say whose it is);
- * its box then goes in with the placed names, so the nebula
+ * the nearest that is its own -- its middle nearer its star than any other
+ * star -- clear of every placed name and badge and of the main chain's
+ * lines, crossing as few other lines and stars as it can. In a cluster too
+ * dense for that, or set off on the outer ring, a thin leader runs from the
+ * badge to its star, so it still says whose it is. Its box then goes in
+ * with the placed names, so the nebula
  * names and the next badges keep clear of it. Painted at once, over the
  * lines and stars. The parallel DOM says the same thing in words ("Step 3 of
  * 10", `components/labels.ts`).
@@ -16,10 +18,42 @@ import { boxHitsCircle, boxHitsSegment, placeInsisting, placeLabel, type Box, ty
 import type { StarMapTheme } from '@/features/starmap/render/types'
 
 /** A badge: its text's size (px, bold), its height, the room either side of the number, how far off the glyph, and the far ring's extra distance. */
-export const STEP = { font: 11, height: 16, padX: 4, gap: 2, far: 9, outline: 1.5, lineCost: 1.5, starCost: 10 } as const
+export const STEP = {
+  font: 11,
+  height: 16,
+  padX: 4,
+  gap: 2,
+  far: 9,
+  outline: 1.5,
+  lineCost: 1.5,
+  starCost: 10,
+  /** A badge whose nearest edge is farther than this (px) off its star's glyph gets a leader, as does one not its star's own. */
+  leaderAt: 6,
+  /** A badge is its star's own only if its middle is at most this share of the way to the nearest other star (a clear margin, not a tie). */
+  own: 0.8,
+  /** The leader: width and strength. */
+  leader: { width: 1, alpha: 0.85 },
+} as const
 
-/** A step badge placed: whose it is (star index), its number, its box (CSS px). */
-export type StepBadge = { star: number; step: number; box: Box }
+/** A step badge placed: whose it is (star index), its number, its box (CSS px), and the leader to its star if it has one. */
+export type StepBadge = { star: number; step: number; box: Box; leader: Segment | null }
+
+/** Whether `box`'s middle is clearly nearer `own` than every one of `others` (`STEP.own`): a badge there reads as `own`'s. */
+export function ownsBadge(box: Box, own: { x: number; y: number }, others: readonly { x: number; y: number }[]): boolean {
+  const cx = (box.x0 + box.x1) / 2
+  const cy = (box.y0 + box.y1) / 2
+  const d = Math.hypot(cx - own.x, cy - own.y)
+  return others.every((c) => Math.hypot(cx - c.x, cy - c.y) * STEP.own > d)
+}
+
+/** The leader from a star of radius `r` at `(x, y)` to `box`: glyph edge to the box's nearest point; null when the box is close enough. */
+export function leaderTo(x: number, y: number, r: number, box: Box, always = false): Segment | null {
+  const nx = Math.max(box.x0, Math.min(x, box.x1))
+  const ny = Math.max(box.y0, Math.min(y, box.y1))
+  const d = Math.hypot(nx - x, ny - y)
+  if (d <= r + 1 || (!always && d <= r + STEP.leaderAt)) return null
+  return { x0: x + ((nx - x) / d) * (r + 1), y0: y + ((ny - y) / d) * (r + 1), x1: nx, y1: ny }
+}
 
 /**
  * Spots for a badge `w` x `h` round a star of radius `r` at `(x, y)`, in
@@ -66,11 +100,15 @@ export type StepPlacement = {
 
 /**
  * Place the badges of `steps` (star indices, step 1 first) at `x`, `y`:
- * each clear of the placed names, the other badges and the main chain,
- * crossing the fewest other lines (`STEP.lineCost` each) and stars
- * (`STEP.starCost`), the nearer spots first; failing that, across the chain
- * too, still never over a name or a badge; failing that too, over a name,
- * never over another badge. A star off screen gets none.
+ * each on a spot its own star owns (`ownsBadge`), clear of the placed names,
+ * the other badges and the main chain, crossing the fewest other lines
+ * (`STEP.lineCost` each) and stars (`STEP.starCost`), the nearer spots
+ * first; failing that, anywhere clear of names, badges and the chain, the
+ * outer ring first (its leader must be long enough to see);
+ * failing that, across the chain too, still never over a name or a badge;
+ * failing that too, over a name, never over another badge. A badge not its
+ * star's own, or farther than `STEP.leaderAt` off its glyph, gets a leader.
+ * A star off screen gets none.
  */
 export function placeStepBadges(
   ctx: CanvasRenderingContext2D,
@@ -106,14 +144,20 @@ export function placeStepBadges(
       for (const c of circles) if (boxHitsCircle(box, c)) cost += STEP.starCost
       return cost
     }
+    const own = { x: sx, y: sy }
+    const clear = { boxes: at.boxes, circles: [], segments: chain, covers: at.covers }
+    const owned = placeLabel(preferred, clear, area, (b) => (ownsBadge(b, own, circles) ? crossings(b) : Infinity))
+    // No spot is its own: the outer ring first, so the leader that says whose it is can be seen.
+    const apart = owned ? preferred : [...spots.slice(8), ...spots.slice(0, 8)]
     const box =
-      placeLabel(preferred, { boxes: at.boxes, circles: [], segments: chain, covers: at.covers }, area, crossings) ??
-      placeInsisting(preferred, at.boxes, circles, [], lines, area, undefined, at.covers ?? []) ??
-      placeLabel(preferred, { boxes: badges.map((badge) => badge.box), circles, segments: [] }, area)
+      owned ??
+      placeLabel(apart, clear, area, crossings) ??
+      placeInsisting(apart, at.boxes, circles, [], lines, area, undefined, at.covers ?? []) ??
+      placeLabel(apart, { boxes: badges.map((badge) => badge.box), circles, segments: [] }, area)
     if (!box) return
     at.boxes.push(box)
     at.slots.set(star, spots.indexOf(box))
-    badges.push({ star, step, box })
+    badges.push({ star, step, box, leader: leaderTo(sx, sy, at.radius(star), box, owned === null) })
   })
   return badges
 }
@@ -126,6 +170,18 @@ export function paintStepBadges(ctx: CanvasRenderingContext2D, badges: readonly 
   ctx.textAlign = 'center'
   ctx.textBaseline = 'middle'
   ctx.setLineDash([])
+  // The leaders first, under every badge.
+  ctx.strokeStyle = ink
+  ctx.lineWidth = STEP.leader.width
+  ctx.lineCap = 'round'
+  ctx.globalAlpha = alpha * STEP.leader.alpha
+  for (const { leader } of badges) {
+    if (!leader) continue
+    ctx.beginPath()
+    ctx.moveTo(leader.x0, leader.y0)
+    ctx.lineTo(leader.x1, leader.y1)
+    ctx.stroke()
+  }
   ctx.globalAlpha = alpha
   for (const { step, box } of badges) {
     const w = box.x1 - box.x0

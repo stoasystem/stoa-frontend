@@ -91,6 +91,12 @@ export function arcLengths(curve: Cubic): number[] {
   return out
 }
 
+/** Its length along the curve, px. */
+export function cubicLength(curve: Cubic): number {
+  const lengths = arcLengths(curve)
+  return lengths[lengths.length - 1]
+}
+
 /** The t at arc length `s` along a curve of `lengths` (`arcLengths`). */
 function tAtLength(lengths: readonly number[], s: number): number {
   const total = lengths[lengths.length - 1]
