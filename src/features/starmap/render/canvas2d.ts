@@ -14,7 +14,9 @@ import { DRAG, panoramaDot, panoramaLook, ramp, reachFade, REVEAL, type Ramp } f
 import { createTileCache, nebulaStateKeys, tileKey, tileSizeFor, TILE_REACH, type TileCache } from '@/features/starmap/render/nebulaTiles'
 import { CLOUD_REACH, galaxyHazeAlpha, galaxyHazeBox, nebulaGlowAlpha, paintGalaxy, paintGalaxyHaze, paintNebulaCloud } from '@/features/starmap/render/galaxy'
 import { createGalaxyNames } from '@/features/starmap/render/galaxyNames'
-import { drawEdgeLabels, drawLinks, drawPath, paintGlowSprite, type EdgeLabel, type EdgeStars } from '@/features/starmap/render/links'
+import { drawEdgeLabels, drawLinks, drawPath, LINK_INK, paintGlowSprite, type EdgeLabel, type EdgeStars } from '@/features/starmap/render/links'
+import { paintStepBadges, placeStepBadges } from '@/features/starmap/render/pathSteps'
+import { chainSteps } from '@/features/starmap/model/missingStars'
 import { sheetBand } from '@/features/starmap/view/layers'
 import { DRAW_THRESHOLD } from '@/features/starmap/view/foveation'
 import type { Viewport } from '@/features/starmap/view/camera'
@@ -330,6 +332,8 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
   }
   let lastLabelTime: number | null = null
   let labelFrame = 0
+  /** A found path's step badges (#489): which spot round its star each took last frame, by star. */
+  const stepSlots = new Map<number, number>()
   /** Measured name widths, CSS px, per star and nebula of the current data. */
   let starNameWidths: (number | undefined)[] = []
   /** Star names as drawn: cut with an ellipsis past `REVEAL.keyName.maxWidthPx` (#76, #144). */
@@ -700,6 +704,24 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
        */
       const insists = (i: number) => keyStar[i] === 1 || i === frame.focusStar || Boolean(drag && drag.amount > 0.01 && drag.related[i] === 1)
 
+      const fadeStep = !(frame.labelFadeMs && frame.labelFadeMs > 0) || frame.time === undefined || lastLabelTime === null
+        ? 1
+        : Math.max(0, frame.time - lastLabelTime) / frame.labelFadeMs
+      lastLabelTime = frame.time ?? null
+      labelFrame += 1
+      let settling = false
+
+      // A hovered star's name fades in, and out once the pointer leaves it (#138 B2); so do its
+      // side branches on a found path (#489, `drawPath` below), so this comes before the lines.
+      const hovered = frame.hoveredStar ?? -1
+      if (hovered >= 0 && !hoverFades.has(hovered)) hoverFades.set(hovered, 0)
+      for (const [i, amount] of hoverFades) {
+        const next = i === hovered ? Math.min(1, amount + fadeStep) : Math.max(0, amount - fadeStep)
+        if (next <= 0 && i !== hovered) hoverFades.delete(i)
+        else hoverFades.set(i, next)
+        if (next > 0 && next < 1) settling = true
+      }
+
       // Connection lines (#121): by layer and tier, in their own module. Names keep clear of what it lists.
       const segments: Segment[] = []
       const cores: Circle[] = []
@@ -738,7 +760,12 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
         glowSprite,
       })
       // A path found (#489): its own layer over the lines, under the stars.
-      stats.path = drawPath(ctx, scene, frame, colours, { segments }, { wrap: frame.galaxyShift !== undefined })
+      const chainSegments: Segment[] = []
+      // Its side branches only for the star in focus, or under the pointer as far as it is lifted.
+      stats.path = drawPath(ctx, scene, frame, colours, { segments, chain: chainSegments }, {
+        wrap: frame.galaxyShift !== undefined,
+        reveal: (i) => (i >= 0 && i === frame.focusStar ? 1 : hoverFades.get(i) ?? 0),
+      })
       // Where the edge names went this frame, for the page's own overlays (#145 keeps its labels clear of them).
       stats.edgeLabels = edgeLabels.map(({ text, box, alpha }) => ({ text, x0: box.x0, y0: box.y0, x1: box.x1, y1: box.y1, alpha }))
 
@@ -770,23 +797,6 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
       const grown = (i: number) => (drag && drag.star === i ? drag.grow : 1)
       const pressedStar = frame.pressedStar ?? -1
       const sunk = (i: number) => (i === pressedStar ? PRESS.scale : 1)
-
-      const fadeStep = !(frame.labelFadeMs && frame.labelFadeMs > 0) || frame.time === undefined || lastLabelTime === null
-        ? 1
-        : Math.max(0, frame.time - lastLabelTime) / frame.labelFadeMs
-      lastLabelTime = frame.time ?? null
-      labelFrame += 1
-      let settling = false
-
-      // A hovered star's name fades in, and out once the pointer leaves it (#138 B2).
-      const hovered = frame.hoveredStar ?? -1
-      if (hovered >= 0 && !hoverFades.has(hovered)) hoverFades.set(hovered, 0)
-      for (const [i, amount] of hoverFades) {
-        const next = i === hovered ? Math.min(1, amount + fadeStep) : Math.max(0, amount - fadeStep)
-        if (next <= 0 && i !== hovered) hoverFades.delete(i)
-        else hoverFades.set(i, next)
-        if (next > 0 && next < 1) settling = true
-      }
 
       /** How far star `i` is lifted by the pointer, 0..1. */
       const lifted = (i: number) => hoverFades.get(i) ?? 0
@@ -1154,6 +1164,35 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
           }
           names.stars += 1
         }
+      }
+
+      // A found path's step numbers (#489): placed after the star names, clear of them, of each
+      // other, of the lines and of the other stars, and painted at once, over the lines and stars.
+      // The nebula names below keep clear of them.
+      const steps = frame.path && (frame.path.amount ?? 0) > 0.001 ? chainSteps(frame.path.edges, frame.path.target) : []
+      stats.stepBadges = []
+      if (steps.length === 0) stepSlots.clear()
+      else {
+        const stars: Circle[] = []
+        const index: number[] = []
+        for (let i = 0; i < count; i += 1) {
+          if (starAlpha[i] < DRAW_THRESHOLD || !onScreen(x[i], y[i], radiusOf(i))) continue
+          stars.push({ x: x[i], y: y[i], r: radiusOf(i) })
+          index.push(i)
+        }
+        const badges = placeStepBadges(ctx, colours, steps, x, y, {
+          boxes: placed,
+          segments,
+          chain: chainSegments,
+          covers: galaxyCovers,
+          area: labelArea,
+          radius: radiusOf,
+          slots: stepSlots,
+          starsNear: (box, own) => stars.filter((c, k) => index[k] !== own && c.x + c.r > box.x0 && c.x - c.r < box.x1 && c.y + c.r > box.y0 && c.y - c.r < box.y1),
+        })
+        const painted = paintStepBadges(ctx, badges, colours, (colours.links ?? LINK_INK).recommended, Math.min(1, frame.path!.amount))
+        if (stats.path) stats.path.steps = painted
+        stats.stepBadges = badges.map(({ star, step, box, leader }) => ({ star, step, x0: box.x0, y0: box.y0, x1: box.x1, y1: box.y1, leader: leader !== null }))
       }
 
       // Nebula names, by their own nebula: by its size on screen (#134), and

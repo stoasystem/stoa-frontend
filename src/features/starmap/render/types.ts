@@ -248,8 +248,10 @@ export type SceneFrame = {
    * prerequisites from the missing stars into each other and into the
    * target, drawn over every line in the recommended gold, all the way, at
    * any zoom -- the chain from the first missing star to the target (`main`)
-   * brightest, the side branches thin and dim; a glow round each missing
-   * star. `amount` (0..1, eased) draws it
+   * brightest, arrowed and its steps numbered, the side branches only for
+   * the star in focus or under the pointer; a line between two nebulae bundled with the others between them
+   * (`render/pathShapes.ts`); a glow round each missing star. `amount`
+   * (0..1, eased) draws it
    * in and lets every other line step back, as around a chosen star.
    */
   path?: {
@@ -278,8 +280,15 @@ export type RenderStats = {
   highlightNebula: number
   /** Connection lines drawn in the last frame (#121). */
   links?: { bridges: number; hints: number; lines: number; labels: number; dragLabels?: number; bridgeLabels?: number }
-  /** A path found (#489), as drawn in the last frame: its lines and the glows round its missing stars. */
-  path?: { lines: number; glows: number }
+  /**
+   * A path found (#489), as drawn in the last frame: its lines (`curves` of
+   * them bundled between nebulae, `sides` of them side branches shown for
+   * the star in focus or under the pointer), the glows round its missing
+   * stars, and the step badges numbered on its main chain.
+   */
+  path?: { lines: number; glows: number; curves?: number; sides?: number; steps?: number }
+  /** The step badges of a found path's main chain drawn in the last frame (#489): whose, which step, its box in CSS px, whether a leader ties it to its star. */
+  stepBadges?: readonly { star: number; step: number; x0: number; y0: number; x1: number; y1: number; leader: boolean }[]
   /** Galaxy names drawn in the last frame (#137; one sky, far out). */
   galaxyNames?: number
   /** Where star and nebula names kept off the galaxy names' letters in the last frame (CSS px; `galaxyNameBoxes`). */

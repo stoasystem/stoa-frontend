@@ -2,14 +2,16 @@
  * What assistive technology reads for a star (#11 point 5, kept by #72): its
  * name, its learning state and its progress, then the recommendation, that
  * it waits on prerequisites not lit yet (drawn quieter, `starLook`), and the
- * review marker when it has them.
+ * review marker when it has them. A star on the main chain of a path found
+ * from Ask says its step first (#489: "Step 3 of 10 on the way: ...").
  */
 import type { TFunction } from 'i18next'
 import { nebulaCounts, starLook, type Nebula, type Recommendation, type Star } from '@/features/starmap/model/starMap'
 
-export function starLabel(t: TFunction<'starmap'>, star: Star): string {
+export function starLabel(t: TFunction<'starmap'>, star: Star, step?: { step: number; total: number }): string {
   const parts = [
-    star.name,
+    // On a found path's main chain (#489): which step it is, as the badge beside it numbers it.
+    step ? t('findStar.step', { step: step.step, total: step.total, name: star.name }) : star.name,
     t(`state.${star.state}`),
     t('star.progress', { percent: Math.round(Math.max(0, Math.min(1, star.progress)) * 100) }),
   ]

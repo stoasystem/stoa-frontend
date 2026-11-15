@@ -82,7 +82,8 @@
     "suggest": "Ti consiglio di imparare prima {{name}}.",
     "start": "Inizia {{name}}",
     "quiz": "Mettimi alla prova su {{name}}",
-    "direct": "Impara subito {{name}}"
+    "direct": "Impara subito {{name}}",
+    "step": "Passo {{step}} di {{total}} del percorso: {{name}}"
   },
   "help": {
     "open": "Come funziona la mappa stellare",
