@@ -33,7 +33,7 @@ import { subjectOfNebula, type StarMap } from '@/features/starmap/model/starMap'
 import { ZOOM_MS } from '@/features/starmap/motion/motionPolicy'
 import { REVEAL_FLIGHT_MS } from '@/features/starmap/onboarding/useFirstReveal'
 import { createCanvas2DRenderer } from '@/features/starmap/render/canvas2d'
-import { drawPath, LINE } from '@/features/starmap/render/links'
+import { drawPath, LINE, PATH } from '@/features/starmap/render/links'
 import { STATE_READY, type SceneData, type SceneFrame, type StarMapRenderer } from '@/features/starmap/render/types'
 import { StarMapRoute } from '@/features/starmap/StarMapRoute'
 import { StarMapSourceContext, type StarMapSource } from '@/features/starmap/starMapSource'
@@ -468,9 +468,9 @@ describe('the path drawn (#488 point 2)', () => {
       y: Float32Array.from([300, 300]),
       glyphSize: 10,
       dotRadius: 2,
-      path: { target: 1, missing: [0], edges: [{ from: 0, to: 1 }], amount: 1 },
+      path: { target: 1, missing: [0], edges: [{ from: 0, to: 1, main: true }], amount: 1 },
     } as unknown as SceneFrame
-    const strokes: { from: [number, number]; to: [number, number]; style: unknown; width: number }[] = []
+    const strokes: { from: [number, number]; to: [number, number]; style: unknown; width: number; alpha: number }[] = []
     let at: number[] = []
     const store: Record<string | symbol, unknown> = {}
     const ctx = new Proxy(store, {
@@ -479,7 +479,7 @@ describe('the path drawn (#488 point 2)', () => {
         if (prop === 'createRadialGradient' || prop === 'createLinearGradient') return () => ({ addColorStop() {} })
         if (prop === 'beginPath') return () => (at = [])
         if (prop === 'moveTo' || prop === 'lineTo') return (x: number, y: number) => at.push(x, y)
-        if (prop === 'stroke') return () => strokes.push({ from: [at[0], at[1]], to: [at[2], at[3]], style: store.strokeStyle, width: store.lineWidth as number })
+        if (prop === 'stroke') return () => strokes.push({ from: [at[0], at[1]], to: [at[2], at[3]], style: store.strokeStyle, width: store.lineWidth as number, alpha: store.globalAlpha as number })
         return () => undefined
       },
       set(target, prop, value) {
@@ -489,13 +489,24 @@ describe('the path drawn (#488 point 2)', () => {
     }) as unknown as CanvasRenderingContext2D
     const drawn = drawPath(ctx, scene, frame, THEME, { segments: [] })
     expect(drawn).toEqual({ lines: 1, glows: 1 })
-    const line = strokes.find((stroke) => stroke.width === LINE.width[1])!
+    const line = strokes.find((stroke) => stroke.width === PATH.main.width)!
     // From just off the target (x 700) to just off the missing star (x 300): the whole way.
     expect(line.from[0]).toBeGreaterThan(680)
     expect(line.from[0]).toBeLessThan(700)
     expect(line.to[0]).toBeGreaterThan(300)
     expect(line.to[0]).toBeLessThan(320)
     expect(line.style).toBe('rgba(242, 197, 114, 0.95)')
+    // The chain: a core thinner than tier 1's over a halo far narrower and fainter than tier 1's.
+    expect(strokes.map((stroke) => stroke.width)).toEqual([PATH.main.halo, PATH.main.width])
+    expect(PATH.main.width).toBeLessThan(LINE.width[1])
+    expect(PATH.main.halo).toBeLessThan(LINE.glow.width / 2)
+    expect(PATH.main.haloAlpha).toBeLessThan(LINE.glow.alpha)
+    // A side branch: one thin dim line, no halo.
+    strokes.length = 0
+    frame.path!.edges = [{ from: 0, to: 1, main: false }]
+    drawPath(ctx, scene, frame, THEME, { segments: [] })
+    expect(strokes.map(({ width, alpha }) => ({ width, alpha }))).toEqual([{ width: PATH.side.width, alpha: PATH.side.alpha }])
+    expect(PATH.side.width).toBeLessThan(PATH.main.width)
   })
 })
 

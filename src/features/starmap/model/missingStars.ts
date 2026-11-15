@@ -24,9 +24,17 @@ export type FindStarPath = {
   missing: string[]
   /** The missing star to learn first: on the outer edge, first in course order. */
   first: string
-  /** The prerequisites along the path: from a missing star into another one or into the target. */
-  edges: Prerequisite[]
+  /**
+   * The prerequisites along the path, from a missing star into another one or
+   * into the target, each only where no longer way along the path already
+   * leads (`reducePathEdges`). `main` marks the one chain drawn brightest:
+   * from `first` to the target (`mainChain`).
+   */
+  edges: PathEdge[]
 }
+
+/** A prerequisite on the path; `main` when it is on the chain from the first missing star to the target. */
+export type PathEdge = Prerequisite & { main: boolean }
 
 /**
  * The missing stars on the way to `targetId`, in course order: every star not
@@ -69,11 +77,78 @@ export function findStarPath(map: Pick<StarMap, 'stars' | 'nebulae' | 'prerequis
   // Only a loop with no way in leaves no star on the edge: then the first in course order.
   const first = outer[0] ?? missing[0]
   const onPath = new Set(missing)
-  const edges: Prerequisite[] = []
+  const all: Prerequisite[] = []
   for (const to of [...missing, targetId]) {
-    for (const from of before.get(to) ?? []) if (onPath.has(from)) edges.push({ from, to })
+    for (const from of before.get(to) ?? []) if (onPath.has(from)) all.push({ from, to })
   }
+  const reduced = reducePathEdges(all)
+  const chain = mainChain(reduced, first, targetId, [...missing, targetId])
+  const edges = reduced.map(({ from, to }) => ({ from, to, main: chain.has(`${from}:${to}`) }))
   return { target: targetId, missing, first, edges }
+}
+
+/**
+ * The path's prerequisites without the long jumps: `a -> c` goes where `c` is
+ * still reached from `a` along the others (`a -> b -> c`). Every star reaches
+ * just what it reached before -- so every missing star still leads into the
+ * target -- by fewer lines: the whole web of prerequisites behind a far star
+ * drew dozens of them over each other. Taken out one at a time in the order
+ * given, each against what is left, so a loop keeps one way round; each test
+ * is a walk that visits a star once, so a loop never hangs it. Only a star
+ * with more than one line out can have one to spare.
+ */
+export function reducePathEdges<E extends Prerequisite>(edges: readonly E[]): E[] {
+  const kept = [...edges]
+  const out = new Map<string, E[]>()
+  for (const edge of kept) out.set(edge.from, [...(out.get(edge.from) ?? []), edge])
+  for (const edge of edges) {
+    const fromHere = out.get(edge.from)!
+    if (fromHere.length < 2) continue
+    // Is `to` reached from `from` without this line?
+    const seen = new Set([edge.from])
+    const queue = fromHere.filter((other) => other !== edge).map((other) => other.to)
+    let reached = false
+    while (queue.length > 0 && !reached) {
+      const at = queue.shift()!
+      if (at === edge.to) reached = true
+      else if (!seen.has(at)) {
+        seen.add(at)
+        for (const next of out.get(at) ?? []) queue.push(next.to)
+      }
+    }
+    if (!reached) continue
+    out.set(edge.from, fromHere.filter((other) => other !== edge))
+    kept.splice(kept.indexOf(edge), 1)
+  }
+  return kept
+}
+
+/**
+ * The chain drawn brightest (#489): the fewest lines from `first` to
+ * `target`, as `from:to` keys; where two are as short, the one through the
+ * star first in `order` (course order, the target last). Empty when no way
+ * leads there.
+ */
+function mainChain(edges: readonly Prerequisite[], first: string, target: string, order: readonly string[]): Set<string> {
+  const rank = new Map(order.map((id, i) => [id, i]))
+  const out = new Map<string, string[]>()
+  for (const { from, to } of edges) out.set(from, [...(out.get(from) ?? []), to])
+  for (const list of out.values()) list.sort((a, b) => (rank.get(a) ?? Infinity) - (rank.get(b) ?? Infinity))
+  const came = new Map<string, string>()
+  const seen = new Set([first])
+  const queue = [first]
+  while (queue.length > 0 && !seen.has(target)) {
+    const at = queue.shift()!
+    for (const next of out.get(at) ?? []) {
+      if (seen.has(next)) continue
+      seen.add(next)
+      came.set(next, at)
+      queue.push(next)
+    }
+  }
+  const chain = new Set<string>()
+  for (let at = target; came.has(at); at = came.get(at)!) chain.add(`${came.get(at)}:${at}`)
+  return chain
 }
 
 /**

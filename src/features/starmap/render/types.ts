@@ -247,13 +247,15 @@ export type SceneFrame = {
    * A path to a star found from Ask (#489), by star index, or absent: the
    * prerequisites from the missing stars into each other and into the
    * target, drawn over every line in the recommended gold, all the way, at
-   * any zoom; a glow round each missing star. `amount` (0..1, eased) draws it
+   * any zoom -- the chain from the first missing star to the target (`main`)
+   * brightest, the side branches thin and dim; a glow round each missing
+   * star. `amount` (0..1, eased) draws it
    * in and lets every other line step back, as around a chosen star.
    */
   path?: {
     target: number
     missing: readonly number[]
-    edges: readonly { from: number; to: number }[]
+    edges: readonly { from: number; to: number; main: boolean }[]
     amount: number
   }
   /** The frame's time, ms, and how long a name takes to fade when it gains or loses its place (0: at once). */
