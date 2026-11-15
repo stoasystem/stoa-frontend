@@ -307,6 +307,45 @@ describe('getting out of its way', () => {
     }
   })
 
+  it('stands above the whole composer area on a phone, clear of the year-group line (#687)', async () => {
+    emulate({ wide: false })
+    server.profile = { ...server.profile, grade: '' }
+    // jsdom lays nothing out: a phone's sheet, its composer area at the bottom, the
+    // year-group line on top of the field and the microphone in it.
+    const size = (name: 'offsetHeight' | 'offsetWidth', value: number) => {
+      const before = Object.getOwnPropertyDescriptor(HTMLElement.prototype, name)!
+      Object.defineProperty(HTMLElement.prototype, name, {
+        configurable: true,
+        get(this: HTMLElement) {
+          return this.hasAttribute('data-ask-tour-bubble') ? value : 0
+        },
+      })
+      return () => Object.defineProperty(HTMLElement.prototype, name, before)
+    }
+    const rect = (top: number, left: number, width: number, height: number) =>
+      ({ top, left, width, height, bottom: top + height, right: left + width, x: left, y: top, toJSON() {} }) as DOMRect
+    const boxes = vi.spyOn(Element.prototype, 'getBoundingClientRect').mockImplementation(function (this: Element) {
+      if (this.querySelector(':scope > [data-ask-composer-area]')) return rect(0, 0, 390, 760)
+      if (this.hasAttribute('data-ask-composer-area')) return rect(640, 0, 390, 120)
+      if (this.hasAttribute('data-composer-mic')) return rect(700, 300, 36, 36)
+      return rect(0, 0, 0, 0)
+    })
+    const restore = [size('offsetHeight', 120), size('offsetWidth', 300)]
+    try {
+      const { ask } = await askExample()
+      const line = await within(ask).findByRole('link', { name: i18n.t('chat:gradeMissingHint') })
+      expect(ask.querySelector('[data-ask-composer-area]')!.contains(line)).toBe(true)
+      await waitFor(() => expect(bubble()?.dataset.askTourBubble).toBe('mic'))
+      await waitFor(() => expect(bubble()!.style.visibility).toBe(''))
+      // Its pointer's tip stops at the area's top, not at the microphone's (700), over the line.
+      expect(bubble()!.dataset.askTourSide).toBe('above')
+      expect(parseFloat(bubble()!.style.top) + 120 + 10 + 6).toBeLessThanOrEqual(640)
+    } finally {
+      boxes.mockRestore()
+      restore.forEach((undo) => undo())
+    }
+  })
+
   it('stays with Ask in full screen (#676)', async () => {
     await askExample()
     await waitFor(() => expect(bubble()).not.toBeNull())

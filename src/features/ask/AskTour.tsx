@@ -22,6 +22,8 @@
  *   Nothing in the thread or the list is left under the bubble: the one above
  *   the composer is given room at its end as tall as the bubble, so its newest
  *   answer and that answer's "Ask a teacher" scroll clear of it (`onRoom`).
+ *   Nor in the composer area: the bubble for the microphone or the + stands
+ *   above the whole area, not over what sits above the field (#687).
  * - Each step is read out once as it arrives (`role="status"`, always there).
  *   The bubble fades in; the control it points at is ringed once
  *   (`askGuide.css`); with reduced motion, only fades.
@@ -232,10 +234,15 @@ function placeFor(root: HTMLElement, target: HTMLElement, bubble: HTMLElement, p
   const viewport = window.visualViewport
   const screenBottom = viewport ? viewport.offsetTop + viewport.height : window.innerHeight
   const bottomLimit = Math.min(box.height, screenBottom - box.top) - EDGE
-  const composer = root.querySelector('[data-ask-composer-area]')?.getBoundingClientRect()
+  const area = root.querySelector('[data-ask-composer-area]')
+  const composer = area?.getBoundingClientRect()
   const belowLimit = Math.min(bottomLimit, composer ? composer.top - box.top - EDGE : bottomLimit)
 
-  const above = spot.top - box.top - GAP - POINTER - height
+  // A control in the composer area is pointed at from above the whole area, so
+  // what stands over the field -- the year-group line and its link (#687), the
+  // Stop button -- stays readable and pressable under the bubble.
+  const anchor = composer && area?.contains(target) ? Math.min(spot.top, composer.top) : spot.top
+  const above = anchor - box.top - GAP - POINTER - height
   const below = spot.bottom - box.top + GAP + POINTER
   const side = preferBelow && below + height <= belowLimit ? 'below' : above >= EDGE ? 'above' : below + height <= bottomLimit ? 'below' : 'above'
   const rawTop = side === 'above' ? above : below
