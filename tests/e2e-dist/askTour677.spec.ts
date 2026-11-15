@@ -85,3 +85,50 @@ test('the tour on the microphone leaves the answer’s "Ask a teacher" free to p
   await expect(ask.getByRole('region', { name: 'Teacher support' })).toContainText('Test Teacher will join this conversation')
   await expect(bubble).toBeVisible()
 })
+
+/**
+ * A student with no year group has a line over the composer: "Add your year
+ * group to your profile ...", a link to the profile. On a phone the microphone's
+ * bubble stood over it (#687). It now stands above the whole composer area.
+ */
+test('the tour on the microphone leaves the year-group line readable and its link free to press (phone, #687)', async ({ page, backend }) => {
+  await page.setViewportSize({ width: 375, height: 812 })
+  const world = new StudentWorld(backend)
+  world.grade = ''
+  world.install()
+  await signInAsStudent(page)
+
+  await page.getByRole('textbox', { name: 'Your question' }).fill('Why is the sum of the angles in a triangle 180 degrees?')
+  const ask = page.locator('[data-ask-surface]')
+  await ask.getByRole('textbox', { name: 'Your question' }).press('Enter')
+
+  const bubble = ask.locator('[data-ask-tour-bubble="mic"]')
+  await expect(bubble).toBeVisible()
+  const link = ask.getByRole('link', { name: 'Add your year group to your profile and explanations will fit you better.' })
+  await expect(link).toBeVisible()
+
+  // Whatever the answer does to the thread meanwhile, the line stays clear of the bubble.
+  for (const settled of [false, true]) {
+    if (settled) await expect(ask.getByRole('log', { name: 'Messages' }).getByText(/Here is how to think about it/)).toBeVisible()
+    expect(
+      await link.evaluate((anchor) => {
+        const box = anchor.getBoundingClientRect()
+        const hit = anchor.ownerDocument.elementFromPoint(box.left + box.width / 2, box.top + box.height / 2)
+        return hit !== null && anchor.contains(hit)
+      }),
+    ).toBe(true)
+    const [linkBox, bubbleBox] = [await link.boundingBox(), await bubble.boundingBox()]
+    expect(bubbleBox!.y + bubbleBox!.height).toBeLessThanOrEqual(linkBox!.y)
+  }
+
+  // On the + step too.
+  await bubble.getByRole('button', { name: 'Next' }).click()
+  const add = ask.locator('[data-ask-tour-bubble="add"]')
+  await expect(add).toBeVisible()
+  const [linkBox, addBox] = [await link.boundingBox(), await add.boundingBox()]
+  expect(addBox!.y + addBox!.height).toBeLessThanOrEqual(linkBox!.y)
+
+  // A press goes to the profile's year group; the tour is not a modal.
+  await link.click({ timeout: 5_000 })
+  await expect(page).toHaveURL(/\/me#/)
+})
