@@ -42,6 +42,8 @@ import {
 } from '@/dev/preview/demoSource'
 import { asNewcomer } from '@/dev/demo/sky/newcomer'
 import { readDemoStarMap } from '@/dev/demo/sky/source'
+import { catalogSky, catalogSkyWanted } from '@/dev/demo/sky/catalogSky'
+import { projectStarMap } from '@/features/starmap/readModelSource'
 import { LightingEventSourceContext, type LightingEventSource } from '@/features/starmap/lighting/lightingEvents'
 import { orderedStars, subjectOfNebula, type Nebula, type Star, type StarMap } from '@/features/starmap/model/starMap'
 import { StarMapSourceContext, type FixtureSize, type StarMapSource } from '@/features/starmap/starMapSource'
@@ -131,6 +133,7 @@ export function demoStarMapOverride(map: StarMap, size: FixtureSize, completed: 
  * Asked for the skeleton (#503), every star comes without its small stars.
  */
 export function demoKnowledgeMap(size: FixtureSize, view: 'full' | 'skeleton' = 'full'): KnowledgeMapResponse {
+  if (catalogSkyWanted()) return catalogSky()
   const sky = demoFollowedSky(size)
   if (view === 'full') return sky
   return { ...sky, view: 'skeleton', stars: sky.stars.map((star) => ({ ...star, skills: [] })) }
@@ -255,6 +258,8 @@ export function PreviewLighting({ children, longNames = false, newcomer = false 
     return {
       demo: true,
       read: (request) => {
+        // Prototype (proto/starmap-line-styles): the backend's real knowledge base, nothing lit.
+        if (catalogSkyWanted()) return projectStarMap(catalogSky(), request)
         const read = readDemoStarMap(request)
         // The newcomer's sky is built from the demo sky's own arrays, so the engine keeps its tiles.
         const followed = newcomer

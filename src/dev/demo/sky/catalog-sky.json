@@ -1,0 +1,3190 @@
+{
+"source": "stoa-backend src/stoa/services/knowledge_base_stars.json (proto/starmap-line-styles only)",
+"galaxies": [
+{
+"subjectId": "mathematics",
+"name": "Mathematics",
+"lit": 0,
+"total": 98,
+"enrolled": true
+},
+{
+"subjectId": "english",
+"name": "English",
+"lit": 0,
+"total": 83,
+"enrolled": true
+},
+{
+"subjectId": "physics",
+"name": "Physics",
+"lit": 0,
+"total": 35,
+"enrolled": true
+}
+],
+"nebulae": [
+{
+"topicId": "zahlen",
+"subjectId": "mathematics",
+"name": "Numbers and arithmetic",
+"order": 1
+},
+{
+"topicId": "brueche",
+"subjectId": "mathematics",
+"name": "Fractions",
+"order": 2
+},
+{
+"topicId": "prozentrechnung",
+"subjectId": "mathematics",
+"name": "Percentages and ratios",
+"order": 3
+},
+{
+"topicId": "groessen",
+"subjectId": "mathematics",
+"name": "Quantities and measures",
+"order": 4
+},
+{
+"topicId": "gleichungen",
+"subjectId": "mathematics",
+"name": "Equations",
+"order": 5
+},
+{
+"topicId": "geometrie",
+"subjectId": "mathematics",
+"name": "Geometry",
+"order": 6
+},
+{
+"topicId": "daten",
+"subjectId": "mathematics",
+"name": "Data and counting",
+"order": 7
+},
+{
+"topicId": "englisch-ich",
+"subjectId": "english",
+"name": "Me and other people",
+"order": 1
+},
+{
+"topicId": "englisch-alltag",
+"subjectId": "english",
+"name": "Daily life and home",
+"order": 2
+},
+{
+"topicId": "englisch-schule",
+"subjectId": "english",
+"name": "School and work",
+"order": 3
+},
+{
+"topicId": "englisch-essen",
+"subjectId": "english",
+"name": "Food and shopping",
+"order": 4
+},
+{
+"topicId": "englisch-freizeit",
+"subjectId": "english",
+"name": "Free time and celebrations",
+"order": 5
+},
+{
+"topicId": "englisch-unterwegs",
+"subjectId": "english",
+"name": "Out and about",
+"order": 6
+},
+{
+"topicId": "englisch-natur",
+"subjectId": "english",
+"name": "Nature and the environment",
+"order": 7
+},
+{
+"topicId": "englisch-gesundheit",
+"subjectId": "english",
+"name": "Body and health",
+"order": 8
+},
+{
+"topicId": "englisch-gesellschaft",
+"subjectId": "english",
+"name": "Society and knowledge",
+"order": 9
+},
+{
+"topicId": "englisch-kommunizieren",
+"subjectId": "english",
+"name": "Communicating",
+"order": 10
+},
+{
+"topicId": "englisch-laute",
+"subjectId": "english",
+"name": "Letters and pronunciation",
+"order": 11
+},
+{
+"topicId": "englisch-woerter",
+"subjectId": "english",
+"name": "Parts of speech",
+"order": 12
+},
+{
+"topicId": "englisch-verben",
+"subjectId": "english",
+"name": "Verbs and tenses",
+"order": 13
+},
+{
+"topicId": "englisch-saetze",
+"subjectId": "english",
+"name": "Building sentences",
+"order": 14
+},
+{
+"topicId": "physik-mechanik",
+"subjectId": "physics",
+"name": "Mechanics",
+"order": 1
+},
+{
+"topicId": "physik-elektrizitaet",
+"subjectId": "physics",
+"name": "Electricity and magnetism",
+"order": 2
+},
+{
+"topicId": "physik-waerme",
+"subjectId": "physics",
+"name": "Heat and matter",
+"order": 3
+},
+{
+"topicId": "physik-optik-akustik",
+"subjectId": "physics",
+"name": "Sound and light",
+"order": 4
+},
+{
+"topicId": "physik-modern",
+"subjectId": "physics",
+"name": "Modern physics",
+"order": 5
+},
+{
+"topicId": "physik-praxis",
+"subjectId": "physics",
+"name": "Measuring and experimenting",
+"order": 6
+}
+],
+"stars": [
+{
+"unitId": "brueche-brueche-kuerzen-addieren-und-subtrahieren",
+"name": "Simplifying, adding and subtracting fractions",
+"nebulaId": "brueche",
+"order": 3
+},
+{
+"unitId": "brueche-brueche-und-dezimalzahlen-verstehen",
+"name": "Understanding fractions and decimals",
+"nebulaId": "brueche",
+"order": 4
+},
+{
+"unitId": "brueche-brueche-multiplizieren-und-dividieren",
+"name": "Multiplying and dividing fractions",
+"nebulaId": "brueche",
+"order": 5
+},
+{
+"unitId": "daten-daten-ordnen-und-darstellen",
+"name": "Organising data and showing it in charts",
+"nebulaId": "daten",
+"order": 3
+},
+{
+"unitId": "daten-zaehlprinzipien-und-variationen",
+"name": "Counting principles and permutations",
+"nebulaId": "daten",
+"order": 4
+},
+{
+"unitId": "daten-mittelwert-median-und-modalwert",
+"name": "Mean, median and mode",
+"nebulaId": "daten",
+"order": 5
+},
+{
+"unitId": "daten-diagramme-und-histogramme-lesen",
+"name": "Reading charts and histograms",
+"nebulaId": "daten",
+"order": 6
+},
+{
+"unitId": "daten-zufall-und-wahrscheinlichkeit-einschaetzen",
+"name": "Judging chance and probability",
+"nebulaId": "daten",
+"order": 7
+},
+{
+"unitId": "daten-statistische-untersuchungen-durchfuehren",
+"name": "Carrying out statistical investigations",
+"nebulaId": "daten",
+"order": 8
+},
+{
+"unitId": "daten-stichproben-und-stichprobenverfahren",
+"name": "Samples and sampling methods",
+"nebulaId": "daten",
+"order": 9
+},
+{
+"unitId": "daten-streuung-quartile-und-boxplots",
+"name": "Spread, quartiles and box plots",
+"nebulaId": "daten",
+"order": 10
+},
+{
+"unitId": "daten-ereignisse-und-mehrstufige-zufallsexperimente",
+"name": "Events and multi-stage random experiments",
+"nebulaId": "daten",
+"order": 11
+},
+{
+"unitId": "daten-wahrscheinlichkeiten-berechnen",
+"name": "Calculating probabilities",
+"nebulaId": "daten",
+"order": 12
+},
+{
+"unitId": "daten-bedingte-wahrscheinlichkeit-und-bayes",
+"name": "Conditional probability and Bayes' theorem",
+"nebulaId": "daten",
+"order": 13
+},
+{
+"unitId": "daten-kombinationen-und-binomischer-lehrsatz",
+"name": "Combinations and the binomial theorem",
+"nebulaId": "daten",
+"order": 14
+},
+{
+"unitId": "daten-korrelation-und-lineare-regression",
+"name": "Correlation and linear regression",
+"nebulaId": "daten",
+"order": 15
+},
+{
+"unitId": "daten-zufallsvariablen-und-verteilungen",
+"name": "Random variables and distributions",
+"nebulaId": "daten",
+"order": 16
+},
+{
+"unitId": "englisch-alltag-zahlen-und-ordnungszahlen",
+"name": "Numbers and ordinal numbers",
+"nebulaId": "englisch-alltag",
+"order": 1
+},
+{
+"unitId": "englisch-alltag-haus-zimmer-und-ortsangaben",
+"name": "House, rooms and places",
+"nebulaId": "englisch-alltag",
+"order": 2
+},
+{
+"unitId": "englisch-alltag-farben-kleidung-und-besitz",
+"name": "Colours, clothes and belongings",
+"nebulaId": "englisch-alltag",
+"order": 3
+},
+{
+"unitId": "englisch-alltag-uhrzeit-und-tagesablauf",
+"name": "Time and daily routine",
+"nebulaId": "englisch-alltag",
+"order": 4
+},
+{
+"unitId": "englisch-alltag-monate-und-datum",
+"name": "Months and dates",
+"nebulaId": "englisch-alltag",
+"order": 5
+},
+{
+"unitId": "englisch-alltag-wochentage-und-alltagstaetigkeiten",
+"name": "Days of the week and everyday activities",
+"nebulaId": "englisch-alltag",
+"order": 6
+},
+{
+"unitId": "englisch-alltag-von-frueher-erzaehlen",
+"name": "Talking about the past",
+"nebulaId": "englisch-alltag",
+"order": 7
+},
+{
+"unitId": "englisch-essen-essen-anbieten-und-bestellen",
+"name": "Offering and ordering food",
+"nebulaId": "englisch-essen",
+"order": 1
+},
+{
+"unitId": "englisch-essen-lebensmittel-und-lieblingsessen",
+"name": "Food and favourite meals",
+"nebulaId": "englisch-essen",
+"order": 2
+},
+{
+"unitId": "englisch-essen-einkaufen-und-taschengeld",
+"name": "Shopping and pocket money",
+"nebulaId": "englisch-essen",
+"order": 3
+},
+{
+"unitId": "englisch-essen-kochen-und-esskultur",
+"name": "Cooking and food culture",
+"nebulaId": "englisch-essen",
+"order": 4
+},
+{
+"unitId": "englisch-essen-produkte-wert-und-konsum",
+"name": "Products, value and consumption",
+"nebulaId": "englisch-essen",
+"order": 5
+},
+{
+"unitId": "englisch-freizeit-spielsachen-hobbys-und-faehigkeiten",
+"name": "Toys, hobbies and abilities",
+"nebulaId": "englisch-freizeit",
+"order": 1
+},
+{
+"unitId": "englisch-freizeit-das-wochenende",
+"name": "The weekend",
+"nebulaId": "englisch-freizeit",
+"order": 2
+},
+{
+"unitId": "englisch-freizeit-sport-und-wettkaempfe",
+"name": "Sport and competitions",
+"nebulaId": "englisch-freizeit",
+"order": 3
+},
+{
+"unitId": "englisch-freizeit-fernsehen-und-internet",
+"name": "Television and the internet",
+"nebulaId": "englisch-freizeit",
+"order": 4
+},
+{
+"unitId": "englisch-freizeit-partys-und-feste",
+"name": "Parties and celebrations",
+"nebulaId": "englisch-freizeit",
+"order": 5
+},
+{
+"unitId": "englisch-freizeit-buecher-filme-und-science-fiction",
+"name": "Books, films and science fiction",
+"nebulaId": "englisch-freizeit",
+"order": 6
+},
+{
+"unitId": "englisch-freizeit-musik-und-auffuehrungen",
+"name": "Music and performances",
+"nebulaId": "englisch-freizeit",
+"order": 7
+},
+{
+"unitId": "englisch-freizeit-feste-und-traditionen",
+"name": "Festivals and traditions",
+"nebulaId": "englisch-freizeit",
+"order": 8
+},
+{
+"unitId": "englisch-gesellschaft-regeln-in-schule-und-alltag",
+"name": "Rules at school and in everyday life",
+"nebulaId": "englisch-gesellschaft",
+"order": 1
+},
+{
+"unitId": "englisch-gesellschaft-weltraum-und-raumfahrt",
+"name": "Space and space travel",
+"nebulaId": "englisch-gesellschaft",
+"order": 2
+},
+{
+"unitId": "englisch-gesellschaft-geschichten-mythen-und-gedichte",
+"name": "Stories, myths and poems",
+"nebulaId": "englisch-gesellschaft",
+"order": 3
+},
+{
+"unitId": "englisch-gesellschaft-leben-und-technik-der-zukunft",
+"name": "Life and technology in the future",
+"nebulaId": "englisch-gesellschaft",
+"order": 4
+},
+{
+"unitId": "englisch-gesellschaft-kunst-und-ausstellungen",
+"name": "Art and exhibitions",
+"nebulaId": "englisch-gesellschaft",
+"order": 5
+},
+{
+"unitId": "englisch-gesellschaft-helfen-und-sich-engagieren",
+"name": "Helping and getting involved",
+"nebulaId": "englisch-gesellschaft",
+"order": 6
+},
+{
+"unitId": "englisch-gesellschaft-erfindungen-und-leistungen",
+"name": "Inventions and achievements",
+"nebulaId": "englisch-gesellschaft",
+"order": 7
+},
+{
+"unitId": "englisch-gesellschaft-kulturerbe-schuetzen",
+"name": "Protecting cultural heritage",
+"nebulaId": "englisch-gesellschaft",
+"order": 8
+},
+{
+"unitId": "englisch-gesellschaft-wissenschaftliche-forschung",
+"name": "Scientific research",
+"nebulaId": "englisch-gesellschaft",
+"order": 9
+},
+{
+"unitId": "englisch-gesundheit-gesicht-beschwerden-und-erste-hilfe",
+"name": "Face, ailments and first aid",
+"nebulaId": "englisch-gesundheit",
+"order": 1
+},
+{
+"unitId": "englisch-gesundheit-sport-und-gesunde-gewohnheiten",
+"name": "Sport and healthy habits",
+"nebulaId": "englisch-gesundheit",
+"order": 2
+},
+{
+"unitId": "englisch-ich-familie",
+"name": "The family",
+"nebulaId": "englisch-ich",
+"order": 1
+},
+{
+"unitId": "englisch-ich-begruessen-und-sich-vorstellen",
+"name": "Greetings and introducing yourself",
+"nebulaId": "englisch-ich",
+"order": 2
+},
+{
+"unitId": "englisch-ich-aussehen-und-koerpersprache",
+"name": "Appearance and body language",
+"nebulaId": "englisch-ich",
+"order": 3
+},
+{
+"unitId": "englisch-ich-personen-und-charakter-beschreiben",
+"name": "Describing people and character",
+"nebulaId": "englisch-ich",
+"order": 4
+},
+{
+"unitId": "englisch-ich-gefuehle-ratschlaege-und-durchhalten",
+"name": "Feelings, advice and perseverance",
+"nebulaId": "englisch-ich",
+"order": 5
+},
+{
+"unitId": "englisch-ich-frueher-und-heute",
+"name": "Then and now",
+"nebulaId": "englisch-ich",
+"order": 6
+},
+{
+"unitId": "englisch-kommunizieren-texte-verstehen-und-im-alltag-kommunizieren",
+"name": "Understanding texts and everyday communication",
+"nebulaId": "englisch-kommunizieren",
+"order": 1
+},
+{
+"unitId": "englisch-laute-alphabet-und-anlaute",
+"name": "Alphabet and initial sounds",
+"nebulaId": "englisch-laute",
+"order": 1
+},
+{
+"unitId": "englisch-laute-kurze-und-lange-vokale",
+"name": "Short and long vowels",
+"nebulaId": "englisch-laute",
+"order": 2
+},
+{
+"unitId": "englisch-laute-aussprache-im-wort-und-im-redefluss",
+"name": "Pronunciation in words and connected speech",
+"nebulaId": "englisch-laute",
+"order": 3
+},
+{
+"unitId": "englisch-laute-betonung-satzmelodie-und-pausen",
+"name": "Stress, intonation and pauses",
+"nebulaId": "englisch-laute",
+"order": 4
+},
+{
+"unitId": "englisch-natur-tiere",
+"name": "Animals",
+"nebulaId": "englisch-natur",
+"order": 1
+},
+{
+"unitId": "englisch-natur-wetter-und-jahreszeiten",
+"name": "Weather and seasons",
+"nebulaId": "englisch-natur",
+"order": 2
+},
+{
+"unitId": "englisch-natur-bauernhof-und-landwirtschaft",
+"name": "Farm and agriculture",
+"nebulaId": "englisch-natur",
+"order": 3
+},
+{
+"unitId": "englisch-natur-naturparks-und-naturschutz",
+"name": "Nature parks and conservation",
+"nebulaId": "englisch-natur",
+"order": 4
+},
+{
+"unitId": "englisch-natur-umweltschutz-und-klima",
+"name": "Environmental protection and climate",
+"nebulaId": "englisch-natur",
+"order": 5
+},
+{
+"unitId": "englisch-natur-unwetter-und-naturkatastrophen",
+"name": "Storms and natural disasters",
+"nebulaId": "englisch-natur",
+"order": 6
+},
+{
+"unitId": "englisch-saetze-fragen-mit-fragewoertern",
+"name": "Questions with question words",
+"nebulaId": "englisch-saetze",
+"order": 1
+},
+{
+"unitId": "englisch-saetze-aussagen-aufforderungen-und-ausrufe",
+"name": "Statements, commands and exclamations",
+"nebulaId": "englisch-saetze",
+"order": 2
+},
+{
+"unitId": "englisch-saetze-ja-nein-fragen-und-question-tags",
+"name": "Yes/no questions and question tags",
+"nebulaId": "englisch-saetze",
+"order": 3
+},
+{
+"unitId": "englisch-saetze-bedingung-gegensatz-und-zweck",
+"name": "Condition, contrast and purpose",
+"nebulaId": "englisch-saetze",
+"order": 4
+},
+{
+"unitId": "englisch-saetze-satzglieder-und-satzbau",
+"name": "Sentence elements and structure",
+"nebulaId": "englisch-saetze",
+"order": 5
+},
+{
+"unitId": "englisch-saetze-nominalsaetze-und-indirekte-rede",
+"name": "Noun clauses and reported speech",
+"nebulaId": "englisch-saetze",
+"order": 6
+},
+{
+"unitId": "englisch-saetze-relativsaetze-und-appositionssaetze",
+"name": "Relative and appositive clauses",
+"nebulaId": "englisch-saetze",
+"order": 7
+},
+{
+"unitId": "englisch-saetze-irreale-bedingungen-und-konjunktiv",
+"name": "Unreal conditionals and the subjunctive",
+"nebulaId": "englisch-saetze",
+"order": 8
+},
+{
+"unitId": "englisch-saetze-hervorhebung-inversion-und-ellipse",
+"name": "Emphasis, inversion and ellipsis",
+"nebulaId": "englisch-saetze",
+"order": 9
+},
+{
+"unitId": "englisch-schule-schulzimmer-und-schulsachen",
+"name": "Classroom and school things",
+"nebulaId": "englisch-schule",
+"order": 1
+},
+{
+"unitId": "englisch-schule-berufe-und-arbeitsorte",
+"name": "Jobs and workplaces",
+"nebulaId": "englisch-schule",
+"order": 2
+},
+{
+"unitId": "englisch-schule-orte-faecher-und-regeln-in-der-schule",
+"name": "Places, subjects and rules at school",
+"nebulaId": "englisch-schule",
+"order": 3
+},
+{
+"unitId": "englisch-schule-berufsplaene-und-bewerbung",
+"name": "Career plans and job applications",
+"nebulaId": "englisch-schule",
+"order": 4
+},
+{
+"unitId": "englisch-schule-lernmethoden-und-schulabschluss",
+"name": "Learning methods and leaving school",
+"nebulaId": "englisch-schule",
+"order": 5
+},
+{
+"unitId": "englisch-schule-schulalltag-kurse-und-clubs",
+"name": "School life, courses and clubs",
+"nebulaId": "englisch-schule",
+"order": 6
+},
+{
+"unitId": "englisch-unterwegs-laender-sprachen-und-umgangsformen",
+"name": "Countries, languages and manners",
+"nebulaId": "englisch-unterwegs",
+"order": 1
+},
+{
+"unitId": "englisch-unterwegs-verkehrsmittel-und-schulweg",
+"name": "Means of transport and the way to school",
+"nebulaId": "englisch-unterwegs",
+"order": 2
+},
+{
+"unitId": "englisch-unterwegs-von-ausfluegen-und-ferien-erzaehlen",
+"name": "Talking about trips and holidays",
+"nebulaId": "englisch-unterwegs",
+"order": 3
+},
+{
+"unitId": "englisch-unterwegs-orte-in-der-stadt-und-wege",
+"name": "Places in town and directions",
+"nebulaId": "englisch-unterwegs",
+"order": 4
+},
+{
+"unitId": "englisch-unterwegs-reisen-planen-und-sehenswuerdigkeiten",
+"name": "Planning trips and sights",
+"nebulaId": "englisch-unterwegs",
+"order": 5
+},
+{
+"unitId": "englisch-unterwegs-kulturelle-vielfalt-und-austausch",
+"name": "Cultural diversity and exchange",
+"nebulaId": "englisch-unterwegs",
+"order": 6
+},
+{
+"unitId": "englisch-unterwegs-bahnreisen-und-seereisen",
+"name": "Train journeys and sea voyages",
+"nebulaId": "englisch-unterwegs",
+"order": 7
+},
+{
+"unitId": "englisch-verben-be-have-und-simple-present",
+"name": "be, have and the simple present",
+"nebulaId": "englisch-verben",
+"order": 1
+},
+{
+"unitId": "englisch-verben-pflicht-erlaubnis-und-vermutung",
+"name": "Obligation, permission and deduction with modal verbs",
+"nebulaId": "englisch-verben",
+"order": 2
+},
+{
+"unitId": "englisch-verben-faehigkeiten-bitten-und-ratschlaege",
+"name": "Ability, requests and advice with modal verbs",
+"nebulaId": "englisch-verben",
+"order": 3
+},
+{
+"unitId": "englisch-verben-present-progressive-und-zukunft",
+"name": "Present progressive and the future",
+"nebulaId": "englisch-verben",
+"order": 4
+},
+{
+"unitId": "englisch-verben-simple-past-und-past-progressive",
+"name": "Simple past, past progressive and used to",
+"nebulaId": "englisch-verben",
+"order": 5
+},
+{
+"unitId": "englisch-verben-infinitiv-und-gerundium",
+"name": "Infinitive and gerund",
+"nebulaId": "englisch-verben",
+"order": 6
+},
+{
+"unitId": "englisch-verben-perfekt-und-zeitformen-unterscheiden",
+"name": "Present perfect, past perfect and choosing the tense",
+"nebulaId": "englisch-verben",
+"order": 7
+},
+{
+"unitId": "englisch-verben-das-passiv",
+"name": "The passive",
+"nebulaId": "englisch-verben",
+"order": 8
+},
+{
+"unitId": "englisch-verben-partizipien-und-partizipialkonstruktionen",
+"name": "Participles and participle clauses",
+"nebulaId": "englisch-verben",
+"order": 9
+},
+{
+"unitId": "englisch-woerter-this-these-und-plural-von-nomen",
+"name": "this, these and plural nouns",
+"nebulaId": "englisch-woerter",
+"order": 1
+},
+{
+"unitId": "englisch-woerter-adjektive-steigerung-und-wortbildung",
+"name": "Adjectives, comparison and word formation",
+"nebulaId": "englisch-woerter",
+"order": 2
+},
+{
+"unitId": "englisch-woerter-praepositionen-adverbien-und-verbindungswoerter",
+"name": "Prepositions, adverbs and linking words",
+"nebulaId": "englisch-woerter",
+"order": 3
+},
+{
+"unitId": "englisch-woerter-besitz-und-pronomen",
+"name": "Possession and pronouns",
+"nebulaId": "englisch-woerter",
+"order": 4
+},
+{
+"unitId": "geometrie-lage-richtung-und-koordinaten",
+"name": "Position, direction and coordinates",
+"nebulaId": "geometrie",
+"order": 5
+},
+{
+"unitId": "geometrie-ebene-figuren-und-vielecke",
+"name": "Plane shapes and polygons",
+"nebulaId": "geometrie",
+"order": 6
+},
+{
+"unitId": "geometrie-koerper-ansichten-und-netze",
+"name": "Solids, views and nets",
+"nebulaId": "geometrie",
+"order": 7
+},
+{
+"unitId": "geometrie-umfang-und-flaeche-ebener-figuren",
+"name": "Perimeter and area of plane shapes",
+"nebulaId": "geometrie",
+"order": 8
+},
+{
+"unitId": "geometrie-strecken-geraden-senkrechte-und-parallelen",
+"name": "Segments, lines, perpendiculars and parallels",
+"nebulaId": "geometrie",
+"order": 9
+},
+{
+"unitId": "geometrie-winkel-messen-und-berechnen",
+"name": "Measuring and calculating angles",
+"nebulaId": "geometrie",
+"order": 10
+},
+{
+"unitId": "geometrie-verschiebung-und-drehung",
+"name": "Translation and rotation",
+"nebulaId": "geometrie",
+"order": 11
+},
+{
+"unitId": "geometrie-dreiecke-und-winkelsummen",
+"name": "Triangles and angle sums",
+"nebulaId": "geometrie",
+"order": 12
+},
+{
+"unitId": "geometrie-achsen-und-punktsymmetrie",
+"name": "Line and point symmetry",
+"nebulaId": "geometrie",
+"order": 13
+},
+{
+"unitId": "geometrie-volumen-und-oberflaeche-von-koerpern",
+"name": "Volume and surface area of solids",
+"nebulaId": "geometrie",
+"order": 14
+},
+{
+"unitId": "geometrie-kreis-umfang-flaeche-und-sektor",
+"name": "Circle: circumference, area and sector",
+"nebulaId": "geometrie",
+"order": 15
+},
+{
+"unitId": "geometrie-winkel-an-parallelen-und-beweise",
+"name": "Angles at parallel lines and geometric proofs",
+"nebulaId": "geometrie",
+"order": 16
+},
+{
+"unitId": "geometrie-kongruenz-und-gleichschenklige-dreiecke",
+"name": "Congruence and isosceles triangles",
+"nebulaId": "geometrie",
+"order": 17
+},
+{
+"unitId": "geometrie-parallelogramme-und-besondere-vierecke",
+"name": "Parallelograms and special quadrilaterals",
+"nebulaId": "geometrie",
+"order": 18
+},
+{
+"unitId": "geometrie-rechtwinklige-dreiecke-und-pythagoras",
+"name": "Right triangles and the Pythagorean theorem",
+"nebulaId": "geometrie",
+"order": 19
+},
+{
+"unitId": "geometrie-besondere-linien-inkreis-und-umkreis",
+"name": "Special lines in a triangle, incircle and circumcircle",
+"nebulaId": "geometrie",
+"order": 20
+},
+{
+"unitId": "geometrie-aehnlichkeit-und-zentrische-streckung",
+"name": "Similarity and dilation",
+"nebulaId": "geometrie",
+"order": 21
+},
+{
+"unitId": "geometrie-kreissaetze-sehnen-tangenten-umfangswinkel",
+"name": "Circle theorems: chords, tangents and inscribed angles",
+"nebulaId": "geometrie",
+"order": 22
+},
+{
+"unitId": "geometrie-koerper-darstellen-projektionen-schraegbilder",
+"name": "Representing solids: projections and oblique drawings",
+"nebulaId": "geometrie",
+"order": 23
+},
+{
+"unitId": "geometrie-trigonometrie",
+"name": "Trigonometry",
+"nebulaId": "geometrie",
+"order": 24
+},
+{
+"unitId": "geometrie-geraden-und-ebenen-im-raum",
+"name": "Lines and planes in space",
+"nebulaId": "geometrie",
+"order": 25
+},
+{
+"unitId": "geometrie-vektoren-in-der-ebene",
+"name": "Vectors in the plane",
+"nebulaId": "geometrie",
+"order": 26
+},
+{
+"unitId": "geometrie-skalarprodukt-und-geometrie-mit-vektoren",
+"name": "Dot product and geometry with vectors",
+"nebulaId": "geometrie",
+"order": 27
+},
+{
+"unitId": "geometrie-ellipse",
+"name": "Ellipse",
+"nebulaId": "geometrie",
+"order": 28
+},
+{
+"unitId": "geometrie-geraden-in-der-koordinatenebene",
+"name": "Lines in the coordinate plane",
+"nebulaId": "geometrie",
+"order": 29
+},
+{
+"unitId": "geometrie-hyperbel-und-parabel",
+"name": "Hyperbola and parabola",
+"nebulaId": "geometrie",
+"order": 30
+},
+{
+"unitId": "geometrie-kreisgleichungen-und-lage-zum-kreis",
+"name": "Circle equations and positions relative to a circle",
+"nebulaId": "geometrie",
+"order": 31
+},
+{
+"unitId": "geometrie-lage-winkel-und-abstaende-mit-vektoren",
+"name": "Position, angles and distances with vectors",
+"nebulaId": "geometrie",
+"order": 32
+},
+{
+"unitId": "geometrie-vektoren-und-koordinaten-im-raum",
+"name": "Vectors and coordinates in space",
+"nebulaId": "geometrie",
+"order": 33
+},
+{
+"unitId": "gleichungen-ersetzen-und-groessenbeziehungen",
+"name": "Word problems with substitution and quantity relations",
+"nebulaId": "gleichungen",
+"order": 3
+},
+{
+"unitId": "gleichungen-lineare-gleichungen-loesen",
+"name": "Solving linear equations",
+"nebulaId": "gleichungen",
+"order": 4
+},
+{
+"unitId": "gleichungen-terme-aufstellen-und-berechnen",
+"name": "Writing and evaluating expressions",
+"nebulaId": "gleichungen",
+"order": 5
+},
+{
+"unitId": "gleichungen-sachaufgaben-mit-gleichungen",
+"name": "Word problems with equations",
+"nebulaId": "gleichungen",
+"order": 6
+},
+{
+"unitId": "gleichungen-lineare-gleichungssysteme",
+"name": "Systems of linear equations",
+"nebulaId": "gleichungen",
+"order": 7
+},
+{
+"unitId": "gleichungen-rechnen-mit-polynomen",
+"name": "Calculating with polynomials",
+"nebulaId": "gleichungen",
+"order": 8
+},
+{
+"unitId": "gleichungen-lineare-ungleichungen-loesen-und-anwenden",
+"name": "Solving and applying linear inequalities",
+"nebulaId": "gleichungen",
+"order": 9
+},
+{
+"unitId": "gleichungen-ungleichungen-und-ihre-eigenschaften",
+"name": "Inequalities and their properties",
+"nebulaId": "gleichungen",
+"order": 10
+},
+{
+"unitId": "gleichungen-binomische-formeln-und-faktorisieren",
+"name": "Binomial formulas and factorising",
+"nebulaId": "gleichungen",
+"order": 11
+},
+{
+"unitId": "gleichungen-bruchterme-und-bruchgleichungen",
+"name": "Algebraic fractions and fractional equations",
+"nebulaId": "gleichungen",
+"order": 12
+},
+{
+"unitId": "gleichungen-funktionsbegriff-und-darstellungen",
+"name": "The function concept and representations",
+"nebulaId": "gleichungen",
+"order": 13
+},
+{
+"unitId": "gleichungen-lineare-funktionen",
+"name": "Linear functions",
+"nebulaId": "gleichungen",
+"order": 14
+},
+{
+"unitId": "gleichungen-umgekehrt-proportionale-funktionen",
+"name": "Inverse proportional functions",
+"nebulaId": "gleichungen",
+"order": 15
+},
+{
+"unitId": "gleichungen-quadratische-funktionen",
+"name": "Quadratic functions",
+"nebulaId": "gleichungen",
+"order": 16
+},
+{
+"unitId": "gleichungen-quadratische-gleichungen",
+"name": "Quadratic equations",
+"nebulaId": "gleichungen",
+"order": 17
+},
+{
+"unitId": "gleichungen-bogenmass-und-einheitskreis",
+"name": "Radians and the unit circle",
+"nebulaId": "gleichungen",
+"order": 18
+},
+{
+"unitId": "gleichungen-eigenschaften-von-funktionen",
+"name": "Properties of functions",
+"nebulaId": "gleichungen",
+"order": 19
+},
+{
+"unitId": "gleichungen-exponential-und-logarithmusfunktionen",
+"name": "Exponential and logarithmic functions",
+"nebulaId": "gleichungen",
+"order": 20
+},
+{
+"unitId": "gleichungen-funktionen-und-funktionsmodelle",
+"name": "Functions and function models",
+"nebulaId": "gleichungen",
+"order": 21
+},
+{
+"unitId": "gleichungen-trigonometrische-formeln",
+"name": "Trigonometric identities",
+"nebulaId": "gleichungen",
+"order": 22
+},
+{
+"unitId": "gleichungen-trigonometrische-funktionen",
+"name": "Trigonometric functions",
+"nebulaId": "gleichungen",
+"order": 23
+},
+{
+"unitId": "gleichungen-ableitung-und-ableitungsregeln",
+"name": "The derivative and differentiation rules",
+"nebulaId": "gleichungen",
+"order": 24
+},
+{
+"unitId": "gleichungen-monotonie-und-extremwerte",
+"name": "Monotonicity and extrema",
+"nebulaId": "gleichungen",
+"order": 25
+},
+{
+"unitId": "groessen-gewicht-hohlmasse-und-geld",
+"name": "Weight, capacity and money",
+"nebulaId": "groessen",
+"order": 4
+},
+{
+"unitId": "groessen-zeit-uhrzeit-und-zeitdauer",
+"name": "Time: clock, units of time and duration",
+"nebulaId": "groessen",
+"order": 5
+},
+{
+"unitId": "groessen-laengen-und-flaechen",
+"name": "Length and area",
+"nebulaId": "groessen",
+"order": 6
+},
+{
+"unitId": "physik-elektrizitaet-elektrische-energie-leistung-und-haushalt",
+"name": "Electrical energy, power and the household",
+"nebulaId": "physik-elektrizitaet",
+"order": 1
+},
+{
+"unitId": "physik-elektrizitaet-ladung-strom-und-stromkreise",
+"name": "Charge, current and circuits",
+"nebulaId": "physik-elektrizitaet",
+"order": 2
+},
+{
+"unitId": "physik-elektrizitaet-magnetfeld-und-elektromagnet",
+"name": "Magnetic field and electromagnet",
+"nebulaId": "physik-elektrizitaet",
+"order": 3
+},
+{
+"unitId": "physik-elektrizitaet-schaltungen-und-innenwiderstand-berechnen",
+"name": "Calculating circuits and internal resistance",
+"nebulaId": "physik-elektrizitaet",
+"order": 4
+},
+{
+"unitId": "physik-elektrizitaet-widerstand-und-ohmsches-gesetz",
+"name": "Resistance and Ohm's law",
+"nebulaId": "physik-elektrizitaet",
+"order": 5
+},
+{
+"unitId": "physik-elektrizitaet-elektromagnetische-induktion",
+"name": "Electromagnetic induction",
+"nebulaId": "physik-elektrizitaet",
+"order": 6
+},
+{
+"unitId": "physik-elektrizitaet-elektromagnetische-wellen-und-nachrichtentechnik",
+"name": "Electromagnetic waves and communication technology",
+"nebulaId": "physik-elektrizitaet",
+"order": 7
+},
+{
+"unitId": "physik-elektrizitaet-kraefte-im-magnetfeld-und-elektromotor",
+"name": "Forces in a magnetic field and the electric motor",
+"nebulaId": "physik-elektrizitaet",
+"order": 8
+},
+{
+"unitId": "physik-elektrizitaet-coulombsches-gesetz-und-elektrisches-feld",
+"name": "Coulomb's law and the electric field",
+"nebulaId": "physik-elektrizitaet",
+"order": 9
+},
+{
+"unitId": "physik-elektrizitaet-potential-spannung-und-kondensator",
+"name": "Potential, voltage and capacitor",
+"nebulaId": "physik-elektrizitaet",
+"order": 10
+},
+{
+"unitId": "physik-elektrizitaet-wechselstrom-transformator-und-selbstinduktion",
+"name": "Alternating current, transformer and self-induction",
+"nebulaId": "physik-elektrizitaet",
+"order": 11
+},
+{
+"unitId": "physik-mechanik-druck-und-auftrieb",
+"name": "Pressure and buoyancy",
+"nebulaId": "physik-mechanik",
+"order": 1
+},
+{
+"unitId": "physik-mechanik-bewegung-geschwindigkeit-und-beschleunigung",
+"name": "Motion, velocity and acceleration",
+"nebulaId": "physik-mechanik",
+"order": 2
+},
+{
+"unitId": "physik-mechanik-kraefte-elastische-kraft-und-reibung",
+"name": "Forces, elastic force and friction",
+"nebulaId": "physik-mechanik",
+"order": 3
+},
+{
+"unitId": "physik-mechanik-kraefte-zusammensetzen-und-gleichgewicht",
+"name": "Combining forces and equilibrium",
+"nebulaId": "physik-mechanik",
+"order": 4
+},
+{
+"unitId": "physik-mechanik-masse-dichte-und-gewichtskraft",
+"name": "Mass, density and weight",
+"nebulaId": "physik-mechanik",
+"order": 5
+},
+{
+"unitId": "physik-mechanik-newtonsche-gesetze",
+"name": "Newton's laws",
+"nebulaId": "physik-mechanik",
+"order": 6
+},
+{
+"unitId": "physik-mechanik-arbeit-leistung-und-einfache-maschinen",
+"name": "Work, power and simple machines",
+"nebulaId": "physik-mechanik",
+"order": 7
+},
+{
+"unitId": "physik-mechanik-mechanische-energie-und-energieerhaltung",
+"name": "Mechanical energy and conservation of energy",
+"nebulaId": "physik-mechanik",
+"order": 8
+},
+{
+"unitId": "physik-mechanik-freier-fall-und-wurfbewegungen",
+"name": "Free fall and projectile motion",
+"nebulaId": "physik-mechanik",
+"order": 9
+},
+{
+"unitId": "physik-mechanik-kreisbewegung-und-gravitation",
+"name": "Circular motion and gravitation",
+"nebulaId": "physik-mechanik",
+"order": 10
+},
+{
+"unitId": "physik-mechanik-impuls-und-stoesse",
+"name": "Momentum and collisions",
+"nebulaId": "physik-mechanik",
+"order": 11
+},
+{
+"unitId": "physik-mechanik-mechanische-schwingungen",
+"name": "Mechanical oscillations",
+"nebulaId": "physik-mechanik",
+"order": 12
+},
+{
+"unitId": "physik-mechanik-mechanische-wellen",
+"name": "Mechanical waves",
+"nebulaId": "physik-mechanik",
+"order": 13
+},
+{
+"unitId": "physik-modern-kernphysik-und-energieversorgung",
+"name": "Nuclear physics and energy supply",
+"nebulaId": "physik-modern",
+"order": 1
+},
+{
+"unitId": "physik-modern-relativitaet-und-quantenphysik",
+"name": "Relativity and quantum physics",
+"nebulaId": "physik-modern",
+"order": 2
+},
+{
+"unitId": "physik-optik-akustik-linsen-und-optische-geraete",
+"name": "Lenses and optical instruments",
+"nebulaId": "physik-optik-akustik",
+"order": 1
+},
+{
+"unitId": "physik-optik-akustik-schall-und-laerm",
+"name": "Sound and noise",
+"nebulaId": "physik-optik-akustik",
+"order": 2
+},
+{
+"unitId": "physik-optik-akustik-ausbreitung-reflexion-und-brechung-des-lichts",
+"name": "Propagation, reflection and refraction of light",
+"nebulaId": "physik-optik-akustik",
+"order": 3
+},
+{
+"unitId": "physik-optik-akustik-wellenoptik",
+"name": "Wave optics",
+"nebulaId": "physik-optik-akustik",
+"order": 4
+},
+{
+"unitId": "physik-praxis-messen-energiesparen-steuern",
+"name": "Measuring, saving energy and control in practice",
+"nebulaId": "physik-praxis",
+"order": 1
+},
+{
+"unitId": "physik-waerme-aggregatzustaende-und-zustandsaenderungen",
+"name": "States of matter and changes of state",
+"nebulaId": "physik-waerme",
+"order": 1
+},
+{
+"unitId": "physik-waerme-teilchenmodell-temperatur-und-waerme",
+"name": "Particle model, temperature and heat",
+"nebulaId": "physik-waerme",
+"order": 2
+},
+{
+"unitId": "physik-waerme-thermodynamik-und-waermekraftmaschinen",
+"name": "Laws of thermodynamics and heat engines",
+"nebulaId": "physik-waerme",
+"order": 3
+},
+{
+"unitId": "physik-waerme-ideales-gas-und-kinetische-gastheorie",
+"name": "Ideal gas and kinetic theory of gases",
+"nebulaId": "physik-waerme",
+"order": 4
+},
+{
+"unitId": "prozentrechnung-prozente-und-prozentrechnung",
+"name": "Percentages and percentage calculation",
+"nebulaId": "prozentrechnung",
+"order": 3
+},
+{
+"unitId": "prozentrechnung-verhaeltnisse-und-proportionalitaet",
+"name": "Ratios and proportionality",
+"nebulaId": "prozentrechnung",
+"order": 4
+},
+{
+"unitId": "zahlen-addition-und-subtraktion-bis-20",
+"name": "Addition and subtraction up to 20",
+"nebulaId": "zahlen",
+"order": 5
+},
+{
+"unitId": "zahlen-plus-und-minus-bis-10",
+"name": "Addition and subtraction up to 10",
+"nebulaId": "zahlen",
+"order": 6
+},
+{
+"unitId": "zahlen-plus-und-minus-bis-100",
+"name": "Addition and subtraction up to 100",
+"nebulaId": "zahlen",
+"order": 7
+},
+{
+"unitId": "zahlen-zahlenraum-bis-20",
+"name": "Numbers up to 20",
+"nebulaId": "zahlen",
+"order": 8
+},
+{
+"unitId": "zahlen-stellenwerte-und-zahlensysteme",
+"name": "Place value and number systems",
+"nebulaId": "zahlen",
+"order": 9
+},
+{
+"unitId": "zahlen-plus-und-minus-bis-1000",
+"name": "Addition and subtraction up to 1000",
+"nebulaId": "zahlen",
+"order": 10
+},
+{
+"unitId": "zahlen-einmaleins-und-teilen",
+"name": "Times tables and division",
+"nebulaId": "zahlen",
+"order": 11
+},
+{
+"unitId": "zahlen-mehrstellig-multiplizieren-und-dividieren",
+"name": "Multiplying and dividing larger numbers",
+"nebulaId": "zahlen",
+"order": 12
+},
+{
+"unitId": "zahlen-rechengesetze-und-rechenreihenfolge",
+"name": "Laws of arithmetic and order of operations",
+"nebulaId": "zahlen",
+"order": 13
+},
+{
+"unitId": "zahlen-muster-und-knobelaufgaben",
+"name": "Patterns and puzzles",
+"nebulaId": "zahlen",
+"order": 14
+},
+{
+"unitId": "zahlen-rechnen-mit-dezimalzahlen",
+"name": "Calculating with decimals",
+"nebulaId": "zahlen",
+"order": 15
+},
+{
+"unitId": "zahlen-mengenoperationen-und-logik",
+"name": "Set operations and logic",
+"nebulaId": "zahlen",
+"order": 16
+},
+{
+"unitId": "zahlen-dezimalstellen-runden-und-ueberschlagen",
+"name": "Decimal places, rounding and estimating",
+"nebulaId": "zahlen",
+"order": 17
+},
+{
+"unitId": "zahlen-teilbarkeit-primzahlen-ggt-kgv",
+"name": "Divisibility, primes, GCD and LCM",
+"nebulaId": "zahlen",
+"order": 18
+},
+{
+"unitId": "zahlen-negative-und-rationale-zahlen",
+"name": "Negative and rational numbers",
+"nebulaId": "zahlen",
+"order": 19
+},
+{
+"unitId": "zahlen-rechnen-mit-rationalen-zahlen",
+"name": "Calculating with rational numbers",
+"nebulaId": "zahlen",
+"order": 20
+},
+{
+"unitId": "zahlen-wurzeln-und-reelle-zahlen",
+"name": "Roots and real numbers",
+"nebulaId": "zahlen",
+"order": 21
+},
+{
+"unitId": "zahlen-potenzen-und-potenzgesetze",
+"name": "Powers and laws of exponents",
+"nebulaId": "zahlen",
+"order": 22
+},
+{
+"unitId": "zahlen-rechnen-mit-quadratwurzeln",
+"name": "Calculating with square roots",
+"nebulaId": "zahlen",
+"order": 23
+},
+{
+"unitId": "zahlen-mengen-und-teilmengen",
+"name": "Sets and subsets",
+"nebulaId": "zahlen",
+"order": 24
+},
+{
+"unitId": "zahlen-komplexe-zahlen",
+"name": "Complex numbers",
+"nebulaId": "zahlen",
+"order": 25
+},
+{
+"unitId": "zahlen-arithmetische-folgen",
+"name": "Arithmetic sequences",
+"nebulaId": "zahlen",
+"order": 26
+},
+{
+"unitId": "zahlen-folgen-rekursion-und-induktion",
+"name": "Sequences, recursion and induction",
+"nebulaId": "zahlen",
+"order": 27
+},
+{
+"unitId": "zahlen-geometrische-folgen",
+"name": "Geometric sequences",
+"nebulaId": "zahlen",
+"order": 28
+}
+],
+"prerequisites": [
+{
+"from": "brueche-brueche-und-dezimalzahlen-verstehen",
+"to": "brueche-brueche-kuerzen-addieren-und-subtrahieren"
+},
+{
+"from": "zahlen-rechengesetze-und-rechenreihenfolge",
+"to": "brueche-brueche-kuerzen-addieren-und-subtrahieren"
+},
+{
+"from": "zahlen-teilbarkeit-primzahlen-ggt-kgv",
+"to": "brueche-brueche-kuerzen-addieren-und-subtrahieren"
+},
+{
+"from": "groessen-gewicht-hohlmasse-und-geld",
+"to": "brueche-brueche-und-dezimalzahlen-verstehen"
+},
+{
+"from": "zahlen-einmaleins-und-teilen",
+"to": "brueche-brueche-und-dezimalzahlen-verstehen"
+},
+{
+"from": "zahlen-teilbarkeit-primzahlen-ggt-kgv",
+"to": "brueche-brueche-und-dezimalzahlen-verstehen"
+},
+{
+"from": "brueche-brueche-kuerzen-addieren-und-subtrahieren",
+"to": "brueche-brueche-multiplizieren-und-dividieren"
+},
+{
+"from": "gleichungen-ersetzen-und-groessenbeziehungen",
+"to": "brueche-brueche-multiplizieren-und-dividieren"
+},
+{
+"from": "zahlen-rechnen-mit-dezimalzahlen",
+"to": "brueche-brueche-multiplizieren-und-dividieren"
+},
+{
+"from": "daten-statistische-untersuchungen-durchfuehren",
+"to": "daten-daten-ordnen-und-darstellen"
+},
+{
+"from": "geometrie-winkel-messen-und-berechnen",
+"to": "daten-daten-ordnen-und-darstellen"
+},
+{
+"from": "prozentrechnung-prozente-und-prozentrechnung",
+"to": "daten-daten-ordnen-und-darstellen"
+},
+{
+"from": "zahlen-plus-und-minus-bis-100",
+"to": "daten-daten-ordnen-und-darstellen"
+},
+{
+"from": "zahlen-stellenwerte-und-zahlensysteme",
+"to": "daten-daten-ordnen-und-darstellen"
+},
+{
+"from": "zahlen-zahlenraum-bis-20",
+"to": "daten-daten-ordnen-und-darstellen"
+},
+{
+"from": "zahlen-einmaleins-und-teilen",
+"to": "daten-zaehlprinzipien-und-variationen"
+},
+{
+"from": "zahlen-mehrstellig-multiplizieren-und-dividieren",
+"to": "daten-mittelwert-median-und-modalwert"
+},
+{
+"from": "zahlen-negative-und-rationale-zahlen",
+"to": "daten-mittelwert-median-und-modalwert"
+},
+{
+"from": "zahlen-rechnen-mit-rationalen-zahlen",
+"to": "daten-mittelwert-median-und-modalwert"
+},
+{
+"from": "daten-daten-ordnen-und-darstellen",
+"to": "daten-diagramme-und-histogramme-lesen"
+},
+{
+"from": "daten-mittelwert-median-und-modalwert",
+"to": "daten-diagramme-und-histogramme-lesen"
+},
+{
+"from": "daten-stichproben-und-stichprobenverfahren",
+"to": "daten-diagramme-und-histogramme-lesen"
+},
+{
+"from": "geometrie-kreis-umfang-flaeche-und-sektor",
+"to": "daten-diagramme-und-histogramme-lesen"
+},
+{
+"from": "prozentrechnung-prozente-und-prozentrechnung",
+"to": "daten-diagramme-und-histogramme-lesen"
+},
+{
+"from": "daten-daten-ordnen-und-darstellen",
+"to": "daten-zufall-und-wahrscheinlichkeit-einschaetzen"
+},
+{
+"from": "daten-mittelwert-median-und-modalwert",
+"to": "daten-statistische-untersuchungen-durchfuehren"
+},
+{
+"from": "daten-stichproben-und-stichprobenverfahren",
+"to": "daten-statistische-untersuchungen-durchfuehren"
+},
+{
+"from": "daten-streuung-quartile-und-boxplots",
+"to": "daten-statistische-untersuchungen-durchfuehren"
+},
+{
+"from": "daten-mittelwert-median-und-modalwert",
+"to": "daten-streuung-quartile-und-boxplots"
+},
+{
+"from": "daten-stichproben-und-stichprobenverfahren",
+"to": "daten-streuung-quartile-und-boxplots"
+},
+{
+"from": "daten-wahrscheinlichkeiten-berechnen",
+"to": "daten-ereignisse-und-mehrstufige-zufallsexperimente"
+},
+{
+"from": "daten-zufall-und-wahrscheinlichkeit-einschaetzen",
+"to": "daten-ereignisse-und-mehrstufige-zufallsexperimente"
+},
+{
+"from": "zahlen-mengen-und-teilmengen",
+"to": "daten-ereignisse-und-mehrstufige-zufallsexperimente"
+},
+{
+"from": "zahlen-mengenoperationen-und-logik",
+"to": "daten-ereignisse-und-mehrstufige-zufallsexperimente"
+},
+{
+"from": "brueche-brueche-und-dezimalzahlen-verstehen",
+"to": "daten-wahrscheinlichkeiten-berechnen"
+},
+{
+"from": "daten-daten-ordnen-und-darstellen",
+"to": "daten-wahrscheinlichkeiten-berechnen"
+},
+{
+"from": "daten-zufall-und-wahrscheinlichkeit-einschaetzen",
+"to": "daten-wahrscheinlichkeiten-berechnen"
+},
+{
+"from": "daten-ereignisse-und-mehrstufige-zufallsexperimente",
+"to": "daten-bedingte-wahrscheinlichkeit-und-bayes"
+},
+{
+"from": "daten-wahrscheinlichkeiten-berechnen",
+"to": "daten-bedingte-wahrscheinlichkeit-und-bayes"
+},
+{
+"from": "daten-zufall-und-wahrscheinlichkeit-einschaetzen",
+"to": "daten-bedingte-wahrscheinlichkeit-und-bayes"
+},
+{
+"from": "daten-zaehlprinzipien-und-variationen",
+"to": "daten-kombinationen-und-binomischer-lehrsatz"
+},
+{
+"from": "daten-statistische-untersuchungen-durchfuehren",
+"to": "daten-korrelation-und-lineare-regression"
+},
+{
+"from": "gleichungen-lineare-funktionen",
+"to": "daten-korrelation-und-lineare-regression"
+},
+{
+"from": "daten-diagramme-und-histogramme-lesen",
+"to": "daten-zufallsvariablen-und-verteilungen"
+},
+{
+"from": "daten-ereignisse-und-mehrstufige-zufallsexperimente",
+"to": "daten-zufallsvariablen-und-verteilungen"
+},
+{
+"from": "daten-kombinationen-und-binomischer-lehrsatz",
+"to": "daten-zufallsvariablen-und-verteilungen"
+},
+{
+"from": "daten-mittelwert-median-und-modalwert",
+"to": "daten-zufallsvariablen-und-verteilungen"
+},
+{
+"from": "daten-streuung-quartile-und-boxplots",
+"to": "daten-zufallsvariablen-und-verteilungen"
+},
+{
+"from": "englisch-alltag-zahlen-und-ordnungszahlen",
+"to": "englisch-alltag-monate-und-datum"
+},
+{
+"from": "englisch-verben-present-progressive-und-zukunft",
+"to": "englisch-alltag-wochentage-und-alltagstaetigkeiten"
+},
+{
+"from": "englisch-verben-perfekt-und-zeitformen-unterscheiden",
+"to": "englisch-alltag-von-frueher-erzaehlen"
+},
+{
+"from": "englisch-verben-das-passiv",
+"to": "englisch-essen-produkte-wert-und-konsum"
+},
+{
+"from": "englisch-saetze-ja-nein-fragen-und-question-tags",
+"to": "englisch-freizeit-das-wochenende"
+},
+{
+"from": "englisch-verben-simple-past-und-past-progressive",
+"to": "englisch-freizeit-das-wochenende"
+},
+{
+"from": "englisch-saetze-bedingung-gegensatz-und-zweck",
+"to": "englisch-freizeit-partys-und-feste"
+},
+{
+"from": "englisch-verben-perfekt-und-zeitformen-unterscheiden",
+"to": "englisch-freizeit-buecher-filme-und-science-fiction"
+},
+{
+"from": "englisch-saetze-relativsaetze-und-appositionssaetze",
+"to": "englisch-freizeit-musik-und-auffuehrungen"
+},
+{
+"from": "englisch-saetze-nominalsaetze-und-indirekte-rede",
+"to": "englisch-freizeit-feste-und-traditionen"
+},
+{
+"from": "englisch-natur-tiere",
+"to": "englisch-gesellschaft-weltraum-und-raumfahrt"
+},
+{
+"from": "englisch-verben-das-passiv",
+"to": "englisch-gesellschaft-erfindungen-und-leistungen"
+},
+{
+"from": "englisch-woerter-adjektive-steigerung-und-wortbildung",
+"to": "englisch-ich-personen-und-charakter-beschreiben"
+},
+{
+"from": "englisch-verben-simple-past-und-past-progressive",
+"to": "englisch-ich-frueher-und-heute"
+},
+{
+"from": "englisch-saetze-ja-nein-fragen-und-question-tags",
+"to": "englisch-kommunizieren-texte-verstehen-und-im-alltag-kommunizieren"
+},
+{
+"from": "englisch-verben-perfekt-und-zeitformen-unterscheiden",
+"to": "englisch-kommunizieren-texte-verstehen-und-im-alltag-kommunizieren"
+},
+{
+"from": "englisch-verben-present-progressive-und-zukunft",
+"to": "englisch-kommunizieren-texte-verstehen-und-im-alltag-kommunizieren"
+},
+{
+"from": "englisch-woerter-adjektive-steigerung-und-wortbildung",
+"to": "englisch-kommunizieren-texte-verstehen-und-im-alltag-kommunizieren"
+},
+{
+"from": "englisch-laute-alphabet-und-anlaute",
+"to": "englisch-laute-kurze-und-lange-vokale"
+},
+{
+"from": "englisch-laute-alphabet-und-anlaute",
+"to": "englisch-laute-aussprache-im-wort-und-im-redefluss"
+},
+{
+"from": "englisch-laute-betonung-satzmelodie-und-pausen",
+"to": "englisch-laute-aussprache-im-wort-und-im-redefluss"
+},
+{
+"from": "englisch-verben-simple-past-und-past-progressive",
+"to": "englisch-laute-aussprache-im-wort-und-im-redefluss"
+},
+{
+"from": "englisch-woerter-this-these-und-plural-von-nomen",
+"to": "englisch-laute-aussprache-im-wort-und-im-redefluss"
+},
+{
+"from": "englisch-laute-alphabet-und-anlaute",
+"to": "englisch-laute-betonung-satzmelodie-und-pausen"
+},
+{
+"from": "englisch-verben-perfekt-und-zeitformen-unterscheiden",
+"to": "englisch-natur-umweltschutz-und-klima"
+},
+{
+"from": "englisch-verben-simple-past-und-past-progressive",
+"to": "englisch-natur-unwetter-und-naturkatastrophen"
+},
+{
+"from": "englisch-alltag-zahlen-und-ordnungszahlen",
+"to": "englisch-saetze-fragen-mit-fragewoertern"
+},
+{
+"from": "englisch-verben-be-have-und-simple-present",
+"to": "englisch-saetze-fragen-mit-fragewoertern"
+},
+{
+"from": "englisch-woerter-praepositionen-adverbien-und-verbindungswoerter",
+"to": "englisch-saetze-fragen-mit-fragewoertern"
+},
+{
+"from": "englisch-woerter-this-these-und-plural-von-nomen",
+"to": "englisch-saetze-fragen-mit-fragewoertern"
+},
+{
+"from": "englisch-natur-wetter-und-jahreszeiten",
+"to": "englisch-saetze-aussagen-aufforderungen-und-ausrufe"
+},
+{
+"from": "englisch-saetze-fragen-mit-fragewoertern",
+"to": "englisch-saetze-aussagen-aufforderungen-und-ausrufe"
+},
+{
+"from": "englisch-saetze-ja-nein-fragen-und-question-tags",
+"to": "englisch-saetze-aussagen-aufforderungen-und-ausrufe"
+},
+{
+"from": "englisch-verben-be-have-und-simple-present",
+"to": "englisch-saetze-aussagen-aufforderungen-und-ausrufe"
+},
+{
+"from": "englisch-verben-be-have-und-simple-present",
+"to": "englisch-saetze-ja-nein-fragen-und-question-tags"
+},
+{
+"from": "englisch-verben-simple-past-und-past-progressive",
+"to": "englisch-saetze-ja-nein-fragen-und-question-tags"
+},
+{
+"from": "englisch-verben-infinitiv-und-gerundium",
+"to": "englisch-saetze-bedingung-gegensatz-und-zweck"
+},
+{
+"from": "englisch-verben-present-progressive-und-zukunft",
+"to": "englisch-saetze-bedingung-gegensatz-und-zweck"
+},
+{
+"from": "englisch-woerter-praepositionen-adverbien-und-verbindungswoerter",
+"to": "englisch-saetze-bedingung-gegensatz-und-zweck"
+},
+{
+"from": "englisch-saetze-ja-nein-fragen-und-question-tags",
+"to": "englisch-saetze-satzglieder-und-satzbau"
+},
+{
+"from": "englisch-verben-be-have-und-simple-present",
+"to": "englisch-saetze-satzglieder-und-satzbau"
+},
+{
+"from": "englisch-verben-be-have-und-simple-present",
+"to": "englisch-saetze-nominalsaetze-und-indirekte-rede"
+},
+{
+"from": "englisch-saetze-nominalsaetze-und-indirekte-rede",
+"to": "englisch-saetze-relativsaetze-und-appositionssaetze"
+},
+{
+"from": "englisch-saetze-bedingung-gegensatz-und-zweck",
+"to": "englisch-saetze-irreale-bedingungen-und-konjunktiv"
+},
+{
+"from": "englisch-verben-perfekt-und-zeitformen-unterscheiden",
+"to": "englisch-saetze-irreale-bedingungen-und-konjunktiv"
+},
+{
+"from": "englisch-saetze-irreale-bedingungen-und-konjunktiv",
+"to": "englisch-saetze-hervorhebung-inversion-und-ellipse"
+},
+{
+"from": "englisch-saetze-relativsaetze-und-appositionssaetze",
+"to": "englisch-saetze-hervorhebung-inversion-und-ellipse"
+},
+{
+"from": "englisch-verben-infinitiv-und-gerundium",
+"to": "englisch-saetze-hervorhebung-inversion-und-ellipse"
+},
+{
+"from": "englisch-verben-simple-past-und-past-progressive",
+"to": "englisch-unterwegs-von-ausfluegen-und-ferien-erzaehlen"
+},
+{
+"from": "englisch-alltag-farben-kleidung-und-besitz",
+"to": "englisch-verben-be-have-und-simple-present"
+},
+{
+"from": "englisch-essen-lebensmittel-und-lieblingsessen",
+"to": "englisch-verben-be-have-und-simple-present"
+},
+{
+"from": "englisch-saetze-aussagen-aufforderungen-und-ausrufe",
+"to": "englisch-verben-pflicht-erlaubnis-und-vermutung"
+},
+{
+"from": "englisch-verben-das-passiv",
+"to": "englisch-verben-pflicht-erlaubnis-und-vermutung"
+},
+{
+"from": "englisch-verben-infinitiv-und-gerundium",
+"to": "englisch-verben-pflicht-erlaubnis-und-vermutung"
+},
+{
+"from": "englisch-essen-essen-anbieten-und-bestellen",
+"to": "englisch-verben-faehigkeiten-bitten-und-ratschlaege"
+},
+{
+"from": "englisch-saetze-fragen-mit-fragewoertern",
+"to": "englisch-verben-present-progressive-und-zukunft"
+},
+{
+"from": "englisch-verben-present-progressive-und-zukunft",
+"to": "englisch-verben-simple-past-und-past-progressive"
+},
+{
+"from": "englisch-verben-be-have-und-simple-present",
+"to": "englisch-verben-infinitiv-und-gerundium"
+},
+{
+"from": "englisch-verben-partizipien-und-partizipialkonstruktionen",
+"to": "englisch-verben-infinitiv-und-gerundium"
+},
+{
+"from": "englisch-verben-present-progressive-und-zukunft",
+"to": "englisch-verben-perfekt-und-zeitformen-unterscheiden"
+},
+{
+"from": "englisch-verben-simple-past-und-past-progressive",
+"to": "englisch-verben-perfekt-und-zeitformen-unterscheiden"
+},
+{
+"from": "englisch-verben-be-have-und-simple-present",
+"to": "englisch-verben-das-passiv"
+},
+{
+"from": "englisch-verben-infinitiv-und-gerundium",
+"to": "englisch-verben-das-passiv"
+},
+{
+"from": "englisch-verben-perfekt-und-zeitformen-unterscheiden",
+"to": "englisch-verben-das-passiv"
+},
+{
+"from": "englisch-verben-present-progressive-und-zukunft",
+"to": "englisch-verben-das-passiv"
+},
+{
+"from": "englisch-verben-simple-past-und-past-progressive",
+"to": "englisch-verben-das-passiv"
+},
+{
+"from": "englisch-natur-tiere",
+"to": "englisch-woerter-this-these-und-plural-von-nomen"
+},
+{
+"from": "englisch-verben-be-have-und-simple-present",
+"to": "englisch-woerter-this-these-und-plural-von-nomen"
+},
+{
+"from": "englisch-ich-aussehen-und-koerpersprache",
+"to": "englisch-woerter-adjektive-steigerung-und-wortbildung"
+},
+{
+"from": "englisch-alltag-haus-zimmer-und-ortsangaben",
+"to": "englisch-woerter-praepositionen-adverbien-und-verbindungswoerter"
+},
+{
+"from": "englisch-verben-be-have-und-simple-present",
+"to": "englisch-woerter-praepositionen-adverbien-und-verbindungswoerter"
+},
+{
+"from": "geometrie-strecken-geraden-senkrechte-und-parallelen",
+"to": "geometrie-lage-richtung-und-koordinaten"
+},
+{
+"from": "zahlen-negative-und-rationale-zahlen",
+"to": "geometrie-lage-richtung-und-koordinaten"
+},
+{
+"from": "zahlen-zahlenraum-bis-20",
+"to": "geometrie-lage-richtung-und-koordinaten"
+},
+{
+"from": "geometrie-strecken-geraden-senkrechte-und-parallelen",
+"to": "geometrie-ebene-figuren-und-vielecke"
+},
+{
+"from": "geometrie-ebene-figuren-und-vielecke",
+"to": "geometrie-koerper-ansichten-und-netze"
+},
+{
+"from": "geometrie-kreis-umfang-flaeche-und-sektor",
+"to": "geometrie-koerper-ansichten-und-netze"
+},
+{
+"from": "zahlen-zahlenraum-bis-20",
+"to": "geometrie-koerper-ansichten-und-netze"
+},
+{
+"from": "geometrie-dreiecke-und-winkelsummen",
+"to": "geometrie-umfang-und-flaeche-ebener-figuren"
+},
+{
+"from": "geometrie-ebene-figuren-und-vielecke",
+"to": "geometrie-umfang-und-flaeche-ebener-figuren"
+},
+{
+"from": "geometrie-strecken-geraden-senkrechte-und-parallelen",
+"to": "geometrie-umfang-und-flaeche-ebener-figuren"
+},
+{
+"from": "zahlen-mehrstellig-multiplizieren-und-dividieren",
+"to": "geometrie-umfang-und-flaeche-ebener-figuren"
+},
+{
+"from": "zahlen-plus-und-minus-bis-100",
+"to": "geometrie-umfang-und-flaeche-ebener-figuren"
+},
+{
+"from": "groessen-laengen-und-flaechen",
+"to": "geometrie-strecken-geraden-senkrechte-und-parallelen"
+},
+{
+"from": "geometrie-strecken-geraden-senkrechte-und-parallelen",
+"to": "geometrie-winkel-messen-und-berechnen"
+},
+{
+"from": "gleichungen-lineare-gleichungen-loesen",
+"to": "geometrie-winkel-messen-und-berechnen"
+},
+{
+"from": "geometrie-achsen-und-punktsymmetrie",
+"to": "geometrie-verschiebung-und-drehung"
+},
+{
+"from": "geometrie-ebene-figuren-und-vielecke",
+"to": "geometrie-verschiebung-und-drehung"
+},
+{
+"from": "geometrie-lage-richtung-und-koordinaten",
+"to": "geometrie-verschiebung-und-drehung"
+},
+{
+"from": "geometrie-winkel-an-parallelen-und-beweise",
+"to": "geometrie-verschiebung-und-drehung"
+},
+{
+"from": "geometrie-winkel-messen-und-berechnen",
+"to": "geometrie-verschiebung-und-drehung"
+},
+{
+"from": "geometrie-ebene-figuren-und-vielecke",
+"to": "geometrie-dreiecke-und-winkelsummen"
+},
+{
+"from": "geometrie-strecken-geraden-senkrechte-und-parallelen",
+"to": "geometrie-dreiecke-und-winkelsummen"
+},
+{
+"from": "geometrie-winkel-an-parallelen-und-beweise",
+"to": "geometrie-dreiecke-und-winkelsummen"
+},
+{
+"from": "geometrie-lage-richtung-und-koordinaten",
+"to": "geometrie-achsen-und-punktsymmetrie"
+},
+{
+"from": "geometrie-strecken-geraden-senkrechte-und-parallelen",
+"to": "geometrie-achsen-und-punktsymmetrie"
+},
+{
+"from": "geometrie-koerper-ansichten-und-netze",
+"to": "geometrie-volumen-und-oberflaeche-von-koerpern"
+},
+{
+"from": "geometrie-koerper-darstellen-projektionen-schraegbilder",
+"to": "geometrie-volumen-und-oberflaeche-von-koerpern"
+},
+{
+"from": "geometrie-kreis-umfang-flaeche-und-sektor",
+"to": "geometrie-volumen-und-oberflaeche-von-koerpern"
+},
+{
+"from": "geometrie-umfang-und-flaeche-ebener-figuren",
+"to": "geometrie-volumen-und-oberflaeche-von-koerpern"
+},
+{
+"from": "groessen-laengen-und-flaechen",
+"to": "geometrie-volumen-und-oberflaeche-von-koerpern"
+},
+{
+"from": "geometrie-strecken-geraden-senkrechte-und-parallelen",
+"to": "geometrie-kreis-umfang-flaeche-und-sektor"
+},
+{
+"from": "geometrie-umfang-und-flaeche-ebener-figuren",
+"to": "geometrie-kreis-umfang-flaeche-und-sektor"
+},
+{
+"from": "geometrie-winkel-messen-und-berechnen",
+"to": "geometrie-kreis-umfang-flaeche-und-sektor"
+},
+{
+"from": "gleichungen-ersetzen-und-groessenbeziehungen",
+"to": "geometrie-kreis-umfang-flaeche-und-sektor"
+},
+{
+"from": "zahlen-rechnen-mit-dezimalzahlen",
+"to": "geometrie-kreis-umfang-flaeche-und-sektor"
+},
+{
+"from": "geometrie-strecken-geraden-senkrechte-und-parallelen",
+"to": "geometrie-winkel-an-parallelen-und-beweise"
+},
+{
+"from": "geometrie-winkel-messen-und-berechnen",
+"to": "geometrie-winkel-an-parallelen-und-beweise"
+},
+{
+"from": "geometrie-dreiecke-und-winkelsummen",
+"to": "geometrie-kongruenz-und-gleichschenklige-dreiecke"
+},
+{
+"from": "geometrie-verschiebung-und-drehung",
+"to": "geometrie-kongruenz-und-gleichschenklige-dreiecke"
+},
+{
+"from": "geometrie-winkel-an-parallelen-und-beweise",
+"to": "geometrie-kongruenz-und-gleichschenklige-dreiecke"
+},
+{
+"from": "geometrie-ebene-figuren-und-vielecke",
+"to": "geometrie-parallelogramme-und-besondere-vierecke"
+},
+{
+"from": "geometrie-kongruenz-und-gleichschenklige-dreiecke",
+"to": "geometrie-parallelogramme-und-besondere-vierecke"
+},
+{
+"from": "geometrie-rechtwinklige-dreiecke-und-pythagoras",
+"to": "geometrie-parallelogramme-und-besondere-vierecke"
+},
+{
+"from": "geometrie-strecken-geraden-senkrechte-und-parallelen",
+"to": "geometrie-parallelogramme-und-besondere-vierecke"
+},
+{
+"from": "geometrie-winkel-an-parallelen-und-beweise",
+"to": "geometrie-parallelogramme-und-besondere-vierecke"
+},
+{
+"from": "geometrie-dreiecke-und-winkelsummen",
+"to": "geometrie-rechtwinklige-dreiecke-und-pythagoras"
+},
+{
+"from": "geometrie-kongruenz-und-gleichschenklige-dreiecke",
+"to": "geometrie-rechtwinklige-dreiecke-und-pythagoras"
+},
+{
+"from": "gleichungen-binomische-formeln-und-faktorisieren",
+"to": "geometrie-rechtwinklige-dreiecke-und-pythagoras"
+},
+{
+"from": "zahlen-rechnen-mit-quadratwurzeln",
+"to": "geometrie-rechtwinklige-dreiecke-und-pythagoras"
+},
+{
+"from": "zahlen-wurzeln-und-reelle-zahlen",
+"to": "geometrie-rechtwinklige-dreiecke-und-pythagoras"
+},
+{
+"from": "geometrie-achsen-und-punktsymmetrie",
+"to": "geometrie-besondere-linien-inkreis-und-umkreis"
+},
+{
+"from": "geometrie-dreiecke-und-winkelsummen",
+"to": "geometrie-besondere-linien-inkreis-und-umkreis"
+},
+{
+"from": "geometrie-kongruenz-und-gleichschenklige-dreiecke",
+"to": "geometrie-besondere-linien-inkreis-und-umkreis"
+},
+{
+"from": "geometrie-kreissaetze-sehnen-tangenten-umfangswinkel",
+"to": "geometrie-besondere-linien-inkreis-und-umkreis"
+},
+{
+"from": "geometrie-strecken-geraden-senkrechte-und-parallelen",
+"to": "geometrie-besondere-linien-inkreis-und-umkreis"
+},
+{
+"from": "geometrie-winkel-messen-und-berechnen",
+"to": "geometrie-besondere-linien-inkreis-und-umkreis"
+},
+{
+"from": "geometrie-ebene-figuren-und-vielecke",
+"to": "geometrie-aehnlichkeit-und-zentrische-streckung"
+},
+{
+"from": "geometrie-lage-richtung-und-koordinaten",
+"to": "geometrie-aehnlichkeit-und-zentrische-streckung"
+},
+{
+"from": "geometrie-winkel-an-parallelen-und-beweise",
+"to": "geometrie-aehnlichkeit-und-zentrische-streckung"
+},
+{
+"from": "gleichungen-bruchterme-und-bruchgleichungen",
+"to": "geometrie-aehnlichkeit-und-zentrische-streckung"
+},
+{
+"from": "prozentrechnung-verhaeltnisse-und-proportionalitaet",
+"to": "geometrie-aehnlichkeit-und-zentrische-streckung"
+},
+{
+"from": "geometrie-achsen-und-punktsymmetrie",
+"to": "geometrie-kreissaetze-sehnen-tangenten-umfangswinkel"
+},
+{
+"from": "geometrie-dreiecke-und-winkelsummen",
+"to": "geometrie-kreissaetze-sehnen-tangenten-umfangswinkel"
+},
+{
+"from": "geometrie-kongruenz-und-gleichschenklige-dreiecke",
+"to": "geometrie-kreissaetze-sehnen-tangenten-umfangswinkel"
+},
+{
+"from": "geometrie-kreis-umfang-flaeche-und-sektor",
+"to": "geometrie-kreissaetze-sehnen-tangenten-umfangswinkel"
+},
+{
+"from": "geometrie-rechtwinklige-dreiecke-und-pythagoras",
+"to": "geometrie-kreissaetze-sehnen-tangenten-umfangswinkel"
+},
+{
+"from": "geometrie-strecken-geraden-senkrechte-und-parallelen",
+"to": "geometrie-kreissaetze-sehnen-tangenten-umfangswinkel"
+},
+{
+"from": "geometrie-verschiebung-und-drehung",
+"to": "geometrie-kreissaetze-sehnen-tangenten-umfangswinkel"
+},
+{
+"from": "geometrie-koerper-ansichten-und-netze",
+"to": "geometrie-koerper-darstellen-projektionen-schraegbilder"
+},
+{
+"from": "geometrie-aehnlichkeit-und-zentrische-streckung",
+"to": "geometrie-trigonometrie"
+},
+{
+"from": "geometrie-rechtwinklige-dreiecke-und-pythagoras",
+"to": "geometrie-trigonometrie"
+},
+{
+"from": "gleichungen-bogenmass-und-einheitskreis",
+"to": "geometrie-trigonometrie"
+},
+{
+"from": "geometrie-koerper-ansichten-und-netze",
+"to": "geometrie-geraden-und-ebenen-im-raum"
+},
+{
+"from": "geometrie-koerper-darstellen-projektionen-schraegbilder",
+"to": "geometrie-geraden-und-ebenen-im-raum"
+},
+{
+"from": "geometrie-strecken-geraden-senkrechte-und-parallelen",
+"to": "geometrie-geraden-und-ebenen-im-raum"
+},
+{
+"from": "geometrie-lage-richtung-und-koordinaten",
+"to": "geometrie-vektoren-in-der-ebene"
+},
+{
+"from": "geometrie-rechtwinklige-dreiecke-und-pythagoras",
+"to": "geometrie-skalarprodukt-und-geometrie-mit-vektoren"
+},
+{
+"from": "geometrie-trigonometrie",
+"to": "geometrie-skalarprodukt-und-geometrie-mit-vektoren"
+},
+{
+"from": "geometrie-vektoren-in-der-ebene",
+"to": "geometrie-skalarprodukt-und-geometrie-mit-vektoren"
+},
+{
+"from": "geometrie-vektoren-und-koordinaten-im-raum",
+"to": "geometrie-skalarprodukt-und-geometrie-mit-vektoren"
+},
+{
+"from": "geometrie-geraden-in-der-koordinatenebene",
+"to": "geometrie-ellipse"
+},
+{
+"from": "geometrie-lage-richtung-und-koordinaten",
+"to": "geometrie-geraden-in-der-koordinatenebene"
+},
+{
+"from": "geometrie-rechtwinklige-dreiecke-und-pythagoras",
+"to": "geometrie-geraden-in-der-koordinatenebene"
+},
+{
+"from": "geometrie-strecken-geraden-senkrechte-und-parallelen",
+"to": "geometrie-geraden-in-der-koordinatenebene"
+},
+{
+"from": "geometrie-ellipse",
+"to": "geometrie-hyperbel-und-parabel"
+},
+{
+"from": "geometrie-geraden-in-der-koordinatenebene",
+"to": "geometrie-kreisgleichungen-und-lage-zum-kreis"
+},
+{
+"from": "geometrie-kreis-umfang-flaeche-und-sektor",
+"to": "geometrie-kreisgleichungen-und-lage-zum-kreis"
+},
+{
+"from": "geometrie-geraden-und-ebenen-im-raum",
+"to": "geometrie-lage-winkel-und-abstaende-mit-vektoren"
+},
+{
+"from": "geometrie-skalarprodukt-und-geometrie-mit-vektoren",
+"to": "geometrie-lage-winkel-und-abstaende-mit-vektoren"
+},
+{
+"from": "geometrie-vektoren-und-koordinaten-im-raum",
+"to": "geometrie-lage-winkel-und-abstaende-mit-vektoren"
+},
+{
+"from": "geometrie-geraden-und-ebenen-im-raum",
+"to": "geometrie-vektoren-und-koordinaten-im-raum"
+},
+{
+"from": "geometrie-lage-richtung-und-koordinaten",
+"to": "geometrie-vektoren-und-koordinaten-im-raum"
+},
+{
+"from": "geometrie-rechtwinklige-dreiecke-und-pythagoras",
+"to": "geometrie-vektoren-und-koordinaten-im-raum"
+},
+{
+"from": "geometrie-vektoren-in-der-ebene",
+"to": "geometrie-vektoren-und-koordinaten-im-raum"
+},
+{
+"from": "zahlen-einmaleins-und-teilen",
+"to": "gleichungen-ersetzen-und-groessenbeziehungen"
+},
+{
+"from": "zahlen-mehrstellig-multiplizieren-und-dividieren",
+"to": "gleichungen-ersetzen-und-groessenbeziehungen"
+},
+{
+"from": "zahlen-plus-und-minus-bis-1000",
+"to": "gleichungen-ersetzen-und-groessenbeziehungen"
+},
+{
+"from": "gleichungen-rechnen-mit-polynomen",
+"to": "gleichungen-lineare-gleichungen-loesen"
+},
+{
+"from": "gleichungen-terme-aufstellen-und-berechnen",
+"to": "gleichungen-lineare-gleichungen-loesen"
+},
+{
+"from": "zahlen-rechnen-mit-dezimalzahlen",
+"to": "gleichungen-lineare-gleichungen-loesen"
+},
+{
+"from": "gleichungen-ersetzen-und-groessenbeziehungen",
+"to": "gleichungen-terme-aufstellen-und-berechnen"
+},
+{
+"from": "zahlen-rechengesetze-und-rechenreihenfolge",
+"to": "gleichungen-terme-aufstellen-und-berechnen"
+},
+{
+"from": "zahlen-rechnen-mit-rationalen-zahlen",
+"to": "gleichungen-terme-aufstellen-und-berechnen"
+},
+{
+"from": "gleichungen-bruchterme-und-bruchgleichungen",
+"to": "gleichungen-sachaufgaben-mit-gleichungen"
+},
+{
+"from": "gleichungen-ersetzen-und-groessenbeziehungen",
+"to": "gleichungen-sachaufgaben-mit-gleichungen"
+},
+{
+"from": "gleichungen-lineare-gleichungen-loesen",
+"to": "gleichungen-sachaufgaben-mit-gleichungen"
+},
+{
+"from": "gleichungen-terme-aufstellen-und-berechnen",
+"to": "gleichungen-sachaufgaben-mit-gleichungen"
+},
+{
+"from": "groessen-gewicht-hohlmasse-und-geld",
+"to": "gleichungen-sachaufgaben-mit-gleichungen"
+},
+{
+"from": "gleichungen-lineare-gleichungen-loesen",
+"to": "gleichungen-lineare-gleichungssysteme"
+},
+{
+"from": "gleichungen-sachaufgaben-mit-gleichungen",
+"to": "gleichungen-lineare-gleichungssysteme"
+},
+{
+"from": "gleichungen-terme-aufstellen-und-berechnen",
+"to": "gleichungen-rechnen-mit-polynomen"
+},
+{
+"from": "zahlen-potenzen-und-potenzgesetze",
+"to": "gleichungen-rechnen-mit-polynomen"
+},
+{
+"from": "zahlen-rechnen-mit-rationalen-zahlen",
+"to": "gleichungen-rechnen-mit-polynomen"
+},
+{
+"from": "gleichungen-lineare-gleichungen-loesen",
+"to": "gleichungen-lineare-ungleichungen-loesen-und-anwenden"
+},
+{
+"from": "gleichungen-sachaufgaben-mit-gleichungen",
+"to": "gleichungen-lineare-ungleichungen-loesen-und-anwenden"
+},
+{
+"from": "gleichungen-ungleichungen-und-ihre-eigenschaften",
+"to": "gleichungen-lineare-ungleichungen-loesen-und-anwenden"
+},
+{
+"from": "gleichungen-lineare-gleichungen-loesen",
+"to": "gleichungen-ungleichungen-und-ihre-eigenschaften"
+},
+{
+"from": "zahlen-mengen-und-teilmengen",
+"to": "gleichungen-ungleichungen-und-ihre-eigenschaften"
+},
+{
+"from": "zahlen-negative-und-rationale-zahlen",
+"to": "gleichungen-ungleichungen-und-ihre-eigenschaften"
+},
+{
+"from": "zahlen-rechnen-mit-rationalen-zahlen",
+"to": "gleichungen-ungleichungen-und-ihre-eigenschaften"
+},
+{
+"from": "gleichungen-rechnen-mit-polynomen",
+"to": "gleichungen-binomische-formeln-und-faktorisieren"
+},
+{
+"from": "gleichungen-binomische-formeln-und-faktorisieren",
+"to": "gleichungen-bruchterme-und-bruchgleichungen"
+},
+{
+"from": "gleichungen-lineare-gleichungen-loesen",
+"to": "gleichungen-bruchterme-und-bruchgleichungen"
+},
+{
+"from": "gleichungen-rechnen-mit-polynomen",
+"to": "gleichungen-bruchterme-und-bruchgleichungen"
+},
+{
+"from": "geometrie-lage-richtung-und-koordinaten",
+"to": "gleichungen-funktionsbegriff-und-darstellungen"
+},
+{
+"from": "gleichungen-bruchterme-und-bruchgleichungen",
+"to": "gleichungen-funktionsbegriff-und-darstellungen"
+},
+{
+"from": "gleichungen-terme-aufstellen-und-berechnen",
+"to": "gleichungen-funktionsbegriff-und-darstellungen"
+},
+{
+"from": "zahlen-rechnen-mit-quadratwurzeln",
+"to": "gleichungen-funktionsbegriff-und-darstellungen"
+},
+{
+"from": "geometrie-verschiebung-und-drehung",
+"to": "gleichungen-lineare-funktionen"
+},
+{
+"from": "gleichungen-funktionsbegriff-und-darstellungen",
+"to": "gleichungen-lineare-funktionen"
+},
+{
+"from": "gleichungen-lineare-gleichungen-loesen",
+"to": "gleichungen-lineare-funktionen"
+},
+{
+"from": "gleichungen-lineare-gleichungssysteme",
+"to": "gleichungen-lineare-funktionen"
+},
+{
+"from": "gleichungen-lineare-ungleichungen-loesen-und-anwenden",
+"to": "gleichungen-lineare-funktionen"
+},
+{
+"from": "prozentrechnung-verhaeltnisse-und-proportionalitaet",
+"to": "gleichungen-lineare-funktionen"
+},
+{
+"from": "geometrie-lage-richtung-und-koordinaten",
+"to": "gleichungen-umgekehrt-proportionale-funktionen"
+},
+{
+"from": "gleichungen-funktionsbegriff-und-darstellungen",
+"to": "gleichungen-umgekehrt-proportionale-funktionen"
+},
+{
+"from": "gleichungen-lineare-funktionen",
+"to": "gleichungen-umgekehrt-proportionale-funktionen"
+},
+{
+"from": "gleichungen-lineare-gleichungen-loesen",
+"to": "gleichungen-umgekehrt-proportionale-funktionen"
+},
+{
+"from": "prozentrechnung-verhaeltnisse-und-proportionalitaet",
+"to": "gleichungen-umgekehrt-proportionale-funktionen"
+},
+{
+"from": "gleichungen-lineare-funktionen",
+"to": "gleichungen-quadratische-funktionen"
+},
+{
+"from": "gleichungen-lineare-gleichungssysteme",
+"to": "gleichungen-quadratische-funktionen"
+},
+{
+"from": "gleichungen-quadratische-gleichungen",
+"to": "gleichungen-quadratische-funktionen"
+},
+{
+"from": "gleichungen-binomische-formeln-und-faktorisieren",
+"to": "gleichungen-quadratische-gleichungen"
+},
+{
+"from": "gleichungen-lineare-gleichungen-loesen",
+"to": "gleichungen-quadratische-gleichungen"
+},
+{
+"from": "gleichungen-sachaufgaben-mit-gleichungen",
+"to": "gleichungen-quadratische-gleichungen"
+},
+{
+"from": "gleichungen-ungleichungen-und-ihre-eigenschaften",
+"to": "gleichungen-quadratische-gleichungen"
+},
+{
+"from": "zahlen-rechnen-mit-quadratwurzeln",
+"to": "gleichungen-quadratische-gleichungen"
+},
+{
+"from": "zahlen-wurzeln-und-reelle-zahlen",
+"to": "gleichungen-quadratische-gleichungen"
+},
+{
+"from": "geometrie-winkel-messen-und-berechnen",
+"to": "gleichungen-bogenmass-und-einheitskreis"
+},
+{
+"from": "gleichungen-funktionen-und-funktionsmodelle",
+"to": "gleichungen-bogenmass-und-einheitskreis"
+},
+{
+"from": "gleichungen-funktionen-und-funktionsmodelle",
+"to": "gleichungen-eigenschaften-von-funktionen"
+},
+{
+"from": "gleichungen-quadratische-funktionen",
+"to": "gleichungen-eigenschaften-von-funktionen"
+},
+{
+"from": "gleichungen-ungleichungen-und-ihre-eigenschaften",
+"to": "gleichungen-eigenschaften-von-funktionen"
+},
+{
+"from": "gleichungen-eigenschaften-von-funktionen",
+"to": "gleichungen-exponential-und-logarithmusfunktionen"
+},
+{
+"from": "zahlen-potenzen-und-potenzgesetze",
+"to": "gleichungen-exponential-und-logarithmusfunktionen"
+},
+{
+"from": "zahlen-rechnen-mit-quadratwurzeln",
+"to": "gleichungen-exponential-und-logarithmusfunktionen"
+},
+{
+"from": "gleichungen-funktionsbegriff-und-darstellungen",
+"to": "gleichungen-funktionen-und-funktionsmodelle"
+},
+{
+"from": "gleichungen-quadratische-funktionen",
+"to": "gleichungen-funktionen-und-funktionsmodelle"
+},
+{
+"from": "zahlen-mengen-und-teilmengen",
+"to": "gleichungen-funktionen-und-funktionsmodelle"
+},
+{
+"from": "gleichungen-bogenmass-und-einheitskreis",
+"to": "gleichungen-trigonometrische-formeln"
+},
+{
+"from": "gleichungen-trigonometrische-formeln",
+"to": "gleichungen-trigonometrische-funktionen"
+},
+{
+"from": "geometrie-geraden-in-der-koordinatenebene",
+"to": "gleichungen-ableitung-und-ableitungsregeln"
+},
+{
+"from": "gleichungen-eigenschaften-von-funktionen",
+"to": "gleichungen-ableitung-und-ableitungsregeln"
+},
+{
+"from": "gleichungen-ableitung-und-ableitungsregeln",
+"to": "gleichungen-monotonie-und-extremwerte"
+},
+{
+"from": "groessen-laengen-und-flaechen",
+"to": "groessen-gewicht-hohlmasse-und-geld"
+},
+{
+"from": "zahlen-plus-und-minus-bis-100",
+"to": "groessen-gewicht-hohlmasse-und-geld"
+},
+{
+"from": "zahlen-stellenwerte-und-zahlensysteme",
+"to": "groessen-gewicht-hohlmasse-und-geld"
+},
+{
+"from": "zahlen-plus-und-minus-bis-100",
+"to": "groessen-zeit-uhrzeit-und-zeitdauer"
+},
+{
+"from": "zahlen-stellenwerte-und-zahlensysteme",
+"to": "groessen-zeit-uhrzeit-und-zeitdauer"
+},
+{
+"from": "zahlen-zahlenraum-bis-20",
+"to": "groessen-laengen-und-flaechen"
+},
+{
+"from": "physik-elektrizitaet-ladung-strom-und-stromkreise",
+"to": "physik-elektrizitaet-elektrische-energie-leistung-und-haushalt"
+},
+{
+"from": "physik-elektrizitaet-potential-spannung-und-kondensator",
+"to": "physik-elektrizitaet-elektrische-energie-leistung-und-haushalt"
+},
+{
+"from": "physik-elektrizitaet-widerstand-und-ohmsches-gesetz",
+"to": "physik-elektrizitaet-elektrische-energie-leistung-und-haushalt"
+},
+{
+"from": "physik-elektrizitaet-ladung-strom-und-stromkreise",
+"to": "physik-elektrizitaet-magnetfeld-und-elektromagnet"
+},
+{
+"from": "physik-elektrizitaet-elektrische-energie-leistung-und-haushalt",
+"to": "physik-elektrizitaet-schaltungen-und-innenwiderstand-berechnen"
+},
+{
+"from": "physik-elektrizitaet-ladung-strom-und-stromkreise",
+"to": "physik-elektrizitaet-schaltungen-und-innenwiderstand-berechnen"
+},
+{
+"from": "physik-elektrizitaet-potential-spannung-und-kondensator",
+"to": "physik-elektrizitaet-schaltungen-und-innenwiderstand-berechnen"
+},
+{
+"from": "physik-elektrizitaet-widerstand-und-ohmsches-gesetz",
+"to": "physik-elektrizitaet-schaltungen-und-innenwiderstand-berechnen"
+},
+{
+"from": "physik-elektrizitaet-ladung-strom-und-stromkreise",
+"to": "physik-elektrizitaet-widerstand-und-ohmsches-gesetz"
+},
+{
+"from": "physik-praxis-messen-energiesparen-steuern",
+"to": "physik-elektrizitaet-widerstand-und-ohmsches-gesetz"
+},
+{
+"from": "physik-elektrizitaet-kraefte-im-magnetfeld-und-elektromotor",
+"to": "physik-elektrizitaet-elektromagnetische-induktion"
+},
+{
+"from": "physik-elektrizitaet-magnetfeld-und-elektromagnet",
+"to": "physik-elektrizitaet-elektromagnetische-induktion"
+},
+{
+"from": "physik-elektrizitaet-schaltungen-und-innenwiderstand-berechnen",
+"to": "physik-elektrizitaet-elektromagnetische-induktion"
+},
+{
+"from": "physik-elektrizitaet-elektromagnetische-induktion",
+"to": "physik-elektrizitaet-elektromagnetische-wellen-und-nachrichtentechnik"
+},
+{
+"from": "physik-elektrizitaet-kraefte-im-magnetfeld-und-elektromotor",
+"to": "physik-elektrizitaet-elektromagnetische-wellen-und-nachrichtentechnik"
+},
+{
+"from": "physik-elektrizitaet-potential-spannung-und-kondensator",
+"to": "physik-elektrizitaet-elektromagnetische-wellen-und-nachrichtentechnik"
+},
+{
+"from": "physik-elektrizitaet-wechselstrom-transformator-und-selbstinduktion",
+"to": "physik-elektrizitaet-elektromagnetische-wellen-und-nachrichtentechnik"
+},
+{
+"from": "physik-elektrizitaet-widerstand-und-ohmsches-gesetz",
+"to": "physik-elektrizitaet-elektromagnetische-wellen-und-nachrichtentechnik"
+},
+{
+"from": "physik-optik-akustik-ausbreitung-reflexion-und-brechung-des-lichts",
+"to": "physik-elektrizitaet-elektromagnetische-wellen-und-nachrichtentechnik"
+},
+{
+"from": "physik-elektrizitaet-coulombsches-gesetz-und-elektrisches-feld",
+"to": "physik-elektrizitaet-kraefte-im-magnetfeld-und-elektromotor"
+},
+{
+"from": "physik-elektrizitaet-magnetfeld-und-elektromagnet",
+"to": "physik-elektrizitaet-kraefte-im-magnetfeld-und-elektromotor"
+},
+{
+"from": "physik-mechanik-kreisbewegung-und-gravitation",
+"to": "physik-elektrizitaet-kraefte-im-magnetfeld-und-elektromotor"
+},
+{
+"from": "physik-elektrizitaet-ladung-strom-und-stromkreise",
+"to": "physik-elektrizitaet-coulombsches-gesetz-und-elektrisches-feld"
+},
+{
+"from": "physik-mechanik-freier-fall-und-wurfbewegungen",
+"to": "physik-elektrizitaet-coulombsches-gesetz-und-elektrisches-feld"
+},
+{
+"from": "physik-mechanik-kraefte-zusammensetzen-und-gleichgewicht",
+"to": "physik-elektrizitaet-coulombsches-gesetz-und-elektrisches-feld"
+},
+{
+"from": "physik-mechanik-mechanische-energie-und-energieerhaltung",
+"to": "physik-elektrizitaet-coulombsches-gesetz-und-elektrisches-feld"
+},
+{
+"from": "physik-elektrizitaet-coulombsches-gesetz-und-elektrisches-feld",
+"to": "physik-elektrizitaet-potential-spannung-und-kondensator"
+},
+{
+"from": "physik-mechanik-arbeit-leistung-und-einfache-maschinen",
+"to": "physik-elektrizitaet-potential-spannung-und-kondensator"
+},
+{
+"from": "physik-elektrizitaet-elektrische-energie-leistung-und-haushalt",
+"to": "physik-elektrizitaet-wechselstrom-transformator-und-selbstinduktion"
+},
+{
+"from": "physik-elektrizitaet-elektromagnetische-induktion",
+"to": "physik-elektrizitaet-wechselstrom-transformator-und-selbstinduktion"
+},
+{
+"from": "physik-elektrizitaet-magnetfeld-und-elektromagnet",
+"to": "physik-elektrizitaet-wechselstrom-transformator-und-selbstinduktion"
+},
+{
+"from": "physik-mechanik-kraefte-zusammensetzen-und-gleichgewicht",
+"to": "physik-mechanik-druck-und-auftrieb"
+},
+{
+"from": "physik-mechanik-masse-dichte-und-gewichtskraft",
+"to": "physik-mechanik-druck-und-auftrieb"
+},
+{
+"from": "physik-praxis-messen-energiesparen-steuern",
+"to": "physik-mechanik-bewegung-geschwindigkeit-und-beschleunigung"
+},
+{
+"from": "physik-mechanik-kraefte-zusammensetzen-und-gleichgewicht",
+"to": "physik-mechanik-kraefte-elastische-kraft-und-reibung"
+},
+{
+"from": "physik-mechanik-masse-dichte-und-gewichtskraft",
+"to": "physik-mechanik-kraefte-zusammensetzen-und-gleichgewicht"
+},
+{
+"from": "physik-mechanik-bewegung-geschwindigkeit-und-beschleunigung",
+"to": "physik-mechanik-newtonsche-gesetze"
+},
+{
+"from": "physik-mechanik-kraefte-elastische-kraft-und-reibung",
+"to": "physik-mechanik-newtonsche-gesetze"
+},
+{
+"from": "physik-mechanik-kraefte-zusammensetzen-und-gleichgewicht",
+"to": "physik-mechanik-newtonsche-gesetze"
+},
+{
+"from": "physik-mechanik-bewegung-geschwindigkeit-und-beschleunigung",
+"to": "physik-mechanik-arbeit-leistung-und-einfache-maschinen"
+},
+{
+"from": "physik-mechanik-kraefte-elastische-kraft-und-reibung",
+"to": "physik-mechanik-arbeit-leistung-und-einfache-maschinen"
+},
+{
+"from": "physik-mechanik-kraefte-zusammensetzen-und-gleichgewicht",
+"to": "physik-mechanik-arbeit-leistung-und-einfache-maschinen"
+},
+{
+"from": "physik-mechanik-masse-dichte-und-gewichtskraft",
+"to": "physik-mechanik-arbeit-leistung-und-einfache-maschinen"
+},
+{
+"from": "physik-mechanik-arbeit-leistung-und-einfache-maschinen",
+"to": "physik-mechanik-mechanische-energie-und-energieerhaltung"
+},
+{
+"from": "physik-mechanik-bewegung-geschwindigkeit-und-beschleunigung",
+"to": "physik-mechanik-mechanische-energie-und-energieerhaltung"
+},
+{
+"from": "physik-mechanik-kraefte-elastische-kraft-und-reibung",
+"to": "physik-mechanik-mechanische-energie-und-energieerhaltung"
+},
+{
+"from": "physik-mechanik-masse-dichte-und-gewichtskraft",
+"to": "physik-mechanik-mechanische-energie-und-energieerhaltung"
+},
+{
+"from": "physik-waerme-teilchenmodell-temperatur-und-waerme",
+"to": "physik-mechanik-mechanische-energie-und-energieerhaltung"
+},
+{
+"from": "physik-mechanik-bewegung-geschwindigkeit-und-beschleunigung",
+"to": "physik-mechanik-freier-fall-und-wurfbewegungen"
+},
+{
+"from": "physik-mechanik-newtonsche-gesetze",
+"to": "physik-mechanik-freier-fall-und-wurfbewegungen"
+},
+{
+"from": "physik-mechanik-bewegung-geschwindigkeit-und-beschleunigung",
+"to": "physik-mechanik-kreisbewegung-und-gravitation"
+},
+{
+"from": "physik-mechanik-freier-fall-und-wurfbewegungen",
+"to": "physik-mechanik-kreisbewegung-und-gravitation"
+},
+{
+"from": "physik-mechanik-newtonsche-gesetze",
+"to": "physik-mechanik-kreisbewegung-und-gravitation"
+},
+{
+"from": "physik-mechanik-bewegung-geschwindigkeit-und-beschleunigung",
+"to": "physik-mechanik-impuls-und-stoesse"
+},
+{
+"from": "physik-mechanik-kraefte-elastische-kraft-und-reibung",
+"to": "physik-mechanik-impuls-und-stoesse"
+},
+{
+"from": "physik-mechanik-mechanische-energie-und-energieerhaltung",
+"to": "physik-mechanik-impuls-und-stoesse"
+},
+{
+"from": "physik-mechanik-newtonsche-gesetze",
+"to": "physik-mechanik-impuls-und-stoesse"
+},
+{
+"from": "physik-mechanik-kraefte-elastische-kraft-und-reibung",
+"to": "physik-mechanik-mechanische-schwingungen"
+},
+{
+"from": "physik-mechanik-kraefte-zusammensetzen-und-gleichgewicht",
+"to": "physik-mechanik-mechanische-schwingungen"
+},
+{
+"from": "physik-mechanik-newtonsche-gesetze",
+"to": "physik-mechanik-mechanische-schwingungen"
+},
+{
+"from": "physik-mechanik-mechanische-schwingungen",
+"to": "physik-mechanik-mechanische-wellen"
+},
+{
+"from": "physik-mechanik-mechanische-energie-und-energieerhaltung",
+"to": "physik-modern-kernphysik-und-energieversorgung"
+},
+{
+"from": "physik-modern-relativitaet-und-quantenphysik",
+"to": "physik-modern-kernphysik-und-energieversorgung"
+},
+{
+"from": "physik-elektrizitaet-coulombsches-gesetz-und-elektrisches-feld",
+"to": "physik-modern-relativitaet-und-quantenphysik"
+},
+{
+"from": "physik-elektrizitaet-elektromagnetische-wellen-und-nachrichtentechnik",
+"to": "physik-modern-relativitaet-und-quantenphysik"
+},
+{
+"from": "physik-mechanik-impuls-und-stoesse",
+"to": "physik-modern-relativitaet-und-quantenphysik"
+},
+{
+"from": "physik-mechanik-mechanische-energie-und-energieerhaltung",
+"to": "physik-modern-relativitaet-und-quantenphysik"
+},
+{
+"from": "physik-optik-akustik-ausbreitung-reflexion-und-brechung-des-lichts",
+"to": "physik-optik-akustik-linsen-und-optische-geraete"
+},
+{
+"from": "physik-mechanik-mechanische-wellen",
+"to": "physik-optik-akustik-wellenoptik"
+},
+{
+"from": "physik-waerme-teilchenmodell-temperatur-und-waerme",
+"to": "physik-waerme-aggregatzustaende-und-zustandsaenderungen"
+},
+{
+"from": "physik-mechanik-masse-dichte-und-gewichtskraft",
+"to": "physik-waerme-teilchenmodell-temperatur-und-waerme"
+},
+{
+"from": "physik-mechanik-mechanische-energie-und-energieerhaltung",
+"to": "physik-waerme-thermodynamik-und-waermekraftmaschinen"
+},
+{
+"from": "physik-waerme-ideales-gas-und-kinetische-gastheorie",
+"to": "physik-waerme-thermodynamik-und-waermekraftmaschinen"
+},
+{
+"from": "physik-waerme-teilchenmodell-temperatur-und-waerme",
+"to": "physik-waerme-thermodynamik-und-waermekraftmaschinen"
+},
+{
+"from": "physik-mechanik-druck-und-auftrieb",
+"to": "physik-waerme-ideales-gas-und-kinetische-gastheorie"
+},
+{
+"from": "physik-mechanik-mechanische-energie-und-energieerhaltung",
+"to": "physik-waerme-ideales-gas-und-kinetische-gastheorie"
+},
+{
+"from": "physik-waerme-teilchenmodell-temperatur-und-waerme",
+"to": "physik-waerme-ideales-gas-und-kinetische-gastheorie"
+},
+{
+"from": "brueche-brueche-multiplizieren-und-dividieren",
+"to": "prozentrechnung-prozente-und-prozentrechnung"
+},
+{
+"from": "brueche-brueche-und-dezimalzahlen-verstehen",
+"to": "prozentrechnung-prozente-und-prozentrechnung"
+},
+{
+"from": "groessen-gewicht-hohlmasse-und-geld",
+"to": "prozentrechnung-prozente-und-prozentrechnung"
+},
+{
+"from": "brueche-brueche-multiplizieren-und-dividieren",
+"to": "prozentrechnung-verhaeltnisse-und-proportionalitaet"
+},
+{
+"from": "geometrie-lage-richtung-und-koordinaten",
+"to": "prozentrechnung-verhaeltnisse-und-proportionalitaet"
+},
+{
+"from": "gleichungen-ersetzen-und-groessenbeziehungen",
+"to": "prozentrechnung-verhaeltnisse-und-proportionalitaet"
+},
+{
+"from": "gleichungen-lineare-gleichungen-loesen",
+"to": "prozentrechnung-verhaeltnisse-und-proportionalitaet"
+},
+{
+"from": "zahlen-plus-und-minus-bis-10",
+"to": "zahlen-addition-und-subtraktion-bis-20"
+},
+{
+"from": "zahlen-stellenwerte-und-zahlensysteme",
+"to": "zahlen-addition-und-subtraktion-bis-20"
+},
+{
+"from": "zahlen-zahlenraum-bis-20",
+"to": "zahlen-plus-und-minus-bis-10"
+},
+{
+"from": "zahlen-addition-und-subtraktion-bis-20",
+"to": "zahlen-plus-und-minus-bis-100"
+},
+{
+"from": "zahlen-plus-und-minus-bis-10",
+"to": "zahlen-plus-und-minus-bis-100"
+},
+{
+"from": "zahlen-stellenwerte-und-zahlensysteme",
+"to": "zahlen-plus-und-minus-bis-100"
+},
+{
+"from": "zahlen-zahlenraum-bis-20",
+"to": "zahlen-stellenwerte-und-zahlensysteme"
+},
+{
+"from": "zahlen-plus-und-minus-bis-100",
+"to": "zahlen-plus-und-minus-bis-1000"
+},
+{
+"from": "zahlen-stellenwerte-und-zahlensysteme",
+"to": "zahlen-plus-und-minus-bis-1000"
+},
+{
+"from": "zahlen-plus-und-minus-bis-10",
+"to": "zahlen-einmaleins-und-teilen"
+},
+{
+"from": "zahlen-einmaleins-und-teilen",
+"to": "zahlen-mehrstellig-multiplizieren-und-dividieren"
+},
+{
+"from": "zahlen-plus-und-minus-bis-1000",
+"to": "zahlen-mehrstellig-multiplizieren-und-dividieren"
+},
+{
+"from": "zahlen-einmaleins-und-teilen",
+"to": "zahlen-rechengesetze-und-rechenreihenfolge"
+},
+{
+"from": "zahlen-mehrstellig-multiplizieren-und-dividieren",
+"to": "zahlen-rechengesetze-und-rechenreihenfolge"
+},
+{
+"from": "zahlen-plus-und-minus-bis-100",
+"to": "zahlen-rechengesetze-und-rechenreihenfolge"
+},
+{
+"from": "zahlen-plus-und-minus-bis-1000",
+"to": "zahlen-rechengesetze-und-rechenreihenfolge"
+},
+{
+"from": "brueche-brueche-multiplizieren-und-dividieren",
+"to": "zahlen-muster-und-knobelaufgaben"
+},
+{
+"from": "geometrie-strecken-geraden-senkrechte-und-parallelen",
+"to": "zahlen-muster-und-knobelaufgaben"
+},
+{
+"from": "gleichungen-terme-aufstellen-und-berechnen",
+"to": "zahlen-muster-und-knobelaufgaben"
+},
+{
+"from": "zahlen-plus-und-minus-bis-10",
+"to": "zahlen-muster-und-knobelaufgaben"
+},
+{
+"from": "zahlen-rechengesetze-und-rechenreihenfolge",
+"to": "zahlen-muster-und-knobelaufgaben"
+},
+{
+"from": "zahlen-stellenwerte-und-zahlensysteme",
+"to": "zahlen-muster-und-knobelaufgaben"
+},
+{
+"from": "brueche-brueche-und-dezimalzahlen-verstehen",
+"to": "zahlen-rechnen-mit-dezimalzahlen"
+},
+{
+"from": "gleichungen-ersetzen-und-groessenbeziehungen",
+"to": "zahlen-rechnen-mit-dezimalzahlen"
+},
+{
+"from": "zahlen-dezimalstellen-runden-und-ueberschlagen",
+"to": "zahlen-rechnen-mit-dezimalzahlen"
+},
+{
+"from": "zahlen-mehrstellig-multiplizieren-und-dividieren",
+"to": "zahlen-rechnen-mit-dezimalzahlen"
+},
+{
+"from": "zahlen-plus-und-minus-bis-100",
+"to": "zahlen-rechnen-mit-dezimalzahlen"
+},
+{
+"from": "zahlen-rechengesetze-und-rechenreihenfolge",
+"to": "zahlen-rechnen-mit-dezimalzahlen"
+},
+{
+"from": "zahlen-mengen-und-teilmengen",
+"to": "zahlen-mengenoperationen-und-logik"
+},
+{
+"from": "zahlen-plus-und-minus-bis-100",
+"to": "zahlen-mengenoperationen-und-logik"
+},
+{
+"from": "brueche-brueche-und-dezimalzahlen-verstehen",
+"to": "zahlen-dezimalstellen-runden-und-ueberschlagen"
+},
+{
+"from": "zahlen-mehrstellig-multiplizieren-und-dividieren",
+"to": "zahlen-dezimalstellen-runden-und-ueberschlagen"
+},
+{
+"from": "zahlen-stellenwerte-und-zahlensysteme",
+"to": "zahlen-dezimalstellen-runden-und-ueberschlagen"
+},
+{
+"from": "zahlen-mehrstellig-multiplizieren-und-dividieren",
+"to": "zahlen-teilbarkeit-primzahlen-ggt-kgv"
+},
+{
+"from": "brueche-brueche-und-dezimalzahlen-verstehen",
+"to": "zahlen-negative-und-rationale-zahlen"
+},
+{
+"from": "zahlen-dezimalstellen-runden-und-ueberschlagen",
+"to": "zahlen-negative-und-rationale-zahlen"
+},
+{
+"from": "zahlen-stellenwerte-und-zahlensysteme",
+"to": "zahlen-negative-und-rationale-zahlen"
+},
+{
+"from": "zahlen-negative-und-rationale-zahlen",
+"to": "zahlen-rechnen-mit-rationalen-zahlen"
+},
+{
+"from": "zahlen-negative-und-rationale-zahlen",
+"to": "zahlen-wurzeln-und-reelle-zahlen"
+},
+{
+"from": "zahlen-potenzen-und-potenzgesetze",
+"to": "zahlen-wurzeln-und-reelle-zahlen"
+},
+{
+"from": "zahlen-rechnen-mit-rationalen-zahlen",
+"to": "zahlen-wurzeln-und-reelle-zahlen"
+},
+{
+"from": "zahlen-rechnen-mit-rationalen-zahlen",
+"to": "zahlen-potenzen-und-potenzgesetze"
+},
+{
+"from": "gleichungen-lineare-ungleichungen-loesen-und-anwenden",
+"to": "zahlen-rechnen-mit-quadratwurzeln"
+},
+{
+"from": "gleichungen-rechnen-mit-polynomen",
+"to": "zahlen-rechnen-mit-quadratwurzeln"
+},
+{
+"from": "zahlen-wurzeln-und-reelle-zahlen",
+"to": "zahlen-rechnen-mit-quadratwurzeln"
+},
+{
+"from": "zahlen-wurzeln-und-reelle-zahlen",
+"to": "zahlen-mengen-und-teilmengen"
+},
+{
+"from": "geometrie-lage-richtung-und-koordinaten",
+"to": "zahlen-komplexe-zahlen"
+},
+{
+"from": "zahlen-mengen-und-teilmengen",
+"to": "zahlen-komplexe-zahlen"
+},
+{
+"from": "zahlen-folgen-rekursion-und-induktion",
+"to": "zahlen-arithmetische-folgen"
+},
+{
+"from": "gleichungen-funktionen-und-funktionsmodelle",
+"to": "zahlen-folgen-rekursion-und-induktion"
+},
+{
+"from": "gleichungen-exponential-und-logarithmusfunktionen",
+"to": "zahlen-geometrische-folgen"
+},
+{
+"from": "zahlen-folgen-rekursion-und-induktion",
+"to": "zahlen-geometrische-folgen"
+}
+]
+}

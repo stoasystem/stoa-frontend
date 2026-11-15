@@ -48,6 +48,21 @@ import { ditherHaze } from '@/features/starmap/render/galaxy'
 import { seededRandom } from '@/features/starmap/layout/layout'
 import { PANORAMA, REVEAL } from '@/features/starmap/view/semanticZoom'
 import type { LinkInk, SceneData, SceneFrame, StarMapTheme } from '@/features/starmap/render/types'
+import {
+  arcCubic,
+  arcLengths,
+  bundleCubic,
+  cubicSegments,
+  CUE_FROM,
+  drawnPart,
+  lineStyle,
+  pointAt,
+  reverseCubic,
+  straightCubic,
+  strokeCubic,
+  type Cubic,
+  type Pt,
+} from '@/features/starmap/render/lineShapes'
 
 /**
  * The inks, as the `--starmap-link-*` / `--starmap-bridge` sky tokens define
@@ -408,6 +423,25 @@ function fade(color: string, alpha: number): string {
   return `rgba(${r}, ${g}, ${b}, ${Math.max(0, Math.min(1, a * alpha))})`
 }
 
+/**
+ * PROTOTYPE (line styles): the shape of the line from star `from` at `a` to
+ * star `to` at `b` (screen, the shorter way round), in this frame's style.
+ */
+function shaper(scene: SceneData, frame: SceneFrame) {
+  const style = lineStyle()
+  const band = frame.scale
+  return (from: number, to: number, a: Pt, b: Pt): Cubic => {
+    if (style === 'straight') return straightCubic(a, b)
+    const na = scene.nebula[from]
+    const nb = scene.nebula[to]
+    if (style !== 'bundle' || na === nb) return arcCubic(a, b)
+    // Each nebula's centre where it is on screen beside its own star (the seam: the shorter way round).
+    const ca = { x: a.x + shortestDx(scene.mapX[from], scene.nebulae[na].x) * band, y: frame.nebulaY[na] }
+    const cb = { x: b.x + shortestDx(scene.mapX[to], scene.nebulae[nb].x) * band, y: frame.nebulaY[nb] }
+    return bundleCubic(a, ca, cb, b)
+  }
+}
+
 const inkOf = (ink: LinkInk, tier: LinkTier) =>
   tier === TIER_RECOMMENDED ? ink.recommended : tier === 2 ? ink.inProgress : tier === 3 ? ink.walked : ink.waiting
 
@@ -591,6 +625,8 @@ export function drawLinks(
     const leadsTo = new Map<number, { strength: number; along: { x: number; y: number; ux: number; uy: number; d: number } | null }>()
     const ends: [number, number][] = []
     const web = waitingWebHint(frame) * (1 - giveWay)
+    const shapeOf = shaper(scene, frame)
+    const curved = lineStyle() !== 'straight'
     for (const line of data.lines) {
       if (onPath?.has(`${line.from}:${line.to}`)) continue
       const look = starLineLook(line, lineView)
@@ -624,53 +660,59 @@ export function drawLinks(
         if (d <= trim * 2) continue
         const ux = (qx - px) / d
         const uy = (qy - py) / d
-        const full = d - trim * 2
+        // PROTOTYPE (line styles): the line's shape, prerequisite -> dependent, then run from p to q.
+        const forward = p === line.from
+        const curve = forward
+          ? shapeOf(p, q, { x: px, y: py }, { x: qx, y: qy })
+          : reverseCubic(shapeOf(q, p, { x: qx, y: qy }, { x: px, y: py }))
+        const lengths = arcLengths(curve)
+        const full = lengths[lengths.length - 1] - trim * 2
+        if (full <= 0) continue
         const fadeLength = fadeOf(pNebula)
         const length = leaves ? Math.min(full, fadeLength + reach * Math.max(0, full - fadeLength)) : full
+        const part = drawnPart(curve, trim, length)
+        if (!part) continue
         const color = inkOf(ink, line.tier)
         const lineWidth = LINE.width[line.tier]
         let seen = false
         for (const k of periods) {
-          const x0 = px + ux * trim + k * band
-          const y0 = py + uy * trim
-          const x1 = x0 + ux * length
-          const y1 = y0 + uy * length
-          if (!onScreen(x0, y0, x1, y1, 8)) continue
+          const shape: Cubic = k === 0 ? part : (part.map((pt) => ({ x: pt.x + k * band, y: pt.y })) as Cubic)
+          const x0 = shape[0].x
+          const y0 = shape[0].y
+          const x1 = shape[3].x
+          const y1 = shape[3].y
+          const xs = shape.map((pt) => pt.x)
+          const ys = shape.map((pt) => pt.y)
+          if (!onScreen(Math.min(...xs), Math.min(...ys), Math.max(...xs), Math.max(...ys), 8)) continue
           const faded = leaves && reach < 0.999
+          // A faint direction cue on curved lines: dimmer at the prerequisite's end.
+          const cue = curved
           let stroke: string | CanvasGradient = color
-          if (faded) {
+          if (faded || cue) {
             const gradient = ctx.createLinearGradient(x0, y0, x1, y1)
-            gradient.addColorStop(0, fade(color, 1))
-            gradient.addColorStop(1, fade(color, reach))
+            const [cueStart, cueEnd] = cue ? (forward ? [CUE_FROM, 1] : [1, CUE_FROM]) : [1, 1]
+            gradient.addColorStop(0, fade(color, cueStart))
+            gradient.addColorStop(1, fade(color, (faded ? reach : 1) * cueEnd))
             stroke = gradient
           }
           if (line.tier === TIER_RECOMMENDED) {
             ctx.setLineDash([])
-            ctx.strokeStyle = faded ? stroke : fade(color, 1)
+            ctx.strokeStyle = faded || cue ? stroke : fade(color, 1)
             ctx.globalAlpha = strength * LINE.glow.alpha
             ctx.lineWidth = LINE.glow.width
-            ctx.beginPath()
-            ctx.moveTo(x0, y0)
-            ctx.lineTo(x1, y1)
-            ctx.stroke()
+            strokeCubic(ctx, shape)
           } else if (line.tier !== TIER_WAITING) {
             ctx.setLineDash([])
             ctx.strokeStyle = stroke
             ctx.globalAlpha = Math.min(1, strength) * LINE.soft.alpha
             ctx.lineWidth = lineWidth * LINE.soft.wide
-            ctx.beginPath()
-            ctx.moveTo(x0, y0)
-            ctx.lineTo(x1, y1)
-            ctx.stroke()
+            strokeCubic(ctx, shape)
           }
           ctx.setLineDash(line.tier === TIER_WAITING ? [...LINE.dash] : [])
           ctx.strokeStyle = stroke
           ctx.globalAlpha = Math.min(1, strength)
           ctx.lineWidth = lineWidth
-          ctx.beginPath()
-          ctx.moveTo(x0, y0)
-          ctx.lineTo(x1, y1)
-          ctx.stroke()
+          strokeCubic(ctx, shape)
           if (lit > 0.001) {
             // A dragged star's line lights up whatever its tier: a bright solid
             // stroke over it (gold into the recommended star), eased in and out.
@@ -678,10 +720,7 @@ export function drawLinks(
             ctx.strokeStyle = line.tier === TIER_RECOMMENDED ? fade(ink.recommended, 1) : fade(ink.inProgress, DRAG_LINE_INK)
             ctx.globalAlpha = Math.min(1, lit)
             ctx.lineWidth = DRAG_LINE_WIDTH
-            ctx.beginPath()
-            ctx.moveTo(x0, y0)
-            ctx.lineTo(x1, y1)
-            ctx.stroke()
+            strokeCubic(ctx, shape)
           }
           seen = true
           // Names keep clear of what carries the message now; the faint path
@@ -690,7 +729,8 @@ export function drawLinks(
           // of its dashes reads as a mistake, so while it is lit it keeps
           // names clear like any other line that is carrying the message.
           if (strength >= 0.5 && (line.tier <= 2 || reach > 0 || (line.tier === TIER_WAITING && web > 0))) {
-            obstacles.segments.push({ x0, y0, x1, y1 })
+            if (curved) obstacles.segments.push(...cubicSegments(shape))
+            else obstacles.segments.push({ x0, y0, x1, y1 })
           }
         }
         if (!seen) continue
@@ -854,7 +894,12 @@ export function drawPath(
 
   // The lines, star to star: anchored on the star they lead into, the shorter way round the ring.
   // Side branches first: the chain is drawn over them.
-  const edges = [...path.edges.filter((edge) => !edge.main), ...path.edges.filter((edge) => edge.main)]
+  // PROTOTYPE (line styles): `chain` draws the main chain alone, with direction and step numbers.
+  const style = lineStyle()
+  const chainOnly = style === 'chain'
+  const shapeOf = shaper(scene, frame)
+  const curved = style !== 'straight'
+  const edges = [...(chainOnly ? [] : path.edges.filter((edge) => !edge.main)), ...path.edges.filter((edge) => edge.main)]
   for (const { from, to, main } of edges) {
     const px = frame.x[to]
     const py = frame.y[to]
@@ -862,35 +907,110 @@ export function drawPath(
     const qy = frame.y[from]
     const d = Math.hypot(qx - px, qy - py)
     if (d <= trim * 2) continue
-    const ux = (qx - px) / d
-    const uy = (qy - py) / d
+    // Prerequisite (q) -> dependent (p).
+    const curve = shapeOf(from, to, { x: qx, y: qy }, { x: px, y: py })
+    const cut = drawnPart(curve, trim, Infinity)
+    if (!cut) continue
+    // Straight, as before: from the dependent's end.
+    const part = curved ? cut : reverseCubic(cut)
     let seen = false
     for (const k of periods) {
-      const x0 = px + ux * trim + k * band
-      const y0 = py + uy * trim
-      const x1 = qx - ux * trim + k * band
-      const y1 = qy - uy * trim
-      if (!onScreen(x0, y0, x1, y1, 8)) continue
+      const shape: Cubic = k === 0 ? part : (part.map((pt) => ({ x: pt.x + k * band, y: pt.y })) as Cubic)
+      const xs = shape.map((pt) => pt.x)
+      const ys = shape.map((pt) => pt.y)
+      if (!onScreen(Math.min(...xs), Math.min(...ys), Math.max(...xs), Math.max(...ys), 8)) continue
       const passes = main
         ? [[PATH.main.halo, PATH.main.haloAlpha], [PATH.main.width, 1]] as const
         : [[PATH.side.width, PATH.side.alpha]] as const
       for (const [lineWidth, alpha] of passes) {
-        ctx.strokeStyle = fade(ink, 1)
+        let stroke: string | CanvasGradient = fade(ink, 1)
+        if (curved && !chainOnly) {
+          // The faint direction cue: dimmer at the prerequisite's end.
+          const gradient = ctx.createLinearGradient(shape[0].x, shape[0].y, shape[3].x, shape[3].y)
+          gradient.addColorStop(0, fade(ink, CUE_FROM))
+          gradient.addColorStop(1, fade(ink, 1))
+          stroke = gradient
+        }
+        ctx.strokeStyle = stroke
         ctx.globalAlpha = alpha * amount
         ctx.lineWidth = lineWidth
-        ctx.beginPath()
-        ctx.moveTo(x0, y0)
-        ctx.lineTo(x1, y1)
-        ctx.stroke()
+        strokeCubic(ctx, shape)
       }
-      obstacles.segments.push({ x0, y0, x1, y1 })
+      if (chainOnly) drawChevron(ctx, shape, fade(ink, 1), amount)
+      if (curved) obstacles.segments.push(...cubicSegments(shape))
+      else obstacles.segments.push({ x0: shape[0].x, y0: shape[0].y, x1: shape[3].x, y1: shape[3].y })
       seen = true
     }
     if (seen) stats.lines += 1
   }
 
+  if (chainOnly) drawStepNumbers(ctx, frame, theme, ink, amount, periods, band, radius)
+
   ctx.restore()
   return stats
+}
+
+/** PROTOTYPE (chain): a small arrowhead at the middle of a chain line, pointing to the dependent. */
+function drawChevron(ctx: CanvasRenderingContext2D, curve: Cubic, color: string, amount: number) {
+  const m = pointAt(curve, 0.5)
+  const n = pointAt(curve, 0.52)
+  const a = Math.atan2(n.y - m.y, n.x - m.x)
+  const s = 6
+  ctx.save()
+  ctx.translate(m.x, m.y)
+  ctx.rotate(a)
+  ctx.globalAlpha = amount
+  ctx.strokeStyle = color
+  ctx.lineWidth = 2
+  ctx.lineJoin = 'round'
+  ctx.beginPath()
+  ctx.moveTo(-s * 0.6, -s)
+  ctx.lineTo(s * 0.6, 0)
+  ctx.lineTo(-s * 0.6, s)
+  ctx.stroke()
+  ctx.restore()
+}
+
+/** PROTOTYPE (chain): step numbers 1, 2, 3 ... beside the main chain's missing stars, first to last. */
+function drawStepNumbers(
+  ctx: CanvasRenderingContext2D,
+  frame: SceneFrame,
+  theme: StarMapTheme,
+  ink: string,
+  amount: number,
+  periods: readonly number[],
+  band: number,
+  radius: number,
+) {
+  const path = frame.path!
+  const main = path.edges.filter((edge) => edge.main)
+  if (main.length === 0) return
+  const next = new Map(main.map((edge) => [edge.from, edge.to]))
+  const into = new Set(main.map((edge) => edge.to))
+  let at = main.find((edge) => !into.has(edge.from))?.from
+  const steps: number[] = []
+  while (at !== undefined && at !== path.target && steps.length <= main.length) {
+    steps.push(at)
+    at = next.get(at)
+  }
+  ctx.font = `700 11px ${theme.fontFamily}`
+  ctx.textAlign = 'center'
+  ctx.textBaseline = 'middle'
+  const r = 8
+  steps.forEach((star, index) => {
+    for (const k of periods) {
+      // Up and to the left of the star, clear of its glyph (its name sits below or beside it).
+      const x = frame.x[star] + k * band - radius - r - 2
+      const y = frame.y[star] - radius - r + 2
+      ctx.globalAlpha = amount
+      ctx.fillStyle = fade(ink, 1)
+      ctx.beginPath()
+      ctx.arc(x, y, r, 0, Math.PI * 2)
+      ctx.fill()
+      ctx.fillStyle = theme.sky
+      ctx.fillText(String(index + 1), x, y + 0.5)
+    }
+  })
 }
 
 /**

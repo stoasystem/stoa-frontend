@@ -386,6 +386,10 @@ const DEMO_FINDS_KNOWLEDGE_POINT = /\b(sine|sinus|seno)\b/i
 
 /** The star a question's answer names in the demo backend, if any. */
 export function demoTargetFor(content: string): { unitId: string } | null {
+  // Prototype (proto/starmap-line-styles): on the real knowledge base, quadratic equations.
+  if (new URLSearchParams(window.location.search).get('sky') === 'catalog' && /quadrat/i.test(content)) {
+    return { unitId: 'gleichungen-quadratische-gleichungen' }
+  }
   if (content.includes(DEMO_FIND_STAR)) return { unitId: DEMO_BRIDGE_STAR }
   if (DEMO_FINDS_KNOWLEDGE_POINT.test(content)) return { unitId: DEMO_KNOWLEDGE_POINT.unitId }
   return null

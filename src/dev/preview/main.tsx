@@ -57,6 +57,8 @@ registerDevelopmentRuntimeConfig(API_ORIGIN, window.location.origin)
 
 async function start() {
   await installInterception()
+  // PROTOTYPE (proto/starmap-line-styles): `&lineStyle=straight|arc|bundle|chain`, preview only.
+  ;(await import('@/features/starmap/render/lineShapes')).setLineStyle(params.get('lineStyle'))
   const { LANGUAGE_STORAGE_KEY, isSupportedLanguage } = await import('@/i18n/languages')
   if (language && isSupportedLanguage(language)) localStorage.setItem(LANGUAGE_STORAGE_KEY, language)
   const [, { default: i18n, i18nReady }, { demo, setDemoLanguage, resetDemoServer, startAsNewcomer, forgetDemoLanguage, finishDemoKnowledgePoint, makeReviewDue, makeReviewScheduled }] = await Promise.all([
