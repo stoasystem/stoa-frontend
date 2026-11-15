@@ -130,6 +130,12 @@ buttons keep 12 px under the subjects; a card taller than its room scrolls
 under the wheel; "Done" is what is at its own centre; nothing scrolls sideways
 (#625). `StudentWorld.locale` signs the student in German.
 
+`helpStarPausedNotice686.spec.ts`: at 375 x 812 and 390 x 844, with the usage
+period ended and cards due for review, the paused notice over the docked
+composer keeps clear of the help star, the zoom pair and the review Murmi, and
+a tap on the help star opens its dialog (#686: the star stood over the
+notice's third line, which also took its taps).
+
 `accountMenu.spec.ts`: at 375 px, the account menu's language and switch-account
 lists open on the screen and can be tapped where they are drawn (#162: they
 opened at x = -152).

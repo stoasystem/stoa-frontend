@@ -360,10 +360,14 @@ export function AskHost({
                 )}
                 {paused && usagePeriod.entitlement && (
                   // Out of the flow, as the examples are, so the dock's box stays the composer's.
+                  // On a phone its lines rise into the page's bottom-left corner, where the
+                  // star map's help star stands (left 16, 32 wide): starting 44 px in from the
+                  // dock's 12 keeps the notice 8 px clear of it -- the room the zoom pair keeps
+                  // on the right over Ask's way back -- and off the star's taps (#686).
                   <UsagePeriodPausedNotice
                     id={pausedNoticeId}
                     entitlement={usagePeriod.entitlement}
-                    className="absolute inset-x-0 bottom-full m-0 mb-2 text-center text-[13px] text-[color:var(--on-sky-text-body)] [&_a]:text-[color:var(--on-sky-plain)]"
+                    className={`absolute ${wide ? 'left-0' : 'left-11'} right-0 bottom-full m-0 mb-2 text-center text-[13px] text-[color:var(--on-sky-text-body)] [&_a]:text-[color:var(--on-sky-plain)]`}
                   />
                 )}
                 <Composer
