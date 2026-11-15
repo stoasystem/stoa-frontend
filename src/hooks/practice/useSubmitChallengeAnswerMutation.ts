@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { submitChallengeAnswer } from '@/services/practice/practiceApi'
 import { KNOWLEDGE_MAP_KEY } from '@/hooks/practice/useKnowledgeMapQuery'
 import { practiceQueryKeys } from '@/services/practice/practiceQueryKeys'
-import type { KnowledgeMapResponse, PracticeAnswerRequest } from '@/types/practice'
+import type { ChallengeAnswerRequest, KnowledgeMapResponse } from '@/types/practice'
 
 /**
  * One answer in a lesson. A right one can light the knowledge point and any
@@ -18,7 +18,7 @@ export function useSubmitChallengeAnswerMutation({ unitId }: { unitId?: string }
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: ({ challengeId, payload }: { challengeId: string; payload: PracticeAnswerRequest }) =>
+    mutationFn: ({ challengeId, payload }: { challengeId: string; payload: ChallengeAnswerRequest }) =>
       submitChallengeAnswer(challengeId, payload),
     onSuccess: () => {
       const skeleton = queryClient.getQueryData<KnowledgeMapResponse>(KNOWLEDGE_MAP_KEY)?.view === 'skeleton'

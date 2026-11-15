@@ -31,6 +31,8 @@ import { usePracticeHintMutation } from '@/hooks/practice/usePracticeHintMutatio
 import { useSubmitChallengeAnswerMutation } from '@/hooks/practice/useSubmitChallengeAnswerMutation'
 import { newRandomId } from '@/lib/randomId'
 import { answerLessonQuiz, startLessonQuiz } from '@/services/practice/practiceApi'
+import { askFor, useAskStore } from '@/store/askStore'
+import { useAuthStore } from '@/store/authStore'
 import type {
   LessonQuizAnswer,
   LessonQuizKind,
@@ -55,6 +57,19 @@ type Quiz = {
 export type LessonRunOptions = {
   /** Start with the quiz that tests out of the lesson (from the chapter). */
   testOut?: boolean
+}
+
+/**
+ * The Ask conversation open beside the exercise, read when the answer is sent
+ * (stoa-backend#449): the stage's Ask is the student's one Ask, kept in the
+ * Ask store. With one open, a right answer after asking about this exercise
+ * in it is recorded as answered after asking AI; with none, nothing is sent
+ * and the answer is the student's own. Lighting the star is the same either way.
+ */
+function askConversation(): { conversationId?: string } {
+  const ownerId = useAuthStore.getState().user?.id ?? null
+  const conversationId = askFor(useAskStore.getState(), ownerId).conversationId
+  return conversationId ? { conversationId } : {}
 }
 
 export function useLessonRun(lesson: PracticeLesson | undefined, { testOut = false }: LessonRunOptions = {}) {
@@ -206,7 +221,7 @@ export function useLessonRun(lesson: PracticeLesson | undefined, { testOut = fal
     if (submitAnswer.isPending) return
     const judged = await submitAnswer.mutateAsync({
       challengeId: challenge.challengeId,
-      payload: { answer: state.answer },
+      payload: { answer: state.answer, ...askConversation() },
     })
     if (!judged.correct) setTries({ challengeId: challenge.challengeId, wrong: wrong + 1 })
     dispatch({ type: 'feedback', feedback: judged })
