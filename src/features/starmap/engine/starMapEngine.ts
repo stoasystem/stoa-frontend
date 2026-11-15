@@ -1710,10 +1710,10 @@ export class StarMapEngine {
     const target = this.starIndex.get(path.target)
     if (target === undefined) return undefined
     const missing = path.missing.flatMap((unitId) => this.starIndex.get(unitId) ?? [])
-    const edges = path.edges.flatMap(({ from, to }) => {
+    const edges = path.edges.flatMap(({ from, to, main }) => {
       const a = this.starIndex.get(from)
       const b = this.starIndex.get(to)
-      return a === undefined || b === undefined || a === b ? [] : [{ from: a, to: b }]
+      return a === undefined || b === undefined || a === b ? [] : [{ from: a, to: b, main }]
     })
     return { target, missing, edges, amount: this.pathAmount }
   }

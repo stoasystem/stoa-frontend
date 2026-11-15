@@ -778,19 +778,25 @@ export function drawLinks(
   return stats
 }
 
-/** A path found (#489): its lines as wide as the recommended tier's, and the glow round a missing star. */
+/** A path found (#489): its two kinds of line, and the glow round a missing star. */
 export const PATH = {
   /** The glow round a missing star: this many times its drawn radius, at least `glowMin` px, at this strength. */
   glow: 2.6,
   glowMin: 14,
   glowAlpha: 0.55,
+  /** The chain from the first missing star to the target: gold, a little under tier 1's width, over a narrow faint halo. */
+  main: { width: 2, halo: 4.5, haloAlpha: 0.14 },
+  /** The side branches leading into it: hairlines, no halo, dim enough to read as behind the chain. */
+  side: { width: 1.2, alpha: 0.4 },
 } as const
 
 /**
  * A path to a star found from Ask (#489, #488 point 2): a layer of its own
  * over every other line (`drawLinks`, which lets them step back), outside the
  * four tiers. Each prerequisite on it is drawn in the recommended tier's gold,
- * brightest, with its warm halo, from star to star whatever the zoom -- never
+ * from star to star whatever the zoom -- the chain from the first missing star
+ * to the target brightest, over a narrow warm halo, the side branches thin and
+ * dim (`PATH`), so a far star's many prerequisites read as one way -- never
  * faded out as a line leaving a nebula is, and drawn where the panorama draws
  * no line between stars. Each missing star gets a soft ring of the same gold
  * round it, under its glyph. Names keep clear of the lines.
@@ -847,7 +853,9 @@ export function drawPath(
   }
 
   // The lines, star to star: anchored on the star they lead into, the shorter way round the ring.
-  for (const { from, to } of path.edges) {
+  // Side branches first: the chain is drawn over them.
+  const edges = [...path.edges.filter((edge) => !edge.main), ...path.edges.filter((edge) => edge.main)]
+  for (const { from, to, main } of edges) {
     const px = frame.x[to]
     const py = frame.y[to]
     const qx = px + shortestDx(scene.mapX[to], scene.mapX[from]) * band
@@ -863,7 +871,10 @@ export function drawPath(
       const x1 = qx - ux * trim + k * band
       const y1 = qy - uy * trim
       if (!onScreen(x0, y0, x1, y1, 8)) continue
-      for (const [lineWidth, alpha] of [[LINE.glow.width, LINE.glow.alpha], [LINE.width[TIER_RECOMMENDED], 1]] as const) {
+      const passes = main
+        ? [[PATH.main.halo, PATH.main.haloAlpha], [PATH.main.width, 1]] as const
+        : [[PATH.side.width, PATH.side.alpha]] as const
+      for (const [lineWidth, alpha] of passes) {
         ctx.strokeStyle = fade(ink, 1)
         ctx.globalAlpha = alpha * amount
         ctx.lineWidth = lineWidth

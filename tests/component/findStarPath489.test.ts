@@ -8,7 +8,7 @@
  * no path.
  */
 import { describe, expect, it } from 'vitest'
-import { findStarPath, missingStars } from '@/features/starmap/model/missingStars'
+import { findStarPath, missingStars, reducePathEdges, type PathEdge } from '@/features/starmap/model/missingStars'
 import type { LearningState, Prerequisite, Star, StarMap } from '@/features/starmap/model/starMap'
 
 function star(unitId: string, nebulaId: string, order: number, state: LearningState = 'ready'): Star {
@@ -31,6 +31,8 @@ function star(unitId: string, nebulaId: string, order: number, state: LearningSt
 }
 
 const edge = (from: string, to: string): Prerequisite => ({ from, to })
+const bare = (edges: PathEdge[]) => edges.map(({ from, to }) => edge(from, to))
+const chainOf = (edges: PathEdge[]) => edges.filter((e) => e.main).map(({ from, to }) => `${from}>${to}`)
 
 /**
  * Two subjects. Maths: algebra (order 1) a1..a4, geometry (order 2) g1, g2.
@@ -99,7 +101,7 @@ describe('the missing stars (#478 point 2)', () => {
     const named: Record<string, string[]> = { p2: ['a4', 'p1'], a4: ['a3', 'g1'], a3: ['a2'] }
     sky.stars = sky.stars.map((s) => ({ ...s, unlitPrerequisiteIds: named[s.unitId] ?? [] }))
     expect(missingStars(sky, 'p2')).toEqual(['a2', 'a3', 'a4', 'g1', 'p1'])
-    expect(findStarPath(sky, 'p2')!.edges).toEqual([edge('a2', 'a3'), edge('a3', 'a4'), edge('g1', 'a4'), edge('a4', 'p2'), edge('p1', 'p2')])
+    expect(bare(findStarPath(sky, 'p2')!.edges)).toEqual([edge('a2', 'a3'), edge('a3', 'a4'), edge('g1', 'a4'), edge('a4', 'p2'), edge('p1', 'p2')])
   })
 
   it('name each star once where two ways lead to it, and never the target, loops included', () => {
@@ -137,11 +139,81 @@ describe('the path', () => {
   it('holds the prerequisites from a missing star into another or into the target, none leading off it', () => {
     const path = findStarPath(map(), 'p2')!
     expect(path.target).toBe('p2')
-    expect(path.edges).toEqual([edge('a2', 'a3'), edge('a3', 'a4'), edge('g1', 'a4'), edge('a4', 'p2'), edge('p1', 'p2')])
+    expect(bare(path.edges)).toEqual([edge('a2', 'a3'), edge('a3', 'a4'), edge('g1', 'a4'), edge('a4', 'p2'), edge('p1', 'p2')])
   })
 
   it('is null for a lit target and for one with nothing missing', () => {
     expect(findStarPath(map({ p2: 'lit' }), 'p2')).toBeNull()
     expect(findStarPath(map({ a4: 'lit', p1: 'lit' }), 'p2')).toBeNull()
+  })
+})
+
+describe('the path decluttered (#489: a far star drew dozens of thick lines)', () => {
+  /** Reachability along `edges`: every star each star leads to. */
+  function reach(edges: readonly Prerequisite[]): Map<string, Set<string>> {
+    const out = new Map<string, string[]>()
+    for (const { from, to } of edges) out.set(from, [...(out.get(from) ?? []), to])
+    const all = new Map<string, Set<string>>()
+    for (const start of new Set(edges.flatMap(({ from, to }) => [from, to]))) {
+      const seen = new Set<string>()
+      const queue = [...(out.get(start) ?? [])]
+      while (queue.length > 0) {
+        const at = queue.shift()!
+        if (seen.has(at)) continue
+        seen.add(at)
+        queue.push(...(out.get(at) ?? []))
+      }
+      all.set(start, seen)
+    }
+    return all
+  }
+
+  it('drops a long jump that a longer way along the path already covers', () => {
+    // a2 -> a4 and a2 -> p2 jump over a3 / a4: a2 -> a3 -> a4 -> p2 covers both.
+    const jumps = [edge('a1', 'a2'), edge('a2', 'a3'), edge('a3', 'a4'), edge('a2', 'a4'), edge('a4', 'p2'), edge('a2', 'p2'), edge('p1', 'p2')]
+    const path = findStarPath(map({}, jumps), 'p2')!
+    expect(bare(path.edges)).toEqual([edge('a2', 'a3'), edge('a3', 'a4'), edge('a4', 'p2'), edge('p1', 'p2')])
+    expect(reducePathEdges([edge('a', 'b'), edge('b', 'c'), edge('a', 'c')])).toEqual([edge('a', 'b'), edge('b', 'c')])
+  })
+
+  it('keeps every star leading where it led: each missing star still into the target', () => {
+    // A dense web: every missing star a prerequisite of every later one and of the target.
+    const ids = ['a2', 'a3', 'a4', 'g1', 'g2', 'p1']
+    const web = ids.flatMap((from, i) => [...ids.slice(i + 1), 'p2'].map((to) => edge(from, to)))
+    const all = findStarPath(map({}, web), 'p2')!
+    const before = reach(web.filter(({ from }) => ids.includes(from)))
+    const after = reach(all.edges)
+    expect(all.edges.length).toBe(ids.length)
+    for (const id of ids) {
+      expect(after.get(id)).toEqual(before.get(id))
+      expect(after.get(id)!.has('p2')).toBe(true)
+    }
+  })
+
+  it('marks one chain from the first missing star to the target as main, the rest as side', () => {
+    const path = findStarPath(map(), 'p2')!
+    // a2 is first; g1 -> a4 and p1 -> p2 are side branches leading into the chain.
+    expect(chainOf(path.edges)).toEqual(['a2>a3', 'a3>a4', 'a4>p2'])
+    expect(path.edges.filter((e) => !e.main).map(({ from, to }) => `${from}>${to}`)).toEqual(['g1>a4', 'p1>p2'])
+  })
+
+  it('takes the shorter way as the chain, and of two as short the one first in course order', () => {
+    // From a2 two ways of two lines reach p2: through a3 (algebra) or g1 (geometry); a3 comes first.
+    const twoWays = [edge('a2', 'g1'), edge('g1', 'p2'), edge('a2', 'a3'), edge('a3', 'p2'), edge('a2', 'a4'), edge('a4', 'p1'), edge('p1', 'g2'), edge('g2', 'p2')]
+    const path = findStarPath(map({ a1: 'lit' }, twoWays), 'p2')!
+    expect(path.first).toBe('a2')
+    expect(chainOf(path.edges)).toEqual(['a2>a3', 'a3>p2'])
+  })
+
+  it('ends on loops: one way round is kept, and the chain still reaches the target', () => {
+    const loop = [edge('a2', 'a3'), edge('a3', 'a4'), edge('a4', 'a2'), edge('a2', 'a4'), edge('a4', 'p2'), edge('a3', 'p2'), edge('p2', 'a2')]
+    const path = findStarPath(map({}, loop), 'p2')!
+    const after = reach(path.edges)
+    for (const id of path.missing) expect(after.get(id)!.has('p2')).toBe(true)
+    expect(path.edges.length).toBeLessThan(loop.length)
+    const chain = path.edges.filter((e) => e.main)
+    expect(chain.some((e) => e.to === 'p2')).toBe(true)
+    expect(chain.some((e) => e.from === path.first)).toBe(true)
+    expect(reducePathEdges([edge('x', 'y'), edge('y', 'x'), edge('x', 'z'), edge('y', 'z')]).length).toBe(3)
   })
 })
