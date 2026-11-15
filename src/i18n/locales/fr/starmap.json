@@ -82,7 +82,8 @@
     "suggest": "Je te propose d’apprendre d’abord {{name}}.",
     "start": "Commencer {{name}}",
     "quiz": "Teste-moi sur {{name}}",
-    "direct": "Apprendre {{name}} tout de suite"
+    "direct": "Apprendre {{name}} tout de suite",
+    "step": "Étape {{step}} sur {{total}} du chemin : {{name}}"
   },
   "help": {
     "open": "Comment fonctionne la carte du ciel",

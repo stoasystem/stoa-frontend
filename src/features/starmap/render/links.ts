@@ -48,6 +48,17 @@ import { ditherHaze } from '@/features/starmap/render/galaxy'
 import { seededRandom } from '@/features/starmap/layout/layout'
 import { PANORAMA, REVEAL } from '@/features/starmap/view/semanticZoom'
 import type { LinkInk, SceneData, SceneFrame, StarMapTheme } from '@/features/starmap/render/types'
+import {
+  bundleCubic,
+  bundlePoint,
+  cubicBounds,
+  cubicSegments,
+  pointAt,
+  shiftCubic,
+  straightCubic,
+  trimCubic,
+  type Cubic,
+} from '@/features/starmap/render/pathShapes'
 
 /**
  * The inks, as the `--starmap-link-*` / `--starmap-bridge` sky tokens define
@@ -778,7 +789,7 @@ export function drawLinks(
   return stats
 }
 
-/** A path found (#489): its two kinds of line, and the glow round a missing star. */
+/** A path found (#489): its two kinds of line, the arrow on the chain, and the glow round a missing star. */
 export const PATH = {
   /** The glow round a missing star: this many times its drawn radius, at least `glowMin` px, at this strength. */
   glow: 2.6,
@@ -787,29 +798,96 @@ export const PATH = {
   /** The chain from the first missing star to the target: gold, a little under tier 1's width, over a narrow faint halo. */
   main: { width: 2, halo: 4.5, haloAlpha: 0.14 },
   /** The side branches leading into it: hairlines, no halo, dim enough to read as behind the chain. */
-  side: { width: 1.2, alpha: 0.4 },
+  side: { width: 1.2, alpha: 0.38 },
+  /** A side branch of the star in focus or under the pointer: brighter, so its end inside a trunk can be followed. */
+  sideFocused: { width: 1.5, alpha: 0.8 },
+  /** The arrowhead halfway along each line of the chain, pointing the way to walk: half its length (px) and its stroke. */
+  arrow: { size: 5, width: 1.8 },
+  /** A curve is kept clear of names as this many straight pieces. */
+  pieces: 6,
 } as const
+
+/** One line of the path on screen, prerequisite to dependent: straight inside a nebula, a bundled curve between two. */
+export type PathLine = { from: number; to: number; main: boolean; curve: Cubic; straight: boolean }
+
+/**
+ * The line of a path's prerequisite `from -> to` on screen (#489), whole,
+ * star centre to star centre: anchored on the star it leads into, the shorter
+ * way round the ring (#120). Inside one nebula a straight line; between two a
+ * curve pulled toward a bundle point on each nebula's side facing the other
+ * (`bundlePoint`, `bundleCubic`), so the lines between the same two nebulae
+ * share one trunk.
+ */
+export function pathCurve(scene: SceneData, frame: SceneFrame, from: number, to: number): { curve: Cubic; straight: boolean } {
+  const band = frame.scale
+  const b = { x: frame.x[to], y: frame.y[to] }
+  const a = { x: b.x + shortestDx(scene.mapX[to], scene.mapX[from]) * band, y: frame.y[from] }
+  const na = scene.nebula[from]
+  const nb = scene.nebula[to]
+  if (na === nb) return { curve: straightCubic(a, b), straight: true }
+  // Each nebula's centre where it is on screen beside its own star: the seam is crossed the same way.
+  const ca = { x: a.x + shortestDx(scene.mapX[from], scene.nebulae[na].x) * band, y: frame.nebulaY[na] }
+  const cb = { x: b.x + shortestDx(scene.mapX[to], scene.nebulae[nb].x) * band, y: frame.nebulaY[nb] }
+  const pa = bundlePoint(ca, frame.nebulaR[na], cb)
+  const pb = bundlePoint(cb, frame.nebulaR[nb], ca)
+  return { curve: bundleCubic(a, pa, pb, b), straight: false }
+}
+
+function strokeShape(ctx: CanvasRenderingContext2D, [p0, p1, p2, p3]: Cubic, straight: boolean) {
+  ctx.beginPath()
+  ctx.moveTo(p0.x, p0.y)
+  if (straight) ctx.lineTo(p3.x, p3.y)
+  else ctx.bezierCurveTo(p1.x, p1.y, p2.x, p2.y, p3.x, p3.y)
+  ctx.stroke()
+}
+
+/** The arrowhead halfway along a line of the chain, pointing to the star it leads into. */
+function strokeArrow(ctx: CanvasRenderingContext2D, curve: Cubic) {
+  const m = pointAt(curve, 0.5)
+  const before = pointAt(curve, 0.48)
+  const after = pointAt(curve, 0.52)
+  const d = Math.hypot(after.x - before.x, after.y - before.y)
+  if (d < 1e-6) return
+  const ux = (after.x - before.x) / d
+  const uy = (after.y - before.y) / d
+  const s = PATH.arrow.size
+  ctx.lineWidth = PATH.arrow.width
+  ctx.beginPath()
+  ctx.moveTo(m.x - ux * s * 0.6 - uy * s, m.y - uy * s * 0.6 + ux * s)
+  ctx.lineTo(m.x + ux * s * 0.6, m.y + uy * s * 0.6)
+  ctx.lineTo(m.x - ux * s * 0.6 + uy * s, m.y - uy * s * 0.6 - ux * s)
+  ctx.stroke()
+}
 
 /**
  * A path to a star found from Ask (#489, #488 point 2): a layer of its own
  * over every other line (`drawLinks`, which lets them step back), outside the
- * four tiers. Each prerequisite on it is drawn in the recommended tier's gold,
- * from star to star whatever the zoom -- the chain from the first missing star
- * to the target brightest, over a narrow warm halo, the side branches thin and
- * dim (`PATH`), so a far star's many prerequisites read as one way -- never
- * faded out as a line leaving a nebula is, and drawn where the panorama draws
- * no line between stars. Each missing star gets a soft ring of the same gold
- * round it, under its glyph. Names keep clear of the lines.
+ * four tiers, in the recommended tier's gold, from star to star whatever the
+ * zoom, never faded out as a line leaving a nebula is.
+ *
+ *   the chain   from the first missing star to the target: brightest, over a
+ *               narrow warm halo, an arrowhead halfway along each line
+ *               pointing the way to walk; its steps are numbered beside the
+ *               stars (`render/pathSteps.ts`, placed with the names).
+ *   the sides   the branches leading into it: thin and dim, under the chain;
+ *               those of the star in focus or under the pointer brighter.
+ *
+ * A line inside one nebula is straight; one between two nebulae is a curve
+ * bundled with the others between the same two (`pathCurve`), so a far
+ * star's many prerequisites read as a few trunks. Each missing star gets a
+ * soft ring of the same gold round it, under its glyph. Names keep clear of
+ * the lines (a curve as `PATH.pieces` straight pieces); the chain's pieces
+ * also go into `obstacles.chain`, for the step badges.
  */
 export function drawPath(
   ctx: CanvasRenderingContext2D,
   scene: SceneData,
   frame: SceneFrame,
   theme: StarMapTheme,
-  obstacles: Pick<LinkObstacles, 'segments'>,
+  obstacles: Pick<LinkObstacles, 'segments'> & { chain?: Segment[] },
   options: Pick<LinkOptions, 'wrap'> = {},
-): { lines: number; glows: number } {
-  const stats = { lines: 0, glows: 0 }
+): { lines: number; glows: number; curves: number } {
+  const stats = { lines: 0, glows: 0, curves: 0 }
   const path = frame.path
   const amount = Math.max(0, Math.min(1, path?.amount ?? 0))
   if (!path || amount <= 0.001) return stats
@@ -824,6 +902,7 @@ export function drawPath(
 
   ctx.save()
   ctx.lineCap = 'round'
+  ctx.lineJoin = 'round'
   ctx.setLineDash([])
 
   // The glow round each missing star, under the lines and the glyphs.
@@ -852,41 +931,46 @@ export function drawPath(
     if (seen) stats.glows += 1
   }
 
-  // The lines, star to star: anchored on the star they lead into, the shorter way round the ring.
-  // Side branches first: the chain is drawn over them.
-  const edges = [...path.edges.filter((edge) => !edge.main), ...path.edges.filter((edge) => edge.main)]
-  for (const { from, to, main } of edges) {
-    const px = frame.x[to]
-    const py = frame.y[to]
-    const qx = px + shortestDx(scene.mapX[to], scene.mapX[from]) * band
-    const qy = frame.y[from]
-    const d = Math.hypot(qx - px, qy - py)
-    if (d <= trim * 2) continue
-    const ux = (qx - px) / d
-    const uy = (qy - py) / d
+  // The side branches first, those of the star in focus or under the pointer over them, the chain over all.
+  const focus = (i: number) => i >= 0 && (i === frame.focusStar || i === (frame.hoveredStar ?? -1))
+  const lit = (edge: { from: number; to: number; main: boolean }) => !edge.main && (focus(edge.from) || focus(edge.to))
+  const rank = (edge: { from: number; to: number; main: boolean }) => (edge.main ? 2 : lit(edge) ? 1 : 0)
+  const edges = [...path.edges].sort((a, b) => rank(a) - rank(b))
+  const stroke = fade(ink, 1)
+  ctx.strokeStyle = stroke
+  for (const edge of edges) {
+    const { curve, straight } = pathCurve(scene, frame, edge.from, edge.to)
+    const part = trimCubic(curve, trim)
+    if (!part) continue
+    const passes = edge.main
+      ? [[PATH.main.halo, PATH.main.haloAlpha], [PATH.main.width, 1]] as const
+      : lit(edge)
+        ? [[PATH.sideFocused.width, PATH.sideFocused.alpha]] as const
+        : [[PATH.side.width, PATH.side.alpha]] as const
     let seen = false
     for (const k of periods) {
-      const x0 = px + ux * trim + k * band
-      const y0 = py + uy * trim
-      const x1 = qx - ux * trim + k * band
-      const y1 = qy - uy * trim
-      if (!onScreen(x0, y0, x1, y1, 8)) continue
-      const passes = main
-        ? [[PATH.main.halo, PATH.main.haloAlpha], [PATH.main.width, 1]] as const
-        : [[PATH.side.width, PATH.side.alpha]] as const
+      const shape = shiftCubic(part, k * band)
+      const box = cubicBounds(shape)
+      if (!onScreen(box.x0, box.y0, box.x1, box.y1, 8)) continue
       for (const [lineWidth, alpha] of passes) {
-        ctx.strokeStyle = fade(ink, 1)
         ctx.globalAlpha = alpha * amount
         ctx.lineWidth = lineWidth
-        ctx.beginPath()
-        ctx.moveTo(x0, y0)
-        ctx.lineTo(x1, y1)
-        ctx.stroke()
+        strokeShape(ctx, shape, straight)
       }
-      obstacles.segments.push({ x0, y0, x1, y1 })
+      if (edge.main) {
+        ctx.globalAlpha = amount
+        strokeArrow(ctx, shape)
+      }
+      const pieces = straight ? [{ x0: shape[0].x, y0: shape[0].y, x1: shape[3].x, y1: shape[3].y }] : cubicSegments(shape, PATH.pieces)
+      obstacles.segments.push(...pieces)
+      // The chain's own, apart too: a step badge never sits on it (`render/pathSteps.ts`).
+      if (edge.main) obstacles.chain?.push(...pieces)
       seen = true
     }
-    if (seen) stats.lines += 1
+    if (seen) {
+      stats.lines += 1
+      if (!straight) stats.curves += 1
+    }
   }
 
   ctx.restore()

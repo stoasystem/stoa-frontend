@@ -82,7 +82,8 @@
     "suggest": "I suggest you learn {{name}} first.",
     "start": "Start {{name}}",
     "quiz": "Test me on {{name}}",
-    "direct": "Learn {{name}} right away"
+    "direct": "Learn {{name}} right away",
+    "step": "Step {{step}} of {{total}} on the way: {{name}}"
   },
   "help": {
     "open": "How the star map works",

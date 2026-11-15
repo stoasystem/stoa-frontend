@@ -152,6 +152,27 @@ function mainChain(edges: readonly Prerequisite[], first: string, target: string
 }
 
 /**
+ * The steps of the main chain (#489), in walking order: its stars from the
+ * first missing star on, each once, the target left out -- step 1 is
+ * `steps[0]`. The map numbers them beside the stars and the parallel DOM
+ * says "Step 3 of 10". Empty when no line is `main`. Generic over the id, so
+ * the renderer can walk star indices and the view unit ids.
+ */
+export function chainSteps<Id>(edges: readonly { from: Id; to: Id; main: boolean }[], target: Id): Id[] {
+  const main = edges.filter((edge) => edge.main)
+  if (main.length === 0) return []
+  const next = new Map(main.map((edge) => [edge.from, edge.to]))
+  const into = new Set(main.map((edge) => edge.to))
+  const steps: Id[] = []
+  const seen = new Set<Id>()
+  for (let at = main.find((edge) => !into.has(edge.from))?.from; at !== undefined && at !== target && !seen.has(at); at = next.get(at)) {
+    seen.add(at)
+    steps.push(at)
+  }
+  return steps
+}
+
+/**
  * Each star's prerequisites, once each, self-loops left out: the sky's
  * edges, and the unlit ones a star names itself (`unlitPrerequisiteIds`,
  * stoa-backend#125) -- the same prerequisites, but a sky read without its

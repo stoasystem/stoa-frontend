@@ -44,6 +44,7 @@ import { StarCard } from '@/features/starmap/components/StarCard'
 import { StarSheet } from '@/features/starmap/components/StarSheet'
 import { StarGlyph } from '@/features/starmap/components/StarGlyph'
 import { nebulaLabel, starLabel } from '@/features/starmap/components/labels'
+import { chainSteps } from '@/features/starmap/model/missingStars'
 import { nebulaLinks } from '@/features/starmap/model/links'
 import { animationFrameScheduler, StarMapEngine, type FoundPath, type FrameScheduler, type NebulaDiscOnScreen, type StarOnScreen, type VisibleStar, type ZoomState } from '@/features/starmap/engine/starMapEngine'
 import { LEARNING_STATES, nebulaCounts, orderedNebulae, orderedStars, subjectOfNebula, type StarMap } from '@/features/starmap/model/starMap'
@@ -312,6 +313,11 @@ export function StarMapView({ map, demo = false, target, path, marked, onNavigat
   })
 
   const stars = useMemo(() => orderedStars(map), [map])
+  // The steps of a found path's main chain (#489), by unit id: the parallel DOM says which step a star is.
+  const pathSteps = useMemo(() => {
+    const steps = path ? chainSteps(path.edges, path.target) : []
+    return new Map(steps.map((unitId, k) => [unitId, { step: k + 1, total: steps.length }]))
+  }, [path])
   const nebulae = useMemo(() => orderedNebulae(map).filter((n) => stars.some((s) => s.nebulaId === n.topicId)), [map, stars])
   // The lines between nebulae carry meaning, so the parallel DOM says them too.
   const relatedTo = useMemo(() => {
@@ -995,7 +1001,7 @@ export function StarMapView({ map, demo = false, target, path, marked, onNavigat
                                 onBlur={() => focusStar(-1)}
                                 onKeyDown={stepStar}
                               >
-                                <span className="sr-only">{starLabel(t, star)}</span>
+                                <span className="sr-only">{starLabel(t, star, pathSteps.get(star.unitId))}</span>
                               </a>
                             </li>
                           )
