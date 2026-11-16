@@ -5,7 +5,6 @@ import {
   Mail,
   ShieldCheck,
   UserRound,
-  Users,
   type LucideIcon,
 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
@@ -99,15 +98,6 @@ function StatusCard({ profile }: { profile: TeacherProfile }) {
           value={t(`profile.accountStatus.${profile.accountStatus}`, {
             defaultValue: profile.accountStatus,
           })}
-        />
-        <ProfileDetail
-          icon={Users}
-          label={t('profile.concurrentStudents')}
-          value={
-            profile.maxActiveSessions == null
-              ? t('profile.concurrentNotSet')
-              : t('profile.concurrentValue', { count: profile.maxActiveSessions })
-          }
         />
         <ProfileDetail
           icon={CalendarDays}
