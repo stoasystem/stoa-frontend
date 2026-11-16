@@ -667,7 +667,7 @@ describe('a lesson with explanation cards (#692)', () => {
     vi.mocked(getPracticeLesson).mockResolvedValue({ ...lesson, sections })
     open('/chapter/u-5/l-2', { width: 375 })
 
-    const cards = await screen.findByRole('region', { name: 'First, the idea' })
+    const cards = await screen.findByRole('region', { name: 'Explanation' })
     const titles = within(cards).getAllByRole('heading', { level: 3 }).map((heading) => heading.textContent)
     expect(titles).toEqual(['What balancing means', 'Undo in reverse'])
     expect(within(cards).getByText(/Do the same to both sides\./)).toBeInTheDocument()
@@ -675,7 +675,7 @@ describe('a lesson with explanation cards (#692)', () => {
     expect(screen.queryByRole('heading', { level: 2, name: '3x + 5 = 20' })).not.toBeInTheDocument()
     expect(document.querySelector('[data-stage-exercise]')).toBeNull()
 
-    await userEvent.click(screen.getByRole('button', { name: 'On to the exercises' }))
+    await userEvent.click(screen.getByRole('button', { name: 'Start the exercises' }))
 
     // The keyboard goes on to the first question; the cards are gone.
     expect(await screen.findByRole('heading', { level: 2, name: '3x + 5 = 20' })).toHaveFocus()
@@ -697,7 +697,7 @@ describe('a lesson with explanation cards (#692)', () => {
 
     expect(await screen.findByRole('heading', { level: 2, name: '3x + 5 = 20' })).toBeInTheDocument()
     expect(document.querySelector('[data-stage-cards]')).toBeNull()
-    expect(screen.queryByRole('button', { name: 'On to the exercises' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Start the exercises' })).not.toBeInTheDocument()
   })
 
   it('opens on the exercise when a backend from before sends no sections at all', async () => {

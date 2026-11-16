@@ -64,8 +64,8 @@
     "backToChapter": "Back to {{chapter}}",
     "backToLessons": "Back to the chapter",
     "cards": {
-      "start": "On to the exercises",
-      "title": "First, the idea"
+      "start": "Start the exercises",
+      "title": "Explanation"
     },
     "check": "Check answer",
     "checkFailed": "Your answer could not be checked. Try again.",

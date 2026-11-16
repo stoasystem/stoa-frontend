@@ -122,7 +122,7 @@ for (const viewport of [
     await signInAsStudent(page)
     await page.goto(`/chapter/${UNIT}/${LESSON}`)
 
-    const cards = page.getByRole('region', { name: 'First, the idea' })
+    const cards = page.getByRole('region', { name: 'Explanation' })
     await expect(cards).toBeVisible()
     await expect(cards.getByRole('heading', { level: 3 })).toHaveText(SECTIONS.map((section) => section.title))
     // Formulas typeset, the display one on its own line; none left as written.
@@ -133,7 +133,7 @@ for (const viewport of [
     expect(await page.locator('html').evaluate((root) => root.scrollWidth)).toBeLessThanOrEqual(viewport.width)
     await page.screenshot({ path: testInfo.outputPath(`cards-${viewport.name}.png`) })
 
-    await page.getByRole('button', { name: 'On to the exercises' }).click()
+    await page.getByRole('button', { name: 'Start the exercises' }).click()
     await expect(page.getByRole('heading', { level: 2, name: PROMPT })).toBeFocused()
     await expect(cards).toHaveCount(0)
   })
