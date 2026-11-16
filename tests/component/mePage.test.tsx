@@ -386,13 +386,11 @@ describe('changing the password on /me', () => {
     expect(seen.confirm).toEqual([])
   })
 
-  it('is where the avatar menu’s "Change password" leads a student', async () => {
-    const user = userEvent.setup()
+  // The avatar menu has no "Change password" for a student: the Profile item
+  // opens this page. The old address still lands on the section.
+  it('opens at its password section from /me#password', async () => {
     backend()
-    openAt('/me')
-
-    await user.click(await screen.findByRole('button', { name: enCommon.accountMenu.open }))
-    await user.click(await screen.findByRole('menuitem', { name: enCommon.actions.changePassword }))
+    openAt('/me#password')
 
     await waitFor(() => expect(screen.getByRole('heading', { name: enCommon.me.password.heading })).toHaveFocus())
     expect(pathname).toBe('/me')

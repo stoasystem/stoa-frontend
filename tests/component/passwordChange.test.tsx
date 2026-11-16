@@ -66,12 +66,11 @@ describe('the password change entry point', () => {
   })
 
   // Since #46 the old account pill is gone; the entry is the avatar menu's
-  // "Change password", which accountMenu.test.tsx checks item by item.
+  // "Change password", which accountMenu.test.tsx checks item by item. Only
+  // teachers and parents get it; everyone else finds it in the profile (/me).
   it.each([
-    ['student', '/me#password'],
     ['parent', '/settings/password'],
     ['teacher', '/settings/password'],
-    ['admin', '/me#password'],
   ] as const)('is offered to a signed-in %s in the avatar menu, leading to %s', async (role, to) => {
     signIn(role)
 
