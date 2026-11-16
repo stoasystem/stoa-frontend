@@ -81,7 +81,8 @@
       "retryNamed": "Réessayer : {{name}}",
       "altTeacher": "Image de l’enseignant·e : {{name}}"
     },
-    "enterClassroom": "Entrer dans la classe"
+    "enterClassroom": "Entrer dans la classe",
+    "takeAndEnterClassroom": "Prendre en charge et entrer dans la classe"
   },
   "profile": {
     "eyebrow": "Compte enseignant",

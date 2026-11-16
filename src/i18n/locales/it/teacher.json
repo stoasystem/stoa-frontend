@@ -81,7 +81,8 @@
       "retryNamed": "Riprovare: {{name}}",
       "altTeacher": "Immagine del docente: {{name}}"
     },
-    "enterClassroom": "Entra in classe"
+    "enterClassroom": "Entra in classe",
+    "takeAndEnterClassroom": "Prendi in carico ed entra in classe"
   },
   "profile": {
     "eyebrow": "Account insegnante",

@@ -81,7 +81,8 @@
       "retryNamed": "Erneut laden: {{name}}",
       "altTeacher": "Bild der Lehrperson: {{name}}"
     },
-    "enterClassroom": "Klassenzimmer betreten"
+    "enterClassroom": "Klassenzimmer betreten",
+    "takeAndEnterClassroom": "Übernehmen und Klassenzimmer betreten"
   },
   "profile": {
     "eyebrow": "Lehrpersonen-Konto",
