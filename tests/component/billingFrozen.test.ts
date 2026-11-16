@@ -78,13 +78,26 @@ describe('card 007: the paid surface is not reachable from the app', () => {
 // which agrees with itself the moment somebody adds a tenth, but "no classroom
 // page is registered and no classroom entry is offered". Since #45 an old
 // student `/classroom*` link redirects to the planet (#13 point 2) -- that is
-// the one way the word may appear, and it may only lead to `/`.
+// the one way the word may appear as a redirect, and it may only lead to `/`.
+//
+// #696 is a different thing under the same word: the virtual classroom of one
+// help request, its whiteboard and voice issued by the backend
+// (stoa-backend#467). It is the one classroom page allowed, at exactly
+// `/classroom/:conversationId`, for the student and teacher of that request.
 
 const CLASSROOM_PATH = /(^|\/)classroom(\/|$)/i
+const HELP_CLASSROOM = '/classroom/:conversationId'
+
+/** The classroom pages registered, but the help request's own (#696). */
+const otherClassroomPages = (paths: readonly string[]) =>
+  paths.filter((p) => CLASSROOM_PATH.test(p) && p !== HELP_CLASSROOM)
 
 describe('card 020: the online classroom is gone and does not come back', () => {
-  it('registers no classroom page', () => {
-    expect(pageRoutes.map((route) => route.path).filter((p) => CLASSROOM_PATH.test(p))).toEqual([])
+  it('registers no classroom page but the virtual classroom of a help request (#696)', () => {
+    expect(otherClassroomPages(pageRoutes.map((route) => route.path))).toEqual([])
+    const help = pageRoutes.find((route) => route.path === HELP_CLASSROOM)
+    expect(help?.page.pageName).toBe('ClassroomPage')
+    expect(help?.access).toEqual({ kind: 'roles', roles: ['student', 'teacher'] })
   })
 
   it('sends an old classroom link to the planet and nowhere else', () => {
@@ -97,7 +110,7 @@ describe('card 020: the online classroom is gone and does not come back', () => 
     // Negative control, so the check above cannot go quiet.
     const poisoned = [...pageRoutes.map((route) => route.path), '/classroom']
 
-    expect(poisoned.filter((p) => CLASSROOM_PATH.test(p))).toEqual(['/classroom'])
+    expect(otherClassroomPages(poisoned)).toEqual(['/classroom'])
   })
 
   it('deletes the pages, so this is a deletion and not a withdrawal', () => {
@@ -118,7 +131,7 @@ describe('card 020: the online classroom is gone and does not come back', () => 
       classroomFiles.filter((file) => existsSync(path.resolve(__dirname, '../../', file))),
     ).toEqual([])
     expect(source).not.toContain('live-classroom')
-    expect(pageRoutes.map((route) => route.path).filter((p) => CLASSROOM_PATH.test(p))).toEqual([])
+    expect(otherClassroomPages(pageRoutes.map((route) => route.path))).toEqual([])
   })
 
   it('offers no classroom entry in navigation', () => {

@@ -1,5 +1,5 @@
 /*
- * The server behind Ask (#571): the twelve requests Ask makes, in one object.
+ * The server behind Ask (#571): the requests Ask makes, in one object.
  *
  * The seam is at the service functions, in a React context, as the star map's
  * source is (`StarMapSourceContext`). Its default is the real services, so the
@@ -20,6 +20,7 @@ import { createConversation, getConversation, getConversations } from '@/service
 import { getGenerationProgress, streamConversationMessage } from '@/services/chat/chatStreamApi'
 import { getMyMemorySummary } from '@/services/learning/memoryApi'
 import { getStudentEntitlement, getStudentProfile } from '@/services/student/studentApi'
+import { enterStudentClassroom } from '@/services/classroom/classroomApi'
 import {
   createTeacherHelpRequest,
   getTeacherAvailability,
@@ -39,12 +40,16 @@ export type AskServer = {
     streamConversationMessage: typeof streamConversationMessage
     getGenerationProgress: typeof getGenerationProgress
   }
-  /** 真人求助: whether teachers are online, and the conversation's request. */
+  /**
+   * 真人求助: whether teachers are online, the conversation's request, and
+   * the seat in its virtual classroom (#696).
+   */
   teacherHelp: {
     getTeacherAvailability: typeof getTeacherAvailability
     getTeacherHelpRequest: typeof getTeacherHelpRequest
     createTeacherHelpRequest: typeof createTeacherHelpRequest
     withdrawTeacherHelpRequest: typeof withdrawTeacherHelpRequest
+    enterStudentClassroom: typeof enterStudentClassroom
   }
   /** The student's profile (their year group and subjects), and their entitlement (the usage period, #615). */
   student: {
@@ -78,6 +83,7 @@ export const serverAskServer: AskServer = {
     getTeacherHelpRequest: (conversationId) => getTeacherHelpRequest(conversationId),
     createTeacherHelpRequest: (payload) => createTeacherHelpRequest(payload),
     withdrawTeacherHelpRequest: (conversationId) => withdrawTeacherHelpRequest(conversationId),
+    enterStudentClassroom: (conversationId) => enterStudentClassroom(conversationId),
   },
   student: {
     getStudentProfile: () => getStudentProfile(),

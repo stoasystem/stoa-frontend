@@ -5,7 +5,7 @@
  * It holds what the real one holds -- conversations and their messages, the
  * list of them, each conversation's request for a teacher, the commands that
  * answer messages, whether teachers are online, the student's profile,
- * entitlement and learning memory -- and answers the twelve requests of
+ * entitlement and learning memory -- and answers the requests of
  * `AskServer` from it.
  * Each test makes its own (`createFakeAskServer()`) and gives it only what that
  * test needs:
@@ -53,7 +53,7 @@ export type MockedAskServer = {
   }
 }
 
-/** Any one of the twelve requests, by its name. */
+/** Any one of the requests, by its name. */
 export type AskRequest = {
   [Group in keyof AskServer]: keyof AskServer[Group]
 }[keyof AskServer]
@@ -226,6 +226,10 @@ export function createFakeAskServer(): FakeAskServer {
         helpRequests.set(conversationId, withdrawn)
         return withdrawn
       },
+      // No classroom unless a test gives one (#696): Ask stays where it was, as before it.
+      enterStudentClassroom: async () => {
+        throw new ApiError('The classroom is not configured', { status: 503, code: 'classroom_unavailable' })
+      },
     },
     student: {
       getStudentProfile: async () => server.profile,
@@ -264,6 +268,7 @@ export function createFakeAskServer(): FakeAskServer {
       getTeacherHelpRequest: gated('getTeacherHelpRequest', teacherHelp.getTeacherHelpRequest),
       createTeacherHelpRequest: gated('createTeacherHelpRequest', teacherHelp.createTeacherHelpRequest),
       withdrawTeacherHelpRequest: gated('withdrawTeacherHelpRequest', teacherHelp.withdrawTeacherHelpRequest),
+      enterStudentClassroom: gated('enterStudentClassroom', teacherHelp.enterStudentClassroom),
     },
     student: {
       getStudentProfile: gated('getStudentProfile', student.getStudentProfile),

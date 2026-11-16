@@ -80,7 +80,8 @@
       "retry": "Réessayer",
       "retryNamed": "Réessayer : {{name}}",
       "altTeacher": "Image de l’enseignant·e : {{name}}"
-    }
+    },
+    "enterClassroom": "Entrer dans la classe"
   },
   "profile": {
     "eyebrow": "Compte enseignant",

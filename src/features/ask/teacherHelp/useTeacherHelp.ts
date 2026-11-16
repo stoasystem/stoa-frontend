@@ -33,6 +33,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useAskServer, type AskServer } from '@/features/ask/server/askServer'
 import { useAskUsagePeriod } from '@/features/ask/useAskUsagePeriod'
+import { classroomOpens } from '@/features/classroom/useClassroomPass'
 import { useConversationQuery } from '@/hooks/chat/useConversationQuery'
 import { useTeacherAvailabilityQuery } from '@/hooks/chat/useTeacherAvailabilityQuery'
 import { noteUsagePeriodEnded } from '@/hooks/student/useStudentEntitlementQuery'
@@ -199,21 +200,28 @@ function cardKind(status: string): 'waiting' | 'assigned' | 'withTeacher' | 'end
  */
 export type TeacherHelpServer = Pick<
   AskServer['teacherHelp'],
-  'getTeacherHelpRequest' | 'createTeacherHelpRequest' | 'withdrawTeacherHelpRequest'
+  'getTeacherHelpRequest' | 'createTeacherHelpRequest' | 'withdrawTeacherHelpRequest' | 'enterStudentClassroom'
 >
 
 export function useTeacherHelp({
   conversationId,
   messages,
   isStreaming,
+  onClassroomOpens,
 }: {
   conversationId: string
   messages: readonly ChatMessage[]
   isStreaming: boolean
+  /**
+   * Called once a request was taken and its virtual classroom opens (#696):
+   * Ask takes the student there to wait. Where the classroom is not set up,
+   * it is not called and Ask stays as it was.
+   */
+  onClassroomOpens?: (conversationId: string) => void
 }): TeacherHelp {
   const queryClient = useQueryClient()
   const server: TeacherHelpServer = useAskServer().teacherHelp
-  const { getTeacherHelpRequest, createTeacherHelpRequest, withdrawTeacherHelpRequest } = server
+  const { getTeacherHelpRequest, createTeacherHelpRequest, withdrawTeacherHelpRequest, enterStudentClassroom } = server
   const [requestError, setRequestError] = useState<string | null>(null)
   const [withdrawError, setWithdrawError] = useState<string | null>(null)
 
@@ -272,6 +280,14 @@ export function useTeacherHelp({
       void queryClient.invalidateQueries({ queryKey: chatQueryKeys.teacherHelpRequest(conversationId) })
       // One of the week's requests is gone: said now, not at the next minute's read (#506).
       void queryClient.invalidateQueries({ queryKey: chatQueryKeys.teacherAvailability() })
+      // Into the virtual classroom to wait for the teacher (#696), once it is
+      // known to open: where it is not set up, Ask stays as it was.
+      if (onClassroomOpens) {
+        const asked = request.conversationId || conversationId
+        void classroomOpens(queryClient, { role: 'student', conversationId: asked }, enterStudentClassroom).then((opens) => {
+          if (opens) onClassroomOpens(asked)
+        })
+      }
     },
     onError: (error) => {
       const key = requestErrorKey(error)

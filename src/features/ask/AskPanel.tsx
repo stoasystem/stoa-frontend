@@ -1,7 +1,8 @@
 import { ChevronLeft, Maximize2, Minimize2, X } from 'lucide-react'
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type HTMLAttributes } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
+import { classroomPathFor } from '@/app/router/routeManifest'
 import { Button, Composer, IconButton, PresenceDot } from '@/components/base'
 import { conversationDisplayTitle, subjectDisplayLabel } from '@/components/chat/conversationTitle'
 import { MathRenderer } from '@/components/ui/MathRenderer'
@@ -66,6 +67,7 @@ export function AskPanel({
   onExpand,
   fullScreen,
   column,
+  pinned = false,
 }: {
   controller: AskController
   layout: AskLayout
@@ -94,6 +96,11 @@ export function AskPanel({
    * left edge. The panel's sky still fills the window.
    */
   column?: number
+  /**
+   * Held to the one conversation it opened on: the classroom's (#696), where
+   * leaving for the list would leave the classroom. No back arrow.
+   */
+  pinned?: boolean
 }) {
   const { t } = useTranslation('chat')
   const { conversationId, draft, setDraft, select, close } = controller
@@ -294,7 +301,7 @@ export function AskPanel({
             : { height: ASK_PANEL.headerHeight, ...columnPadding(column, 0, 18, 0, { right: 12 }) }
         }
       >
-        {conversationId && (
+        {conversationId && !pinned && (
           <IconButton
             label={t('ask.back')}
             icon={ChevronLeft}
@@ -563,7 +570,14 @@ function AskThread({
   const { t } = useTranslation('chat')
   const scroller = useRef<HTMLDivElement>(null)
   const { messages, isStreaming, retryMessage, conversationQuery } = ask
-  const help = useTeacherHelp({ conversationId, messages, isStreaming })
+  const navigate = useNavigate()
+  // Asking a teacher takes the student into the virtual classroom to wait, where there is one (#696).
+  const help = useTeacherHelp({
+    conversationId,
+    messages,
+    isStreaming,
+    onClassroomOpens: (id) => navigate(classroomPathFor(id)),
+  })
   const { view, request, withdraw } = help
 
   const ownerId = useAuthStore((state) => state.user?.id)

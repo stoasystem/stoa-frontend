@@ -277,5 +277,56 @@
       "skip": "Skip",
       "done": "Got it"
     }
+  },
+  "classroom": {
+    "status": {
+      "waiting": "Finding a teacher for you…",
+      "coming": "{{name}} is on the way",
+      "joined": "{{name}} has joined",
+      "teaching": "Helping {{name}}",
+      "ended": "This help request has ended"
+    },
+    "voice": {
+      "connecting": "Connecting voice…",
+      "alone": "Voice on · waiting for the other side",
+      "inRoom": "{{name}} is on the call",
+      "speaking": "{{name}} is speaking",
+      "micDenied": "Microphone blocked: allow it in the address bar, then reload. You can still listen.",
+      "failed": "Voice did not connect. The whiteboard and chat still work."
+    },
+    "mic": {
+      "mute": "Turn microphone off",
+      "unmute": "Turn microphone on"
+    },
+    "sidebar": {
+      "hide": "Hide the sidebar",
+      "show": "Show the sidebar",
+      "resize": "Resize the sidebar"
+    },
+    "board": {
+      "title": "Whiteboard",
+      "loading": "Loading the whiteboard…",
+      "failedTitle": "The whiteboard did not load",
+      "failedBody": "Open it in a new tab, or go back to the conversation.",
+      "openInTab": "Open the whiteboard in a new tab"
+    },
+    "leave": "Leave classroom",
+    "entering": "Entering the classroom…",
+    "unavailable": {
+      "title": "The classroom is unavailable right now",
+      "body": "You can keep going in the conversation as usual.",
+      "back": "Back to the conversation"
+    },
+    "refused": {
+      "title": "This classroom is closed",
+      "body": "The help request has ended or is no longer yours. The conversation is still there."
+    },
+    "teacherSidebar": {
+      "label": "Student conversation",
+      "conversation": "AI conversation",
+      "replies": "Replies",
+      "readOnly": "The student’s conversation with the assistant, read-only.",
+      "empty": "No messages yet."
+    }
   }
 }

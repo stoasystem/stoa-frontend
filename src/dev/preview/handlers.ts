@@ -31,6 +31,15 @@ import {
   storeDemoLanguage,
 } from '@/dev/preview/demoSource'
 import { starCountFrom } from '@/dev/preview/surfaces'
+import {
+  classroomUnavailable,
+  demoClassroomPass,
+  demoTeacher,
+  demoTeacherRequestDetail,
+  previewAsTeacher,
+  TEACHER_JOINS_AFTER_MS,
+} from '@/dev/preview/classroom'
+import { DEMO_TEACHER_NAME } from '@/dev/demo/data'
 import { DEMO_BRIDGE_STAR, DEMO_KNOWLEDGE_POINT } from '@/dev/demo/data'
 import { DEMO_ANSWER_STYLE_CODES, DEMO_GRADE_CODES } from '@/dev/demo/data/student'
 import { isSupportedLanguage } from '@/i18n/languages'
@@ -131,11 +140,11 @@ const field = <T>(body: unknown, name: string): T | undefined =>
 const answeredRight = new Set<string>()
 
 /** Teachers asked for on this page, by conversation. */
-const askedForTeacher = new Map<string, { requestId: string; conversationId: string; status: string; createdAt: string }>()
+const askedForTeacher = new Map<string, { requestId: string; conversationId: string; status: string; createdAt: string; teacherName?: string }>()
 
 const routes: Array<[method: string, pattern: string, handler: Handler]> = [
   // Account
-  ['GET', '/auth/me', () => demo().demoStudent],
+  ['GET', '/auth/me', () => (previewAsTeacher() ? demoTeacher : demo().demoStudent)],
   // Login review: #fail refuses credentials; the unverified demo address opens
   // the existing verification panel. These replies never contact an identity provider.
   ['POST', '/auth/login', ({ body }) =>
@@ -290,8 +299,25 @@ const routes: Array<[method: string, pattern: string, handler: Handler]> = [
     return withdrawn
   }],
   // A conversation never handed to a teacher answers 404, as the backend does.
-  ['GET', '/teacher-help/conversations/:id/request', ({ params }) =>
-    demoTeacherHelpRequests.find((request) => request.conversationId === params.id) ?? askedForTeacher.get(params.id) ?? null],
+  // A request asked for here is taken by the demo teacher a few seconds later (#696).
+  ['GET', '/teacher-help/conversations/:id/request', ({ params }) => {
+    const asked = askedForTeacher.get(params.id)
+    if (asked?.status === 'pending' && Date.now() - Date.parse(asked.createdAt) > TEACHER_JOINS_AFTER_MS) {
+      askedForTeacher.set(params.id, { ...asked, status: 'in_progress', teacherName: DEMO_TEACHER_NAME })
+    }
+    return demoTeacherHelpRequests.find((request) => request.conversationId === params.id) ?? askedForTeacher.get(params.id) ?? null
+  }],
+
+  // The virtual classroom (#696, stoa-backend#467): a seat for the student and for the teacher.
+  ['POST', '/conversations/:id/classroom', ({ params }) =>
+    classroomUnavailable()
+      ? refuse(503, 'classroom_unavailable', 'The classroom is not configured.')
+      : demoClassroomPass(`help-${params.id}`)],
+  ['POST', '/teachers/me/help-requests/:id/classroom', ({ params }) =>
+    classroomUnavailable()
+      ? refuse(503, 'classroom_unavailable', 'The classroom is not configured.')
+      : demoTeacherRequestDetail(params.id) && demoClassroomPass(`help-${params.id}`)],
+  ['GET', '/teachers/me/help-requests/:id', ({ params }) => demoTeacherRequestDetail(params.id)],
 
   // Chapter and practice stage
   ['GET', '/practice/curriculum/catalog', () => demo().demoChapter.catalog],

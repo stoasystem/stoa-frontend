@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
+import { classroomPathFor } from '@/app/router/routeManifest'
 import { useTranslation } from 'react-i18next'
 import { BackButton } from '@/components/common/BackButton'
 import { Breadcrumbs } from '@/components/common/Breadcrumbs'
@@ -81,7 +82,22 @@ export function TeacherHelpRequestDetailPage() {
         <PageHeader
           title={tTeacher('detail.title')}
           description={tTeacher('detail.description')}
-          actions={<PageActions secondary={<BackButton label={tTeacher('detail.backLabel')} to="/teacher" />} />}
+          actions={
+            <PageActions
+              secondary={<BackButton label={tTeacher('detail.backLabel')} to="/teacher" />}
+              primary={
+                // Once this teacher holds it and works on it, the student waits in
+                // the classroom (#696): the backend lets a teacher in only then.
+                canAct && requestQuery.data?.status === 'in_progress' ? (
+                  <Button asChild>
+                    <Link to={classroomPathFor(requestQuery.data.conversationId, requestQuery.data.requestId)} data-enter-classroom>
+                      {tTeacher('detail.enterClassroom')}
+                    </Link>
+                  </Button>
+                ) : undefined
+              }
+            />
+          }
         />
         <Breadcrumbs
           className="mb-6"

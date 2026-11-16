@@ -277,5 +277,56 @@
       "skip": "Überspringen",
       "done": "Verstanden"
     }
+  },
+  "classroom": {
+    "status": {
+      "waiting": "Wir suchen eine Lehrperson für dich…",
+      "coming": "{{name}} ist unterwegs",
+      "joined": "{{name}} ist da",
+      "teaching": "Du hilfst {{name}}",
+      "ended": "Diese Hilfeanfrage ist beendet"
+    },
+    "voice": {
+      "connecting": "Sprachverbindung wird aufgebaut…",
+      "alone": "Sprache an · warte auf die andere Seite",
+      "inRoom": "{{name}} ist im Gespräch",
+      "speaking": "{{name}} spricht",
+      "micDenied": "Mikrofon blockiert: in der Adressleiste erlauben und neu laden. Zuhören geht trotzdem.",
+      "failed": "Sprachverbindung fehlgeschlagen. Whiteboard und Chat funktionieren weiter."
+    },
+    "mic": {
+      "mute": "Mikrofon ausschalten",
+      "unmute": "Mikrofon einschalten"
+    },
+    "sidebar": {
+      "hide": "Seitenleiste ausblenden",
+      "show": "Seitenleiste einblenden",
+      "resize": "Seitenleiste anpassen"
+    },
+    "board": {
+      "title": "Whiteboard",
+      "loading": "Whiteboard wird geladen…",
+      "failedTitle": "Das Whiteboard hat nicht geladen",
+      "failedBody": "Öffne es in einem neuen Tab oder geh zurück zum Gespräch.",
+      "openInTab": "Whiteboard in neuem Tab öffnen"
+    },
+    "leave": "Klassenzimmer verlassen",
+    "entering": "Klassenzimmer wird geöffnet…",
+    "unavailable": {
+      "title": "Das Klassenzimmer ist gerade nicht verfügbar",
+      "body": "Du kannst im Gespräch wie gewohnt weitermachen.",
+      "back": "Zurück zum Gespräch"
+    },
+    "refused": {
+      "title": "Dieses Klassenzimmer ist geschlossen",
+      "body": "Die Hilfeanfrage ist beendet oder nicht mehr deine. Das Gespräch bleibt erhalten."
+    },
+    "teacherSidebar": {
+      "label": "Gespräch der lernenden Person",
+      "conversation": "KI-Gespräch",
+      "replies": "Antworten",
+      "readOnly": "Das Gespräch mit dem Assistenten, nur zum Lesen.",
+      "empty": "Noch keine Nachrichten."
+    }
   }
 }

@@ -1,0 +1,83 @@
+<!doctype html>
+<!--
+  A stand-in for the shared whiteboard (WBO) in the design preview (#696):
+  a page the classroom can frame, to draw on with the mouse or a pen. Dev
+  server only; the real board is the address stoa-backend#467 returns.
+  Not a product screen, so its own words are not translated.
+-->
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Whiteboard (design preview)</title>
+    <style>
+      html, body { margin: 0; height: 100%; background: #fff; font: 13px system-ui, sans-serif; color: #555; overflow: hidden; }
+      canvas { display: block; width: 100%; height: 100%; touch-action: none; cursor: crosshair;
+        background-image: radial-gradient(#d8dce6 1px, transparent 1px); background-size: 24px 24px; }
+      .tools { position: absolute; left: 12px; top: 12px; display: flex; flex-direction: column; gap: 6px;
+        background: #fff; border: 1px solid #e3e6ee; border-radius: 10px; padding: 6px; box-shadow: 0 2px 8px rgba(0,0,0,.06); }
+      .tools button { width: 28px; height: 28px; border-radius: 50%; border: 2px solid transparent; cursor: pointer; }
+      .tools button[aria-pressed="true"] { border-color: #1d2b53; }
+      .note { position: absolute; right: 12px; bottom: 10px; }
+    </style>
+  </head>
+  <body>
+    <div class="tools" role="toolbar" aria-label="Colour"></div>
+    <canvas></canvas>
+    <p class="note">Design preview: a stand-in for the shared whiteboard</p>
+    <script>
+      const canvas = document.querySelector('canvas')
+      const context = canvas.getContext('2d')
+      const tools = document.querySelector('.tools')
+      let colour = '#1d2b53'
+      for (const each of ['#1d2b53', '#d6453d', '#2e9b5f', '#e0a526']) {
+        const button = document.createElement('button')
+        button.style.background = each
+        button.setAttribute('aria-label', each)
+        button.setAttribute('aria-pressed', String(each === colour))
+        button.onclick = () => {
+          colour = each
+          for (const other of tools.children) other.setAttribute('aria-pressed', String(other === button))
+        }
+        tools.append(button)
+      }
+      function size() {
+        const ratio = window.devicePixelRatio || 1
+        canvas.width = canvas.clientWidth * ratio
+        canvas.height = canvas.clientHeight * ratio
+        context.scale(ratio, ratio)
+        context.lineCap = 'round'
+        context.lineJoin = 'round'
+        context.lineWidth = 3
+        // Something already on the board, as a teacher would have left it.
+        context.strokeStyle = '#1d2b53'
+        context.font = '22px system-ui, sans-serif'
+        context.fillStyle = '#1d2b53'
+        context.fillText('sin²(x) + cos²(x) = 1', 80, 70)
+        context.beginPath()
+        context.arc(200, 210, 90, 0, Math.PI * 2)
+        context.moveTo(110, 210); context.lineTo(290, 210)
+        context.moveTo(200, 120); context.lineTo(200, 300)
+        context.moveTo(200, 210); context.lineTo(264, 146)
+        context.stroke()
+        context.strokeStyle = '#d6453d'
+        context.beginPath(); context.moveTo(264, 146); context.lineTo(264, 210); context.stroke()
+        context.fillStyle = '#d6453d'; context.font = '16px system-ui'; context.fillText('sin x', 270, 182)
+        context.strokeStyle = '#2e9b5f'
+        context.beginPath(); context.moveTo(200, 214); context.lineTo(264, 214); context.stroke()
+        context.fillStyle = '#2e9b5f'; context.fillText('cos x', 210, 236)
+      }
+      // Drawn again at each new size (the sidebar folded or opened): a stand-in keeps no strokes.
+      new ResizeObserver(size).observe(canvas)
+      let last = null
+      canvas.addEventListener('pointerdown', (event) => { last = [event.offsetX, event.offsetY]; canvas.setPointerCapture(event.pointerId) })
+      canvas.addEventListener('pointermove', (event) => {
+        if (!last) return
+        context.strokeStyle = colour
+        context.beginPath(); context.moveTo(...last); context.lineTo(event.offsetX, event.offsetY); context.stroke()
+        last = [event.offsetX, event.offsetY]
+      })
+      canvas.addEventListener('pointerup', () => { last = null })
+    </script>
+  </body>
+</html>

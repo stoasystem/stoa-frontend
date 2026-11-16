@@ -13,7 +13,8 @@
  * anything, to see the first landing; `languageFirst=1` an account that never
  * stored a language, to see the language first (#627); `fresh=1` forgets what the demo backend kept in this tab
  * (completed lessons, the lighting and its acknowledgement, #51, and Ask's
- * messages). Moving around inside the page writes the route back to `path` (with
+ * messages); `role=teacher`, `classroom=` and `mic=` set up the virtual
+ * classroom (#696, see `classroom.ts`). Moving around inside the page writes the route back to `path` (with
  * `signedIn=0` once signed out, and `lang` once the language changes), so a
  * reload stays where it was -- also back on the surface's own route.
  *
@@ -92,7 +93,18 @@ async function start() {
     import('react-dom/client'),
     import('react-router-dom'),
   ])
-  const [{ AppProviders }, { AppRoutes }, { AuthBootstrap }, { RouteArrival }, { PageSkeleton }, { useAuthStore }, { PreviewChrome }, { PreviewLighting }] =
+  const [
+    { AppProviders },
+    { AppRoutes },
+    { AuthBootstrap },
+    { RouteArrival },
+    { PageSkeleton },
+    { useAuthStore },
+    { PreviewChrome },
+    { PreviewLighting },
+    { ClassroomVoiceProvider },
+    { demoTeacher, previewAsTeacher, previewVoiceConnector },
+  ] =
     await Promise.all([
       import('@/app/providers/AppProviders'),
       import('@/app/router/AppRoutes'),
@@ -102,13 +114,15 @@ async function start() {
       import('@/store/authStore'),
       import('@/dev/preview/PreviewChrome'),
       import('@/dev/preview/lighting'),
+      import('@/features/classroom/classroomVoice'),
+      import('@/dev/preview/classroom'),
     ])
 
   // Signed in the way the login form leaves it: a token in the store, the
   // account read back from `/auth/me` by the real AuthBootstrap.
   useAuthStore.setState(
     signedIn
-      ? { user: demo().demoStudent, accessToken: 'design-preview', isAuthenticated: true }
+      ? { user: previewAsTeacher() ? demoTeacher : demo().demoStudent, accessToken: 'design-preview', isAuthenticated: true }
       : { user: null, accessToken: null, isAuthenticated: false },
   )
 
@@ -123,7 +137,10 @@ async function start() {
             <PreviewChrome initialPath={path} open={surface?.open} focus={surface?.focus} pending={surface?.pending} readyWhen={surface?.readyWhen} />
             <RouteArrival>
               <Suspense fallback={<PageSkeleton rows={4} />}>
-                <AppRoutes />
+                {/* The classroom's voice is a stand-in here: nothing joins a real room (#696). */}
+                <ClassroomVoiceProvider value={previewVoiceConnector}>
+                  <AppRoutes />
+                </ClassroomVoiceProvider>
               </Suspense>
             </RouteArrival>
           </MemoryRouter>

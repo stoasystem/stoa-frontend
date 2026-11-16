@@ -80,7 +80,8 @@
       "retry": "Erneut laden",
       "retryNamed": "Erneut laden: {{name}}",
       "altTeacher": "Bild der Lehrperson: {{name}}"
-    }
+    },
+    "enterClassroom": "Klassenzimmer betreten"
   },
   "profile": {
     "eyebrow": "Lehrpersonen-Konto",
