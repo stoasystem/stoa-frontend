@@ -272,7 +272,6 @@ describe('what sits beside the logo', () => {
   })
 
   it.each([
-    ['/teacher/learning-automation', 'navigation.requests'],
     ['/teacher/requests/r-1', 'navigation.requests'],
   ])('keeps a teacher on Requests inside it (%s)', (path, label) => {
     renderShell('teacher', path, 1280)

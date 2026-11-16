@@ -150,10 +150,11 @@ const rowLinks = () =>
   [...screen.getByRole('main').querySelectorAll('a[data-row]')].map((row) => row.getAttribute('href'))
 
 describe('a teacher\'s Requests', () => {
-  it('lists requests as chevron rows, filters with one segmented control, and leads into learning automation', () => {
+  it('lists requests as chevron rows, filters with one segmented control, and no longer leads into learning automation (#703)', () => {
     renderAs('teacher', '/teacher', <TeacherDashboardPage />)
 
-    expect(rowLinks()).toEqual(['/teacher/requests/r-1', '/teacher/requests/r-2', '/teacher/learning-automation'])
+    expect(rowLinks()).toEqual(['/teacher/requests/r-1', '/teacher/requests/r-2'])
+    expect(screen.queryByRole('link', { name: /learning automation/i })).not.toBeInTheDocument()
     expect(screen.getByRole('region', { name: 'Requests' })).toBeInTheDocument()
     const row = screen.getByRole('link', { name: /Lina Meier/ })
     expect(row.querySelector('[data-chevron]')).not.toBeNull()

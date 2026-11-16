@@ -159,7 +159,8 @@ describe('the teacher area moved off its old prefix (#69)', () => {
     ['/tutor', '/teacher', 'TeacherDashboardPage'],
     ['/tutor/availability', '/teacher/availability', 'TeacherAvailabilityPage'],
     ['/tutor/profile', '/teacher/profile', 'TeacherProfilePage'],
-    ['/tutor/learning-automation', '/teacher/learning-automation', 'LearningAutomationConsolePage'],
+    // Learning automation is hidden from teachers until #703, so its old address lands home.
+    ['/tutor/learning-automation', '/teacher', 'TeacherDashboardPage'],
     ['/tutor/requests/r-1', '/teacher/requests/r-1', 'TeacherHelpRequestDetailPage'],
     // An address no page answers keeps its tail out of the router: the
     // classroom was deleted (card 020), so its old links land home.
@@ -186,6 +187,33 @@ describe('the teacher area moved off its old prefix (#69)', () => {
     for (const viewer of ALL_VIEWERS) {
       if (viewer === 'teacher') continue
       const landed = openAs(viewer, '/tutor/availability')
+      expect(landed.pathname).toBe(viewer === 'anonymous' ? '/login' : '/forbidden')
+    }
+  })
+})
+
+describe('learning automation is hidden from teachers (#703)', () => {
+  it('sends a teacher with a bookmark to the teacher home, query and all', () => {
+    for (const from of ['/teacher/learning-automation', '/teacher/learning-automation?studentId=stu-1']) {
+      expect(openAs('teacher', from)).toMatchObject({ pathname: '/teacher', search: '', page: 'TeacherDashboardPage' })
+    }
+  })
+
+  it('keeps the console for admins and organisations', () => {
+    expect(openAs('admin', '/admin/learning-automation')).toMatchObject({
+      pathname: '/admin/learning-automation',
+      page: 'LearningAutomationConsolePage',
+    })
+    expect(openAs('organization_admin', '/organization/learning-automation')).toMatchObject({
+      pathname: '/organization/learning-automation',
+      page: 'LearningAutomationConsolePage',
+    })
+  })
+
+  it('refuses every other role exactly as the teacher route did', () => {
+    for (const viewer of ALL_VIEWERS) {
+      if (viewer === 'teacher') continue
+      const landed = openAs(viewer, '/teacher/learning-automation')
       expect(landed.pathname).toBe(viewer === 'anonymous' ? '/login' : '/forbidden')
     }
   })

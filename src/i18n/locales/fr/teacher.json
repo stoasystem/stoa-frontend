@@ -69,7 +69,6 @@
     "reportContext": "Envoyer le contexte de cette demande à la modération interne.",
     "noNotes": "Aucune note d’enseignant pour l’instant.",
     "replyPaused": "Impossible d’actualiser la demande pour le moment. Votre brouillon est conservé ; vous pourrez l’envoyer dès que la connexion sera rétablie.",
-    "openAutomation": "Attribuer des exercices à {{name}} dans l’automatisation de l’apprentissage",
     "attachments": {
       "label": "Pièces jointes",
       "alt": "Image envoyée par l’élève : {{name}}",
@@ -147,9 +146,6 @@
       "elapsed": "{{elapsed}} (objectif : {{target}})",
       "target": "Objectif {{target}}"
     },
-    "more": "Plus",
-    "learningAutomation": "Automatisation de l’apprentissage",
-    "learningAutomationDescription": "Prévisualiser et lancer les attributions automatiques d’exercices pour vos élèves",
     "firstAction": "Première action de l’enseignant : {{time}}",
     "firstActionNone": "Première action de l’enseignant : pas encore enregistrée",
     "statsLoadFailed": "Les chiffres n’ont pas pu être chargés."

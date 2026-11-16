@@ -253,7 +253,7 @@ describe('moving to another page (#406)', () => {
     openAt('/teacher')
     const release = holdSlowPage()
 
-    const pressed = screen.getByRole('link', { name: 'Learning automation' })
+    const pressed = screen.getByRole('link', { name: 'Classroom' })
     await user.click(pressed)
 
     // The router keeps the page on screen while the next one loads
@@ -264,9 +264,9 @@ describe('moving to another page (#406)', () => {
 
     await act(async () => release())
 
-    const title = await waitFor(() => heading('LearningAutomationConsolePage'))
+    const title = await waitFor(() => heading('ClassroomPage'))
     await waitFor(() => expect(document.activeElement).toBe(title))
-    expect(announced()).toEqual([name('routes.learningAutomation.title')])
+    expect(announced()).toEqual([name('routes.classroom.title')])
   })
 })
 
@@ -743,15 +743,15 @@ describe('a new page starts at its top (#448)', () => {
     openAt('/teacher')
     const release = holdSlowPage()
 
-    await user.click(screen.getByRole('link', { name: 'Learning automation' }))
+    await user.click(screen.getByRole('link', { name: 'Classroom' }))
     expect(heading('TeacherDashboardPage')).toBeInTheDocument()
     expect(watch.scrolls()).toEqual([])
 
     await act(async () => release())
 
-    await waitFor(() => expect(document.activeElement).toBe(heading('LearningAutomationConsolePage')))
+    await waitFor(() => expect(document.activeElement).toBe(heading('ClassroomPage')))
     expect(watch.scrolls()).toEqual([TO_TOP])
-    expect(watch.log.slice(watch.log.indexOf(TO_TOP))).toEqual([TO_TOP, 'focus LearningAutomationConsolePage'])
+    expect(watch.log.slice(watch.log.indexOf(TO_TOP))).toEqual([TO_TOP, 'focus ClassroomPage'])
   })
 
   it('scrolls once as a guard’s loading screen comes in, and not again for the page behind it', async () => {

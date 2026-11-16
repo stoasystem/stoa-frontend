@@ -171,15 +171,7 @@ export function TeacherHelpRequestDetailPage() {
               isError={assistanceQuery.isError}
             />
             <AiTeacherToolsPanel request={requestQuery.data} canAct={canAct && !readFailed} />
-            {/* The console needs a student id, and this is the one place a
-                teacher has one (#333). The id goes in the link, the name does not. */}
-            {canAct && (
-              <Button asChild variant="outline">
-                <Link to={`/teacher/learning-automation?studentId=${encodeURIComponent(requestQuery.data.student.id)}`}>
-                  {tTeacher('detail.openAutomation', { name: requestQuery.data.student.name })}
-                </Link>
-              </Button>
-            )}
+            {/* No "open automation" link: the console is hidden from teachers until #703. */}
             <CurriculumRolloutPanel
               title={t('curriculumRollout.teacherTitle')}
               description={t('curriculumRollout.teacherDescription')}

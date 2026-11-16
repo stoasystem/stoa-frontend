@@ -69,7 +69,6 @@
     "reportContext": "Invia il contesto di questa richiesta alla moderazione interna.",
     "noNotes": "Ancora nessuna nota dell’insegnante.",
     "replyPaused": "Al momento non è possibile aggiornare la richiesta. La tua bozza resta salvata: potrai inviarla appena la connessione torna.",
-    "openAutomation": "Assegna esercizi a {{name}} nell’automazione dell’apprendimento",
     "attachments": {
       "label": "Allegati",
       "alt": "Immagine della persona che apprende: {{name}}",
@@ -147,9 +146,6 @@
       "elapsed": "{{elapsed}} (obiettivo: {{target}})",
       "target": "Obiettivo {{target}}"
     },
-    "more": "Altro",
-    "learningAutomation": "Automazione dell’apprendimento",
-    "learningAutomationDescription": "Visualizzare ed eseguire le assegnazioni automatiche di esercizi per i tuoi studenti",
     "firstAction": "Prima azione del docente: {{time}}",
     "firstActionNone": "Prima azione del docente: non ancora registrata",
     "statsLoadFailed": "Non è stato possibile caricare i dati."

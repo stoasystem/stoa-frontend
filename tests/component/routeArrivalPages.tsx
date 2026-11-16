@@ -74,7 +74,7 @@ function PageLinks() {
       <Link to="/teacher/profile">Profile</Link>
       <Link to="/teacher/requests/r-1">Request one</Link>
       <Link to="/teacher/requests/r-2">Request two</Link>
-      <Link to="/teacher/learning-automation">Learning automation</Link>
+      <Link to="/classroom/c1">Classroom</Link>
       <Link to="/tutor/availability">Old availability address</Link>
       <Link to="/teacher">Teacher home</Link>
       <Link to="/map/s1">Star map</Link>
@@ -180,7 +180,7 @@ function Page({ pageName }: { pageName: string }) {
           <FocusedField />
         </DashboardLayout>
       )
-    case 'LearningAutomationConsolePage':
+    case 'ClassroomPage':
       return <SlowPage pageName={pageName} />
     case 'MePage':
       return (

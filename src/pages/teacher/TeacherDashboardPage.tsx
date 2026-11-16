@@ -1,7 +1,5 @@
 import { useMemo, useState } from 'react'
-import { Sparkles } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
-import { Group, Row } from '@/components/base'
 import { PageContainer } from '@/components/common/PageContainer'
 import { PageHeader } from '@/components/common/PageHeader'
 import { HelpRequestList } from '@/components/teacher/HelpRequestList'
@@ -79,15 +77,7 @@ export function TeacherDashboardPage() {
             />
           </div>
         )}
-        {/* Learning automation: the secondary entry inside Requests (#13 point 6). */}
-        <Group title={t('requests.more')}>
-          <Row
-            to="/teacher/learning-automation"
-            leading={{ kind: 'icon', icon: Sparkles }}
-            title={t('requests.learningAutomation')}
-            subtitle={t('requests.learningAutomationDescription')}
-          />
-        </Group>
+        {/* No learning automation entry: hidden from teachers until #703. */}
       </PageContainer>
     </DashboardLayout>
   )
