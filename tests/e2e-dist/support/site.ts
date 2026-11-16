@@ -48,7 +48,11 @@ export async function serveSite(page: Page, problems: string[]) {
 }
 
 /** The policy production is served with, for this suite's hosts. */
-export const POLICY = contentSecurityPolicy({ apiOrigin: API_ORIGIN, uploadOrigin: S3_ORIGIN })
+export const POLICY = contentSecurityPolicy({
+  apiOrigin: API_ORIGIN,
+  uploadOrigin: S3_ORIGIN,
+  whiteboardOrigin: 'https://board.e2e-dist.invalid',
+})
 
 async function isFile(file: string) {
   try {

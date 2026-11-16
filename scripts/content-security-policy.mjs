@@ -23,11 +23,37 @@
  * - worker-src blob:: heic-to decodes a HEIC photo in a worker it starts from
  *   a blob URL; its `csp` build is the one that needs no `unsafe-eval`.
  * - frame-ancestors 'none': nobody frames the app.
+ * - frame-src: the virtual classroom's shared whiteboard (#696, WBO), framed
+ *   from its own host; nothing else is framed.
+ * - Daily, the classroom's voice (#696): its call object loads its bundle by a
+ *   <script> (`avoidEval`, so no 'unsafe-eval') and talks to Daily over HTTPS
+ *   and WebSockets, from `*.daily.co` and the fallback domains Daily's CSP
+ *   guide lists with it (docs.daily.co, "Setting up your CSP for daily-js");
+ *   `*.daily.co` alone would block its failover. No blur or noise
+ *   cancellation is used, so no 'wasm-unsafe-eval', blob: script or Banuba.
  */
 
 import { URL } from 'node:url'
 
-/** @typedef {{ apiOrigin: string, uploadOrigin: string }} PolicySources */
+/** @typedef {{ apiOrigin: string, uploadOrigin: string, whiteboardOrigin: string }} PolicySources */
+
+/** Where Daily's call bundle is loaded from (`script-src`). */
+export const DAILY_SCRIPT_SOURCES = Object.freeze([
+  'https://*.daily.co',
+  'https://*.dailywebrtc.com',
+  'https://*.dailywebrtc.net',
+])
+
+/** What Daily's call object connects to (`connect-src`): the narrowed list of its guide. */
+export const DAILY_CONNECT_SOURCES = Object.freeze([
+  'https://*.daily.co',
+  'https://*.dailywebrtc.com',
+  'https://*.dailywebrtc.net',
+  'https://prod-ks.pluot.blue',
+  'wss://*.daily.co',
+  'wss://*.dailywebrtc.com',
+  'wss://*.dailywebrtc.net',
+])
 
 /** @type {Readonly<PolicySources>} */
 export const PRODUCTION_SOURCES = Object.freeze({
@@ -35,6 +61,9 @@ export const PRODUCTION_SOURCES = Object.freeze({
   // StoaStorageStack's images bucket, `stoa-images-<account>`, at the regional
   // host the backend signs part URLs for (virtual-hosted, eu-central-2).
   uploadOrigin: 'https://stoa-images-562923011260.s3.eu-central-2.amazonaws.com',
+  // The WBO board behind a named Cloudflare tunnel (#696, stoa-backend#467's
+  // WBO_BASE_URL); its address is fixed so the policy can name it.
+  whiteboardOrigin: 'https://board.stoaedu.ch',
 })
 
 /**
@@ -43,16 +72,17 @@ export const PRODUCTION_SOURCES = Object.freeze({
  * @param {PolicySources} sources
  * @returns {string}
  */
-export function contentSecurityPolicy({ apiOrigin, uploadOrigin }) {
+export function contentSecurityPolicy({ apiOrigin, uploadOrigin, whiteboardOrigin }) {
   const api = new URL(apiOrigin)
   const realtime = `wss://${api.host}`
   const directives = [
     ["default-src", "'self'"],
-    ["script-src", "'self'"],
+    ["script-src", "'self'", ...DAILY_SCRIPT_SOURCES],
     ["style-src", "'self'", "'unsafe-inline'"],
     ["img-src", "'self'", 'data:', 'blob:'],
     ["font-src", "'self'", 'data:'],
-    ["connect-src", "'self'", api.origin, realtime, new URL(uploadOrigin).origin],
+    ["connect-src", "'self'", api.origin, realtime, new URL(uploadOrigin).origin, ...DAILY_CONNECT_SOURCES],
+    ["frame-src", new URL(whiteboardOrigin).origin],
     ["worker-src", "'self'", 'blob:'],
     ["object-src", "'none'"],
     ["base-uri", "'self'"],
