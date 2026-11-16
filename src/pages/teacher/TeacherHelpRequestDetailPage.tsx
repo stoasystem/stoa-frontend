@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import { classroomPathFor } from '@/app/router/routeManifest'
 import { useTranslation } from 'react-i18next'
 import { BackButton } from '@/components/common/BackButton'
@@ -37,6 +37,7 @@ export function TeacherHelpRequestDetailPage() {
   const { t } = useTranslation('practice')
   const { t: tTeacher } = useTranslation('teacher')
   const { requestId } = useParams()
+  const navigate = useNavigate()
   const [resolutionNote, setResolutionNote] = useState('')
   const requestCardRef = useRef<HTMLDivElement>(null)
   // A change that failed takes focus to the failure, not to the request: there a
@@ -93,6 +94,28 @@ export function TeacherHelpRequestDetailPage() {
                     <Link to={classroomPathFor(requestQuery.data.conversationId, requestQuery.data.requestId)} data-enter-classroom>
                       {tTeacher('detail.enterClassroom')}
                     </Link>
+                  </Button>
+                ) : requestQuery.data && statusActions.includes('in_progress') ? (
+                  // Offered and not yet taken: one press takes it (the same
+                  // change as "start review") and, once the server has it, goes
+                  // into the classroom, where the student is already waiting.
+                  // Refused or failed, the page says so as for any status change.
+                  <Button
+                    type="button"
+                    data-take-and-enter-classroom
+                    disabled={readFailed || updateStatus.isPending || !requestId}
+                    onClick={() => {
+                      const { conversationId, requestId: heldRequestId } = requestQuery.data!
+                      updateStatus.mutate(
+                        { requestId: heldRequestId, status: 'in_progress' },
+                        {
+                          onSuccess: () => navigate(classroomPathFor(conversationId, heldRequestId)),
+                          onError: () => setRefocus({ failed: true }),
+                        },
+                      )
+                    }}
+                  >
+                    {tTeacher('detail.takeAndEnterClassroom')}
                   </Button>
                 ) : undefined
               }

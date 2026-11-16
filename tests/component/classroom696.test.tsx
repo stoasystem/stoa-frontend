@@ -50,6 +50,7 @@ vi.mock('@/layouts/DashboardLayout', () => ({
 vi.mock('@/services/teacher/teacherApi', async (orig) => ({
   ...(await orig<typeof import('@/services/teacher/teacherApi')>()),
   getTeacherHelpRequestDetail: vi.fn(),
+  updateTeacherHelpRequestStatus: vi.fn(),
   getTeacherAssistanceSummary: vi.fn(() => new Promise(() => {})),
 }))
 vi.mock('@/hooks/practice/useCurriculumCatalogQuery', () => ({
@@ -60,6 +61,7 @@ vi.mock('sonner', () => ({ toast: { success: vi.fn(), error: vi.fn(), info: vi.f
 const enterStudent = vi.mocked(classroomApi.enterStudentClassroom)
 const enterTeacher = vi.mocked(classroomApi.enterTeacherClassroom)
 const readDetail = vi.mocked(teacherApi.getTeacherHelpRequestDetail)
+const updateStatus = vi.mocked(teacherApi.updateTeacherHelpRequestStatus)
 
 const tr = (key: string, options?: Record<string, unknown>) => i18n.t(`chat:${key}`, options)
 const initialLanguage = i18n.language
@@ -362,6 +364,38 @@ describe('the teacher', () => {
     open('/teacher/requests/r1')
     await waitFor(() => expect(readDetail).toHaveBeenCalled())
     expect(screen.queryByRole('link', { name: i18n.t('teacher:detail.enterClassroom') })).toBeNull()
+  })
+
+  it('takes an offered request and goes into the classroom with one press', async () => {
+    readDetail.mockResolvedValue(detail('pending'))
+    updateStatus.mockImplementation(async () => {
+      // The server has it now: the next read says so.
+      readDetail.mockResolvedValue(detail('in_progress'))
+      return detail('in_progress') as unknown as Awaited<ReturnType<typeof teacherApi.updateTeacherHelpRequestStatus>>
+    })
+    open('/teacher/requests/r1')
+    expect(screen.queryByRole('link', { name: i18n.t('teacher:detail.enterClassroom') })).toBeNull()
+    const take = await screen.findByRole('button', { name: i18n.t('teacher:detail.takeAndEnterClassroom') })
+    await userEvent.click(take)
+
+    await waitFor(() => expect(updateStatus).toHaveBeenCalled())
+    expect(updateStatus.mock.calls[0][0]).toEqual({ requestId: 'r1', status: 'in_progress' })
+    // Into the classroom only once the server took it: the seat is asked with the request.
+    await waitFor(() => expect(enterTeacher).toHaveBeenCalledWith('r1'))
+    expect(updateStatus.mock.invocationCallOrder[0]).toBeLessThan(enterTeacher.mock.invocationCallOrder[0])
+    expect(await bar696()).toBeInTheDocument()
+  })
+
+  it('stays on the request and says so when the offer was taken or lapsed meanwhile', async () => {
+    readDetail.mockResolvedValue(detail('pending'))
+    updateStatus.mockRejectedValue(new ApiError('conflict', { status: 409, code: 'help_request_changed' }))
+    open('/teacher/requests/r1')
+    await userEvent.click(await screen.findByRole('button', { name: i18n.t('teacher:detail.takeAndEnterClassroom') }))
+
+    await waitFor(() => expect(updateStatus).toHaveBeenCalled())
+    expect(await screen.findByRole('alert')).toBeInTheDocument()
+    expect(enterTeacher).not.toHaveBeenCalled()
+    expect(screen.queryByRole('complementary', { name: tr('classroom.teacherSidebar.label') })).toBeNull()
   })
 
   it('enters with the request it holds and reads the student’s conversation', async () => {

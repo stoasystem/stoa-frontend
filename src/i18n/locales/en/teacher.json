@@ -81,7 +81,8 @@
       "retryNamed": "Try again: {{name}}",
       "altTeacher": "Teacher’s picture: {{name}}"
     },
-    "enterClassroom": "Enter classroom"
+    "enterClassroom": "Enter classroom",
+    "takeAndEnterClassroom": "Take it and enter classroom"
   },
   "profile": {
     "eyebrow": "Teacher account",
