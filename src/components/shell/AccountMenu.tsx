@@ -203,7 +203,7 @@ export function AccountMenu({
             </Menu.Portal>
           </Menu.Sub>
 
-          {!forcedChange && (
+          {!forcedChange && targets.password && (
             <LinkItem to={targets.password} icon={KeyRound}>
               {t('actions.changePassword')}
             </LinkItem>

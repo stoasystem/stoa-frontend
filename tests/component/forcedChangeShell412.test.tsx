@@ -169,12 +169,12 @@ describe('the account menu under a forced change', () => {
     expect(updateLocale).toHaveBeenCalledWith('fr')
   })
 
-  it.each(ROLES)('still offers a %s nobody reset Profile, Language and Change password', async (role) => {
+  it.each(ROLES)('still offers a %s nobody reset Profile and Language', async (role) => {
     const menu = await openMenu(role, false)
 
-    expect(itemNames(menu)).toEqual(
-      expect.arrayContaining(['navigation.profile', 'actions.changePassword', 'accountMenu.help', 'actions.logOut']),
-    )
+    expect(itemNames(menu)).toEqual(expect.arrayContaining(['navigation.profile', 'accountMenu.help', 'actions.logOut']))
+    // Teachers and parents keep a menu item for it; the rest change it on /me.
+    expect(itemNames(menu).includes('actions.changePassword')).toBe(role === 'teacher' || role === 'parent')
     expect(within(menu).getByText('language.label')).toBeInTheDocument()
   })
 })

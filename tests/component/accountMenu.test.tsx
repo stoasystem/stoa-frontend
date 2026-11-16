@@ -86,21 +86,21 @@ const itemNames = (menu: HTMLElement) =>
     .getAllByRole('menuitem')
     .map((item) => item.textContent?.replace(/language\.english$/, '').trim())
 
-const FIXED = [
-  'navigation.profile',
-  'language.label',
-  'actions.changePassword',
-  'accountMenu.help',
-]
+// Change password is a teacher's and a parent's only: everyone else changes it
+// on /me, which the Profile item already opens.
+const FIXED = ['navigation.profile', 'language.label', 'accountMenu.help']
+const WITH_PASSWORD = ['navigation.profile', 'language.label', 'actions.changePassword', 'accountMenu.help']
 
 describe('the account menu', () => {
-  it.each(['teacher', 'parent', 'admin', 'organization_admin'] as const)(
-    'offers a %s the fixed items, sign-out last',
-    async (role) => {
-      const menu = await openWithMouse(role)
-      expect(itemNames(menu)).toEqual([...FIXED, 'actions.logOut'])
-    },
-  )
+  it.each(['teacher', 'parent'] as const)('offers a %s the fixed items and Change password, sign-out last', async (role) => {
+    const menu = await openWithMouse(role)
+    expect(itemNames(menu)).toEqual([...WITH_PASSWORD, 'actions.logOut'])
+  })
+
+  it.each(['admin', 'organization_admin'] as const)('offers a %s the fixed items, sign-out last', async (role) => {
+    const menu = await openWithMouse(role)
+    expect(itemNames(menu)).toEqual([...FIXED, 'actions.logOut'])
+  })
 
   // The backend sends no assignment notification, so the bell never led a
   // student to /assignments; the menu does (#400).
@@ -131,18 +131,20 @@ describe('the account menu', () => {
   )
 
   it.each([
-    ['student', '/me', '/me#password'],
+    ['student', '/me', null],
     ['teacher', '/teacher/profile', '/settings/password'],
     ['parent', '/parent/account-operations', '/settings/password'],
-    ['admin', '/me', '/me#password'],
-    ['organization_admin', '/me', '/me#password'],
-    ['school_teacher', '/me', '/me#password'],
-    ['school_viewer', '/me', '/me#password'],
+    ['admin', '/me', null],
+    ['organization_admin', '/me', null],
+    ['school_teacher', '/me', null],
+    ['school_viewer', '/me', null],
   ] as const)('sends a %s to %s for the profile and %s for the password', async (role, profile, password) => {
     const menu = await openWithMouse(role)
 
     expect(within(menu).getByRole('menuitem', { name: 'navigation.profile' })).toHaveAttribute('href', profile)
-    expect(within(menu).getByRole('menuitem', { name: 'actions.changePassword' })).toHaveAttribute('href', password)
+    const item = within(menu).queryByRole('menuitem', { name: 'actions.changePassword' })
+    if (password === null) expect(item).toBeNull()
+    else expect(item).toHaveAttribute('href', password)
     expect(within(menu).getByRole('menuitem', { name: 'accountMenu.help' })).toHaveAttribute('href', '/support')
   })
 
@@ -189,14 +191,17 @@ describe('the account menu', () => {
     registry.everything = true
     const menu = await openWithMouse('parent')
 
-    expect(itemNames(menu)).toEqual([...FIXED, 'accountMenu.billing', 'actions.logOut'])
+    expect(itemNames(menu)).toEqual([...WITH_PASSWORD, 'accountMenu.billing', 'actions.logOut'])
     expect(within(menu).getByRole('menuitem', { name: 'accountMenu.billing' })).toHaveAttribute('href', '/billing')
   })
 
-  it.each(['teacher', 'admin'] as const)('gives a %s no extra item even then', async (role) => {
+  it.each([
+    ['teacher', WITH_PASSWORD],
+    ['admin', FIXED],
+  ] as const)('gives a %s no extra item even then', async (role, fixed) => {
     registry.everything = true
     const menu = await openWithMouse(role)
-    expect(itemNames(menu)).toEqual([...FIXED, 'actions.logOut'])
+    expect(itemNames(menu)).toEqual([...fixed, 'actions.logOut'])
   })
 
   it('gives a student only Assignments even then', async () => {

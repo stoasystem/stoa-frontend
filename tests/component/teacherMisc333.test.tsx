@@ -2,8 +2,10 @@
  * #333: two loose ends on the teacher side.
  *
  * T5 - the learning automation console asks for a student id, and a teacher
- *      sees no student id anywhere. The help request now links to the console
- *      with its student filled in.
+ *      sees no student id anywhere. The help request linked to the console
+ *      with its student filled in, until the console was hidden from
+ *      teachers (#703): the link is gone, and the console still reads
+ *      `?studentId=` on the routes that keep it.
  * T7 - the "Assigned" filter was always empty (the teacher list carries the
  *      stored status, which is never "assigned"), and an empty filter said
  *      "No teacher support requests are available", as if there were none.
@@ -31,7 +33,6 @@ vi.mock('@/services/teacher/teacherApi', async (orig) => ({
   getTeacherStats: vi.fn(),
   getTeacherHelpRequests: vi.fn(),
   getTeacherHelpRequestDetail: vi.fn(),
-  getTeacherAssistanceSummary: vi.fn(() => new Promise(() => {})),
 }))
 vi.mock('@/services/learning/learningOperationsApi', async (orig) => ({
   ...(await orig<typeof import('@/services/learning/learningOperationsApi')>()),
@@ -89,23 +90,23 @@ afterAll(async () => {
 })
 
 describe('T5: from a help request to the automation console', () => {
-  it('links the request to the console with its student, and the console starts on that student', async () => {
+  it('no longer links the request to the console: it is hidden from teachers (#703)', async () => {
     vi.mocked(teacherApi.getTeacherHelpRequestDetail).mockResolvedValue({
       requestId: 'r1', conversationId: 'c1', student: { id: 'stu/42', name: 'Lea', grade: '8' },
       subject: 'mathematics', status: 'in_progress', messages: [], notes: [],
     } as never)
-    renderAt(
-      '/teacher/requests/r1',
-      <>
-        <Route path="/teacher/requests/:requestId" element={<TeacherHelpRequestDetailPage />} />
-        <Route path="/teacher/learning-automation" element={<LearningAutomationConsolePage />} />
-      </>,
-    )
+    renderAt('/teacher/requests/r1', <Route path="/teacher/requests/:requestId" element={<TeacherHelpRequestDetailPage />} />)
 
-    const link = await screen.findByRole('link', { name: 'Assign practice to Lea in learning automation' })
-    // The id, encoded; never the name.
-    expect(link).toHaveAttribute('href', '/teacher/learning-automation?studentId=stu%2F42')
-    fireEvent.click(link)
+    // The request has loaded (its student is on screen) before the absence is read.
+    expect((await screen.findAllByText(/Lea/)).length).toBeGreaterThan(0)
+    for (const link of screen.queryAllByRole('link')) {
+      expect(link.getAttribute('href') ?? '').not.toContain('learning-automation')
+    }
+    expect(screen.queryByRole('link', { name: /learning automation/i })).not.toBeInTheDocument()
+  })
+
+  it('starts the console on the student named in the address', async () => {
+    renderAt('/admin/learning-automation?studentId=stu%2F42', <Route path="/admin/learning-automation" element={<LearningAutomationConsolePage />} />)
 
     expect(await screen.findByLabelText('Student id')).toHaveValue('stu/42')
     // The history is read for that student at once, not after the field is left.
@@ -113,14 +114,14 @@ describe('T5: from a help request to the automation console', () => {
   })
 
   it('still opens empty without a student in the link', async () => {
-    renderAt('/teacher/learning-automation', <Route path="/teacher/learning-automation" element={<LearningAutomationConsolePage />} />)
+    renderAt('/admin/learning-automation', <Route path="/admin/learning-automation" element={<LearningAutomationConsolePage />} />)
     expect(await screen.findByLabelText('Student id')).toHaveValue('')
     expect(getStudentAssignments).not.toHaveBeenCalled()
   })
 
-  it('has the link copy in all four languages', () => {
+  it('has the filter copy in all four languages, and no longer the link copy', () => {
     for (const lng of ['en', 'de', 'fr', 'it']) {
-      expect(i18n.getResource(lng, 'teacher', 'detail.openAutomation')).toContain('{{name}}')
+      expect(i18n.getResource(lng, 'teacher', 'detail.openAutomation')).toBeUndefined()
       expect(i18n.getResource(lng, 'teacher', 'requests.emptyFiltered')).toContain('{{status}}')
     }
   })

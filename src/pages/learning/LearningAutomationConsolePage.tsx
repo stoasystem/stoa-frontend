@@ -102,8 +102,9 @@ function CandidateList({
 
 export function LearningAutomationConsolePage() {
   const { t } = useTranslation('teacher')
-  // A help request links here with its student (#333): teachers never see an
-  // id anywhere else, so the field could not be filled from the teacher side.
+  // `?studentId=` fills the field. A teacher's help request linked here with
+  // its student (#333) until the console was hidden from teachers (#703); the
+  // parameter stays for the admin and organisation routes and the redesign.
   const [searchParams] = useSearchParams()
   const linkedStudentId = searchParams.get('studentId')?.trim() ?? ''
   // Empty, not a sample id: `useStudentAssignmentsQuery` is enabled by a

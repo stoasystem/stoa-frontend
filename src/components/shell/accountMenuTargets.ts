@@ -1,8 +1,9 @@
 /**
  * What the avatar menu offers each role (#13 point 4, #46).
  *
- * Five fixed items for everybody: Profile, Language, Change password, Help,
- * Sign out. A role's extra items sit between Help and Sign out: the student's
+ * Fixed items for everybody: Profile, Language, Help, Sign out; teachers and
+ * parents also get Change password, which nobody else needs because their
+ * profile page already holds it. A role's extra items sit between Help and Sign out: the student's
  * "Assignments" (#400) and the parent's "Billing and payments". Every link
  * must be a route the manifest registers, and an entry whose route is not
  * registered is left out: billing is withdrawn (card 007), so the parent's
@@ -10,7 +11,7 @@
  * password change gets no page but Help (AccountMenu, #412).
  */
 import { matchPath } from 'react-router-dom'
-import { CHANGE_PASSWORD_PATH, ME_PASSWORD_PATH, pageRoutes, type AppNavArea } from '@/app/router/routeManifest'
+import { CHANGE_PASSWORD_PATH, pageRoutes, type AppNavArea } from '@/app/router/routeManifest'
 
 export const HELP_PATH = '/support'
 
@@ -29,17 +30,19 @@ const PROFILE_PATHS: Record<AppNavArea, string | null> = {
 }
 
 /*
- * Whoever has /me changes the password there (#13 point 2, #46); the menu
- * opens the page at its password section. Teachers and parents keep
- * /settings/password. /settings/password still sends a student to /me, except
- * under a forced change, which only ever happens there.
+ * Whoever has /me changes the password there (#13 point 2, #46), in the
+ * profile the menu already opens, so the menu has no separate item for them:
+ * it would be the Profile item twice. Teachers and parents keep
+ * /settings/password, which their profile pages do not hold. /settings/password
+ * still sends a student to /me#password, except under a forced change, which
+ * only ever happens there.
  */
-const PASSWORD_PATHS: Record<AppNavArea, string> = {
-  student: ME_PASSWORD_PATH,
+const PASSWORD_PATHS: Record<AppNavArea, string | null> = {
+  student: null,
   teacher: CHANGE_PASSWORD_PATH,
   parent: CHANGE_PASSWORD_PATH,
-  admin: ME_PASSWORD_PATH,
-  organization: ME_PASSWORD_PATH,
+  admin: null,
+  organization: null,
 }
 
 export type AccountMenuExtra = { key: string; labelKey: string; to: string }
@@ -76,7 +79,7 @@ export function isRegisteredPage(path: string): boolean {
 
 export type AccountMenuTargets = {
   profile: string | null
-  password: string
+  password: string | null
   help: string
   extras: readonly AccountMenuExtra[]
 }

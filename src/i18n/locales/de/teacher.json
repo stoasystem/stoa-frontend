@@ -69,7 +69,6 @@
     "reportContext": "Diesen Anfragekontext an die interne Moderation senden.",
     "noNotes": "Noch keine Notizen der Lehrperson.",
     "replyPaused": "Die Anfrage konnte gerade nicht neu geladen werden. Ihr Entwurf bleibt erhalten; Sie können ihn senden, sobald die Verbindung wieder steht.",
-    "openAutomation": "Übungen für {{name}} in der Lernautomatisierung zuweisen",
     "attachments": {
       "label": "Anhänge",
       "alt": "Bild der lernenden Person: {{name}}",
@@ -94,9 +93,6 @@
     "statusTitle": "Kontostatus",
     "statusDescription": "Betriebszustand und letzte Profilaktualisierung.",
     "statusLabel": "Status",
-    "concurrentStudents": "Gleichzeitige Lernende",
-    "concurrentNotSet": "Nicht festgelegt",
-    "concurrentValue": "Bis zu {{count}} gleichzeitig",
     "lastUpdated": "Zuletzt aktualisiert",
     "notProvided": "Nicht angegeben",
     "coverageTitle": "Unterrichtsabdeckung",
@@ -147,77 +143,15 @@
       "elapsed": "{{elapsed}} (Ziel: {{target}})",
       "target": "Ziel {{target}}"
     },
-    "more": "Mehr",
-    "learningAutomation": "Lernautomatisierung",
-    "learningAutomationDescription": "Automatische Übungszuweisungen für Ihre Schülerinnen und Schüler prüfen und ausführen",
     "firstAction": "Erste Aktion der Lehrperson: {{time}}",
     "firstActionNone": "Erste Aktion der Lehrperson: noch nicht erfasst",
     "statsLoadFailed": "Die Kennzahlen konnten nicht geladen werden."
   },
   "assistance": {
     "title": "Zusammenfassung zur Vorbereitung",
-    "description": "Eine begrenzte Zusammenfassung zur Vorbereitung, keine automatische Aufgabenerstellung.",
-    "sources_one": "{{count}} Quelle",
-    "sources_other": "{{count}} Quellen",
-    "loading": "Zusammenfassung wird vorbereitet ...",
-    "error": "Für diese Anfrage ist keine Zusammenfassung verfügbar.",
-    "empty": "Es liegt noch keine Zusammenfassung vor.",
-    "studentContext": "Kontext der lernenden Person",
-    "suggestedFocus": "Empfohlener Schwerpunkt",
+    "student": "Lernende Person",
     "question": "Frage",
-    "assistantAnswer": "Antwort des Lernassistenten",
-    "noQuestion": "Kein Fragetext verfügbar.",
-    "noAnswer": "Keine Antwort des Lernassistenten verfügbar.",
-    "noWeakTopics": "Keine Hinweise auf schwache Themen"
-  },
-  "aiTools": {
-    "title": "KI-Werkzeuge für Lehrpersonen",
-    "description": "Bereiten Sie Entwürfe aus dem sichtbaren Kontext der Lernenden vor, die Sie selbst prüfen.",
-    "draftOnly": "Nur Entwurf",
-    "generate": "Erstellen",
-    "noDraft": "Noch kein Entwurf erstellt.",
-    "notAvailable": "Nicht verfügbar.",
-    "unavailable": "Entwürfe können gerade nicht erstellt werden.",
-    "summary": {
-      "title": "Entwurf einer Zusammenfassung",
-      "description": "Zusammenfassung der Sitzung, wahrscheinliches Missverständnis und Erklärung für die Nachbetreuung.",
-      "generateLabel": "Entwurf einer Zusammenfassung erstellen",
-      "session": "Sitzung",
-      "misconception": "Missverständnis",
-      "focus": "Vorgeschlagener Schwerpunkt",
-      "followUp": "Nachbetreuung"
-    },
-    "exercise": {
-      "title": "Entwurf von Übungen",
-      "description": "Kurze Übungsaufgaben, die Sie prüfen, bevor sie die Lernenden erhalten.",
-      "generateLabel": "Entwurf von Übungen erstellen",
-      "difficulty": "Schwierigkeit",
-      "items": "Aufgaben",
-      "item": "Aufgabe {{number}}",
-      "answerKey": "Lösungen",
-      "difficulties": {
-        "targeted": "Gezielt",
-        "standard": "Standard",
-        "stretch": "Anspruchsvoll"
-      }
-    },
-    "status": {
-      "draft": "Entwurf",
-      "accepted": "Angenommen",
-      "rejected": "Abgelehnt",
-      "archived": "Archiviert"
-    },
-    "delivery": {
-      "not_delivered": "Nicht zugestellt",
-      "delivered": "Zugestellt"
-    },
-    "actions": {
-      "regenerate": "Neu erstellen",
-      "accept": "Annehmen",
-      "reject": "Ablehnen",
-      "archive": "Archivieren"
-    },
-    "notApplicable": "Für diese Anfrage können Sie gerade keine Entwürfe erstellen."
+    "noQuestion": "Kein Fragetext verfügbar."
   },
   "reply": {
     "label": "Antwort der Lehrperson",
@@ -383,22 +317,6 @@
     "replyConflict": "Ihre Antwort wurde nicht gesendet: Die Anfrage hat inzwischen eine andere Lehrperson übernommen, oder sie hat sich geändert.",
     "replyRefused": "Ihre Antwort wurde nicht angenommen. Bitte prüfen Sie Inhalt und Format und senden Sie sie erneut.",
     "availabilityUpdated": "Ihre Verfügbarkeit wurde gespeichert.",
-    "summaryCreated": "Zusammenfassungsentwurf erstellt.",
-    "summaryFailed": "Der Zusammenfassungsentwurf konnte nicht erstellt werden.",
-    "exerciseCreated": "Übungsentwurf erstellt.",
-    "exerciseFailed": "Der Übungsentwurf konnte nicht erstellt werden.",
-    "regenerated": "Entwurf neu erstellt.",
-    "regenerateFailed": "Der Entwurf konnte nicht neu erstellt werden.",
-    "reviewed": {
-      "accepted": "Entwurf angenommen.",
-      "rejected": "Entwurf abgelehnt.",
-      "archived": "Entwurf archiviert."
-    },
-    "reviewFailed": {
-      "accepted": "Der Entwurf konnte nicht angenommen werden.",
-      "rejected": "Der Entwurf konnte nicht abgelehnt werden.",
-      "archived": "Der Entwurf konnte nicht archiviert werden."
-    },
     "replyRefusedBecause": {
       "html": "Ihre Antwort wurde nicht angenommen: Ein Teil davon sieht für den Server wie HTML-Code aus. Bitte formulieren Sie diese Stelle um.",
       "privateMarkers": "Ihre Antwort wurde nicht angenommen: Sie enthält interne Kennungen oder Zugangsdaten. Bitte entfernen Sie diese.",

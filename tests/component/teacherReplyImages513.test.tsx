@@ -46,7 +46,6 @@ vi.mock('@/services/teacher/teacherApi', async (orig) => ({
   getTeacherHelpRequestDetail: vi.fn(),
   addTeacherHelpRequestNote: vi.fn(),
   getTeacherHelpRequestAttachment: vi.fn(),
-  getTeacherAssistanceSummary: vi.fn(() => new Promise(() => {})),
 }))
 vi.mock('@/hooks/practice/useCurriculumCatalogQuery', () => ({
   useCurriculumCatalogQuery: () => ({ data: undefined, isLoading: false, isError: false }),

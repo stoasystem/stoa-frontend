@@ -69,7 +69,6 @@
     "reportContext": "Send this request context to the internal moderation queue.",
     "noNotes": "No teacher notes yet.",
     "replyPaused": "This request could not be refreshed just now. Your draft is kept; you can send it once the connection is back.",
-    "openAutomation": "Assign practice to {{name}} in learning automation",
     "attachments": {
       "label": "Attachments",
       "alt": "Image from the student: {{name}}",
@@ -94,9 +93,6 @@
     "statusTitle": "Account status",
     "statusDescription": "Operational state and latest profile update.",
     "statusLabel": "Status",
-    "concurrentStudents": "Concurrent students",
-    "concurrentNotSet": "Not set",
-    "concurrentValue": "Up to {{count}} at a time",
     "lastUpdated": "Last updated",
     "notProvided": "Not provided",
     "coverageTitle": "Teaching coverage",
@@ -147,77 +143,15 @@
       "elapsed": "{{elapsed}} (target: {{target}})",
       "target": "Target {{target}}"
     },
-    "more": "More",
-    "learningAutomation": "Learning automation",
-    "learningAutomationDescription": "Preview and run automatic practice assignments for your students",
     "firstAction": "First teacher action: {{time}}",
     "firstActionNone": "First teacher action: not recorded yet",
     "statsLoadFailed": "The figures could not be loaded."
   },
   "assistance": {
     "title": "Preparation summary",
-    "description": "A bounded summary for teacher preparation, not automatic exercise generation.",
-    "sources_one": "{{count}} source",
-    "sources_other": "{{count}} sources",
-    "loading": "Preparing the summary...",
-    "error": "No summary is available for this request.",
-    "empty": "No summary is available yet.",
-    "studentContext": "Student context",
-    "suggestedFocus": "Suggested focus",
+    "student": "Student",
     "question": "Question",
-    "assistantAnswer": "Learning assistant answer",
-    "noQuestion": "No question text available.",
-    "noAnswer": "No assistant answer available.",
-    "noWeakTopics": "No weak topic evidence"
-  },
-  "aiTools": {
-    "title": "AI teacher tools",
-    "description": "Prepare teacher-reviewed drafts from visible student context.",
-    "draftOnly": "Draft only",
-    "generate": "Generate",
-    "noDraft": "No draft generated yet.",
-    "notAvailable": "Not available.",
-    "unavailable": "Draft generation is unavailable.",
-    "summary": {
-      "title": "Teacher summary draft",
-      "description": "Session summary, likely misconception, and follow-up explanation.",
-      "generateLabel": "Generate summary draft",
-      "session": "Session",
-      "misconception": "Misconception",
-      "focus": "Suggested focus",
-      "followUp": "Follow-up"
-    },
-    "exercise": {
-      "title": "Exercise draft",
-      "description": "Short practice items for teacher review before student delivery.",
-      "generateLabel": "Generate exercise draft",
-      "difficulty": "Difficulty",
-      "items": "Items",
-      "item": "Item {{number}}",
-      "answerKey": "Answer key",
-      "difficulties": {
-        "targeted": "Targeted",
-        "standard": "Standard",
-        "stretch": "Stretch"
-      }
-    },
-    "status": {
-      "draft": "Draft",
-      "accepted": "Accepted",
-      "rejected": "Rejected",
-      "archived": "Archived"
-    },
-    "delivery": {
-      "not_delivered": "Not delivered",
-      "delivered": "Delivered"
-    },
-    "actions": {
-      "regenerate": "Regenerate",
-      "accept": "Accept",
-      "reject": "Reject",
-      "archive": "Archive"
-    },
-    "notApplicable": "You can’t create drafts for this request right now."
+    "noQuestion": "No question text available."
   },
   "reply": {
     "label": "Teacher reply",
@@ -383,22 +317,6 @@
     "replyConflict": "Your reply was not sent: another teacher has taken this request, or it has changed.",
     "replyRefused": "Your reply was not accepted. Please check its content and format and send it again.",
     "availabilityUpdated": "Your availability was saved.",
-    "summaryCreated": "Summary draft created.",
-    "summaryFailed": "The summary draft could not be created.",
-    "exerciseCreated": "Exercise draft created.",
-    "exerciseFailed": "The exercise draft could not be created.",
-    "regenerated": "Draft regenerated.",
-    "regenerateFailed": "The draft could not be regenerated.",
-    "reviewed": {
-      "accepted": "Draft accepted.",
-      "rejected": "Draft rejected.",
-      "archived": "Draft archived."
-    },
-    "reviewFailed": {
-      "accepted": "The draft could not be accepted.",
-      "rejected": "The draft could not be rejected.",
-      "archived": "The draft could not be archived."
-    },
     "replyRefusedBecause": {
       "html": "Your reply was not accepted: part of it looks like HTML code to the server. Please rephrase that part.",
       "privateMarkers": "Your reply was not accepted: it contains internal identifiers or credentials. Please remove them.",

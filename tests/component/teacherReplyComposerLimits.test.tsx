@@ -9,8 +9,9 @@
  * T3 - a reply that may not go says why, on the field, and sends nothing.
  * T4 - queued blocks are shown and can be removed.
  * T8 - line breaks survive into the timeline; a list block is one item a line.
- * T9 - focus is not dropped after an action, the resolution note says it is
- *      required in text, and the difficulty buttons are a named group.
+ * T9 - focus is not dropped after an action, and the resolution note says it
+ *      is required in text. (The difficulty buttons went with the AI teacher
+ *      tools, #704.)
  */
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { act, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
@@ -19,7 +20,6 @@ import type { ReactNode } from 'react'
 import { I18nextProvider } from 'react-i18next'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { AiTeacherToolsPanel } from '@/components/teacher/AiTeacherToolsPanel'
 import { RichTeacherReply } from '@/components/teacher/RichTeacherReply'
 import { TeacherReplyComposer } from '@/features/teacherReply/TeacherReplyComposer'
 import type { TeacherReplyAdapter } from '@/features/teacherReply/teacherReplyAdapter'
@@ -42,7 +42,6 @@ vi.mock('@/services/teacher/teacherApi', async (orig) => ({
   getTeacherHelpRequestDetail: vi.fn(),
   updateTeacherHelpRequestStatus: vi.fn(),
   addTeacherHelpRequestNote: vi.fn(),
-  getTeacherAssistanceSummary: vi.fn(() => new Promise(() => {})),
 }))
 vi.mock('@/hooks/practice/useCurriculumCatalogQuery', () => ({
   useCurriculumCatalogQuery: () => ({ data: undefined, isLoading: false, isError: false }),
@@ -256,18 +255,6 @@ describe('T9: focus and labels', () => {
     await act(async () => finish({ requestId: 'r1', status: 'in_progress' }))
     await waitFor(() => expect(document.activeElement).toHaveAttribute('tabindex', '-1'))
     expect(document.activeElement).toHaveTextContent('Lea')
-  })
-
-  it('names the difficulty buttons as a group', () => {
-    render(
-      <I18nextProvider i18n={i18n}>
-        <QueryClientProvider client={new QueryClient()}>
-          <AiTeacherToolsPanel request={detail('in_progress')} canAct />
-        </QueryClientProvider>
-      </I18nextProvider>,
-    )
-    const group = screen.getByRole('group', { name: de.aiTools.exercise.difficulty })
-    expect(within(group).getAllByRole('button')).toHaveLength(3)
   })
 })
 

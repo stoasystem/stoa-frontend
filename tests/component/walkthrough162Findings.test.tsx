@@ -25,12 +25,10 @@ const detail = vi.hoisted(() => ({ status: 'resolved' as string }))
 const adminEvents = vi.hoisted(() => ({ items: [] as unknown[] }))
 
 vi.mock('@/layouts/DashboardLayout', () => ({ DashboardLayout: ({ children }: { children: ReactNode }) => <>{children}</> }))
-vi.mock('@/components/teacher/AiTeacherToolsPanel', () => ({ AiTeacherToolsPanel: () => null }))
 vi.mock('@/components/practice/CurriculumRolloutPanel', () => ({ CurriculumRolloutPanel: () => null }))
 vi.mock('@/components/teacher/TeacherAssistanceSummaryCard', () => ({ TeacherAssistanceSummaryCard: () => null }))
 vi.mock('@/components/teacher/HelpRequestDetailCard', () => ({ HelpRequestDetailCard: () => null }))
 vi.mock('@/hooks/practice/useCurriculumCatalogQuery', () => ({ useCurriculumCatalogQuery: () => ({}) }))
-vi.mock('@/hooks/teacher/useTeacherAssistanceSummaryQuery', () => ({ useTeacherAssistanceSummaryQuery: () => ({}) }))
 vi.mock('@/hooks/teacher/useTeacherHelpRequestDetailQuery', () => ({
   useTeacherHelpRequestDetailQuery: () => ({
     data: {

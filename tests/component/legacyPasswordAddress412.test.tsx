@@ -6,7 +6,7 @@
  * Two things went wrong there:
  *
  * - the student landed at the top of /me, not on its password section
- *   (`#password`, where the avatar menu's "Change password" leads);
+ *   (`#password`, the password section of the profile);
  * - with a session whose account was not read yet (a reload), the page
  *   decided on the missing account as "not a student" and showed the
  *   teachers' and parents' change first, and kept showing it for good when
@@ -74,10 +74,11 @@ describe('a student on the old address', () => {
     expect(landed).toMatchObject({ pathname: '/me', hash: '#password', page: 'MePage' })
   })
 
-  it('lands where the avatar menu leads a student to change it', () => {
+  it('lands on the profile the avatar menu opens, where a student changes it', () => {
     const landed = openAs('student', '/settings/password')
 
-    expect(`${landed.pathname}${landed.hash}`).toBe(accountMenuFor('student').password)
+    expect(landed.pathname).toBe(accountMenuFor('student').profile)
+    expect(accountMenuFor('student').password).toBeNull()
   })
 
   it.each(['teacher', 'parent'] as const)('leaves a %s on the page, without a hash', (role) => {

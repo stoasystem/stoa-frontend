@@ -3,10 +3,9 @@
  * detail showed it as written -- `1. **Schritt 1: …**`, `$$\frac{18 \div 6}…$$`
  * -- where the student saw it drawn in Ask. It is now drawn the same way.
  *
- * The preparation summary carries only the start of that answer, cut at 360
- * characters with its line breaks folded into spaces (stoa-backend#181), so
- * the cut can leave a formula or emphasis half open. What it leaves open is
- * taken out before the excerpt is drawn; whole pairs are drawn.
+ * The preparation summary no longer carries the start of that answer: since
+ * #704 it shows only the student's name and first question
+ * (teacherPrepSummary704.test.tsx).
  */
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { render, screen, waitFor, within } from '@testing-library/react'
@@ -15,9 +14,7 @@ import { MemoryRouter } from 'react-router-dom'
 import { beforeAll, beforeEach, describe, expect, it } from 'vitest'
 import i18n from '@/i18n'
 import { HelpRequestDetailCard } from '@/components/teacher/HelpRequestDetailCard'
-import { TeacherAssistanceSummaryCard } from '@/components/teacher/TeacherAssistanceSummaryCard'
-import { settleTruncatedMarkdown } from '@/lib/truncatedMarkdown'
-import type { TeacherAssistanceSummary, TeacherHelpRequestDetail } from '@/types/teacher'
+import type { TeacherHelpRequestDetail } from '@/types/teacher'
 
 /** As production served it for a closed request (stoa-backend#147's walkthrough). */
 const ANSWER = [
@@ -44,22 +41,6 @@ function request(content: string): TeacherHelpRequestDetail {
   } as unknown as TeacherHelpRequestDetail
 }
 
-function summary(aiAnswerSummary: string, questionSummary = 'Wie kürze ich 18/24? — **dringend**'): TeacherAssistanceSummary {
-  return {
-    summaryId: 'sum-1',
-    questionId: 'r-1',
-    studentId: 's-1',
-    subject: 'math',
-    studentContextSummary: 'Klasse 6',
-    questionSummary,
-    aiAnswerSummary,
-    suggestedFocus: 'Kürzen',
-    weakTopics: [],
-    sourceCount: 2,
-    createdAt: '2026-10-31T09:01:00Z',
-  } as TeacherAssistanceSummary
-}
-
 function wrap(node: React.ReactNode) {
   return render(
     <I18nextProvider i18n={i18n}>
@@ -75,11 +56,6 @@ function shownText(element: HTMLElement) {
   const copy = element.cloneNode(true) as HTMLElement
   copy.querySelectorAll('.katex-mathml').forEach((node) => node.remove())
   return copy.textContent ?? ''
-}
-
-/** The answer block of the summary card. */
-function answerBlock() {
-  return screen.getByText('Antwort des Lernassistenten').parentElement as HTMLElement
 }
 
 beforeAll(async () => {
@@ -107,54 +83,5 @@ describe('the assistant’s answer in the help request', () => {
   it('leaves the student’s message as written', () => {
     wrap(<HelpRequestDetailCard request={request(ANSWER)} />)
     expect(screen.getByText('Wie kürze ich 18/24?')).toBeInTheDocument()
-  })
-})
-
-describe('the start of the answer in the preparation summary', () => {
-  it('draws whole emphasis and formulas', async () => {
-    wrap(<TeacherAssistanceSummaryCard summary={summary(ANSWER.replace(/\n/g, ' '))} isLoading={false} isError={false} />)
-    const block = answerBlock()
-    await waitFor(() => expect(block.querySelector('.katex')).not.toBeNull())
-    expect(within(block).getByText('Schritt 1: Was bedeutet Kürzen?').tagName).toBe('STRONG')
-    expect(shownText(block)).not.toMatch(/\*\*|\$|\\frac/)
-  })
-
-  it.each([
-    ['inside bold', '1. **Schritt 1: Was bedeutet Kürzen?** Beim Kürzen teilst du. 2. **Schritt 2: Der grösste gem', 'Schritt 2: Der grösste gem'],
-    ['inside an inline formula', 'Teile Zähler und Nenner durch $\\frac{18}{', 'Teile Zähler und Nenner durch…'],
-    ['inside a block formula', 'Dann gilt: $$\\frac{18 \\div 6}{24', 'Dann gilt:…'],
-    ['inside italic', 'Beim Kürzen bleibt der Wert gleich. *Hinweis: Teile immer durch', 'Hinweis: Teile immer durch'],
-  ])('shows no half mark when the cut falls %s', (_, excerpt, shown) => {
-    wrap(<TeacherAssistanceSummaryCard summary={summary(excerpt)} isLoading={false} isError={false} />)
-    const block = answerBlock()
-    expect(block.textContent).toContain(shown)
-    expect(block.textContent).not.toMatch(/\*|\$|\\frac/)
-  })
-
-  it('shows the student’s question as written, marks and all', () => {
-    wrap(<TeacherAssistanceSummaryCard summary={summary('Kürzen heisst teilen.')} isLoading={false} isError={false} />)
-    expect(screen.getByText('Wie kürze ich 18/24? — **dringend**')).toBeInTheDocument()
-  })
-
-  it('still says there is no answer when there is none', () => {
-    wrap(<TeacherAssistanceSummaryCard summary={summary('')} isLoading={false} isError={false} />)
-    expect(within(answerBlock()).getByText('Keine Antwort des Lernassistenten verfügbar.')).toBeInTheDocument()
-  })
-})
-
-describe('settleTruncatedMarkdown', () => {
-  it.each([
-    ['whole pairs and formulas stay', '**a** and $x^2$ and *b*', '**a** and $x^2$ and *b*'],
-    ['an open bold pair loses its mark', '**a** then **b c', '**a** then b c'],
-    ['an open single star loses its mark', '*a* then *b c', '*a* then b c'],
-    ['a product keeps its star', 'so 2 * 3 = 6', 'so 2 * 3 = 6'],
-    ['an open inline formula is dropped', 'teile durch $\\frac{18', 'teile durch…'],
-    ['an open block formula is dropped', 'also $$\\frac{18}{24', 'also…'],
-    ['a formula after a whole one is dropped alone', '$a$ und $b + ', '$a$ und…'],
-    ['a price stays', 'Das Heft kostet $5 und der Stift $2.', 'Das Heft kostet $5 und der Stift $2.'],
-    ['heading marks go', '### Schritt 1 Kürzen ## Schritt 2', 'Schritt 1 Kürzen Schritt 2'],
-    ['nothing stays nothing', '', ''],
-  ])('%s', (_, excerpt, settled) => {
-    expect(settleTruncatedMarkdown(excerpt)).toBe(settled)
   })
 })
