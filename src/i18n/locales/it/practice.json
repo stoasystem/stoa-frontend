@@ -161,6 +161,16 @@
     "missed_one": "sbagliata una volta",
     "missed_many": "sbagliata {{count}} volte",
     "missed_other": "sbagliata {{count}} volte",
+    "reason": {
+      "fresh": "Ancora fresco",
+      "fading": "Un po’ sfocato",
+      "forgetting": "Quasi dimenticato",
+      "forgotten": "Probabilmente dimenticato",
+      "latestWrong": "Sbagliata l’ultima volta",
+      "overdue_one": "in ritardo di un giorno",
+      "overdue_many": "in ritardo di {{count}} giorni",
+      "overdue_other": "in ritardo di {{count}} giorni"
+    },
     "title": "Le domande che tornano"
   },
   "session": {

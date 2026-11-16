@@ -157,6 +157,15 @@
     "loading": "Looking for what is due...",
     "missed_one": "missed once",
     "missed_other": "missed {{count}} times",
+    "reason": {
+      "fresh": "Still fresh",
+      "fading": "Getting fuzzy",
+      "forgetting": "Almost forgotten",
+      "forgotten": "Probably forgotten",
+      "latestWrong": "Wrong last time",
+      "overdue_one": "1 day overdue",
+      "overdue_other": "{{count}} days overdue"
+    },
     "title": "Questions coming back"
   },
   "session": {

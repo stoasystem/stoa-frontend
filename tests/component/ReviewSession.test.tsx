@@ -738,3 +738,63 @@ describe('a right verdict is read once (#453)', () => {
     expect(region).toBeEmptyDOMElement()
   })
 })
+
+describe('why a question is due now (#684)', () => {
+  const reason = (overrides = {}) => ({
+    daysOverdue: 0,
+    retrievability: 0.6,
+    targetRetention: 0.9,
+    latestWrong: false,
+    band: 'forgetting',
+    bandLabel: 'Fast vergessen',
+    ...overrides,
+  })
+
+  function due(items: ReturnType<typeof card>[]) {
+    mockedDue.mockResolvedValue({ items, dueCount: items.length, generatedAt: '2026-03-02T09:00:00+00:00' })
+  }
+
+  const reasonOf = (index: number) =>
+    document.querySelectorAll<HTMLElement>('[data-review-card]')[index].querySelector('[data-review-reason]')
+
+  it('names each band in words, with the days it has waited, and never a percentage', async () => {
+    due([
+      card({ challengeId: 'a', reason: reason({ band: 'fading', daysOverdue: 0 }) }),
+      card({ challengeId: 'b', reason: reason({ band: 'forgetting', daysOverdue: 1 }) }),
+      card({ challengeId: 'c', reason: reason({ band: 'forgotten', daysOverdue: 12, retrievability: 0.31 }) }),
+    ])
+    renderSession()
+    await waitFor(() => expect(document.querySelectorAll('[data-review-card]')).toHaveLength(3))
+
+    expect(reasonOf(0)).toHaveTextContent(/^Getting fuzzy$/)
+    expect(reasonOf(1)).toHaveTextContent(/^Almost forgotten · 1 day overdue$/)
+    expect(reasonOf(2)).toHaveTextContent(/^Probably forgotten · 12 days overdue$/)
+    for (const node of document.querySelectorAll('[data-review-reason]')) {
+      expect(node.textContent).not.toMatch(/%|\d\.\d/)
+    }
+  })
+
+  it('says a fresh card missed last time is back because it was wrong', async () => {
+    due([card({ reason: reason({ band: 'fresh', latestWrong: true, retrievability: 0.99 }) })])
+    renderSession()
+    await waitFor(() => expect(reasonOf(0)).toHaveTextContent(/^Wrong last time$/))
+  })
+
+  it('shows nothing for a card with no reason, or with no band, and still answers it', async () => {
+    due([
+      card({ challengeId: 'old' }),
+      card({ challengeId: 'null', reason: null }),
+      card({ challengeId: 'unanswered', reason: reason({ band: null, bandLabel: null, retrievability: null }) }),
+    ])
+    renderSession()
+    await waitFor(() => expect(document.querySelectorAll('[data-review-card]')).toHaveLength(3))
+    expect(document.querySelector('[data-review-reason]')).toBeNull()
+    expect(screen.getAllByRole('button', { name: 'Check answer' })).toHaveLength(3)
+  })
+
+  it('falls back to the server’s label for a band this build does not know', async () => {
+    due([card({ reason: reason({ band: 'vanished', bandLabel: 'Ganz weg', daysOverdue: 2 }) })])
+    renderSession()
+    await waitFor(() => expect(reasonOf(0)).toHaveTextContent(/^Ganz weg · 2 days overdue$/))
+  })
+})

@@ -421,6 +421,23 @@ export type ReviewCard = ExerciseFigures & {
   dueAt: string
   lapses: number
   reps: number
+  /** Why it is due now (stoa-backend#447); absent on cards from before that. */
+  reason?: ReviewReason | null
+}
+
+/**
+ * `ReviewCard.reason` (stoa-backend#447). The student is shown a band in
+ * words, never `retrievability` as a percentage (decided on #447). `band` is
+ * null for a card with no answer behind it, whose recall cannot be estimated.
+ */
+export type ReviewReason = {
+  daysOverdue: number
+  retrievability: number | null
+  targetRetention: number
+  latestWrong: boolean
+  band: 'fresh' | 'fading' | 'forgetting' | 'forgotten' | null
+  /** The band in the request's language, from the server's own catalog. */
+  bandLabel: string | null
 }
 
 export type ReviewDueResponse = {

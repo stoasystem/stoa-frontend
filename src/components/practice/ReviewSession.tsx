@@ -34,7 +34,7 @@ import { submitChallengeAnswer } from '@/services/practice/practiceApi'
 import { practiceQueryKeys } from '@/services/practice/practiceQueryKeys'
 import { useDueReviewQuery } from '@/hooks/practice/useReviewQueries'
 import { cn } from '@/lib/utils'
-import type { PracticeAnswerResult, ReviewCard } from '@/types/practice'
+import type { PracticeAnswerResult, ReviewCard, ReviewReason } from '@/types/practice'
 
 /** The kinds that are answered by picking from what the card carries. */
 const FROM_OPTIONS = ['multiple_choice', 'ordering']
@@ -191,6 +191,8 @@ function ReviewQuestion({ card, onAnswer }: { card: ReviewCard; onAnswer: () => 
         ) : null}
       </div>
 
+      <ReasonLabel reason={card.reason} />
+
       {card.figure && <ExerciseFigure svg={card.figure} labelledBy={promptId} />}
 
       {unanswerable ? (
@@ -266,5 +268,38 @@ function ReviewQuestion({ card, onAnswer }: { card: ReviewCard; onAnswer: () => 
         <p role="alert" className={cn('m-0 text-[13px]', bodyOnSky)}>{t('review.answerFailed')}</p>
       ) : null}
     </article>
+  )
+}
+
+const BANDS = ['fresh', 'fading', 'forgetting', 'forgotten'] as const
+
+/**
+ * Why the question is back now (#684, from stoa-backend#447): how well it is
+ * likely still remembered, in words, and how many days it has waited. Never
+ * the chance of recall as a percentage: a child cannot act on "62 %".
+ *
+ * A miss comes back the next day while its recall is still high, so "still
+ * fresh" would not say why it is here; that card says it was wrong last time
+ * instead. A card from before the server sent a reason, or one with no answer
+ * behind it (`band` null), shows nothing. A band this build does not know
+ * falls back to the server's own label, which it sends in the request's
+ * language.
+ */
+function ReasonLabel({ reason }: { reason?: ReviewReason | null }) {
+  const { t } = useTranslation('practice')
+  if (!reason?.band) return null
+  const known = (BANDS as readonly string[]).includes(reason.band)
+  const label =
+    reason.latestWrong && reason.band === 'fresh'
+      ? t('review.reason.latestWrong')
+      : known
+        ? t(`review.reason.${reason.band}`)
+        : reason.bandLabel
+  if (!label) return null
+  const overdue = Math.floor(reason.daysOverdue ?? 0)
+  return (
+    <p data-review-reason={reason.band} className={cn('m-0 -mt-2 text-[13px]', bodyOnSky)}>
+      {overdue > 0 ? `${label} · ${t('review.reason.overdue', { count: overdue })}` : label}
+    </p>
   )
 }
