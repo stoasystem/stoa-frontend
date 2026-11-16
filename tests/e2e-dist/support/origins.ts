@@ -9,6 +9,8 @@ import path from 'node:path'
  */
 export const WEB_ORIGIN = 'https://app.stoa-e2e.test'
 export const API_ORIGIN = 'https://api.stoa-e2e.test'
+/** The classroom's shared whiteboard (#696), framed from its own host. */
+export const BOARD_ORIGIN = 'https://board.stoa-e2e.test'
 
 /** The backend's contract, owned and kept current by the backend (stoasystem/stoa-backend#80). */
 export const OPENAPI_URL = 'https://raw.githubusercontent.com/stoasystem/stoa-backend/main/docs/api/openapi.json'

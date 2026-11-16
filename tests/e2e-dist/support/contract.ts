@@ -109,6 +109,14 @@ export class Contract {
     // pass, say -- has its `{ code, message, correlationId }` there instead,
     // which the document does not declare; it is held to the envelope too.
     if (status === 422 && isRefusal(body)) return this.check('error envelope', ERROR_ENVELOPE, body)
+    // Any other error status is what the operation's `default` response says,
+    // where it declares one: the backend's rule violation (#211), e.g. the
+    // classroom's 503 `classroom_unavailable` (stoa-backend#467).
+    const fallback = !response && status >= 400 ? op.operation.responses?.default : undefined
+    if (fallback) {
+      const schema = fallback.content?.['application/json']?.schema
+      return schema === undefined ? null : this.check(`${op.method} ${op.template} default`, schema, body)
+    }
     if (!response) return `answers ${status}, which the operation does not declare`
     const schema = response.content?.['application/json']?.schema
     if (schema === undefined) return body === undefined ? null : `answers ${status} with a body the operation does not declare`
