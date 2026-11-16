@@ -24,7 +24,8 @@
  *   a blob URL; its `csp` build is the one that needs no `unsafe-eval`.
  * - frame-ancestors 'none': nobody frames the app.
  * - frame-src: the virtual classroom's shared whiteboard (#696, WBO), framed
- *   from its own host; nothing else is framed.
+ *   from its host (for now any Cloudflare quick-tunnel host, see
+ *   PRODUCTION_SOURCES); nothing else is framed.
  * - Daily, the classroom's voice (#696): its call object loads its bundle by a
  *   <script> (`avoidEval`, so no 'unsafe-eval') and talks to Daily over HTTPS
  *   and WebSockets, from `*.daily.co` and the fallback domains Daily's CSP
@@ -61,9 +62,13 @@ export const PRODUCTION_SOURCES = Object.freeze({
   // StoaStorageStack's images bucket, `stoa-images-<account>`, at the regional
   // host the backend signs part URLs for (virtual-hosted, eu-central-2).
   uploadOrigin: 'https://stoa-images-562923011260.s3.eu-central-2.amazonaws.com',
-  // The WBO board behind a named Cloudflare tunnel (#696, stoa-backend#467's
-  // WBO_BASE_URL); its address is fixed so the policy can name it.
-  whiteboardOrigin: 'https://board.stoaedu.ch',
+  // The WBO board (#696, stoa-backend#467's WBO_BASE_URL), for the demo
+  // phase behind a Cloudflare quick tunnel: its address is a random
+  // `*.trycloudflare.com` host that changes whenever the tunnel restarts, so
+  // the policy names the domain, not the host. This only widens what the app
+  // may frame; the board it frames is still the URL the backend returns. Pin
+  // it to a fixed host again once the board has one (a named tunnel or AWS).
+  whiteboardOrigin: 'https://*.trycloudflare.com',
 })
 
 /**
