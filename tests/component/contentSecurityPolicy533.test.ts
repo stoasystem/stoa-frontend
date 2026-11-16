@@ -10,17 +10,25 @@
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import path from 'node:path'
 import { describe, expect, it } from 'vitest'
-import { contentSecurityPolicy, PRODUCTION_SOURCES } from '../../scripts/content-security-policy.mjs'
+import {
+  contentSecurityPolicy,
+  DAILY_CONNECT_SOURCES,
+  DAILY_SCRIPT_SOURCES,
+  PRODUCTION_SOURCES,
+} from '../../scripts/content-security-policy.mjs'
 
 const repoRoot = path.resolve(__dirname, '../..')
 
 const PRODUCTION_POLICY = [
   "default-src 'self'",
-  "script-src 'self'",
+  "script-src 'self' https://*.daily.co https://*.dailywebrtc.com https://*.dailywebrtc.net",
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob:",
   "font-src 'self' data:",
-  "connect-src 'self' https://api.stoaedu.ch wss://api.stoaedu.ch https://stoa-images-562923011260.s3.eu-central-2.amazonaws.com",
+  "connect-src 'self' https://api.stoaedu.ch wss://api.stoaedu.ch https://stoa-images-562923011260.s3.eu-central-2.amazonaws.com" +
+    ' https://*.daily.co https://*.dailywebrtc.com https://*.dailywebrtc.net https://prod-ks.pluot.blue' +
+    ' wss://*.daily.co wss://*.dailywebrtc.com wss://*.dailywebrtc.net',
+  'frame-src https://board.stoaedu.ch',
   "worker-src 'self' blob:",
   "object-src 'none'",
   "base-uri 'self'",
@@ -45,19 +53,28 @@ describe('the content security policy', () => {
     const policy = contentSecurityPolicy({
       apiOrigin: 'https://api.example.test/',
       uploadOrigin: 'https://bucket.example.test/some/path?x=1',
+      whiteboardOrigin: 'https://board.example.test/boards/x?token=t',
     })
     expect(policy).toContain(
-      "connect-src 'self' https://api.example.test wss://api.example.test https://bucket.example.test;",
+      `connect-src 'self' https://api.example.test wss://api.example.test https://bucket.example.test ${DAILY_CONNECT_SOURCES.join(' ')};`,
     )
+    // The board's host only: no path, and never its token.
+    expect(policy).toContain('frame-src https://board.example.test;')
   })
 
-  it('lets no script run but the app’s own files: no inline script, no eval', () => {
+  it('lets no script run but the app’s own files and Daily’s call bundle: no inline script, no eval', () => {
     const directives = PRODUCTION_POLICY.split('; ')
     expect(PRODUCTION_POLICY).not.toContain("'unsafe-eval'")
+    expect(PRODUCTION_POLICY).not.toContain("'wasm-unsafe-eval'")
     expect(directives.filter((directive) => directive.includes("'unsafe-inline'"))).toEqual([
       "style-src 'self' 'unsafe-inline'",
     ])
-    expect(directives.find((directive) => directive.startsWith('script-src'))).toBe("script-src 'self'")
+    expect(directives.find((directive) => directive.startsWith('script-src'))).toBe(
+      ["script-src 'self'", ...DAILY_SCRIPT_SOURCES].join(' '),
+    )
+    // Daily's bundle comes by a <script> only because the voice asks for it so (#696).
+    const voice = readFileSync(path.join(repoRoot, 'src/features/classroom/classroomVoice.ts'), 'utf8')
+    expect(voice).toContain('avoidEval: true')
     const page = readFileSync(path.join(repoRoot, 'index.html'), 'utf8')
     const inline = [...page.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/g)].filter(
       ([, attributes, body]) => !/\bsrc=/.test(attributes) || body.trim() !== '',

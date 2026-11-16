@@ -50,7 +50,8 @@ test('control: the content security policy is enforced, and a violation is caugh
   })()`)
   expect(ran).toBe(false)
   await expect.poll(() => backend.problems).toEqual([
-    expect.stringMatching(/^CSP: Executing inline script violates the following Content Security Policy directive 'script-src 'self''/),
+    // `script-src 'self'` and Daily's call bundle (#696): still no inline script, no eval.
+    expect.stringMatching(/^CSP: Executing inline script violates the following Content Security Policy directive 'script-src 'self'[^']*'/),
   ])
   // Caught as it should be; cleared so the fixture's own check passes.
   backend.problems.length = 0

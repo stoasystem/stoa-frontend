@@ -192,6 +192,7 @@ const only = (...roles: UserRole[]): RouteAccess => ({ kind: 'roles', roles })
 const STUDENT = only('student')
 const PARENT = only('parent')
 const TEACHER = only('teacher')
+const CLASSROOM = only('student', 'teacher')
 const ADMIN = only('admin')
 const ORGANIZATION = only('admin', 'organization_admin', 'school_teacher', 'school_viewer')
 const ME_ACCESS = only('student', 'admin', 'organization_admin', 'school_teacher', 'school_viewer')
@@ -263,6 +264,7 @@ const OrganizationHomePage = lazyPage('OrganizationHomePage', () => import('@/pa
 const TeacherDashboardPage = lazyPage('TeacherDashboardPage', () => import('@/pages/teacher/TeacherDashboardPage'))
 const TeacherAvailabilityPage = lazyPage('TeacherAvailabilityPage', () => import('@/pages/teacher/TeacherAvailabilityPage'))
 const TeacherProfilePage = lazyPage('TeacherProfilePage', () => import('@/pages/teacher/TeacherProfilePage'))
+const ClassroomPage = lazyPage('ClassroomPage', () => import('@/pages/classroom/ClassroomPage'))
 const TeacherHelpRequestDetailPage = lazyPage('TeacherHelpRequestDetailPage', () => import('@/pages/teacher/TeacherHelpRequestDetailPage'))
 
 const AdminDashboardPage = lazyPage('AdminDashboardPage', () => import('@/pages/admin/Dashboard'))
@@ -310,6 +312,8 @@ const VirtualCheckoutPage = lazyPage('VirtualCheckoutPage', () => import('@/page
  * product documents, the backend and the infrastructure all turned out to carry
  * no classroom at all, so there was nothing left to bring back. Old student
  * `/classroom*` links still redirect to `/` (#13). The code is in git history.
+ * The virtual classroom of #696 is new, and backed by stoa-backend#467: one
+ * help request's whiteboard and voice, at `/classroom/:conversationId` only.
  */
 
 export const pageRoutes: readonly PageRoute[] = [
@@ -442,6 +446,8 @@ export const pageRoutes: readonly PageRoute[] = [
   { path: '/teacher/learning-automation', access: TEACHER, page: LearningAutomationConsolePage, titleKey: 'routes.learningAutomation.title', meta: { module: 'Teacher', status: 'core', purpose: 'Teacher learning automation.' } },
   // No `nav`: the profile is the avatar menu's Profile (#13 point 6, #46).
   { path: '/teacher/profile', access: TEACHER, page: TeacherProfilePage, titleKey: 'routes.teacherProfile.title', meta: { module: 'Teacher', status: 'core', purpose: 'Teacher profile, contact, verification, and payout settlement details.' } },
+  // Student and teacher alike (#696): the student of the conversation, or the teacher who holds its request.
+  { path: '/classroom/:conversationId', access: CLASSROOM, page: ClassroomPage, titleKey: 'routes.classroom.title', meta: { module: 'Classroom', status: 'core', purpose: 'The virtual classroom of one help request: whiteboard, voice and the conversation beside it.' } },
   { path: '/teacher/requests/:requestId', access: TEACHER, page: TeacherHelpRequestDetailPage, titleKey: 'routes.helpRequest.title', meta: { module: 'Teacher', status: 'core', purpose: 'Teacher request detail and status update.' } },
 
   // ---- admin -------------------------------------------------------------
@@ -547,6 +553,19 @@ export function usagePeriodPathFor(userId: unknown): string {
 export function teacherRequestPathFor(requestId: unknown): string {
   const id = typeof requestId === 'string' ? requestId.trim() : ''
   return CONVERSATION_ID.test(id) ? `/teacher/requests/${id}` : '/teacher'
+}
+
+/**
+ * The virtual classroom of a conversation's help request (#696),
+ * `/classroom/<conversationId>`; a teacher's also names the request they hold,
+ * `?request=<requestId>`, which their seat is asked for by. Home when the
+ * conversation id is not one; the request is left out when it is not one.
+ */
+export function classroomPathFor(conversationId: unknown, requestId?: unknown): string {
+  const id = typeof conversationId === 'string' ? conversationId.trim() : ''
+  if (!CONVERSATION_ID.test(id)) return '/'
+  const request = typeof requestId === 'string' ? requestId.trim() : ''
+  return CONVERSATION_ID.test(request) ? `/classroom/${id}?request=${encodeURIComponent(request)}` : `/classroom/${id}`
 }
 
 /*

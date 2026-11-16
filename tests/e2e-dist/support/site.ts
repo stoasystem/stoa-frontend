@@ -3,7 +3,7 @@ import path from 'node:path'
 import type { Page } from '@playwright/test'
 import { contentSecurityPolicy } from '../../../scripts/content-security-policy.mjs'
 import { contentTypeFor } from '../../../scripts/publish-web-release.mjs'
-import { API_ORIGIN, WEB_ORIGIN, workDir } from './origins'
+import { API_ORIGIN, BOARD_ORIGIN, WEB_ORIGIN, workDir } from './origins'
 import { S3_ORIGIN } from './uploads'
 
 const repoRoot = path.resolve(import.meta.dirname, '../../..')
@@ -48,7 +48,11 @@ export async function serveSite(page: Page, problems: string[]) {
 }
 
 /** The policy production is served with, for this suite's hosts. */
-export const POLICY = contentSecurityPolicy({ apiOrigin: API_ORIGIN, uploadOrigin: S3_ORIGIN })
+export const POLICY = contentSecurityPolicy({
+  apiOrigin: API_ORIGIN,
+  uploadOrigin: S3_ORIGIN,
+  whiteboardOrigin: BOARD_ORIGIN,
+})
 
 async function isFile(file: string) {
   try {

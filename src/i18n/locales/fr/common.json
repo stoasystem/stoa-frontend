@@ -372,6 +372,9 @@
     },
     "unsubscribe": {
       "title": "Notifications par e-mail"
+    },
+    "classroom": {
+      "title": "Classe"
     }
   },
   "state": {

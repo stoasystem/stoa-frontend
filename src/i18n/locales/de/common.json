@@ -372,6 +372,9 @@
     },
     "unsubscribe": {
       "title": "E-Mail-Benachrichtigungen"
+    },
+    "classroom": {
+      "title": "Klassenzimmer"
     }
   },
   "state": {

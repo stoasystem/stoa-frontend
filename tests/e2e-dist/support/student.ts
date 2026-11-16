@@ -339,6 +339,19 @@ export class StudentWorld {
       status: 404,
       body: { detail: 'This conversation was never escalated to a teacher' },
     }))
+    // The virtual classroom (#696, stoa-backend#467) as the backend answers it
+    // until its whiteboard and voice are configured: Ask stays where it was.
+    b.on('POST', '/conversations/{conv_id}/classroom', () => ({
+      status: 503,
+      body: {
+        detail: {
+          code: 'classroom_unavailable',
+          message: 'The classroom is not available right now.',
+          correlationId: 'e2e-correlation',
+          action: 'retry_later',
+        },
+      },
+    }))
     // What the backend answers for a student with no evidence yet (stoasystem/stoa-backend#81):
     // every supported subject, whatever subject is asked about, all counts at zero.
     b.on('GET', '/adaptive/students/me/memory', () => ({

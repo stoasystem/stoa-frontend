@@ -39,6 +39,10 @@ const LATER_PAGES_ONLY = [
   'uqr/',
   // Cleans an exercise's figure (#504): the practice stage and the review only.
   'dompurify/',
+  // The virtual classroom's panels and voice (#696): its page only; the voice
+  // is imported when it joins a room.
+  'react-resizable-panels/',
+  '@daily-co/daily-js/',
 ]
 
 /** A slash-separated module id's path below the outermost node_modules/. */

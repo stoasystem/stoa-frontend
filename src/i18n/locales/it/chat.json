@@ -279,5 +279,56 @@
       "skip": "Salta",
       "done": "Ho capito"
     }
+  },
+  "classroom": {
+    "status": {
+      "waiting": "Stiamo cercando un insegnante per te…",
+      "coming": "{{name}} sta arrivando",
+      "joined": "{{name}} è entrato in classe",
+      "teaching": "Stai aiutando {{name}}",
+      "ended": "Questa richiesta di aiuto è conclusa"
+    },
+    "voice": {
+      "connecting": "Connessione audio…",
+      "alone": "Audio attivo · in attesa dell’altra persona",
+      "inRoom": "{{name}} è in chiamata",
+      "speaking": "{{name}} sta parlando",
+      "micDenied": "Microfono bloccato: consentilo nella barra degli indirizzi e ricarica. Puoi comunque ascoltare.",
+      "failed": "L’audio non si è collegato. Lavagna e chat funzionano comunque."
+    },
+    "mic": {
+      "mute": "Spegni il microfono",
+      "unmute": "Accendi il microfono"
+    },
+    "sidebar": {
+      "hide": "Nascondi il pannello",
+      "show": "Mostra il pannello",
+      "resize": "Ridimensiona il pannello"
+    },
+    "board": {
+      "title": "Lavagna",
+      "loading": "Caricamento della lavagna…",
+      "failedTitle": "La lavagna non si è caricata",
+      "failedBody": "Aprila in una nuova scheda o torna alla conversazione.",
+      "openInTab": "Apri la lavagna in una nuova scheda"
+    },
+    "leave": "Esci dalla classe",
+    "entering": "Ingresso in classe…",
+    "unavailable": {
+      "title": "La classe non è disponibile al momento",
+      "body": "Puoi continuare nella conversazione come sempre.",
+      "back": "Torna alla conversazione"
+    },
+    "refused": {
+      "title": "Questa classe è chiusa",
+      "body": "La richiesta di aiuto è conclusa o non è più tua. La conversazione resta disponibile."
+    },
+    "teacherSidebar": {
+      "label": "Conversazione dello studente",
+      "conversation": "Conversazione IA",
+      "replies": "Risposte",
+      "readOnly": "La conversazione dello studente con l’assistente, in sola lettura.",
+      "empty": "Ancora nessun messaggio."
+    }
   }
 }

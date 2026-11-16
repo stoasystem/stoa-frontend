@@ -279,5 +279,56 @@
       "skip": "Passer",
       "done": "Compris"
     }
+  },
+  "classroom": {
+    "status": {
+      "waiting": "On cherche un·e enseignant·e pour toi…",
+      "coming": "{{name}} arrive",
+      "joined": "{{name}} a rejoint la classe",
+      "teaching": "Tu aides {{name}}",
+      "ended": "Cette demande d’aide est terminée"
+    },
+    "voice": {
+      "connecting": "Connexion audio…",
+      "alone": "Audio activé · en attente de l’autre personne",
+      "inRoom": "{{name}} est en ligne",
+      "speaking": "{{name}} parle",
+      "micDenied": "Micro bloqué : autorise-le dans la barre d’adresse, puis recharge. Tu peux quand même écouter.",
+      "failed": "L’audio ne s’est pas connecté. Le tableau et le chat fonctionnent toujours."
+    },
+    "mic": {
+      "mute": "Couper le micro",
+      "unmute": "Activer le micro"
+    },
+    "sidebar": {
+      "hide": "Masquer le panneau",
+      "show": "Afficher le panneau",
+      "resize": "Redimensionner le panneau"
+    },
+    "board": {
+      "title": "Tableau blanc",
+      "loading": "Chargement du tableau blanc…",
+      "failedTitle": "Le tableau blanc ne s’est pas chargé",
+      "failedBody": "Ouvre-le dans un nouvel onglet ou reviens à la conversation.",
+      "openInTab": "Ouvrir le tableau blanc dans un nouvel onglet"
+    },
+    "leave": "Quitter la classe",
+    "entering": "Entrée dans la classe…",
+    "unavailable": {
+      "title": "La classe n’est pas disponible pour le moment",
+      "body": "Tu peux continuer dans la conversation comme d’habitude.",
+      "back": "Retour à la conversation"
+    },
+    "refused": {
+      "title": "Cette classe est fermée",
+      "body": "La demande d’aide est terminée ou ne t’est plus attribuée. La conversation reste disponible."
+    },
+    "teacherSidebar": {
+      "label": "Conversation de l’élève",
+      "conversation": "Conversation IA",
+      "replies": "Réponses",
+      "readOnly": "La conversation de l’élève avec l’assistant, en lecture seule.",
+      "empty": "Pas encore de messages."
+    }
   }
 }
