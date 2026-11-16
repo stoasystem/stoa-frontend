@@ -153,7 +153,8 @@ describe('the teacher request page', () => {
   it.each(Object.entries(TEACHER))('%s carries the assistance card copy', (language, bundle) => {
     const assistance = (bundle as unknown as { assistance?: Record<string, string> }).assistance
 
-    for (const key of ['title', 'description', 'sources_one', 'sources_other', 'studentContext', 'suggestedFocus']) {
+    // Since #704 the card holds the student's name and first question, nothing generated.
+    for (const key of ['title', 'student', 'question', 'noQuestion']) {
       expect(typeof assistance?.[key], `${language}.assistance.${key}`).toBe('string')
     }
   })
@@ -166,27 +167,13 @@ describe('the teacher request page', () => {
     }
   })
 
-  it('counts one source as one source', async () => {
-    // "1 sources" was the badge in every language, because the count was
-    // interpolated into a fixed English plural.
-    for (const language of ['de', 'en', 'fr', 'it']) {
-      await i18n.changeLanguage(language)
-      const one = i18n.t('teacher:assistance.sources', { count: 1 })
-      const many = i18n.t('teacher:assistance.sources', { count: 4 })
-
-      expect(one, language).toContain('1')
-      expect(one, language).not.toBe(many.replace('4', '1'))
-    }
-    await i18n.changeLanguage('en')
-  })
-
-  it('leaves the summary bodies to the backend', () => {
-    // `studentContextSummary` and `suggestedFocus` are written by
-    // teacher_assistance_service.py. The card must not try to translate them.
+  it('has no generated summary bodies left to translate', () => {
+    // `studentContextSummary` and `suggestedFocus` were written by
+    // teacher_assistance_service.py; the card no longer asks for them (#704).
     const card = source('components/teacher/TeacherAssistanceSummaryCard.tsx')
 
-    expect(card).toContain('{summary.studentContextSummary}')
-    expect(card).toContain('{summary.suggestedFocus}')
+    expect(card).not.toContain('studentContextSummary')
+    expect(card).not.toContain('suggestedFocus')
     expect(card).not.toContain('Teacher assistance seed')
   })
 

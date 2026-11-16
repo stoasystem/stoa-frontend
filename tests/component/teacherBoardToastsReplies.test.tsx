@@ -12,14 +12,6 @@ import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { toast } from 'sonner'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { TeacherStatsCards } from '@/components/teacher/TeacherStatsCards'
-import {
-  useAcceptAiTeacherDraftMutation,
-  useArchiveAiTeacherDraftMutation,
-  useCreateAiTeacherExerciseDraftMutation,
-  useCreateAiTeacherSummaryDraftMutation,
-  useRegenerateAiTeacherDraftMutation,
-  useRejectAiTeacherDraftMutation,
-} from '@/hooks/teacher/useAiTeacherDraftMutations'
 import { useTeacherStatsQuery } from '@/hooks/teacher/useTeacherStatsQuery'
 import { useUpdateTeacherWeeklyAvailabilityMutation } from '@/hooks/teacher/useUpdateTeacherWeeklyAvailabilityMutation'
 import i18n from '@/i18n'
@@ -45,13 +37,6 @@ vi.mock('@/services/teacher/teacherApi', async (orig) => ({
   getTeacherHelpRequestDetail: vi.fn(),
   updateTeacherHelpRequestStatus: vi.fn(),
   addTeacherHelpRequestNote: vi.fn(),
-  getTeacherAssistanceSummary: vi.fn(() => new Promise(() => {})),
-  createAiTeacherSummaryDraft: vi.fn(),
-  createAiTeacherExerciseDraft: vi.fn(),
-  regenerateAiTeacherDraft: vi.fn(),
-  acceptAiTeacherDraft: vi.fn(),
-  rejectAiTeacherDraft: vi.fn(),
-  archiveAiTeacherDraft: vi.fn(),
 }))
 vi.mock('@/services/teacher/teacherAvailabilityApi', () => ({
   getTeacherWeeklyAvailability: vi.fn(),
@@ -192,25 +177,6 @@ describe('other teacher toasts', () => {
     await waitFor(() => expect(toast.success).toHaveBeenCalledWith('Ihre Verfügbarkeit wurde gespeichert.'))
   })
 
-  const draft = { draftId: 'd1', questionId: 'q1', studentId: 's1', previousDraftId: 'd0', status: 'accepted' }
-
-  it.each([
-    [useCreateAiTeacherSummaryDraftMutation, teacherApi.createAiTeacherSummaryDraft, 'Zusammenfassungsentwurf erstellt.', 'Der Zusammenfassungsentwurf konnte nicht erstellt werden.'],
-    [useCreateAiTeacherExerciseDraftMutation, teacherApi.createAiTeacherExerciseDraft, 'Übungsentwurf erstellt.', 'Der Übungsentwurf konnte nicht erstellt werden.'],
-    [useRegenerateAiTeacherDraftMutation, teacherApi.regenerateAiTeacherDraft, 'Entwurf neu erstellt.', 'Der Entwurf konnte nicht neu erstellt werden.'],
-    [useAcceptAiTeacherDraftMutation, teacherApi.acceptAiTeacherDraft, 'Entwurf angenommen.', 'Der Entwurf konnte nicht angenommen werden.'],
-    [useRejectAiTeacherDraftMutation, teacherApi.rejectAiTeacherDraft, 'Entwurf abgelehnt.', 'Der Entwurf konnte nicht abgelehnt werden.'],
-    [useArchiveAiTeacherDraftMutation, teacherApi.archiveAiTeacherDraft, 'Entwurf archiviert.', 'Der Entwurf konnte nicht archiviert werden.'],
-  ] as const)('AI draft toast %#: success and failure in German', async (useHook, api, success, failure) => {
-    vi.mocked(api).mockResolvedValueOnce(draft as never).mockRejectedValueOnce(new ApiError('boom', { status: 500 }))
-    const { result } = renderHook(() => useHook(), { wrapper: wrapper(client()) })
-    const mutate = result.current.mutate as (variables: unknown) => void
-    mutate({})
-    await waitFor(() => expect(toast.success).toHaveBeenCalledWith(success))
-    mutate({})
-    await waitFor(() => expect(toast.error).toHaveBeenCalledWith(failure))
-  })
-
   it('has every toast in all four languages, German in Sie', () => {
     const flatten = (value: unknown, prefix = ''): Record<string, string> =>
       Object.entries(value as Record<string, unknown>).reduce<Record<string, string>>((all, [key, entry]) => (
@@ -239,10 +205,13 @@ describe('the teacher reply on the request page', () => {
       notes: [{ id: 'n1', note: reply, createdAt: at, teacher: { id: 't1', name: 'Frau Muster' }, richContent: null }],
     }))
     renderDetail()
-    expect(await screen.findByText('Wie geht das?')).toBeInTheDocument()
+    // The question is also quoted in the preparation summary (#704); the message is the other one.
+    const [studentMessage] = (await screen.findAllByText('Wie geht das?'))
+      .filter((element) => !element.closest('[data-preparation-summary]'))
+    expect(studentMessage).toBeInTheDocument()
     expect(screen.getAllByText(reply)).toHaveLength(1)
     // The student's message keeps its own report button; nothing else has one.
-    const studentCard = screen.getByText('Wie geht das?').parentElement as HTMLElement
+    const studentCard = studentMessage.parentElement as HTMLElement
     expect(within(studentCard).getByRole('button', { name: 'Beitrag der lernenden Person melden' })).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Inhalt melden' })).toBeNull()
   })

@@ -5,18 +5,17 @@
  *      keeps the reply composer, and the draft in it, on screen. The draft
  *      also outlives the composer itself.
  * T2 - a refused request is neither polled nor retried.
- * T6 - the AI tools follow the same rule and the request's status, and the
- *      exercise count is clamped when the field is left, not while typing.
+ * T6 - the AI tools it covered are gone from the page since #704
+ *      (teacherPrepSummary704.test.tsx).
  */
 import { QueryClient, QueryClientProvider, focusManager } from '@tanstack/react-query'
-import { act, fireEvent, render, renderHook, screen, waitFor } from '@testing-library/react'
+import { act, render, renderHook, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import type { ReactNode } from 'react'
 import { I18nextProvider } from 'react-i18next'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { queryClient as appQueryClient } from '@/app/query/queryClient'
-import { AiTeacherToolsPanel } from '@/components/teacher/AiTeacherToolsPanel'
 import { TeacherReplyComposer } from '@/features/teacherReply/TeacherReplyComposer'
 import type { TeacherReplyAdapter } from '@/features/teacherReply/teacherReplyAdapter'
 import { useTeacherReply } from '@/features/teacherReply/useTeacherReply'
@@ -41,9 +40,6 @@ vi.mock('@/services/teacher/teacherApi', async (orig) => ({
   getTeacherHelpRequestDetail: vi.fn(),
   updateTeacherHelpRequestStatus: vi.fn(),
   addTeacherHelpRequestNote: vi.fn(),
-  getTeacherAssistanceSummary: vi.fn(() => new Promise(() => {})),
-  createAiTeacherSummaryDraft: vi.fn(() => new Promise(() => {})),
-  createAiTeacherExerciseDraft: vi.fn(() => new Promise(() => {})),
 }))
 vi.mock('@/hooks/practice/useCurriculumCatalogQuery', () => ({
   useCurriculumCatalogQuery: () => ({ data: undefined, isLoading: false, isError: false }),
@@ -56,10 +52,6 @@ const REPLY = 'Antwort der Lehrperson'
 const SEND = 'Antwort senden'
 const TAKE = 'Prüfung starten'
 const PAUSED = de.detail.replyPaused
-const NOT_APPLICABLE = de.aiTools.notApplicable
-const SUMMARY = de.aiTools.summary.generateLabel
-const EXERCISE = de.aiTools.exercise.generateLabel
-const COUNT = de.aiTools.exercise.items
 const DETAIL_KEY = teacherQueryKeys.helpRequestDetail('r1')
 
 function detail(status: TeacherHelpStatus) {
@@ -109,7 +101,6 @@ describe('T1: a read that fails while the teacher writes a reply', () => {
     expect(reply).toBeDisabled()
     expect(screen.getByRole('button', { name: SEND })).toBeDisabled()
     expect(screen.getByRole('button', { name: TAKE })).toBeDisabled()
-    expect(screen.getByRole('button', { name: SUMMARY })).toBeDisabled()
 
     // The next read succeeds: everything is offered again, the draft intact.
     mockedDetail.mockResolvedValue(detail('pending'))
@@ -249,85 +240,17 @@ describe('T2: a request out of reach is not asked for again', () => {
   })
 })
 
-describe('T6: the AI tools', () => {
-  function renderPanel(status: TeacherHelpStatus, canAct: boolean) {
-    const client = new QueryClient()
-    render(
-      <I18nextProvider i18n={i18n}>
-        <QueryClientProvider client={client}>
-          <AiTeacherToolsPanel request={{ ...(detail(status) as object), status } as never} canAct={canAct} />
-        </QueryClientProvider>
-      </I18nextProvider>,
-    )
-  }
-
-  it.each(['pending', 'assigned', 'in_progress', 'resolved'] as const)('generate drafts on a request that is %s', (status) => {
-    renderPanel(status, true)
-    expect(screen.getByRole('button', { name: SUMMARY })).toBeEnabled()
-    expect(screen.getByRole('button', { name: EXERCISE })).toBeEnabled()
-    expect(screen.queryByText(NOT_APPLICABLE)).toBeNull()
-  })
-
-  it.each(['withdrawn', 'expired', 'cancelled'] as const)('generate nothing on a request that is %s', (status) => {
-    renderPanel(status, true)
-    expect(screen.getByRole('button', { name: SUMMARY })).toBeDisabled()
-    expect(screen.getByRole('button', { name: EXERCISE })).toBeDisabled()
-    expect(screen.getByText(NOT_APPLICABLE)).toBeInTheDocument()
-  })
-
-  it('generate nothing when the page cannot act on the request', () => {
-    renderPanel('in_progress', false)
-    expect(screen.getByRole('button', { name: SUMMARY })).toBeDisabled()
-    expect(screen.getByRole('button', { name: EXERCISE })).toBeDisabled()
-    expect(screen.getByText(NOT_APPLICABLE)).toBeInTheDocument()
-  })
-
-  it('are refused on the page once the read is refused', async () => {
-    mockedDetail.mockResolvedValueOnce(detail('pending'))
-    const { poll } = renderDetail()
-    expect(await screen.findByRole('button', { name: SUMMARY })).toBeEnabled()
-
-    mockedDetail.mockRejectedValue(new ApiError('taken', { status: 403 }))
-    await poll()
-    await waitFor(() => expect(screen.getByRole('button', { name: SUMMARY })).toBeDisabled())
-  })
-
-  it('clamp the exercise count when the field is left, not while typing', async () => {
-    renderPanel('in_progress', true)
-    const count = screen.getByLabelText(COUNT)
-    await userEvent.clear(count)
-    expect(count).toHaveValue(null)
-    await userEvent.type(count, '9')
-    expect(count).toHaveValue(9)
-
-    fireEvent.blur(count)
-    expect(count).toHaveValue(5)
-  })
-
-  it('send the clamped count', async () => {
-    renderPanel('in_progress', true)
-    const count = screen.getByLabelText(COUNT)
-    await userEvent.clear(count)
-    await userEvent.type(count, '0')
-    await userEvent.click(screen.getByRole('button', { name: EXERCISE }))
-    expect(vi.mocked(teacherApi.createAiTeacherExerciseDraft).mock.calls[0]?.[0]).toMatchObject({ exerciseCount: 1 })
-  })
-})
-
 describe('the new copy', () => {
   it('is in all four languages, teachers addressed as Sie and vous, Italian informal', () => {
     for (const [language, bundle] of Object.entries({ de, en, fr, it: italian })) {
       expect(bundle.detail.replyPaused, language).toBeTruthy()
-      expect(bundle.aiTools.notApplicable, language).toBeTruthy()
     }
-    for (const text of [de.detail.replyPaused, de.aiTools.notApplicable]) {
+    for (const text of [de.detail.replyPaused]) {
       expect(text).toMatch(/\b(Sie|Ihr)\b/)
       expect(text).not.toMatch(/\b(du|dich|dein)\b/i)
       expect(text).not.toContain('ß')
     }
     expect(fr.detail.replyPaused).toMatch(/\bvous\b|\bVotre\b/)
-    expect(fr.aiTools.notApplicable).toMatch(/\bVous\b/)
     expect(italian.detail.replyPaused).toMatch(/\btua\b/)
-    expect(italian.aiTools.notApplicable).toMatch(/\bpuoi\b/)
   })
 })

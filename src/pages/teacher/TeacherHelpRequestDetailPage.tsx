@@ -13,14 +13,12 @@ import { PracticeRequestContextCard } from '@/components/teacher/PracticeRequest
 import { TeacherDashboardSkeleton } from '@/components/teacher/TeacherDashboardSkeleton'
 import { TeacherRequestTimeline } from '@/components/teacher/TeacherRequestTimeline'
 import { TeacherAssistanceSummaryCard } from '@/components/teacher/TeacherAssistanceSummaryCard'
-import { AiTeacherToolsPanel } from '@/components/teacher/AiTeacherToolsPanel'
 import { CurriculumRolloutPanel } from '@/components/practice/CurriculumRolloutPanel'
 import { Button } from '@/components/ui/button'
 import { TeacherReplyComposer } from '@/features/teacherReply/TeacherReplyComposer'
 import { useTeacherReply } from '@/features/teacherReply/useTeacherReply'
 import { useCurriculumCatalogQuery } from '@/hooks/practice/useCurriculumCatalogQuery'
 import { useTeacherHelpRequestDetailQuery } from '@/hooks/teacher/useTeacherHelpRequestDetailQuery'
-import { useTeacherAssistanceSummaryQuery } from '@/hooks/teacher/useTeacherAssistanceSummaryQuery'
 import { useUpdateTeacherHelpRequestMutation } from '@/hooks/teacher/useUpdateTeacherHelpRequestMutation'
 import { DashboardLayout } from '@/layouts/DashboardLayout'
 import { trackEvent } from '@/services/analytics/analyticsClient'
@@ -48,7 +46,6 @@ export function TeacherHelpRequestDetailPage() {
   const requestQuery = useTeacherHelpRequestDetailQuery(requestId)
   const updateStatus = useUpdateTeacherHelpRequestMutation()
   const reply = useTeacherReply(requestId)
-  const assistanceQuery = useTeacherAssistanceSummaryQuery(requestQuery.data?.requestId)
   // Read once the request has said its subject: read before, it was the whole
   // catalog with its previews, and then again for the subject (#416).
   const curriculumQuery = useCurriculumCatalogQuery({
@@ -165,12 +162,8 @@ export function TeacherHelpRequestDetailPage() {
             <div ref={requestCardRef} tabIndex={-1} className="rounded-lg">
               <HelpRequestDetailCard request={requestQuery.data} />
             </div>
-            <TeacherAssistanceSummaryCard
-              summary={assistanceQuery.data}
-              isLoading={assistanceQuery.isLoading}
-              isError={assistanceQuery.isError}
-            />
-            <AiTeacherToolsPanel request={requestQuery.data} canAct={canAct && !readFailed} />
+            <TeacherAssistanceSummaryCard request={requestQuery.data} />
+            {/* No "AI teacher tools" card: hidden from teachers (#704). */}
             {/* No "open automation" link: the console is hidden from teachers until #703. */}
             <CurriculumRolloutPanel
               title={t('curriculumRollout.teacherTitle')}

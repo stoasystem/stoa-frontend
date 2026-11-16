@@ -33,7 +33,6 @@ vi.mock('@/services/teacher/teacherApi', async (orig) => ({
   getTeacherStats: vi.fn(),
   getTeacherHelpRequests: vi.fn(),
   getTeacherHelpRequestDetail: vi.fn(),
-  getTeacherAssistanceSummary: vi.fn(() => new Promise(() => {})),
 }))
 vi.mock('@/services/learning/learningOperationsApi', async (orig) => ({
   ...(await orig<typeof import('@/services/learning/learningOperationsApi')>()),

@@ -152,69 +152,9 @@
   },
   "assistance": {
     "title": "Sintesi per la preparazione",
-    "description": "Una sintesi limitata per la preparazione della lezione, non una generazione automatica di esercizi.",
-    "sources_one": "{{count}} fonte",
-    "sources_many": "{{count}} fonti",
-    "sources_other": "{{count}} fonti",
-    "loading": "Preparazione della sintesi ...",
-    "error": "Per questa richiesta non è disponibile alcuna sintesi.",
-    "empty": "Non è ancora disponibile alcuna sintesi.",
-    "studentContext": "Contesto dello studente",
-    "suggestedFocus": "Punto su cui concentrarsi",
+    "student": "Studente",
     "question": "Domanda",
-    "assistantAnswer": "Risposta dell’assistente di apprendimento",
-    "noQuestion": "Nessun testo della domanda disponibile.",
-    "noAnswer": "Nessuna risposta dell’assistente disponibile.",
-    "noWeakTopics": "Nessun indizio di argomenti deboli"
-  },
-  "aiTools": {
-    "title": "Strumenti IA per docenti",
-    "description": "Prepara, dal contesto visibile dell’allievo, bozze che poi rivedi tu.",
-    "draftOnly": "Solo bozza",
-    "generate": "Genera",
-    "noDraft": "Nessuna bozza ancora.",
-    "notAvailable": "Non disponibile.",
-    "unavailable": "Al momento non è possibile generare bozze.",
-    "summary": {
-      "title": "Bozza di riepilogo",
-      "description": "Riepilogo della sessione, probabile malinteso e spiegazione di seguito.",
-      "generateLabel": "Genera bozza di riepilogo",
-      "session": "Sessione",
-      "misconception": "Malinteso",
-      "focus": "Punto suggerito",
-      "followUp": "Seguito"
-    },
-    "exercise": {
-      "title": "Bozza di esercizi",
-      "description": "Brevi esercizi da rivedere prima di consegnarli all’allievo.",
-      "generateLabel": "Genera bozza di esercizi",
-      "difficulty": "Difficoltà",
-      "items": "Esercizi",
-      "item": "Esercizio {{number}}",
-      "answerKey": "Soluzioni",
-      "difficulties": {
-        "targeted": "Mirato",
-        "standard": "Standard",
-        "stretch": "Impegnativo"
-      }
-    },
-    "status": {
-      "draft": "Bozza",
-      "accepted": "Accettata",
-      "rejected": "Rifiutata",
-      "archived": "Archiviata"
-    },
-    "delivery": {
-      "not_delivered": "Non consegnato",
-      "delivered": "Consegnato"
-    },
-    "actions": {
-      "regenerate": "Rigenera",
-      "accept": "Accetta",
-      "reject": "Rifiuta",
-      "archive": "Archivia"
-    },
-    "notApplicable": "Al momento non puoi creare bozze per questa richiesta."
+    "noQuestion": "Nessun testo della domanda disponibile."
   },
   "reply": {
     "label": "Risposta del/la docente",
@@ -382,22 +322,6 @@
     "replyConflict": "La tua risposta non è stata inviata: un altro insegnante ha preso questa richiesta, oppure è cambiata.",
     "replyRefused": "La tua risposta non è stata accettata. Controlla contenuto e formato e inviala di nuovo.",
     "availabilityUpdated": "La tua disponibilità è stata salvata.",
-    "summaryCreated": "Bozza di riepilogo creata.",
-    "summaryFailed": "Non è stato possibile creare la bozza di riepilogo.",
-    "exerciseCreated": "Bozza di esercizio creata.",
-    "exerciseFailed": "Non è stato possibile creare la bozza di esercizio.",
-    "regenerated": "Bozza rigenerata.",
-    "regenerateFailed": "Non è stato possibile rigenerare la bozza.",
-    "reviewed": {
-      "accepted": "Bozza accettata.",
-      "rejected": "Bozza rifiutata.",
-      "archived": "Bozza archiviata."
-    },
-    "reviewFailed": {
-      "accepted": "Non è stato possibile accettare la bozza.",
-      "rejected": "Non è stato possibile rifiutare la bozza.",
-      "archived": "Non è stato possibile archiviare la bozza."
-    },
     "replyRefusedBecause": {
       "html": "La tua risposta non è stata accettata: per il server una parte sembra codice HTML. Riformula quel passaggio.",
       "privateMarkers": "La tua risposta non è stata accettata: contiene identificativi interni o credenziali. Rimuovili.",

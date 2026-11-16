@@ -53,7 +53,6 @@ vi.mock('@/layouts/DashboardLayout', () => ({
 vi.mock('@/services/teacher/teacherApi', async (orig) => ({
   ...(await orig<typeof import('@/services/teacher/teacherApi')>()),
   getTeacherHelpRequestDetail: vi.fn(),
-  getTeacherAssistanceSummary: vi.fn(() => new Promise(() => {})),
 }))
 vi.mock('@/hooks/practice/useCurriculumCatalogQuery', () => ({
   useCurriculumCatalogQuery: () => ({ data: undefined, isLoading: false, isError: false }),

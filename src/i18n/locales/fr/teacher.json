@@ -152,69 +152,9 @@
   },
   "assistance": {
     "title": "Résumé de préparation",
-    "description": "Un résumé limité pour la préparation du cours, pas une génération automatique d’exercices.",
-    "sources_one": "{{count}} source",
-    "sources_many": "{{count}} sources",
-    "sources_other": "{{count}} sources",
-    "loading": "Préparation du résumé ...",
-    "error": "Aucun résumé n’est disponible pour cette demande.",
-    "empty": "Aucun résumé n’est encore disponible.",
-    "studentContext": "Contexte de l’élève",
-    "suggestedFocus": "Point à travailler en priorité",
+    "student": "Élève",
     "question": "Question",
-    "assistantAnswer": "Réponse de l’assistant d’apprentissage",
-    "noQuestion": "Aucun texte de question disponible.",
-    "noAnswer": "Aucune réponse de l’assistant disponible.",
-    "noWeakTopics": "Aucun indice de sujet à travailler"
-  },
-  "aiTools": {
-    "title": "Outils IA pour enseignant·es",
-    "description": "Préparez, à partir du contexte visible de l’élève, des brouillons que vous relisez vous-même.",
-    "draftOnly": "Brouillon uniquement",
-    "generate": "Générer",
-    "noDraft": "Aucun brouillon pour l’instant.",
-    "notAvailable": "Non disponible.",
-    "unavailable": "Impossible de générer des brouillons pour le moment.",
-    "summary": {
-      "title": "Brouillon de synthèse",
-      "description": "Synthèse de la séance, malentendu probable et explication de suivi.",
-      "generateLabel": "Générer un brouillon de synthèse",
-      "session": "Séance",
-      "misconception": "Malentendu",
-      "focus": "Point d’attention suggéré",
-      "followUp": "Suivi"
-    },
-    "exercise": {
-      "title": "Brouillon d’exercices",
-      "description": "Courts exercices à relire avant de les transmettre à l’élève.",
-      "generateLabel": "Générer un brouillon d’exercices",
-      "difficulty": "Difficulté",
-      "items": "Exercices",
-      "item": "Exercice {{number}}",
-      "answerKey": "Corrigé",
-      "difficulties": {
-        "targeted": "Ciblé",
-        "standard": "Standard",
-        "stretch": "Approfondi"
-      }
-    },
-    "status": {
-      "draft": "Brouillon",
-      "accepted": "Accepté",
-      "rejected": "Refusé",
-      "archived": "Archivé"
-    },
-    "delivery": {
-      "not_delivered": "Non transmis",
-      "delivered": "Transmis"
-    },
-    "actions": {
-      "regenerate": "Régénérer",
-      "accept": "Accepter",
-      "reject": "Refuser",
-      "archive": "Archiver"
-    },
-    "notApplicable": "Vous ne pouvez pas créer de brouillons pour cette demande pour le moment."
+    "noQuestion": "Aucun texte de question disponible."
   },
   "reply": {
     "label": "Réponse de l’enseignant·e",
@@ -382,22 +322,6 @@
     "replyConflict": "Votre réponse n’a pas été envoyée : un autre enseignant a pris cette demande en charge, ou elle a changé.",
     "replyRefused": "Votre réponse n’a pas été acceptée. Veuillez vérifier son contenu et sa mise en forme, puis l’envoyer à nouveau.",
     "availabilityUpdated": "Vos disponibilités ont été enregistrées.",
-    "summaryCreated": "Brouillon de synthèse créé.",
-    "summaryFailed": "Le brouillon de synthèse n’a pas pu être créé.",
-    "exerciseCreated": "Brouillon d’exercice créé.",
-    "exerciseFailed": "Le brouillon d’exercice n’a pas pu être créé.",
-    "regenerated": "Brouillon régénéré.",
-    "regenerateFailed": "Le brouillon n’a pas pu être régénéré.",
-    "reviewed": {
-      "accepted": "Brouillon accepté.",
-      "rejected": "Brouillon refusé.",
-      "archived": "Brouillon archivé."
-    },
-    "reviewFailed": {
-      "accepted": "Le brouillon n’a pas pu être accepté.",
-      "rejected": "Le brouillon n’a pas pu être refusé.",
-      "archived": "Le brouillon n’a pas pu être archivé."
-    },
     "replyRefusedBecause": {
       "html": "Votre réponse n’a pas été acceptée : une partie ressemble à du code HTML pour le serveur. Veuillez reformuler ce passage.",
       "privateMarkers": "Votre réponse n’a pas été acceptée : elle contient des identifiants internes ou des données d’accès. Veuillez les retirer.",

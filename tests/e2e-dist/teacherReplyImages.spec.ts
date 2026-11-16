@@ -49,7 +49,6 @@ test('a teacher replies with a picture: it goes up as the reply picture, and the
   backend.on('GET', '/teachers/me/help-requests/{request_id}', () => ({ status: 200, body: REQUEST }))
   // The page's other panels, which this test does not look at.
   const none = () => ({ status: 404, body: { detail: 'Not Found' } })
-  backend.on('GET', '/teachers/questions/{question_id}/assistance-summary', none)
   backend.on('GET', '/practice/curriculum/catalog', none)
   backend.on('POST', '/teachers/me/help-requests/{request_id}/notes', ({ body }) => {
     const { content } = body as { content: string }

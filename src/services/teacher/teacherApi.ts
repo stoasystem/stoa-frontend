@@ -10,10 +10,6 @@ import type {
   TeacherProfile,
   TeacherStats,
   TeacherReplyRichContent,
-  TeacherAssistanceSummary,
-  AiTeacherDraft,
-  CreateExerciseDraftPayload,
-  ReviewAiTeacherDraftPayload,
 } from '@/types/teacher'
 
 export async function getTeacherProfile() {
@@ -89,51 +85,6 @@ export async function addTeacherHelpRequestNote({
 
 export async function getTeacherStats() {
   const response = await httpClient.get<TeacherStats>('/teachers/me/stats')
-  return response.data
-}
-
-export async function getTeacherAssistanceSummary(questionId: string) {
-  const response = await httpClient.get<TeacherAssistanceSummary>(
-    apiPath`/teachers/questions/${questionId}/assistance-summary`,
-  )
-  return response.data
-}
-
-export async function createAiTeacherSummaryDraft(questionId: string) {
-  const response = await httpClient.post<AiTeacherDraft>(
-    apiPath`/teachers/questions/${questionId}/ai-tools/summary-draft`,
-    {},
-  )
-  return response.data
-}
-
-export async function createAiTeacherExerciseDraft(payload: CreateExerciseDraftPayload) {
-  const response = await httpClient.post<AiTeacherDraft>('/teachers/ai-tools/exercise-drafts', payload)
-  return response.data
-}
-
-export async function regenerateAiTeacherDraft(draftId: string) {
-  const response = await httpClient.post<AiTeacherDraft>(apiPath`/teachers/ai-tools/drafts/${draftId}/regenerate`, {})
-  return response.data
-}
-
-export async function acceptAiTeacherDraft(payload: ReviewAiTeacherDraftPayload) {
-  return reviewAiTeacherDraft('accept', payload)
-}
-
-export async function rejectAiTeacherDraft(payload: ReviewAiTeacherDraftPayload) {
-  return reviewAiTeacherDraft('reject', payload)
-}
-
-export async function archiveAiTeacherDraft(payload: ReviewAiTeacherDraftPayload) {
-  return reviewAiTeacherDraft('archive', payload)
-}
-
-async function reviewAiTeacherDraft(
-  action: 'accept' | 'reject' | 'archive',
-  { draftId, note }: ReviewAiTeacherDraftPayload,
-) {
-  const response = await httpClient.post<AiTeacherDraft>(apiPath`/teachers/ai-tools/drafts/${draftId}/${action}`, { note })
   return response.data
 }
 

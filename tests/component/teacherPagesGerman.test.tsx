@@ -1,9 +1,9 @@
 /**
  * The teacher pages the #162 walkthrough found in English (app-planet,
  * 2026-10-10) and main had not reached yet: the availability editor with its
- * subject options and summary, the reply composer, the AI teacher tools and
- * the practice context. Rendered in German, with every new key checked in all
- * four languages.
+ * subject options and summary, the reply composer and the practice context
+ * (the AI teacher tools are gone since #704). Rendered in German, with every
+ * new key checked in all four languages.
  */
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { render, screen } from '@testing-library/react'
@@ -83,8 +83,8 @@ describe('the new teacher keys exist in all four languages', () => {
     return Object.entries(node).flatMap(([key, value]) => leaves(value, `${prefix}.${key}`))
   }
 
-  it('availability, AI tools, reply and practice context', () => {
-    const groups = ['availability.editor', 'availability.summary', 'aiTools', 'reply', 'practiceContext']
+  it('availability, reply and practice context', () => {
+    const groups = ['availability.editor', 'availability.summary', 'reply', 'practiceContext']
     const keys = groups.flatMap((group) =>
       leaves(group.split('.').reduce<unknown>((node, part) => (node as Record<string, unknown>)?.[part], deTeacher), group),
     )
