@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { BackButton } from '@/components/common/BackButton'
 import { Breadcrumbs } from '@/components/common/Breadcrumbs'
 import { PageActions } from '@/components/common/PageActions'
+import { ChildStarAnswersCard } from '@/components/parent/ChildStarAnswersCard'
 import { ChildSummaryHeader } from '@/components/parent/ChildSummaryHeader'
 import { getActivityTypeLabel } from '@/components/parent/activityLabels'
 import { LearningProfileSignals } from '@/components/learning/LearningProfileSignals'
@@ -97,6 +98,7 @@ export function ChildSummaryPage() {
                 </Card>
               ))}
             </div>
+            <ChildStarAnswersCard starAnswers={summary.starAnswers} />
             <LearningProfileSignals
               title={tParent('summary.subjectProfile')}
               description={tParent('summary.subjectProfileDescription')}

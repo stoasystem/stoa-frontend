@@ -133,6 +133,17 @@ export type PracticeAnswerRequest = {
 }
 
 /**
+ * An answer in a lesson (stoa-backend#449). `conversationId` is the Ask
+ * conversation open beside the exercise, sent only when there is one: the
+ * backend checks whether this exercise was asked about in it, and records a
+ * right answer after that as answered after asking AI. Without it the answer
+ * counts as the student's own.
+ */
+export type ChallengeAnswerRequest = PracticeAnswerRequest & {
+  conversationId?: string
+}
+
+/**
  * One lesson quiz answer (stoa-backend `QuizAnswerSubmission`; extra fields 422).
  * `exerciseId` is the exercise it answers, so a resend after a lost reply gets
  * the first verdict back instead of being judged against the next exercise.

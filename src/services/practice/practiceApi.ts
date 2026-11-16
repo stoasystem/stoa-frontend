@@ -10,10 +10,10 @@ import type {
   LessonQuizSession,
   StarQuizAnswer,
   StarQuizView,
+  ChallengeAnswerRequest,
   ReviewDueResponse,
   ReviewSummary,
   LessonQuizAnswerRequest,
-  PracticeAnswerRequest,
   PracticeAnswerResult,
   PracticeHintRequest,
   PracticeHintResponse,
@@ -41,7 +41,12 @@ export async function getPracticeLesson(lessonId: string) {
   return response.data
 }
 
-export async function submitChallengeAnswer(challengeId: string, payload: PracticeAnswerRequest) {
+/**
+ * Hand one lesson answer to the backend, which judges it. `conversationId`,
+ * when there is one, names the Ask conversation open beside the exercise
+ * (stoa-backend#449); left out, nothing is sent for it.
+ */
+export async function submitChallengeAnswer(challengeId: string, payload: ChallengeAnswerRequest) {
   const response = await httpClient.post<PracticeAnswerResult>(
     apiPath`/practice/challenges/${challengeId}/answer`,
     payload,
