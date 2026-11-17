@@ -39,11 +39,6 @@ export function isWithdrawableHelpRequest(status: TeacherHelpStatus | undefined)
 }
 
 /**
- * Whether the server takes a teacher's reply on a request in this status.
- * The holder may still add to a resolved request (user decision, #222); one
- * that ended without a teacher has nobody holding it and is refused.
- */
-/**
  * The status changes the server takes on a request in this status, mirroring
  * `advance_help_request` in stoa-backend: only `pending` and `in_progress`
  * move. A pending request can be taken or finished at once; one in progress
@@ -55,8 +50,21 @@ export function teacherStatusActions(status: TeacherHelpStatus | undefined): Tea
   return []
 }
 
+/**
+ * Whether the server takes a teacher's reply on a request in this status: only
+ * from the teacher holding it (stoa-backend#479). Offered and not yet accepted
+ * (`pending`), the reply is refused with `help_request_not_accepted`, so the
+ * teacher accepts it first (#705). The holder may still add to a resolved
+ * request (user decision, #222); one that ended without a teacher has nobody
+ * holding it and is refused.
+ */
 export function acceptsTeacherReply(status: TeacherHelpStatus | undefined): boolean {
-  return isOpenHelpRequest(status) || status === 'resolved'
+  return status === 'in_progress' || status === 'resolved'
+}
+
+/** Offered to the teacher and not yet accepted: the one step left is to accept it (#705). */
+export function awaitsTeacherAcceptance(status: TeacherHelpStatus | undefined): boolean {
+  return status === 'pending'
 }
 
 export type TeacherHelpRequest = {

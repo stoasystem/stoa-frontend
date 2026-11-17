@@ -35,6 +35,8 @@ import {
   classroomUnavailable,
   demoClassroomPass,
   demoTeacher,
+  demoTeacherChangeStatus,
+  demoTeacherReply,
   demoTeacherRequestDetail,
   previewAsTeacher,
   TEACHER_JOINS_AFTER_MS,
@@ -47,6 +49,7 @@ import { commandMessageIds } from '@/services/chat/commandMessageIds'
 import type { ChatMessage, ConversationSummary, MessageQuote } from '@/types/chat'
 import type { NotificationPreferenceMatrix } from '@/types/notification'
 import type { StudentEntitlement } from '@/types/student'
+import type { TeacherHelpRequestNote } from '@/types/teacher'
 
 export type PreviewRequest = {
   method: string
@@ -318,6 +321,28 @@ const routes: Array<[method: string, pattern: string, handler: Handler]> = [
       ? refuse(503, 'classroom_unavailable', 'The classroom is not configured.')
       : demoTeacherRequestDetail(params.id) && demoClassroomPass(`help-${params.id}`)],
   ['GET', '/teachers/me/help-requests/:id', ({ params }) => demoTeacherRequestDetail(params.id)],
+  // Accepting it, then replying (#705, stoa-backend#479): a reply to a request
+  // only offered is refused as the backend refuses it.
+  ['PATCH', '/teachers/me/help-requests/:id', ({ params, body }) => {
+    const changed = demoTeacherChangeStatus(params.id, field<string>(body, 'status'))
+    if (changed === 'ended') return refuse(409, 'help_request_changed', 'This help request changed.')
+    const detail = changed && demoTeacherRequestDetail(params.id)
+    return detail && {
+      requestId: detail.requestId, conversationId: detail.conversationId, studentName: detail.student.name,
+      subject: detail.subject, grade: 'Grade 9', status: detail.status, createdAt: now(),
+    }
+  }],
+  ['POST', '/teachers/me/help-requests/:id/notes', ({ params, body }) => {
+    const written = demoTeacherReply(params.id, {
+      content: field<string>(body, 'content') ?? '',
+      richContent: field<TeacherHelpRequestNote['richContent']>(body, 'richContent'),
+    })
+    if (written === 'not_accepted') {
+      return refuse(409, 'help_request_not_accepted', 'Accept the help request before replying.')
+    }
+    if (written === 'ended') return refuse(409, 'help_request_not_held', 'This help request is not yours.')
+    return written
+  }],
 
   // Chapter and practice stage
   ['GET', '/practice/curriculum/catalog', () => demo().demoChapter.catalog],

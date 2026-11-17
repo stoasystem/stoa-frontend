@@ -38,7 +38,8 @@ vi.mock('sonner', () => ({ toast: { success: vi.fn(), error: vi.fn(), info: vi.f
 const CHANGED = 'Diese Anfrage hat inzwischen eine andere Lehrperson übernommen, oder sie hat sich geändert. Die Ansicht wurde neu geladen – bitte prüfen Sie den aktuellen Stand.'
 const UPDATE_FAILED = 'Status konnte nicht aktualisiert werden.'
 const LOAD_FAILED = 'Anfrage konnte nicht geladen werden.'
-const TAKE = 'Prüfung starten'
+// Accepting an offer is its own step before any reply (#705).
+const TAKE = 'Anfrage annehmen'
 const RESOLVE = 'Als gelöst markieren'
 const REPLY = 'Antwort der Lehrperson'
 
@@ -97,7 +98,7 @@ describe('a request that moved on under the teacher (409)', () => {
 
   // The reply's own refusal reaches the page as `reply.conflict` (#564).
   it('also reads it again when a reply is refused', async () => {
-    vi.mocked(teacherApi.getTeacherHelpRequestDetail).mockResolvedValue(detail('pending'))
+    vi.mocked(teacherApi.getTeacherHelpRequestDetail).mockResolvedValue(detail('in_progress'))
     vi.mocked(teacherApi.addTeacherHelpRequestNote).mockRejectedValue(
       new ApiError('x', { status: 409, code: 'help_request_changed' }),
     )
@@ -167,15 +168,15 @@ describe('the status changes offered', () => {
   it('offers no status change on an assigned request', async () => {
     vi.mocked(teacherApi.getTeacherHelpRequestDetail).mockResolvedValue(detail('assigned'))
     renderDetail()
-    await screen.findByLabelText(REPLY)
+    await screen.findAllByText('Lea', { exact: false })
     expect(screen.queryByRole('button', { name: TAKE })).toBeNull()
     expect(screen.queryByRole('button', { name: RESOLVE })).toBeNull()
   })
 })
 
-describe('a reply that takes the offer', () => {
+describe('a reply', () => {
   it('refreshes the list and the stats, not only the detail', async () => {
-    vi.mocked(teacherApi.getTeacherHelpRequestDetail).mockResolvedValue(detail('pending'))
+    vi.mocked(teacherApi.getTeacherHelpRequestDetail).mockResolvedValue(detail('in_progress'))
     vi.mocked(teacherApi.addTeacherHelpRequestNote).mockResolvedValue({ id: 'n1' } as never)
     const { invalidatedKeys } = renderDetail()
     await userEvent.type(await screen.findByLabelText(REPLY), 'Hallo Lea')

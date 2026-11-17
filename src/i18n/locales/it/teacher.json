@@ -81,7 +81,17 @@
       "altTeacher": "Immagine del docente: {{name}}"
     },
     "enterClassroom": "Entra in classe",
-    "takeAndEnterClassroom": "Prendi in carico ed entra in classe"
+    "takeAndEnterClassroom": "Prendi in carico ed entra in classe",
+    "accept": {
+      "title": "Accetta la richiesta",
+      "body": "Prima di rispondere, accetta la richiesta. Così lo studente vede che un insegnante se ne sta occupando.",
+      "replyRefused": "La tua risposta non è stata inviata: non hai ancora accettato questa richiesta. Accettala prima; la tua bozza resta salvata.",
+      "button": "Accetta richiesta"
+    },
+    "ended": {
+      "withdrawn": "Lo studente ha ritirato questa richiesta. Non c’è più nulla da fare.",
+      "expired": "Questa richiesta è scaduta prima che qualcuno la accettasse. Non c’è più nulla da fare."
+    }
   },
   "profile": {
     "eyebrow": "Account insegnante",
@@ -317,6 +327,7 @@
     "replySent": "La tua risposta è stata inviata.",
     "replyFailed": "Non è stato possibile inviare la tua risposta. Riprova.",
     "replyConflict": "La tua risposta non è stata inviata: un altro insegnante ha preso questa richiesta, oppure è cambiata.",
+    "replyNotAccepted": "La tua risposta non è stata inviata: accetta prima la richiesta.",
     "replyRefused": "La tua risposta non è stata accettata. Controlla contenuto e formato e inviala di nuovo.",
     "availabilityUpdated": "La tua disponibilità è stata salvata.",
     "replyRefusedBecause": {

@@ -81,7 +81,17 @@
       "altTeacher": "Image de l’enseignant·e : {{name}}"
     },
     "enterClassroom": "Entrer dans la classe",
-    "takeAndEnterClassroom": "Prendre en charge et entrer dans la classe"
+    "takeAndEnterClassroom": "Prendre en charge et entrer dans la classe",
+    "accept": {
+      "title": "Accepter la demande",
+      "body": "Acceptez la demande avant de répondre. L’élève voit alors qu’un enseignant s’en occupe.",
+      "replyRefused": "Votre réponse n’a pas été envoyée : vous n’avez pas encore accepté cette demande. Veuillez d’abord l’accepter ; votre brouillon est conservé.",
+      "button": "Accepter la demande"
+    },
+    "ended": {
+      "withdrawn": "L’élève a retiré cette demande. Il n’y a plus rien à faire.",
+      "expired": "Cette demande a expiré avant que quelqu’un l’accepte. Il n’y a plus rien à faire."
+    }
   },
   "profile": {
     "eyebrow": "Compte enseignant",
@@ -317,6 +327,7 @@
     "replySent": "Votre réponse a été envoyée.",
     "replyFailed": "Votre réponse n’a pas pu être envoyée. Veuillez réessayer.",
     "replyConflict": "Votre réponse n’a pas été envoyée : un autre enseignant a pris cette demande en charge, ou elle a changé.",
+    "replyNotAccepted": "Votre réponse n’a pas été envoyée : veuillez d’abord accepter la demande.",
     "replyRefused": "Votre réponse n’a pas été acceptée. Veuillez vérifier son contenu et sa mise en forme, puis l’envoyer à nouveau.",
     "availabilityUpdated": "Vos disponibilités ont été enregistrées.",
     "replyRefusedBecause": {

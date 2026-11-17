@@ -248,10 +248,10 @@ describe('T9: focus and labels', () => {
     let finish: (value: unknown) => void = () => {}
     vi.mocked(teacherApi.updateTeacherHelpRequestStatus).mockReturnValue(new Promise((resolve) => { finish = resolve }) as never)
     renderDetail()
-    await userEvent.click(await screen.findByRole('button', { name: de.markInProgress }))
+    await userEvent.click(await screen.findByRole('button', { name: de.detail.accept.button }))
 
     // The pressed button is disabled now: focus stays on it, going nowhere.
-    expect(screen.getByRole('button', { name: de.markInProgress })).toBeDisabled()
+    expect(screen.getByRole('button', { name: de.detail.accept.button })).toBeDisabled()
     await act(async () => finish({ requestId: 'r1', status: 'in_progress' }))
     await waitFor(() => expect(document.activeElement).toHaveAttribute('tabindex', '-1'))
     expect(document.activeElement).toHaveTextContent('Lea')

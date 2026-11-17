@@ -24,7 +24,7 @@ import { DashboardLayout } from '@/layouts/DashboardLayout'
 import { trackEvent } from '@/services/analytics/analyticsClient'
 import { normalizeCurriculumSubjectId } from '@/services/practice/practiceApi'
 import { isHelpRequestConflict, isHelpRequestOutOfReach } from '@/lib/teacherHelpRequestConflict'
-import { acceptsTeacherReply, teacherStatusActions } from '@/types/teacherHelp'
+import { acceptsTeacherReply, awaitsTeacherAcceptance, teacherStatusActions } from '@/types/teacherHelp'
 
 const statusActionKey: Record<string, string> = {
   in_progress: 'markInProgress',
@@ -71,8 +71,29 @@ export function TeacherHelpRequestDetailPage() {
   // Refused before any copy was read: there is nothing to keep (#670).
   const gone = !canAct && requestQuery.data === undefined
   const readFailed = requestQuery.isError && canAct
-  const statusActions = canAct ? teacherStatusActions(requestQuery.data?.status) : []
+  const status = requestQuery.data?.status
+  // Offered and not yet accepted, the request is only read: accepting it is
+  // the one step, and nothing else is offered until then (#705). The backend
+  // refuses a reply before it (stoa-backend#479).
+  const awaitingAcceptance = canAct && awaitsTeacherAcceptance(status)
+  const statusActions = canAct && !awaitingAcceptance ? teacherStatusActions(status) : []
   const changedElsewhere = isHelpRequestConflict(updateStatus.error) || reply.conflict
+  // A reply refused as not accepted yet (409 `accept_help_request`): the copy
+  // on screen said otherwise, so the teacher is led to accept it, the draft
+  // kept, until an acceptance here goes through.
+  const acceptedHere = updateStatus.isSuccess && updateStatus.data?.status === 'in_progress'
+  const replyNeedsAcceptance = canAct && reply.notAccepted && !acceptedHere
+  const ended = status === 'withdrawn' || status === 'expired' ? status : null
+  const accept = () =>
+    requestId &&
+    updateStatus.mutate(
+      { requestId, status: 'in_progress' },
+      {
+        onSettled: (_request, error) => {
+          if (focusLost()) setRefocus({ failed: Boolean(error) })
+        },
+      },
+    )
 
   return (
     <DashboardLayout>
@@ -92,7 +113,7 @@ export function TeacherHelpRequestDetailPage() {
                       {tTeacher('detail.enterClassroom')}
                     </Link>
                   </Button>
-                ) : requestQuery.data && statusActions.includes('in_progress') ? (
+                ) : requestQuery.data && awaitingAcceptance ? (
                   // Offered and not yet taken: one press takes it (the same
                   // change as "start review") and, once the server has it, goes
                   // into the classroom, where the student is already waiting.
@@ -173,6 +194,39 @@ export function TeacherHelpRequestDetailPage() {
               isError={curriculumQuery.isError}
               contextLabel={t('curriculumRollout.teacherContext')}
             />
+            {/* Ended before any teacher took it: said, with nothing to do on it (#705). */}
+            {ended && (
+              <section role="status" data-request-ended={ended} className="rounded-lg border bg-card p-4">
+                <p className="m-0 text-sm leading-6 text-muted-foreground">{tTeacher(`detail.ended.${ended}`)}</p>
+              </section>
+            )}
+            {(awaitingAcceptance || replyNeedsAcceptance) && (
+              <section
+                aria-labelledby="accept-request-title"
+                data-accept-request
+                className="rounded-lg border bg-card p-4"
+              >
+                <h2 id="accept-request-title" className="m-0 text-base font-semibold text-foreground">
+                  {tTeacher('detail.accept.title')}
+                </h2>
+                <p
+                  role={replyNeedsAcceptance ? 'alert' : undefined}
+                  className="mb-0 mt-1 text-sm leading-6 text-muted-foreground"
+                >
+                  {tTeacher(replyNeedsAcceptance ? 'detail.accept.replyRefused' : 'detail.accept.body')}
+                </p>
+                <div className="mt-3">
+                  <Button
+                    type="button"
+                    data-accept-request-button
+                    disabled={readFailed || updateStatus.isPending || !requestId}
+                    onClick={accept}
+                  >
+                    {tTeacher('detail.accept.button')}
+                  </Button>
+                </div>
+              </section>
+            )}
             {changedElsewhere && (
               <p ref={failureLine} tabIndex={-1} role="alert" className="text-sm text-destructive">
                 {tTeacher('detail.changedElsewhere')}
@@ -234,12 +288,12 @@ export function TeacherHelpRequestDetailPage() {
                   </Button>
                 ))}
               </div>
-              {updateStatus.isError && !changedElsewhere && (
-                <p ref={failureLine} tabIndex={-1} role="alert" className="text-sm text-destructive">
-                  {tTeacher('detail.updateFailed')}
-                </p>
-              )}
               </>
+            )}
+            {updateStatus.isError && !changedElsewhere && (
+              <p ref={failureLine} tabIndex={-1} role="alert" className="text-sm text-destructive">
+                {tTeacher('detail.updateFailed')}
+              </p>
             )}
             {/* A resolved request still takes its teacher's follow-up (#222); one
                 withdrawn or expired has no teacher and the server refuses the reply. */}

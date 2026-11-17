@@ -50,7 +50,7 @@ const mockedDetail = vi.mocked(teacherApi.getTeacherHelpRequestDetail)
 
 const REPLY = 'Antwort der Lehrperson'
 const SEND = 'Antwort senden'
-const TAKE = 'Prüfung starten'
+const RESOLVE = 'Als gelöst markieren'
 const PAUSED = de.detail.replyPaused
 const DETAIL_KEY = teacherQueryKeys.helpRequestDetail('r1')
 
@@ -88,7 +88,8 @@ beforeEach(async () => {
 
 describe('T1: a read that fails while the teacher writes a reply', () => {
   it('keeps the composer and the draft on any failure but a refusal, and takes nothing', async () => {
-    mockedDetail.mockResolvedValueOnce(detail('pending'))
+    // Held: only the holder is offered the reply (#705).
+    mockedDetail.mockResolvedValueOnce(detail('in_progress'))
     const { poll } = renderDetail()
     await userEvent.type(await screen.findByLabelText(REPLY), 'Hallo Lea, schau dir Schritt 2 an')
 
@@ -100,10 +101,10 @@ describe('T1: a read that fails while the teacher writes a reply', () => {
     expect(reply).toHaveValue('Hallo Lea, schau dir Schritt 2 an')
     expect(reply).toBeDisabled()
     expect(screen.getByRole('button', { name: SEND })).toBeDisabled()
-    expect(screen.getByRole('button', { name: TAKE })).toBeDisabled()
+    expect(screen.getByRole('button', { name: RESOLVE })).toBeDisabled()
 
     // The next read succeeds: everything is offered again, the draft intact.
-    mockedDetail.mockResolvedValue(detail('pending'))
+    mockedDetail.mockResolvedValue(detail('in_progress'))
     await poll()
     await waitFor(() => expect(screen.getByLabelText(REPLY)).toBeEnabled())
     expect(screen.getByLabelText(REPLY)).toHaveValue('Hallo Lea, schau dir Schritt 2 an')
@@ -112,7 +113,7 @@ describe('T1: a read that fails while the teacher writes a reply', () => {
   }, 10_000)
 
   it('hides the composer on a 403, and gives the draft back once the request is readable again', async () => {
-    mockedDetail.mockResolvedValueOnce(detail('pending'))
+    mockedDetail.mockResolvedValueOnce(detail('in_progress'))
     const { poll } = renderDetail()
     await userEvent.type(await screen.findByLabelText(REPLY), 'Entwurf')
 
@@ -121,7 +122,7 @@ describe('T1: a read that fails while the teacher writes a reply', () => {
     await waitFor(() => expect(screen.queryByLabelText(REPLY)).toBeNull())
     expect(screen.queryByText(PAUSED)).toBeNull()
 
-    mockedDetail.mockResolvedValue(detail('pending'))
+    mockedDetail.mockResolvedValue(detail('in_progress'))
     await poll()
     expect(await screen.findByLabelText(REPLY)).toHaveValue('Entwurf')
   })
