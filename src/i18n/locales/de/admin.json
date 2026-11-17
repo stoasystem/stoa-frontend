@@ -962,11 +962,17 @@
     "fromParent": "vom Elternteil {{parent}}",
     "fromSelf": "eigene des Schülers",
     "versionConflict": "Jemand anderes hat diese Nutzungsdauer gerade geändert. Sie wurde neu gelesen: Prüfen Sie die Daten und senden Sie erneut.",
-    "extendTitle": "Nutzungsdauer verlängern",
-    "sourceLabel": "Art",
+    "formTitle": "Nutzungsdauer festlegen",
+    "methodLabel": "Wie",
+    "method": {
+      "add": "Zeit hinzufügen",
+      "set": "Ein Enddatum festlegen"
+    },
+    "sourceLabel": "Warum",
     "source": {
       "paid": "Bezahlt",
-      "gifted": "Geschenkt"
+      "gifted": "Geschenkt",
+      "correction": "Korrektur"
     },
     "amountLabel": "Anzahl",
     "unitLabel": "Einheit",
@@ -980,7 +986,9 @@
     "giftedHint": "Ein Geschenk kann Tage oder Monate umfassen, bis {{max}}, und nennt keine Zahlung.",
     "preview": "Neues Enddatum: {{date}} (gezählt ab {{from}})",
     "previewEmpty": "Gezählt ab {{from}}, dem späteren von heute und dem aktuellen Enddatum.",
-    "extendSubmit": "Verlängern",
+    "setPreview": "Neues Enddatum: {{date}} (jetzt {{current}})",
+    "setPreviewEmpty": "Aktuelles Enddatum: {{current}}. Wählen Sie das neue.",
+    "addSubmit": "Zur Nutzungsdauer hinzufügen",
     "extended": "Verlängert. Die Nutzungsdauer endet jetzt am {{date}}.",
     "extendFailed": "Die Nutzungsdauer konnte nicht verlängert werden.",
     "extensionIssues": {
@@ -990,11 +998,10 @@
       "paymentReferenceTooLong": "Die Zahlungsreferenz darf höchstens 200 Zeichen lang sein.",
       "noteTooLong": "Die Notiz darf höchstens 1000 Zeichen lang sein."
     },
-    "setTitle": "Enddatum ändern",
-    "setHint": "Um einen Fehler zu korrigieren oder die Nutzungsdauer früher zu beenden. Der Grund wird mit dem Eintrag festgehalten.",
+    "correctionHint": "Ein gewähltes Enddatum wird als Korrektur festgehalten und braucht einen Grund. Es kann vor oder nach dem aktuellen Ende liegen. Um eine Zahlung oder ein Geschenk festzuhalten, fügen Sie stattdessen Zeit hinzu.",
     "newEndLabel": "Neues Enddatum",
     "reasonLabel": "Grund (Pflicht)",
-    "setSubmit": "Enddatum ändern…",
+    "setSubmit": "Enddatum festlegen…",
     "endIssues": {
       "date": "Wählen Sie das neue Enddatum.",
       "reason": "Geben Sie einen Grund an.",
@@ -1006,7 +1013,7 @@
     "shortensWarning_one": "Die Nutzungsdauer endet {{count}} Tag früher als jetzt.",
     "shortensWarning_other": "Die Nutzungsdauer endet {{count}} Tage früher als jetzt.",
     "parentWarning": "Die Nutzungsdauer dieses Elternteils gilt auch für die Kinder. Ein Kind ohne spätere eigene Nutzungsdauer oder eine eines anderen Elternteils ist ebenfalls betroffen.",
-    "confirmSubmit": "Enddatum ändern",
+    "confirmSubmit": "Enddatum festlegen",
     "confirmBack": "Zurück",
     "endChanged": "Das Enddatum ist jetzt der {{date}}.",
     "endChangeFailed": "Das Enddatum konnte nicht geändert werden.",

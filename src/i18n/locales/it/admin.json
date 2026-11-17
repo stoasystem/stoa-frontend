@@ -978,11 +978,17 @@
     "fromParent": "dal genitore {{parent}}",
     "fromSelf": "proprio dello studente",
     "versionConflict": "Qualcun altro ha appena modificato questo periodo. È stato riletto: controlla le date e invia di nuovo.",
-    "extendTitle": "Prolungare il periodo",
-    "sourceLabel": "Tipo",
+    "formTitle": "Impostare il periodo di utilizzo",
+    "methodLabel": "Come",
+    "method": {
+      "add": "Aggiungere tempo",
+      "set": "Fissare una data di scadenza"
+    },
+    "sourceLabel": "Perché",
     "source": {
       "paid": "Pagato",
-      "gifted": "Regalato"
+      "gifted": "Regalato",
+      "correction": "Correzione"
     },
     "amountLabel": "Quantità",
     "unitLabel": "Unità",
@@ -996,7 +1002,9 @@
     "giftedHint": "Un regalo può essere di giorni o mesi, fino a {{max}}, e non indica alcun pagamento.",
     "preview": "Nuova data di scadenza: {{date}} (contata dal {{from}})",
     "previewEmpty": "Contata dal {{from}}, il più tardi tra oggi e la scadenza attuale.",
-    "extendSubmit": "Prolunga",
+    "setPreview": "Nuova data di scadenza: {{date}} (ora {{current}})",
+    "setPreviewEmpty": "Data di scadenza attuale: {{current}}. Scegli la nuova.",
+    "addSubmit": "Aggiungi al periodo",
     "extended": "Prolungato. Il periodo ora scade il {{date}}.",
     "extendFailed": "Non è stato possibile prolungare il periodo.",
     "extensionIssues": {
@@ -1006,11 +1014,10 @@
       "paymentReferenceTooLong": "Il riferimento del pagamento può avere al massimo 200 caratteri.",
       "noteTooLong": "La nota può avere al massimo 1000 caratteri."
     },
-    "setTitle": "Cambiare la data di scadenza",
-    "setHint": "Per correggere un errore o terminare il periodo prima. Il motivo viene conservato con la registrazione.",
+    "correctionHint": "Una data di scadenza scelta viene registrata come correzione e richiede un motivo. Può essere prima o dopo la scadenza attuale. Per registrare un pagamento o un regalo, aggiungi invece del tempo.",
     "newEndLabel": "Nuova data di scadenza",
     "reasonLabel": "Motivo (obbligatorio)",
-    "setSubmit": "Cambia data di scadenza…",
+    "setSubmit": "Fissa la data di scadenza…",
     "endIssues": {
       "date": "Scegli la nuova data di scadenza.",
       "reason": "Indica un motivo.",
@@ -1023,7 +1030,7 @@
     "shortensWarning_other": "Il periodo termina {{count}} giorni prima di adesso.",
     "shortensWarning_many": "Il periodo termina {{count}} giorni prima di adesso.",
     "parentWarning": "Il periodo di questo genitore copre anche i figli. Anche un figlio senza un periodo proprio o di un altro genitore più lungo ne è toccato.",
-    "confirmSubmit": "Cambia data di scadenza",
+    "confirmSubmit": "Fissa la data di scadenza",
     "confirmBack": "Indietro",
     "endChanged": "La data di scadenza ora è il {{date}}.",
     "endChangeFailed": "Non è stato possibile cambiare la data di scadenza.",

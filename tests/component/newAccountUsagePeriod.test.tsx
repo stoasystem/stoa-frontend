@@ -260,7 +260,7 @@ describe('a new account’s usage period', () => {
     expect(alert).toHaveTextContent(copy.newAccount.conflict)
     // The account is open: its invitation notice stands, and the panel can set the period.
     expect(screen.getByText(fill(accounts.inviteSent, { accountNumber: 'S26-0042' }))).toBeInTheDocument()
-    expect(await screen.findByRole('button', { name: copy.extendSubmit })).toBeInTheDocument()
+    expect(await screen.findByRole('button', { name: copy.addSubmit })).toBeInTheDocument()
     expect(screen.queryByText(/Usage period of S26-0042 set/)).not.toBeInTheDocument()
   })
 })

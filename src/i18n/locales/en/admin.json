@@ -962,11 +962,17 @@
     "fromParent": "from parent {{parent}}",
     "fromSelf": "the student's own",
     "versionConflict": "Someone else changed this period a moment ago. It has been read again: check the dates and submit again.",
-    "extendTitle": "Extend the period",
-    "sourceLabel": "Source",
+    "formTitle": "Set the usage period",
+    "methodLabel": "How",
+    "method": {
+      "add": "Add time",
+      "set": "Set an end date"
+    },
+    "sourceLabel": "Why",
     "source": {
       "paid": "Paid",
-      "gifted": "Gifted"
+      "gifted": "Gifted",
+      "correction": "Correction"
     },
     "amountLabel": "How many",
     "unitLabel": "Unit",
@@ -980,7 +986,9 @@
     "giftedHint": "A gift may be days or months, up to {{max}}, and names no payment.",
     "preview": "New end date: {{date}} (counted from {{from}})",
     "previewEmpty": "Counted from {{from}}, the later of today and the current end date.",
-    "extendSubmit": "Extend",
+    "setPreview": "New end date: {{date}} (now {{current}})",
+    "setPreviewEmpty": "Current end date: {{current}}. Choose the new one.",
+    "addSubmit": "Add to the period",
     "extended": "Extended. The period now ends on {{date}}.",
     "extendFailed": "The period could not be extended.",
     "extensionIssues": {
@@ -990,11 +998,10 @@
       "paymentReferenceTooLong": "The payment reference can be at most 200 characters.",
       "noteTooLong": "The note can be at most 1000 characters."
     },
-    "setTitle": "Change the end date",
-    "setHint": "To correct a mistake or end the period early. The reason is kept with the record.",
+    "correctionHint": "A chosen end date is recorded as a correction and needs a reason. It may be earlier or later than the current end. To record a payment or a gift, add time instead.",
     "newEndLabel": "New end date",
     "reasonLabel": "Reason (required)",
-    "setSubmit": "Change end date…",
+    "setSubmit": "Set end date…",
     "endIssues": {
       "date": "Choose the new end date.",
       "reason": "Enter a reason.",
@@ -1006,7 +1013,7 @@
     "shortensWarning_one": "The period ends {{count}} day earlier than it does now.",
     "shortensWarning_other": "The period ends {{count}} days earlier than it does now.",
     "parentWarning": "This parent's period also covers their children. A child without a later period of their own or from another parent is affected too.",
-    "confirmSubmit": "Change end date",
+    "confirmSubmit": "Set end date",
     "confirmBack": "Back",
     "endChanged": "The end date is now {{date}}.",
     "endChangeFailed": "The end date could not be changed.",

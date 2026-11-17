@@ -110,7 +110,27 @@ export function extensionIssues(draft: ExtensionDraft): ExtensionIssue[] {
   return issues
 }
 
-export type EndChangeIssue = 'date' | 'reason' | 'reasonTooLong' | 'unchanged'
+/**
+ * The two ways one form changes a period: add time to it, or set its end date.
+ * They are the backend's two writes, an extension and a set end date.
+ */
+export type PeriodMethod = 'add' | 'set'
+
+/** Why the period changes, as the form offers it: the extension's source, or a correction. */
+export type PeriodWhy = UsagePeriodSource | 'correction'
+
+/**
+ * The reasons each way may give. The backend records a source (paid or
+ * gifted) only on an extension, and a reason only on a set end date, so added
+ * time is paid or gifted, and a chosen end date is always a correction: a
+ * paid or gifted end date, or a correction counted in months, has nowhere to
+ * be kept.
+ */
+export function whyChoices(method: PeriodMethod): readonly PeriodWhy[] {
+  return method === 'add' ? ['paid', 'gifted'] : ['correction']
+}
+
+export type EndChangeIssue ='date' | 'reason' | 'reasonTooLong' | 'unchanged'
 
 export function endChangeIssues(draft: { endsOn: string; reason: string }, current: string | null): EndChangeIssue[] {
   const issues: EndChangeIssue[] = []
