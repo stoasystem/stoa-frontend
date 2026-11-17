@@ -59,6 +59,15 @@ function holdsPeriod(role: string) {
   return role === 'student' || role === 'parent'
 }
 
+/**
+ * The actions column stays pinned to the card's right edge while the rest of
+ * the row scrolls under it: the table is wider than the card at desktop
+ * widths, and the buttons used to sit in the scrolled-off part, cut through
+ * with no cue that more was there. It needs the card's own surface to cover
+ * what scrolls beneath, and a hairline to mark where the scrolling stops.
+ */
+const ACTIONS_CELL = 'sticky right-0 bg-[color:var(--surface)] p-2 shadow-[inset_1px_0_0_var(--hairline)]'
+
 /** An account just opened, whose period is set next, on this page (#614). */
 type OpenedAccount = { userId: string; accountNumber: string; role: AccountRole }
 
@@ -582,7 +591,10 @@ export function AdminAccountsPage() {
                 {t(`accounts.role.${group.role}`)} · {groups[group.role] ?? 0}
               </CardTitle>
             </CardHeader>
-            <CardContent className="overflow-x-auto">
+            {/* Margin rather than the usual padding: a sticky cell pins to the
+              * scroller's padding edge, and the row would show through the
+              * padding beside the pinned actions. */}
+            <CardContent className="mx-6 mb-6 overflow-x-auto p-0">
               {group.rows.length === 0 ? (
                 <p className="text-sm">{t('accounts.empty')}</p>
               ) : (
@@ -599,7 +611,7 @@ export function AdminAccountsPage() {
                       <th className="p-2">{t('accounts.columnLastLogin')}</th>
                       <th className="p-2">{t('accounts.columnLinked')}</th>
                       {holdsPeriod(group.role) ? <th className="p-2">{t('usagePeriod.columnEndsOn')}</th> : null}
-                      <th className="p-2">{t('accounts.columnActions')}</th>
+                      <th className={ACTIONS_CELL}>{t('accounts.columnActions')}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -640,8 +652,10 @@ export function AdminAccountsPage() {
                             <PeriodCell endsOn={row.usagePeriodEndsAt} today={today} />
                           </td>
                         ) : null}
-                        <td className="p-2">
-                          <div className="flex flex-wrap gap-2">
+                        <td className={ACTIONS_CELL}>
+                          {/* One under the other, each as wide as the widest,
+                            * so the column has one width and every button one size. */}
+                          <div className="flex flex-col items-stretch gap-2">
                             <Button
                               type="button"
                               size="sm"
