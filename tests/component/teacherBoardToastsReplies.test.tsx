@@ -128,7 +128,7 @@ describe('stats board', () => {
   })
 
   it.each([
-    ['taking a request', 'pending', 'Prüfung starten'],
+    ['taking a request', 'pending', 'Anfrage annehmen'],
     ['resolving a request', 'in_progress', 'Als gelöst markieren'],
   ] as const)('reads the figures again after %s', async (_label, status, button) => {
     vi.mocked(teacherApi.getTeacherHelpRequestDetail).mockResolvedValue(detail(status))
@@ -143,7 +143,7 @@ describe('stats board', () => {
   })
 
   it('reads the figures again after a reply', async () => {
-    vi.mocked(teacherApi.getTeacherHelpRequestDetail).mockResolvedValue(detail('pending'))
+    vi.mocked(teacherApi.getTeacherHelpRequestDetail).mockResolvedValue(detail('in_progress'))
     vi.mocked(teacherApi.addTeacherHelpRequestNote).mockResolvedValue({ id: 'n1' } as never)
     const { invalidatedKeys } = renderDetail()
     await userEvent.type(await screen.findByLabelText(REPLY_LABEL), 'Hallo Lea')

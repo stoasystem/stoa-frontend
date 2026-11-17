@@ -61,7 +61,7 @@ function renderAt(path: string, element: ReactNode, route = path) {
 
 const renderDetail = () => renderAt('/teacher/requests/r1', <TeacherHelpRequestDetailPage />, '/teacher/requests/:requestId')
 
-/** Presses "Prüfung starten" and lets the change fail with `error`. */
+/** Presses "Anfrage annehmen" and lets the change fail with `error`. */
 async function failStatusChange(error: unknown) {
   vi.mocked(teacherApi.getTeacherHelpRequestDetail).mockResolvedValue(detail('pending'))
   let refuse: (reason: unknown) => void = () => {}
@@ -69,9 +69,9 @@ async function failStatusChange(error: unknown) {
     new Promise((_, reject) => { refuse = reject }) as never,
   )
   renderDetail()
-  await userEvent.click(await screen.findByRole('button', { name: de.markInProgress }))
+  await userEvent.click(await screen.findByRole('button', { name: de.detail.accept.button }))
   // The pressed button is disabled while the change is out: focus is lost.
-  expect(screen.getByRole('button', { name: de.markInProgress })).toBeDisabled()
+  expect(screen.getByRole('button', { name: de.detail.accept.button })).toBeDisabled()
   await act(async () => refuse(error))
 }
 
@@ -106,7 +106,7 @@ describe('a status change that fails', () => {
       new Promise((resolve) => { finish = resolve }) as never,
     )
     renderDetail()
-    await userEvent.click(await screen.findByRole('button', { name: de.markInProgress }))
+    await userEvent.click(await screen.findByRole('button', { name: de.detail.accept.button }))
     await act(async () => finish({ requestId: 'r1', status: 'in_progress' }))
 
     await waitFor(() => expect(document.activeElement).toHaveAttribute('tabindex', '-1'))

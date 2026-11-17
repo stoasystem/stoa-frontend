@@ -17,6 +17,15 @@ export function isHelpRequestConflict(error: unknown): boolean {
 }
 
 /**
+ * A reply refused because the teacher it is offered to has not accepted the
+ * request yet: 409 `help_request_not_accepted`, action `accept_help_request`
+ * (stoa-backend#479). Not a conflict: the request is still theirs to accept.
+ */
+export function isHelpRequestNotAccepted(error: unknown): boolean {
+  return error instanceof ApiError && error.status === 409 && error.code === 'help_request_not_accepted'
+}
+
+/**
  * The server will not show this request to this teacher any more: someone
  * else took it (403) or it is gone (404). Asking again cannot change that;
  * any other failure (a timeout, a 500) may pass (#331).

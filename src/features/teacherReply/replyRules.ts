@@ -1,5 +1,5 @@
 import { isUploadGone } from '@/features/uploads/uploadGone'
-import { isHelpRequestConflict } from '@/lib/teacherHelpRequestConflict'
+import { isHelpRequestConflict, isHelpRequestNotAccepted } from '@/lib/teacherHelpRequestConflict'
 import { ApiError } from '@/services/api/httpClient'
 import type { TeacherReplyBlock, TeacherReplyRichContent } from '@/types/teacher'
 
@@ -18,6 +18,7 @@ import type { TeacherReplyBlock, TeacherReplyRichContent } from '@/types/teacher
  * - `images`: a picture it carried was already sent, or past its time; the
  *   server took none of it (#513).
  * - `conflict`: the request moved on under the teacher (409, #269).
+ * - `notAccepted`: offered to the teacher, not yet accepted (409, #705).
  * - `unknown`: refused (422) for a reason not read here.
  */
 export type ReplyRefusal =
@@ -28,6 +29,7 @@ export type ReplyRefusal =
   | 'tooLong'
   | 'images'
   | 'conflict'
+  | 'notAccepted'
   | 'unknown'
 
 /** The refusals that lie in the reply's own content: the ones checked before it goes. */
@@ -208,6 +210,7 @@ const REFUSAL_CODES = new Map<string, ContentRefusal>([
  */
 export function classifyRefusal(error: unknown): ReplyRefusal | null {
   if (isUploadGone(error)) return 'images'
+  if (isHelpRequestNotAccepted(error)) return 'notAccepted'
   if (isHelpRequestConflict(error)) return 'conflict'
   if (!(error instanceof ApiError) || error.status !== 422) return null
   return (error.code ? REFUSAL_CODES.get(error.code) : undefined) ?? 'unknown'

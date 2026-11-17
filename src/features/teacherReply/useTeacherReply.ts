@@ -52,6 +52,12 @@ export type TeacherReply = {
   sending: boolean
   /** The last reply was refused because the request moved on (409), until the next one is sent. */
   conflict: boolean
+  /**
+   * The last reply was refused because the request is offered to this teacher
+   * and not yet accepted (409 `help_request_not_accepted`, #705), until the
+   * next one is sent. The draft is kept; the page offers to accept it.
+   */
+  notAccepted: boolean
   /** The pictures it carries: `view` for `<Attachments>`, `pickFile` for the button. */
   attachments: { view: AttachmentsView; pickFile: () => void }
 }
@@ -99,6 +105,7 @@ function replyFailureKey(error: unknown) {
   const refusal = classifyRefusal(error)
   if (refusal === 'images') return 'teacher:toasts.replyImagesExpired'
   if (refusal === 'conflict') return 'teacher:toasts.replyConflict'
+  if (refusal === 'notAccepted') return 'teacher:toasts.replyNotAccepted'
   if (refusal === 'unknown') return 'teacher:toasts.replyRefused'
   if (refusal) return `teacher:toasts.replyRefusedBecause.${refusal}`
   return 'teacher:toasts.replyFailed'
@@ -142,7 +149,9 @@ export function useTeacherReply(
     },
     onError: (error) => {
       toast.error(i18n.t(replyFailureKey(error)))
-      if (classifyRefusal(error) !== 'conflict') return
+      // Moved on, or still only offered: either way the copy on screen is stale.
+      const refusal = classifyRefusal(error)
+      if (refusal !== 'conflict' && refusal !== 'notAccepted') return
       void queryClient.invalidateQueries({ queryKey: teacherQueryKeys.helpRequests() })
       void queryClient.invalidateQueries({ queryKey: teacherQueryKeys.stats() })
     },
@@ -210,6 +219,7 @@ export function useTeacherReply(
     send,
     sending,
     conflict: classifyRefusal(mutation.error) === 'conflict',
+    notAccepted: classifyRefusal(mutation.error) === 'notAccepted',
     attachments: { view: uploads.view, pickFile: uploads.sources.pickFile },
   }
 }

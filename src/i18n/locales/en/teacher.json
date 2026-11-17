@@ -81,7 +81,17 @@
       "altTeacher": "Teacher’s picture: {{name}}"
     },
     "enterClassroom": "Enter classroom",
-    "takeAndEnterClassroom": "Take it and enter classroom"
+    "takeAndEnterClassroom": "Take it and enter classroom",
+    "accept": {
+      "title": "Accept this request",
+      "body": "Accept the request before you reply. The student then sees that a teacher is on it.",
+      "replyRefused": "Your reply was not sent: you have not accepted this request yet. Accept it first; your draft is kept.",
+      "button": "Accept request"
+    },
+    "ended": {
+      "withdrawn": "The student withdrew this request. There is nothing left to do.",
+      "expired": "This request expired before anyone accepted it. There is nothing left to do."
+    }
   },
   "profile": {
     "eyebrow": "Teacher account",
@@ -315,6 +325,7 @@
     "replySent": "Your reply was sent.",
     "replyFailed": "Your reply could not be sent. Please try again.",
     "replyConflict": "Your reply was not sent: another teacher has taken this request, or it has changed.",
+    "replyNotAccepted": "Your reply was not sent: accept the request first.",
     "replyRefused": "Your reply was not accepted. Please check its content and format and send it again.",
     "availabilityUpdated": "Your availability was saved.",
     "replyRefusedBecause": {

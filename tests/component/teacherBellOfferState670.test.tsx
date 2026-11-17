@@ -62,7 +62,6 @@ vi.mock('sonner', () => ({ toast: { success: vi.fn(), error: vi.fn(), info: vi.f
 const mockedDetail = vi.mocked(teacherApi.getTeacherHelpRequestDetail)
 const TAGS = deCommon.notifications.offerState
 const GONE = deTeacher.detail.outOfReach
-const REPLY = 'Antwort der Lehrperson'
 
 function offer(eventId: string, metadata: Record<string, unknown>, title = `Hilfeanfrage ${eventId}`): NotificationEvent {
   return {
@@ -264,12 +263,14 @@ describe('the request page, refused', () => {
   it('with a copy on screen, keeps #269: the copy stays and offers nothing', async () => {
     mockedDetail.mockResolvedValueOnce(detail())
     const { poll } = renderPage()
-    expect(await screen.findByLabelText(REPLY)).toBeInTheDocument()
+    // Offered, it is accepted before any reply (#705).
+    const accept = { name: deTeacher.detail.accept.button }
+    expect(await screen.findByRole('button', accept)).toBeInTheDocument()
 
     mockedDetail.mockRejectedValue(new ApiError('gone', { status: 404 }))
     await poll()
 
-    await waitFor(() => expect(screen.queryByLabelText(REPLY)).toBeNull())
+    await waitFor(() => expect(screen.queryByRole('button', accept)).toBeNull())
     expect(screen.getByText(deTeacher.detail.loadFailed)).toBeInTheDocument()
     expect(screen.getAllByText(/Lea/).length).toBeGreaterThan(0)
     expect(screen.queryByText(GONE.title)).toBeNull()

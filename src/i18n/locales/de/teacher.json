@@ -81,7 +81,17 @@
       "altTeacher": "Bild der Lehrperson: {{name}}"
     },
     "enterClassroom": "Klassenzimmer betreten",
-    "takeAndEnterClassroom": "Übernehmen und Klassenzimmer betreten"
+    "takeAndEnterClassroom": "Übernehmen und Klassenzimmer betreten",
+    "accept": {
+      "title": "Anfrage annehmen",
+      "body": "Bevor Sie antworten können, nehmen Sie die Anfrage an. Dann sieht die lernende Person, dass sich eine Lehrperson darum kümmert.",
+      "replyRefused": "Ihre Antwort wurde nicht gesendet: Sie haben die Anfrage noch nicht angenommen. Nehmen Sie sie zuerst an; Ihr Entwurf bleibt erhalten.",
+      "button": "Anfrage annehmen"
+    },
+    "ended": {
+      "withdrawn": "Die lernende Person hat diese Anfrage zurückgezogen. Es ist nichts mehr zu tun.",
+      "expired": "Diese Anfrage ist abgelaufen, bevor jemand sie angenommen hat. Es ist nichts mehr zu tun."
+    }
   },
   "profile": {
     "eyebrow": "Lehrpersonen-Konto",
@@ -315,6 +325,7 @@
     "replySent": "Ihre Antwort wurde gesendet.",
     "replyFailed": "Ihre Antwort konnte nicht gesendet werden. Bitte versuchen Sie es erneut.",
     "replyConflict": "Ihre Antwort wurde nicht gesendet: Die Anfrage hat inzwischen eine andere Lehrperson übernommen, oder sie hat sich geändert.",
+    "replyNotAccepted": "Ihre Antwort wurde nicht gesendet: Nehmen Sie die Anfrage zuerst an.",
     "replyRefused": "Ihre Antwort wurde nicht angenommen. Bitte prüfen Sie Inhalt und Format und senden Sie sie erneut.",
     "availabilityUpdated": "Ihre Verfügbarkeit wurde gespeichert.",
     "replyRefusedBecause": {
