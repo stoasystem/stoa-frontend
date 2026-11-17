@@ -188,6 +188,7 @@ const COLOR = ['color']
 const DECORATION = ['text-decoration', 'text-decoration-line']
 const OUTLINE_STYLE = ['outline', 'outline-style']
 const MAX_WIDTH = ['max-width']
+const FONT_SIZE = ['font', 'font-size']
 const RING_SHADOW = ['--tw-ring-shadow']
 
 function place(html: string) {
@@ -238,6 +239,18 @@ const PRIMITIVES: [string, () => ReactElement, () => HTMLElement][] = [
   ],
 ]
 
+/** A small outline Button as a <button> and as a link, side by side as the admin accounts table has them. */
+const smallButton = () => (
+  <UiButton type="button" size="sm" variant="outline">
+    Suspend
+  </UiButton>
+)
+const smallLink = () => (
+  <UiButton asChild size="sm" variant="outline">
+    <a href="/admin/usage-periods/u-1">Usage period</a>
+  </UiButton>
+)
+
 const skyLink = () => (
   <Button asChild variant="onSky">
     <a href="/chapter/u-1">Open</a>
@@ -273,7 +286,7 @@ describe('global base rules sit under the utilities (#73)', () => {
       'md:max-w-[20px]',
       'max-md:max-w-[30px]',
       'motion-reduce:max-w-[40px]',
-      ...classesInUse([skyLink, ...PRIMITIVES.map(([, fixture]) => fixture)]),
+      ...classesInUse([skyLink, smallButton, smallLink, ...PRIMITIVES.map(([, fixture]) => fixture)]),
     ]
     sheet.textContent = compiler.build(candidates)
     document.head.append(sheet)
@@ -328,6 +341,26 @@ describe('global base rules sit under the utilities (#73)', () => {
     const win = winner(screen.getByRole('link', { name: 'Open' }), COLOR)
     expect(win?.selector).toBe('.text-\\[color\\:var\\(--on-sky-button-text\\)\\]')
     expect(win?.value).toBe('var(--on-sky-button-text)')
+  })
+})
+
+describe('a Button keeps its size token as a <button> and as a link', () => {
+  it('gives a bare button the surrounding text size', () => {
+    expect(winner(place('<button type="button">x</button>'), FONT_SIZE)?.value).toBe('inherit')
+  })
+
+  it('sizes a small Button rendered as a <button> from its token, not the surrounding text', () => {
+    // The base rule sat outside the layers and outranked this utility, so a
+    // <button> in a table cell took the cell's rem size while the link beside
+    // it kept the px token.
+    render(smallButton())
+    const win = winner(screen.getByRole('button', { name: 'Suspend' }), FONT_SIZE)
+    expect(win?.value).toBe('var(--control-text-small)')
+  })
+
+  it('sizes the same Button rendered as a link (asChild) from the same token', () => {
+    render(smallLink())
+    expect(winner(screen.getByRole('link', { name: 'Usage period' }), FONT_SIZE)?.value).toBe('var(--control-text-small)')
   })
 })
 

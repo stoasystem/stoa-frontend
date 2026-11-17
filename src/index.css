@@ -103,6 +103,19 @@
   canvas {
     max-width: 100%;
   }
+
+  /*
+   * A button takes the surrounding text by default, but a size utility on it
+   * (the Button's `--control-text-*` tokens) wins. Outside the layer this
+   * outranked those utilities, so a <button> took its table cell's size while
+   * a <Button asChild> link beside it kept the token: with a browser default
+   * font other than 16px the cell's rem size and the px token differ.
+   */
+  button {
+    font-family: var(--font-button);
+    font-size: inherit;
+    line-height: inherit;
+  }
 }
 
 html {
@@ -142,12 +155,12 @@ body {
   background: var(--accent);
 }
 
-button {
-  font-family: var(--font-button);
-  font-size: inherit;
-  line-height: inherit;
-}
-
+/*
+ * Still outside the layer, so it outranks size utilities on fields and labels
+ * the way the button rule above used to. Moving it in is a visible change of
+ * its own (login and /me labels 15 → 13 px, the login fields 15 → 17 px, the
+ * Ask composer 15 → 16 px), left for a separate decision.
+ */
 input,
 textarea,
 select,
