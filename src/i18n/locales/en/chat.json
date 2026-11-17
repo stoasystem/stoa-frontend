@@ -176,7 +176,20 @@
         "status": "Requested",
         "body": "Replies from a teacher appear in this conversation."
       },
-      "usagePeriodPaused": "Your usage period has ended, so asking a teacher is paused."
+      "usagePeriodPaused": "Your usage period has ended, so asking a teacher is paused.",
+      "mode": {
+        "choose": "How should the teacher help you?",
+        "text": "Text answer",
+        "classroom": "Online classroom",
+        "cancel": "Cancel",
+        "hint": "Text answer: the teacher replies here in the conversation. Online classroom: whiteboard and voice call, on a computer or tablet."
+      },
+      "classroom": {
+        "waiting": "You chose the online classroom. Once a teacher accepts your request, you can enter it here.",
+        "ready": "Your teacher is waiting for you in the classroom.",
+        "enter": "Enter classroom",
+        "biggerScreen": "The classroom works on a computer or tablet. Open it there."
+      }
     },
     "practice": {
       "subtitle": "Knows the question you are on",

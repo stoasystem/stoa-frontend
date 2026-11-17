@@ -178,7 +178,20 @@
         "status": "Demandée",
         "body": "Les réponses d’un enseignant apparaissent dans cette conversation."
       },
-      "usagePeriodPaused": "Ta période d’utilisation est terminée, tu ne peux donc pas demander à un enseignant pour le moment."
+      "usagePeriodPaused": "Ta période d’utilisation est terminée, tu ne peux donc pas demander à un enseignant pour le moment.",
+      "mode": {
+        "choose": "Comment l’enseignant doit-il t’aider ?",
+        "text": "Réponse écrite",
+        "classroom": "Classe en ligne",
+        "cancel": "Annuler",
+        "hint": "Réponse écrite : l’enseignant répond ici, dans la conversation. Classe en ligne : tableau blanc et appel vocal, sur ordinateur ou tablette."
+      },
+      "classroom": {
+        "waiting": "Tu as choisi la classe en ligne. Dès qu’un enseignant accepte ta demande, tu pourras y entrer ici.",
+        "ready": "Ton enseignant t’attend dans la classe.",
+        "enter": "Entrer dans la classe",
+        "biggerScreen": "La classe fonctionne sur ordinateur ou tablette. Ouvre-la là-bas."
+      }
     },
     "practice": {
       "subtitle": "Connaît la question sur laquelle tu es",

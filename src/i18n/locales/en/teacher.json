@@ -81,12 +81,12 @@
       "altTeacher": "Teacher’s picture: {{name}}"
     },
     "enterClassroom": "Enter classroom",
-    "takeAndEnterClassroom": "Take it and enter classroom",
     "accept": {
       "title": "Accept this request",
       "body": "Accept the request before you reply. The student then sees that a teacher is on it.",
       "replyRefused": "Your reply was not sent: you have not accepted this request yet. Accept it first; your draft is kept.",
-      "button": "Accept request"
+      "button": "Accept request",
+      "bodyClassroom": "Accept the request. Then you can enter the classroom, where the student joins you."
     },
     "ended": {
       "withdrawn": "The student withdrew this request. There is nothing left to do.",
@@ -336,5 +336,9 @@
       "tooLong": "Your reply was not accepted: it is too long in total. Please shorten or split it."
     },
     "replyImagesExpired": "The reply was not sent: a picture was no longer valid. Please choose it again, then send once more."
+  },
+  "helpMode": {
+    "text": "Text answer",
+    "classroom": "Online classroom"
   }
 }

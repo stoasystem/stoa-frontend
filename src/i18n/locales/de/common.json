@@ -232,6 +232,10 @@
         "summary": "Eine Lehrperson kümmert sich jetzt um deine Anfrage.",
         "title": "Eine Lehrperson ist deinem Gespräch beigetreten"
       },
+      "takeoverConversationClassroom": {
+        "title": "Eine Lehrperson ist deinem Gespräch beigetreten",
+        "summary": "Eine Lehrperson hat deine Anfrage angenommen. Komm jetzt ins Klassenzimmer."
+      },
       "takeoverQuestion": {
         "summary": "Eine Lehrperson arbeitet jetzt an deiner Frage.",
         "title": "Eine Lehrperson hat deine Frage übernommen"

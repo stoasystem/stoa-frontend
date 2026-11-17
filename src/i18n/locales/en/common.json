@@ -232,6 +232,10 @@
         "summary": "A teacher has started working on your request.",
         "title": "A teacher joined your conversation"
       },
+      "takeoverConversationClassroom": {
+        "title": "A teacher joined your conversation",
+        "summary": "A teacher accepted your request. Enter the classroom now."
+      },
       "takeoverQuestion": {
         "summary": "A teacher has started working on your question.",
         "title": "Teacher joined your question"

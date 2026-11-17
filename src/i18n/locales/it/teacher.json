@@ -81,12 +81,12 @@
       "altTeacher": "Immagine del docente: {{name}}"
     },
     "enterClassroom": "Entra in classe",
-    "takeAndEnterClassroom": "Prendi in carico ed entra in classe",
     "accept": {
       "title": "Accetta la richiesta",
       "body": "Prima di rispondere, accetta la richiesta. Così lo studente vede che un insegnante se ne sta occupando.",
       "replyRefused": "La tua risposta non è stata inviata: non hai ancora accettato questa richiesta. Accettala prima; la tua bozza resta salvata.",
-      "button": "Accetta richiesta"
+      "button": "Accetta richiesta",
+      "bodyClassroom": "Accetta la richiesta. Poi potrai entrare in classe, dove lo studente ti raggiungerà."
     },
     "ended": {
       "withdrawn": "Lo studente ha ritirato questa richiesta. Non c’è più nulla da fare.",
@@ -338,5 +338,9 @@
       "tooLong": "La tua risposta non è stata accettata: nel complesso è troppo lunga. Accorciala o dividila."
     },
     "replyImagesExpired": "La risposta non è stata inviata: un’immagine non era più valida. La scelga di nuovo e poi invii ancora."
+  },
+  "helpMode": {
+    "text": "Risposta scritta",
+    "classroom": "Classe online"
   }
 }

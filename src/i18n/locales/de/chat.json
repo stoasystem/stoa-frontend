@@ -176,7 +176,20 @@
         "status": "Angefragt",
         "body": "Antworten einer Lehrperson erscheinen in dieser Unterhaltung."
       },
-      "usagePeriodPaused": "Deine Nutzungsdauer ist abgelaufen, deshalb kannst du gerade keine Lehrperson fragen."
+      "usagePeriodPaused": "Deine Nutzungsdauer ist abgelaufen, deshalb kannst du gerade keine Lehrperson fragen.",
+      "mode": {
+        "choose": "Wie soll dir die Lehrperson helfen?",
+        "text": "Textantwort",
+        "classroom": "Online-Klassenzimmer",
+        "cancel": "Abbrechen",
+        "hint": "Textantwort: Die Lehrperson antwortet hier in der Unterhaltung. Online-Klassenzimmer: Whiteboard und Sprachanruf, am Computer oder Tablet."
+      },
+      "classroom": {
+        "waiting": "Du hast das Online-Klassenzimmer gewählt. Sobald eine Lehrperson deine Anfrage annimmt, kannst du hier eintreten.",
+        "ready": "Deine Lehrperson wartet im Klassenzimmer auf dich.",
+        "enter": "Klassenzimmer betreten",
+        "biggerScreen": "Das Klassenzimmer funktioniert am Computer oder Tablet. Öffne es dort."
+      }
     },
     "practice": {
       "subtitle": "Kennt die Aufgabe, an der du bist",

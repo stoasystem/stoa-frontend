@@ -334,7 +334,7 @@ describe('one request per conversation (#544)', () => {
     // Never escalated, and a request asked for is pending: the fake's own answers.
     const ask = openAsk()
     await userEvent.click(await ask.findByRole('button', { name: 'Ask a teacher' }))
-    await waitFor(() => expect(requestHelpMock).toHaveBeenCalledWith({ conversationId: 'c1' }))
+    await waitFor(() => expect(requestHelpMock).toHaveBeenCalledWith({ conversationId: 'c1', mode: 'text' }))
   })
 
   it('names the statuses that end a request, and the ones a student may still take back', () => {

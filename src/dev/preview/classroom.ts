@@ -12,6 +12,8 @@
  *                              `help_request_not_accepted` until it is (#705)
  *   ?teacherRequest=withdrawn  the student withdrew it before anyone took it
  *   ?teacherRequest=expired    nobody took it in time
+ *   ?helpMode=classroom        the demo request asks for the classroom, not a
+ *                              text answer (#705)
  *
  * A student who asks for a teacher here waits `TEACHER_JOINS_AFTER_MS`, then
  * the demo teacher has the request (`in_progress`), so the bar changes from
@@ -130,6 +132,7 @@ export function demoTeacherRequestDetail(requestId: string): TeacherHelpRequestD
     student: { id: student.id, name: student.name, grade: 'Grade 9' },
     subject: 'math',
     status: state.status,
+    mode: setting('helpMode') === 'classroom' ? 'classroom' : 'text',
     requestMessage: conversation?.messages.find((message) => message.role === 'student')?.content,
     messages: (conversation?.messages ?? []).map(({ attachments: _attachments, ...message }) => {
       void _attachments

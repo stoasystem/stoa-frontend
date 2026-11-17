@@ -3,7 +3,7 @@ import { formattingLocale } from '@/i18n/languages'
 import { Group, Pill, Row, type PillTone } from '@/components/base'
 import { SafeStatusLabel } from '@/components/common/SafeStatusLabel'
 import { getGradeLabelOrNotSet, getSubjectLabel } from '@/lib/displayLabels'
-import { isOpenHelpRequest, type TeacherHelpStatus } from '@/types/teacherHelp'
+import { helpModeOf, isOpenHelpRequest, type TeacherHelpStatus } from '@/types/teacherHelp'
 import type { TeacherHelpRequestSummary } from '@/types/teacher'
 
 /*
@@ -105,6 +105,14 @@ export function HelpRequestList({
                   </Pill>
                 )}
                 {(sla === 'at_risk' || sla === 'breached') && <Pill tone={slaTones[sla]}>{t(`requests.sla.${sla}`)}</Pill>}
+                {/* How the student asked to be helped (#705); an older request is a
+                  * text answer. On a phone only the classroom is marked: text is the usual. */}
+                <Pill
+                  tone={helpModeOf(request) === 'classroom' ? 'accent' : 'neutral'}
+                  className={helpModeOf(request) === 'classroom' ? undefined : 'hidden sm:inline-flex'}
+                >
+                  <span data-help-mode={helpModeOf(request)}>{t(`helpMode.${helpModeOf(request)}`)}</span>
+                </Pill>
                 <Pill tone={statusTones[request.status] ?? 'neutral'}>
                   <SafeStatusLabel kind="teacherHelp" value={request.status} />
                 </Pill>

@@ -232,6 +232,10 @@
         "summary": "Un/a docente si sta occupando della tua richiesta.",
         "title": "Un/a docente si è unito/a alla tua conversazione"
       },
+      "takeoverConversationClassroom": {
+        "title": "Un insegnante si è unito alla tua conversazione",
+        "summary": "Un insegnante ha accettato la tua richiesta. Entra ora in classe."
+      },
       "takeoverQuestion": {
         "summary": "Un/a docente sta lavorando alla tua domanda.",
         "title": "Un/a docente ha preso la tua domanda"

@@ -1,7 +1,7 @@
 import type { ChatMessage } from '@/types/chat'
 import type { AttachmentSummary } from '@/types/file'
 import type { PracticeTeacherRequestContext } from '@/types/practice'
-import type { TeacherHelpStatus } from '@/types/teacherHelp'
+import type { HelpMode, TeacherHelpStatus } from '@/types/teacherHelp'
 
 export type TeacherReplyBlock =
   | { type: 'paragraph' | 'heading' | 'ordered_list' | 'unordered_list' | 'quote' | 'code'; text: string }
@@ -25,6 +25,8 @@ export type TeacherHelpRequestSummary = {
   subject: string
   grade: string
   status: TeacherHelpStatus
+  /** How the student asked to be helped; missing means a text answer (`helpModeOf`, #705). */
+  mode?: HelpMode
   requestMessage?: string
   priority?: 'low' | 'medium' | 'high'
   createdAt: string
@@ -67,6 +69,8 @@ export type TeacherHelpRequestDetail = {
   }
   subject: string
   status: TeacherHelpStatus
+  /** How the student asked to be helped; missing means a text answer (`helpModeOf`, #705). */
+  mode?: HelpMode
   requestMessage?: string
   practiceContext?: PracticeTeacherRequestContext
   messages: TeacherHelpMessage[]

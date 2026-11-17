@@ -143,7 +143,7 @@ const field = <T>(body: unknown, name: string): T | undefined =>
 const answeredRight = new Set<string>()
 
 /** Teachers asked for on this page, by conversation. */
-const askedForTeacher = new Map<string, { requestId: string; conversationId: string; status: string; createdAt: string; teacherName?: string }>()
+const askedForTeacher = new Map<string, { requestId: string; conversationId: string; status: string; createdAt: string; mode: string; teacherName?: string }>()
 
 const routes: Array<[method: string, pattern: string, handler: Handler]> = [
   // Account
@@ -289,6 +289,8 @@ const routes: Array<[method: string, pattern: string, handler: Handler]> = [
       conversationId: field<string>(body, 'conversationId') ?? '',
       status: 'pending',
       createdAt: now(),
+      // As the backend: left out, a text answer (stoa-backend#480).
+      mode: field<string>(body, 'mode') === 'classroom' ? 'classroom' : 'text',
     }
     askedForTeacher.set(request.conversationId, request)
     return request
