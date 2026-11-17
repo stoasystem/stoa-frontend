@@ -110,8 +110,8 @@
       "showHint": "Show a hint",
       "nextHint": "Another hint",
       "practice": "Practice",
-      "showExercise": "One more to practise",
-      "nextExercise": "Another one",
+      "showExercise": "Try a similar question",
+      "nextExercise": "Try another",
       "related": "Related topics"
     },
     "presence": {
