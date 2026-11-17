@@ -1067,6 +1067,19 @@
     "open": "Periodo di utilizzo",
     "newAccountTitle": "Imposta il periodo di utilizzo di {{accountNumber}}",
     "newAccountHint": "L'account è aperto. Senza un periodo non potrà essere usato quando i periodi saranno applicati.",
-    "newAccountDone": "Fatto"
+    "newAccountDone": "Fatto",
+    "newAccount": {
+      "legend": "Periodo di utilizzo",
+      "hint": "Facoltativo. Se non lo modifichi, l'account riceve una prova di {{trial}}, in regalo.",
+      "preview": "Il periodo scadrà il {{date}}.",
+      "summary": "{{amount}} ({{source}})",
+      "dialogSummary": "Periodo di utilizzo, come scelto nel modulo: {{summary}}",
+      "fixInForm": "Correggi prima il periodo di utilizzo nel modulo:",
+      "applying": "Impostazione del periodo di utilizzo di {{accountNumber}}…",
+      "set": "Periodo di utilizzo di {{accountNumber}} impostato: {{summary}}, scade il {{date}}.",
+      "change": "Modifica il periodo",
+      "failed": "L'account {{accountNumber}} è stato aperto, ma il suo periodo di utilizzo non è stato impostato. {{reason}} Impostalo qui sotto.",
+      "conflict": "Qualcuno ha modificato questo periodo nello stesso momento."
+    }
   }
 }

@@ -1047,6 +1047,19 @@
     "open": "Nutzungsdauer",
     "newAccountTitle": "Nutzungsdauer für {{accountNumber}} festlegen",
     "newAccountHint": "Das Konto ist eröffnet. Ohne Nutzungsdauer kann es nicht genutzt werden, sobald Nutzungsdauern durchgesetzt werden.",
-    "newAccountDone": "Fertig"
+    "newAccountDone": "Fertig",
+    "newAccount": {
+      "legend": "Nutzungsdauer",
+      "hint": "Optional. Unverändert erhält das Konto eine Probezeit von {{trial}}, geschenkt.",
+      "preview": "Die Nutzungsdauer endet am {{date}}.",
+      "summary": "{{amount}} ({{source}})",
+      "dialogSummary": "Nutzungsdauer, wie im Formular gewählt: {{summary}}",
+      "fixInForm": "Korrigieren Sie zuerst die Nutzungsdauer im Formular:",
+      "applying": "Die Nutzungsdauer von {{accountNumber}} wird festgelegt…",
+      "set": "Nutzungsdauer von {{accountNumber}} festgelegt: {{summary}}, endet am {{date}}.",
+      "change": "Nutzungsdauer ändern",
+      "failed": "Das Konto {{accountNumber}} wurde eröffnet, aber seine Nutzungsdauer wurde nicht festgelegt. {{reason}} Legen Sie sie unten fest.",
+      "conflict": "Jemand hat diese Nutzungsdauer im selben Moment geändert."
+    }
   }
 }

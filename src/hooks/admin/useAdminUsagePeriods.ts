@@ -15,6 +15,7 @@ import {
   readUsagePeriod,
   setUsagePeriodEnd,
   type UsagePeriodChange,
+  type UsagePeriodExtension,
   type UsagePeriodRead,
 } from '@/services/admin/usagePeriodApi'
 
@@ -68,6 +69,24 @@ export function useExtendUsagePeriodMutation() {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: extendUsagePeriod,
+    onSuccess: (result) => afterWrite(queryClient, result),
+  })
+}
+
+/**
+ * A new account's first period, chosen in the form that opened it. Neither
+ * opening route takes a period, so it is an ordinary extension sent right
+ * after. The version it carries is read first, as the panel reads it: a new
+ * profile is not at 0 (opening it and attaching its number each write one),
+ * and guessing would answer `usage_period_version_conflict`.
+ */
+export function useFirstUsagePeriodMutation() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (input: Omit<UsagePeriodExtension, 'expectedVersion'>) => {
+      const current = await readUsagePeriod(input.userId)
+      return extendUsagePeriod({ ...input, expectedVersion: current.version })
+    },
     onSuccess: (result) => afterWrite(queryClient, result),
   })
 }

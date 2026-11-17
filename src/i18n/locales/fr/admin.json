@@ -1067,6 +1067,19 @@
     "open": "Période d'utilisation",
     "newAccountTitle": "Fixer la période d'utilisation de {{accountNumber}}",
     "newAccountHint": "Le compte est ouvert. Sans période, il ne pourra pas être utilisé une fois les périodes appliquées.",
-    "newAccountDone": "Terminé"
+    "newAccountDone": "Terminé",
+    "newAccount": {
+      "legend": "Période d'utilisation",
+      "hint": "Facultatif. Sans modification, le compte reçoit un essai de {{trial}}, offert.",
+      "preview": "La période se terminera le {{date}}.",
+      "summary": "{{amount}} ({{source}})",
+      "dialogSummary": "Période d'utilisation, telle que choisie dans le formulaire : {{summary}}",
+      "fixInForm": "Corrigez d'abord la période d'utilisation dans le formulaire :",
+      "applying": "Fixation de la période d'utilisation de {{accountNumber}}…",
+      "set": "Période d'utilisation de {{accountNumber}} fixée : {{summary}}, se termine le {{date}}.",
+      "change": "Modifier la période",
+      "failed": "Le compte {{accountNumber}} a été ouvert, mais sa période d'utilisation n'a pas été fixée. {{reason}} Fixez-la ci-dessous.",
+      "conflict": "Quelqu'un a modifié cette période au même moment."
+    }
   }
 }

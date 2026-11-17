@@ -64,6 +64,27 @@ export type ExtensionDraft = {
 
 export type ExtensionIssue = 'amount' | 'paidInMonths' | 'paymentReference' | 'paymentReferenceTooLong' | 'noteTooLong'
 
+/** The roles that hold a usage period (#614, the backend's `PERIOD_ROLES`); a teacher or an administrator has none. */
+export function holdsUsagePeriod(role: string): boolean {
+  return role === 'student' || role === 'parent'
+}
+
+/** A new student's or parent's period unless the administrator changes it: a three-day trial, as a gift. */
+export const TRIAL_EXTENSION: ExtensionDraft = {
+  unit: 'days',
+  amount: '3',
+  source: 'gifted',
+  paymentReference: '',
+  note: '',
+}
+
+/** A draft with `patch` applied. A paid extension is counted in months, so switching to paid takes days away. */
+export function changeExtensionDraft(current: ExtensionDraft, patch: Partial<ExtensionDraft>): ExtensionDraft {
+  const next = { ...current, ...patch }
+  if (next.source === 'paid') next.unit = 'months'
+  return next
+}
+
 /** The whole number the amount field holds, or null. */
 export function extensionAmount(draft: ExtensionDraft): number | null {
   const text = draft.amount.trim()

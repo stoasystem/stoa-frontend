@@ -16,6 +16,7 @@ import { BlockedReason } from '@/pages/admin/AccountFormFields'
 import {
   type ExtensionDraft,
   MAX_EXTENSION_AMOUNT,
+  changeExtensionDraft,
   daysBetween,
   endChangeEffect,
   endChangeIssues,
@@ -146,12 +147,7 @@ export function UsagePeriodPanel({
   const extensionReasons = extensionTouched ? issues.map((issue) => t(`usagePeriod.extensionIssues.${issue}`)) : []
 
   function changeExtension(patch: Partial<ExtensionDraft>) {
-    setExtension((current) => {
-      const next = { ...current, ...patch }
-      // A paid extension is counted in months; switching to paid takes days away.
-      if (next.source === 'paid') next.unit = 'months'
-      return next
-    })
+    setExtension((current) => changeExtensionDraft(current, patch))
   }
 
   function extend() {

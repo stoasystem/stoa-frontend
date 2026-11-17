@@ -1047,6 +1047,19 @@
     "open": "Usage period",
     "newAccountTitle": "Set the usage period of {{accountNumber}}",
     "newAccountHint": "The account is open. Until it has a period it cannot be used once periods are enforced.",
-    "newAccountDone": "Done"
+    "newAccountDone": "Done",
+    "newAccount": {
+      "legend": "Usage period",
+      "hint": "Optional. Left as it is, the account gets a trial of {{trial}}, as a gift.",
+      "preview": "The period will end on {{date}}.",
+      "summary": "{{amount}} ({{source}})",
+      "dialogSummary": "Usage period, as chosen in the form: {{summary}}",
+      "fixInForm": "Correct the usage period in the form first:",
+      "applying": "Setting the usage period of {{accountNumber}}…",
+      "set": "Usage period of {{accountNumber}} set: {{summary}}, ends on {{date}}.",
+      "change": "Change the period",
+      "failed": "Account {{accountNumber}} was opened, but its usage period was not set. {{reason}} Set it below.",
+      "conflict": "Someone changed this period at the same moment."
+    }
   }
 }

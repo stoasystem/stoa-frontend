@@ -428,7 +428,7 @@ describe('#614 the users list', () => {
     expect(teacher.closest('table')).not.toHaveTextContent(copy.columnEndsOn)
   })
 
-  it('goes straight to the new account’s period after opening it, with the first password still shown', async () => {
+  it('gives the new account its period right after opening it, with the first password still shown', async () => {
     const user = userEvent.setup()
     mockedList.mockResolvedValue({ items: [], count: 0, groups: {}, nextCursor: null })
     mockedAssign.mockResolvedValue({
@@ -439,7 +439,15 @@ describe('#614 the users list', () => {
       accountStatus: 'active',
       initialPassword: 'Initial12345678',
     })
-    mockedRead.mockResolvedValue(period({ userId: 'stud-new', endsOn: null, state: 'none', version: 0, effective: null }))
+    mockedRead.mockResolvedValue(period({ userId: 'stud-new', endsOn: null, state: 'none', version: 2, effective: null }))
+    mockedExtend.mockResolvedValue({
+      userId: 'stud-new',
+      role: 'student',
+      endsOn: '2026-11-12',
+      state: 'active',
+      version: 3,
+      record: record({ unit: 'days', amount: 3, source: 'gifted', newEndsOn: '2026-11-12' }),
+    })
     wrap(<AdminAccountsPage />, '/admin/users')
 
     await user.click(await screen.findByRole('button', { name: enAdmin.accounts.assign }))
@@ -447,10 +455,17 @@ describe('#614 the users list', () => {
     await user.type(within(dialog).getByLabelText(new RegExp(enAdmin.accounts.emailLabel)), 'new@example.ch')
     await user.click(within(dialog).getByRole('button', { name: enAdmin.accounts.assignDialogSubmit }))
 
+    const done = await screen.findByText(new RegExp('Usage period of S26-0011 set'))
+    await waitFor(() => expect(done).toHaveFocus())
+    expect(done).toHaveTextContent(day('2026-11-12'))
+    expect(screen.getByText(new RegExp('Initial12345678'))).toBeInTheDocument()
+    expect(mockedRead).toHaveBeenCalledWith('stud-new')
+    expect(mockedExtend).toHaveBeenCalledWith(expect.objectContaining({ userId: 'stud-new', expectedVersion: 2 }))
+
+    // The panel is one click away, to change what was just set.
+    await user.click(screen.getByRole('button', { name: copy.newAccount.change }))
     const heading = await screen.findByText(fill(copy.newAccountTitle, { accountNumber: 'S26-0011' }))
     await waitFor(() => expect(heading).toHaveFocus())
-    expect(screen.getByText(new RegExp('Initial12345678'))).toBeInTheDocument()
-    expect(await screen.findByLabelText(copy.amountLabel)).toBeInTheDocument()
-    expect(mockedRead).toHaveBeenCalledWith('stud-new', expect.anything())
+    expect(await screen.findByRole('button', { name: copy.extendSubmit })).toBeInTheDocument()
   })
 })

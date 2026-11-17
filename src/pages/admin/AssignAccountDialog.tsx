@@ -12,10 +12,17 @@ import {
 import { AccountDraftFields, BlockedReason } from '@/pages/admin/AccountFormFields'
 import type { AccountDraft } from '@/pages/admin/accountFormRules'
 import { accountDraftIssues, blockingIssues } from '@/pages/admin/accountFormRules'
+import { holdsUsagePeriod } from '@/pages/admin/usagePeriodRules'
 
 type Props = {
   open: boolean
   initial: AccountDraft
+  /**
+   * The usage period chosen in the form behind the dialog, named here for a
+   * student or a parent. It is set there, not here, so there is one period
+   * per opening and it is the one the administrator sees in the form.
+   */
+  periodSummary?: string
   pending: boolean
   /** What the server refused with, if it refused. */
   error: string | null
@@ -37,6 +44,7 @@ type Props = {
 export function AssignAccountDialog({
   open,
   initial,
+  periodSummary,
   pending,
   error,
   onOpenChange,
@@ -90,6 +98,12 @@ export function AssignAccountDialog({
             onChange={(patch) => setDraft((current) => ({ ...current, ...patch }))}
             onTouch={(field) => setTouched((current) => ({ ...current, [field]: true }))}
           />
+
+          {periodSummary && holdsUsagePeriod(draft.role) ? (
+            <p className="w-full text-sm" data-testid="assign-period-summary">
+              {t('usagePeriod.newAccount.dialogSummary', { summary: periodSummary })}
+            </p>
+          ) : null}
 
           <BlockedReason id="assign-blocked" reasons={shownReasons} />
 
