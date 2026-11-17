@@ -175,7 +175,7 @@ describe('an answer read back in its sections', () => {
     expect(thread(ask).queryByRole('button', { name: 'Another hint' })).not.toBeInTheDocument()
     await waitFor(() => expect(within(hints).getAllByRole('listitem')[1]).toHaveFocus())
 
-    await userEvent.click(thread(ask).getByRole('button', { name: 'One more to practise' }))
+    await userEvent.click(thread(ask).getByRole('button', { name: 'Try a similar question' }))
     expect(thread(ask).getByRole('list', { name: 'Practice' })).toHaveTextContent('Solve 2x + 4 = 10.')
   })
 

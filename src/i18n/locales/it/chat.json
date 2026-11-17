@@ -110,8 +110,8 @@
       "showHint": "Mostra un suggerimento",
       "nextHint": "Un altro suggerimento",
       "practice": "Esercitati",
-      "showExercise": "Un altro esercizio",
-      "nextExercise": "Un altro ancora",
+      "showExercise": "Un esercizio simile",
+      "nextExercise": "Un altro esercizio",
       "related": "Argomenti collegati"
     },
     "presence": {
