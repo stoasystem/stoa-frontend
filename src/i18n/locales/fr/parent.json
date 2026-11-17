@@ -351,5 +351,19 @@
     "loading": "Chargement des réglages e-mail …",
     "unavailable": "Les réglages e-mail ne sont pas disponibles pour le moment.",
     "saveFailed": "Cette modification n’a pas été enregistrée. Veuillez réessayer."
+  },
+  "voiceQuestions": {
+    "title": "Questions à voix haute",
+    "label": "Autoriser les questions à voix haute",
+    "description": "Lorsque cette option est activée, {{name}} peut dire une question dans le micro dans STOA au lieu de l’écrire.",
+    "processing": "L'enregistrement est envoyé à STOA et transformé en texte en Irlande, dans un centre de données d'AWS (région eu-west-1), par le modèle vocal Voxtral. Seuls l'enregistrement et la consigne de le transcrire mot pour mot, sans le traduire, sont envoyés au modèle ; le nom, le compte et la conversation en cours de votre enfant ne l'accompagnent pas. L'enregistrement est traité uniquement en mémoire : il n'est ni conservé, ni journalisé, ni utilisé pour entraîner des modèles d'IA. Votre enfant voit le texte dans le champ de saisie et envoie lui-même la question.",
+    "off": "Désactivé par défaut. Tant que l’option est désactivée, STOA n’enregistre aucune voix ; votre enfant peut toujours écrire ou dicter avec la dictée de son appareil.",
+    "changedByMe": "Modifié en dernier par vous le {{date}}.",
+    "changedByOther": "Modifié en dernier par un autre parent le {{date}}.",
+    "loading": "Chargement du réglage …",
+    "loadFailed": "Le réglage n’a pas pu être chargé.",
+    "saving": "Enregistrement …",
+    "saveFailed": "Le réglage n’a pas pu être enregistré. Veuillez réessayer.",
+    "privacyLink": "En savoir plus dans la déclaration de confidentialité"
   }
 }

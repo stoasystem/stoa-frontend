@@ -14,7 +14,11 @@
       },
       "voiceInput": {
         "title": "Dettare invece di scrivere",
-        "body": "Le domande si possono anche dettare, per esempio con Win + H su Windows, con il tasto del microfono o la scorciatoia di dettatura su un Mac, o con il microfono sulla tastiera del telefono. La voce viene allora elaborata dal sistema del dispositivo e STOA riceve solo il testo. Per il riconoscimento vocale valgono le regole sulla privacy del fornitore del sistema operativo o della tastiera (per esempio Microsoft, Apple o Google). STOA stesso non registra alcuna voce."
+        "body": "Le domande si possono anche dettare, per esempio con Win + H su Windows, con il tasto del microfono o la scorciatoia di dettatura su un Mac, o con il microfono sulla tastiera del telefono. La voce viene allora elaborata dal sistema del dispositivo e STOA riceve solo il testo. Per il riconoscimento vocale valgono le regole sulla privacy del fornitore del sistema operativo o della tastiera (per esempio Microsoft, Apple o Google). Durante la dettatura STOA stesso non registra alcuna voce."
+      },
+      "voiceQuestions": {
+        "title": "Fare domande a voce",
+        "body": "Se un genitore lo ha consentito per il proprio figlio, lo studente può anche dire una domanda nel microfono direttamente in STOA. Senza questo consenso la funzione è disattivata. La registrazione viene inviata a STOA e trasformata in testo in Irlanda, in un centro dati di AWS (regione eu-west-1), dal modello vocale Voxtral. Al modello vengono inviati solo la registrazione e l'istruzione di trascriverla parola per parola, senza tradurla; i dati dello studente, come il nome o l'account, e la conversazione fino a quel momento non vengono inviati. La registrazione viene elaborata solo in memoria: non viene conservata, non viene registrata nei log e non viene usata per addestrare modelli di IA. Lo studente vede il testo nel campo di inserimento e invia la domanda da solo."
       },
       "visibility": {
         "title": "Visibilità per genitori e insegnanti",

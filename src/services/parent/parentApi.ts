@@ -49,6 +49,33 @@ export async function getChildLearningProfile(childId: string) {
   return response.data
 }
 
+/**
+ * Whether this child may ask by voice (#697, stoa-backend#469): off until a
+ * linked parent turns it on; any linked parent may change it, the last change
+ * wins, and `changedByMe` says whether that was this parent.
+ */
+export type ChildVoiceQuestions = {
+  studentId: string
+  allowed: boolean
+  changedAt?: string | null
+  changedByMe?: boolean | null
+}
+
+export async function getChildVoiceQuestions(childId: string) {
+  const response = await httpClient.get<ChildVoiceQuestions>(
+    apiPath`/parents/me/children/${childId}/voice-questions`,
+  )
+  return response.data
+}
+
+export async function setChildVoiceQuestions(childId: string, allowed: boolean) {
+  const response = await httpClient.put<ChildVoiceQuestions>(
+    apiPath`/parents/me/children/${childId}/voice-questions`,
+    { allowed },
+  )
+  return response.data
+}
+
 export async function getParentSubscription() {
   const response = await httpClient.get<ParentSubscription>('/parents/me/subscription')
   return response.data

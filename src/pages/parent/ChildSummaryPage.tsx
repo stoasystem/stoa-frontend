@@ -6,6 +6,7 @@ import { Breadcrumbs } from '@/components/common/Breadcrumbs'
 import { PageActions } from '@/components/common/PageActions'
 import { ChildStarAnswersCard } from '@/components/parent/ChildStarAnswersCard'
 import { ChildSummaryHeader } from '@/components/parent/ChildSummaryHeader'
+import { ChildVoiceQuestionsCard } from '@/components/parent/ChildVoiceQuestionsCard'
 import { getActivityTypeLabel } from '@/components/parent/activityLabels'
 import { LearningProfileSignals } from '@/components/learning/LearningProfileSignals'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -156,6 +157,8 @@ export function ChildSummaryPage() {
                 </p>
               </CardContent>
             </Card>
+            {/* The child's settings (#697): asking by voice, off until a parent allows it. */}
+            {childId && <ChildVoiceQuestionsCard childId={childId} childName={summary.student.name} />}
           </>
         )}
       </div>
