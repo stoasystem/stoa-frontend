@@ -1,10 +1,12 @@
-import { ArrowUp, Camera, Image as ImageGlyph, Mic, Plus, Smartphone, type LucideIcon } from 'lucide-react'
-import { useEffect, useId, useRef, useState, type FormEvent, type KeyboardEvent, type ReactNode } from 'react'
+import { ArrowUp, Camera, Image as ImageGlyph, LoaderCircle, Mic, Plus, Smartphone, Square, type LucideIcon } from 'lucide-react'
+import { useCallback, useEffect, useId, useRef, useState, type FormEvent, type KeyboardEvent, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { IconButton } from '@/components/base/IconButton'
 import { COMPOSER } from '@/components/base/sizes'
 import * as Menu from '@radix-ui/react-dropdown-menu'
+import { useVoiceRecording, type VoiceInput } from '@/components/base/useVoiceRecording'
 import { dictationPlatform } from '@/lib/dictationPlatform'
+import { clockOf, insertAtCursor, MAX_RECORDING_SECONDS } from '@/lib/voiceRecording'
 import { cn } from '@/lib/utils'
 
 export type ComposerVariant = 'docked' | 'full'
@@ -58,6 +60,13 @@ export interface ComposerProps {
    * into the field like a keyboard. No microphone where the device is not known.
    */
   dictation?: boolean
+  /**
+   * Ask's fields, for a student a linked parent allowed to ask by voice
+   * (#697): the microphone records, and what was said is put into the field
+   * at the cursor, not sent. Without it, or once the browser refuses the
+   * microphone, the microphone says how to dictate (`dictation`).
+   */
+  voice?: VoiceInput
   className?: string
 }
 
@@ -108,6 +117,7 @@ export function Composer({
   onCompositionStart,
   onCompositionEnd,
   dictation = false,
+  voice,
   className,
 }: ComposerProps) {
   const { t } = useTranslation('common')
@@ -116,10 +126,42 @@ export function Composer({
   const dictationId = `${fieldId}-dictation`
   const field = useRef<HTMLTextAreaElement>(null)
   const [blocked, setBlocked] = useState<SendBlocked | null>(null)
-  const [platform] = useState(() => (dictation ? dictationPlatform() : null))
+  const voiceId = `${fieldId}-voice`
+  const [platform] = useState(() => (dictation || voice ? dictationPlatform() : null))
   const [dictationOpen, setDictationOpen] = useState(false)
   const mic = useRef<HTMLButtonElement>(null)
   const bubble = useRef<HTMLDivElement>(null)
+  const valueNow = useRef(value)
+  useEffect(() => {
+    valueNow.current = value
+  })
+  /*
+   * What was said goes where the cursor is (a selection is replaced), and the
+   * cursor goes after it, so the child reads it over and sends it themself
+   * (#697). Nothing is sent from here.
+   */
+  const insertSpoken = useCallback((text: string) => {
+    const node = field.current
+    const { value: next, cursor } = insertAtCursor(valueNow.current, node?.selectionStart, node?.selectionEnd, text)
+    valueNow.current = next
+    setBlocked(null)
+    onChange(next)
+    window.requestAnimationFrame(() => {
+      const now = field.current
+      if (!now) return
+      now.focus()
+      now.setSelectionRange(cursor, cursor)
+    })
+  }, [onChange])
+  const recording = useVoiceRecording(voice && !disabled ? voice : undefined, insertSpoken)
+  const voiceState = recording.state
+  /** The microphone records: voice questions are on and the browser has not refused the microphone. */
+  const records = Boolean(voice) && !recording.micBlocked
+  const listening = voiceState.phase === 'listening'
+  const working = voiceState.phase === 'starting' || voiceState.phase === 'transcribing'
+  const voiceOpen = records
+    ? listening || voiceState.phase === 'transcribing' || voiceState.phase === 'failed'
+    : voiceState.phase === 'failed' && voiceState.failure !== 'micBlocked'
   const spec = COMPOSER[variant]
   const empty = value.trim().length === 0
   const canSend = !disabled && !busy && !empty
@@ -155,6 +197,24 @@ export function Composer({
       document.removeEventListener('pointerdown', onPress)
     }
   }, [dictationOpen])
+
+  // Esc puts a recording, its transcription or its failure away; the field keeps what it had.
+  const dismissVoice = recording.dismiss
+  useEffect(() => {
+    if (!voiceOpen) return
+    function onKey(event: globalThis.KeyboardEvent) {
+      if (event.key !== 'Escape') return
+      dismissVoice()
+      mic.current?.focus()
+    }
+    document.addEventListener('keydown', onKey)
+    return () => document.removeEventListener('keydown', onKey)
+  }, [voiceOpen, dismissVoice])
+
+  // Switched off mid-recording (a quiz started, the period ended): nothing of it is kept.
+  useEffect(() => {
+    if (disabled) dismissVoice()
+  }, [disabled, dismissVoice])
 
   // The answer arrived: the reason for holding send went with it.
   useEffect(() => {
@@ -280,36 +340,150 @@ export function Composer({
   )
   /*
    * The microphone (#553) took the place of the line that used to sit over the
-   * field: the child asked for an icon. It says how to start the device's own
-   * dictation and that STOA only receives the text; it starts nothing itself.
+   * field: the child asked for an icon. Without voice questions it says how to
+   * start the device's own dictation and that STOA only receives the text; it
+   * starts nothing itself. With them (#697) it records: press to start, press
+   * again to stop.
    */
-  const micButton = platform && (
+  function pressMic() {
+    if (!records) {
+      dismissVoice()
+      setDictationOpen((open) => !open)
+      return
+    }
+    if (listening) recording.stop()
+    else if (!working) void recording.start()
+  }
+  // The browser refused the microphone: from here on it says how to dictate, and says so at once.
+  const micBlocked = recording.micBlocked
+  useEffect(() => {
+    if (!micBlocked) return
+    dismissVoice()
+    setDictationOpen(true)
+  }, [micBlocked, dismissVoice])
+  const micLabel = records
+    ? t(listening ? 'composer.voice.stop' : 'composer.voice.start')
+    : t('composer.dictation.label')
+  const micButton = (platform || voice) && (
     <IconButton
       ref={mic}
-      label={t('composer.dictation.label')}
-      icon={Mic}
+      label={micLabel}
+      icon={listening ? Square : Mic}
       size={spec.attach}
       glyph={spec.attachGlyph}
-      variant="plain"
-      aria-expanded={dictationOpen}
-      aria-controls={dictationOpen ? dictationId : undefined}
-      onClick={() => setDictationOpen((open) => !open)}
+      variant={listening ? 'tinted' : 'plain'}
+      aria-expanded={records ? undefined : dictationOpen}
+      aria-controls={records ? (voiceOpen ? voiceId : undefined) : dictationOpen ? dictationId : undefined}
+      aria-pressed={records ? listening : undefined}
+      aria-disabled={records && working ? true : undefined}
+      onClick={pressMic}
       disabled={disabled}
-      data-composer-mic
+      data-composer-mic={records ? 'voice' : 'dictation'}
+      data-composer-mic-phase={records ? voiceState.phase : undefined}
     />
   )
-  const dictationBubble = platform && dictationOpen && (
+  /** Why the microphone says how to dictate, when it would have recorded. */
+  const blockedNote = voice && micBlocked ? t('composer.voice.failed.micBlocked') : null
+  const dictationBubble = !records && dictationOpen && (platform || blockedNote) && (
     <div
       ref={bubble}
       id={dictationId}
       role="note"
       aria-label={t('composer.dictation.label')}
-      data-composer-dictation={platform}
+      data-composer-dictation={platform ?? 'none'}
       className="absolute bottom-full right-0 z-10 mb-2 flex max-w-[320px] flex-col gap-1 rounded-[12px] border border-[color:var(--float-border)] [background:linear-gradient(var(--surface),var(--surface)),var(--ground)] p-3 text-left shadow-[var(--shadow-float)]"
     >
-      <p className="m-0 text-[15px] text-ink">{t(`composer.dictation.${platform}`)}</p>
-      <p className="m-0 text-[13px] text-caption">{t('composer.dictation.privacy')}</p>
+      {blockedNote && <p data-composer-dictation-blocked className="m-0 text-[15px] text-ink">{blockedNote}</p>}
+      {platform && <p className="m-0 text-[15px] text-ink">{t(`composer.dictation.${platform}`)}</p>}
+      {platform && <p className="m-0 text-[13px] text-caption">{t('composer.dictation.privacy')}</p>}
+      {!platform && <p className="m-0 text-[13px] text-caption">{t('composer.voice.typeInstead')}</p>}
     </div>
+  )
+  /*
+   * Where a voice question stands, over the field like the way to dictate:
+   * listening (with the time, against the minute), turning it into text, or
+   * what went wrong and the way on -- again, or typing. The field keeps what
+   * it had through all of it.
+   */
+  function typeInstead() {
+    recording.dismiss()
+    field.current?.focus()
+  }
+  const voiceSaid =
+    voiceState.phase === 'listening'
+      ? t('composer.voice.listening')
+      : voiceState.phase === 'transcribing'
+        ? t('composer.voice.transcribing')
+        : voiceState.phase === 'failed'
+          ? t(`composer.voice.failed.${voiceState.failure}`)
+          : ''
+  const failedState = voiceState.phase === 'failed' ? voiceState : null
+  const voiceBubble = voiceOpen && (
+    <div
+      id={voiceId}
+      data-composer-voice={voiceState.phase}
+      data-composer-voice-failure={failedState?.failure}
+      className="absolute bottom-full right-0 z-10 mb-2 flex w-[min(320px,100%)] flex-col gap-2 rounded-[12px] border border-[color:var(--float-border)] [background:linear-gradient(var(--surface),var(--surface)),var(--ground)] p-3 text-left shadow-[var(--shadow-float)]"
+    >
+      {voiceState.phase === 'listening' && (
+        <>
+          <p className="m-0 flex items-center gap-2 text-[15px] text-ink">
+            <span aria-hidden="true" className="inline-block size-2.5 shrink-0 rounded-full bg-[#d93025] motion-safe:animate-pulse" />
+            <span className="min-w-0 flex-1">{voiceSaid}</span>
+            <span data-composer-voice-clock className="tabular-nums text-caption">
+              {clockOf(voiceState.seconds)} / {clockOf(MAX_RECORDING_SECONDS)}
+            </span>
+          </p>
+          <p className="m-0 text-[13px] text-caption">{t('composer.voice.stopHint')}</p>
+          <p className="m-0 text-[13px] text-caption">{t('composer.voice.privacy')}</p>
+        </>
+      )}
+      {voiceState.phase === 'transcribing' && (
+        <p className="m-0 flex items-center gap-2 text-[15px] text-ink">
+          <LoaderCircle size={16} aria-hidden="true" className="shrink-0 motion-safe:animate-spin" />
+          <span className="min-w-0">{voiceSaid}</span>
+        </p>
+      )}
+      {failedState && (
+        <>
+          <p className="m-0 text-[15px] text-ink">{voiceSaid}</p>
+          {(failedState.failure === 'notAllowed' || failedState.failure === 'unsupported') && platform && (
+            <p className="m-0 text-[13px] text-caption">{t(`composer.dictation.${platform}`)}</p>
+          )}
+        </>
+      )}
+      {voiceState.phase !== 'listening' && (
+        <div className="flex flex-wrap justify-end gap-2">
+          {failedState?.retry && (
+            <button
+              type="button"
+              data-composer-voice-retry={failedState.retry}
+              onClick={recording.retry}
+              className="min-h-9 cursor-pointer rounded-full border-0 bg-accent-tint px-3 text-[14px] font-medium text-accent"
+            >
+              {t(failedState.retry === 'send' ? 'composer.voice.sendAgain' : 'composer.voice.recordAgain')}
+            </button>
+          )}
+          <button
+            type="button"
+            data-composer-voice-type
+            onClick={typeInstead}
+            className="min-h-9 cursor-pointer rounded-full border-0 bg-fill px-3 text-[14px] font-medium text-ink"
+          >
+            {t('composer.voice.typeInsteadAction')}
+          </button>
+        </div>
+      )}
+    </div>
+  )
+  /*
+   * Read out as it changes (#345: always mounted, only its words change).
+   * Not the running clock, which would be read every second.
+   */
+  const voiceStatus = (dictation || voice) && (
+    <p role="status" className="sr-only" data-composer-voice-status>
+      {voiceSaid}
+    </p>
   )
   const fieldDescribedBy = [describedBy, blocked ? hintId : undefined].filter(Boolean).join(' ') || undefined
   const fieldParts = (
@@ -366,7 +540,9 @@ export function Composer({
         }}
       >
         {hint}
+        {voiceStatus}
         {dictationBubble}
+        {voiceBubble}
         {add}
         {fieldParts}
         {micButton}
@@ -389,7 +565,9 @@ export function Composer({
       }}
     >
       {hint}
+      {voiceStatus}
       {dictationBubble}
+      {voiceBubble}
       {fieldParts}
       <div data-composer-footer className="flex items-center gap-1.5" style={{ height: COMPOSER.full.footer }}>
         {add}
