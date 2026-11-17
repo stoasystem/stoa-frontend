@@ -116,6 +116,21 @@
     font-size: inherit;
     line-height: inherit;
   }
+
+  /*
+   * Fields and labels likewise take the surrounding text unless a size or
+   * leading utility on them says otherwise. Outside the layer this rule
+   * outranked those utilities, so `text-[13px]` on a label or `text-[17px]` on
+   * an input was silently ignored and everything rendered at the body's 15 px.
+   */
+  input,
+  textarea,
+  select,
+  label {
+    font-family: var(--font-label);
+    font-size: inherit;
+    line-height: inherit;
+  }
 }
 
 html {
@@ -153,21 +168,6 @@ body {
 ::selection {
   color: var(--on-accent);
   background: var(--accent);
-}
-
-/*
- * Still outside the layer, so it outranks size utilities on fields and labels
- * the way the button rule above used to. Moving it in is a visible change of
- * its own (login and /me labels 15 → 13 px, the login fields 15 → 17 px, the
- * Ask composer 15 → 16 px), left for a separate decision.
- */
-input,
-textarea,
-select,
-label {
-  font-family: var(--font-label);
-  font-size: inherit;
-  line-height: inherit;
 }
 
 .stoa-type-body {
