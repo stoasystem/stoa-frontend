@@ -200,10 +200,12 @@ test('an administrator extends a student’s period, changes its end, and finds 
   await expect(page.getByRole('heading', { name: 'Lea Muster (S26-0001)' })).toBeVisible()
   await expect(page.getByText('No period').first()).toBeVisible()
 
-  // A paid extension: whole months and the offline payment's reference.
+  // One form. Added time, paid: whole months and the offline payment's reference.
+  await expect(page.getByRole('radio', { name: 'Add time' })).toBeChecked()
+  await expect(page.getByLabel('Why')).toHaveValue('paid')
   await page.getByLabel('How many').fill('3')
   await page.getByLabel('Payment reference (required)').fill('RF18 5390 0754')
-  await page.getByRole('button', { name: 'Extend', exact: true }).click()
+  await page.getByRole('button', { name: 'Add to the period', exact: true }).click()
   await expect(page.getByText(/^Extended\. The period now ends on/)).toBeVisible()
   expect(backend.callsTo('POST', '/admin/users/{user_id}/usage-period/extensions').map((call) => call.body)).toEqual([
     { unit: 'months', amount: 3, source: 'paid', paymentReference: 'RF18 5390 0754', expectedVersion: 0 },
@@ -216,18 +218,22 @@ test('an administrator extends a student’s period, changes its end, and finds 
   // Another administrator gives a month before this one changes the end date.
   period.write(OTHER_ADMIN_ID, { kind: 'extend', unit: 'months', amount: 1, source: 'gifted', newEndsOn: extendedEnd(period.endsOn, zurichToday(), 'months', 1) })
   const ended = addDays(zurichToday(), -3)
+  // A chosen end date is always a correction, with its reason.
+  await page.getByRole('radio', { name: 'Set an end date' }).check()
+  await expect(page.getByLabel('Why')).toHaveValue('correction')
+  await expect(page.getByLabel('Why')).toBeDisabled()
   await page.getByLabel('New end date').fill(ended)
   await page.getByLabel('Reason (required)').fill('refund agreed')
-  await page.getByRole('button', { name: 'Change end date…' }).click()
+  await page.getByRole('button', { name: 'Set end date…' }).click()
   await expect(page.getByText(/That day has already passed, so the period ends at once/)).toBeVisible()
-  await page.getByRole('button', { name: 'Change end date', exact: true }).click()
+  await page.getByRole('button', { name: 'Set end date', exact: true }).click()
   await expect(page.getByRole('alert')).toContainText('Someone else changed this period a moment ago')
   // Read again: the other administrator's record is there, and what was typed stays.
   await expect(page.getByRole('row').filter({ hasText: OTHER_ADMIN_ID })).toContainText('Gifted')
   await expect(page.getByLabel('Reason (required)')).toHaveValue('refund agreed')
 
-  await page.getByRole('button', { name: 'Change end date…' }).click()
-  await page.getByRole('button', { name: 'Change end date', exact: true }).click()
+  await page.getByRole('button', { name: 'Set end date…' }).click()
+  await page.getByRole('button', { name: 'Set end date', exact: true }).click()
   await expect(page.getByText(/^The end date is now/)).toBeVisible()
   expect(backend.callsTo('PUT', '/admin/users/{user_id}/usage-period').map((call) => call.body)).toEqual([
     { endsOn: ended, reason: 'refund agreed', expectedVersion: 1 },

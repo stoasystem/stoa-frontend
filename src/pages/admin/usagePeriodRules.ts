@@ -64,6 +64,27 @@ export type ExtensionDraft = {
 
 export type ExtensionIssue = 'amount' | 'paidInMonths' | 'paymentReference' | 'paymentReferenceTooLong' | 'noteTooLong'
 
+/** The roles that hold a usage period (#614, the backend's `PERIOD_ROLES`); a teacher or an administrator has none. */
+export function holdsUsagePeriod(role: string): boolean {
+  return role === 'student' || role === 'parent'
+}
+
+/** A new student's or parent's period unless the administrator changes it: a three-day trial, as a gift. */
+export const TRIAL_EXTENSION: ExtensionDraft = {
+  unit: 'days',
+  amount: '3',
+  source: 'gifted',
+  paymentReference: '',
+  note: '',
+}
+
+/** A draft with `patch` applied. A paid extension is counted in months, so switching to paid takes days away. */
+export function changeExtensionDraft(current: ExtensionDraft, patch: Partial<ExtensionDraft>): ExtensionDraft {
+  const next = { ...current, ...patch }
+  if (next.source === 'paid') next.unit = 'months'
+  return next
+}
+
 /** The whole number the amount field holds, or null. */
 export function extensionAmount(draft: ExtensionDraft): number | null {
   const text = draft.amount.trim()
@@ -89,7 +110,27 @@ export function extensionIssues(draft: ExtensionDraft): ExtensionIssue[] {
   return issues
 }
 
-export type EndChangeIssue = 'date' | 'reason' | 'reasonTooLong' | 'unchanged'
+/**
+ * The two ways one form changes a period: add time to it, or set its end date.
+ * They are the backend's two writes, an extension and a set end date.
+ */
+export type PeriodMethod = 'add' | 'set'
+
+/** Why the period changes, as the form offers it: the extension's source, or a correction. */
+export type PeriodWhy = UsagePeriodSource | 'correction'
+
+/**
+ * The reasons each way may give. The backend records a source (paid or
+ * gifted) only on an extension, and a reason only on a set end date, so added
+ * time is paid or gifted, and a chosen end date is always a correction: a
+ * paid or gifted end date, or a correction counted in months, has nowhere to
+ * be kept.
+ */
+export function whyChoices(method: PeriodMethod): readonly PeriodWhy[] {
+  return method === 'add' ? ['paid', 'gifted'] : ['correction']
+}
+
+export type EndChangeIssue ='date' | 'reason' | 'reasonTooLong' | 'unchanged'
 
 export function endChangeIssues(draft: { endsOn: string; reason: string }, current: string | null): EndChangeIssue[] {
   const issues: EndChangeIssue[] = []

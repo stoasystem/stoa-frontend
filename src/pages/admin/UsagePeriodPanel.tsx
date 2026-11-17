@@ -16,12 +16,15 @@ import { BlockedReason } from '@/pages/admin/AccountFormFields'
 import {
   type ExtensionDraft,
   MAX_EXTENSION_AMOUNT,
+  changeExtensionDraft,
   daysBetween,
   endChangeEffect,
   endChangeIssues,
   extendedEnd,
   extensionAmount,
   extensionIssues,
+  type PeriodMethod,
+  whyChoices,
   zurichToday,
 } from '@/pages/admin/usagePeriodRules'
 import { ApiError } from '@/services/api/httpClient'
@@ -61,8 +64,14 @@ export function periodDay(day: string | null | undefined) {
 
 /**
  * One student's or parent's usage period (#614): the end date and its state,
- * for a student the period actually in force and whose it is, the two ways to
+ * for a student the period actually in force and whose it is, one form to
  * change it, and every change made so far.
+ *
+ * The form says how (add time, or set an end date) and why (paid, gifted, or
+ * a correction). Their effect on the end date is the same; what differs is
+ * what the record keeps, so the choices follow the backend's two writes
+ * (`whyChoices`): added time is an extension, paid or gifted; a chosen end
+ * date is a correction with its reason, and is confirmed before it is sent.
  *
  * Both writes send the version the panel read. When somebody else wrote in
  * between, the server refuses (`usage_period_version_conflict`); the panel
@@ -83,6 +92,7 @@ export function UsagePeriodPanel({
   const reload = useReloadUsagePeriod()
   const formId = useId()
 
+  const [method, setMethod] = useState<PeriodMethod>('add')
   const [extension, setExtension] = useState<ExtensionDraft>(EMPTY_EXTENSION)
   const [extensionTouched, setExtensionTouched] = useState(false)
   const [endDraft, setEndDraft] = useState({ endsOn: '', reason: '' })
@@ -134,6 +144,7 @@ export function UsagePeriodPanel({
   // Writes wait for the read a previous write started, so they carry its version.
   const writing = extendMutation.isPending || setMutation.isPending || periodQuery.isFetching
   const isParent = period.role === 'parent'
+  const adding = method === 'add'
 
   // ---- extend ---------------------------------------------------------------
   const issues = extensionIssues(extension)
@@ -146,12 +157,7 @@ export function UsagePeriodPanel({
   const extensionReasons = extensionTouched ? issues.map((issue) => t(`usagePeriod.extensionIssues.${issue}`)) : []
 
   function changeExtension(patch: Partial<ExtensionDraft>) {
-    setExtension((current) => {
-      const next = { ...current, ...patch }
-      // A paid extension is counted in months; switching to paid takes days away.
-      if (next.source === 'paid') next.unit = 'months'
-      return next
-    })
+    setExtension((current) => changeExtensionDraft(current, patch))
   }
 
   function extend() {
@@ -253,115 +259,131 @@ export function UsagePeriodPanel({
         </p>
       ) : null}
 
-      <section aria-labelledby={`${formId}-extend`} className="flex flex-col gap-2 rounded-md border p-3">
-        <h3 id={`${formId}-extend`} className="text-sm font-semibold">
-          {t('usagePeriod.extendTitle')}
+      <section aria-labelledby={`${formId}-form`} className="flex flex-col gap-3 rounded-md border p-3">
+        <h3 id={`${formId}-form`} className="text-sm font-semibold">
+          {t('usagePeriod.formTitle')}
         </h3>
+        <fieldset className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
+          <legend className="mb-1 text-sm">{t('usagePeriod.methodLabel')}</legend>
+          {(['add', 'set'] as const).map((choice) => (
+            <label key={choice} className="flex items-center gap-2">
+              <input
+                type="radio"
+                name={`${formId}-method`}
+                value={choice}
+                checked={method === choice}
+                disabled={confirming}
+                onChange={() => setMethod(choice)}
+              />
+              {t(`usagePeriod.method.${choice}`)}
+            </label>
+          ))}
+        </fieldset>
         <div className="flex flex-wrap items-end gap-3">
           <label className="flex flex-col gap-1 text-sm">
             {t('usagePeriod.sourceLabel')}
             <select
-              className="h-9 rounded-md border px-2"
-              value={extension.source}
+              className="h-9 rounded-md border px-2 disabled:opacity-100"
+              value={adding ? extension.source : 'correction'}
+              // A chosen end date is always a correction: there is nothing else to pick.
+              disabled={!adding}
               onChange={(event) => changeExtension({ source: event.target.value as UsagePeriodSource })}
             >
-              <option value="paid">{t('usagePeriod.source.paid')}</option>
-              <option value="gifted">{t('usagePeriod.source.gifted')}</option>
+              {whyChoices(method).map((why) => (
+                <option key={why} value={why}>
+                  {t(`usagePeriod.source.${why}`)}
+                </option>
+              ))}
             </select>
           </label>
-          <label className="flex flex-col gap-1 text-sm">
-            {t('usagePeriod.amountLabel')}
-            <Input
-              className="w-24"
-              inputMode="numeric"
-              value={extension.amount}
-              onChange={(event) => changeExtension({ amount: event.target.value })}
-              onBlur={() => setExtensionTouched(true)}
-            />
-          </label>
-          <label className="flex flex-col gap-1 text-sm">
-            {t('usagePeriod.unitLabel')}
-            <select
-              className="h-9 rounded-md border px-2"
-              value={extension.unit}
-              onChange={(event) => changeExtension({ unit: event.target.value as UsagePeriodUnit })}
-            >
-              <option value="months">{t('usagePeriod.unit.months')}</option>
-              <option value="days" disabled={extension.source === 'paid'}>
-                {t('usagePeriod.unit.days')}
-              </option>
-            </select>
-          </label>
-          {extension.source === 'paid' ? (
-            <label className="flex flex-col gap-1 text-sm">
-              {t('usagePeriod.paymentReferenceLabel')}
-              <Input
-                className="w-72"
-                value={extension.paymentReference}
-                aria-required
-                onChange={(event) => changeExtension({ paymentReference: event.target.value })}
-                onBlur={() => setExtensionTouched(true)}
-              />
-            </label>
-          ) : null}
-          <label className="flex flex-col gap-1 text-sm">
-            {t('usagePeriod.noteLabel')}
-            <Input
-              className="w-72"
-              value={extension.note}
-              onChange={(event) => changeExtension({ note: event.target.value })}
-            />
-          </label>
+          {adding ? (
+            <>
+              <label className="flex flex-col gap-1 text-sm">
+                {t('usagePeriod.amountLabel')}
+                <Input
+                  className="w-24"
+                  inputMode="numeric"
+                  value={extension.amount}
+                  onChange={(event) => changeExtension({ amount: event.target.value })}
+                  onBlur={() => setExtensionTouched(true)}
+                />
+              </label>
+              <label className="flex flex-col gap-1 text-sm">
+                {t('usagePeriod.unitLabel')}
+                <select
+                  className="h-9 rounded-md border px-2"
+                  value={extension.unit}
+                  onChange={(event) => changeExtension({ unit: event.target.value as UsagePeriodUnit })}
+                >
+                  <option value="months">{t('usagePeriod.unit.months')}</option>
+                  <option value="days" disabled={extension.source === 'paid'}>
+                    {t('usagePeriod.unit.days')}
+                  </option>
+                </select>
+              </label>
+              {extension.source === 'paid' ? (
+                <label className="flex flex-col gap-1 text-sm">
+                  {t('usagePeriod.paymentReferenceLabel')}
+                  <Input
+                    className="w-72"
+                    value={extension.paymentReference}
+                    aria-required
+                    onChange={(event) => changeExtension({ paymentReference: event.target.value })}
+                    onBlur={() => setExtensionTouched(true)}
+                  />
+                </label>
+              ) : null}
+              <label className="flex flex-col gap-1 text-sm">
+                {t('usagePeriod.noteLabel')}
+                <Input
+                  className="w-72"
+                  value={extension.note}
+                  onChange={(event) => changeExtension({ note: event.target.value })}
+                />
+              </label>
+            </>
+          ) : (
+            <>
+              <label className="flex flex-col gap-1 text-sm">
+                {t('usagePeriod.newEndLabel')}
+                <Input
+                  type="date"
+                  value={endDraft.endsOn}
+                  disabled={confirming}
+                  onChange={(event) => setEndDraft((current) => ({ ...current, endsOn: event.target.value }))}
+                />
+              </label>
+              <label className="flex flex-col gap-1 text-sm">
+                {t('usagePeriod.reasonLabel')}
+                <Input
+                  className="w-72"
+                  value={endDraft.reason}
+                  aria-required
+                  disabled={confirming}
+                  onChange={(event) => setEndDraft((current) => ({ ...current, reason: event.target.value }))}
+                />
+              </label>
+            </>
+          )}
         </div>
         <p className="text-xs text-muted-foreground">
-          {extension.source === 'paid' ? t('usagePeriod.paidHint') : t('usagePeriod.giftedHint', { max: MAX_EXTENSION_AMOUNT })}
+          {!adding
+            ? t('usagePeriod.correctionHint')
+            : extension.source === 'paid'
+              ? t('usagePeriod.paidHint')
+              : t('usagePeriod.giftedHint', { max: MAX_EXTENSION_AMOUNT })}
         </p>
         <p className="text-sm" data-testid="usage-period-preview">
-          {preview
-            ? t('usagePeriod.preview', { date: periodDay(preview), from: periodDay(countsFrom) })
-            : t('usagePeriod.previewEmpty', { from: periodDay(countsFrom) })}
+          {adding
+            ? preview
+              ? t('usagePeriod.preview', { date: periodDay(preview), from: periodDay(countsFrom) })
+              : t('usagePeriod.previewEmpty', { from: periodDay(countsFrom) })
+            : endIssues.includes('date')
+              ? t('usagePeriod.setPreviewEmpty', { current: periodDay(period.endsOn) })
+              : t('usagePeriod.setPreview', { date: periodDay(endDraft.endsOn), current: periodDay(period.endsOn) })}
         </p>
-        <BlockedReason id={`${formId}-extend-blocked`} reasons={extensionReasons} />
-        <div>
-          <Button
-            type="button"
-            onClick={extend}
-            disabled={writing || (extensionTouched && issues.length > 0)}
-            aria-describedby={extensionReasons.length > 0 ? `${formId}-extend-blocked` : undefined}
-          >
-            {t('usagePeriod.extendSubmit')}
-          </Button>
-        </div>
-      </section>
-
-      <section aria-labelledby={`${formId}-set`} className="flex flex-col gap-2 rounded-md border p-3">
-        <h3 id={`${formId}-set`} className="text-sm font-semibold">
-          {t('usagePeriod.setTitle')}
-        </h3>
-        <p className="text-xs text-muted-foreground">{t('usagePeriod.setHint')}</p>
-        <div className="flex flex-wrap items-end gap-3">
-          <label className="flex flex-col gap-1 text-sm">
-            {t('usagePeriod.newEndLabel')}
-            <Input
-              type="date"
-              value={endDraft.endsOn}
-              disabled={confirming}
-              onChange={(event) => setEndDraft((current) => ({ ...current, endsOn: event.target.value }))}
-            />
-          </label>
-          <label className="flex flex-col gap-1 text-sm">
-            {t('usagePeriod.reasonLabel')}
-            <Input
-              className="w-72"
-              value={endDraft.reason}
-              aria-required
-              disabled={confirming}
-              onChange={(event) => setEndDraft((current) => ({ ...current, reason: event.target.value }))}
-            />
-          </label>
-        </div>
-        <BlockedReason id={`${formId}-set-blocked`} reasons={endReasons} />
-        {confirming ? (
+        <BlockedReason id={`${formId}-blocked`} reasons={adding ? extensionReasons : endReasons} />
+        {!adding && confirming ? (
           <div role="group" aria-labelledby={`${formId}-confirm`} className="flex flex-col gap-2 rounded-md bg-muted/40 p-3 text-sm">
             <p id={`${formId}-confirm`} className="font-medium">
               {t('usagePeriod.confirmChange', { from: periodDay(period.endsOn), to: periodDay(endDraft.endsOn) })}
@@ -387,12 +409,11 @@ export function UsagePeriodPanel({
           <div>
             <Button
               type="button"
-              variant="outline"
-              onClick={askToConfirm}
-              disabled={writing || (endTouched && endIssues.length > 0)}
-              aria-describedby={endReasons.length > 0 ? `${formId}-set-blocked` : undefined}
+              onClick={adding ? extend : askToConfirm}
+              disabled={writing || (adding ? extensionTouched && issues.length > 0 : endTouched && endIssues.length > 0)}
+              aria-describedby={(adding ? extensionReasons : endReasons).length > 0 ? `${formId}-blocked` : undefined}
             >
-              {t('usagePeriod.setSubmit')}
+              {adding ? t('usagePeriod.addSubmit') : t('usagePeriod.setSubmit')}
             </Button>
           </div>
         )}
