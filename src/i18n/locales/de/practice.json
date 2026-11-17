@@ -157,6 +157,15 @@
     "loading": "Fällige Fragen werden gesucht …",
     "missed_one": "einmal falsch",
     "missed_other": "{{count}}-mal falsch",
+    "reason": {
+      "fresh": "Noch frisch",
+      "fading": "Etwas verschwommen",
+      "forgetting": "Fast vergessen",
+      "forgotten": "Wahrscheinlich vergessen",
+      "latestWrong": "Letztes Mal falsch",
+      "overdue_one": "einen Tag überfällig",
+      "overdue_other": "{{count}} Tage überfällig"
+    },
     "title": "Fragen, die zurückkommen"
   },
   "session": {

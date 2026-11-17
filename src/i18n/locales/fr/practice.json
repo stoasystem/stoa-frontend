@@ -161,6 +161,16 @@
     "missed_one": "ratée une fois",
     "missed_many": "ratée {{count}} fois",
     "missed_other": "ratée {{count}} fois",
+    "reason": {
+      "fresh": "Encore frais",
+      "fading": "Un peu flou",
+      "forgetting": "Presque oublié",
+      "forgotten": "Sans doute oublié",
+      "latestWrong": "Ratée la dernière fois",
+      "overdue_one": "en retard d’un jour",
+      "overdue_many": "en retard de {{count}} jours",
+      "overdue_other": "en retard de {{count}} jours"
+    },
     "title": "Les questions qui reviennent"
   },
   "session": {

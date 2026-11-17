@@ -197,9 +197,24 @@ export function demoReviewDue(): ReviewDueResponse {
     dueAt: generatedAt,
     lapses: index === 0 ? 2 : 0,
     reps: index + 1,
+    reason: demoReviewReasons[index % demoReviewReasons.length],
   }))
   return { items, dueCount: items.length, generatedAt }
 }
+
+/**
+ * Why each demo card is due (#684), one of each kind the page draws: a band
+ * with days waited, one without, a miss that is still fresh, and a card from
+ * before the server sent a reason. `bandLabel` stays null: the page names the
+ * band in the reader's language itself.
+ */
+const demoReviewReasons: ReviewCard['reason'][] = [
+  { daysOverdue: 3, retrievability: 0.42, targetRetention: 0.9, latestWrong: false, band: 'forgotten', bandLabel: null },
+  { daysOverdue: 0, retrievability: 0.86, targetRetention: 0.9, latestWrong: false, band: 'fading', bandLabel: null },
+  { daysOverdue: 1, retrievability: 0.97, targetRetention: 0.9, latestWrong: true, band: 'fresh', bandLabel: null },
+  { daysOverdue: 1, retrievability: 0.7, targetRetention: 0.9, latestWrong: false, band: 'forgetting', bandLabel: null },
+  undefined,
+]
 
 /** Which review state the demo backend is in (#593): questions due, scheduled and none due, or neither. */
 export function demoReviewState(): 'due' | 'scheduled' | null {
