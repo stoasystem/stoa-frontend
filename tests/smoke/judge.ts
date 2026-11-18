@@ -9,6 +9,8 @@
  * them, without asking a model anything.
  */
 
+import { expect, type Locator } from '@playwright/test'
+
 const WORDS: Record<'de' | 'en', ReadonlySet<string>> = {
   de: new Set([
     'der', 'die', 'das', 'und', 'ist', 'nicht', 'ein', 'eine', 'einen', 'ich', 'du', 'wir',
@@ -86,18 +88,73 @@ export function screenAnswer(answer: string, screen: Screen): string[] {
   return problems
 }
 
+/** An assistant message as `GET /conversations/{id}` returns it. */
+export type StoredAnswer = {
+  content: string
+  structured?: {
+    kind?: string
+    steps?: string[] | null
+    answer?: string | null
+    hints?: string[] | null
+    similarExercises?: string[] | null
+    knowledgePoints?: unknown[] | null
+  } | null
+}
+
+/**
+ * The text of an answer the page shows at first sight (#714). An answer that
+ * carries its sections is drawn from them, not from `content`
+ * (src/features/ask/AskAnswerSections.tsx, `hasSections`): each step in its own
+ * card, the card's number drawn beside the step's text, then the answer. Its
+ * `content` is the backend's joined text -- `1. …`, `2. …` and the first hint,
+ * which the page keeps closed -- so a stretch of it may not be on screen at all.
+ * The steps' own text is, whatever the card around it is made to look like.
+ */
+export function shownAnswerText(message: StoredAnswer): string {
+  const structured = message.structured
+  if (structured?.kind === 'answer') {
+    const steps = (structured.steps ?? []).filter((step) => step.trim())
+    const answer = structured.answer?.trim() ?? ''
+    const sections = Boolean(
+      steps.length || answer || structured.hints?.length || structured.similarExercises?.length || structured.knowledgePoints?.length,
+    )
+    if (sections) return [...steps, answer].filter(Boolean).join('\n')
+  }
+  return message.content
+}
+
+/** `1. `, `2) `, `- `, `• ` at the start of a line: a list marker, not the line's words. */
+const LIST_MARKER = /^\s*(?:\d{1,3}[.)]|[-+•])\s+/
+
 /**
  * A stretch of an answer that reads the same on screen as in the stored text:
- * no markdown or LaTeX in it, which the page renders into something else.
+ * no markdown or LaTeX in it, which the page renders into something else, and
+ * no list marker at the start of a line, which the page may draw as a number
+ * of its own (#714).
  */
 export function plainSnippet(content: string, length = 32): string | null {
   for (const line of content.split('\n')) {
-    for (const piece of line.split(/[$\\`*_#|^{}[\]<>~]+/)) {
+    for (const piece of line.replace(LIST_MARKER, '').split(/[$\\`*_#|^{}[\]<>~]+/)) {
       const text = piece.replace(/\s+/g, ' ').trim()
       if (text.length >= length && /[A-Za-zÄÖÜäöüß]{3}/.test(text)) return text.slice(0, length).trim()
     }
   }
   return null
+}
+
+/**
+ * The stored answer is on screen in `shown`, the assistant's bubble: a plain
+ * stretch of what the page draws of it (`shownAnswerText`), or, for an answer
+ * with no such stretch, something. `offline/judge.spec.ts` runs it against a
+ * page laid out as Ask lays out an answer in steps, and against one without it.
+ */
+export async function expectAnswerOnScreen(shown: Locator, message: StoredAnswer, timeout = 15_000): Promise<void> {
+  const snippet = plainSnippet(shownAnswerText(message))
+  if (snippet) {
+    await expect(shown, 'the answer is on screen').toContainText(snippet, { timeout })
+  } else {
+    await expect(shown, 'an answer is on screen').not.toBeEmpty({ timeout })
+  }
 }
 
 /**

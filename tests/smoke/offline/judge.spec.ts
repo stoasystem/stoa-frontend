@@ -1,5 +1,15 @@
-import { expect, test } from '@playwright/test'
-import { E03_SCREEN, dominantLanguage, findErrorCode, plainSnippet, screenAnswer, type Screen } from '../judge'
+import { expect, test, type Page } from '@playwright/test'
+import {
+  E03_SCREEN,
+  dominantLanguage,
+  expectAnswerOnScreen,
+  findErrorCode,
+  plainSnippet,
+  screenAnswer,
+  shownAnswerText,
+  type Screen,
+  type StoredAnswer,
+} from '../judge'
 
 /*
  * The negative controls for AI answers (#27, 判据): fixed answers, written
@@ -102,6 +112,103 @@ test('the on-screen snippet skips LaTeX and markdown', () => {
     'Die Ableitung misst, wie schnell',
   )
   expect(plainSnippet('$x$')).toBeNull()
+})
+
+test('the on-screen snippet skips a list marker at the start of a line (#714)', () => {
+  expect(plainSnippet('1. Stell dir vor, du fährst mit dem Fahrrad einen Hügel hinauf.')).toBe('Stell dir vor, du fährst mit dem')
+  // A first step too short to use: the snippet comes from the second, still without its "2. ".
+  expect(plainSnippet('1. Kurz gesagt:\n2) Die Ableitung misst, wie schnell sich etwas ändert.')).toBe(
+    'Die Ableitung misst, wie schnell',
+  )
+  expect(plainSnippet('- Die Steigung einer Geraden ist überall gleich gross.')).toMatch(/^Die Steigung einer Geraden/)
+  // A number that is part of the sentence stays.
+  expect(plainSnippet('Am 1. August feiern wir in der Schweiz den Nationalfeiertag.')).toMatch(/^Am 1\. August/)
+})
+
+/*
+ * The answer of the 2026-11-18 production run, as `GET /conversations/{id}`
+ * returned it: the joined `content` the backend keeps beside the sections, and
+ * the sections the page draws (#506, #714).
+ */
+const STEPS = [
+  'Stell dir vor, du fährst mit dem **Velo** einen Hügel hinauf. Je steiler der Hügel, desto mehr musst du treten.',
+  'Die Ableitung $f\'(x)$ sagt dir an jeder Stelle, wie steil es gerade ist.',
+]
+const STEPPED: StoredAnswer = {
+  content:
+    `1. ${STEPS[0]}\n2. ${STEPS[1]}\n\nDie Ableitung ist die Steigung an einer Stelle.\n\n` +
+    'Tipp: Zeichne eine Gerade, die den Hügel an einer Stelle nur berührt.',
+  structured: {
+    kind: 'answer',
+    steps: STEPS,
+    answer: 'Die Ableitung ist die Steigung an einer Stelle.',
+    hints: ['Tipp: Zeichne eine Gerade, die den Hügel an einer Stelle nur berührt.'],
+    similarExercises: [],
+    knowledgePoints: [],
+  },
+}
+
+test('what the page shows of an answer in sections is its steps and answer, not the closed hint', () => {
+  const shown = shownAnswerText(STEPPED)
+  expect(shown).toContain(STEPS[0])
+  expect(shown).not.toMatch(/^1\. /m)
+  expect(shown).not.toContain('Tipp:')
+  expect(plainSnippet(shown)).toBe('Stell dir vor, du fährst mit dem')
+  // An answer from before the sections, or a follow-up, is shown as its text.
+  expect(shownAnswerText({ content: 'Nur Text.', structured: null })).toBe('Nur Text.')
+  expect(shownAnswerText({ content: 'Nur Text.', structured: { kind: 'followUp', steps: ['x'] } })).toBe('Nur Text.')
+})
+
+/** The assistant's bubble, laid out as src/features/ask/AskAnswerSections.tsx draws an answer in steps. */
+function steppedBubble(steps: string[], answer: string): string {
+  const cards = steps
+    .map(
+      (step, index) =>
+        `<li data-step-index="${index}"><span aria-hidden="true">${index + 1}</span><div>` +
+        `<span class="sr-only">Step ${index + 1}: </span>` +
+        // MathRenderer: **bold** as <strong>, a formula as KaTeX's own markup.
+        `<span>${step.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>').replace(/\$(.+?)\$/g, '<span class="katex">f′(x)</span>')}</span>` +
+        `<button type="button">I don't get this step</button></div></li>`,
+    )
+    .join('')
+  return (
+    '<div data-message-role="assistant"><p class="sr-only">STOA assistant</p><div data-answer-sections>' +
+    `<ol data-answer-section="steps">${cards}</ol>` +
+    `<div data-answer-section="answer"><p>Answer</p><p>${answer}</p></div>` +
+    '<div data-answer-section="hints"><ol data-shown="0"></ol><button type="button">Show a hint 1/1</button></div>' +
+    '</div></div>'
+  )
+}
+
+async function bubbles(page: Page, ...html: string[]): Promise<void> {
+  await page.setContent(`<!doctype html><main>${html.join('')}</main>`)
+}
+
+test('an answer that starts with a numbered step is found on a page that draws it as step cards (#714)', async ({ page }) => {
+  await bubbles(page, steppedBubble(STEPS, STEPPED.structured!.answer!))
+  const shown = page.locator('[data-message-role=assistant]').last()
+  // The bug: the stored text's "1. " is drawn as a number badge, never as text.
+  await expect(shown).not.toContainText(`1. ${STEPS[0].slice(0, 20)}`, { timeout: 500 })
+  await expectAnswerOnScreen(shown, STEPPED, 2_000)
+  // The same text with no sections is drawn as typed, "1. " and all, and is found too.
+  await bubbles(page, `<div data-message-role="assistant"><p>${STEPPED.content.replace(/\*\*/g, '')}</p></div>`)
+  await expectAnswerOnScreen(page.locator('[data-message-role=assistant]').last(), { content: STEPPED.content }, 2_000)
+})
+
+test('the on-screen check fails when the bubble shows some other answer', async ({ page }) => {
+  // The last bubble is still an earlier answer: the one asked for never arrived.
+  await bubbles(
+    page,
+    steppedBubble(STEPS, STEPPED.structured!.answer!),
+    steppedBubble(['Quantenphysik ist die Physik der ganz kleinen Dinge, wie Atome und Licht.'], 'Licht kommt in Paketen.'),
+  )
+  const shown = page.locator('[data-message-role=assistant]').last()
+  await expect(expectAnswerOnScreen(shown, STEPPED, 500)).rejects.toThrow(/the answer is on screen/)
+  // And an empty bubble fails the check for an answer with no plain stretch in it.
+  await bubbles(page, '<div data-message-role="assistant"></div>')
+  await expect(expectAnswerOnScreen(page.locator('[data-message-role=assistant]'), { content: '$x$' }, 500)).rejects.toThrow(
+    /an answer is on screen/,
+  )
 })
 
 test('an error code is found wherever the refusal nests it', () => {
