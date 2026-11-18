@@ -978,11 +978,17 @@
     "fromParent": "du parent {{parent}}",
     "fromSelf": "propre à l'élève",
     "versionConflict": "Quelqu'un d'autre vient de modifier cette période. Elle a été relue : vérifiez les dates et envoyez à nouveau.",
-    "extendTitle": "Prolonger la période",
-    "sourceLabel": "Type",
+    "formTitle": "Définir la période d'utilisation",
+    "methodLabel": "Comment",
+    "method": {
+      "add": "Ajouter du temps",
+      "set": "Fixer une date de fin"
+    },
+    "sourceLabel": "Pourquoi",
     "source": {
       "paid": "Payée",
-      "gifted": "Offerte"
+      "gifted": "Offerte",
+      "correction": "Correction"
     },
     "amountLabel": "Nombre",
     "unitLabel": "Unité",
@@ -996,7 +1002,9 @@
     "giftedHint": "Une période offerte peut compter des jours ou des mois, jusqu'à {{max}}, sans paiement.",
     "preview": "Nouvelle date de fin : {{date}} (comptée à partir du {{from}})",
     "previewEmpty": "Comptée à partir du {{from}}, le plus tardif entre aujourd'hui et la date de fin actuelle.",
-    "extendSubmit": "Prolonger",
+    "setPreview": "Nouvelle date de fin : {{date}} (actuellement {{current}})",
+    "setPreviewEmpty": "Date de fin actuelle : {{current}}. Choisissez la nouvelle.",
+    "addSubmit": "Ajouter à la période",
     "extended": "Prolongée. La période se termine maintenant le {{date}}.",
     "extendFailed": "La période n'a pas pu être prolongée.",
     "extensionIssues": {
@@ -1006,11 +1014,10 @@
       "paymentReferenceTooLong": "La référence de paiement compte au plus 200 caractères.",
       "noteTooLong": "La note compte au plus 1000 caractères."
     },
-    "setTitle": "Changer la date de fin",
-    "setHint": "Pour corriger une erreur ou terminer la période plus tôt. La raison est conservée avec l'entrée.",
+    "correctionHint": "Une date de fin choisie est enregistrée comme correction et demande une raison. Elle peut être avant ou après la fin actuelle. Pour enregistrer un paiement ou un cadeau, ajoutez plutôt du temps.",
     "newEndLabel": "Nouvelle date de fin",
     "reasonLabel": "Raison (obligatoire)",
-    "setSubmit": "Changer la date de fin…",
+    "setSubmit": "Fixer la date de fin…",
     "endIssues": {
       "date": "Choisissez la nouvelle date de fin.",
       "reason": "Indiquez une raison.",
@@ -1023,7 +1030,7 @@
     "shortensWarning_other": "La période se termine {{count}} jours plus tôt qu'actuellement.",
     "shortensWarning_many": "La période se termine {{count}} jours plus tôt qu'actuellement.",
     "parentWarning": "La période de ce parent couvre aussi ses enfants. Un enfant sans période propre ou d'un autre parent plus tardive est également concerné.",
-    "confirmSubmit": "Changer la date de fin",
+    "confirmSubmit": "Fixer la date de fin",
     "confirmBack": "Retour",
     "endChanged": "La date de fin est maintenant le {{date}}.",
     "endChangeFailed": "La date de fin n'a pas pu être changée.",
@@ -1067,6 +1074,19 @@
     "open": "Période d'utilisation",
     "newAccountTitle": "Fixer la période d'utilisation de {{accountNumber}}",
     "newAccountHint": "Le compte est ouvert. Sans période, il ne pourra pas être utilisé une fois les périodes appliquées.",
-    "newAccountDone": "Terminé"
+    "newAccountDone": "Terminé",
+    "newAccount": {
+      "legend": "Période d'utilisation",
+      "hint": "Facultatif. Sans modification, le compte reçoit un essai de {{trial}}, offert.",
+      "preview": "La période se terminera le {{date}}.",
+      "summary": "{{amount}} ({{source}})",
+      "dialogSummary": "Période d'utilisation, telle que choisie dans le formulaire : {{summary}}",
+      "fixInForm": "Corrigez d'abord la période d'utilisation dans le formulaire :",
+      "applying": "Fixation de la période d'utilisation de {{accountNumber}}…",
+      "set": "Période d'utilisation de {{accountNumber}} fixée : {{summary}}, se termine le {{date}}.",
+      "change": "Modifier la période",
+      "failed": "Le compte {{accountNumber}} a été ouvert, mais sa période d'utilisation n'a pas été fixée. {{reason}} Fixez-la ci-dessous.",
+      "conflict": "Quelqu'un a modifié cette période au même moment."
+    }
   }
 }

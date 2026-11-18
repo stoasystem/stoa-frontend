@@ -43,7 +43,7 @@ import { useLessonQuery } from '@/hooks/practice/useLessonQuery'
 import { useMediaQuery } from '@/hooks/layout/useMediaQuery'
 import { AppLayout } from '@/layouts/AppLayout'
 import { cn } from '@/lib/utils'
-import type { PracticeExercise, PracticeLesson } from '@/types/practice'
+import type { LessonSection, PracticeExercise, PracticeLesson } from '@/types/practice'
 import '@/features/chapter/chapter.css'
 
 const plainOnSky =
@@ -172,16 +172,22 @@ function LessonRunStage({
   const arrived = useRef(true)
   const { challenge } = run
   const inQuiz = run.quiz !== null
+  // The lesson's explanation cards come first, once, before its first
+  // exercise (#692). Not before the quiz that tests out of the lesson: that
+  // is for a student who says they know it already.
+  const sections = lesson.sections ?? []
+  const [reading, setReading] = useState(!testOut && sections.length > 0)
 
   // The exercise on screen, by id (#56): the backend reads its wording, the
   // chapter and the learning state from these three itself.
   const practice = useMemo<AskPractice | undefined>(
     () =>
-      // Not during a quiz: Ask is off, and told nothing.
-      challenge && !run.finished && !inQuiz
+      // Not during a quiz: Ask is off, and told nothing. Nor over the cards:
+      // no exercise is on screen to name.
+      challenge && !run.finished && !inQuiz && !reading
         ? { context: { unitId, lessonId: lesson.id, challengeId: challenge.challengeId } }
         : undefined,
-    [challenge, inQuiz, lesson.id, run.finished, unitId],
+    [challenge, inQuiz, lesson.id, reading, run.finished, unitId],
   )
 
   const lessonNumber = chapter ? chapter.lessons.findIndex((item) => item.id === lesson.id) + 1 : 0
@@ -190,7 +196,18 @@ function LessonRunStage({
     <div ref={host} className="flex min-h-0 flex-1 flex-col">
       <StageWithAsk practice={practice} subjectId={lesson.subjectId} off={inQuiz ? t('quiz.askOff') : undefined}>
         <StageStrip lesson={lesson} unitId={unitId} chapter={chapter} lessonNumber={lessonNumber} run={run} side={side} />
-        {run.finished ? (
+        {reading ? (
+          <LessonCards
+            sections={sections}
+            side={side}
+            start={() => {
+              // Leaving the cards is a step the student took: the keyboard
+              // goes on to the first question, as it does to every next one.
+              arrived.current = false
+              setReading(false)
+            }}
+          />
+        ) : run.finished ? (
           <LessonDone lesson={lesson} unitId={unitId} chapter={chapter} testedOut={run.passedQuiz} />
         ) : run.trouble?.inQuiz ? (
           <QuizTrouble run={run} unitId={unitId} />
@@ -214,6 +231,80 @@ function LessonRunStage({
         )}
       </StageWithAsk>
     </div>
+  )
+}
+
+/**
+ * The lesson's explanation cards, in the lesson's order, before its first
+ * exercise (#692): glass cards on the sky, formulas typeset, and the one lit
+ * button on to the exercises. Each card's text is the backend's, already in
+ * the student's language.
+ */
+/**
+ * A display formula is a block of its own: the line breaks written round it
+ * would stand as empty lines under `pre-line`.
+ */
+function withoutBreaksAroundDisplayMath(body: string) {
+  return body.replace(/[ \t]*\n?(\$\$[\s\S]+?\$\$)[ \t]*\n?/g, '$1')
+}
+
+function LessonCards({ sections, side, start }: { sections: LessonSection[]; side: boolean; start: () => void }) {
+  const { t } = useTranslation('chapter')
+  const cardId = useId()
+  const button = (
+    <Button
+      lift
+      data-stage-primary
+      variant="onSky"
+      size="large"
+      fullWidth={!side}
+      onClick={start}
+      style={side ? { minWidth: 200 } : undefined}
+    >
+      {t('stage.cards.start')}
+    </Button>
+  )
+  return (
+    <>
+      <div className="relative min-h-0 flex-1 overflow-y-auto">
+        <div className="relative flex min-h-full justify-center" style={{ padding: side ? '40px 48px' : '22px 16px 16px' }}>
+          <section
+            aria-labelledby="stage-cards-title"
+            data-stage-cards
+            className="flex w-full max-w-[620px] min-w-0 flex-col"
+            style={{ gap: side ? 20 : 16 }}
+          >
+            <h2
+              id="stage-cards-title"
+              className="m-0 text-on-sky"
+              style={{ font: 'var(--t-title2)', letterSpacing: 'var(--t-title2-tracking)' }}
+            >
+              {t('stage.cards.title')}
+            </h2>
+            {sections.map((section, index) => (
+              <article
+                key={section.id}
+                data-stage-card={section.id}
+                aria-labelledby={`${cardId}-${index}`}
+                className="flex min-w-0 flex-col gap-2 rounded-[16px] border p-4 text-on-sky"
+                style={glass}
+              >
+                <h3 id={`${cardId}-${index}`} className="m-0 text-[17px] font-semibold">
+                  <MathRenderer>{section.title}</MathRenderer>
+                </h3>
+                {/* The backend's line breaks are the card's paragraphs; a long
+                  * formula scrolls inside the card, not the page. */}
+                <div className={cn('m-0 overflow-x-auto text-[15px] leading-[1.5] whitespace-pre-line [overflow-wrap:anywhere]', bodyOnSky)}>
+                  <MathRenderer>{withoutBreaksAroundDisplayMath(section.body)}</MathRenderer>
+                </div>
+              </article>
+            ))}
+            {side && <div className="pt-2">{button}</div>}
+          </section>
+        </div>
+      </div>
+      {!side && <div className="shrink-0 px-4 pt-2.5">{button}</div>}
+    </>
   )
 }
 

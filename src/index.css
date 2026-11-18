@@ -103,6 +103,34 @@
   canvas {
     max-width: 100%;
   }
+
+  /*
+   * A button takes the surrounding text by default, but a size utility on it
+   * (the Button's `--control-text-*` tokens) wins. Outside the layer this
+   * outranked those utilities, so a <button> took its table cell's size while
+   * a <Button asChild> link beside it kept the token: with a browser default
+   * font other than 16px the cell's rem size and the px token differ.
+   */
+  button {
+    font-family: var(--font-button);
+    font-size: inherit;
+    line-height: inherit;
+  }
+
+  /*
+   * Fields and labels likewise take the surrounding text unless a size or
+   * leading utility on them says otherwise. Outside the layer this rule
+   * outranked those utilities, so `text-[13px]` on a label or `text-[17px]` on
+   * an input was silently ignored and everything rendered at the body's 15 px.
+   */
+  input,
+  textarea,
+  select,
+  label {
+    font-family: var(--font-label);
+    font-size: inherit;
+    line-height: inherit;
+  }
 }
 
 html {
@@ -140,21 +168,6 @@ body {
 ::selection {
   color: var(--on-accent);
   background: var(--accent);
-}
-
-button {
-  font-family: var(--font-button);
-  font-size: inherit;
-  line-height: inherit;
-}
-
-input,
-textarea,
-select,
-label {
-  font-family: var(--font-label);
-  font-size: inherit;
-  line-height: inherit;
 }
 
 .stoa-type-body {

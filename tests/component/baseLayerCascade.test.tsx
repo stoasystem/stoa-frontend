@@ -188,6 +188,8 @@ const COLOR = ['color']
 const DECORATION = ['text-decoration', 'text-decoration-line']
 const OUTLINE_STYLE = ['outline', 'outline-style']
 const MAX_WIDTH = ['max-width']
+const FONT_SIZE = ['font', 'font-size']
+const LINE_HEIGHT = ['line-height']
 const RING_SHADOW = ['--tw-ring-shadow']
 
 function place(html: string) {
@@ -238,6 +240,18 @@ const PRIMITIVES: [string, () => ReactElement, () => HTMLElement][] = [
   ],
 ]
 
+/** A small outline Button as a <button> and as a link, side by side as the admin accounts table has them. */
+const smallButton = () => (
+  <UiButton type="button" size="sm" variant="outline">
+    Suspend
+  </UiButton>
+)
+const smallLink = () => (
+  <UiButton asChild size="sm" variant="outline">
+    <a href="/admin/usage-periods/u-1">Usage period</a>
+  </UiButton>
+)
+
 const skyLink = () => (
   <Button asChild variant="onSky">
     <a href="/chapter/u-1">Open</a>
@@ -273,7 +287,11 @@ describe('global base rules sit under the utilities (#73)', () => {
       'md:max-w-[20px]',
       'max-md:max-w-[30px]',
       'motion-reduce:max-w-[40px]',
-      ...classesInUse([skyLink, ...PRIMITIVES.map(([, fixture]) => fixture)]),
+      'text-[13px]',
+      'text-[17px]',
+      'text-sm',
+      'leading-6',
+      ...classesInUse([skyLink, smallButton, smallLink, ...PRIMITIVES.map(([, fixture]) => fixture)]),
     ]
     sheet.textContent = compiler.build(candidates)
     document.head.append(sheet)
@@ -328,6 +346,52 @@ describe('global base rules sit under the utilities (#73)', () => {
     const win = winner(screen.getByRole('link', { name: 'Open' }), COLOR)
     expect(win?.selector).toBe('.text-\\[color\\:var\\(--on-sky-button-text\\)\\]')
     expect(win?.value).toBe('var(--on-sky-button-text)')
+  })
+})
+
+describe('a Button keeps its size token as a <button> and as a link', () => {
+  it('gives a bare button the surrounding text size', () => {
+    expect(winner(place('<button type="button">x</button>'), FONT_SIZE)?.value).toBe('inherit')
+  })
+
+  it('sizes a small Button rendered as a <button> from its token, not the surrounding text', () => {
+    // The base rule sat outside the layers and outranked this utility, so a
+    // <button> in a table cell took the cell's rem size while the link beside
+    // it kept the px token.
+    render(smallButton())
+    const win = winner(screen.getByRole('button', { name: 'Suspend' }), FONT_SIZE)
+    expect(win?.value).toBe('var(--control-text-small)')
+  })
+
+  it('sizes the same Button rendered as a link (asChild) from the same token', () => {
+    render(smallLink())
+    expect(winner(screen.getByRole('link', { name: 'Usage period' }), FONT_SIZE)?.value).toBe('var(--control-text-small)')
+  })
+})
+
+describe('fields and labels take a size utility over the surrounding text', () => {
+  // The input / textarea / select / label rule sat outside the layers too, so
+  // `text-[13px]` on a label or `text-[17px]` on an input lost to `inherit`.
+  it.each([['input', '<input type="text" />'], ['textarea', '<textarea></textarea>'], ['select', '<select></select>'], ['label', '<label>x</label>']])(
+    'gives a bare %s the surrounding text size and leading',
+    (_name, html) => {
+      const element = place(html)
+      expect(winner(element, FONT_SIZE)?.value).toBe('inherit')
+      expect(winner(element, LINE_HEIGHT)?.value).toBe('inherit')
+    },
+  )
+
+  it('lets a size utility on an input win', () => {
+    expect(winner(place('<input type="text" class="text-[17px]" />'), FONT_SIZE)?.value).toBe('17px')
+  })
+
+  it('lets a size utility on a label win', () => {
+    expect(winner(place('<label class="text-[13px]">x</label>'), FONT_SIZE)?.value).toBe('13px')
+  })
+
+  it('lets a leading utility on a textarea win', () => {
+    const win = winner(place('<textarea class="text-sm leading-6"></textarea>'), LINE_HEIGHT)
+    expect(win?.selector).toBe('.leading-6')
   })
 })
 

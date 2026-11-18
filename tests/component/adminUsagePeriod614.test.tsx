@@ -2,7 +2,9 @@
  * #614: the administrator sets students' and parents' usage periods.
  *
  * Payment is offline, so the console is where a period is extended or its end
- * date changed, and every change leaves a record. The rules the user approved:
+ * date changed, and every change leaves a record. One form does both: added
+ * time is paid or gifted, a chosen end date is a correction with a reason.
+ * The rules the user approved:
  * a paid extension is whole months and names its offline payment; a gift does
  * not; every write carries the version it read, and a 409 means somebody else
  * changed the period - read it again and let the administrator retry.
@@ -25,6 +27,7 @@ import {
   extendedEnd,
   extensionIssues,
   stateOn,
+  whyChoices,
   zurichToday,
 } from '@/pages/admin/usagePeriodRules'
 import { assignAccount, listAccounts, type AccountRow } from '@/services/admin/accountsApi'
@@ -187,6 +190,11 @@ describe('the period rules the console previews with', () => {
     expect(extensionIssues({ ...paid, source: 'gifted', amount: '1.5' })).toEqual(['amount'])
   })
 
+  it('records added time as paid or gifted, and a chosen end date as a correction', () => {
+    expect(whyChoices('add')).toEqual(['paid', 'gifted'])
+    expect(whyChoices('set')).toEqual(['correction'])
+  })
+
   it('tells an early end from a shortened one', () => {
     expect(endChangeEffect('2026-12-15', '2026-11-01', '2026-11-09')).toBe('endsNow')
     expect(endChangeEffect('2026-12-15', '2026-11-30', '2026-11-09')).toBe('shortens')
@@ -228,12 +236,12 @@ describe('#614 one account’s period', () => {
     // Days cannot be chosen for a paid extension.
     expect(within(screen.getByLabelText(copy.unitLabel)).getByRole('option', { name: copy.unit.days })).toBeDisabled()
 
-    await user.click(screen.getByRole('button', { name: copy.extendSubmit }))
+    await user.click(screen.getByRole('button', { name: copy.addSubmit }))
     expect(mockedExtend).not.toHaveBeenCalled()
     expect(screen.getByText(new RegExp(copy.extensionIssues.paymentReference))).toBeInTheDocument()
 
     await user.type(screen.getByLabelText(copy.paymentReferenceLabel), 'RF18 1')
-    await user.click(screen.getByRole('button', { name: copy.extendSubmit }))
+    await user.click(screen.getByRole('button', { name: copy.addSubmit }))
 
     await waitFor(() =>
       expect(mockedExtend.mock.calls[0]?.[0]).toEqual({
@@ -262,7 +270,7 @@ describe('#614 one account’s period', () => {
     expect(screen.getByTestId('usage-period-preview')).toHaveTextContent(
       fill(copy.preview, { date: day('2026-11-23'), from: day('2026-11-09') }),
     )
-    await user.click(screen.getByRole('button', { name: copy.extendSubmit }))
+    await user.click(screen.getByRole('button', { name: copy.addSubmit }))
 
     await waitFor(() =>
       expect(mockedExtend.mock.calls[0]?.[0]).toMatchObject({
@@ -274,7 +282,38 @@ describe('#614 one account’s period', () => {
     )
   })
 
-  it('confirms a changed end date, says it ends the period at once, and sends the reason', async () => {
+  it('offers paid or gifted for added time, and only a correction for a chosen end date', async () => {
+    const user = userEvent.setup()
+    mockedRead.mockResolvedValue(period())
+    wrap(<UsagePeriodPanel userId="stud-1" />)
+
+    // One form: adding time is chosen first, and a correction is not offered with it.
+    expect(await screen.findByRole('radio', { name: copy.method.add })).toBeChecked()
+    const why = () => screen.getByLabelText(copy.sourceLabel)
+    expect(within(why()).getAllByRole('option').map((option) => option.textContent)).toEqual([
+      copy.source.paid,
+      copy.source.gifted,
+    ])
+    expect(screen.queryByLabelText(copy.newEndLabel)).not.toBeInTheDocument()
+    expect(screen.queryByLabelText(copy.reasonLabel)).not.toBeInTheDocument()
+
+    // A chosen end date is always a correction: the reason for it cannot be changed, and nothing is counted or paid.
+    await user.click(screen.getByRole('radio', { name: copy.method.set }))
+    expect(why()).toBeDisabled()
+    expect(why()).toHaveValue('correction')
+    expect(within(why()).getAllByRole('option').map((option) => option.textContent)).toEqual([copy.source.correction])
+    expect(screen.queryByLabelText(copy.amountLabel)).not.toBeInTheDocument()
+    expect(screen.queryByLabelText(copy.paymentReferenceLabel)).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: copy.addSubmit })).not.toBeInTheDocument()
+    expect(screen.getByText(copy.correctionHint)).toBeInTheDocument()
+
+    // Going back keeps what was chosen for the added time.
+    await user.click(screen.getByRole('radio', { name: copy.method.add }))
+    expect(why()).toHaveValue('paid')
+    expect(why()).toBeEnabled()
+  })
+
+  it('confirms a chosen end date, says it ends the period at once, and sends the reason', async () => {
     const user = userEvent.setup()
     mockedRead.mockResolvedValue(period({ role: 'parent', effective: null }))
     mockedSet.mockResolvedValue({
@@ -283,7 +322,14 @@ describe('#614 one account’s period', () => {
     })
     wrap(<UsagePeriodPanel userId="par-1" />)
 
-    await user.type(await screen.findByLabelText(copy.newEndLabel), '2026-11-01')
+    await user.click(await screen.findByRole('radio', { name: copy.method.set }))
+    expect(screen.getByTestId('usage-period-preview')).toHaveTextContent(
+      fill(copy.setPreviewEmpty, { current: day('2026-12-15') }),
+    )
+    await user.type(screen.getByLabelText(copy.newEndLabel), '2026-11-01')
+    expect(screen.getByTestId('usage-period-preview')).toHaveTextContent(
+      fill(copy.setPreview, { date: day('2026-11-01'), current: day('2026-12-15') }),
+    )
     await user.type(screen.getByLabelText(copy.reasonLabel), 'refund agreed')
     await user.click(screen.getByRole('button', { name: copy.setSubmit }))
 
@@ -292,6 +338,8 @@ describe('#614 one account’s period', () => {
     expect(screen.getByText(copy.endsNowWarning)).toBeInTheDocument()
     // A parent's period reaches the children.
     expect(screen.getByText(copy.parentWarning)).toBeInTheDocument()
+    // The way cannot change under an open confirmation.
+    expect(screen.getByRole('radio', { name: copy.method.add })).toBeDisabled()
 
     await user.click(screen.getByRole('button', { name: copy.confirmSubmit }))
     await waitFor(() =>
@@ -302,19 +350,44 @@ describe('#614 one account’s period', () => {
         expectedVersion: 4,
       }),
     )
+    expect(mockedExtend).not.toHaveBeenCalled()
     expect(await screen.findByText(fill(copy.endChanged, { date: day('2026-11-01') }))).toBeInTheDocument()
   })
 
-  it('does not change the end date without a reason', async () => {
+  it('asks before shortening the period, and goes back without sending', async () => {
     const user = userEvent.setup()
     mockedRead.mockResolvedValue(period())
     wrap(<UsagePeriodPanel userId="stud-1" />)
 
-    await user.type(await screen.findByLabelText(copy.newEndLabel), '2027-01-10')
+    await user.click(await screen.findByRole('radio', { name: copy.method.set }))
+    await user.type(screen.getByLabelText(copy.newEndLabel), '2026-11-30')
+    await user.type(screen.getByLabelText(copy.reasonLabel), 'wrong month entered')
+    await user.click(screen.getByRole('button', { name: copy.setSubmit }))
+
+    const confirm = screen.getByRole('group', {
+      name: fill(copy.confirmChange, { from: day('2026-12-15'), to: day('2026-11-30') }),
+    })
+    expect(confirm).toHaveTextContent(fill(copy.shortensWarning_other, { count: 15 }))
+    expect(within(confirm).queryByText(copy.endsNowWarning)).not.toBeInTheDocument()
+
+    await user.click(within(confirm).getByRole('button', { name: copy.confirmBack }))
+    expect(mockedSet).not.toHaveBeenCalled()
+    expect(screen.getByLabelText(copy.newEndLabel)).toHaveValue('2026-11-30')
+    expect(screen.getByRole('button', { name: copy.setSubmit })).toBeInTheDocument()
+  })
+
+  it('does not set an end date without a reason', async () => {
+    const user = userEvent.setup()
+    mockedRead.mockResolvedValue(period())
+    wrap(<UsagePeriodPanel userId="stud-1" />)
+
+    await user.click(await screen.findByRole('radio', { name: copy.method.set }))
+    await user.type(screen.getByLabelText(copy.newEndLabel), '2027-01-10')
     await user.click(screen.getByRole('button', { name: copy.setSubmit }))
 
     expect(screen.queryByRole('button', { name: copy.confirmSubmit })).not.toBeInTheDocument()
     expect(screen.getByText(new RegExp(copy.endIssues.reason))).toBeInTheDocument()
+    expect(mockedSet).not.toHaveBeenCalled()
   })
 
   it('on a version conflict says somebody else changed it, reads it again and keeps what was typed', async () => {
@@ -330,7 +403,7 @@ describe('#614 one account’s period', () => {
 
     await user.selectOptions(await screen.findByLabelText(copy.sourceLabel), 'gifted')
     await user.type(screen.getByLabelText(copy.amountLabel), '1')
-    await user.click(screen.getByRole('button', { name: copy.extendSubmit }))
+    await user.click(screen.getByRole('button', { name: copy.addSubmit }))
 
     expect(await screen.findByRole('alert')).toHaveTextContent(copy.versionConflict)
     expect(await screen.findByText(fill(copy.endsOn, { date: day('2027-01-15') }))).toBeInTheDocument()
@@ -338,7 +411,7 @@ describe('#614 one account’s period', () => {
     expect(screen.getByLabelText(copy.amountLabel)).toHaveValue('1')
 
     // The retry carries the version just read.
-    await user.click(screen.getByRole('button', { name: copy.extendSubmit }))
+    await user.click(screen.getByRole('button', { name: copy.addSubmit }))
     await waitFor(() => expect(mockedExtend.mock.calls[1]?.[0]).toMatchObject({ expectedVersion: 5 }))
   })
 
@@ -428,7 +501,7 @@ describe('#614 the users list', () => {
     expect(teacher.closest('table')).not.toHaveTextContent(copy.columnEndsOn)
   })
 
-  it('goes straight to the new account’s period after opening it, with the first password still shown', async () => {
+  it('gives the new account its period right after opening it, with the first password still shown', async () => {
     const user = userEvent.setup()
     mockedList.mockResolvedValue({ items: [], count: 0, groups: {}, nextCursor: null })
     mockedAssign.mockResolvedValue({
@@ -439,7 +512,15 @@ describe('#614 the users list', () => {
       accountStatus: 'active',
       initialPassword: 'Initial12345678',
     })
-    mockedRead.mockResolvedValue(period({ userId: 'stud-new', endsOn: null, state: 'none', version: 0, effective: null }))
+    mockedRead.mockResolvedValue(period({ userId: 'stud-new', endsOn: null, state: 'none', version: 2, effective: null }))
+    mockedExtend.mockResolvedValue({
+      userId: 'stud-new',
+      role: 'student',
+      endsOn: '2026-11-12',
+      state: 'active',
+      version: 3,
+      record: record({ unit: 'days', amount: 3, source: 'gifted', newEndsOn: '2026-11-12' }),
+    })
     wrap(<AdminAccountsPage />, '/admin/users')
 
     await user.click(await screen.findByRole('button', { name: enAdmin.accounts.assign }))
@@ -447,10 +528,17 @@ describe('#614 the users list', () => {
     await user.type(within(dialog).getByLabelText(new RegExp(enAdmin.accounts.emailLabel)), 'new@example.ch')
     await user.click(within(dialog).getByRole('button', { name: enAdmin.accounts.assignDialogSubmit }))
 
+    const done = await screen.findByText(new RegExp('Usage period of S26-0011 set'))
+    await waitFor(() => expect(done).toHaveFocus())
+    expect(done).toHaveTextContent(day('2026-11-12'))
+    expect(screen.getByText(new RegExp('Initial12345678'))).toBeInTheDocument()
+    expect(mockedRead).toHaveBeenCalledWith('stud-new')
+    expect(mockedExtend).toHaveBeenCalledWith(expect.objectContaining({ userId: 'stud-new', expectedVersion: 2 }))
+
+    // The panel is one click away, to change what was just set.
+    await user.click(screen.getByRole('button', { name: copy.newAccount.change }))
     const heading = await screen.findByText(fill(copy.newAccountTitle, { accountNumber: 'S26-0011' }))
     await waitFor(() => expect(heading).toHaveFocus())
-    expect(screen.getByText(new RegExp('Initial12345678'))).toBeInTheDocument()
-    expect(await screen.findByLabelText(copy.amountLabel)).toBeInTheDocument()
-    expect(mockedRead).toHaveBeenCalledWith('stud-new', expect.anything())
+    expect(await screen.findByRole('button', { name: copy.addSubmit })).toBeInTheDocument()
   })
 })

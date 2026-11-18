@@ -18,6 +18,7 @@ import {
   useReissueInvitationMutation,
   useResetAccountPasswordMutation,
 } from '@/hooks/admin/useAdminAccounts'
+import { useFirstUsagePeriodMutation } from '@/hooks/admin/useAdminUsagePeriods'
 import { useDebouncedValue } from '@/hooks/admin/useDebouncedValue'
 import { DashboardLayout } from '@/layouts/DashboardLayout'
 import { toUserFacingError } from '@/lib/userFacingText'
@@ -25,9 +26,19 @@ import type { AccountAction } from '@/pages/admin/AccountActionDialog'
 import { AccountActionDialog, accountLabel } from '@/pages/admin/AccountActionDialog'
 import { AccountDraftFields, BlockedReason } from '@/pages/admin/AccountFormFields'
 import { AssignAccountDialog } from '@/pages/admin/AssignAccountDialog'
+import { NewAccountPeriodFields } from '@/pages/admin/NewAccountPeriodFields'
 import { TeacherSupportAllowanceEditor } from '@/pages/admin/TeacherSupportAllowanceEditor'
 import { UsagePeriodPanel, UsagePeriodStateBadge, periodDay } from '@/pages/admin/UsagePeriodPanel'
-import { stateOn, zurichToday } from '@/pages/admin/usagePeriodRules'
+import {
+  type ExtensionDraft,
+  TRIAL_EXTENSION,
+  changeExtensionDraft,
+  extensionAmount,
+  extensionIssues,
+  holdsUsagePeriod,
+  stateOn,
+  zurichToday,
+} from '@/pages/admin/usagePeriodRules'
 import type { AccountDraft } from '@/pages/admin/accountFormRules'
 import {
   accountDraftIssues,
@@ -55,12 +66,30 @@ const STATUSES: AccountStatus[] = ['invited', 'active', 'suspended', 'archived']
 const EMPTY_DRAFT: AccountDraft = { role: 'student', email: '', fullName: '', dateOfBirth: '' }
 
 /** The roles that hold a usage period (#614); a teacher's or an administrator's account has none. */
-function holdsPeriod(role: string) {
-  return role === 'student' || role === 'parent'
-}
+const holdsPeriod = holdsUsagePeriod
 
-/** An account just opened, whose period is set next, on this page (#614). */
-type OpenedAccount = { userId: string; accountNumber: string; role: AccountRole }
+/**
+ * The actions column stays pinned to the card's right edge while the rest of
+ * the row scrolls under it: the table is wider than the card at desktop
+ * widths, and the buttons used to sit in the scrolled-off part, cut through
+ * with no cue that more was there. It needs the card's own surface to cover
+ * what scrolls beneath, and a hairline to mark where the scrolling stops.
+ */
+const ACTIONS_CELL = 'sticky right-0 bg-[color:var(--surface)] p-2 shadow-[inset_1px_0_0_var(--hairline)]'
+
+/**
+ * What became of the period chosen with a new account: still being sent; set,
+ * with the end date the server stored; not set, and why; or opened in the
+ * panel to change it.
+ */
+type OpenedPeriod =
+  | { kind: 'applying' }
+  | { kind: 'set'; endsOn: string | null; summary: string }
+  | { kind: 'failed'; reason: string }
+  | { kind: 'panel' }
+
+/** An account just opened, and its first period (#614). */
+type OpenedAccount = { userId: string; accountNumber: string; role: AccountRole; period: OpenedPeriod }
 
 const NEXT_STATUS: Record<string, Exclude<AccountStatus, 'invited'>[]> = {
   invited: ['archived'],
@@ -92,6 +121,12 @@ export function AdminAccountsPage() {
   // would take the secret off the screen before it was passed on.
   const [opened, setOpened] = useState<OpenedAccount | null>(null)
   const openedHeading = useRef<HTMLParagraphElement>(null)
+  const periodSetLine = useRef<HTMLParagraphElement>(null)
+  // The period the new account starts with: the trial unless the administrator changes it.
+  const [period, setPeriod] = useState<ExtensionDraft>(TRIAL_EXTENSION)
+  const [periodTouched, setPeriodTouched] = useState(false)
+  // Only the latest opening's period may land: an older one finishing late must not replace it.
+  const periodRun = useRef(0)
 
   // #335: the list used to be read in full on every key typed. The keyword
   // now waits for a pause, and the previous answer stays up meanwhile.
@@ -106,6 +141,7 @@ export function AdminAccountsPage() {
   const reissueMutation = useReissueInvitationMutation()
   const resetMutation = useResetAccountPasswordMutation()
   const statusMutation = useChangeAccountStatusMutation()
+  const firstPeriodMutation = useFirstUsagePeriodMutation()
   // #259: one row action at a time. A double-clicked reset issued two temporary
   // passwords and the first was dead on arrival; the ref closes the gap before
   // `isPending` reaches the next render.
@@ -133,18 +169,31 @@ export function AdminAccountsPage() {
 
   // Card 014: the button that cannot be pressed has to name what is missing.
   const inviteIssues = accountDraftIssues(draft)
+  // A period that could not be sent stops the opening too: an account opened
+  // without the period chosen for it is the failure this form exists to avoid.
+  const periodIssues = holdsPeriod(draft.role) ? extensionIssues(period) : []
   const inviteBlocking = blockingIssues(draft)
-  const inviteReasons = inviteBlocking.map((issue) => t(`accounts.fieldIssues.${issue}`))
+  const inviteReasons = [
+    ...inviteBlocking.map((issue) => t(`accounts.fieldIssues.${issue}`)),
+    ...periodIssues.map((issue) => t(`usagePeriod.extensionIssues.${issue}`)),
+  ]
+  const inviteBlocked = inviteReasons.length > 0
   // Card 124: an untouched form is not a wrong one. The blocked line used to
   // open under a blank form reading "Not ready to send: Enter an email
   // address.", which tells an administrator who has typed nothing that they
   // already did something wrong. It waits until a field has been touched; the
   // button is disabled until then either way, and its tooltip still says why.
-  const inviteTouched = Object.values(touched).some(Boolean)
+  const inviteTouched = Object.values(touched).some(Boolean) || periodTouched
   const shownInviteReasons = inviteTouched ? inviteReasons : []
   // Blocked: say what is missing. Ready: say what the button will do.
-  const inviteTooltip =
-    inviteBlocking.length > 0 ? inviteReasons.join(' · ') : t('accounts.inviteExplainer')
+  const inviteTooltip = inviteBlocked ? inviteReasons.join(' · ') : t('accounts.inviteExplainer')
+
+  /** "3 days, gifted": the period as the confirmation and the dialog name it. */
+  function periodSummary(chosen: ExtensionDraft) {
+    const amount = extensionAmount(chosen)
+    const length = amount === null ? chosen.amount : t(`usagePeriod.amount.${chosen.unit}`, { count: amount })
+    return t('usagePeriod.newAccount.summary', { amount: length, source: t(`usagePeriod.source.${chosen.source}`) })
+  }
 
   /**
    * #335: after a success the form is emptied. Left filled, a second press
@@ -154,20 +203,69 @@ export function AdminAccountsPage() {
   function clearDraft() {
     setDraft(EMPTY_DRAFT)
     setTouched({})
+    setPeriod(TRIAL_EXTENSION)
+    setPeriodTouched(false)
   }
 
-  /** Opens the new account's period under the notice, and moves focus to it. */
-  function openPeriod(result: { userId: string; accountNumber: string; role: AccountRole }) {
+  /** Opens the period panel under the notice, and moves focus to its heading. */
+  function showPanel(account: OpenedAccount) {
+    setOpened(account)
+    window.setTimeout(() => openedHeading.current?.focus(), 0)
+  }
+
+  /**
+   * Gives the new account the period chosen with it. Neither opening route
+   * takes a period, so it is sent as an extension once the account exists.
+   * When that fails the account is open all the same: the panel comes up with
+   * what went wrong, so the period can be set there.
+   */
+  function applyPeriod(
+    result: { userId: string; accountNumber: string; role: AccountRole },
+    chosen: ExtensionDraft,
+  ) {
+    const run = ++periodRun.current
     if (!holdsPeriod(result.role)) {
       setOpened(null)
       return
     }
-    setOpened({ userId: result.userId, accountNumber: result.accountNumber, role: result.role })
-    window.setTimeout(() => openedHeading.current?.focus(), 0)
+    const account = { userId: result.userId, accountNumber: result.accountNumber, role: result.role }
+    const amount = extensionAmount(chosen)
+    if (amount === null || extensionIssues(chosen).length > 0) {
+      // Checked before the opening was sent; kept so a slip there still ends in the panel.
+      showPanel({ ...account, period: { kind: 'failed', reason: t('usagePeriod.extendFailed') } })
+      return
+    }
+    setOpened({ ...account, period: { kind: 'applying' } })
+    firstPeriodMutation.mutate(
+      {
+        userId: result.userId,
+        unit: chosen.unit,
+        amount,
+        source: chosen.source,
+        paymentReference: chosen.paymentReference.trim(),
+      },
+      {
+        onSuccess: (change) => {
+          if (run !== periodRun.current) return
+          setOpened({ ...account, period: { kind: 'set', endsOn: change.endsOn, summary: periodSummary(chosen) } })
+          window.setTimeout(() => periodSetLine.current?.focus(), 0)
+        },
+        onError: (error) => {
+          if (run !== periodRun.current) return
+          const code = error instanceof ApiError ? error.code : undefined
+          const reason =
+            code === 'usage_period_version_conflict'
+              ? t('usagePeriod.newAccount.conflict')
+              : refusal(error, t('usagePeriod.extendFailed'))
+          showPanel({ ...account, period: { kind: 'failed', reason } })
+        },
+      },
+    )
   }
 
   function invite() {
-    if (inviteBlocking.length > 0 || inviteMutation.isPending) return
+    if (inviteBlocked || inviteMutation.isPending) return
+    const chosen = period
     setNotice(null)
     setSecret(null)
     setOpened(null)
@@ -180,7 +278,7 @@ export function AdminAccountsPage() {
             : t('accounts.inviteNotDelivered', { accountNumber: result.accountNumber }),
         )
         if (!result.invitationDelivered) setSecret(result.activationToken)
-        openPeriod(result)
+        applyPeriod(result, chosen)
         // #449: the page holds what it shows now. The mutation's answer, code
         // and all, would otherwise stay in the query client's cache for as
         // long as the page is open; reset, it is collected at once.
@@ -214,6 +312,15 @@ export function AdminAccountsPage() {
 
   function assign(filled: AccountDraft) {
     if (blockingIssues(filled).length > 0) return
+    // The period comes from the form behind the dialog; the dialog only names it.
+    const chosen = period
+    const chosenIssues = holdsPeriod(filled.role) ? extensionIssues(chosen) : []
+    if (chosenIssues.length > 0) {
+      setAssignError(
+        `${t('usagePeriod.newAccount.fixInForm')} ${chosenIssues.map((issue) => t(`usagePeriod.extensionIssues.${issue}`)).join(' · ')}`,
+      )
+      return
+    }
     setNotice(null)
     setSecret(null)
     setOpened(null)
@@ -224,7 +331,7 @@ export function AdminAccountsPage() {
         clearDraft()
         setNotice(t('accounts.assigned', { accountNumber: result.accountNumber }))
         setSecret(result.initialPassword)
-        openPeriod(result)
+        applyPeriod(result, chosen)
         assignMutation.reset()
       },
       // The dialog stays open on a refusal, and it sits over the page, so the
@@ -386,6 +493,15 @@ export function AdminAccountsPage() {
               onTouch={(field) => setTouched((current) => ({ ...current, [field]: true }))}
             />
 
+            {holdsPeriod(draft.role) ? (
+              <NewAccountPeriodFields
+                idPrefix="create"
+                period={period}
+                onChange={(patch) => setPeriod((current) => changeExtensionDraft(current, patch))}
+                onTouch={() => setPeriodTouched(true)}
+              />
+            ) : null}
+
             <BlockedReason id="invite-blocked" reasons={shownInviteReasons} />
 
             <div className="flex w-full flex-wrap items-center gap-3">
@@ -395,7 +511,7 @@ export function AdminAccountsPage() {
                   onClick={invite}
                   title={inviteTooltip}
                   aria-describedby={shownInviteReasons.length > 0 ? 'invite-blocked' : undefined}
-                  disabled={inviteBlocking.length > 0 || inviteMutation.isPending}
+                  disabled={inviteBlocked || inviteMutation.isPending}
                 >
                   {t('accounts.invite')}
                 </Button>
@@ -419,6 +535,7 @@ export function AdminAccountsPage() {
         <AssignAccountDialog
           open={assignOpen}
           initial={draft}
+          periodSummary={periodSummary(period)}
           pending={assignMutation.isPending}
           error={assignError}
           onOpenChange={(open) => {
@@ -511,7 +628,34 @@ export function AdminAccountsPage() {
             </Button>
           </div>
         ) : null}
-        {opened ? (
+        {opened?.period.kind === 'applying' ? (
+          <p role="status" className="mb-3 text-sm text-muted-foreground">
+            {t('usagePeriod.newAccount.applying', { accountNumber: opened.accountNumber })}
+          </p>
+        ) : null}
+        {/* Set as chosen: one line, not the whole panel. The administrator has
+          * just picked this period, so the panel would only repeat it, and push
+          * the one-time code or password above further from the list. */}
+        {opened?.period.kind === 'set' ? (
+          <div className="mb-3 flex flex-wrap items-center gap-3 rounded-md border p-2">
+            <p ref={periodSetLine} tabIndex={-1} role="status" className="min-w-0 flex-1 text-sm">
+              {t('usagePeriod.newAccount.set', {
+                accountNumber: opened.accountNumber,
+                date: periodDay(opened.period.endsOn),
+                summary: opened.period.summary,
+              })}
+            </p>
+            <Button
+              type="button"
+              size="sm"
+              variant="outline"
+              onClick={() => showPanel({ ...opened, period: { kind: 'panel' } })}
+            >
+              {t('usagePeriod.newAccount.change')}
+            </Button>
+          </div>
+        ) : null}
+        {opened && (opened.period.kind === 'failed' || opened.period.kind === 'panel') ? (
           <Card className="mb-4">
             <CardHeader>
               <CardTitle ref={openedHeading} tabIndex={-1}>
@@ -520,6 +664,17 @@ export function AdminAccountsPage() {
               <p className="text-sm text-muted-foreground">{t('usagePeriod.newAccountHint')}</p>
             </CardHeader>
             <CardContent className="flex flex-col gap-3">
+              {opened.period.kind === 'failed' ? (
+                <p
+                  role="alert"
+                  className="rounded-md border border-destructive/40 bg-destructive/5 p-2 text-sm text-destructive"
+                >
+                  {t('usagePeriod.newAccount.failed', {
+                    accountNumber: opened.accountNumber,
+                    reason: opened.period.reason,
+                  })}
+                </p>
+              ) : null}
               <UsagePeriodPanel userId={opened.userId} accounts={rows} />
               <div>
                 <Button type="button" size="sm" variant="outline" onClick={() => setOpened(null)}>
@@ -582,7 +737,10 @@ export function AdminAccountsPage() {
                 {t(`accounts.role.${group.role}`)} · {groups[group.role] ?? 0}
               </CardTitle>
             </CardHeader>
-            <CardContent className="overflow-x-auto">
+            {/* Margin rather than the usual padding: a sticky cell pins to the
+              * scroller's padding edge, and the row would show through the
+              * padding beside the pinned actions. */}
+            <CardContent className="mx-6 mb-6 overflow-x-auto p-0">
               {group.rows.length === 0 ? (
                 <p className="text-sm">{t('accounts.empty')}</p>
               ) : (
@@ -599,7 +757,7 @@ export function AdminAccountsPage() {
                       <th className="p-2">{t('accounts.columnLastLogin')}</th>
                       <th className="p-2">{t('accounts.columnLinked')}</th>
                       {holdsPeriod(group.role) ? <th className="p-2">{t('usagePeriod.columnEndsOn')}</th> : null}
-                      <th className="p-2">{t('accounts.columnActions')}</th>
+                      <th className={ACTIONS_CELL}>{t('accounts.columnActions')}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -640,8 +798,10 @@ export function AdminAccountsPage() {
                             <PeriodCell endsOn={row.usagePeriodEndsAt} today={today} />
                           </td>
                         ) : null}
-                        <td className="p-2">
-                          <div className="flex flex-wrap gap-2">
+                        <td className={ACTIONS_CELL}>
+                          {/* One under the other, each as wide as the widest,
+                            * so the column has one width and every button one size. */}
+                          <div className="flex flex-col items-stretch gap-2">
                             <Button
                               type="button"
                               size="sm"

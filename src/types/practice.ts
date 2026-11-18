@@ -113,7 +113,21 @@ export type PracticeLesson = {
   difficulty: PracticeLessonDifficulty
   status: PracticeLessonStatus
   estimatedMinutes: number
+  /**
+   * The lesson's explanation cards, in order, shown before its exercises
+   * (#692, stoa-backend#465). Already in the student's language (German where
+   * a card has no translation); `body` may hold LaTeX. The backend sends an
+   * empty list for a lesson without any; optional for a backend from before.
+   */
+  sections?: LessonSection[]
   challenges: PracticeChallenge[]
+}
+
+/** One explanation card of a lesson (#692). */
+export type LessonSection = {
+  id: string
+  title: string
+  body: string
 }
 
 export type PracticeProgress = {
