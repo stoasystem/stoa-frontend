@@ -347,7 +347,7 @@ export class StudentWorld {
       body: { detail: 'This conversation was never escalated to a teacher' },
     }))
     // The virtual classroom (#696, stoa-backend#467) as the backend answers it
-    // until its whiteboard and voice are configured: Ask stays where it was.
+    // until its whiteboard and voice are configured: the classroom says it is unavailable.
     b.on('POST', '/conversations/{conv_id}/classroom', () => ({
       status: 503,
       body: {

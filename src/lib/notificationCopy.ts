@@ -30,6 +30,8 @@ const KNOWN: Record<string, Copy[]> = {
   ],
   'teacher_takeover:conversation': [
     { key: 'takeoverConversation', title: 'A teacher joined your conversation', summary: 'A teacher has started working on your request.' },
+    // A classroom request (stoa-backend#480, #705): the teacher waits there.
+    { key: 'takeoverConversationClassroom', title: 'A teacher joined your conversation', summary: 'A teacher accepted your request. Enter the classroom now.' },
   ],
   'teacher_reply:question': [
     { key: 'replyQuestion', title: 'Teacher replied', summary: 'Your teacher added a reply to your question.' },

@@ -158,6 +158,8 @@ describe('what the student sees', () => {
         support: support(),
         blockedKey: null,
         errorKey: null,
+        // The classroom is not offered by default (#705): every request is a text answer.
+        classroomOffered: false,
       },
     })
   })
@@ -392,14 +394,14 @@ describe('asking a teacher', () => {
     await advance()
 
     await press(opened, 'request')
-    expect(askHelp).toHaveBeenCalledWith({ conversationId: 'c1' })
+    expect(askHelp).toHaveBeenCalledWith({ conversationId: 'c1', mode: 'text' })
     expect(opened.result.current.view.kind).toBe('asking')
 
     letGo()
     await advance()
     expect(opened.result.current.view.kind).toBe('waiting')
     expect(cardOf(opened).request).toEqual(help('pending'))
-    expect(track).toHaveBeenCalledWith('teacher_help_requested', { requestId: 'r1', conversationId: 'c1', status: 'pending' })
+    expect(track).toHaveBeenCalledWith('teacher_help_requested', { requestId: 'r1', conversationId: 'c1', status: 'pending', mode: 'text' })
   })
 
   it('stays "on its way" while an answer is being written', async () => {

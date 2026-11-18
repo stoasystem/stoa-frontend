@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { MathRenderer } from '@/components/ui/MathRenderer'
 import { getGradeLabelOrNotSet, getSubjectLabel } from '@/lib/displayLabels'
 import type { TeacherHelpMessage, TeacherHelpRequestDetail } from '@/types/teacher'
-import { isOpenHelpRequest } from '@/types/teacherHelp'
+import { helpModeOf, isOpenHelpRequest } from '@/types/teacherHelp'
 
 export function HelpRequestDetailCard({ request }: { request: TeacherHelpRequestDetail }) {
   const { t, i18n } = useTranslation('teacher')
@@ -44,6 +44,13 @@ export function HelpRequestDetailCard({ request }: { request: TeacherHelpRequest
             {/* A finished request has no target left to miss; as on its row in
               * the list, the badge only shows while it is open (#162). */}
             {isOpenHelpRequest(request.status) && <TeacherSlaBadge sla={request.sla} />}
+            {/* How the student asked to be helped (#705); an older request is a text answer. */}
+            <span
+              data-help-mode={helpModeOf(request)}
+              className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium text-foreground"
+            >
+              {t(`helpMode.${helpModeOf(request)}`)}
+            </span>
             <HelpRequestStatusBadge status={request.status} />
           </div>
         </div>

@@ -81,12 +81,12 @@
       "altTeacher": "Bild der Lehrperson: {{name}}"
     },
     "enterClassroom": "Klassenzimmer betreten",
-    "takeAndEnterClassroom": "Übernehmen und Klassenzimmer betreten",
     "accept": {
       "title": "Anfrage annehmen",
       "body": "Bevor Sie antworten können, nehmen Sie die Anfrage an. Dann sieht die lernende Person, dass sich eine Lehrperson darum kümmert.",
       "replyRefused": "Ihre Antwort wurde nicht gesendet: Sie haben die Anfrage noch nicht angenommen. Nehmen Sie sie zuerst an; Ihr Entwurf bleibt erhalten.",
-      "button": "Anfrage annehmen"
+      "button": "Anfrage annehmen",
+      "bodyClassroom": "Nehmen Sie die Anfrage an. Danach können Sie das Klassenzimmer betreten, wo die lernende Person zu Ihnen kommt."
     },
     "ended": {
       "withdrawn": "Die lernende Person hat diese Anfrage zurückgezogen. Es ist nichts mehr zu tun.",
@@ -336,5 +336,9 @@
       "tooLong": "Ihre Antwort wurde nicht angenommen: Sie ist insgesamt zu lang. Bitte kürzen Sie sie oder teilen Sie sie auf."
     },
     "replyImagesExpired": "Die Antwort wurde nicht gesendet: Ein Bild war nicht mehr gültig. Bitte wählen Sie es noch einmal und senden Sie dann erneut."
+  },
+  "helpMode": {
+    "text": "Textantwort",
+    "classroom": "Online-Klassenzimmer"
   }
 }

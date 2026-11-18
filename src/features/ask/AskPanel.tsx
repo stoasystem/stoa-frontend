@@ -574,13 +574,9 @@ function AskThread({
   const scroller = useRef<HTMLDivElement>(null)
   const { messages, isStreaming, retryMessage, conversationQuery } = ask
   const navigate = useNavigate()
-  // Asking a teacher takes the student into the virtual classroom to wait, where there is one (#696).
-  const help = useTeacherHelp({
-    conversationId,
-    messages,
-    isStreaming,
-    onClassroomOpens: (id) => navigate(classroomPathFor(id)),
-  })
+  // Asking a teacher keeps the student here (#705); a classroom request is
+  // entered from the card once a teacher has accepted it.
+  const help = useTeacherHelp({ conversationId, messages, isStreaming })
   const { view, request, withdraw } = help
 
   const ownerId = useAuthStore((state) => state.user?.id)
@@ -597,12 +593,13 @@ function AskThread({
   const offer = view.kind === 'offer' || view.kind === 'asking' ? view.offer : null
   const requesting = view.kind === 'asking'
   const offered = offer !== null
-  const { teachersOnline, support, suggested, blockedKey, errorKey } = offer ?? {}
+  const { teachersOnline, support, suggested, blockedKey, errorKey, classroomOffered } = offer ?? {}
   const helpAction = useMemo(
     () =>
       offered ? (
         <TeacherHelpAction
-          onRequest={() => request()}
+          onRequest={request}
+          classroomOffered={classroomOffered}
           requesting={requesting}
           teachersOnline={teachersOnline}
           support={support ?? null}
@@ -611,7 +608,7 @@ function AskThread({
           errorKey={errorKey}
         />
       ) : undefined,
-    [blockedKey, errorKey, offered, request, requesting, suggested, support, teachersOnline],
+    [blockedKey, classroomOffered, errorKey, offered, request, requesting, suggested, support, teachersOnline],
   )
   const card = 'card' in view ? view.card : null
 
@@ -640,6 +637,7 @@ function AskThread({
             teachersOnline={card.teachersOnline}
             withdraw={{ ...card.withdraw, onWithdraw: () => withdraw() }}
             onNewConversation={onNewConversation}
+            onEnterClassroom={() => navigate(classroomPathFor(conversationId))}
           />
         </div>
       )}

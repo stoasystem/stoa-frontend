@@ -67,10 +67,26 @@ export function awaitsTeacherAcceptance(status: TeacherHelpStatus | undefined): 
   return status === 'pending'
 }
 
+/**
+ * How the student asked to be helped (stoa-backend#480): a text answer in the
+ * conversation, or the online classroom. Chosen when asking, never changed.
+ */
+export type HelpMode = 'text' | 'classroom'
+
+/**
+ * The request's mode as the app reads it: a request without one (asked before
+ * modes, or an older server) is a text answer, as the backend counts it.
+ */
+export function helpModeOf(request: { mode?: unknown } | null | undefined): HelpMode {
+  return request?.mode === 'classroom' ? 'classroom' : 'text'
+}
+
 export type TeacherHelpRequest = {
   requestId: string
   conversationId: string
   status: TeacherHelpStatus
+  /** Missing on an older request: then a text answer (`helpModeOf`). */
+  mode?: HelpMode
   teacherName?: string
   createdAt: string
   updatedAt?: string

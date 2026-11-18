@@ -178,7 +178,20 @@
         "status": "Richiesta",
         "body": "Le risposte di un insegnante appaiono in questa conversazione."
       },
-      "usagePeriodPaused": "Il tuo periodo di utilizzo è terminato, quindi per ora non puoi chiedere a un docente."
+      "usagePeriodPaused": "Il tuo periodo di utilizzo è terminato, quindi per ora non puoi chiedere a un docente.",
+      "mode": {
+        "choose": "Come deve aiutarti l’insegnante?",
+        "text": "Risposta scritta",
+        "classroom": "Classe online",
+        "cancel": "Annulla",
+        "hint": "Risposta scritta: l’insegnante risponde qui nella conversazione. Classe online: lavagna e chiamata vocale, al computer o sul tablet."
+      },
+      "classroom": {
+        "waiting": "Hai scelto la classe online. Appena un insegnante accetta la tua richiesta, puoi entrare da qui.",
+        "ready": "Il tuo insegnante ti aspetta in classe.",
+        "enter": "Entra in classe",
+        "biggerScreen": "La classe funziona al computer o sul tablet. Aprila lì."
+      }
     },
     "practice": {
       "subtitle": "Conosce la domanda su cui sei",

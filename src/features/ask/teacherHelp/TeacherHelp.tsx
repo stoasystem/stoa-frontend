@@ -1,11 +1,18 @@
-import { GraduationCap } from 'lucide-react'
+import { GraduationCap, MessageSquareText, Presentation } from 'lucide-react'
 import { useEffect, useId, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Button, Pill, type PillTone } from '@/components/base'
 import { ICON, ROW } from '@/components/base/sizes'
 import { cn } from '@/lib/utils'
 import type { HelpWithdraw } from '@/features/ask/teacherHelp/useTeacherHelp'
-import { isEndedHelpRequest, type TeacherHelpRequest, type TeacherHelpStatus, type TeacherSupportStanding } from '@/types/teacherHelp'
+import {
+  helpModeOf,
+  isEndedHelpRequest,
+  type HelpMode,
+  type TeacherHelpRequest,
+  type TeacherHelpStatus,
+  type TeacherSupportStanding,
+} from '@/types/teacherHelp'
 
 /*
  * Motion and states, "Status pills": Pending navy tint, Assigned gold,
@@ -52,12 +59,17 @@ const KNOWN_STATUSES: ReadonlySet<string> = new Set(Object.keys(PILL_TONE))
  * While no teacher has the request the student can take it back, after saying
  * so a second time (#543). Once it is over the card points to a new
  * conversation: this one has had its request (#544).
+ *
+ * A classroom request (#705) says it waits for a teacher to accept it, and
+ * once one has (`in_progress`) offers the way into the classroom. A text
+ * request never does: its answer comes in this conversation.
  */
 export function TeacherHelpStatusCard({
   request,
   teachersOnline,
   withdraw,
   onNewConversation,
+  onEnterClassroom,
 }: {
   request: TeacherHelpRequest
   /** `false` while no teacher is online: said plainly, with no time (#12 point 7). */
@@ -66,6 +78,8 @@ export function TeacherHelpStatusCard({
   withdraw?: HelpWithdraw & { onWithdraw: () => void }
   /** Back to the list, where a new conversation starts; offered once the request is over. */
   onNewConversation?: () => void
+  /** Into this request's classroom; offered only for a classroom request a teacher has accepted. */
+  onEnterClassroom?: () => void
 }) {
   const { t } = useTranslation('chat')
   const status = KNOWN_STATUSES.has(request.status) ? request.status : null
@@ -88,18 +102,25 @@ export function TeacherHelpStatusCard({
   const name = request.teacherName?.trim() || t('ask.thread.teacherFallback')
   const title = status ? t(`ask.help.title.${status}`, { name }) : t('ask.help.fallback.title')
   const pill = status ? t(`ask.help.status.${status}`) : t('ask.help.fallback.status')
+  const classroom = helpModeOf(request) === 'classroom'
+  const classroomReady = classroom && status === 'in_progress'
   const body =
     status === 'pending' && teachersOnline === false
       ? t('ask.help.offline')
-      : status
-        ? t(`ask.help.body.${status}`)
-        : t('ask.help.fallback.body')
+      : classroomReady
+        ? t('ask.help.classroom.ready')
+        : classroom && !ended && status
+          ? t('ask.help.classroom.waiting')
+          : status
+            ? t(`ask.help.body.${status}`)
+            : t('ask.help.fallback.body')
 
   return (
     <section
       aria-label={t('ask.help.cardLabel')}
       aria-live="polite"
       data-help-status={request.status}
+      data-help-mode={helpModeOf(request)}
       className="flex flex-col gap-2.5 border border-[color:var(--card-border)] bg-surface"
       style={{ padding: '12px 14px', borderRadius: ROW.groupRadius }}
     >
@@ -146,6 +167,16 @@ export function TeacherHelpStatusCard({
             </Button>
           </div>
         ))}
+      {classroomReady && onEnterClassroom && (
+        <div className="flex flex-col items-start gap-1">
+          <Button variant="tinted" size="small" onClick={onEnterClassroom} data-enter-classroom>
+            <Presentation aria-hidden="true" size={ICON.rowLeading} strokeWidth={ICON.stroke} />
+            {t('ask.help.classroom.enter')}
+          </Button>
+          {/* The classroom is made for a computer or a tablet. */}
+          <p className="text-[13px] leading-[1.4] text-caption sm:hidden">{t('ask.help.classroom.biggerScreen')}</p>
+        </div>
+      )}
       {withdraw?.errorKey && (
         <p role="alert" className="text-[13px] leading-[1.4] text-red">
           {t(withdraw.errorKey)}
@@ -170,9 +201,14 @@ export function TeacherHelpStatusCard({
  * Quiet, a plain button, unless the answer above it suggests a teacher (#506):
  * then it says so in a card of its own, with a tinted button, and tells how many of
  * the week's requests are left.
+ *
+ * Where the classroom is offered (#705, `classroomHelpOffered`), pressing it
+ * first asks how: a text answer here, or the online classroom. Otherwise it
+ * asks for a text answer at once, as before.
  */
 export function TeacherHelpAction({
   onRequest,
+  classroomOffered = false,
   requesting,
   teachersOnline,
   support,
@@ -180,7 +216,9 @@ export function TeacherHelpAction({
   blockedKey,
   errorKey,
 }: {
-  onRequest: () => void
+  onRequest: (mode: HelpMode) => void
+  /** Ask how first: a text answer or the online classroom. */
+  classroomOffered?: boolean
   requesting: boolean
   teachersOnline: boolean | undefined
   /**
@@ -200,6 +238,16 @@ export function TeacherHelpAction({
   const blocked = Boolean(blockedKey)
   const noteId = useId()
   const blockedNote = blockedKey ? t(blockedKey) : null
+  const [choosing, setChoosing] = useState(false)
+  const chooseId = useId()
+  const firstChoice = useRef<HTMLButtonElement>(null)
+  useEffect(() => {
+    if (choosing) firstChoice.current?.focus()
+  }, [choosing])
+  const choose = (mode: HelpMode) => {
+    setChoosing(false)
+    onRequest(mode)
+  }
 
   return (
     <div
@@ -210,17 +258,39 @@ export function TeacherHelpAction({
       style={suggested ? { padding: '10px 12px', borderRadius: ROW.groupRadius } : undefined}
     >
       {suggested && <p className="text-[14px] font-semibold leading-[1.35] text-ink">{t('ask.help.suggested')}</p>}
-      <Button
-        variant={suggested ? 'tinted' : 'plain'}
-        size="small"
-        onClick={onRequest}
-        disabled={requesting || blocked}
-        aria-busy={requesting || undefined}
-        aria-describedby={blockedNote ? noteId : undefined}
-      >
-        <GraduationCap aria-hidden="true" size={ICON.rowLeading} strokeWidth={ICON.stroke} />
-        {requesting ? t('ask.help.requesting') : t('ask.help.request')}
-      </Button>
+      {choosing ? (
+        <div role="group" aria-labelledby={chooseId} data-help-mode-choice className="flex flex-col items-start gap-2">
+          <p id={chooseId} className="text-[13px] font-semibold leading-[1.4] text-ink">
+            {t('ask.help.mode.choose')}
+          </p>
+          <div className="flex flex-wrap gap-2">
+            <Button ref={firstChoice} variant="tinted" size="small" onClick={() => choose('text')} data-help-mode-option="text">
+              <MessageSquareText aria-hidden="true" size={ICON.rowLeading} strokeWidth={ICON.stroke} />
+              {t('ask.help.mode.text')}
+            </Button>
+            <Button variant="tinted" size="small" onClick={() => choose('classroom')} data-help-mode-option="classroom">
+              <Presentation aria-hidden="true" size={ICON.rowLeading} strokeWidth={ICON.stroke} />
+              {t('ask.help.mode.classroom')}
+            </Button>
+            <Button variant="plain" size="small" onClick={() => setChoosing(false)}>
+              {t('ask.help.mode.cancel')}
+            </Button>
+          </div>
+          <p className="text-[13px] leading-[1.4] text-caption">{t('ask.help.mode.hint')}</p>
+        </div>
+      ) : (
+        <Button
+          variant={suggested ? 'tinted' : 'plain'}
+          size="small"
+          onClick={() => (classroomOffered ? setChoosing(true) : onRequest('text'))}
+          disabled={requesting || blocked}
+          aria-busy={requesting || undefined}
+          aria-describedby={blockedNote ? noteId : undefined}
+        >
+          <GraduationCap aria-hidden="true" size={ICON.rowLeading} strokeWidth={ICON.stroke} />
+          {requesting ? t('ask.help.requesting') : t('ask.help.request')}
+        </Button>
+      )}
       {blockedNote ? (
         <p id={noteId} className="text-[13px] leading-[1.4] text-caption">
           {blockedNote}

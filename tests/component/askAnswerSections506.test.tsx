@@ -311,7 +311,7 @@ describe('Ask a teacher', () => {
     expect(ask.queryByText(/left this week/)).not.toBeInTheDocument()
 
     await userEvent.click(button)
-    await waitFor(() => expect(requestHelpMock).toHaveBeenCalledWith({ conversationId: 'c1' }))
+    await waitFor(() => expect(requestHelpMock).toHaveBeenCalledWith({ conversationId: 'c1', mode: 'text' }))
   })
 
   it('is offered plainly under an answer that suggests a teacher', async () => {
@@ -351,7 +351,7 @@ describe('Ask a teacher', () => {
     const reads = availabilityMock.mock.calls.length
     await userEvent.click(ask.getByRole('button', { name: 'Ask a teacher' }))
 
-    await waitFor(() => expect(requestHelpMock).toHaveBeenCalledWith({ conversationId: 'c1' }))
+    await waitFor(() => expect(requestHelpMock).toHaveBeenCalledWith({ conversationId: 'c1', mode: 'text' }))
     await waitFor(() => expect(availabilityMock.mock.calls.length).toBeGreaterThan(reads))
   })
 

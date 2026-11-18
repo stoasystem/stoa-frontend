@@ -37,7 +37,7 @@ import { type CurrentUser, useAuthStore } from '@/store/authStore'
 import type { ChatMessage, Conversation } from '@/types/chat'
 import type { ClassroomPass } from '@/types/classroom'
 import type { TeacherHelpRequestDetail } from '@/types/teacher'
-import type { TeacherHelpRequest, TeacherHelpStatus } from '@/types/teacherHelp'
+import type { HelpMode, TeacherHelpRequest, TeacherHelpStatus } from '@/types/teacherHelp'
 import { createFakeAskServer, type FakeAskServer } from '../fakes/askServer'
 
 vi.mock('@/services/classroom/classroomApi', () => ({
@@ -90,17 +90,19 @@ function conversation(): Conversation {
   }
 }
 
-function help(status: TeacherHelpStatus): TeacherHelpRequest {
-  return { requestId: 'r1', conversationId: 'c1', status, teacherName: 'Frau Muster', createdAt: '2026-11-16T10:00:00.000Z' }
+// A classroom request (#705): only those have a classroom to enter.
+function help(status: TeacherHelpStatus, mode: HelpMode = 'classroom'): TeacherHelpRequest {
+  return { requestId: 'r1', conversationId: 'c1', status, mode, teacherName: 'Frau Muster', createdAt: '2026-11-16T10:00:00.000Z' }
 }
 
-function detail(status: TeacherHelpStatus): TeacherHelpRequestDetail {
+function detail(status: TeacherHelpStatus, mode: HelpMode = 'classroom'): TeacherHelpRequestDetail {
   return {
     requestId: 'r1',
     conversationId: 'c1',
     student: { id: 's1', name: 'Lina Meier', grade: '8' },
     subject: 'math',
     status,
+    mode,
     messages: [
       { id: 's1', conversationId: 'c1', role: 'student', content: 'How do I reduce 18/24?', createdAt: '2026-11-16T10:00:00.000Z' },
       { id: 'a1', conversationId: 'c1', role: 'assistant', content: 'Divide both by 6: 3/4.', createdAt: '2026-11-16T10:00:00.000Z' },
@@ -222,24 +224,32 @@ describe('the classroom address', () => {
   })
 })
 
-describe('asking a teacher leads into the classroom', () => {
-  it('goes to the classroom once it opens', async () => {
+// #705: asking no longer leads into the classroom to wait (#696). The student
+// stays in the conversation; a classroom request is entered from the card once
+// a teacher has accepted it.
+describe('asking a teacher keeps the student in Ask', () => {
+  it('stays in the conversation, with no seat asked for', async () => {
     server.teacherHelp.enterStudentClassroom.mockResolvedValue(PASS)
     open('/ask/c1')
     await userEvent.click(await screen.findByRole('button', { name: tr('ask.help.request') }))
-    await waitFor(() => expect(where()).toBe('/classroom/c1'))
-    expect(server.teacherHelp.enterStudentClassroom).toHaveBeenCalledWith('c1')
-    // The seat asked for is the page's: not asked for again on arrival.
-    expect(await screen.findByTitle(tr('classroom.board.title'))).toHaveAttribute('src', PASS.whiteboardUrl)
-    expect(enterStudent).not.toHaveBeenCalled()
-  })
-
-  it('stays in Ask where the classroom is not set up', async () => {
-    open('/ask/c1')
-    await userEvent.click(await screen.findByRole('button', { name: tr('ask.help.request') }))
-    await waitFor(() => expect(server.teacherHelp.enterStudentClassroom).toHaveBeenCalledWith('c1'))
     await screen.findByRole('region', { name: tr('ask.help.cardLabel') })
     expect(where()).toBe('/ask/c1')
+    expect(server.teacherHelp.enterStudentClassroom).not.toHaveBeenCalled()
+  })
+
+  it('goes into the classroom from the card once a teacher accepted a classroom request', async () => {
+    server.seed({ helpRequests: [help('in_progress')] })
+    open('/ask/c1')
+    await userEvent.click(await screen.findByRole('button', { name: tr('ask.help.classroom.enter') }))
+    await waitFor(() => expect(where()).toBe('/classroom/c1'))
+    expect(await screen.findByTitle(tr('classroom.board.title'))).toHaveAttribute('src', PASS.whiteboardUrl)
+  })
+
+  it('offers no classroom for a text request', async () => {
+    server.seed({ helpRequests: [help('in_progress', 'text')] })
+    open('/ask/c1')
+    await screen.findByRole('region', { name: tr('ask.help.cardLabel') })
+    expect(screen.queryByRole('button', { name: tr('ask.help.classroom.enter') })).toBeNull()
   })
 })
 
@@ -365,7 +375,7 @@ describe('the teacher', () => {
     expect(screen.queryByRole('link', { name: i18n.t('teacher:detail.enterClassroom') })).toBeNull()
   })
 
-  it('takes an offered request and goes into the classroom with one press', async () => {
+  it('accepts an offered classroom request without leaving, then enters the classroom', async () => {
     readDetail.mockResolvedValue(detail('pending'))
     updateStatus.mockImplementation(async () => {
       // The server has it now: the next read says so.
@@ -374,14 +384,16 @@ describe('the teacher', () => {
     })
     open('/teacher/requests/r1')
     expect(screen.queryByRole('link', { name: i18n.t('teacher:detail.enterClassroom') })).toBeNull()
-    const take = await screen.findByRole('button', { name: i18n.t('teacher:detail.takeAndEnterClassroom') })
-    await userEvent.click(take)
+    const accept = await screen.findByRole('button', { name: i18n.t('teacher:detail.accept.button') })
+    await userEvent.click(accept)
 
     await waitFor(() => expect(updateStatus).toHaveBeenCalled())
     expect(updateStatus.mock.calls[0][0]).toEqual({ requestId: 'r1', status: 'in_progress' })
-    // Into the classroom only once the server took it: the seat is asked with the request.
+    // Accepting goes nowhere (#705); the way in comes once the server has it.
+    const enter = await screen.findByRole('link', { name: i18n.t('teacher:detail.enterClassroom') })
+    expect(enterTeacher).not.toHaveBeenCalled()
+    await userEvent.click(enter)
     await waitFor(() => expect(enterTeacher).toHaveBeenCalledWith('r1'))
-    expect(updateStatus.mock.invocationCallOrder[0]).toBeLessThan(enterTeacher.mock.invocationCallOrder[0])
     expect(await bar696()).toBeInTheDocument()
   })
 
@@ -389,7 +401,7 @@ describe('the teacher', () => {
     readDetail.mockResolvedValue(detail('pending'))
     updateStatus.mockRejectedValue(new ApiError('conflict', { status: 409, code: 'help_request_changed' }))
     open('/teacher/requests/r1')
-    await userEvent.click(await screen.findByRole('button', { name: i18n.t('teacher:detail.takeAndEnterClassroom') }))
+    await userEvent.click(await screen.findByRole('button', { name: i18n.t('teacher:detail.accept.button') }))
 
     await waitFor(() => expect(updateStatus).toHaveBeenCalled())
     expect(await screen.findByRole('alert')).toBeInTheDocument()

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { Link, useNavigate, useParams } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
 import { classroomPathFor } from '@/app/router/routeManifest'
 import { useTranslation } from 'react-i18next'
 import { BackButton } from '@/components/common/BackButton'
@@ -24,7 +24,7 @@ import { DashboardLayout } from '@/layouts/DashboardLayout'
 import { trackEvent } from '@/services/analytics/analyticsClient'
 import { normalizeCurriculumSubjectId } from '@/services/practice/practiceApi'
 import { isHelpRequestConflict, isHelpRequestOutOfReach } from '@/lib/teacherHelpRequestConflict'
-import { acceptsTeacherReply, awaitsTeacherAcceptance, teacherStatusActions } from '@/types/teacherHelp'
+import { acceptsTeacherReply, awaitsTeacherAcceptance, helpModeOf, teacherStatusActions } from '@/types/teacherHelp'
 
 const statusActionKey: Record<string, string> = {
   in_progress: 'markInProgress',
@@ -35,7 +35,6 @@ export function TeacherHelpRequestDetailPage() {
   const { t } = useTranslation('practice')
   const { t: tTeacher } = useTranslation('teacher')
   const { requestId } = useParams()
-  const navigate = useNavigate()
   const [resolutionNote, setResolutionNote] = useState('')
   const requestCardRef = useRef<HTMLDivElement>(null)
   // A change that failed takes focus to the failure, not to the request: there a
@@ -84,6 +83,10 @@ export function TeacherHelpRequestDetailPage() {
   const acceptedHere = updateStatus.isSuccess && updateStatus.data?.status === 'in_progress'
   const replyNeedsAcceptance = canAct && reply.notAccepted && !acceptedHere
   const ended = status === 'withdrawn' || status === 'expired' ? status : null
+  // How the student asked to be helped (#705): a text answer is written here,
+  // a classroom request is answered in the classroom. An older request is text.
+  const mode = helpModeOf(requestQuery.data)
+  const repliesHere = mode === 'text' || status === 'resolved'
   const accept = () =>
     requestId &&
     updateStatus.mutate(
@@ -105,35 +108,26 @@ export function TeacherHelpRequestDetailPage() {
             <PageActions
               secondary={<BackButton label={tTeacher('detail.backLabel')} to="/teacher" />}
               primary={
-                // Once this teacher holds it and works on it, the student waits in
-                // the classroom (#696): the backend lets a teacher in only then.
-                canAct && requestQuery.data?.status === 'in_progress' ? (
+                // Offered and not yet accepted: accepting is the one step, and it
+                // goes nowhere (#705). Refused or failed, the page says so as for
+                // any status change.
+                awaitingAcceptance ? (
+                  <Button
+                    type="button"
+                    data-accept-request-button
+                    disabled={readFailed || updateStatus.isPending || !requestId}
+                    onClick={accept}
+                  >
+                    {tTeacher('detail.accept.button')}
+                  </Button>
+                ) : canAct && status === 'in_progress' && mode === 'classroom' && requestQuery.data ? (
+                  // Accepted, a classroom request is answered there; the backend
+                  // lets a teacher in only once they hold it (#696). A text
+                  // request has no classroom: its reply box is below.
                   <Button asChild>
                     <Link to={classroomPathFor(requestQuery.data.conversationId, requestQuery.data.requestId)} data-enter-classroom>
                       {tTeacher('detail.enterClassroom')}
                     </Link>
-                  </Button>
-                ) : requestQuery.data && awaitingAcceptance ? (
-                  // Offered and not yet taken: one press takes it (the same
-                  // change as "start review") and, once the server has it, goes
-                  // into the classroom, where the student is already waiting.
-                  // Refused or failed, the page says so as for any status change.
-                  <Button
-                    type="button"
-                    data-take-and-enter-classroom
-                    disabled={readFailed || updateStatus.isPending || !requestId}
-                    onClick={() => {
-                      const { conversationId, requestId: heldRequestId } = requestQuery.data!
-                      updateStatus.mutate(
-                        { requestId: heldRequestId, status: 'in_progress' },
-                        {
-                          onSuccess: () => navigate(classroomPathFor(conversationId, heldRequestId)),
-                          onError: () => setRefocus({ failed: true }),
-                        },
-                      )
-                    }}
-                  >
-                    {tTeacher('detail.takeAndEnterClassroom')}
                   </Button>
                 ) : undefined
               }
@@ -213,18 +207,28 @@ export function TeacherHelpRequestDetailPage() {
                   role={replyNeedsAcceptance ? 'alert' : undefined}
                   className="mb-0 mt-1 text-sm leading-6 text-muted-foreground"
                 >
-                  {tTeacher(replyNeedsAcceptance ? 'detail.accept.replyRefused' : 'detail.accept.body')}
+                  {tTeacher(
+                    replyNeedsAcceptance
+                      ? 'detail.accept.replyRefused'
+                      : mode === 'classroom'
+                        ? 'detail.accept.bodyClassroom'
+                        : 'detail.accept.body',
+                  )}
                 </p>
-                <div className="mt-3">
-                  <Button
-                    type="button"
-                    data-accept-request-button
-                    disabled={readFailed || updateStatus.isPending || !requestId}
-                    onClick={accept}
-                  >
-                    {tTeacher('detail.accept.button')}
-                  </Button>
-                </div>
+                {/* Offered, the page's one button is at the top. A reply refused as
+                    not accepted on a copy that said otherwise has none there. */}
+                {replyNeedsAcceptance && !awaitingAcceptance && (
+                  <div className="mt-3">
+                    <Button
+                      type="button"
+                      data-accept-request-button
+                      disabled={readFailed || updateStatus.isPending || !requestId}
+                      onClick={accept}
+                    >
+                      {tTeacher('detail.accept.button')}
+                    </Button>
+                  </div>
+                )}
               </section>
             )}
             {changedElsewhere && (
@@ -297,7 +301,7 @@ export function TeacherHelpRequestDetailPage() {
             )}
             {/* A resolved request still takes its teacher's follow-up (#222); one
                 withdrawn or expired has no teacher and the server refuses the reply. */}
-            {canAct && acceptsTeacherReply(requestQuery.data.status) && (
+            {canAct && acceptsTeacherReply(requestQuery.data.status) && repliesHere && (
               <>
                 <SectionHeader
                   title={tTeacher('detail.replyTitle')}

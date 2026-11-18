@@ -1,7 +1,7 @@
 import { apiPath } from '@/services/api/apiPath'
 import { httpClient } from '@/services/api/httpClient'
 
-import type { TeacherAvailability, TeacherHelpRequest } from '@/types/teacherHelp'
+import type { HelpMode, TeacherAvailability, TeacherHelpRequest } from '@/types/teacherHelp'
 
 export async function getTeacherAvailability() {
   const response = await httpClient.get<TeacherAvailability>(
@@ -10,9 +10,11 @@ export async function getTeacherAvailability() {
   return response.data
 }
 
+/** `mode` left out is a text answer on the server too (stoa-backend#480). */
 export async function createTeacherHelpRequest(payload: {
   conversationId: string
   message?: string
+  mode?: HelpMode
 }) {
   const response = await httpClient.post<TeacherHelpRequest>(
     '/teacher-help/request',

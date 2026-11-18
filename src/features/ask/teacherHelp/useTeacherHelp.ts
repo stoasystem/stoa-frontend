@@ -30,13 +30,13 @@
  * (`types/teacherHelp.ts`); this module reads it and repeats none of it.
  */
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useAskServer, type AskServer } from '@/features/ask/server/askServer'
 import { useAskUsagePeriod } from '@/features/ask/useAskUsagePeriod'
-import { classroomOpens } from '@/features/classroom/useClassroomPass'
 import { useConversationQuery } from '@/hooks/chat/useConversationQuery'
 import { useTeacherAvailabilityQuery } from '@/hooks/chat/useTeacherAvailabilityQuery'
 import { noteUsagePeriodEnded } from '@/hooks/student/useStudentEntitlementQuery'
+import { classroomHelpOffered } from '@/lib/classroomHelp'
 import { USAGE_PERIOD_ENDED } from '@/lib/usagePeriod'
 import { trackEvent } from '@/services/analytics/analyticsClient'
 import { ApiError } from '@/services/api/httpClient'
@@ -45,6 +45,7 @@ import type { ChatMessage } from '@/types/chat'
 import {
   isEndedHelpRequest,
   isWithdrawableHelpRequest,
+  type HelpMode,
   type TeacherHelpRequest,
   type TeacherHelpStatus,
   type TeacherSupportStanding,
@@ -64,6 +65,11 @@ export type HelpOffer = {
   blockedKey: string | null
   /** Why the last request was refused (`chat` key). */
   errorKey: string | null
+  /**
+   * The student chooses between a text answer and the online classroom before
+   * asking (#705); otherwise every request is a text answer (`classroomHelpOffered`).
+   */
+  classroomOffered: boolean
 }
 
 /** Taking the request back (#543). */
@@ -100,7 +106,8 @@ export type TeacherHelp = {
   view: TeacherHelpView
   /** The teacher's name as the request has it, for their replies. */
   teacherName: string | undefined
-  request: () => void
+  /** Asks a teacher, to be helped this way; a text answer when left out. */
+  request: (mode?: HelpMode) => void
   withdraw: () => void
 }
 
@@ -203,25 +210,23 @@ export type TeacherHelpServer = Pick<
   'getTeacherHelpRequest' | 'createTeacherHelpRequest' | 'withdrawTeacherHelpRequest' | 'enterStudentClassroom'
 >
 
+/*
+ * Asking keeps the student in the conversation (#705): no longer into the
+ * classroom to wait (#696). A classroom request offers the way in once a
+ * teacher has accepted it, from the card.
+ */
 export function useTeacherHelp({
   conversationId,
   messages,
   isStreaming,
-  onClassroomOpens,
 }: {
   conversationId: string
   messages: readonly ChatMessage[]
   isStreaming: boolean
-  /**
-   * Called once a request was taken and its virtual classroom opens (#696):
-   * Ask takes the student there to wait. Where the classroom is not set up,
-   * it is not called and Ask stays as it was.
-   */
-  onClassroomOpens?: (conversationId: string) => void
 }): TeacherHelp {
   const queryClient = useQueryClient()
   const server: TeacherHelpServer = useAskServer().teacherHelp
-  const { getTeacherHelpRequest, createTeacherHelpRequest, withdrawTeacherHelpRequest, enterStudentClassroom } = server
+  const { getTeacherHelpRequest, createTeacherHelpRequest, withdrawTeacherHelpRequest } = server
   const [requestError, setRequestError] = useState<string | null>(null)
   const [withdrawError, setWithdrawError] = useState<string | null>(null)
 
@@ -267,27 +272,20 @@ export function useTeacherHelp({
   }, [listStatus, queryClient])
 
   const asking = useMutation({
-    mutationFn: () => createTeacherHelpRequest({ conversationId }),
-    onSuccess: (request) => {
+    mutationFn: (mode: HelpMode) => createTeacherHelpRequest({ conversationId, mode }),
+    onSuccess: (request, mode) => {
       setRequestError(null)
       trackEvent('teacher_help_requested', {
         requestId: request.requestId,
         conversationId: request.conversationId,
         status: request.status,
+        mode,
       })
       // The card shows the request as the server reports it, read back from
       // the server: not the answer to this POST, and never a guess.
       void queryClient.invalidateQueries({ queryKey: chatQueryKeys.teacherHelpRequest(conversationId) })
       // One of the week's requests is gone: said now, not at the next minute's read (#506).
       void queryClient.invalidateQueries({ queryKey: chatQueryKeys.teacherAvailability() })
-      // Into the virtual classroom to wait for the teacher (#696), once it is
-      // known to open: where it is not set up, Ask stays as it was.
-      if (onClassroomOpens) {
-        const asked = request.conversationId || conversationId
-        void classroomOpens(queryClient, { role: 'student', conversationId: asked }, enterStudentClassroom).then((opens) => {
-          if (opens) onClassroomOpens(asked)
-        })
-      }
     },
     onError: (error) => {
       const key = requestErrorKey(error)
@@ -347,11 +345,14 @@ export function useTeacherHelp({
         blockedKey,
         // Said once: a refusal in the words the greyed button already says is not said again.
         errorKey: requestError === blockedKey ? null : requestError,
+        classroomOffered: classroomHelpOffered(),
       },
     }
   }, [help, isAsking, isStreaming, isWithdrawing, messages, paused, requestError, support, teachersOnline, withdrawError])
 
   const { mutate: ask } = asking
   const { mutate: takeBack } = withdrawing
-  return { view, teacherName: help?.teacherName, request: ask, withdraw: takeBack }
+  // The same function from one render to the next, as `ask` itself (#416).
+  const request = useCallback((mode: HelpMode = 'text') => ask(mode), [ask])
+  return { view, teacherName: help?.teacherName, request, withdraw: takeBack }
 }
