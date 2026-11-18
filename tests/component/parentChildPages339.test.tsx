@@ -53,6 +53,8 @@ vi.mock('@/layouts/DashboardLayout', () => ({
 vi.mock('@/hooks/parent/useChildLearningSummaryQuery', () => ({
   useChildLearningSummaryQuery: () => state.summary,
 }))
+// The child's voice question switch (#697) has its own test (voiceQuestion697).
+vi.mock('@/components/parent/ChildVoiceQuestionsCard', () => ({ ChildVoiceQuestionsCard: () => null }))
 vi.mock('@/hooks/parent/useChildLearningProfileQuery', () => ({
   useChildLearningProfileQuery: () => state.profile,
 }))

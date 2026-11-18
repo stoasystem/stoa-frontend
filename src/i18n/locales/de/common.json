@@ -39,6 +39,33 @@
       "mac": "Lieber sprechen? Drück die Mikrofontaste oder dein Tastenkürzel fürs Diktieren.",
       "touch": "Lieber sprechen? Tipp auf das Mikrofon auf deiner Tastatur.",
       "privacy": "Dein Gerät macht aus deiner Stimme Text. STOA bekommt nur den Text."
+    },
+    "voice": {
+      "start": "Frage einsprechen",
+      "stop": "Aufnahme beenden",
+      "listening": "Ich höre zu …",
+      "stopHint": "Fertig? Drück nochmals auf das Mikrofon. Nach einer Minute hört die Aufnahme von selbst auf.",
+      "privacy": "STOA macht aus deiner Aufnahme Text und speichert die Aufnahme nicht.",
+      "transcribing": "Ich schreibe auf, was du gesagt hast …",
+      "sendAgain": "Nochmals versuchen",
+      "recordAgain": "Nochmals aufnehmen",
+      "typeInsteadAction": "Lieber tippen",
+      "typeInstead": "Du kannst deine Frage auch einfach tippen.",
+      "failed": {
+        "notAllowed": "Fragen mit der Stimme sind für dich gerade nicht eingeschaltet. Du kannst deine Frage tippen oder diktieren.",
+        "unsupported": "Dieser Browser nimmt in einem Format auf, das STOA nicht in Text umwandeln kann. Tippe deine Frage oder diktiere sie.",
+        "tooLarge": "Die Aufnahme ist zu gross. Sag deine Frage etwas kürzer und versuch es nochmals.",
+        "tooLong": "Die Aufnahme ist länger als eine Minute. Sag deine Frage etwas kürzer und versuch es nochmals.",
+        "unreadable": "Die Aufnahme liess sich nicht lesen. Versuch es nochmals.",
+        "silent": "Ich habe nichts gehört. Sprich etwas näher am Mikrofon und versuch es nochmals.",
+        "dailyLimit": "Für heute hast du alle Fragen mit der Stimme gebraucht. Morgen geht es wieder, bis dahin kannst du tippen.",
+        "unavailable": "Das Umwandeln in Text klappt gerade nicht. Versuch es gleich nochmals oder tippe deine Frage.",
+        "offline": "Keine Verbindung zu STOA. Prüf das Internet und versuch es nochmals.",
+        "failed": "Das hat nicht geklappt. Versuch es nochmals oder tippe deine Frage.",
+        "micBlocked": "Der Browser lässt STOA nicht ans Mikrofon. Du kannst es in den Einstellungen des Browsers erlauben.",
+        "micMissing": "Ich finde kein Mikrofon, oder es wird gerade anderswo gebraucht. Versuch es nochmals oder tippe deine Frage.",
+        "recorder": "Die Aufnahme ist abgebrochen. Versuch es nochmals."
+      }
     }
   },
   "errorBoundary": {

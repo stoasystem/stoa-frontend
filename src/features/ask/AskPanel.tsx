@@ -39,6 +39,7 @@ import { toUserFacingError } from '@/lib/userFacingText'
 import { cn } from '@/lib/utils'
 import { askFor, useAskStore } from '@/store/askStore'
 import { useAuthStore } from '@/store/authStore'
+import { useVoiceQuestionInput } from '@/hooks/student/useVoiceQuestionInput'
 import { litMomentsFor, useLitMoments, type LitMoment } from '@/store/litMomentsStore'
 import { learningSubjectOptions } from '@/types/learningProfile'
 import { QUOTE_MAX_LENGTH, type ChatMessage } from '@/types/chat'
@@ -105,6 +106,7 @@ export function AskPanel({
   const { t } = useTranslation('chat')
   const { conversationId, draft, setDraft, select, close } = controller
   const ownerId = useAuthStore((state) => state.user?.id ?? null)
+  const voice = useVoiceQuestionInput()
   const conversationsQuery = useConversationsQuery()
   const availability = useTeacherAvailabilityQuery().data
   const teachersOnline = availability?.online
@@ -456,6 +458,7 @@ export function AskPanel({
           onCapture={attachments.sources.takePhoto}
           onPhone={attachments.sources.usePhone}
           dictation
+          voice={voice}
           label={t('ask.composerLabel')}
           placeholder={practice ? t('ask.practice.placeholder') : t('ask.placeholder')}
           busy={isStreaming || question.starting || attachments.busy}
@@ -471,9 +474,9 @@ export function AskPanel({
           }
         />
       </div>
-      <AskTourStatus step={tour.step} camera={camera} />
+      <AskTourStatus step={tour.step} camera={camera} voice={Boolean(voice)} />
       {tour.step && (
-        <AskTourBubble root={root} step={tour.step} camera={camera} onNext={tour.next} onSkip={tour.skip} onRoom={setBubbleRoom} />
+        <AskTourBubble root={root} step={tour.step} camera={camera} voice={Boolean(voice)} onNext={tour.next} onSkip={tour.skip} onRoom={setBubbleRoom} />
       )}
     </div>
   )

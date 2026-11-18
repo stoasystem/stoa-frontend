@@ -30,6 +30,7 @@ import { ChooserInputs } from '@/features/uploads/Attachments'
 import { useOfferedSources } from '@/features/uploads/useAttachments'
 import { askFor, useAskStore, type AddedFromDock } from '@/store/askStore'
 import { useAuthStore } from '@/store/authStore'
+import { useVoiceQuestionInput } from '@/hooks/student/useVoiceQuestionInput'
 import '@/features/ask/askGuide.css'
 
 /**
@@ -128,6 +129,7 @@ export function AskHost({
 
   // "Find my own star" (#586): the examples, while Ask is closed.
   const ownerId = useAuthStore((state) => state.user?.id ?? null)
+  const voice = useVoiceQuestionInput()
   const examples = useAskStore((state) => askFor(state, ownerId).examples)
   const askNow = useAskStore((state) => state.askNow)
   const endExamples = useAskStore((state) => state.endExamples)
@@ -392,6 +394,7 @@ export function AskHost({
                   onCapture={offered.camera ? () => dockCamera.current?.click() : undefined}
                   onPhone={offered.phone ? () => handOver({ kind: 'phone' }) : undefined}
                   dictation
+                  voice={voice}
                   label={t('ask.composerLabel')}
                   placeholder={
                     offering

@@ -39,6 +39,33 @@
       "mac": "Tu préfères parler ? Appuie sur la touche micro ou sur ton raccourci de dictée.",
       "touch": "Tu préfères parler ? Touche le micro sur ton clavier.",
       "privacy": "Ton appareil transforme ta voix en texte. STOA ne reçoit que le texte."
+    },
+    "voice": {
+      "start": "Dire ta question",
+      "stop": "Arrêter l’enregistrement",
+      "listening": "J’écoute …",
+      "stopHint": "Fini ? Appuie encore sur le micro. L’enregistrement s’arrête tout seul après une minute.",
+      "privacy": "STOA transforme ton enregistrement en texte et ne garde pas l’enregistrement.",
+      "transcribing": "J’écris ce que tu as dit …",
+      "sendAgain": "Réessayer",
+      "recordAgain": "Enregistrer à nouveau",
+      "typeInsteadAction": "Plutôt écrire",
+      "typeInstead": "Tu peux aussi simplement écrire ta question.",
+      "failed": {
+        "notAllowed": "Les questions à voix haute ne sont pas activées pour toi en ce moment. Tu peux écrire ou dicter ta question.",
+        "unsupported": "Ce navigateur enregistre dans un format que STOA ne peut pas transformer en texte. Écris ta question ou dicte-la.",
+        "tooLarge": "L’enregistrement est trop lourd. Dis ta question un peu plus brièvement et réessaie.",
+        "tooLong": "L’enregistrement dure plus d’une minute. Dis ta question un peu plus brièvement et réessaie.",
+        "unreadable": "L’enregistrement n’a pas pu être lu. Réessaie.",
+        "silent": "Je n’ai rien entendu. Parle un peu plus près du micro et réessaie.",
+        "dailyLimit": "Tu as utilisé toutes tes questions à voix haute pour aujourd’hui. Tu pourras recommencer demain ; d’ici là, tu peux écrire.",
+        "unavailable": "La transformation en texte ne fonctionne pas pour le moment. Réessaie dans un instant ou écris ta question.",
+        "offline": "Pas de connexion à STOA. Vérifie Internet et réessaie.",
+        "failed": "Ça n’a pas marché. Réessaie ou écris ta question.",
+        "micBlocked": "Le navigateur ne laisse pas STOA utiliser le micro. Tu peux l’autoriser dans les réglages du navigateur.",
+        "micMissing": "Je ne trouve pas de micro, ou il est déjà utilisé ailleurs. Réessaie ou écris ta question.",
+        "recorder": "L’enregistrement s’est interrompu. Réessaie."
+      }
     }
   },
   "errorBoundary": {

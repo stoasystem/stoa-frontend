@@ -14,7 +14,8 @@
  * stored a language, to see the language first (#627); `fresh=1` forgets what the demo backend kept in this tab
  * (completed lessons, the lighting and its acknowledgement, #51, and Ask's
  * messages); `role=teacher`, `classroom=` and `mic=` set up the virtual
- * classroom (#696, see `classroom.ts`). Moving around inside the page writes the route back to `path` (with
+ * classroom (#696, see `classroom.ts`); `voice=on`, `voiceFails=`, `mic=` and
+ * `role=parent` voice questions and the parent's switch for them (#697, see `voice.ts`). Moving around inside the page writes the route back to `path` (with
  * `signedIn=0` once signed out, and `lang` once the language changes), so a
  * reload stays where it was -- also back on the surface's own route.
  *
@@ -104,6 +105,7 @@ async function start() {
     { PreviewLighting },
     { ClassroomVoiceProvider },
     { demoTeacher, previewAsTeacher, previewVoiceConnector },
+    { demoParentNow, installPreviewMicrophone, previewAsParent },
   ] =
     await Promise.all([
       import('@/app/providers/AppProviders'),
@@ -116,13 +118,16 @@ async function start() {
       import('@/dev/preview/lighting'),
       import('@/features/classroom/classroomVoice'),
       import('@/dev/preview/classroom'),
+      import('@/dev/preview/voice'),
     ])
+  // Voice questions (#697): a stand-in microphone, unless `mic=real`.
+  installPreviewMicrophone()
 
   // Signed in the way the login form leaves it: a token in the store, the
   // account read back from `/auth/me` by the real AuthBootstrap.
   useAuthStore.setState(
     signedIn
-      ? { user: previewAsTeacher() ? demoTeacher : demo().demoStudent, accessToken: 'design-preview', isAuthenticated: true }
+      ? { user: previewAsTeacher() ? demoTeacher : previewAsParent() ? demoParentNow() : demo().demoStudent, accessToken: 'design-preview', isAuthenticated: true }
       : { user: null, accessToken: null, isAuthenticated: false },
   )
 

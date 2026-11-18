@@ -41,6 +41,17 @@ import {
   previewAsTeacher,
   TEACHER_JOINS_AFTER_MS,
 } from '@/dev/preview/classroom'
+import {
+  demoChildLearningProfile,
+  demoChildSummary,
+  demoChildVoiceQuestions,
+  demoParentChildren,
+  demoParentNow,
+  demoStudentVoiceQuestions,
+  demoTranscription,
+  previewAsParent,
+  setDemoChildVoiceQuestions,
+} from '@/dev/preview/voice'
 import { DEMO_TEACHER_NAME } from '@/dev/demo/data'
 import { DEMO_BRIDGE_STAR, DEMO_KNOWLEDGE_POINT } from '@/dev/demo/data'
 import { DEMO_ANSWER_STYLE_CODES, DEMO_GRADE_CODES } from '@/dev/demo/data/student'
@@ -147,7 +158,7 @@ const askedForTeacher = new Map<string, { requestId: string; conversationId: str
 
 const routes: Array<[method: string, pattern: string, handler: Handler]> = [
   // Account
-  ['GET', '/auth/me', () => (previewAsTeacher() ? demoTeacher : demo().demoStudent)],
+  ['GET', '/auth/me', () => (previewAsTeacher() ? demoTeacher : previewAsParent() ? demoParentNow() : demo().demoStudent)],
   // Login review: #fail refuses credentials; the unverified demo address opens
   // the existing verification panel. These replies never contact an identity provider.
   ['POST', '/auth/login', ({ body }) =>
@@ -222,6 +233,20 @@ const routes: Array<[method: string, pattern: string, handler: Handler]> = [
   }],
   // The password change on /me (#184): the current password with the marker in
   // it is refused, a code with it is refused; anything else goes through.
+  // Voice questions (#697, see `voice.ts`): the student's switch and transcription, the parent's switch.
+  ['GET', '/students/me/voice-questions', () => demoStudentVoiceQuestions()],
+  ['POST', '/students/me/voice-questions/transcriptions', async ({ body }) => {
+    const said = await demoTranscription(body)
+    return Array.isArray(said) ? refuse(said[0], said[1], 'Refused by the demo backend.') : said
+  }],
+  ['GET', '/parents/me/children', () => demoParentChildren()],
+  ['GET', '/parents/me/children/:id/summary', ({ params }) => demoChildSummary(params.id)],
+  ['GET', '/parents/me/children/:id/learning-profile', ({ params }) => demoChildLearningProfile(params.id)],
+  ['GET', '/parents/me/children/:id/voice-questions', ({ params }) => demoChildVoiceQuestions(params.id)],
+  ['PUT', '/parents/me/children/:id/voice-questions', ({ params, body }) => {
+    const saved = setDemoChildVoiceQuestions(params.id, body)
+    return saved === 'invalid' ? refuse(422, 'validation_error', 'allowed must be true or false') : saved
+  }],
   ['POST', '/auth/password-change/request', ({ body }) =>
     field<string>(body, 'currentPassword')?.includes(DEMO_FAIL_ONCE)
       ? refuse(400, 'password_change_credentials_invalid', 'Check the current password and try again.')

@@ -21,6 +21,7 @@ import { usePrefersReducedMotion } from '@/features/starmap/motion/usePrefersRed
 import { useMediaQuery } from '@/hooks/layout/useMediaQuery'
 import { useCoverShell } from '@/layouts/shellCover'
 import { useAskStore } from '@/store/askStore'
+import { useVoiceQuestionInput } from '@/hooks/student/useVoiceQuestionInput'
 
 /**
  * Wide enough for the exercise and the 420 panel side by side (Placement:
@@ -117,6 +118,7 @@ export function StageWithAsk({
   const side = useMediaQuery(STAGE_SIDE_QUERY)
   const controller = useStageAskController(side, Boolean(off))
   const { open, close } = controller
+  const voice = useVoiceQuestionInput()
   // The usage period has ended (#615): the docked composer is greyed and says
   // why; the conversation still opens from the reopen button beside it.
   const usagePeriod = useAskUsagePeriod()
@@ -222,6 +224,7 @@ export function StageWithAsk({
                 }}
                 onSubmit={(value) => controller.openWithDraft(value)}
                 dictation
+                voice={voice}
                 label={t('ask.composerLabel')}
                 placeholder={t('ask.practice.placeholder')}
               />

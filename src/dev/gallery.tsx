@@ -31,6 +31,19 @@ async function start() {
   const base = await import('@/components/base')
   const { AppLayout } = await import('@/layouts/AppLayout')
   const { useAuthStore } = await import('@/store/authStore')
+  // Voice questions (#697): the stand-in microphone, and a transcription that answers after a moment.
+  const [{ installPreviewMicrophone }, { recordingTypeHere }] = await Promise.all([
+    import('@/dev/preview/voice'),
+    import('@/lib/voiceRecording'),
+  ])
+  installPreviewMicrophone()
+  const voiceType = recordingTypeHere()
+  const galleryVoice = voiceType
+    ? {
+        recordingType: voiceType,
+        transcribe: () => new Promise<string>((resolve) => window.setTimeout(() => resolve('How do I work out the sine of 30 degrees?'), 1_200)),
+      }
+    : undefined
   const { Avatar, Button, Composer, Group, IconButton, Pill, PresenceDot, Progress, Row, SearchField, SegmentedFilter, SegmentedNav, Toggle } = base
 
   useAuthStore.setState({
@@ -59,7 +72,7 @@ async function start() {
     )
   }
 
-  function ComposerDemo({ variant, disabled = false }: { variant: 'docked' | 'full'; disabled?: boolean }) {
+  function ComposerDemo({ variant, disabled = false, voice = false }: { variant: 'docked' | 'full'; disabled?: boolean; voice?: boolean }) {
     const [value, setValue] = useState('')
     return (
       <Composer
@@ -74,6 +87,7 @@ async function start() {
         onAttach={() => {}}
         onCapture={() => {}}
         dictation
+        voice={voice ? galleryVoice : undefined}
         footerStart={
           variant === 'full' ? (
             <button type="button" className="h-8 rounded-full border-0 bg-transparent px-3 text-[14px] font-medium text-caption">
@@ -227,6 +241,9 @@ async function start() {
                 <ComposerDemo variant="docked" />
               </div>
               <ComposerDemo variant="full" />
+              {/* Voice questions on (#697): the microphone records (a stand-in tone), and the words land in the field. */}
+              <ComposerDemo variant="docked" voice />
+              <ComposerDemo variant="full" voice />
               {/* Paused: the usage period has ended (#615). */}
               <ComposerDemo variant="docked" disabled />
               <div data-surface="sky" className="rounded-[12px] bg-sky px-3 py-2.5">

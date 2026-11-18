@@ -344,5 +344,19 @@
     "loading": "E-Mail-Einstellungen werden geladen …",
     "unavailable": "Die E-Mail-Einstellungen sind gerade nicht verfügbar.",
     "saveFailed": "Diese Änderung wurde nicht gespeichert. Bitte versuchen Sie es noch einmal."
+  },
+  "voiceQuestions": {
+    "title": "Fragen mit der Stimme",
+    "label": "Fragen mit der Stimme erlauben",
+    "description": "Ist das eingeschaltet, kann {{name}} in STOA eine Frage ins Mikrofon sprechen, statt sie zu tippen.",
+    "processing": "Die Aufnahme geht an STOA und wird in Irland, in einem Rechenzentrum von AWS (Region eu-west-1), vom Sprachmodell Voxtral in Text umgewandelt. An das Modell gehen nur die Aufnahme und die Anweisung, sie wörtlich und ohne Übersetzung aufzuschreiben; Name, Konto und bisherige Unterhaltung Ihres Kindes gehen nicht mit. Die Aufnahme wird nur im Arbeitsspeicher verarbeitet: Sie wird nicht gespeichert, nicht protokolliert und nicht zum Trainieren von KI-Modellen verwendet. Ihr Kind sieht den Text im Eingabefeld und schickt die Frage selbst ab.",
+    "off": "Standardmässig ausgeschaltet. Ausgeschaltet nimmt STOA keine Stimme auf; Ihr Kind kann weiterhin tippen oder mit der Diktierfunktion des Geräts diktieren.",
+    "changedByMe": "Zuletzt von Ihnen geändert am {{date}}.",
+    "changedByOther": "Zuletzt von einem anderen Elternteil geändert am {{date}}.",
+    "loading": "Einstellung wird geladen …",
+    "loadFailed": "Die Einstellung konnte nicht geladen werden.",
+    "saving": "Wird gespeichert …",
+    "saveFailed": "Die Einstellung konnte nicht gespeichert werden. Bitte versuchen Sie es erneut.",
+    "privacyLink": "Mehr dazu in der Datenschutzerklärung"
   }
 }

@@ -192,9 +192,10 @@ export function useAskTour({
 }
 
 /** What Murmi says at each step, in the page's language. */
-function useLine(step: AskTourStep | null, camera: boolean): string {
+function useLine(step: AskTourStep | null, camera: boolean, voice: boolean): string {
   const { t } = useTranslation('chat')
-  if (step === 'mic') return t('ask.tour.mic')
+  // The microphone records (#697) or says how to dictate (#515).
+  if (step === 'mic') return voice ? t('ask.tour.micVoice') : t('ask.tour.mic')
   if (step === 'add') return camera ? t('ask.tour.addCamera') : t('ask.tour.add')
   if (step === 'teacher') return t('ask.tour.teacher', { action: t('ask.help.request') })
   return ''
@@ -204,8 +205,8 @@ function useLine(step: AskTourStep | null, camera: boolean): string {
  * What Murmi says, read out once as it arrives: a live region that is always
  * there, so the words arriving in it are announced.
  */
-export function AskTourStatus({ step, camera }: { step: AskTourStep | null; camera: boolean }) {
-  const line = useLine(step, camera)
+export function AskTourStatus({ step, camera, voice = false }: { step: AskTourStep | null; camera: boolean; voice?: boolean }) {
+  const line = useLine(step, camera, voice)
   return (
     <p role="status" data-ask-tour-status className="sr-only">
       {line}
@@ -272,6 +273,7 @@ export function AskTourBubble({
   root,
   step,
   camera,
+  voice = false,
   onNext,
   onSkip,
   onRoom,
@@ -279,12 +281,14 @@ export function AskTourBubble({
   root: RefObject<HTMLElement | null>
   step: AskTourStep
   camera: boolean
+  /** The microphone records voice questions (#697). */
+  voice?: boolean
   onNext: () => void
   onSkip: () => void
   onRoom: (room: number) => void
 }) {
   const { t } = useTranslation('chat')
-  const line = useLine(step, camera)
+  const line = useLine(step, camera, voice)
   const lineId = useId()
   const own = useRef<HTMLDivElement>(null)
   const [place, setPlace] = useState<Place | null>(null)
@@ -335,7 +339,7 @@ export function AskTourBubble({
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
       if (event.key !== 'Escape' || event.defaultPrevented || event.isComposing) return
-      if (document.querySelector('[data-composer-menu], [data-composer-dictation]')) return
+      if (document.querySelector('[data-composer-menu], [data-composer-dictation], [data-composer-voice]')) return
       event.preventDefault()
       event.stopPropagation()
       skipRef.current()
