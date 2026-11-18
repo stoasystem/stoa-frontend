@@ -112,7 +112,8 @@
       "practice": "S’entraîner",
       "showExercise": "Un exercice similaire",
       "nextExercise": "Un autre exercice",
-      "related": "Notions liées"
+      "related": "Notions liées",
+      "quickReplies": "Ce que tu pourrais dire ensuite"
     },
     "presence": {
       "online_one": "{{count}} enseignant en ligne",

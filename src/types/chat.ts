@@ -93,6 +93,12 @@ export type StructuredAnswer = {
   knowledgePoints?: KnowledgePoint[]
   /** True only when the model asked for a teacher; then the answer offers one. */
   suggestTeacher?: boolean
+  /**
+   * Up to three things the student might say next (stoa-backend#443), each
+   * both the button's words and the exact text sent. Absent on answers from
+   * before them; empty on a refusal.
+   */
+  quickReplies?: string[]
 }
 
 export type ChatMessage = {

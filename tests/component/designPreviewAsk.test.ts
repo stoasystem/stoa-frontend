@@ -81,6 +81,23 @@ describe('Ask in the design preview', () => {
     expect((await read('demo-ask-sine')).messages.slice(-1)[0]?.targetUnit).toBeNull()
   })
 
+  it('answers with quick replies, a pressed one with its own, and that one with none (#682)', async () => {
+    const replies = async (content: string, key: string) => {
+      const events = await Promise.resolve(streamedAnswer('demo-ask-sine', content, key))
+      const done = events.find((event) => event.startsWith('event: message_done')) ?? ''
+      const streamed = JSON.parse(done.split('data: ')[1]).structured
+      const kept = (await read('demo-ask-sine')).messages.slice(-1)[0].structured
+      expect(kept).toEqual(streamed)
+      return streamed.quickReplies
+    }
+    expect(await replies('Why?', 'key-q1')).toEqual(['Can you say that more simply?', 'Give me an example'])
+    expect(await replies('Give me an example', 'key-q2')).toEqual(['One more example, please'])
+    expect(await replies('One more example, please', 'key-q3')).toEqual([])
+    // The sections answer offers three, above "Ask a teacher".
+    const fractions = await read('demo-ask-fractions')
+    expect(fractions.messages.slice(-1)[0].structured?.quickReplies).toHaveLength(3)
+  })
+
   it('keeps a conversation whose last answer found a star (#487)', async () => {
     const thread = await read('demo-ask-light')
     expect(thread.messages.slice(-1)[0]).toMatchObject({ role: 'assistant', targetUnit: { unitId: DEMO_KNOWLEDGE_POINT.unitId } })

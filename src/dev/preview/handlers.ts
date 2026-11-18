@@ -469,6 +469,29 @@ export function demoTargetFor(content: string): { unitId: string } | null {
   return null
 }
 
+/**
+ * What an answer offers to say next (#682, stoa-backend#443), in the preview's
+ * language. A question typed is answered with the first pair; one of those
+ * pressed, with the second's one reply; that pressed, with none -- so a
+ * follow-up's own replies replacing the earlier ones, and an answer with none,
+ * can both be seen.
+ */
+const DEMO_QUICK_REPLIES: Record<string, [string[], string[]]> = {
+  en: [['Can you say that more simply?', 'Give me an example'], ['One more example, please']],
+  de: [['Kannst du das einfacher sagen?', 'Gib mir ein Beispiel'], ['Bitte noch ein Beispiel']],
+  fr: [['Tu peux le dire plus simplement ?', 'Donne-moi un exemple'], ['Encore un exemple, s’il te plaît']],
+  it: [['Puoi dirlo in modo più semplice?', 'Fammi un esempio'], ['Ancora un esempio, per favore']],
+}
+
+/** The quick replies the demo answer to `content` carries. */
+export function demoQuickRepliesFor(content: string): string[] {
+  const [first, second] = DEMO_QUICK_REPLIES[demoLanguage()] ?? DEMO_QUICK_REPLIES.en
+  const sets = Object.values(DEMO_QUICK_REPLIES)
+  if (sets.some(([, last]) => last.includes(content))) return []
+  if (sets.some(([one]) => one.includes(content))) return second
+  return first
+}
+
 /** A question and its answer as the backend stores them, with the ids it derives from the command. */
 async function exchange(
   conversationId: string,
@@ -482,7 +505,17 @@ async function exchange(
   return [
     // Its quote kept, as the backend keeps it, so a step quoted from an answer (#506) reads back.
     { id: studentMessageId, conversationId, role: 'student', content, createdAt: askedAt, status: 'completed', quote: quote ?? null, targetUnit: null },
-    { id: assistantMessageId, conversationId, role: 'assistant', content: replyTo(content), createdAt: now(), status: 'completed', targetUnit },
+    {
+      id: assistantMessageId,
+      conversationId,
+      role: 'assistant',
+      content: replyTo(content),
+      createdAt: now(),
+      status: 'completed',
+      targetUnit,
+      // A follow-up in plain words, with what to say next (#682).
+      structured: { kind: 'followUp', quickReplies: demoQuickRepliesFor(content) },
+    },
   ]
 }
 
@@ -528,7 +561,7 @@ export async function streamedAnswer(
   const events: (readonly [string, object])[] = [
     ['message_start', { messageId: reply.id, conversationId, role: 'assistant', createdAt: reply.createdAt }],
     ...words.map((delta) => ['message_delta', { messageId: reply.id, delta }] as const),
-    ['message_done', { messageId: reply.id, status: 'completed', targetUnit: reply.targetUnit ?? null }],
+    ['message_done', { messageId: reply.id, status: 'completed', targetUnit: reply.targetUnit ?? null, structured: reply.structured ?? null }],
   ]
   return events.map(([type, data]) => `event: ${type}\ndata: ${JSON.stringify(data)}\n\n`)
 }

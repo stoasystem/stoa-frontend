@@ -2,7 +2,8 @@
  * Ask's demo conversations (#116): three learning sessions, one of them with
  * a human-help request a teacher is working on, so the status card above the
  * thread and a teacher's message both show; another answered in sections
- * (#506), with "Ask a teacher" under it. In the shapes Ask reads
+ * (#506), with "Ask a teacher" under it and three quick replies above that
+ * (#682). In the shapes Ask reads
  * (`GET /conversations`, `GET /conversations/:id`, the teacher-help status and
  * availability).
  */
@@ -31,6 +32,7 @@ function sections(
   hints: string[],
   similarExercises: string[],
   knowledgePoints: string[],
+  quickReplies: string[],
 ): StructuredAnswer {
   return {
     kind: 'answer',
@@ -40,6 +42,7 @@ function sections(
     similarExercises,
     knowledgePoints: knowledgePoints.map((name) => ({ name, unitId: null })),
     suggestTeacher: true,
+    quickReplies,
   }
 }
 
@@ -59,6 +62,7 @@ const FRACTION_SECTIONS: Record<SupportedLanguage, StructuredAnswer> = {
     ['Count in threes and in fours: which number do you reach in both?', 'Multiply top and bottom by the same number, and the fraction keeps its value.'],
     ['Add $\\frac{1}{2}$ and $\\frac{1}{5}$.', 'Add $\\frac{2}{3}$ and $\\frac{1}{6}$.'],
     ['Fractions', 'Common denominator'],
+    ["I don't get step 2", 'Why 12 and not 24?', 'Give me a similar one to try'],
   ),
   de: sections(
     [
@@ -70,6 +74,7 @@ const FRACTION_SECTIONS: Record<SupportedLanguage, StructuredAnswer> = {
     ['Zähl in Dreier- und in Viererschritten: Welche Zahl erreichst du bei beiden?', 'Multiplizierst du Zähler und Nenner mit derselben Zahl, bleibt der Bruch gleich gross.'],
     ['Addiere $\\frac{1}{2}$ und $\\frac{1}{5}$.', 'Addiere $\\frac{2}{3}$ und $\\frac{1}{6}$.'],
     ['Brüche', 'Gemeinsamer Nenner'],
+    ['Schritt 2 verstehe ich nicht', 'Warum 12 und nicht 24?', 'Gib mir eine ähnliche Aufgabe'],
   ),
   fr: sections(
     [
@@ -81,6 +86,7 @@ const FRACTION_SECTIONS: Record<SupportedLanguage, StructuredAnswer> = {
     ['Compte de 3 en 3 et de 4 en 4 : quel nombre atteins-tu les deux fois ?', 'Si tu multiplies le haut et le bas par le même nombre, la fraction garde sa valeur.'],
     ['Additionne $\\frac{1}{2}$ et $\\frac{1}{5}$.', 'Additionne $\\frac{2}{3}$ et $\\frac{1}{6}$.'],
     ['Fractions', 'Dénominateur commun'],
+    ['Je ne comprends pas l’étape 2', 'Pourquoi 12 et pas 24 ?', 'Donne-moi un exercice semblable'],
   ),
   it: sections(
     [
@@ -92,6 +98,7 @@ const FRACTION_SECTIONS: Record<SupportedLanguage, StructuredAnswer> = {
     ['Conta di 3 in 3 e di 4 in 4: quale numero raggiungi in entrambi i casi?', 'Se moltiplichi sopra e sotto per lo stesso numero, la frazione non cambia valore.'],
     ['Somma $\\frac{1}{2}$ e $\\frac{1}{5}$.', 'Somma $\\frac{2}{3}$ e $\\frac{1}{6}$.'],
     ['Frazioni', 'Denominatore comune'],
+    ['Non capisco il passaggio 2', 'Perché 12 e non 24?', 'Dammi un esercizio simile'],
   ),
 }
 
