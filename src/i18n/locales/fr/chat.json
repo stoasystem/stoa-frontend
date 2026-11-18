@@ -285,6 +285,7 @@
     "tour": {
       "label": "Astuce de Murmi",
       "mic": "Tu préfères parler plutôt qu’écrire ? Le micro te montre comment dicter ta question.",
+      "micVoice": "Tu préfères parler plutôt qu’écrire ? Appuie sur le micro, dis ta question et appuie encore. Elle apparaît dans le champ, et c’est toi qui l’envoies.",
       "add": "Avec +, tu peux m’envoyer une photo ou un fichier de ton exercice.",
       "addCamera": "Avec +, tu peux m’envoyer une photo ou un fichier de ton exercice, ou le prendre en photo avec l’appareil.",
       "teacher": "Tu veux qu’un vrai enseignant y jette un œil ? Appuie sur « {{action}} » sous ma réponse.",

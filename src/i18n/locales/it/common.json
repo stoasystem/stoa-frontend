@@ -39,6 +39,33 @@
       "mac": "Preferisci parlare? Premi il tasto del microfono o la tua scorciatoia per dettare.",
       "touch": "Preferisci parlare? Tocca il microfono sulla tastiera.",
       "privacy": "Il tuo dispositivo trasforma la voce in testo. STOA riceve solo il testo."
+    },
+    "voice": {
+      "start": "Di’ la tua domanda",
+      "stop": "Ferma la registrazione",
+      "listening": "Ti ascolto …",
+      "stopHint": "Finito? Premi di nuovo il microfono. Dopo un minuto la registrazione si ferma da sola.",
+      "privacy": "STOA trasforma la tua registrazione in testo e non conserva la registrazione.",
+      "transcribing": "Scrivo quello che hai detto …",
+      "sendAgain": "Riprova",
+      "recordAgain": "Registra di nuovo",
+      "typeInsteadAction": "Meglio scrivere",
+      "typeInstead": "Puoi anche semplicemente scrivere la tua domanda.",
+      "failed": {
+        "notAllowed": "Le domande a voce non sono attive per te in questo momento. Puoi scrivere o dettare la tua domanda.",
+        "unsupported": "Questo browser registra in un formato che STOA non riesce a trasformare in testo. Scrivi la tua domanda o dettala.",
+        "tooLarge": "La registrazione è troppo grande. Di’ la tua domanda un po’ più in breve e riprova.",
+        "tooLong": "La registrazione dura più di un minuto. Di’ la tua domanda un po’ più in breve e riprova.",
+        "unreadable": "Non è stato possibile leggere la registrazione. Riprova.",
+        "silent": "Non ho sentito niente. Parla un po’ più vicino al microfono e riprova.",
+        "dailyLimit": "Per oggi hai usato tutte le domande a voce. Domani potrai di nuovo; fino ad allora puoi scrivere.",
+        "unavailable": "La trasformazione in testo al momento non funziona. Riprova tra poco o scrivi la tua domanda.",
+        "offline": "Nessuna connessione a STOA. Controlla internet e riprova.",
+        "failed": "Non ha funzionato. Riprova o scrivi la tua domanda.",
+        "micBlocked": "Il browser non permette a STOA di usare il microfono. Puoi consentirlo nelle impostazioni del browser.",
+        "micMissing": "Non trovo un microfono, oppure è già in uso altrove. Riprova o scrivi la tua domanda.",
+        "recorder": "La registrazione si è interrotta. Riprova."
+      }
     }
   },
   "errorBoundary": {

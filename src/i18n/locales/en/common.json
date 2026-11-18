@@ -39,6 +39,33 @@
       "mac": "Rather talk? Press the microphone key or your dictation shortcut.",
       "touch": "Rather talk? Tap the microphone on your keyboard.",
       "privacy": "Your device turns your voice into text. STOA only receives the text."
+    },
+    "voice": {
+      "start": "Ask by voice",
+      "stop": "Stop recording",
+      "listening": "Listening …",
+      "stopHint": "Done? Press the microphone again. The recording stops by itself after one minute.",
+      "privacy": "STOA turns your recording into text and does not keep the recording.",
+      "transcribing": "Writing down what you said …",
+      "sendAgain": "Try again",
+      "recordAgain": "Record again",
+      "typeInsteadAction": "Type instead",
+      "typeInstead": "You can also just type your question.",
+      "failed": {
+        "notAllowed": "Asking by voice isn’t switched on for you right now. You can type or dictate your question.",
+        "unsupported": "This browser records in a format STOA can’t turn into text. Type your question or dictate it.",
+        "tooLarge": "The recording is too big. Say your question a bit more briefly and try again.",
+        "tooLong": "The recording is longer than one minute. Say your question a bit more briefly and try again.",
+        "unreadable": "The recording couldn’t be read. Try again.",
+        "silent": "I didn’t hear anything. Speak a little closer to the microphone and try again.",
+        "dailyLimit": "You’ve used all of today’s voice questions. You can ask by voice again tomorrow; until then you can type.",
+        "unavailable": "Turning speech into text isn’t working right now. Try again in a moment or type your question.",
+        "offline": "No connection to STOA. Check the internet and try again.",
+        "failed": "That didn’t work. Try again or type your question.",
+        "micBlocked": "The browser isn’t letting STOA use the microphone. You can allow it in the browser’s settings.",
+        "micMissing": "I can’t find a microphone, or it’s busy elsewhere. Try again or type your question.",
+        "recorder": "The recording stopped unexpectedly. Try again."
+      }
     }
   },
   "errorBoundary": {

@@ -14,7 +14,11 @@
       },
       "voiceInput": {
         "title": "Diktieren statt tippen",
-        "body": "Fragen lassen sich auch diktieren, zum Beispiel mit Win + H unter Windows, mit der Mikrofontaste oder dem Tastenkürzel fürs Diktieren am Mac oder mit dem Mikrofon auf der Handytastatur. Die Sprache wird dann vom System des Geräts verarbeitet, STOA bekommt nur den Text. Für die Spracherkennung gelten die Datenschutzregeln des Anbieters von Betriebssystem oder Tastatur (zum Beispiel Microsoft, Apple oder Google). STOA selbst nimmt keine Sprache auf."
+        "body": "Fragen lassen sich auch diktieren, zum Beispiel mit Win + H unter Windows, mit der Mikrofontaste oder dem Tastenkürzel fürs Diktieren am Mac oder mit dem Mikrofon auf der Handytastatur. Die Sprache wird dann vom System des Geräts verarbeitet, STOA bekommt nur den Text. Für die Spracherkennung gelten die Datenschutzregeln des Anbieters von Betriebssystem oder Tastatur (zum Beispiel Microsoft, Apple oder Google). Beim Diktieren nimmt STOA selbst keine Sprache auf."
+      },
+      "voiceQuestions": {
+        "title": "Fragen mit der Stimme",
+        "body": "Wenn ein Elternteil es für sein Kind erlaubt hat, kann das Kind eine Frage auch direkt in STOA ins Mikrofon sprechen. Ohne diese Erlaubnis ist die Funktion ausgeschaltet. Die Aufnahme geht an STOA und wird in Irland, in einem Rechenzentrum von AWS (Region eu-west-1), vom Sprachmodell Voxtral in Text umgewandelt. An das Modell gehen nur die Aufnahme und die Anweisung, sie wörtlich und ohne Übersetzung aufzuschreiben; Angaben zum Kind wie Name oder Konto und die bisherige Unterhaltung gehen nicht mit. Die Aufnahme wird nur im Arbeitsspeicher verarbeitet: Sie wird nicht gespeichert, nicht protokolliert und nicht zum Trainieren von KI-Modellen verwendet. Das Kind sieht den Text im Eingabefeld und schickt die Frage selbst ab."
       },
       "visibility": {
         "title": "Sichtbarkeit für Eltern und Lehrpersonen",

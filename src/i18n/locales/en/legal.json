@@ -14,7 +14,11 @@
       },
       "voiceInput": {
         "title": "Dictating instead of typing",
-        "body": "Questions can also be dictated, for example with Win + H on Windows, the microphone key or dictation shortcut on a Mac, or the microphone on a phone's keyboard. The voice is then processed by the device's system, and STOA only receives the text. The speech recognition is covered by the privacy terms of whoever provides the operating system or keyboard (for example Microsoft, Apple or Google). STOA itself does not record any voice."
+        "body": "Questions can also be dictated, for example with Win + H on Windows, the microphone key or dictation shortcut on a Mac, or the microphone on a phone's keyboard. The voice is then processed by the device's system, and STOA only receives the text. The speech recognition is covered by the privacy terms of whoever provides the operating system or keyboard (for example Microsoft, Apple or Google). When dictating, STOA itself does not record any voice."
+      },
+      "voiceQuestions": {
+        "title": "Asking by voice",
+        "body": "If a parent has allowed it for their child, the child can also speak a question into the microphone directly in STOA. Without this permission the feature is off. The recording goes to STOA and is turned into text in Ireland, in an AWS data centre (region eu-west-1), by the speech model Voxtral. Only the recording and the instruction to write it down word for word, without translating, go to the model; details about the child such as their name or account, and the conversation so far, are not sent with it. The recording is processed in memory only: it is not stored, not logged and not used to train AI models. The child sees the text in the input field and sends the question themselves."
       },
       "visibility": {
         "title": "Parent and teacher visibility",

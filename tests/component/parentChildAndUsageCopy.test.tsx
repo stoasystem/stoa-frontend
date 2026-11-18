@@ -40,6 +40,8 @@ vi.mock('@/layouts/DashboardLayout', () => ({
 vi.mock('@/hooks/parent/useChildLearningSummaryQuery', () => ({
   useChildLearningSummaryQuery: () => ({ data: fixtures.summary, isLoading: false, isError: false }),
 }))
+// The child's voice question switch (#697) has its own test (voiceQuestion697).
+vi.mock('@/components/parent/ChildVoiceQuestionsCard', () => ({ ChildVoiceQuestionsCard: () => null }))
 vi.mock('@/hooks/parent/useChildLearningProfileQuery', () => ({
   useChildLearningProfileQuery: () => ({ data: undefined, isLoading: false, isError: false }),
 }))

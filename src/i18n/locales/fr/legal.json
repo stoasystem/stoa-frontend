@@ -14,7 +14,11 @@
       },
       "voiceInput": {
         "title": "Dicter au lieu de taper",
-        "body": "Les questions peuvent aussi être dictées, par exemple avec Win + H sous Windows, la touche micro ou le raccourci de dictée sur un Mac, ou le micro du clavier d'un téléphone. La voix est alors traitée par le système de l'appareil, et STOA ne reçoit que le texte. La reconnaissance vocale relève des règles de confidentialité du fournisseur du système d'exploitation ou du clavier (par exemple Microsoft, Apple ou Google). STOA n'enregistre lui-même aucune voix."
+        "body": "Les questions peuvent aussi être dictées, par exemple avec Win + H sous Windows, la touche micro ou le raccourci de dictée sur un Mac, ou le micro du clavier d'un téléphone. La voix est alors traitée par le système de l'appareil, et STOA ne reçoit que le texte. La reconnaissance vocale relève des règles de confidentialité du fournisseur du système d'exploitation ou du clavier (par exemple Microsoft, Apple ou Google). Lors de la dictée, STOA n'enregistre lui-même aucune voix."
+      },
+      "voiceQuestions": {
+        "title": "Poser une question à voix haute",
+        "body": "Si un parent l'a autorisé pour son enfant, l'enfant peut aussi dire une question dans le micro directement dans STOA. Sans cette autorisation, la fonction est désactivée. L'enregistrement est envoyé à STOA et transformé en texte en Irlande, dans un centre de données d'AWS (région eu-west-1), par le modèle vocal Voxtral. Seuls l'enregistrement et la consigne de le transcrire mot pour mot, sans le traduire, sont envoyés au modèle ; les informations sur l'enfant, comme son nom ou son compte, et la conversation en cours ne l'accompagnent pas. L'enregistrement est traité uniquement en mémoire : il n'est ni conservé, ni journalisé, ni utilisé pour entraîner des modèles d'IA. L'enfant voit le texte dans le champ de saisie et envoie lui-même la question."
       },
       "visibility": {
         "title": "Visibilité pour les parents et les enseignants",

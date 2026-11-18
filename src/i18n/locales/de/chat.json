@@ -283,6 +283,7 @@
     "tour": {
       "label": "Tipp von Murmi",
       "mic": "Lieber sprechen als tippen? Das Mikrofon zeigt dir, wie du deine Frage diktierst.",
+      "micVoice": "Lieber sprechen als tippen? Drück aufs Mikrofon, sag deine Frage und drück nochmals. Dann steht sie im Feld, und du schickst sie selbst ab.",
       "add": "Mit + schickst du mir ein Foto oder eine Datei von deiner Aufgabe.",
       "addCamera": "Mit + schickst du mir ein Foto oder eine Datei von deiner Aufgabe – oder du fotografierst sie gleich mit der Kamera.",
       "teacher": "Soll eine echte Lehrperson draufschauen? Tippe unter meiner Antwort auf «{{action}}».",

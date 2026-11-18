@@ -82,6 +82,11 @@ export class StudentWorld {
     daysLeft: 200,
     paidBy: 'parent',
   }
+  /**
+   * `GET /students/me/voice-questions` (#697): off, as for a child no linked parent has
+   * allowed to ask by voice, so Ask's microphone only says how to dictate (#515).
+   */
+  voiceQuestions = { allowed: false }
   /** The sections an answer to this question comes in (stoa-backend#132); others are text only. */
   readonly sections = new Map<string, Record<string, unknown>>()
   private clock = Date.parse('2026-09-29T08:00:00Z')
@@ -334,6 +339,8 @@ export class StudentWorld {
         renewalContactEmail: 'info@stoaedu.ch',
       },
     }))
+    // Whether the student may ask by voice (#697); Ask's host reads it on every student page.
+    b.on('GET', '/students/me/voice-questions', () => ({ status: 200, body: this.voiceQuestions }))
     // What the backend answers for a conversation nobody asked a teacher about.
     b.on('GET', '/teacher-help/conversations/{conv_id}/request', () => ({
       status: 404,

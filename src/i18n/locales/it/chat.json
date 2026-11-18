@@ -285,6 +285,7 @@
     "tour": {
       "label": "Consiglio di Murmi",
       "mic": "Preferisci parlare invece di scrivere? Il microfono ti mostra come dettare la tua domanda.",
+      "micVoice": "Preferisci parlare invece di scrivere? Premi il microfono, di’ la tua domanda e premi di nuovo. Appare nel campo e la invii tu.",
       "add": "Con + puoi mandarmi una foto o un file del tuo esercizio.",
       "addCamera": "Con + puoi mandarmi una foto o un file del tuo esercizio, oppure fotografarlo con la fotocamera.",
       "teacher": "Vuoi che un vero insegnante ci dia un’occhiata? Tocca «{{action}}» sotto la mia risposta.",

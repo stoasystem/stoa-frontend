@@ -283,6 +283,7 @@
     "tour": {
       "label": "Murmi’s tip",
       "mic": "Rather talk than type? The microphone shows you how to dictate your question.",
+      "micVoice": "Rather talk than type? Press the microphone, say your question and press it again. It appears in the field, and you send it yourself.",
       "add": "With + you can send me a photo or a file of your problem.",
       "addCamera": "With + you can send me a photo or a file of your problem, or take one with the camera.",
       "teacher": "Want a real teacher to look at it? Tap “{{action}}” under my answer.",

@@ -215,24 +215,26 @@ describe('the dictation copy in every language', () => {
 
 describe('the privacy page on dictation', () => {
   // What the section promises, sentence by sentence: the voice stays with the
-  // device's system (#494) and STOA records none. Pinned whole, so a sentence
-  // that keeps its keywords and turns its meaning does not pass.
+  // device's system (#494) and STOA records none while dictating. Pinned whole,
+  // so a sentence that keeps its keywords and turns its meaning does not pass.
+  // Voice questions, which STOA does record once a parent allows them (#697),
+  // have their own section (voiceQuestion697.test.tsx).
   const PROMISES = {
     de: [
       'Die Sprache wird dann vom System des Geräts verarbeitet, STOA bekommt nur den Text.',
-      'STOA selbst nimmt keine Sprache auf.',
+      'Beim Diktieren nimmt STOA selbst keine Sprache auf.',
     ],
     en: [
       "The voice is then processed by the device's system, and STOA only receives the text.",
-      'STOA itself does not record any voice.',
+      'When dictating, STOA itself does not record any voice.',
     ],
     fr: [
       "La voix est alors traitée par le système de l'appareil, et STOA ne reçoit que le texte.",
-      "STOA n'enregistre lui-même aucune voix.",
+      "Lors de la dictée, STOA n'enregistre lui-même aucune voix.",
     ],
     it: [
       'La voce viene allora elaborata dal sistema del dispositivo e STOA riceve solo il testo.',
-      'STOA stesso non registra alcuna voce.',
+      'Durante la dettatura STOA stesso non registra alcuna voce.',
     ],
   } as const
 
