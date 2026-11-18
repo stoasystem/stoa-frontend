@@ -12,6 +12,7 @@ import { AskConversationList, AskEmptyState } from '@/features/ask/AskConversati
 import { hasSections, quoteCaption, sectionsSpokenText, type AnswerStep } from '@/features/ask/AskAnswerSections'
 import { AskLitCard } from '@/features/ask/AskLitCard'
 import { AskMessage } from '@/features/ask/AskMessage'
+import { AskQuickReplies, quickRepliesPlace } from '@/features/ask/AskQuickReplies'
 import { AskTourBubble, AskTourStatus, useAskTour } from '@/features/ask/AskTour'
 import { ASK_PANEL } from '@/features/ask/askLayout'
 import { TeacherHelpAction, TeacherHelpStatusCard } from '@/features/ask/teacherHelp/TeacherHelp'
@@ -253,6 +254,24 @@ export function AskPanel({
     send(recommended, files)
   }
 
+  // A quick reply under the latest answer (#682): its words go out as they
+  // are, an ordinary follow-up into this conversation, through the same send
+  // as the composer's. Nothing the student was writing goes with it: the
+  // draft, a passage put aside and the files chosen stay for their own question.
+  // Pressed from the keyboard, the keyboard goes on to the composer: the
+  // buttons it was on go once the next answer starts. A tap leaves it, so a
+  // phone does not raise its keyboard over the answer coming.
+  const quickReply = useRef<(reply: string, keyboard: boolean) => void>(() => {})
+  useEffect(() => {
+    quickReply.current = (reply, keyboard) => {
+      if (paused || !question.canAsk()) return
+      tour.composerUsed()
+      void question.ask({ content: reply, files: NO_FILES, practice })
+      if (keyboard) composerArea.current?.querySelector('textarea')?.focus()
+    }
+  })
+  const onQuickReply = useCallback((reply: string, keyboard: boolean) => quickReply.current(reply, keyboard), [])
+
   // An example chosen on the star map ("Find my own star", #586) goes out as
   // soon as Ask is open on its list, once the student's year is known (the
   // conversation is made for it). Taken from the store once, so it is sent once.
@@ -353,6 +372,7 @@ export function AskPanel({
           column={column}
           room={tourRoom}
           onAskAboutStep={askAboutStep}
+          onQuickReply={onQuickReply}
           onNewConversation={() => select(null)}
         />
       ) : (
@@ -502,6 +522,9 @@ function columnPadding(
   return { paddingTop: top, paddingBottom: bottom, paddingLeft: side, paddingRight: right === gutter ? side : right }
 }
 
+/** A quick reply carries no files (#682): those chosen wait for the student's own question. */
+const NO_FILES = { references: [], attachments: [], sent: () => {} }
+
 /** The line under which the composer is paused once the usage period has ended (#615). */
 const USAGE_PERIOD_NOTICE_ID = 'ask-usage-period-paused'
 
@@ -555,6 +578,7 @@ function AskThread({
   column,
   room,
   onAskAboutStep,
+  onQuickReply,
   onNewConversation,
 }: {
   conversationId: string
@@ -567,6 +591,8 @@ function AskThread({
   /** Kept at the thread's end while Ask's tour stands over it (#677), so its newest answer scrolls clear of it. */
   room: number
   onAskAboutStep: (step: AnswerStep) => void
+  /** A quick reply under the latest answer pressed (#682), from the keyboard or not. */
+  onQuickReply: (reply: string, keyboard: boolean) => void
   /** Back to the list, where the next question starts a new conversation. */
   onNewConversation: () => void
 }) {
@@ -612,6 +638,44 @@ function AskThread({
   )
   const card = 'card' in view ? view.card : null
 
+  // What the latest answer offers to say next (#682), above "Ask a teacher":
+  // they carry on with the answer, the teacher is the way out of it. Pressed
+  // once, none can be pressed again until the follow-up is answered -- by then
+  // it is the latest answer, with replies of its own or none.
+  const replyPlace = useMemo(() => quickRepliesPlace(messages), [messages])
+  // Kept by their words, so a conversation read again with the same answer
+  // does not draw the answer again (#416).
+  const replyWords = replyPlace ? JSON.stringify(replyPlace.replies) : null
+  const repliesUnder = replyPlace?.underMessageId
+  const sending = isStreaming || paused
+  const helpUnder = offer?.underMessageId
+  const quickAction = useMemo(
+    () =>
+      replyWords ? (
+        <AskQuickReplies replies={JSON.parse(replyWords) as string[]} disabled={sending} onReply={onQuickReply} />
+      ) : null,
+    [onQuickReply, replyWords, sending],
+  )
+  // The same element under the same answer from one render to the next
+  // (#416), and the replies in the same place in it whether "Ask a teacher"
+  // is beside them or not: pressed, they stay the same buttons, now greyed,
+  // while "Ask a teacher" steps away for the answer being written.
+  const helpBeside = repliesUnder === helpUnder ? helpAction : undefined
+  const underReplies = useMemo(
+    () =>
+      quickAction ? (
+        <>
+          {quickAction}
+          {helpBeside}
+        </>
+      ) : null,
+    [helpBeside, quickAction],
+  )
+  const under = (id: string) => {
+    if (underReplies && id === repliesUnder) return underReplies
+    return id === helpUnder ? helpAction : undefined
+  }
+
   // Keep the latest message in view as the thread grows -- unless the student
   // has scrolled up to read something earlier. "Ask a teacher" coming under
   // the answer, and room made for the tour's bubble, are the thread growing too.
@@ -619,7 +683,7 @@ function AskThread({
   useLayoutEffect(() => {
     const node = scroller.current
     if (node && atBottom.current) node.scrollTop = node.scrollHeight
-  }, [messages, offered, room])
+  }, [messages, offered, quickAction, room])
   const onScroll = () => {
     const node = scroller.current
     if (node) atBottom.current = node.scrollHeight - node.scrollTop - node.clientHeight < STICK_TO_BOTTOM_PX
@@ -685,7 +749,7 @@ function AskThread({
             teacherName={help.teacherName}
             onRetry={paused || refusedForNow(entry.message) ? undefined : retryMessage}
             onAskAboutStep={onAskAboutStep}
-            after={entry.message.id === offer?.underMessageId ? helpAction : undefined}
+            after={under(entry.message.id)}
           />
         ))}
       </div>

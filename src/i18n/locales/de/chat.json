@@ -112,7 +112,8 @@
       "practice": "Üben",
       "showExercise": "Ähnliche Aufgabe",
       "nextExercise": "Noch eine Aufgabe",
-      "related": "Passende Themen"
+      "related": "Passende Themen",
+      "quickReplies": "Was du als Nächstes sagen kannst"
     },
     "presence": {
       "online_one": "{{count}} Lehrperson online",

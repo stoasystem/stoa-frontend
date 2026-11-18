@@ -89,6 +89,11 @@ export class StudentWorld {
   voiceQuestions = { allowed: false }
   /** The sections an answer to this question comes in (stoa-backend#132); others are text only. */
   readonly sections = new Map<string, Record<string, unknown>>()
+  /**
+   * The quick replies an answer to this question offers (stoa-backend#443), in its
+   * `structured` beside any sections; a follow-up in plain words where it has none.
+   */
+  readonly quickReplies = new Map<string, string[]>()
   private clock = Date.parse('2026-09-29T08:00:00Z')
   private nextConversation = 1
 
@@ -450,13 +455,20 @@ export class StudentWorld {
       conversationId: conversation.id,
       question,
       answer: this.answerFor(question),
-      structured: this.sections.get(question),
+      structured: this.structuredFor(question),
       finished: false,
       failed,
       attempt: 1,
       reads: 0,
     })
     return student
+  }
+
+  private structuredFor(question: string): Record<string, unknown> | undefined {
+    const sections = this.sections.get(question)
+    const replies = this.quickReplies.get(question)
+    if (!replies) return sections
+    return { ...(sections ?? { kind: 'followUp' }), quickReplies: replies }
   }
 
   private complete(command: Command) {

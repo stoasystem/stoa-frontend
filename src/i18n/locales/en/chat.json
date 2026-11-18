@@ -112,7 +112,8 @@
       "practice": "Practice",
       "showExercise": "Try a similar question",
       "nextExercise": "Try another",
-      "related": "Related topics"
+      "related": "Related topics",
+      "quickReplies": "What you could say next"
     },
     "presence": {
       "online_one": "{{count}} teacher online",
