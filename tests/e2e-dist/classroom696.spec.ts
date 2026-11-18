@@ -5,13 +5,19 @@ import { StudentWorld } from './support/student'
 
 /**
  * The virtual classroom (#696), on the built app under the production content
- * security policy: a student who asks a teacher, and is given a seat
- * (stoa-backend#467), goes into `/classroom/:conversationId`. The board is
- * framed from its own host (`frame-src`), the bar says a teacher is being
- * found, and leaving goes back to the conversation.
+ * security policy. Since help requests carry their mode (#705), asking keeps
+ * the student in the conversation: a classroom request waits there for a
+ * teacher to accept it, and only then does the card offer the way in. With a
+ * seat to be had (stoa-backend#467) that leads into
+ * `/classroom/:conversationId`. The board is framed from its own host
+ * (`frame-src`), the bar says the teacher has joined, and leaving goes back to
+ * the conversation.
  *
- * Without a seat (503 `classroom_unavailable`, the world's default) the
- * student stays in Ask: askTeacherScroll.spec.ts.
+ * The built app does not offer the choice of mode yet (`classroomHelpOffered`
+ * is off without `VITE_CLASSROOM_HELP`), so the classroom request here is the
+ * backend's, as one asked for where the choice is offered. Choosing it, and a
+ * text request never showing a classroom, are helpModes705.test.tsx and
+ * classroom696.test.tsx.
  *
  * Daily is not reachable here: its call bundle is refused (from *.daily.co and
  * its fallback hosts), and the voice says it did not connect while the board
@@ -20,7 +26,10 @@ import { StudentWorld } from './support/student'
  * and taken off the problems; anything else fails the test.
  */
 const DAILY_SENTRY = /^CSP: .*https:\/\/[a-z0-9]+\.ingest\.sentry\.io\//
-test('asking a teacher with a seat to be had leads into the classroom, its board framed (#696)', async ({ page, backend }) => {
+test('a classroom request a teacher accepted leads from the conversation into the classroom, its board framed (#696, #705)', async ({
+  page,
+  backend,
+}) => {
   await page.setViewportSize({ width: 1280, height: 800 })
   const world = new StudentWorld(backend)
   const question = 'How do I solve 3x + 5 = 20?'
@@ -34,21 +43,24 @@ test('asking a teacher with a seat to be had leads into the classroom, its board
     suggestTeacher: true,
   })
   world.install()
+  // A teacher is online: with none, the waiting card says so instead.
+  backend.on('GET', '/teacher-help/availability', () => ({ status: 200, body: { online: true, availableTeachers: 1 } }))
 
-  let asked: { conversationId: string } | null = null
-  const request = () => ({
-    requestId: 'e2e-help-1',
-    conversationId: asked!.conversationId,
-    status: 'pending',
-    createdAt: '2026-11-16T08:10:00Z',
-  })
-  backend.on('POST', '/teacher-help/request', ({ body }) => {
-    asked = body as { conversationId: string }
-    return { status: 200, body: request() }
-  })
+  // The conversation's request, once there is one: a classroom request, as the backend keeps it.
+  let help: { conversationId: string; status: 'pending' | 'in_progress' } | null = null
   backend.on('GET', '/teacher-help/conversations/{conv_id}/request', () =>
-    asked
-      ? { status: 200, body: request() }
+    help
+      ? {
+          status: 200,
+          body: {
+            requestId: 'e2e-help-1',
+            conversationId: help.conversationId,
+            status: help.status,
+            mode: 'classroom',
+            teacherName: 'Frau Muster',
+            createdAt: '2026-11-16T08:10:00Z',
+          },
+        }
       : { status: 404, body: { detail: 'This conversation was never escalated to a teacher' } },
   )
   const board = `${BOARD_ORIGIN}/boards/help-e2e?token=e2e-board-token`
@@ -78,13 +90,25 @@ test('asking a teacher with a seat to be had leads into the classroom, its board
   await ask.getByRole('textbox', { name: 'Your question' }).press('Enter')
   const thread = ask.getByRole('log', { name: 'Messages' })
   await expect(thread.getByText('x = 5', { exact: true })).toBeVisible()
+  const [conversationId] = world.conversations.keys()
 
-  await thread.getByRole('button', { name: 'Ask a teacher' }).click()
-  await expect(page).toHaveURL(/\/classroom\/[^/?]+$/)
-  const conversationId = asked!.conversationId
-  expect(page.url()).toContain(`/classroom/${conversationId}`)
+  // Asked for the classroom, not yet accepted: the student waits in the conversation, with no way in.
+  help = { conversationId, status: 'pending' }
+  await page.goto(`/ask/${conversationId}`)
+  const card = page.getByRole('region', { name: 'Teacher support' })
+  await expect(card).toHaveAttribute('data-help-mode', 'classroom')
+  await expect(card).toContainText('Once a teacher accepts your request, you can enter it here.')
+  await expect(card.getByRole('button', { name: 'Enter classroom' })).toHaveCount(0)
+  expect(seats).toBe(0)
 
-  await expect(page.locator('[data-classroom-status]')).toHaveText('Finding a teacher for you…')
+  // A teacher accepted it: now the card leads in.
+  help = { conversationId, status: 'in_progress' }
+  await page.reload()
+  await expect(card).toContainText('Your teacher is waiting for you in the classroom.')
+  await card.getByRole('button', { name: 'Enter classroom' }).click()
+  await expect(page).toHaveURL(`/classroom/${conversationId}`)
+
+  await expect(page.locator('[data-classroom-status]')).toHaveText('Frau Muster has joined')
   const frame = page.locator('iframe[title="Whiteboard"]')
   await expect(frame).toHaveAttribute('src', board)
   await expect(page.frameLocator('iframe[title="Whiteboard"]').getByText('board')).toBeVisible()
@@ -92,7 +116,7 @@ test('asking a teacher with a seat to be had leads into the classroom, its board
   // The conversation goes on beside the board.
   await expect(page.locator('[data-classroom-sidebar]').getByText('x = 5', { exact: true })).toBeVisible()
   await expect(page.locator('[data-classroom-voice="failed"]')).toBeVisible({ timeout: 15_000 })
-  // The seat asked for before going in is the page's: not asked for again.
+  // The seat is asked for once, on the way in.
   expect(seats).toBe(1)
 
   await page.getByRole('link', { name: 'Leave classroom' }).click()
