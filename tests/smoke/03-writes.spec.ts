@@ -17,7 +17,16 @@ import {
   watchApiFailures,
   watchPageErrors,
 } from './helpers'
-import { E03_SCREEN, findErrorCode, plainSnippet, screenAnswer, type Screen } from './judge'
+import {
+  E03_SCREEN,
+  expectAnswerOnScreen,
+  findErrorCode,
+  plainSnippet,
+  screenAnswer,
+  shownAnswerText,
+  type Screen,
+  type StoredAnswer,
+} from './judge'
 import { anyLanguage } from './locales'
 import { longObjectHeaderPdf } from './pdf'
 import { record, rememberConversations, spendGeneration } from './run'
@@ -368,7 +377,7 @@ test.describe('answers', { tag: ['@generation'] }, () => {
     const seen = { sentAt: 0, acceptedAt: 0, acceptLanguage: null as string | null, subject: null as string | null }
     type Generation = { commandId?: string | null; status?: string | null; assistantMessageId?: string | null }
     const generations: Array<{ at: number; key: string | null; body: Generation }> = []
-    const details = new Map<string, { messages: Array<{ id: string; role: string; content: string }> }>()
+    const details = new Map<string, { messages: Array<StoredAnswer & { id: string; role: string }> }>()
     page.on('request', (request) => {
       if (!isCreate(request.method(), request.url())) return
       seen.sentAt = Date.now()
@@ -465,14 +474,8 @@ test.describe('answers', { tag: ['@generation'] }, () => {
         message: 'the page read back the answer the command named',
       })
       .toBe(true)
-    const answer = details.get(conversationId)!.messages.find((message) => message.id === assistantId)!.content
-    const snippet = plainSnippet(answer)
-    const shown = page.locator('[data-message-role=assistant]').last()
-    if (snippet) {
-      await expect(shown, 'the answer is on screen').toContainText(snippet, { timeout: 15_000 })
-    } else {
-      await expect(shown, 'an answer is on screen').not.toBeEmpty()
-    }
+    const stored = details.get(conversationId)!.messages.find((message) => message.id === assistantId)!
+    const answer = stored.content
 
     // The answer follows the question's language, German, whatever the header
     // says -- as the API physics question above is judged (see item 3's note).
@@ -482,6 +485,8 @@ test.describe('answers', { tag: ['@generation'] }, () => {
       wantsExample: true,
     }
     const problems = screenAnswer(answer, screen)
+    // Written before the on-screen check, so a failure there still leaves the
+    // command, its timings and the answer for a person to read (#714).
     await record(testInfo, 'item3-e01-math-browser', {
       ...base,
       commandId,
@@ -489,9 +494,12 @@ test.describe('answers', { tag: ['@generation'] }, () => {
       polls: mine.length,
       assistantMessageId: assistantId,
       screenProblems: problems,
+      onScreenSnippet: plainSnippet(shownAnswerText(stored)),
       answer,
       needsHumanConfirmation: { language: screen.language, explainsRatherThanRefuses: true, exampleOrAnalogy: true },
     })
+    await expectAnswerOnScreen(page.locator('[data-message-role=assistant]').last(), stored)
+
     if (acceptMs > 1000) {
       testInfo.annotations.push({ type: 'performance', description: `201 after ${acceptMs} ms; target 1 s` })
     }
