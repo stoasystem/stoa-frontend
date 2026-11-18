@@ -63,6 +63,10 @@
     "answerPlaceholder": "Antwort eingeben",
     "backToChapter": "Zurück zu {{chapter}}",
     "backToLessons": "Zurück zum Kapitel",
+    "cards": {
+      "start": "Zu den Aufgaben",
+      "title": "Erklärung"
+    },
     "check": "Antwort prüfen",
     "checkFailed": "Deine Antwort konnte nicht geprüft werden. Versuch es nochmals.",
     "checking": "Wird geprüft…",
