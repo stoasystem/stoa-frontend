@@ -322,6 +322,136 @@
       "high": "Fiabilité élevée"
     }
   },
+  "assignPractice": {
+    "eyebrow": "Exercices",
+    "title": "Recommander des exercices",
+    "description": "Choisissez un élève que vous avez aidé et ce qu’il doit travailler. Cochez les exercices voulus et attribuez-les : ils apparaissent dans les devoirs de l’élève.",
+    "choose": {
+      "title": "Qui et quoi"
+    },
+    "student": {
+      "label": "Élève",
+      "placeholder": "Choisir un élève",
+      "hint": "Les élèves dont vous traitez la demande d’aide, ou l’avez résolue ces 14 derniers jours.",
+      "loading": "Chargement de vos élèves…",
+      "failed": "Impossible de charger vos élèves",
+      "failedBody": "Veuillez recharger la page dans un instant.",
+      "none": "Dès que vous prenez en charge la demande d’aide d’un élève, vous pouvez lui recommander des exercices ici.",
+      "fromRequest": "L’élève de votre demande d’aide"
+    },
+    "subject": {
+      "label": "Branche",
+      "any": "Toutes les branches"
+    },
+    "topic": {
+      "label": "Thème",
+      "any": "N’importe quel thème",
+      "subjectFirst": "Choisissez une branche pour choisir un thème."
+    },
+    "more": {
+      "summary": "Plus d’options",
+      "hint": "Sans changement, les réglages habituels s’appliquent.",
+      "confidence": "À quel point une suggestion doit être sûre",
+      "confidenceDefault": "Réglage habituel ({{level}})",
+      "level": {
+        "low": "Un peu sûre",
+        "medium": "Assez sûre",
+        "high": "Très sûre"
+      },
+      "maxAssignments": "Au plus ce nombre d’exercices",
+      "dueInDays": "À rendre dans (jours)",
+      "freshnessDays": "D’après le travail des derniers (jours)",
+      "sources": "Types d’exercices",
+      "source": {
+        "curriculum_exercise": "Exercices du programme",
+        "ai_draft": "Exercices IA vérifiés par un enseignant"
+      },
+      "reset": "Revenir aux réglages habituels"
+    },
+    "find": "Trouver des exercices",
+    "finding": "Recherche d’exercices…",
+    "candidates": {
+      "title": "Suggestions pour {{name}}",
+      "hint": "Décochez les exercices que vous ne voulez pas attribuer.",
+      "empty": "Rien à suggérer pour {{name}} pour le moment. Essayez un autre thème ou une autre branche, ou revenez après le prochain entraînement.",
+      "listLabel": "Exercices suggérés",
+      "untitled": "Exercice sur {{topic}}",
+      "untitledPlain": "Exercice",
+      "topic": "Thème : {{topic}}"
+    },
+    "assign_one": "Attribuer {{count}} exercice à {{name}}",
+    "assign_many": "Attribuer {{count}} exercices à {{name}}",
+    "assign_other": "Attribuer {{count}} exercices à {{name}}",
+    "assignNone": "Cochez au moins un exercice",
+    "assigning": "Attribution…",
+    "refused": {
+      "summary_one": "{{count}} exercice non suggéré, et pourquoi",
+      "summary_many": "{{count}} exercices non suggérés, et pourquoi",
+      "summary_other": "{{count}} exercices non suggérés, et pourquoi"
+    },
+    "results": {
+      "title": "Ce qui a été attribué"
+    },
+    "resultStatus": {
+      "assigned": "Attribué",
+      "delivered": "Recommandé",
+      "created": "Enregistré comme brouillon",
+      "duplicate": "Déjà présent",
+      "skipped": "Non attribué",
+      "refused": "Non attribué",
+      "failed": "Échec",
+      "unknown": "Inconnu"
+    },
+    "seen": {
+      "title": "Ce que {{name}} voit dans ses devoirs",
+      "hint": "Voici comment chaque exercice apparaît pour {{name}}. Ce que vous venez d’attribuer est en haut.",
+      "loading": "Chargement des devoirs…",
+      "failed": "Impossible de charger les devoirs",
+      "empty": "{{name}} n’a pas encore de devoirs.",
+      "new": "Nouveau"
+    },
+    "errors": {
+      "previewFailed": "Aucun exercice n’a pu être trouvé",
+      "assignFailed": "Les exercices n’ont pas pu être attribués",
+      "noRelation": "Vous pouvez recommander des exercices à {{name}} seulement tant que vous traitez sa demande d’aide, ou pendant 14 jours après l’avoir résolue.",
+      "stale": "Les suggestions ont changé depuis. Cherchez à nouveau les exercices.",
+      "tryAgain": "Veuillez réessayer dans un instant."
+    },
+    "reasons": {
+      "rationale": {
+        "remediation_topic": "Les derniers résultats désignent ce thème comme le prochain à retravailler.",
+        "curriculum_exercise": "Un exercice vérifié du programme existe pour ce thème fragile.",
+        "reviewed_ai_draft": "Un exercice IA vérifié par un enseignant correspond à ce besoin.",
+        "continuation_lesson": "Un court exercice vérifié garde les acquis frais."
+      },
+      "refusal": {
+        "automation_off": "Les suggestions automatiques sont désactivées.",
+        "policy_paused": "Les suggestions automatiques sont en pause.",
+        "student_out_of_scope": "Cet élève n’est pas couvert par ces réglages.",
+        "source_type_not_allowed": "Ce type d’exercice ne fait pas partie des types choisis.",
+        "subject_out_of_scope": "La branche n’est pas celle choisie.",
+        "topic_out_of_scope": "Le thème n’est pas celui choisi.",
+        "low_confidence": "La suggestion n’est pas assez sûre.",
+        "stale_candidate": "Les résultats sur lesquels elle repose sont trop anciens.",
+        "duplicate_or_active": "Un devoir en cours, terminé ou archivé existe déjà à ce sujet.",
+        "review_boundary_missing": "La suggestion ne prévoit pas de vérification par un enseignant.",
+        "max_assignments_reached": "Le nombre maximal d’exercices pour cet élève est déjà suggéré.",
+        "unsupported_assignment_source": "Impossible d’en faire un devoir.",
+        "source_not_assignable": "Cet exercice ne peut plus être attribué."
+      },
+      "result": {
+        "created": "Le devoir a été créé.",
+        "not_approved": "Non coché, donc pas attribué.",
+        "already_created": "Ce devoir avait déjà été créé.",
+        "source_has_history": "Cet exercice a déjà été attribué à cet élève.",
+        "refused": "Non attribué.",
+        "failed": "Le devoir n’a pas pu être créé. Veuillez réessayer plus tard."
+      },
+      "rationaleFallback": "Les derniers entraînements suggèrent cet exercice.",
+      "refusalFallback": "Pas suggéré cette fois.",
+      "resultFallback": "Pas d’autre précision."
+    }
+  },
   "toasts": {
     "statusUpdated": "Statut de la demande mis à jour.",
     "replySent": "Votre réponse a été envoyée.",

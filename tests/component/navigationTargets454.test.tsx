@@ -30,6 +30,7 @@ import {
   NOTIFICATION_TARGETS,
   notificationTargetPath,
 } from '@/components/notifications/notificationTargets'
+import { teacherPracticePathFor } from '@/features/assignPractice/practicePath'
 import { chapterPath, quizPath, skillPath } from '@/features/chapter/useChapter'
 import { StarCard } from '@/features/starmap/components/StarCard'
 import { pathForTarget } from '@/features/starmap/view/layers'
@@ -142,6 +143,8 @@ function builtTargets(): Built[] {
     add('usagePeriodPathFor', id, usagePeriodPathFor(id))
     add('classroomPathFor', id, classroomPathFor(id))
     add('classroomPathFor (request)', id, classroomPathFor('c1', id))
+    add('teacherPracticePathFor', id, teacherPracticePathFor(id))
+    add('teacherPracticePathFor (request)', id, teacherPracticePathFor('stu-1', id))
     add('reviewReturnPath', id, reviewReturnPath(id))
     add('reviewReturnPath', { star: id }, reviewReturnPath({ star: id }))
   }

@@ -15,8 +15,11 @@ import {
 
 export const learningOperationsQueryKeys = {
   all: ['learning-operations'] as const,
-  studentAssignments: (studentId: string) =>
-    [...learningOperationsQueryKeys.all, 'student-assignments', studentId] as const,
+  // The archive flag comes last, so invalidating a student's key reaches both lists.
+  studentAssignments: (studentId: string, includeArchived?: boolean) =>
+    includeArchived === undefined
+      ? ([...learningOperationsQueryKeys.all, 'student-assignments', studentId] as const)
+      : ([...learningOperationsQueryKeys.all, 'student-assignments', studentId, includeArchived] as const),
   myAssignments: (status?: string) =>
     [...learningOperationsQueryKeys.all, 'my-assignments', status ?? 'all'] as const,
   parentProgress: (studentId: string) =>
@@ -29,10 +32,14 @@ export const learningOperationsQueryKeys = {
     [...learningOperationsQueryKeys.all, 'warehouse-export', contentType ?? 'all'] as const,
 }
 
-export function useStudentAssignmentsQuery(studentId: string) {
+/**
+ * A student's assignments. `includeArchived: false` is the list the student
+ * sees under Assignments (the student's own read leaves archived ones out).
+ */
+export function useStudentAssignmentsQuery(studentId: string, { includeArchived = true }: { includeArchived?: boolean } = {}) {
   return useQuery({
-    queryKey: learningOperationsQueryKeys.studentAssignments(studentId),
-    queryFn: () => getStudentAssignments(studentId),
+    queryKey: learningOperationsQueryKeys.studentAssignments(studentId, includeArchived),
+    queryFn: () => getStudentAssignments(studentId, includeArchived),
     enabled: Boolean(studentId),
     // A 404 is an answer (no such student, or not one this account may see),
     // and asking again only delays saying so.

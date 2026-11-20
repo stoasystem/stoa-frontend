@@ -320,6 +320,134 @@
       "high": "Hohe Sicherheit"
     }
   },
+  "assignPractice": {
+    "eyebrow": "Übung",
+    "title": "Übungen empfehlen",
+    "description": "Wählen Sie eine Schülerin oder einen Schüler, der Sie geholfen haben, und was geübt werden soll. Haken Sie die gewünschten Übungen an und weisen Sie sie zu: Sie erscheinen unter den Aufgaben der Person.",
+    "choose": {
+      "title": "Wer und was"
+    },
+    "student": {
+      "label": "Schülerin oder Schüler",
+      "placeholder": "Person auswählen",
+      "hint": "Personen, deren Hilfeanfrage Sie bearbeiten oder in den letzten 14 Tagen abgeschlossen haben.",
+      "loading": "Ihre Schülerinnen und Schüler werden geladen …",
+      "failed": "Ihre Schülerinnen und Schüler konnten nicht geladen werden",
+      "failedBody": "Bitte laden Sie die Seite gleich neu.",
+      "none": "Sobald Sie eine Hilfeanfrage übernehmen, können Sie dieser Person hier Übungen empfehlen.",
+      "fromRequest": "Die Person aus Ihrer Hilfeanfrage"
+    },
+    "subject": {
+      "label": "Fach",
+      "any": "Alle Fächer"
+    },
+    "topic": {
+      "label": "Thema",
+      "any": "Jedes Thema",
+      "subjectFirst": "Wählen Sie zuerst ein Fach, um ein Thema zu wählen."
+    },
+    "more": {
+      "summary": "Weitere Einstellungen",
+      "hint": "Unverändert gelten die üblichen Einstellungen.",
+      "confidence": "Wie sicher ein Vorschlag sein muss",
+      "confidenceDefault": "Übliche Einstellung ({{level}})",
+      "level": {
+        "low": "Etwas sicher",
+        "medium": "Ziemlich sicher",
+        "high": "Sehr sicher"
+      },
+      "maxAssignments": "Höchstens so viele Übungen",
+      "dueInDays": "Fällig in (Tagen)",
+      "freshnessDays": "Auf Grundlage der Arbeit der letzten (Tage)",
+      "sources": "Arten von Übungen",
+      "source": {
+        "curriculum_exercise": "Übungen aus dem Lehrplan",
+        "ai_draft": "KI-Übungen, von einer Lehrperson geprüft"
+      },
+      "reset": "Zurück zu den üblichen Einstellungen"
+    },
+    "find": "Übungen finden",
+    "finding": "Übungen werden gesucht …",
+    "candidates": {
+      "title": "Vorschläge für {{name}}",
+      "hint": "Entfernen Sie den Haken bei jeder Übung, die Sie nicht zuweisen möchten.",
+      "empty": "Für {{name}} gibt es gerade nichts vorzuschlagen. Versuchen Sie ein anderes Thema oder Fach oder schauen Sie nach der nächsten Übung wieder vorbei.",
+      "listLabel": "Vorgeschlagene Übungen",
+      "untitled": "Übung zu {{topic}}",
+      "untitledPlain": "Übung",
+      "topic": "Thema: {{topic}}"
+    },
+    "assign_one": "{{count}} Übung an {{name}} zuweisen",
+    "assign_other": "{{count}} Übungen an {{name}} zuweisen",
+    "assignNone": "Haken Sie mindestens eine Übung an",
+    "assigning": "Wird zugewiesen …",
+    "refused": {
+      "summary_one": "{{count}} Übung nicht vorgeschlagen, und warum",
+      "summary_other": "{{count}} Übungen nicht vorgeschlagen, und warum"
+    },
+    "results": {
+      "title": "Was zugewiesen wurde"
+    },
+    "resultStatus": {
+      "assigned": "Zugewiesen",
+      "delivered": "Empfohlen",
+      "created": "Als Entwurf gespeichert",
+      "duplicate": "Schon vorhanden",
+      "skipped": "Nicht zugewiesen",
+      "refused": "Nicht zugewiesen",
+      "failed": "Fehlgeschlagen",
+      "unknown": "Unbekannt"
+    },
+    "seen": {
+      "title": "Was {{name}} unter Aufgaben sieht",
+      "hint": "So erscheint jede Übung bei {{name}}. Was Sie gerade zugewiesen haben, steht oben.",
+      "loading": "Aufgaben werden geladen …",
+      "failed": "Die Aufgaben konnten nicht geladen werden",
+      "empty": "{{name}} hat noch keine Aufgaben.",
+      "new": "Neu"
+    },
+    "errors": {
+      "previewFailed": "Es konnten keine Übungen gefunden werden",
+      "assignFailed": "Die Übungen konnten nicht zugewiesen werden",
+      "noRelation": "Sie können {{name}} nur Übungen empfehlen, solange Sie die Hilfeanfrage bearbeiten, oder 14 Tage nachdem Sie sie abgeschlossen haben.",
+      "stale": "Die Vorschläge haben sich inzwischen geändert. Suchen Sie die Übungen noch einmal.",
+      "tryAgain": "Bitte versuchen Sie es gleich noch einmal."
+    },
+    "reasons": {
+      "rationale": {
+        "remediation_topic": "Die letzten Lernspuren zeigen dieses Thema als nächstes zum Aufarbeiten.",
+        "curriculum_exercise": "Zu diesem schwachen Thema gibt es eine geprüfte Übung aus dem Lehrplan.",
+        "reviewed_ai_draft": "Eine von einer Lehrperson geprüfte KI-Übung passt zu diesem Lernbedarf.",
+        "continuation_lesson": "Eine kurze geprüfte Übung hält das Gelernte frisch."
+      },
+      "refusal": {
+        "automation_off": "Automatische Vorschläge sind ausgeschaltet.",
+        "policy_paused": "Automatische Vorschläge sind pausiert.",
+        "student_out_of_scope": "Diese Person gehört nicht zu diesen Einstellungen.",
+        "source_type_not_allowed": "Diese Art von Übung gehört nicht zu den gewählten Arten.",
+        "subject_out_of_scope": "Das Fach ist nicht das gewählte.",
+        "topic_out_of_scope": "Das Thema ist nicht das gewählte.",
+        "low_confidence": "Der Vorschlag ist zu unsicher.",
+        "stale_candidate": "Die Lernspuren dazu sind zu alt.",
+        "duplicate_or_active": "Dazu gibt es schon eine offene, erledigte oder archivierte Aufgabe.",
+        "review_boundary_missing": "Der Vorschlag verlangt keine Prüfung durch eine Lehrperson.",
+        "max_assignments_reached": "Für diese Person ist die Höchstzahl an Übungen schon vorgeschlagen.",
+        "unsupported_assignment_source": "Daraus lässt sich keine Aufgabe erstellen.",
+        "source_not_assignable": "Diese Übung kann nicht mehr zugewiesen werden."
+      },
+      "result": {
+        "created": "Die Aufgabe wurde erstellt.",
+        "not_approved": "Nicht angehakt, daher nicht zugewiesen.",
+        "already_created": "Diese Aufgabe wurde bereits erstellt.",
+        "source_has_history": "Diese Übung wurde dieser Person schon einmal zugewiesen.",
+        "refused": "Nicht zugewiesen.",
+        "failed": "Die Aufgabe konnte nicht erstellt werden. Bitte versuchen Sie es später erneut."
+      },
+      "rationaleFallback": "Die letzten Übungen sprechen für diese Übung.",
+      "refusalFallback": "Diesmal nicht vorgeschlagen.",
+      "resultFallback": "Keine weiteren Angaben."
+    }
+  },
   "toasts": {
     "statusUpdated": "Status der Anfrage aktualisiert.",
     "replySent": "Ihre Antwort wurde gesendet.",

@@ -386,6 +386,9 @@
     "teacherProfile": {
       "title": "Lehrpersonen-Profil"
     },
+    "teacherPractice": {
+      "title": "Übungen empfehlen"
+    },
     "terms": {
       "title": "Nutzungsbedingungen"
     },

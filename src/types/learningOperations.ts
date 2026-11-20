@@ -21,6 +21,12 @@ export type AutomationPolicy = {
   pausedReason?: string | null
 }
 
+/**
+ * A policy as a caller sends it: every field the caller leaves out takes the
+ * backend's default (`AssignmentAutomationPolicyRequest`, stoa-backend).
+ */
+export type AutomationPolicyInput = Partial<AutomationPolicy>
+
 export type AutomationCandidate = {
   candidateId: string
   type?: string | null
@@ -32,6 +38,8 @@ export type AutomationCandidate = {
   topicIds: string[]
   confidence?: string | null
   freshness?: Record<string, unknown>
+  /** Why it is proposed, as a code a client translates (stoa-backend#495); `rationale` is its English. */
+  rationaleCode?: string | null
   rationale?: string | null
   expectedImpact?: string | null
   reviewStatus?: string | null
@@ -126,6 +134,8 @@ export type AutomationExecutionResult = {
   candidateId: string
   automationKey: string
   status: 'assigned' | 'delivered' | 'created' | 'skipped' | 'refused' | 'duplicate' | 'failed' | string
+  /** What became of it, as a code (stoa-backend#495); `reason` is its English. */
+  reasonCode?: string
   reason: string
   assignmentId?: string
   assignment?: LearningAssignment

@@ -386,6 +386,9 @@
     "teacherProfile": {
       "title": "Profilo insegnante"
     },
+    "teacherPractice": {
+      "title": "Consiglia esercizi"
+    },
     "terms": {
       "title": "Termini di utilizzo"
     },

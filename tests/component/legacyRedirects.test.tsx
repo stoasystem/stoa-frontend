@@ -159,8 +159,8 @@ describe('the teacher area moved off its old prefix (#69)', () => {
     ['/tutor', '/teacher', 'TeacherDashboardPage'],
     ['/tutor/availability', '/teacher/availability', 'TeacherAvailabilityPage'],
     ['/tutor/profile', '/teacher/profile', 'TeacherProfilePage'],
-    // Learning automation is hidden from teachers until #703, so its old address lands home.
-    ['/tutor/learning-automation', '/teacher', 'TeacherDashboardPage'],
+    // Hidden from teachers for a while, back as the teacher's practice page (#703).
+    ['/tutor/learning-automation', '/teacher/learning-automation', 'TeacherAssignPracticePage'],
     ['/tutor/requests/r-1', '/teacher/requests/r-1', 'TeacherHelpRequestDetailPage'],
     // An address no page answers keeps its tail out of the router: the
     // classroom was deleted (card 020), so its old links land home.
@@ -192,11 +192,17 @@ describe('the teacher area moved off its old prefix (#69)', () => {
   })
 })
 
-describe('learning automation is hidden from teachers (#703)', () => {
-  it('sends a teacher with a bookmark to the teacher home, query and all', () => {
-    for (const from of ['/teacher/learning-automation', '/teacher/learning-automation?studentId=stu-1']) {
-      expect(openAs('teacher', from)).toMatchObject({ pathname: '/teacher', search: '', page: 'TeacherDashboardPage' })
-    }
+describe('a teacher recommends practice on their own page (#703)', () => {
+  it('opens the teacher’s practice page, with the student and request a link names', () => {
+    expect(openAs('teacher', '/teacher/learning-automation')).toMatchObject({
+      pathname: '/teacher/learning-automation',
+      page: 'TeacherAssignPracticePage',
+    })
+    expect(openAs('teacher', '/teacher/learning-automation?studentId=stu-1&request=r-1')).toMatchObject({
+      pathname: '/teacher/learning-automation',
+      search: '?studentId=stu-1&request=r-1',
+      page: 'TeacherAssignPracticePage',
+    })
   })
 
   it('keeps the console for admins and organisations', () => {

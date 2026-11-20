@@ -322,6 +322,136 @@
       "high": "Affidabilità alta"
     }
   },
+  "assignPractice": {
+    "eyebrow": "Esercizi",
+    "title": "Consiglia esercizi",
+    "description": "Scegli un allievo che hai aiutato e cosa deve esercitare. Spunta gli esercizi che vuoi e assegnali: compaiono tra i compiti dell’allievo.",
+    "choose": {
+      "title": "Chi e cosa"
+    },
+    "student": {
+      "label": "Allievo",
+      "placeholder": "Scegli un allievo",
+      "hint": "Gli allievi di cui gestisci la richiesta di aiuto, o l’hai risolta negli ultimi 14 giorni.",
+      "loading": "Caricamento dei tuoi allievi…",
+      "failed": "Non è stato possibile caricare i tuoi allievi",
+      "failedBody": "Ricarica la pagina tra un momento.",
+      "none": "Appena prendi in carico la richiesta di aiuto di un allievo, qui puoi consigliargli degli esercizi.",
+      "fromRequest": "L’allievo della tua richiesta di aiuto"
+    },
+    "subject": {
+      "label": "Materia",
+      "any": "Tutte le materie"
+    },
+    "topic": {
+      "label": "Argomento",
+      "any": "Qualsiasi argomento",
+      "subjectFirst": "Scegli una materia per scegliere un argomento."
+    },
+    "more": {
+      "summary": "Altre opzioni",
+      "hint": "Se non le cambi, valgono le impostazioni abituali.",
+      "confidence": "Quanto deve essere sicuro un suggerimento",
+      "confidenceDefault": "Impostazione abituale ({{level}})",
+      "level": {
+        "low": "Poco sicuro",
+        "medium": "Abbastanza sicuro",
+        "high": "Molto sicuro"
+      },
+      "maxAssignments": "Al massimo questo numero di esercizi",
+      "dueInDays": "Scadenza tra (giorni)",
+      "freshnessDays": "In base al lavoro degli ultimi (giorni)",
+      "sources": "Tipi di esercizio",
+      "source": {
+        "curriculum_exercise": "Esercizi del programma",
+        "ai_draft": "Esercizi IA verificati da un insegnante"
+      },
+      "reset": "Torna alle impostazioni abituali"
+    },
+    "find": "Trova esercizi",
+    "finding": "Ricerca degli esercizi…",
+    "candidates": {
+      "title": "Suggerimenti per {{name}}",
+      "hint": "Togli la spunta agli esercizi che non vuoi assegnare.",
+      "empty": "Al momento non c’è niente da suggerire per {{name}}. Prova un altro argomento o un’altra materia, o torna dopo il prossimo esercizio.",
+      "listLabel": "Esercizi suggeriti",
+      "untitled": "Esercizio su {{topic}}",
+      "untitledPlain": "Esercizio",
+      "topic": "Argomento: {{topic}}"
+    },
+    "assign_one": "Assegna {{count}} esercizio a {{name}}",
+    "assign_many": "Assegna {{count}} esercizi a {{name}}",
+    "assign_other": "Assegna {{count}} esercizi a {{name}}",
+    "assignNone": "Spunta almeno un esercizio",
+    "assigning": "Assegnazione…",
+    "refused": {
+      "summary_one": "{{count}} esercizio non suggerito, e perché",
+      "summary_many": "{{count}} esercizi non suggeriti, e perché",
+      "summary_other": "{{count}} esercizi non suggeriti, e perché"
+    },
+    "results": {
+      "title": "Cosa è stato assegnato"
+    },
+    "resultStatus": {
+      "assigned": "Assegnato",
+      "delivered": "Consigliato",
+      "created": "Salvato come bozza",
+      "duplicate": "Già presente",
+      "skipped": "Non assegnato",
+      "refused": "Non assegnato",
+      "failed": "Non riuscito",
+      "unknown": "Sconosciuto"
+    },
+    "seen": {
+      "title": "Cosa vede {{name}} tra i compiti",
+      "hint": "Ecco come appare ogni esercizio a {{name}}. Quello che hai appena assegnato è in cima.",
+      "loading": "Caricamento dei compiti…",
+      "failed": "Non è stato possibile caricare i compiti",
+      "empty": "{{name}} non ha ancora compiti.",
+      "new": "Nuovo"
+    },
+    "errors": {
+      "previewFailed": "Non è stato trovato nessun esercizio",
+      "assignFailed": "Non è stato possibile assegnare gli esercizi",
+      "noRelation": "Puoi consigliare esercizi a {{name}} solo mentre gestisci la sua richiesta di aiuto, o nei 14 giorni dopo averla risolta.",
+      "stale": "I suggerimenti sono cambiati nel frattempo. Cerca di nuovo gli esercizi.",
+      "tryAgain": "Riprova tra un momento."
+    },
+    "reasons": {
+      "rationale": {
+        "remediation_topic": "I risultati recenti indicano questo argomento come il prossimo da recuperare.",
+        "curriculum_exercise": "Per questo argomento debole c’è un esercizio verificato del programma.",
+        "reviewed_ai_draft": "Un esercizio IA verificato da un insegnante corrisponde a questo bisogno.",
+        "continuation_lesson": "Un breve esercizio verificato mantiene fresco quanto appreso."
+      },
+      "refusal": {
+        "automation_off": "I suggerimenti automatici sono disattivati.",
+        "policy_paused": "I suggerimenti automatici sono in pausa.",
+        "student_out_of_scope": "Questo allievo non rientra in queste impostazioni.",
+        "source_type_not_allowed": "Questo tipo di esercizio non è tra i tipi scelti.",
+        "subject_out_of_scope": "La materia non è quella scelta.",
+        "topic_out_of_scope": "L’argomento non è quello scelto.",
+        "low_confidence": "Il suggerimento non è abbastanza sicuro.",
+        "stale_candidate": "I risultati su cui si basa sono troppo vecchi.",
+        "duplicate_or_active": "Esiste già un compito in corso, completato o archiviato su questo.",
+        "review_boundary_missing": "Il suggerimento non prevede la verifica di un insegnante.",
+        "max_assignments_reached": "Per questo allievo è già suggerito il numero massimo di esercizi.",
+        "unsupported_assignment_source": "Non è possibile ricavarne un compito.",
+        "source_not_assignable": "Questo esercizio non può più essere assegnato."
+      },
+      "result": {
+        "created": "Il compito è stato creato.",
+        "not_approved": "Senza spunta, quindi non assegnato.",
+        "already_created": "Questo compito era già stato creato.",
+        "source_has_history": "Questo esercizio era già stato assegnato a questo allievo.",
+        "refused": "Non assegnato.",
+        "failed": "Non è stato possibile creare il compito. Riprova più tardi."
+      },
+      "rationaleFallback": "Gli ultimi esercizi suggeriscono questo esercizio.",
+      "refusalFallback": "Non suggerito questa volta.",
+      "resultFallback": "Nessun altro dettaglio."
+    }
+  },
   "toasts": {
     "statusUpdated": "Stato della richiesta aggiornato.",
     "replySent": "La tua risposta è stata inviata.",

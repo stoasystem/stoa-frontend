@@ -320,6 +320,134 @@
       "high": "High confidence"
     }
   },
+  "assignPractice": {
+    "eyebrow": "Practice",
+    "title": "Recommend practice",
+    "description": "Choose a student you have helped and what to practise. Tick the exercises you want and assign them: they appear under the student's Assignments.",
+    "choose": {
+      "title": "Who and what"
+    },
+    "student": {
+      "label": "Student",
+      "placeholder": "Choose a student",
+      "hint": "Students whose help request you hold, or resolved in the last 14 days.",
+      "loading": "Loading your students…",
+      "failed": "Your students could not be loaded",
+      "failedBody": "Please reload the page in a moment.",
+      "none": "Once you take a student's help request, you can recommend practice to them here.",
+      "fromRequest": "The student from your help request"
+    },
+    "subject": {
+      "label": "Subject",
+      "any": "All subjects"
+    },
+    "topic": {
+      "label": "Topic",
+      "any": "Any topic",
+      "subjectFirst": "Choose a subject to pick a topic."
+    },
+    "more": {
+      "summary": "More options",
+      "hint": "Left as they are, the usual settings apply.",
+      "confidence": "How sure a suggestion must be",
+      "confidenceDefault": "Usual setting ({{level}})",
+      "level": {
+        "low": "A little sure",
+        "medium": "Fairly sure",
+        "high": "Very sure"
+      },
+      "maxAssignments": "At most this many exercises",
+      "dueInDays": "Due in (days)",
+      "freshnessDays": "Based on work from the last (days)",
+      "sources": "Kinds of exercise",
+      "source": {
+        "curriculum_exercise": "Exercises from the curriculum",
+        "ai_draft": "AI exercises checked by a teacher"
+      },
+      "reset": "Back to the usual settings"
+    },
+    "find": "Find exercises",
+    "finding": "Finding exercises…",
+    "candidates": {
+      "title": "Suggested for {{name}}",
+      "hint": "Untick any exercise you do not want to assign.",
+      "empty": "There is nothing to suggest for {{name}} right now. Try another topic or subject, or come back after the next practice.",
+      "listLabel": "Suggested exercises",
+      "untitled": "Exercise on {{topic}}",
+      "untitledPlain": "Exercise",
+      "topic": "Topic: {{topic}}"
+    },
+    "assign_one": "Assign {{count}} exercise to {{name}}",
+    "assign_other": "Assign {{count}} exercises to {{name}}",
+    "assignNone": "Tick at least one exercise",
+    "assigning": "Assigning…",
+    "refused": {
+      "summary_one": "{{count}} exercise not suggested, and why",
+      "summary_other": "{{count}} exercises not suggested, and why"
+    },
+    "results": {
+      "title": "What was assigned"
+    },
+    "resultStatus": {
+      "assigned": "Assigned",
+      "delivered": "Recommended",
+      "created": "Saved as a draft",
+      "duplicate": "Already there",
+      "skipped": "Not assigned",
+      "refused": "Not assigned",
+      "failed": "Failed",
+      "unknown": "Unknown"
+    },
+    "seen": {
+      "title": "What {{name}} sees under Assignments",
+      "hint": "This is how each exercise appears to {{name}}. What you just assigned is at the top.",
+      "loading": "Loading the assignments…",
+      "failed": "The assignments could not be loaded",
+      "empty": "{{name}} has no assignments yet.",
+      "new": "New"
+    },
+    "errors": {
+      "previewFailed": "No exercises could be found",
+      "assignFailed": "The exercises could not be assigned",
+      "noRelation": "You can recommend practice to {{name}} only while you hold their help request, or for 14 days after you resolved it.",
+      "stale": "The suggestions have changed since you looked. Find the exercises again.",
+      "tryAgain": "Please try again in a moment."
+    },
+    "reasons": {
+      "rationale": {
+        "remediation_topic": "Recent work shows this topic is the next one to go over again.",
+        "curriculum_exercise": "There is a checked curriculum exercise for this weak topic.",
+        "reviewed_ai_draft": "An AI exercise a teacher checked fits what the student needs.",
+        "continuation_lesson": "A short checked exercise keeps what was learnt fresh."
+      },
+      "refusal": {
+        "automation_off": "Automatic suggestions are switched off.",
+        "policy_paused": "Automatic suggestions are paused.",
+        "student_out_of_scope": "This student is not covered by these settings.",
+        "source_type_not_allowed": "This kind of exercise is not among the kinds you chose.",
+        "subject_out_of_scope": "The subject is not the one you chose.",
+        "topic_out_of_scope": "The topic is not the one you chose.",
+        "low_confidence": "The suggestion is not sure enough.",
+        "stale_candidate": "The work it is based on is too old.",
+        "duplicate_or_active": "There is already an open, finished or archived assignment on this.",
+        "review_boundary_missing": "The suggestion does not ask for a teacher to check it.",
+        "max_assignments_reached": "The most exercises for this student are already suggested.",
+        "unsupported_assignment_source": "This cannot be turned into an assignment.",
+        "source_not_assignable": "This exercise can no longer be assigned."
+      },
+      "result": {
+        "created": "The assignment was created.",
+        "not_approved": "Not ticked, so not assigned.",
+        "already_created": "This assignment had already been created.",
+        "source_has_history": "This exercise was already assigned to this student once.",
+        "refused": "Not assigned.",
+        "failed": "The assignment could not be created. Please try again later."
+      },
+      "rationaleFallback": "Recent practice suggests this exercise.",
+      "refusalFallback": "Not suggested this time.",
+      "resultFallback": "No further detail."
+    }
+  },
   "toasts": {
     "statusUpdated": "Request status updated.",
     "replySent": "Your reply was sent.",

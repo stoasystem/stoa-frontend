@@ -4,7 +4,7 @@ import type {
   AssignmentListResponse,
   AutomationCandidate,
   AutomationExecuteResponse,
-  AutomationPolicy,
+  AutomationPolicyInput,
   AutomationPreviewResponse,
   CurriculumAnalyticsDashboard,
   ParentProgressResponse,
@@ -13,14 +13,15 @@ import type {
 } from '@/types/learningOperations'
 
 export type AutomationPreviewRequest = {
-  policy: AutomationPolicy
+  policy: AutomationPolicyInput
   subject?: string
 }
 
 export type AutomationExecuteRequest = {
   batchId: string
   approved: boolean
-  policy: AutomationPolicy
+  /** The policy the preview was asked with: the batch is previewed again from it. */
+  policy: AutomationPolicyInput
   candidates: AutomationCandidate[]
   subject?: string
 }
