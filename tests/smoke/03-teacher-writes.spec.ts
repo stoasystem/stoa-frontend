@@ -263,14 +263,17 @@ test.describe('the teacher side that writes (items 11-13)', () => {
     // One exercise at most, assigned rather than suggested, as the page sends
     // it. The test student's evidence is thin and old, so the two settings a
     // teacher can move under "More options" are opened up: any confidence, and
-    // evidence up to a year old (item 12's read-only run found all five
-    // candidates refused under the defaults).
+    // evidence as old as the backend allows (`freshnessDays` le=180). Item
+    // 12's read-only run found all five candidates refused under the
+    // defaults: two stale, three of a source the page does not assign
+    // (memory snapshots and lesson topics, which an assignment cannot be
+    // made from), so the page's two source types are kept.
     const policy = {
       autonomyLevel: 'teacher_approved_batch',
       deliveryMode: 'assigned',
       maxAssignmentsPerStudent: 1,
       confidenceThreshold: 'low',
-      freshnessDays: 365,
+      freshnessDays: 180,
     }
     const preview = (await teacher.call<{
       batchId: string
