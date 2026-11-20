@@ -217,6 +217,11 @@ test('item 12: a teacher recommends practice only to a student they helped (#720
       previewStatus: preview.status,
       selected: preview.body.selected?.length ?? null,
       refused: preview.body.refused?.length ?? null,
+      refusalCodes: (preview.body.refused ?? []).reduce<Record<string, number>>((counts, candidate) => {
+        const code = candidate.refusalCode ?? 'none'
+        counts[code] = (counts[code] ?? 0) + 1
+        return counts
+      }, {}),
     }
   } else {
     testInfo.annotations.push({ type: 'coverage', description: 'teacher@ 没有处理中或已解决的求助：有关系的一侧未读' })
