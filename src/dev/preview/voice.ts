@@ -211,6 +211,9 @@ export function installPreviewMicrophone() {
     }
     return stream
   }
-  Object.defineProperty(devices, 'getUserMedia', { value: getUserMedia, configurable: true })
+  // On the prototype where there is one: WebKit does not keep a property set on
+  // `navigator.mediaDevices` itself, so in Safari the real microphone was asked for (#726).
+  const target = typeof MediaDevices === 'function' && navigator.mediaDevices instanceof MediaDevices ? MediaDevices.prototype : devices
+  Object.defineProperty(target, 'getUserMedia', { value: getUserMedia, configurable: true, writable: true })
   if (!navigator.mediaDevices) Object.defineProperty(navigator, 'mediaDevices', { value: devices, configurable: true })
 }
