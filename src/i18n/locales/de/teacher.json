@@ -326,6 +326,12 @@
     "eyebrow": "Übung",
     "title": "Übungen empfehlen",
     "description": "Wählen Sie eine Schülerin oder einen Schüler, der Sie geholfen haben, und was geübt werden soll. Haken Sie die gewünschten Übungen an und weisen Sie sie zu: Sie erscheinen unter den Aufgaben der Person.",
+    "entry": {
+      "group": "Mehr",
+      "title": "Übungen empfehlen",
+      "description": "Übungen für Schülerinnen und Schüler zuweisen, denen Sie geholfen haben",
+      "forStudent": "Übungen für {{name}} empfehlen"
+    },
     "choose": {
       "title": "Wer und was"
     },

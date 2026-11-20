@@ -326,6 +326,12 @@
     "eyebrow": "Practice",
     "title": "Recommend practice",
     "description": "Choose a student you have helped and what to practise. Tick the exercises you want and assign them: they appear under the student's Assignments.",
+    "entry": {
+      "group": "More",
+      "title": "Recommend practice",
+      "description": "Assign practice to students you have helped",
+      "forStudent": "Recommend practice for {{name}}"
+    },
     "choose": {
       "title": "Who and what"
     },

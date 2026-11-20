@@ -15,6 +15,7 @@ import { TeacherRequestTimeline } from '@/components/teacher/TeacherRequestTimel
 import { TeacherAssistanceSummaryCard } from '@/components/teacher/TeacherAssistanceSummaryCard'
 import { CurriculumRolloutPanel } from '@/components/practice/CurriculumRolloutPanel'
 import { Button } from '@/components/ui/button'
+import { teacherPracticePathFor } from '@/features/assignPractice/practicePath'
 import { TeacherReplyComposer } from '@/features/teacherReply/TeacherReplyComposer'
 import { useTeacherReply } from '@/features/teacherReply/useTeacherReply'
 import { useCurriculumCatalogQuery } from '@/hooks/practice/useCurriculumCatalogQuery'
@@ -187,7 +188,16 @@ export function TeacherHelpRequestDetailPage() {
             </div>
             <TeacherAssistanceSummaryCard request={requestQuery.data} />
             {/* No "AI teacher tools" card: hidden from teachers (#704). */}
-            {/* No "open automation" link: the console is hidden from teachers until #703. */}
+            {/* Practice for this student (#703): the backend lets the teacher holding
+                the request, or who resolved it in the last 14 days, assign to its
+                student (stoa-backend#495). Offered and not yet accepted is no relation. */}
+            {canAct && (status === 'in_progress' || status === 'resolved') && (
+              <Button asChild variant="outline">
+                <Link to={teacherPracticePathFor(requestQuery.data.student.id, requestQuery.data.requestId)}>
+                  {tTeacher('assignPractice.entry.forStudent', { name: requestQuery.data.student.name })}
+                </Link>
+              </Button>
+            )}
             <CurriculumRolloutPanel
               title={t('curriculumRollout.teacherTitle')}
               description={t('curriculumRollout.teacherDescription')}

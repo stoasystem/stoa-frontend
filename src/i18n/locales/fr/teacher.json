@@ -328,6 +328,12 @@
     "eyebrow": "Exercices",
     "title": "Recommander des exercices",
     "description": "Choisissez un élève que vous avez aidé et ce qu’il doit travailler. Cochez les exercices voulus et attribuez-les : ils apparaissent dans les devoirs de l’élève.",
+    "entry": {
+      "group": "Plus",
+      "title": "Recommander des exercices",
+      "description": "Attribuer des exercices aux élèves que vous avez aidés",
+      "forStudent": "Recommander des exercices à {{name}}"
+    },
     "choose": {
       "title": "Qui et quoi"
     },

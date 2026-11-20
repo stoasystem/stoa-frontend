@@ -180,3 +180,36 @@ for (const [label, viewport] of [['desktop', DESKTOP], ['phone', PHONE]] as cons
     await shoot(page, `703-${label}-assigned`)
   })
 }
+
+test('a teacher reaches practice from the Requests home and from a help request, with its student chosen', async ({ page, backend }) => {
+  new StaffWorld(backend, TEACHER).install()
+  backend.on('GET', '/teachers/me/help-requests', () => ({ status: 200, body: { items: REQUESTS } }))
+  backend.on('GET', '/practice/curriculum/catalog', () => ({ status: 200, body: CATALOG }))
+  backend.on('GET', '/adaptive/students/{student_id}/assignments', () => ({ status: 200, body: { items: [], count: 0 } }))
+  backend.on('GET', '/teachers/me/help-requests/{request_id}', () => ({
+    status: 200,
+    body: {
+      requestId: REQUESTS[0].requestId,
+      conversationId: REQUESTS[0].conversationId,
+      student: { id: STUDENT_ID, name: 'Mia Keller', grade: 'grade_8_secondary' },
+      subject: 'math',
+      status: 'in_progress',
+      messages: [],
+      notes: [],
+    },
+  }))
+
+  await signInAt(page, TEACHER, '/teacher')
+  await page.getByRole('link', { name: /Recommend practice/ }).click()
+  await expect(page).toHaveURL('/teacher/learning-automation')
+  await expect(page.getByRole('heading', { name: 'Recommend practice' })).toBeVisible()
+
+  await page.goto(`/teacher/requests/${REQUESTS[0].requestId}`)
+  const entry = page.getByRole('link', { name: 'Recommend practice for Mia Keller' })
+  await expect(entry).toBeVisible()
+  await shoot(page, '703-detail-entry')
+  await entry.click()
+  await expect(page).toHaveURL(`/teacher/learning-automation?studentId=${STUDENT_ID}&request=${REQUESTS[0].requestId}`)
+  await expect(page.getByLabel('Student', { exact: true })).toHaveValue(STUDENT_ID)
+  await expect(page.getByLabel('Subject', { exact: true })).toHaveValue('math')
+})
