@@ -12,7 +12,6 @@ import { HelpRequestDetailCard } from '@/components/teacher/HelpRequestDetailCar
 import { PracticeRequestContextCard } from '@/components/teacher/PracticeRequestContextCard'
 import { TeacherDashboardSkeleton } from '@/components/teacher/TeacherDashboardSkeleton'
 import { TeacherRequestTimeline } from '@/components/teacher/TeacherRequestTimeline'
-import { TeacherAssistanceSummaryCard } from '@/components/teacher/TeacherAssistanceSummaryCard'
 import { CurriculumRolloutPanel } from '@/components/practice/CurriculumRolloutPanel'
 import { Button } from '@/components/ui/button'
 import { teacherPracticePathFor } from '@/features/assignPractice/practicePath'
@@ -178,15 +177,17 @@ export function TeacherHelpRequestDetailPage() {
         )}
         {requestQuery.data && (
           <div className="space-y-6">
-            {requestQuery.data.practiceContext && (
-              <PracticeRequestContextCard context={requestQuery.data.practiceContext} />
-            )}
             {/* Focus lands here after a status change: the button pressed is
-                then disabled or gone, which would drop it on the page (#332). */}
+                then disabled or gone, which would drop it on the page (#332).
+                The card opens with the preparation table, the conversation
+                folded under it (#704). */}
             <div ref={requestCardRef} tabIndex={-1} className="rounded-lg">
               <HelpRequestDetailCard request={requestQuery.data} />
             </div>
-            <TeacherAssistanceSummaryCard request={requestQuery.data} />
+            {/* The exercise the student asked from: course context, under the request (#704). */}
+            {requestQuery.data.practiceContext && (
+              <PracticeRequestContextCard context={requestQuery.data.practiceContext} />
+            )}
             {/* No "AI teacher tools" card: hidden from teachers (#704). */}
             {/* Practice for this student (#703): the backend lets the teacher holding
                 the request, or who resolved it in the last 14 days, assign to its
