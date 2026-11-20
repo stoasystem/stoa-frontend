@@ -21,6 +21,8 @@ import { readStateFile, record } from './run'
  *        STOA_SMOKE_PASSWORD=... STOA_SMOKE_EXPECT_RELEASE_ID=<releaseId or a prefix> \
  *          npm run test:smoke
  *      Only the items a change touches: `-- --grep @item3` (tags below). The
+ *      grep is a regular expression, so `@item1` also picks items 11-14: write
+ *      `-- --grep "@item1\b"` for item 1 alone. The
  *      `offline` project always runs first; `-- --project=offline` runs only it.
  *      Item 7 means something only after Monday's 06:00 Zurich report run.
  *   4. Read .smoke/runs/<runId>.json. Every entry with `needsHumanConfirmation`
@@ -36,9 +38,12 @@ import { readStateFile, record } from './run'
  * Files run in name order on one worker, never retried:
  *   01 preflight  release, function versions, the two student profiles    read-only
  *   02 read-only  roles sign in, admin console, item 1, 9 (404 control), 6, 7
+ *   02 teacher    items 11-14, the teacher side of 2026-11-20, read only
  *   03 writes     item 5 (no model), 4 (PDF), 2 (E03), 3 (E01 x2)         3 generations
  *   04 logout     item 8, last, because it revokes every parent@ session
  * Item 10 is the removal of the old `3x + 5 = 20` question; item 3 replaces it.
+ * So the items added after #27 start at 11: 11 the two ways of asking a teacher,
+ * 12 assigning practice, 13 exercise drafts, 14 common mistakes under an answer.
  * Item 5's hint needs #154 live (frontend 5778408 or later).
  *
  * Generation budget: three requests in a normal run (items 2 and 3), at most
