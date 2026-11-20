@@ -262,8 +262,8 @@ test('item 13: exercise drafts are bank exercises in the new difficulties (backe
       deliveredAssignmentId?: string | null
     }>
     count: number
-  }>('GET', '/teachers/ai-tools/drafts?draft_type=exercise', { expect: 200 })
-  const drafts = body.items.filter((draft) => draft.draftType === 'exercise')
+  }>('GET', '/teachers/ai-tools/drafts?draft_type=practice_exercise', { expect: 200 })
+  const drafts = body.items.filter((draft) => draft.draftType === 'practice_exercise')
   expect(body.count, 'count is the number of items').toBe(body.items.length)
   // Drafts from before #519 keep easy/medium/hard; new ones are only the three.
   const NEW = ['targeted', 'standard', 'stretch']
