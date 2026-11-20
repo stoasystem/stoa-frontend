@@ -386,6 +386,9 @@
     "teacherProfile": {
       "title": "Profil enseignant"
     },
+    "teacherPractice": {
+      "title": "Recommander des exercices"
+    },
     "terms": {
       "title": "Conditions d’utilisation"
     },

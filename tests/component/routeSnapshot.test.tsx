@@ -70,9 +70,9 @@ const changedSince45: Record<string, Partial<Record<Viewer, { pathname: string; 
   '/tutor': { teacher: { pathname: '/teacher', page: 'TeacherDashboardPage' } },
   '/tutor/availability': { teacher: { pathname: '/teacher/availability', page: 'TeacherAvailabilityPage' } },
   '/tutor/profile': { teacher: { pathname: '/teacher/profile', page: 'TeacherProfilePage' } },
-  // Learning automation is hidden from teachers until #703: the old address lands home.
+  // The teacher's own practice page since #703, no longer the admin console.
   '/tutor/learning-automation': {
-    teacher: { pathname: '/teacher', page: 'TeacherDashboardPage' },
+    teacher: { pathname: '/teacher/learning-automation', page: 'TeacherAssignPracticePage' },
   },
   '/tutor/requests/requestId-1': {
     teacher: { pathname: '/teacher/requests/requestId-1', page: 'TeacherHelpRequestDetailPage' },

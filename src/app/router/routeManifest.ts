@@ -261,6 +261,7 @@ const LearningAutomationConsolePage = lazyPage('LearningAutomationConsolePage', 
 const StudentLearningProfilePage = lazyPage('StudentLearningProfilePage', () => import('@/pages/learning/StudentLearningProfilePage'))
 const OrganizationHomePage = lazyPage('OrganizationHomePage', () => import('@/pages/organization/OrganizationHomePage'))
 
+const TeacherAssignPracticePage = lazyPage('TeacherAssignPracticePage', () => import('@/pages/teacher/TeacherAssignPracticePage'))
 const TeacherDashboardPage = lazyPage('TeacherDashboardPage', () => import('@/pages/teacher/TeacherDashboardPage'))
 const TeacherAvailabilityPage = lazyPage('TeacherAvailabilityPage', () => import('@/pages/teacher/TeacherAvailabilityPage'))
 const TeacherProfilePage = lazyPage('TeacherProfilePage', () => import('@/pages/teacher/TeacherProfilePage'))
@@ -441,7 +442,10 @@ export const pageRoutes: readonly PageRoute[] = [
     nav: [{ area: 'teacher', label: 'Availability', labelKey: 'navigation.availability', priority: 'primary', icon: 'settings', mobile: true, description: 'Teacher availability and subjects.' }],
     meta: { module: 'Teacher', status: 'core', purpose: 'Teacher availability.' },
   },
-  // No /teacher/learning-automation: hidden from teachers until #703 (see legacyRedirects).
+  // Recommending practice to a student the teacher helped (#703): its own page,
+  // not the admin and organisation console. No `nav`: a help request links to
+  // it with its student (`teacherPracticePathFor`); it lights Requests.
+  { path: '/teacher/learning-automation', access: TEACHER, page: TeacherAssignPracticePage, titleKey: 'routes.teacherPractice.title', meta: { module: 'Teacher', status: 'core', purpose: 'Recommend and assign practice to a student the teacher helped.' } },
   // No `nav`: the profile is the avatar menu's Profile (#13 point 6, #46).
   { path: '/teacher/profile', access: TEACHER, page: TeacherProfilePage, titleKey: 'routes.teacherProfile.title', meta: { module: 'Teacher', status: 'core', purpose: 'Teacher profile, contact, verification, and payout settlement details.' } },
   // Student and teacher alike (#696): the student of the conversation, or the teacher who holds its request.
@@ -636,13 +640,12 @@ const toMap = ({ pathname }: LegacyRedirectInput) => mapPathForLegacyPlanet(path
  * instead of ending on a 404. Only the shapes that existed carry their tail
  * over; every other old address lands on the home, so no made-up tail reaches
  * the router. The classroom tails are absent because the online classroom was
- * deleted on 2026-10-09, and learning automation's because teachers no longer
- * have it (#703).
+ * deleted on 2026-10-09.
  */
 const LEGACY_TEACHER_HOME = '/tutor'
 
 const LEGACY_TEACHER_TAILS: readonly RegExp[] = [
-  /^\/(availability|profile)$/,
+  /^\/(availability|profile|learning-automation)$/,
   /^\/requests\/[A-Za-z0-9][A-Za-z0-9_-]{0,127}$/,
 ]
 
@@ -661,11 +664,6 @@ const toTeacher = ({ pathname }: LegacyRedirectInput) => teacherPathForLegacyAdd
 export const legacyRedirects: readonly LegacyRedirect[] = [
   { from: '/planet/*', to: toMap, access: STUDENT, carryContext: true, decision: '#72 §8' },
   { from: `${LEGACY_TEACHER_HOME}/*`, to: toTeacher, access: TEACHER, carryContext: true, decision: '#69 §1' },
-  // The learning automation console cannot serve a teacher yet: the backend
-  // only lets a teacher in through a teacher->student grant nothing writes, so
-  // every request was a 404. Hidden from teachers until its redesign (#703);
-  // admins and organisations keep it. Bookmarks land on the teacher's home.
-  { from: '/teacher/learning-automation', to: '/teacher', access: TEACHER, decision: '#703' },
   { from: '/learn/*', to: '/', access: STUDENT, decision: '#13 §2' },
   { from: '/dashboard', to: '/', access: STUDENT, decision: '#13 §2' },
   { from: '/practice/*', to: '/', access: STUDENT, decision: '#13 §2' },

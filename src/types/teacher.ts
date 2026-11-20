@@ -21,6 +21,12 @@ export type TeacherSlaSnapshot = {
 export type TeacherHelpRequestSummary = {
   requestId: string
   conversationId: string
+  /**
+   * The student the request is from (stoa-backend#495). Holding the request,
+   * or having resolved it in the last 14 days, lets the teacher recommend
+   * practice to this student (#703).
+   */
+  studentId?: string
   studentName: string
   subject: string
   grade: string

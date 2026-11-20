@@ -110,7 +110,7 @@ describe('T5: from a help request to the automation console', () => {
 
     expect(await screen.findByLabelText('Student id')).toHaveValue('stu/42')
     // The history is read for that student at once, not after the field is left.
-    await waitFor(() => expect(getStudentAssignments).toHaveBeenCalledWith('stu/42'))
+    await waitFor(() => expect(getStudentAssignments).toHaveBeenCalledWith('stu/42', true))
   })
 
   it('still opens empty without a student in the link', async () => {

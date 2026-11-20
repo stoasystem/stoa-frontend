@@ -72,6 +72,13 @@ back reloads nothing, and offline it waits for the connection; a stylesheet
 that failed is put back before the next page that loads is shown, and failing
 again holds back no page that never failed on it (#272, #401, #447).
 
+`teacherPractice703.spec.ts`: a teacher picks a student from their own help
+requests and a topic from the catalog, by name, previews practice, unticks one
+exercise and assigns the other, then sees the student's Assignments with it
+marked new; the preview and execute bodies are held to the backend's schema,
+and nothing runs off a phone's width (#703). `STOA_E2E_SHOTS=<dir>` saves the
+page at desktop and phone width.
+
 `attachments.spec.ts`: a photo chosen in Ask is shrunk to a JPEG in the
 browser, goes up by intent, part URL, a PUT straight to S3 (answered in
 `support/uploads.ts`, which refuses a part whose SHA-256 is not the one signed
