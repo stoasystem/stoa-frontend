@@ -139,7 +139,7 @@
         "expired": "Expired"
       },
       "title": {
-        "pending": "Teacher support requested",
+        "pending": "Finding a teacher for you",
         "waiting_no_teacher": "No teacher is free right now",
         "assigned": "{{name}} will join this conversation",
         "in_progress": "{{name}} is helping you",
@@ -183,13 +183,38 @@
         "text": "Text answer",
         "classroom": "Online classroom",
         "cancel": "Cancel",
-        "hint": "Text answer: the teacher replies here in the conversation. Online classroom: whiteboard and voice call, on a computer or tablet."
+        "about": {
+          "text": "The teacher replies here in the conversation.",
+          "classroom": "Whiteboard and voice call, on a computer or tablet."
+        },
+        "left_one": "{{count}} left this week",
+        "left_other": "{{count}} left this week",
+        "usedUp": "Used up this week. Available again next week.",
+        "classroomUpgrade": "Available with the Online classroom option.",
+        "notIncluded": "Not switched on for you yet."
       },
       "classroom": {
         "waiting": "You chose the online classroom. Once a teacher accepts your request, you can enter it here.",
         "ready": "Your teacher is waiting for you in the classroom.",
         "enter": "Enter classroom",
-        "biggerScreen": "The classroom works on a computer or tablet. Open it there."
+        "biggerScreen": "The classroom works on a computer or tablet. Open it there.",
+        "notIncluded": "The online classroom comes with the Online classroom option, which is not switched on for you yet. You can ask for a text answer instead.",
+        "usedUp": "This week’s online classrooms are used up. You can ask for a text answer instead.",
+        "mic": {
+          "title": "The classroom needs your microphone",
+          "body": "In the classroom you talk with your teacher in a voice call. Your browser will now ask whether STOA may use your microphone. Please allow it.",
+          "deniedTitle": "Your browser blocks the microphone",
+          "deniedBody": "To talk with your teacher, allow the microphone for this site in your browser settings (usually the lock icon next to the address), then reload the page. You can also enter without a microphone and use the whiteboard and chat.",
+          "continue": "Continue",
+          "withoutMic": "Enter without microphone",
+          "cancel": "Not now"
+        }
+      },
+      "remainingByMode": {
+        "line": "This week: {{list}}",
+        "left_one": "{{mode}} {{count}} left",
+        "left_other": "{{mode}} {{count}} left",
+        "upgrade": "{{mode}} with the Online classroom option"
       }
     },
     "practice": {

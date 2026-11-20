@@ -39,18 +39,6 @@ export function isWithdrawableHelpRequest(status: TeacherHelpStatus | undefined)
 }
 
 /**
- * The status changes the server takes on a request in this status, mirroring
- * `advance_help_request` in stoa-backend: only `pending` and `in_progress`
- * move. A pending request can be taken or finished at once; one in progress
- * can only be finished (taking it again was a no-op write, #269).
- */
-export function teacherStatusActions(status: TeacherHelpStatus | undefined): TeacherHelpStatus[] {
-  if (status === 'pending') return ['in_progress', 'resolved']
-  if (status === 'in_progress') return ['resolved']
-  return []
-}
-
-/**
  * Whether the server takes a teacher's reply on a request in this status: only
  * from the teacher holding it (stoa-backend#479). Offered and not yet accepted
  * (`pending`), the reply is refused with `help_request_not_accepted`, so the
@@ -92,17 +80,48 @@ export type TeacherHelpRequest = {
   updatedAt?: string
 }
 
+/** Why a request of one way would be refused this week (stoa-backend#144, #482). */
+export type TeacherSupportBlockedReason = 'teacher_support_allowance_exhausted' | 'teacher_support_not_included'
+
 /**
- * Whether this student can still ask a teacher this week (stoa-backend#144).
- * `blockedReason` is the code a request would be refused with; only the
- * allowance comes back with the week, at `resetsAt`.
+ * Whether this student can still ask for one way of help this Zurich week
+ * (stoa-backend#482). `blockedReason` is the code a request of this way would
+ * be refused with: `teacher_support_not_included` when the plan has none of it
+ * (a classroom outside the online classroom plan), `..._exhausted` when this
+ * week's are used up; those come back at `resetsAt`.
  */
-export type TeacherSupportStanding = {
+export type TeacherSupportModeStanding = {
   canRequest: boolean
   remainingCases: number
   weeklyCases: number
-  blockedReason?: 'teacher_support_allowance_exhausted' | 'teacher_support_not_included' | null
+  blockedReason?: TeacherSupportBlockedReason | null
   resetsAt?: string | null
+}
+
+/**
+ * Whether this student can still ask a teacher this week (stoa-backend#144).
+ * The top-level fields are the text answer, as before there were two ways;
+ * `text` and `classroom` answer for each way (stoa-backend#482). An older
+ * server sends neither block: then the top level is the text answer and the
+ * classroom is not known (`helpModeStanding`).
+ */
+export type TeacherSupportStanding = TeacherSupportModeStanding & {
+  text?: TeacherSupportModeStanding
+  classroom?: TeacherSupportModeStanding
+}
+
+/**
+ * One way's standing: the text answer falls back to the top level; a
+ * classroom without its block is `null`, not known, and is then offered and
+ * left to the server to refuse.
+ */
+export function helpModeStanding(
+  support: TeacherSupportStanding | null | undefined,
+  mode: HelpMode,
+): TeacherSupportModeStanding | null {
+  if (!support) return null
+  if (mode === 'text') return support.text ?? support
+  return support.classroom ?? null
 }
 
 export type TeacherAvailability = {

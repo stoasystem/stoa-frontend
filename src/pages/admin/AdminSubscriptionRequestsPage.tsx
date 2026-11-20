@@ -47,7 +47,7 @@ const tierOptions: { label: string; value: SubscriptionTier | '' }[] = [
   { label: 'Free Trial', value: 'free_trial' },
   { label: 'Student', value: 'student' },
   { label: 'Teacher-supported', value: 'teacher_supported' },
-  { label: 'Family', value: 'family' },
+  { label: 'Online classroom', value: 'online_classroom' },
 ]
 
 export function AdminSubscriptionRequestsPage() {

@@ -13,7 +13,7 @@ export type SubscriptionPlan =
   | 'free_trial'
   | 'student'
   | 'teacher_supported'
-  | 'family'
+  | 'online_classroom'
 
 export type BillingStatus =
   | 'not_configured'

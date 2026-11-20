@@ -2,7 +2,6 @@
   "dashboardTitle": "Demandes d’accompagnement",
   "dashboardDescription": "Examinez les questions d’élèves où un accompagnement qualifié peut aider.",
   "loadRequestsFailed": "Impossible de charger les demandes.",
-  "markInProgress": "Commencer l’examen",
   "markResolved": "Marquer résolu",
   "notes": "Notes de l’enseignant",
   "availability": {
@@ -51,8 +50,6 @@
       "body": "Elle a expiré, ou un autre enseignant l’a prise en charge.",
       "back": "Retour aux demandes"
     },
-    "resolutionNote": "Note de résolution",
-    "resolutionNotePlaceholder": "Obligatoire avant de marquer comme résolu.",
     "updateFailed": "Impossible de mettre à jour le statut.",
     "changedElsewhere": "Un autre enseignant a pris cette demande en charge, ou elle a changé. Elle a été rechargée : veuillez vérifier où elle en est.",
     "replyTitle": "Réponse de l’enseignant",
@@ -91,6 +88,11 @@
     "ended": {
       "withdrawn": "L’élève a retiré cette demande. Il n’y a plus rien à faire.",
       "expired": "Cette demande a expiré avant que quelqu’un l’accepte. Il n’y a plus rien à faire."
+    },
+    "resolveHint": "Aide terminée ? Marquez la demande comme résolue. Vous pourrez encore ajouter une réponse ensuite.",
+    "classroomHelp": {
+      "title": "Classe en ligne",
+      "body": "L’élève a choisi la classe en ligne. Aidez-le là-bas avec le tableau blanc et l’appel vocal. Une fois terminé, marquez la demande comme résolue."
     }
   },
   "profile": {

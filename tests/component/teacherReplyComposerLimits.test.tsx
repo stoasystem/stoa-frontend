@@ -234,13 +234,17 @@ describe('T9: focus and labels', () => {
     expect(composer.reply()).toHaveFocus()
   })
 
-  it('says in text that the resolution note is required', async () => {
+  it('finishes with one button and no closing note (#705)', async () => {
     vi.mocked(teacherApi.getTeacherHelpRequestDetail).mockResolvedValue(detail('in_progress'))
+    vi.mocked(teacherApi.updateTeacherHelpRequestStatus).mockResolvedValue({ requestId: 'r1', status: 'resolved' } as never)
     renderDetail()
-    const note = await screen.findByLabelText(de.detail.resolutionNote)
-    expect(note).not.toHaveAttribute('placeholder')
-    expect(note).toHaveAccessibleDescription(de.detail.resolutionNotePlaceholder)
-    expect(screen.getByRole('button', { name: de.markResolved })).toHaveAccessibleDescription(de.detail.resolutionNotePlaceholder)
+    const resolve = await screen.findByRole('button', { name: de.markResolved })
+    expect(screen.queryByRole('textbox', { name: /notiz|note/i })).toBeNull()
+    expect(screen.queryByRole('button', { name: /review|prüfung/i })).toBeNull()
+    await userEvent.click(resolve)
+    await waitFor(() =>
+      expect(vi.mocked(teacherApi.updateTeacherHelpRequestStatus).mock.calls[0]?.[0]).toEqual({ requestId: 'r1', status: 'resolved' }),
+    )
   })
 
   it('puts the focus on the request after a status change', async () => {

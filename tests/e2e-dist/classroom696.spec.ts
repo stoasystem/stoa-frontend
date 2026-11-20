@@ -13,11 +13,11 @@ import { StudentWorld } from './support/student'
  * (`frame-src`), the bar says the teacher has joined, and leaving goes back to
  * the conversation.
  *
- * The built app does not offer the choice of mode yet (`classroomHelpOffered`
- * is off without `VITE_CLASSROOM_HELP`), so the classroom request here is the
- * backend's, as one asked for where the choice is offered. Choosing it, and a
- * text request never showing a classroom, are helpModes705.test.tsx and
- * classroom696.test.tsx.
+ * The classroom request here is the backend's, as the student chose it.
+ * Choosing it (locked outside the online classroom option), the word about the
+ * microphone before entering, and a text request never showing a classroom,
+ * are helpModes705.test.tsx and classroom696.test.tsx. Here the browser has
+ * allowed the microphone before, so the card leads straight in.
  *
  * Daily is not reachable here: its call bundle is refused (from *.daily.co and
  * its fallback hosts), and the voice says it did not connect while the board
@@ -84,6 +84,8 @@ test('a classroom request a teacher accepted leads from the conversation into th
     await page.route(host, (route) => route.abort('connectionrefused'))
   }
 
+  // Allowed before: no word about the microphone in the way (#705).
+  await page.context().grantPermissions(['microphone'])
   await signInAsStudent(page)
   await page.getByRole('textbox', { name: 'Your question' }).fill(question)
   const ask = page.locator('[data-ask-surface]')

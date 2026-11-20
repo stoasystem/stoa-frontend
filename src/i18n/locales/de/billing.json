@@ -42,15 +42,15 @@
     },
     "teacher_supported": {
       "name": "Plan mit Lehrpersonen",
-      "audience": "Familien, die wöchentlich begrenzte Lehrpersonenhilfe möchten.",
+      "audience": "Familien, die jede Woche ein paar Fragen schriftlich von einer Lehrperson beantwortet haben möchten.",
       "cta": "Plan mit Lehrperson wählen",
-      "features": ["Alles im Schüler-Plan", "Wöchentlicher Elternbericht", "Wöchentlich begrenzte Lehrpersonenhilfe"]
+      "features": ["Alles im Schüler-Plan", "Wöchentlicher Elternbericht", "Wöchentliche schriftliche Antworten einer Lehrperson"]
     },
-    "family": {
-      "name": "Familienplan",
-      "audience": "Familien, die das höchste Unterstützungsniveau und gemeinsame Nutzung wünschen.",
-      "cta": "Familienplan wählen",
-      "features": ["Alles im Plan mit Lehrpersonen", "5x mehr Zeit mit Lehrpersonen", "Vorteile für bis zu 3 Personen"]
+    "online_classroom": {
+      "name": "Online-Klassenzimmer",
+      "audience": "Familien, die Fragen live mit einer Lehrperson und ihrem Kind durcharbeiten möchten.",
+      "cta": "Online-Klassenzimmer wählen",
+      "features": ["Alles im Plan mit Lehrpersonen", "Online-Klassenzimmer mit einer Lehrperson (Whiteboard und Sprache)", "Wöchentliche schriftliche Antworten und Online-Klassenzimmer"]
     }
   }
 }

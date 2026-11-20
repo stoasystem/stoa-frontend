@@ -19,7 +19,7 @@ import { TeacherHelpRequestDetailPage } from '@/pages/teacher/TeacherHelpRequest
 import { ApiError } from '@/services/api/httpClient'
 import * as teacherApi from '@/services/teacher/teacherApi'
 import { teacherQueryKeys } from '@/services/teacher/teacherQueryKeys'
-import { teacherStatusActions, type TeacherHelpStatus } from '@/types/teacherHelp'
+import type { TeacherHelpStatus } from '@/types/teacherHelp'
 
 vi.mock('@/layouts/DashboardLayout', () => ({
   DashboardLayout: ({ children }: { children: ReactNode }) => <>{children}</>,
@@ -150,14 +150,6 @@ describe('a request that can no longer be read', () => {
 })
 
 describe('the status changes offered', () => {
-  it('match what advance_help_request moves', () => {
-    expect(teacherStatusActions('pending')).toEqual(['in_progress', 'resolved'])
-    expect(teacherStatusActions('in_progress')).toEqual(['resolved'])
-    for (const status of ['assigned', 'resolved', 'cancelled', 'withdrawn', 'expired', undefined] as const) {
-      expect(teacherStatusActions(status), String(status)).toEqual([])
-    }
-  })
-
   it('offers only finishing on a request already in progress', async () => {
     vi.mocked(teacherApi.getTeacherHelpRequestDetail).mockResolvedValue(detail('in_progress'))
     renderDetail()

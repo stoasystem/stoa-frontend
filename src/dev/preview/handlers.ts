@@ -33,6 +33,7 @@ import {
 import { starCountFrom } from '@/dev/preview/surfaces'
 import {
   classroomUnavailable,
+  demoAvailabilityForPlan,
   demoClassroomPass,
   demoTeacher,
   demoTeacherChangeStatus,
@@ -306,7 +307,7 @@ const routes: Array<[method: string, pattern: string, handler: Handler]> = [
       ? { conversationId: params.id, steps: DEMO_BROKEN_STEPS, updatedAt: now(), status: 'failed', retryable: true, failureCategory: 'provider_unavailable' }
       : { conversationId: params.id, steps: [], updatedAt: now(), status: 'completed' }
   }],
-  ['GET', '/teacher-help/availability', () => demoTeacherAvailability],
+  ['GET', '/teacher-help/availability', () => demoAvailabilityForPlan(demoTeacherAvailability)],
   // Kept, as the backend keeps it: the card is drawn from the request read back, not from this answer (#183).
   ['POST', '/teacher-help/request', ({ body }) => {
     const request = {

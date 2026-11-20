@@ -42,15 +42,15 @@
     },
     "teacher_supported": {
       "name": "Teacher-supported plan",
-      "audience": "Families who want limited weekly teacher Q&A.",
+      "audience": "Families who want a teacher to answer a few questions in writing each week.",
       "cta": "Choose teacher support",
-      "features": ["Everything in Student", "Weekly parent report", "Limited weekly teacher Q&A"]
+      "features": ["Everything in Student", "Weekly parent report", "Weekly text answers from a teacher"]
     },
-    "family": {
-      "name": "Family plan",
-      "audience": "Families who want the highest support level and shared access.",
-      "cta": "Choose family",
-      "features": ["Everything in Teacher-supported", "5x more teacher Q&A time", "Shared benefits for up to 3 people"]
+    "online_classroom": {
+      "name": "Online classroom plan",
+      "audience": "Families who want a teacher to work through questions live with their child.",
+      "cta": "Choose online classroom",
+      "features": ["Everything in Teacher-supported", "Online classroom with a teacher (whiteboard and voice)", "Weekly text answers and online classrooms"]
     }
   }
 }

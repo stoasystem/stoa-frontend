@@ -24,7 +24,7 @@ import type {
 const planLabels: Record<PurchasableSubscriptionPlan, string> = {
   student: '学生计划',
   teacher_supported: '教师支持计划',
-  family: '家庭计划',
+  online_classroom: '在线课堂计划',
 }
 
 export function CheckoutResultPage() {

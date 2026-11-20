@@ -19,13 +19,13 @@ import type {
   SubscriptionTier,
 } from '@/types/subscriptionOperations'
 
-const tierOrder: SubscriptionTier[] = ['free_trial', 'student', 'teacher_supported', 'family']
+const tierOrder: SubscriptionTier[] = ['free_trial', 'student', 'teacher_supported', 'online_classroom']
 
 const tierTone: Record<SubscriptionTier, string> = {
   free_trial: 'border-border/70 bg-card',
   student: 'border-primary/30 bg-[hsl(var(--stoa-brand-burgundy-soft))]',
   teacher_supported: 'border-amber-400/50 bg-amber-50/80',
-  family: 'border-emerald-400/50 bg-emerald-50/80',
+  online_classroom: 'border-emerald-400/50 bg-emerald-50/80',
 }
 
 export function ParentSubscriptionOperationsCard() {

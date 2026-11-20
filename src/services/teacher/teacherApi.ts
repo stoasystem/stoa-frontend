@@ -44,18 +44,20 @@ export async function getTeacherHelpRequestAttachment(requestId: string, attachm
   return response.data
 }
 
+/**
+ * Accept a request (`in_progress`) or finish it (`resolved`). No closing note:
+ * the backend stored it and nothing ever read it (#705).
+ */
 export async function updateTeacherHelpRequestStatus({
   requestId,
   status,
-  resolutionNote,
 }: {
   requestId: string
   status: TeacherHelpStatus
-  resolutionNote?: string
 }) {
   const response = await httpClient.patch<TeacherHelpRequestSummary>(
     apiPath`/teachers/me/help-requests/${requestId}`,
-    { status, resolutionNote },
+    { status },
   )
   return response.data
 }

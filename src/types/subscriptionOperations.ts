@@ -1,4 +1,4 @@
-export type SubscriptionTier = 'free_trial' | 'student' | 'teacher_supported' | 'family'
+export type SubscriptionTier = 'free_trial' | 'student' | 'teacher_supported' | 'online_classroom'
 
 export type SubscriptionRequestType = 'upgrade' | 'downgrade' | 'cancel'
 

@@ -37,7 +37,7 @@ export function PaymentSettingsPage() {
             <PageActions
               primary={
                 <Button asChild>
-                  <Link to="/billing?plan=family">Change plan</Link>
+                  <Link to="/billing?plan=online_classroom">Change plan</Link>
                 </Button>
               }
               secondary={<BackButton label="Billing" to="/billing" />}
@@ -96,7 +96,7 @@ export function PaymentSettingsPage() {
               </p>
               <div className="grid gap-3 sm:grid-cols-2">
                 <Button asChild>
-                  <Link to="/billing?plan=family">{showCheckoutPreview ? 'Review plan' : 'Open checkout'}</Link>
+                  <Link to="/billing?plan=online_classroom">{showCheckoutPreview ? 'Review plan' : 'Open checkout'}</Link>
                 </Button>
                 <Button asChild variant="outline">
                   <Link to="/support">Contact billing support</Link>

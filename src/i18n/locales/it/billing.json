@@ -50,22 +50,22 @@
     },
     "teacher_supported": {
       "name": "Piano con insegnante",
-      "audience": "Famiglie che vogliono domande settimanali limitate a un insegnante.",
+      "audience": "Famiglie che vogliono che un insegnante risponda per iscritto ad alcune domande ogni settimana.",
       "cta": "Scegli insegnante",
       "features": [
         "Tutto in Studente",
         "Report settimanale",
-        "Domande insegnante limitate ogni settimana"
+        "Risposte scritte di un insegnante ogni settimana"
       ]
     },
-    "family": {
-      "name": "Piano famiglia",
-      "audience": "Famiglie che vogliono il livello di supporto più alto e accesso condiviso.",
-      "cta": "Scegli famiglia",
+    "online_classroom": {
+      "name": "Piano Classe online",
+      "audience": "Famiglie che vogliono che un insegnante affronti le domande dal vivo con il proprio figlio.",
+      "cta": "Scegli Classe online",
       "features": [
         "Tutto in Con insegnante",
-        "5x più tempo insegnante",
-        "Vantaggi condivisi fino a 3 persone"
+        "Classe online con un insegnante (lavagna e voce)",
+        "Risposte scritte e classi online ogni settimana"
       ]
     }
   }

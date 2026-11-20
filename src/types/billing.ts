@@ -8,7 +8,8 @@ type BillingPlanPrice = {
   free_trial: 0
   student: 29
   teacher_supported: 89
-  family: 149
+  // PLACEHOLDER: price not decided yet (stoa-backend#474)
+  online_classroom: 149
 }
 
 type BillingPlanBase = {
@@ -164,7 +165,7 @@ export type BillingOverview = {
   inputPercentUsed: Record<string, number>
   outputPercentUsed: Record<string, number>
   teacherCasesRemaining: {
-    scope: 'none' | 'per_beneficiary' | 'shared_family'
+    scope: 'none' | 'per_beneficiary'
     remaining: number | null
     limit: number
     byBeneficiary: Record<string, number>

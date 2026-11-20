@@ -2,7 +2,6 @@
   "dashboardTitle": "Lehrpersonen-Anfragen",
   "dashboardDescription": "Prüfen Sie Schülerfragen, bei denen qualifizierte fachliche Orientierung hilft.",
   "loadRequestsFailed": "Anfragen konnten nicht geladen werden.",
-  "markInProgress": "Prüfung starten",
   "markResolved": "Als gelöst markieren",
   "notes": "Notizen der Lehrperson",
   "availability": {
@@ -51,8 +50,6 @@
       "body": "Sie ist abgelaufen, oder eine andere Lehrperson hat sie übernommen.",
       "back": "Zurück zu den Anfragen"
     },
-    "resolutionNote": "Abschlussnotiz",
-    "resolutionNotePlaceholder": "Erforderlich, bevor als gelöst markiert werden kann.",
     "updateFailed": "Status konnte nicht aktualisiert werden.",
     "changedElsewhere": "Diese Anfrage hat inzwischen eine andere Lehrperson übernommen, oder sie hat sich geändert. Die Ansicht wurde neu geladen – bitte prüfen Sie den aktuellen Stand.",
     "replyTitle": "Antwort der Lehrperson",
@@ -91,6 +88,11 @@
     "ended": {
       "withdrawn": "Die lernende Person hat diese Anfrage zurückgezogen. Es ist nichts mehr zu tun.",
       "expired": "Diese Anfrage ist abgelaufen, bevor jemand sie angenommen hat. Es ist nichts mehr zu tun."
+    },
+    "resolveHint": "Fertig geholfen? Markieren Sie die Anfrage als gelöst. Eine Antwort können Sie danach weiterhin ergänzen.",
+    "classroomHelp": {
+      "title": "Online-Klassenzimmer",
+      "body": "Die lernende Person hat das Online-Klassenzimmer gewählt. Helfen Sie dort mit Whiteboard und Sprachanruf. Wenn Sie fertig sind, markieren Sie die Anfrage als gelöst."
     }
   },
   "profile": {

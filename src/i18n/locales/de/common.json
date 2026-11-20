@@ -439,8 +439,8 @@
     "loadingAccount": "Konto wird geladen…",
     "pending": "Ausstehend",
     "plan": {
-      "family": "Familienplan",
       "free_trial": "Kostenlose Probephase",
+      "online_classroom": "Online-Klassenzimmer",
       "student": "Schüler-Plan",
       "teacher_supported": "Plan mit Lehrperson"
     },

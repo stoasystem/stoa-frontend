@@ -165,7 +165,7 @@ describe('the account operations page in German', () => {
           status: 'past_due',
           mode: 'test',
           subscriptionTier: 'teacher_supported',
-          requestedTier: 'family',
+          requestedTier: 'online_classroom',
           lastProviderEventType: 'invoice.payment_failed',
           events: [
             {
@@ -203,7 +203,7 @@ describe('the account operations page in German', () => {
     await screen.findByText(codes.billingStatus.past_due)
     expect(screen.getByRole('heading', { name: 'Bitte prüfen' })).toBeInTheDocument()
     expect(screen.getByText(codes.billingMode.test)).toBeInTheDocument()
-    expect(screen.getByText(codes.plan.family)).toBeInTheDocument()
+    expect(screen.getByText(codes.plan.online_classroom)).toBeInTheDocument()
     expect(screen.getByText(codes.plan.free_trial)).toBeInTheDocument()
     expect(screen.getByText(codes.binding.pending)).toBeInTheDocument()
     expect(screen.getByText(codes.eventType.invoice_payment_failed)).toBeInTheDocument()

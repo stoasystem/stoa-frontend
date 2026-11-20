@@ -111,7 +111,6 @@ function TeacherCases({ usage }: { usage: BillingOverview }) {
       data-testid="allowance-teacher-cases"
     >
       {remaining.toLocaleString(formattingLocale('en'))} of {support.limit.toLocaleString(formattingLocale('en'))} support cases remaining
-      {support.scope === 'shared_family' ? ' · shared family allowance' : ''}
     </div>
   )
 }

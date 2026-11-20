@@ -320,6 +320,16 @@ export const demoTeacherHelpRequests: TeacherHelpRequest[] = [
 export const demoTeacherAvailability: TeacherAvailability = {
   online: true,
   availableTeachers: 2,
-  // Two of the week's three requests left (stoa-backend#144), said under "Ask a teacher" (#506).
-  teacherSupport: { canRequest: true, remainingCases: 2, weeklyCases: 3, blockedReason: null, resetsAt: null },
+  // The online classroom plan (stoa-backend#482): two text answers left of
+  // two, one classroom of two, said under "Ask a teacher" (#506, #705). The
+  // top level is the text answer, as the backend sends it.
+  teacherSupport: {
+    canRequest: true,
+    remainingCases: 2,
+    weeklyCases: 2,
+    blockedReason: null,
+    resetsAt: null,
+    text: { canRequest: true, remainingCases: 2, weeklyCases: 2, blockedReason: null, resetsAt: null },
+    classroom: { canRequest: true, remainingCases: 1, weeklyCases: 2, blockedReason: null, resetsAt: null },
+  },
 }

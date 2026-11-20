@@ -439,8 +439,8 @@
     "loadingAccount": "Loading account…",
     "pending": "Pending",
     "plan": {
-      "family": "Family plan",
       "free_trial": "Free trial",
+      "online_classroom": "Online classroom plan",
       "student": "Student plan",
       "teacher_supported": "Teacher-supported plan"
     },

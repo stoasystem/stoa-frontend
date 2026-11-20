@@ -311,6 +311,8 @@ describe('Ask a teacher', () => {
     expect(ask.queryByText(/left this week/)).not.toBeInTheDocument()
 
     await userEvent.click(button)
+    // Asked how first (#705): a text answer.
+    await userEvent.click(await ask.findByRole('button', { name: 'Text answer' }))
     await waitFor(() => expect(requestHelpMock).toHaveBeenCalledWith({ conversationId: 'c1', mode: 'text' }))
   })
 
@@ -350,6 +352,8 @@ describe('Ask a teacher', () => {
     expect(await ask.findByText('2 teacher requests left this week')).toBeInTheDocument()
     const reads = availabilityMock.mock.calls.length
     await userEvent.click(ask.getByRole('button', { name: 'Ask a teacher' }))
+    // Asked how first (#705): a text answer.
+    await userEvent.click(await ask.findByRole('button', { name: 'Text answer' }))
 
     await waitFor(() => expect(requestHelpMock).toHaveBeenCalledWith({ conversationId: 'c1', mode: 'text' }))
     await waitFor(() => expect(availabilityMock.mock.calls.length).toBeGreaterThan(reads))
@@ -387,6 +391,8 @@ describe('Ask a teacher', () => {
     expect(ask.queryByText(/left this week/)).not.toBeInTheDocument()
     const reads = availabilityMock.mock.calls.length
     await userEvent.click(button)
+    // Asked how first (#705): a text answer.
+    await userEvent.click(await ask.findByRole('button', { name: 'Text answer' }))
     expect(await ask.findByRole('alert')).toHaveTextContent('This week\'s teacher requests are used up.')
     await waitFor(() => expect(availabilityMock.mock.calls.length).toBeGreaterThan(reads))
   })

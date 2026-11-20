@@ -19,7 +19,7 @@ type Equal<Left, Right> =
 type Expect<Value extends true> = Value
 
 export type CanonicalSubscriptionPlans = Expect<
-  Equal<SubscriptionPlan, 'free_trial' | 'student' | 'teacher_supported' | 'family'>
+  Equal<SubscriptionPlan, 'free_trial' | 'student' | 'teacher_supported' | 'online_classroom'>
 >
 
 export type CanonicalCheckoutOutcomes = Expect<

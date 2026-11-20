@@ -141,7 +141,7 @@
         "expired": "Scaduta"
       },
       "title": {
-        "pending": "Aiuto di un insegnante richiesto",
+        "pending": "Stiamo cercando un insegnante per te",
         "waiting_no_teacher": "Al momento nessun insegnante è libero",
         "assigned": "{{name}} si unirà a questa conversazione",
         "in_progress": "{{name}} ti sta aiutando",
@@ -185,13 +185,40 @@
         "text": "Risposta scritta",
         "classroom": "Classe online",
         "cancel": "Annulla",
-        "hint": "Risposta scritta: l’insegnante risponde qui nella conversazione. Classe online: lavagna e chiamata vocale, al computer o sul tablet."
+        "about": {
+          "text": "L’insegnante risponde qui nella conversazione.",
+          "classroom": "Lavagna e chiamata vocale, al computer o sul tablet."
+        },
+        "left_one": "Ancora {{count}} questa settimana",
+        "left_other": "Ancora {{count}} questa settimana",
+        "usedUp": "Esaurito questa settimana. Di nuovo disponibile la prossima settimana.",
+        "classroomUpgrade": "Disponibile con l’opzione Classe online.",
+        "notIncluded": "Non ancora attivo per te.",
+        "left_many": "Ancora {{count}} questa settimana"
       },
       "classroom": {
         "waiting": "Hai scelto la classe online. Appena un insegnante accetta la tua richiesta, puoi entrare da qui.",
         "ready": "Il tuo insegnante ti aspetta in classe.",
         "enter": "Entra in classe",
-        "biggerScreen": "La classe funziona al computer o sul tablet. Aprila lì."
+        "biggerScreen": "La classe funziona al computer o sul tablet. Aprila lì.",
+        "notIncluded": "La classe online è compresa nell’opzione Classe online, che per te non è ancora attiva. Puoi chiedere invece una risposta scritta.",
+        "usedUp": "Le classi online di questa settimana sono esaurite. Puoi chiedere invece una risposta scritta.",
+        "mic": {
+          "title": "La classe ha bisogno del tuo microfono",
+          "body": "In classe parli con il tuo insegnante in una chiamata vocale. Ora il browser ti chiederà se STOA può usare il microfono. Per favore, consentilo.",
+          "deniedTitle": "Il browser blocca il microfono",
+          "deniedBody": "Per parlare con il tuo insegnante, consenti il microfono per questo sito nelle impostazioni del browser (di solito il lucchetto accanto all’indirizzo), poi ricarica la pagina. Puoi anche entrare senza microfono e usare la lavagna e la chat.",
+          "continue": "Continua",
+          "withoutMic": "Entra senza microfono",
+          "cancel": "Non ora"
+        }
+      },
+      "remainingByMode": {
+        "line": "Questa settimana: {{list}}",
+        "left_one": "{{mode}}: ancora {{count}}",
+        "left_other": "{{mode}}: ancora {{count}}",
+        "upgrade": "{{mode}}: con l’opzione Classe online",
+        "left_many": "{{mode}}: ancora {{count}}"
       }
     },
     "practice": {
