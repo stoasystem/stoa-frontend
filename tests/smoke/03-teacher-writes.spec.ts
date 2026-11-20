@@ -24,11 +24,17 @@ import { record, rememberConversations } from './run'
 //            teacher@ assign practice to student@ for 14 days (CONTEXT.md,
 //            布置练习的权限), which items 12 and 13 need.
 //   item 12  one exercise assigned to student@ through the automation, then
-//            archived by teacher@ in the same test.
+//            archived by teacher@ in the same test. With no candidate left
+//            after the policy (2026-11-20: two stale, three of a source an
+//            assignment cannot be made from) nothing is written and the item
+//            passes with a coverage note.
 //   item 13  one exercise draft from the bank, accepted and delivered to
 //            student@ as an assignment, then the assignment and the draft
 //            archived. The backend has no delete: archived rows stay, hidden
-//            from the student.
+//            from the student. On 2026-11-20 accepting answered a bare 500 in
+//            production, twice (apigw-requestid=HKFA5jQ3ZicEKpQ=) while
+//            archiving the same draft worked, so this item fails until the
+//            backend is fixed; nothing reaches student@ meanwhile.
 //   item 14  one German equation question in Ask as student@: one generation
 //            request, the run's fourth of five, and a conversation in
 //            student@'s history like items 2 and 3. Behind the same switch
