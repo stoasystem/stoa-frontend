@@ -188,10 +188,11 @@ export function TeacherHelpRequestDetailPage() {
             {requestQuery.data.practiceContext && (
               <PracticeRequestContextCard context={requestQuery.data.practiceContext} />
             )}
-            {/* No "AI teacher tools" card: hidden from teachers (#704). */}
             {/* Practice for this student (#703): the backend lets the teacher holding
                 the request, or who resolved it in the last 14 days, assign to its
-                student (stoa-backend#495). Offered and not yet accepted is no relation. */}
+                student (stoa-backend#495). Offered and not yet accepted is no relation.
+                It is the page's one way to give the student exercises: the exercise
+                draft card (stoa-backend#519) stays off, as it did the same (#704). */}
             {canAct && (status === 'in_progress' || status === 'resolved') && (
               <Button asChild variant="outline">
                 <Link to={teacherPracticePathFor(requestQuery.data.student.id, requestQuery.data.requestId)}>

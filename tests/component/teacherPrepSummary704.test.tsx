@@ -3,7 +3,9 @@
  *
  * Nothing on it is generated, and the page asks the backend for no summary
  * (`assistance-summary`, `ai-tools/summary-draft`, both to be removed in
- * stoa-backend#518). The table's rows come as the backend picked them
+ * stoa-backend#518) and no AI tool at all: the exercise draft card
+ * (stoa-backend#519) is not put back, since "Recommend practice" (#703) on
+ * this page already gives the student exercises (decided 2026-11-20). The table's rows come as the backend picked them
  * (stoa-backend#517): the first question, the last one before asking for
  * help (`null` when it is the first, then one row), everything uploaded, and
  * the stars the Ask answers named (none, no row). The whole conversation is
@@ -134,7 +136,8 @@ describe('the preparation table (#704)', () => {
     // The client is watched: the page's other read goes through it.
     await waitFor(() => expect(sent).toContain('/practice/curriculum/catalog'))
     expect(sent.some((url) => url.includes('assistance-summary'))).toBe(false)
-    expect(sent.some((url) => url.includes('summary-draft'))).toBe(false)
+    expect(sent.some((url) => url.includes('ai-tools'))).toBe(false)
+    expect(screen.queryByRole('button', { name: /Entwurf/ })).toBeNull()
   })
 
   it('shows the first and the last question as the backend picked them', async () => {
