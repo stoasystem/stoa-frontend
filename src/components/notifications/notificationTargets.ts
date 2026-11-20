@@ -71,6 +71,10 @@ export const NOTIFICATION_EVENT_TARGETS: Partial<
     // A help request offered to this teacher names the request itself
     // (stoa-backend#141).
     teacher_help_dispatched: { question: (id) => teacherRequestPathFor(id) },
+    // An offer left unaccepted for 10 minutes paused this teacher
+    // (stoa-backend#530): the teacher resumes on the availability page. The
+    // id is the teacher's own, and the page needs none.
+    teacher_dispatch_paused: { teacher_availability: () => '/teacher/availability' },
   },
 }
 

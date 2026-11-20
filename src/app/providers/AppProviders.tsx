@@ -3,6 +3,7 @@ import { useEffect, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Toaster } from 'sonner'
 import { queryClient } from '@/app/query/queryClient'
+import { useBackgroundHeartbeat } from '@/hooks/notifications/useBackgroundHeartbeat'
 import { captureAttributionFromUrl } from '@/lib/utm'
 
 type AppProvidersProps = {
@@ -15,6 +16,9 @@ export function AppProviders({ children }: AppProvidersProps) {
   useEffect(() => {
     captureAttributionFromUrl()
   }, [])
+
+  // A teacher's or admin's hidden tab still counts as here (#717).
+  useBackgroundHeartbeat()
 
   /**
    * Refetch server-rendered content when the reader changes language.

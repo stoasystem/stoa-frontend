@@ -25,6 +25,15 @@ export async function getNotifications({ signal }: Read = {}) {
   return response.data
 }
 
+/*
+ * The background heartbeat (#717): the smallest read that tells the backend
+ * this teacher or admin is still here (stoa-backend#530 counts any request
+ * from such an account as seen). Its answer is thrown away.
+ */
+export async function sendNotificationHeartbeat() {
+  await httpClient.get<NotificationListResponse>('/notifications', { params: { limit: 1 } })
+}
+
 // The most `limit` the backend takes; past it the bell reads "99+".
 export const UNREAD_COUNT_LIMIT = 100
 
