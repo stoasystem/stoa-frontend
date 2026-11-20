@@ -1,7 +1,7 @@
 import { useId, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { MathRenderer } from '@/components/ui/MathRenderer'
-import type { KnowledgePoint, MessageQuote, StructuredAnswer } from '@/types/chat'
+import type { CommonMistake, KnowledgePoint, MessageQuote, StructuredAnswer } from '@/types/chat'
 
 /** A step's place in its answer, as a quote names it (stoa-backend#132). */
 export type AnswerStep = { messageId: string; index: number; text: string }
@@ -18,8 +18,21 @@ export function hasSections(structured: StructuredAnswer | null | undefined): st
       structured.answer?.trim() ||
       structured.hints?.length ||
       structured.similarExercises?.length ||
-      structured.knowledgePoints?.length,
+      structured.knowledgePoints?.length ||
+      commonMistakesOf(structured).length,
   )
+}
+
+/**
+ * The common mistakes an answer names (#683, stoa-backend#444): the backend
+ * always sends the list, but an answer read from before it has no key, and
+ * that counts as none. An entry without words is left out rather than drawn
+ * as an empty line.
+ */
+export function commonMistakesOf(structured: StructuredAnswer): CommonMistake[] {
+  const list = structured.commonMistakes
+  if (!Array.isArray(list)) return []
+  return list.filter((mistake) => typeof mistake?.text === 'string' && mistake.text.trim() !== '')
 }
 
 /**
@@ -41,7 +54,8 @@ export function quoteCaption(quote: MessageQuote, t: (key: string, options?: Rec
 
 /**
  * An answer in its sections (#506): the steps and the answer at once, each
- * step with its own "I don't get this step"; the hints and the similar
+ * step with its own "I don't get this step"; the common mistakes under the
+ * answer when it names any (#683); the hints and the similar
  * exercises closed, opened one at a time; the related knowledge points as a
  * line of small labels. At first sight it is no longer than the joined text
  * was, which also carried the first hint.
@@ -66,6 +80,7 @@ export function AskAnswerSections({
   const steps = structured.steps ?? []
   const answer = structured.answer?.trim() ?? ''
   const points = structured.knowledgePoints ?? []
+  const mistakes = commonMistakesOf(structured)
 
   return (
     <div data-answer-sections className="flex flex-col gap-3 whitespace-normal">
@@ -107,6 +122,31 @@ export function AskAnswerSections({
           <p className="m-0 whitespace-pre-wrap break-words">
             <MathRenderer>{answer}</MathRenderer>
           </p>
+        </div>
+      )}
+      {mistakes.length > 0 && (
+        // Common mistakes (#683): a section of its own, under the answer it
+        // belongs to. A caption like the answer's and a gold rule beside each
+        // one, so it reads as neither a numbered step nor a hint behind a
+        // button. It comes with the rest of the sections once the answer is
+        // whole, never while it is written, so nothing jumps in mid-stream.
+        // The error-cause category is kept on the entry but not shown: the
+        // ticket asks for the mistakes, not for their categories.
+        <div data-answer-section="commonMistakes" className="flex flex-col gap-1">
+          <p className="m-0 text-[12px] font-semibold uppercase tracking-[0.04em] text-caption">{t('ask.answer.commonMistakes')}</p>
+          <ul aria-label={t('ask.answer.commonMistakes')} className="m-0 flex list-none flex-col gap-1.5 p-0">
+            {mistakes.map((mistake, index) => (
+              <li
+                key={index}
+                data-common-mistake={index}
+                data-error-cause={mistake.errorCause ?? undefined}
+                className="whitespace-pre-wrap break-words border-0 border-l-2 border-solid"
+                style={{ borderColor: 'var(--lit, var(--star))', paddingLeft: 10 }}
+              >
+                <MathRenderer>{mistake.text}</MathRenderer>
+              </li>
+            ))}
+          </ul>
         </div>
       )}
       <RevealOneByOne

@@ -99,6 +99,22 @@ export type StructuredAnswer = {
    * before them; empty on a refusal.
    */
   quickReplies?: string[]
+  /**
+   * Up to two mistakes students commonly make on this kind of question
+   * (stoa-backend#444, #683), each one sentence in the answer's language that
+   * may carry LaTeX. Always an array from the backend; absent here on answers
+   * read from before it, which counts as none. Empty on a follow-up.
+   */
+  commonMistakes?: CommonMistake[]
+}
+
+/** The error-cause vocabulary shared with stoa-backend#445. */
+export type ErrorCause = 'structural' | 'deviation' | 'application' | 'metacognitive'
+
+/** One common mistake; `errorCause` is `null` when the model named no category. */
+export type CommonMistake = {
+  text: string
+  errorCause: ErrorCause | null
 }
 
 export type ChatMessage = {
