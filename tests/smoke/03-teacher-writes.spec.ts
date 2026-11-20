@@ -15,9 +15,11 @@ import { record, rememberConversations } from './run'
 //            student@'s cases for that way this Zurich week, not given back.
 //            Sent only while teacher@ is the one teacher on dispatch (backend
 //            #472: dispatch offers only to teachers who are available and
-//            online), so no real teacher is offered it. teacher@ is made
-//            available for that moment if it was not, and put back right after
-//            it takes the request. A classroom request opens a Daily room.
+//            online), so no real teacher is offered it. teacher@ is normally
+//            paused (decided 2026-11-20), so a real student's request is never
+//            offered to it; it is made available just for this request and put
+//            back to paused right after it takes it, whatever its status was.
+//            A classroom request opens a Daily room.
 //            The request is resolved in `afterAll`; resolved, it still lets
 //            teacher@ assign practice to student@ for 14 days (CONTEXT.md,
 //            布置练习的权限), which items 12 and 13 need.
@@ -136,14 +138,11 @@ test.describe('the teacher side that writes (items 11-13)', () => {
       return
     }
     const statusBefore = own.status ?? null
-    const statusChanged = statusBefore !== 'available'
     let requestId = ''
     let conversationId = ''
     let offered: HelpSummary | undefined
     try {
-      if (statusChanged) {
-        await teacher.call('PATCH', '/teachers/me/availability', { data: { status: 'available' }, expect: 200 })
-      }
+      await teacher.call('PATCH', '/teachers/me/availability', { data: { status: 'available' }, expect: 200 })
       await helpRequests(teacher) // the heartbeat that makes teacher@ online
       const onDispatch = (await student.call<StudentAvailability>('GET', '/teacher-help/availability', { expect: 200 }))
         .body.availableTeachers
@@ -196,10 +195,9 @@ test.describe('the teacher side that writes (items 11-13)', () => {
       expect(taken.body.status, 'teacher@ took the request').toBe('in_progress')
       expect(taken.body.mode, 'taking it keeps the way').toBe(mode)
     } finally {
-      // Off dispatch again as soon as teacher@ no longer has to be on it.
-      if (statusChanged) {
-        await teacher.call('PATCH', '/teachers/me/availability', { data: { status: 'paused' }, expect: 200 })
-      }
+      // Off dispatch again as soon as teacher@ no longer has to be on it, and
+      // paused even if it was found available: that is its normal state.
+      await teacher.call('PATCH', '/teachers/me/availability', { data: { status: 'paused' }, expect: 200 })
     }
 
     const seen = (await student.call<StudentHelpView>('GET', `/teacher-help/conversations/${conversationId}/request`, {
@@ -229,7 +227,7 @@ test.describe('the teacher side that writes (items 11-13)', () => {
       requestId,
       conversationId,
       teacherStatusBefore: statusBefore,
-      teacherStatusPutBack: statusChanged ? 'paused' : null,
+      teacherStatusAfter: 'paused',
       studentView: { status: seen.status, mode: seen.mode, teacherName: seen.teacherName ?? null },
       classroom,
       note: `student@ 本周的${mode === 'classroom' ? '课堂' : '文字'}求助用掉一次，不归还`,

@@ -11,6 +11,9 @@ import { deploymentState, record } from './run'
 //   (backend #472): for five minutes afterwards teacher@ counts as online, and
 //   if its own status is "available" a real student's request can be offered
 //   to it. The role sign-in in 02-read-only.spec.ts already does the same.
+//   So teacher@ is normally paused (decided 2026-11-20); item 11 flags it
+//   when it is found available, and 03-teacher-writes.spec.ts item 11 leaves
+//   it paused.
 // * `POST .../assignment-automation/batches/preview` is a POST that writes
 //   nothing (`preview_assignment_automation_batch`: the batch id is a hash,
 //   no row is stored), so item 12 reads it here.
@@ -139,6 +142,17 @@ test('item 11: each way of asking a teacher is stood for and shown (#719, backen
     expect(detail.mode, 'the detail says the same way as the queue').toBe(newest.mode)
   }
 
+  // Not a failure, since a person may have switched it on to try the teacher
+  // side by hand, but worth seeing: while available and online it can be
+  // offered a real student's request nobody is watching for.
+  const exposed = own.body.status === 'available'
+  if (exposed) {
+    testInfo.annotations.push({
+      type: 'warning',
+      description: 'teacher@ is available: set it to paused, or a maths request from a real student can be offered to it',
+    })
+  }
+
   await record(testInfo, 'item11-help-modes', {
     student,
     agent,
@@ -153,7 +167,9 @@ test('item 11: each way of asking a teacher is stood for and shown (#719, backen
       }, {}),
       newest: newest && { requestId: newest.requestId, status: newest.status, mode: newest.mode, subject: newest.subject },
     },
-    note: 'teacher@ 读了求助列表，接下来 5 分钟算在线 (#472)',
+    note: exposed
+      ? 'teacher@ 是可接单状态：应改成暂停，否则接下来 5 分钟可能被派到真实学生的求助 (#472)'
+      : 'teacher@ 读了求助列表，接下来 5 分钟算在线 (#472)；状态不是可接单，不会被派单',
   })
 
   // The screens: the queue, and the newest request's page when there is one.
