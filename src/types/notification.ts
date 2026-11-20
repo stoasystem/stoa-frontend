@@ -5,6 +5,7 @@ export type NotificationEventType =
   | 'teacher_takeover'
   | 'teacher_reply'
   | 'teacher_help_dispatched'
+  | 'teacher_dispatch_paused'
   | 'moderation_case_update'
   | 'subscription_request_update'
   | 'learning_profile_update'

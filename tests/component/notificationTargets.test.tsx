@@ -157,6 +157,30 @@ describe('a notification in the bell', () => {
     expect(markRead).toHaveBeenCalledWith('e-8')
   })
 
+  // stoa-backend#530: an offer left 10 minutes paused the teacher, who
+  // resumes on the availability page (#717).
+  it('opens availability for a teacher whose dispatch was paused', async () => {
+    renderBell('teacher', [
+      event({
+        eventId: 'e-9',
+        recipientRole: 'teacher',
+        eventType: 'teacher_dispatch_paused',
+        targetType: 'teacher_availability',
+        targetId: 'u-1',
+        title: 'Annahme pausiert',
+        summary: 'Eine Anfrage wurde 10 Minuten nicht angenommen.',
+        metadata: { dispatch_id: 'd-1' },
+      }),
+    ])
+    await openBell()
+
+    // Written by the backend in the teacher's language; shown as sent.
+    await userEvent.click(screen.getByRole('button', { name: /Annahme pausiert/ }))
+
+    expect(pathname).toBe('/teacher/availability')
+    expect(markRead).toHaveBeenCalledWith('e-9')
+  })
+
   it("still opens a teacher's queue for a question, which is not a help request", async () => {
     renderBell('teacher', [
       event({ recipientRole: 'teacher', eventType: 'teacher_requested', targetType: 'question', targetId: 'q-3', title: 'Help wanted' }),
@@ -286,6 +310,18 @@ describe('every notification target', () => {
     [{ eventType: 'teacher_help_dispatched', targetType: 'conversation', targetId: 'req-1' }, null],
   ])('reaches an offered request only by its event (%o)', (payload, path) => {
     expect(notificationTargetPath(payload as unknown as NotificationEvent, 'teacher')).toBe(path)
+  })
+
+  // #717: a paused teacher's notification leads to availability, and only by
+  // its event; no other role has the page, so none has a target.
+  it('reaches availability only by the pause event, and only as a teacher', () => {
+    const paused = { eventType: 'teacher_dispatch_paused', targetType: 'teacher_availability', targetId: 'u-1' } as const
+    expect(notificationTargetPath(paused, 'teacher')).toBe('/teacher/availability')
+    expect(notificationTargetPath({ ...paused, targetId: '' }, 'teacher')).toBe('/teacher/availability')
+    expect(notificationTargetPath({ targetType: 'teacher_availability', targetId: 'u-1' }, 'teacher')).toBeNull()
+    for (const role of ALL_ROLES.filter((role) => role !== 'teacher')) {
+      expect(notificationTargetPath(paused, role)).toBeNull()
+    }
   })
 
   it('trims a conversation id the backend padded', () => {
