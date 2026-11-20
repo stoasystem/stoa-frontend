@@ -3,91 +3,48 @@
  * it again, and STOA's backend turns the recording into text
  * (`POST /students/me/voice-questions/transcriptions`, stoa-backend#469).
  *
- * The backend takes the recording as the browser's MediaRecorder made it,
- * never transcoded: WebM or Ogg with Opus, or MP4 with AAC, at most 2 MiB and
- * 60 seconds (`voice_audio.py`). So the recorder is asked for one of those
- * three, in the order below, and a browser that offers none of them gets the
- * device's own dictation instead (#515), as before.
+ * The speech model (Voxtral on Bedrock) takes only mp3 and wav
+ * (stoa-backend#542), and MediaRecorder makes neither: Chrome records WebM,
+ * Safari MP4. So the page records PCM itself with Web Audio and writes a
+ * 16 kHz mono 16-bit WAV (#726, `wav.ts`), at most 2 MiB and 60 seconds. A
+ * browser without an audio worklet gets the device's own dictation instead
+ * (#515), as before.
  */
 
-/** The longest recording the backend takes; the recorder stops itself here. */
+/** The longest recording the backend takes; the recording stops itself here. */
 export const MAX_RECORDING_SECONDS = 60
-/** The largest recording the backend takes (`MAX_BYTES`). */
+/** The largest recording the backend takes (`MAX_BYTES`); a full minute of WAV is 1.92 MB. */
 export const MAX_RECORDING_BYTES = 2 * 1024 * 1024
-/**
- * Speech needs little: at 32 kbit/s a full minute is about 240 KB, far under
- * the 2 MiB the backend takes. A browser that ignores the hint is still
- * checked before anything is sent.
- */
-export const RECORDING_BITS_PER_SECOND = 32_000
-
-/*
- * WebM first: Chrome, Edge and Firefox record it. MP4 with AAC is what Safari
- * records (macOS and iOS). Chrome also offers `audio/mp4`, but with Opus in
- * it rather than AAC, which is not what the backend was built for; asking for
- * WebM first keeps Chrome on WebM. Ogg is Firefox's other one.
- */
-export const RECORDING_TYPES = [
-  'audio/webm;codecs=opus',
-  'audio/ogg;codecs=opus',
-  'audio/mp4;codecs=mp4a.40.2',
-  'audio/mp4',
-] as const
-
-/** The media types the backend accepts, parameters (`;codecs=`) aside (`DECLARED_TYPES`). */
-const ACCEPTED_MEDIA_TYPES = new Set([
-  'audio/webm',
-  'video/webm',
-  'audio/ogg',
-  'application/ogg',
-  'audio/mp4',
-  'audio/m4a',
-  'audio/x-m4a',
-  'video/mp4',
-])
-
-/** `audio/webm;codecs=opus` -> `audio/webm`. */
-export function mediaTypeOf(type: string): string {
-  return type.split(';', 1)[0].trim().toLowerCase()
-}
-
-/** The first of `RECORDING_TYPES` this browser's MediaRecorder can make, or `null`. */
-export function pickRecordingType(isTypeSupported: (type: string) => boolean): string | null {
-  for (const type of RECORDING_TYPES) {
-    try {
-      if (isTypeSupported(type)) return type
-    } catch {
-      // An old engine that throws for an unknown type has not got it.
-    }
-  }
-  return null
-}
-
-/**
- * The type to declare for a finished recording: what the recorder says it
- * made, when that is one the backend takes, else what it was asked for. The
- * backend checks the declared type against the bytes, so it must be the
- * recorder's own, never a guess.
- */
-export function declaredType(recorderType: string | undefined, asked: string): string {
-  if (recorderType && ACCEPTED_MEDIA_TYPES.has(mediaTypeOf(recorderType))) return recorderType
-  return asked
-}
+/** What a recording is declared as (`Content-Type`). */
+export const RECORDING_TYPE = 'audio/wav'
 
 interface RecordingWindow {
-  MediaRecorder?: { isTypeSupported?: (type: string) => boolean }
+  AudioContext?: unknown
+  AudioWorkletNode?: unknown
   navigator?: { mediaDevices?: { getUserMedia?: unknown } }
 }
 
-/** The recording type this browser would use, or `null` when it cannot record a voice question. */
-export function recordingTypeHere(
+/**
+ * Whether this browser can record a voice question: Web Audio with an audio
+ * worklet (Chrome 66, Safari 14.1, Firefox 76, all on a secure page) and a
+ * microphone to ask for.
+ */
+export function canRecordVoiceHere(
   win: RecordingWindow | undefined = typeof window === 'undefined' ? undefined : (window as unknown as RecordingWindow),
-): string | null {
-  const recorder = win?.MediaRecorder
-  if (!recorder || typeof recorder.isTypeSupported !== 'function') return null
-  if (typeof win?.navigator?.mediaDevices?.getUserMedia !== 'function') return null
-  return pickRecordingType((type) => recorder.isTypeSupported!(type))
+): boolean {
+  if (typeof win?.AudioContext !== 'function') return false
+  if (typeof win.AudioWorkletNode !== 'function') return false
+  return typeof win.navigator?.mediaDevices?.getUserMedia === 'function'
 }
+
+/**
+ * How many times one recording is sent before "try again" stops being
+ * offered: the backend allows one retry of the same recording after a 503
+ * (`max_attempts: 1` in `client-error-actions.json`, stoa-backend#542), and
+ * the child should not be left pressing a button that cannot work. Being
+ * offline is not counted: that is the child's connection, not the server.
+ */
+export const MAX_SENDS_PER_RECORDING = 2
 
 /**
  * Why a voice question did not become text. Each has its own sentence for
@@ -95,15 +52,17 @@ export function recordingTypeHere(
  *
  * From the backend (`client-error-actions.json`, domain `voice_question`):
  *   notAllowed   403 `voice_questions_not_allowed`: no linked parent has it on (any more)
- *   unsupported  415 `voice_recording_unsupported`
+ *   unsupported  415 `voice_recording_unsupported`: not the 16 kHz mono WAV agreed (a bug here)
  *   tooLarge     413 `voice_recording_too_large`, or over 2 MiB before sending
  *   tooLong      422 `voice_recording_too_long`
  *   unreadable   422 `voice_recording_unreadable`
  *   silent       422 `voice_recording_silent`, or nothing recorded or heard
  *   dailyLimit   429 `voice_transcription_daily_limit`: today's 30 are used
- *   unavailable  503 `voice_transcription_unavailable`: try again shortly
+ *   unavailable  503 `voice_transcription_unavailable`: try again shortly, once
+ *   refused      502 `voice_transcription_refused`: the model refused it; not for retrying (stoa-backend#542)
  *   offline      the request did not reach the server
  *   failed       anything else
+ *   gaveUp       the same recording failed `MAX_SENDS_PER_RECORDING` times
  * From the browser:
  *   micBlocked   the microphone was refused (by the child or the browser's settings)
  *   micMissing   no microphone, or it is busy elsewhere
@@ -118,8 +77,10 @@ export type VoiceFailureKind =
   | 'silent'
   | 'dailyLimit'
   | 'unavailable'
+  | 'refused'
   | 'offline'
   | 'failed'
+  | 'gaveUp'
   | 'micBlocked'
   | 'micMissing'
   | 'recorder'
@@ -140,8 +101,10 @@ export const VOICE_RETRY: Record<VoiceFailureKind, VoiceRetry> = {
   silent: 'record',
   dailyLimit: null,
   unavailable: 'send',
+  refused: null,
   offline: 'send',
   failed: 'send',
+  gaveUp: null,
   micBlocked: null,
   micMissing: 'record',
   recorder: 'record',
@@ -156,6 +119,7 @@ export const VOICE_FAILURE_CODES: Record<string, VoiceFailureKind> = {
   voice_recording_silent: 'silent',
   voice_transcription_daily_limit: 'dailyLimit',
   voice_transcription_unavailable: 'unavailable',
+  voice_transcription_refused: 'refused',
 }
 
 /** A transcription that did not come back as text, and why. */

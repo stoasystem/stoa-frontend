@@ -60,8 +60,10 @@
         "silent": "Non ho sentito niente. Parla un po’ più vicino al microfono e riprova.",
         "dailyLimit": "Per oggi hai usato tutte le domande a voce. Domani potrai di nuovo; fino ad allora puoi scrivere.",
         "unavailable": "La trasformazione in testo al momento non funziona. Riprova tra poco o scrivi la tua domanda.",
+        "refused": "Le domande vocali al momento non funzionano. Scrivi la tua domanda, per favore.",
         "offline": "Nessuna connessione a STOA. Controlla internet e riprova.",
         "failed": "Non ha funzionato. Riprova o scrivi la tua domanda.",
+        "gaveUp": "Ancora non funziona. Per ora scrivi la tua domanda; più tardi potrai riprovare a voce.",
         "micBlocked": "Il browser non permette a STOA di usare il microfono. Puoi consentirlo nelle impostazioni del browser.",
         "micMissing": "Non trovo un microfono, oppure è già in uso altrove. Riprova o scrivi la tua domanda.",
         "recorder": "La registrazione si è interrotta. Riprova."

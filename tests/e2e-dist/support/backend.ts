@@ -8,6 +8,8 @@ export type BackendRequest = {
   query: URLSearchParams
   headers: Record<string, string>
   body: unknown
+  /** The body as sent, for one that is not JSON (a voice recording, #726). */
+  bytes: Buffer | null
 }
 /** `raw` answers with bytes, not JSON: a file's content route. */
 export type Reply = { status: number; body?: unknown; raw?: { contentType: string; bytes: Buffer } }
@@ -92,6 +94,7 @@ export class MockBackend {
         query: url.searchParams,
         headers: request.headers(),
         body: undefined,
+        bytes: request.postDataBuffer(),
       }
       try {
         backendRequest.body = jsonBody(request)
@@ -99,7 +102,7 @@ export class MockBackend {
         this.problems.push(`${where}: sends a body that says it is JSON and is not`)
       }
       this.calls.push({ ...backendRequest, template: op.template })
-      this.note(where, 'request', this.contract.checkRequest(op, backendRequest.body))
+      this.note(where, 'request', this.contract.checkRequest(op, backendRequest.body, backendRequest.headers['content-type']))
       this.note(where, 'query', this.contract.checkQuery(op, url.searchParams))
 
       const refusal = this.gate?.(op.method, op.template) ?? null

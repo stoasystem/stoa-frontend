@@ -78,8 +78,18 @@ export class Contract {
   }
 
   /** Why a request body breaks the contract, or null when it keeps it. */
-  checkRequest(op: MatchedOperation, body: unknown): string | null {
-    const schema = op.operation.requestBody?.content?.['application/json']?.schema
+  checkRequest(op: MatchedOperation, body: unknown, contentType?: string): string | null {
+    const content = op.operation.requestBody?.content ?? {}
+    // A body that is not JSON (a voice recording, #726): its declared media
+    // type must be one the operation names; its bytes are the mock's to read.
+    const mediaType = (contentType ?? '').split(';', 1)[0].trim().toLowerCase()
+    if (body !== undefined && mediaType && mediaType !== 'application/json' && !mediaType.endsWith('+json')) {
+      const taken = Object.keys(content).filter((type) => type !== 'application/json')
+      if (taken.length > 0) {
+        return taken.includes(mediaType) ? null : `sends ${mediaType}, which the operation does not take (it takes ${taken.join(', ')})`
+      }
+    }
+    const schema = content['application/json']?.schema
     if (schema === undefined) return body === undefined ? null : 'sends a body the operation does not take'
     if (typeof body === 'string') return 'sends a body that is not JSON'
     return this.check(`${op.method} ${op.template} request`, schema, body)
