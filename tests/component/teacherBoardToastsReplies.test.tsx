@@ -134,9 +134,7 @@ describe('stats board', () => {
     vi.mocked(teacherApi.getTeacherHelpRequestDetail).mockResolvedValue(detail(status))
     vi.mocked(teacherApi.updateTeacherHelpRequestStatus).mockResolvedValue({ requestId: 'r1', status: 'resolved' } as never)
     const { invalidatedKeys } = renderDetail()
-    if (status === 'in_progress') {
-      await userEvent.type(await screen.findByLabelText('Abschlussnotiz'), 'Erledigt')
-    }
+    // No closing note before resolving (#705).
     await userEvent.click(await screen.findByRole('button', { name: button }))
     await waitFor(() => expect(invalidatedKeys()).toContain(STATS_KEY))
     expect(toast.success).toHaveBeenCalledWith('Status der Anfrage aktualisiert.')

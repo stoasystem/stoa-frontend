@@ -1,9 +1,12 @@
 /**
- * #705 parts 2 and 3 (stoa-backend#480): how a student asks to be helped, a
- * text answer or the online classroom. The student chooses only where the
- * classroom is offered (off by default); every request carries its mode; a
- * request without one is a text answer. The teacher sees the mode, accepts
- * first, and then replies here (text) or goes into the classroom (classroom).
+ * #705 (stoa-backend#480, #482): how a student asks to be helped, a text
+ * answer or the online classroom. The student always chooses; a way this
+ * week's allowance does not allow is shown locked, with why (not switched on:
+ * it comes with the online classroom option; used up this week). Every request
+ * carries its mode; a request without one is a text answer. A classroom is
+ * entered once a teacher accepted, after a word about the microphone. The
+ * teacher sees the mode, accepts first, then replies here (text) or goes into
+ * the classroom (classroom), and finishes with one "Mark resolved".
  */
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { render, screen, waitFor } from '@testing-library/react'
@@ -27,14 +30,22 @@ import fr from '@/i18n/locales/fr/teacher.json'
 import italian from '@/i18n/locales/it/teacher.json'
 import { HelpRequestList } from '@/components/teacher/HelpRequestList'
 import { TeacherHelpAction, TeacherHelpStatusCard } from '@/features/ask/teacherHelp/TeacherHelp'
-import { classroomHelpOffered } from '@/lib/classroomHelp'
+import { blockedKeyOf, requestErrorKey } from '@/features/ask/teacherHelp/useTeacherHelp'
+import { askForMicrophone, readMicPermission } from '@/features/classroom/micPermission'
 import { notificationText } from '@/lib/notificationCopy'
 import { TeacherHelpRequestDetailPage } from '@/pages/teacher/TeacherHelpRequestDetailPage'
-import { httpClient } from '@/services/api/httpClient'
+import { ApiError, httpClient } from '@/services/api/httpClient'
 import * as teacherApi from '@/services/teacher/teacherApi'
 import { createTeacherHelpRequest } from '@/services/teacherHelp/teacherHelpApi'
 import type { TeacherHelpRequestSummary } from '@/types/teacher'
-import { helpModeOf, type HelpMode, type TeacherHelpRequest, type TeacherHelpStatus } from '@/types/teacherHelp'
+import {
+  helpModeOf,
+  type HelpMode,
+  type TeacherHelpRequest,
+  type TeacherHelpStatus,
+  type TeacherSupportModeStanding,
+  type TeacherSupportStanding,
+} from '@/types/teacherHelp'
 
 vi.mock('@/layouts/DashboardLayout', () => ({
   DashboardLayout: ({ children }: { children: ReactNode }) => <>{children}</>,
@@ -49,6 +60,10 @@ vi.mock('@/hooks/practice/useCurriculumCatalogQuery', () => ({
   useCurriculumCatalogQuery: () => ({ data: undefined, isLoading: false, isError: false }),
 }))
 vi.mock('sonner', () => ({ toast: { success: vi.fn(), error: vi.fn(), info: vi.fn() } }))
+vi.mock('@/features/classroom/micPermission', () => ({
+  readMicPermission: vi.fn(),
+  askForMicrophone: vi.fn(),
+}))
 
 function wrap(children: ReactNode) {
   const client = new QueryClient({ defaultOptions: { queries: { retry: false } } })
@@ -67,6 +82,8 @@ function wrap(children: ReactNode) {
 
 beforeEach(async () => {
   vi.clearAllMocks()
+  vi.mocked(readMicPermission).mockResolvedValue('granted')
+  vi.mocked(askForMicrophone).mockResolvedValue(true)
   sessionStorage.clear()
   await i18n.changeLanguage('de')
 })
@@ -92,52 +109,127 @@ describe('a request’s mode', () => {
   })
 })
 
-describe('the classroom switch', () => {
-  it('is off by default', () => {
-    expect(classroomHelpOffered()).toBe(false)
-  })
+const way = (
+  canRequest: boolean,
+  remainingCases: number,
+  weeklyCases: number,
+  blockedReason: TeacherSupportModeStanding['blockedReason'] = null,
+): TeacherSupportModeStanding => ({ canRequest, remainingCases, weeklyCases, blockedReason, resetsAt: null })
 
-  it('is on with VITE_CLASSROOM_HELP=on', () => {
-    vi.stubEnv('VITE_CLASSROOM_HELP', 'on')
-    expect(classroomHelpOffered()).toBe(true)
-  })
+/** This week's standing as stoa-backend#482 sends it: the top level is the text answer. */
+const standing = (text: TeacherSupportModeStanding, classroom?: TeacherSupportModeStanding): TeacherSupportStanding => ({
+  ...text,
+  text,
+  ...(classroom ? { classroom } : {}),
 })
 
+const TEACHER_SUPPORTED = standing(way(true, 2, 2), way(false, 0, 0, 'teacher_support_not_included'))
+const ONLINE_CLASSROOM = standing(way(true, 2, 2), way(true, 1, 2))
+const CLASSROOM_USED_UP = standing(way(true, 1, 2), way(false, 0, 2, 'teacher_support_allowance_exhausted'))
+const TEXT_USED_UP = standing(way(false, 0, 2, 'teacher_support_allowance_exhausted'), way(true, 2, 2))
+
 describe('"Ask a teacher"', () => {
-  const action = (props: { classroomOffered?: boolean; onRequest: (mode: HelpMode) => void }) =>
+  const action = (props: { onRequest: (mode: HelpMode) => void; support?: TeacherSupportStanding | null; suggested?: boolean }) =>
     render(
       <I18nextProvider i18n={i18n}>
         <TeacherHelpAction requesting={false} teachersOnline support={null} {...props} />
       </I18nextProvider>,
     )
+  const option = (mode: HelpMode) => document.querySelector<HTMLButtonElement>(`[data-help-mode-option="${mode}"]`)!
+  const open = () => userEvent.click(screen.getByRole('button', { name: deChat.ask.help.request }))
 
-  it('asks for a text answer at once while the classroom is not offered', async () => {
+  it('always asks how first: both ways, focus on the first', async () => {
     const onRequest = vi.fn()
     action({ onRequest })
-    await userEvent.click(screen.getByRole('button', { name: deChat.ask.help.request }))
-    expect(onRequest).toHaveBeenCalledWith('text')
-    expect(screen.queryByRole('button', { name: deChat.ask.help.mode.classroom })).toBeNull()
-  })
-
-  it('asks how first where the classroom is offered', async () => {
-    const onRequest = vi.fn()
-    action({ onRequest, classroomOffered: true })
-    await userEvent.click(screen.getByRole('button', { name: deChat.ask.help.request }))
+    await open()
     expect(onRequest).not.toHaveBeenCalled()
     expect(screen.getByRole('group', { name: deChat.ask.help.mode.choose })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: deChat.ask.help.mode.text })).toHaveFocus()
+    expect(option('text')).toHaveFocus()
+    expect(option('classroom')).not.toHaveAttribute('aria-disabled')
 
-    await userEvent.click(screen.getByRole('button', { name: deChat.ask.help.mode.classroom }))
+    await userEvent.click(option('classroom'))
     expect(onRequest).toHaveBeenCalledWith('classroom')
   })
 
-  it('can be called off without asking', async () => {
+  it('Teacher supported: the classroom is locked with the upgrade, a text answer is asked', async () => {
     const onRequest = vi.fn()
-    action({ onRequest, classroomOffered: true })
-    await userEvent.click(screen.getByRole('button', { name: deChat.ask.help.request }))
+    action({ onRequest, support: TEACHER_SUPPORTED })
+    await open()
+    expect(option('classroom')).toHaveAttribute('aria-disabled', 'true')
+    expect(option('classroom')).toHaveAccessibleDescription(expect.stringContaining(deChat.ask.help.mode.classroomUpgrade))
+    expect(option('text')).toHaveAccessibleDescription(expect.stringContaining('Diese Woche noch 2'))
+
+    await userEvent.click(option('classroom'))
+    expect(onRequest).not.toHaveBeenCalled()
+    await userEvent.click(option('text'))
+    expect(onRequest).toHaveBeenCalledWith('text')
+  })
+
+  it('this week’s classrooms used up: said, and locked', async () => {
+    action({ onRequest: vi.fn(), support: CLASSROOM_USED_UP })
+    await open()
+    expect(option('classroom')).toHaveAttribute('aria-disabled', 'true')
+    expect(option('classroom')).toHaveAccessibleDescription(expect.stringContaining(deChat.ask.help.mode.usedUp))
+    expect(option('classroom')).not.toHaveAccessibleDescription(expect.stringContaining(deChat.ask.help.mode.classroomUpgrade))
+  })
+
+  it('text answers used up but a classroom left: the button stays, focus on the classroom', async () => {
+    action({ onRequest: vi.fn(), support: TEXT_USED_UP })
+    await open()
+    expect(option('text')).toHaveAttribute('aria-disabled', 'true')
+    expect(option('classroom')).toHaveFocus()
+  })
+
+  it('can be called off without asking, focus back on the button', async () => {
+    const onRequest = vi.fn()
+    action({ onRequest })
+    await open()
     await userEvent.click(screen.getByRole('button', { name: deChat.ask.help.mode.cancel }))
     expect(onRequest).not.toHaveBeenCalled()
-    expect(screen.getByRole('button', { name: deChat.ask.help.request })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: deChat.ask.help.request })).toHaveFocus()
+  })
+
+  it('a suggesting card counts each way on its own, the missing one as an upgrade', () => {
+    action({ onRequest: vi.fn(), support: TEACHER_SUPPORTED, suggested: true })
+    expect(document.querySelector('[data-help-remaining]')?.textContent).toBe(
+      'Diese Woche: Textantwort noch 2 · Online-Klassenzimmer mit der Option Online-Klassenzimmer',
+    )
+  })
+
+  it('… and both counts with the classroom', async () => {
+    await i18n.changeLanguage('en')
+    action({ onRequest: vi.fn(), support: ONLINE_CLASSROOM, suggested: true })
+    expect(document.querySelector('[data-help-remaining]')?.textContent).toBe('This week: Text answer 2 left · Online classroom 1 left')
+  })
+
+  it('an older server without the classroom keeps the one count', () => {
+    action({ onRequest: vi.fn(), support: way(true, 2, 3), suggested: true })
+    expect(document.querySelector('[data-help-remaining]')?.textContent).toBe('Diese Woche noch 2 Anfragen an eine Lehrperson')
+  })
+})
+
+describe('when "Ask a teacher" is greyed', () => {
+  it('only when neither way can be asked', () => {
+    expect(blockedKeyOf(TEACHER_SUPPORTED, false)).toBeNull()
+    expect(blockedKeyOf(TEXT_USED_UP, false)).toBeNull()
+    expect(blockedKeyOf(CLASSROOM_USED_UP, false)).toBeNull()
+    expect(blockedKeyOf(null, false)).toBeNull()
+    // Neither switched on: as before.
+    const none = standing(way(false, 0, 0, 'teacher_support_not_included'), way(false, 0, 0, 'teacher_support_not_included'))
+    expect(blockedKeyOf(none, false)).toBe('teacher.errors.planDenied')
+    // Text used up, no classroom: used up is what comes back.
+    const textGone = standing(way(false, 0, 2, 'teacher_support_allowance_exhausted'), way(false, 0, 0, 'teacher_support_not_included'))
+    expect(blockedKeyOf(textGone, false)).toBe('teacher.errors.allowanceExhausted')
+    // An older server: the text answer alone decides, as before.
+    expect(blockedKeyOf(way(false, 0, 2, 'teacher_support_allowance_exhausted'), false)).toBe('teacher.errors.allowanceExhausted')
+    expect(blockedKeyOf(ONLINE_CLASSROOM, true)).toBe('ask.help.usagePeriodPaused')
+  })
+
+  it('a classroom refused says so of the classroom, not of teacher help', () => {
+    const refused = (code: string) => new ApiError('x', { status: 403, code })
+    expect(requestErrorKey(refused('teacher_support_not_included'), 'classroom')).toBe('ask.help.classroom.notIncluded')
+    expect(requestErrorKey(refused('teacher_support_allowance_exhausted'), 'classroom')).toBe('ask.help.classroom.usedUp')
+    expect(requestErrorKey(refused('teacher_support_not_included'), 'text')).toBe('teacher.errors.planDenied')
   })
 })
 
@@ -155,11 +247,59 @@ describe('the student’s card', () => {
   }
   const ENTER = { name: deChat.ask.help.classroom.enter }
 
-  it('offers the classroom once a teacher accepted a classroom request', async () => {
+  const MIC = deChat.ask.help.classroom.mic
+
+  it('offers the classroom once a teacher accepted; a microphone allowed before goes straight in', async () => {
     const enter = card('in_progress', 'classroom')
     expect(screen.getByText(deChat.ask.help.classroom.ready)).toBeInTheDocument()
     await userEvent.click(screen.getByRole('button', ENTER))
+    await waitFor(() => expect(enter).toHaveBeenCalled())
+    expect(askForMicrophone).not.toHaveBeenCalled()
+    expect(screen.queryByText(MIC.title)).toBeNull()
+  })
+
+  it('not asked yet: says the browser will ask, asks on "Continue", then goes in', async () => {
+    vi.mocked(readMicPermission).mockResolvedValue('prompt')
+    const enter = card('in_progress', 'classroom')
+    await userEvent.click(screen.getByRole('button', ENTER))
+    expect(await screen.findByRole('group', { name: MIC.title })).toBeInTheDocument()
+    expect(screen.getByText(MIC.body)).toBeInTheDocument()
+    expect(enter).not.toHaveBeenCalled()
+    expect(askForMicrophone).not.toHaveBeenCalled()
+    expect(screen.getByRole('button', { name: MIC.continue })).toHaveFocus()
+
+    await userEvent.click(screen.getByRole('button', { name: MIC.continue }))
+    await waitFor(() => expect(enter).toHaveBeenCalled())
+    expect(askForMicrophone).toHaveBeenCalledTimes(1)
+  })
+
+  it('goes in even when the browser then refuses: the classroom says so again', async () => {
+    vi.mocked(readMicPermission).mockResolvedValue('prompt')
+    vi.mocked(askForMicrophone).mockResolvedValue(false)
+    const enter = card('in_progress', 'classroom')
+    await userEvent.click(screen.getByRole('button', ENTER))
+    await userEvent.click(await screen.findByRole('button', { name: MIC.continue }))
+    await waitFor(() => expect(enter).toHaveBeenCalled())
+  })
+
+  it('refused already: says where to turn it on, and goes in without it', async () => {
+    vi.mocked(readMicPermission).mockResolvedValue('denied')
+    const enter = card('in_progress', 'classroom')
+    await userEvent.click(screen.getByRole('button', ENTER))
+    expect(await screen.findByRole('group', { name: MIC.deniedTitle })).toBeInTheDocument()
+    expect(screen.getByText(MIC.deniedBody)).toBeInTheDocument()
+    await userEvent.click(screen.getByRole('button', { name: MIC.withoutMic }))
     expect(enter).toHaveBeenCalled()
+    expect(askForMicrophone).not.toHaveBeenCalled()
+  })
+
+  it('"Not now" puts the word away, focus back on the way in', async () => {
+    vi.mocked(readMicPermission).mockResolvedValue('prompt')
+    const enter = card('in_progress', 'classroom')
+    await userEvent.click(screen.getByRole('button', ENTER))
+    await userEvent.click(await screen.findByRole('button', { name: MIC.cancel }))
+    expect(screen.getByRole('button', ENTER)).toHaveFocus()
+    expect(enter).not.toHaveBeenCalled()
   })
 
   it('does not offer it before a teacher accepted', () => {
@@ -208,6 +348,7 @@ describe('the teacher’s request page, by mode', () => {
   const ACCEPT = { name: de.detail.accept.button }
   const ENTER = { name: de.detail.enterClassroom }
   const REPLY = de.detail.replyTitle
+  const RESOLVE = { name: de.markResolved }
 
   it('offered: one button, accepting, which goes nowhere', async () => {
     vi.mocked(teacherApi.getTeacherHelpRequestDetail).mockResolvedValue(detail('pending', 'classroom'))
@@ -222,10 +363,33 @@ describe('the teacher’s request page, by mode', () => {
     expect(screen.queryByRole('link', ENTER)).toBeNull()
     expect(screen.getByText(de.helpMode.classroom)).toBeInTheDocument()
 
+    // Before accepting: read only, nothing to finish yet.
+    expect(screen.queryByRole('button', RESOLVE)).toBeNull()
+
     await userEvent.click(screen.getByRole('button', ACCEPT))
     // Accepted, a classroom request is answered in the classroom, not here.
     expect(await screen.findByRole('link', ENTER)).toHaveAttribute('href', '/classroom/c1?request=r1')
     expect(screen.queryByLabelText(REPLY)).toBeNull()
+    expect(vi.mocked(teacherApi.updateTeacherHelpRequestStatus).mock.calls[0]?.[0]).toEqual({ requestId: 'r1', status: 'in_progress' })
+    // Finished from the classroom section, with one button and no note.
+    const section = document.querySelector('[data-classroom-help]')!
+    expect(section).toHaveTextContent(de.detail.classroomHelp.body)
+    expect(screen.getAllByRole('button', RESOLVE)).toHaveLength(1)
+    expect(screen.queryByRole('textbox')).toBeNull()
+  })
+
+  it('accepted: no "Start review", no closing note, one "Mark resolved" that sends only the status', async () => {
+    vi.mocked(teacherApi.getTeacherHelpRequestDetail).mockResolvedValue(detail('in_progress', 'text'))
+    vi.mocked(teacherApi.updateTeacherHelpRequestStatus).mockResolvedValue({ requestId: 'r1', status: 'resolved' } as never)
+    render(wrap(<TeacherHelpRequestDetailPage />))
+    await screen.findByLabelText(REPLY)
+    expect(screen.queryByRole('button', { name: /Start review|Prüfung starten/i })).toBeNull()
+    expect(screen.queryByLabelText(/Abschlussnotiz|Resolution note/i)).toBeNull()
+    expect(screen.getAllByRole('button', RESOLVE)).toHaveLength(1)
+    await userEvent.click(screen.getByRole('button', RESOLVE))
+    await waitFor(() =>
+      expect(vi.mocked(teacherApi.updateTeacherHelpRequestStatus).mock.calls[0]?.[0]).toEqual({ requestId: 'r1', status: 'resolved' }),
+    )
   })
 
   it.each([['text'], [undefined]] as const)('accepted text request (mode %s): the reply box, no classroom', async (mode) => {
@@ -271,23 +435,31 @@ describe('the new copy', () => {
   it('is in all four languages; Swiss German without ß; du for students, Sie for teachers', () => {
     const chats = { de: deChat, en: enChat, fr: frChat, it: itChat }
     for (const [language, bundle] of Object.entries(chats)) {
-      for (const key of ['choose', 'text', 'classroom', 'cancel', 'hint'] as const) {
+      for (const key of ['choose', 'text', 'classroom', 'cancel', 'usedUp', 'classroomUpgrade', 'notIncluded', 'left_one', 'left_other'] as const) {
         expect(bundle.ask.help.mode[key], `${language} mode.${key}`).toBeTruthy()
       }
-      for (const key of ['waiting', 'ready', 'enter', 'biggerScreen'] as const) {
+      expect(bundle.ask.help.mode.about.text, language).toBeTruthy()
+      expect(bundle.ask.help.mode.about.classroom, language).toBeTruthy()
+      for (const key of ['waiting', 'ready', 'enter', 'biggerScreen', 'notIncluded', 'usedUp'] as const) {
         expect(bundle.ask.help.classroom[key], `${language} classroom.${key}`).toBeTruthy()
+      }
+      for (const key of ['title', 'body', 'deniedTitle', 'deniedBody', 'continue', 'withoutMic', 'cancel'] as const) {
+        expect(bundle.ask.help.classroom.mic[key], `${language} classroom.mic.${key}`).toBeTruthy()
       }
     }
     for (const [language, bundle] of Object.entries({ de, en, fr, it: italian })) {
       expect(bundle.helpMode.text, language).toBeTruthy()
       expect(bundle.helpMode.classroom, language).toBeTruthy()
       expect(bundle.detail.accept.bodyClassroom, language).toBeTruthy()
+      expect(bundle.detail.classroomHelp.title, language).toBeTruthy()
+      expect(bundle.detail.classroomHelp.body, language).toBeTruthy()
+      expect(bundle.detail.resolveHint, language).toBeTruthy()
     }
     for (const [language, bundle] of Object.entries({ de: deCommon, en: enCommon, fr: frCommon, it: itCommon })) {
       expect(bundle.notifications.events.takeoverConversationClassroom.summary, language).toBeTruthy()
     }
     const student = JSON.stringify({ mode: deChat.ask.help.mode, classroom: deChat.ask.help.classroom })
-    const teacher = JSON.stringify({ mode: de.helpMode, body: de.detail.accept.bodyClassroom })
+    const teacher = JSON.stringify({ mode: de.helpMode, body: de.detail.accept.bodyClassroom, classroom: de.detail.classroomHelp, hint: de.detail.resolveHint })
     expect(student + teacher).not.toMatch(/ß/)
     expect(student).toMatch(/\b(du|dir|dich|deine?)\b/)
     expect(student).not.toMatch(/\bSie\b/)

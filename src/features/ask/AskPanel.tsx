@@ -619,13 +619,12 @@ function AskThread({
   const offer = view.kind === 'offer' || view.kind === 'asking' ? view.offer : null
   const requesting = view.kind === 'asking'
   const offered = offer !== null
-  const { teachersOnline, support, suggested, blockedKey, errorKey, classroomOffered } = offer ?? {}
+  const { teachersOnline, support, suggested, blockedKey, errorKey } = offer ?? {}
   const helpAction = useMemo(
     () =>
       offered ? (
         <TeacherHelpAction
           onRequest={request}
-          classroomOffered={classroomOffered}
           requesting={requesting}
           teachersOnline={teachersOnline}
           support={support ?? null}
@@ -634,7 +633,7 @@ function AskThread({
           errorKey={errorKey}
         />
       ) : undefined,
-    [blockedKey, classroomOffered, errorKey, offered, request, requesting, suggested, support, teachersOnline],
+    [blockedKey, errorKey, offered, request, requesting, suggested, support, teachersOnline],
   )
   const card = 'card' in view ? view.card : null
 

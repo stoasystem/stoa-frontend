@@ -15,7 +15,9 @@
  *   conversations follows each change of status too (#405).
  * - "Ask a teacher" sits under the latest answer the assistant finished (#12
  *   point 2), suggested when that answer says so (#506), with the week's
- *   allowance and whether a teacher is online. A conversation has one request:
+ *   allowance and whether a teacher is online. Pressed, it asks how: a text
+ *   answer or the online classroom, each with its own weekly allowance
+ *   (#705, stoa-backend#482). It is greyed only when neither can be asked. A conversation has one request:
  *   once asked, open or over, it is not offered here again (#544).
  * - Asking and taking the request back (#543) are read back from the server,
  *   the request and the week's allowance both; nothing is guessed from the
@@ -36,13 +38,13 @@ import { useAskUsagePeriod } from '@/features/ask/useAskUsagePeriod'
 import { useConversationQuery } from '@/hooks/chat/useConversationQuery'
 import { useTeacherAvailabilityQuery } from '@/hooks/chat/useTeacherAvailabilityQuery'
 import { noteUsagePeriodEnded } from '@/hooks/student/useStudentEntitlementQuery'
-import { classroomHelpOffered } from '@/lib/classroomHelp'
 import { USAGE_PERIOD_ENDED } from '@/lib/usagePeriod'
 import { trackEvent } from '@/services/analytics/analyticsClient'
 import { ApiError } from '@/services/api/httpClient'
 import { chatQueryKeys } from '@/services/chat/chatQueryKeys'
 import type { ChatMessage } from '@/types/chat'
 import {
+  helpModeStanding,
   isEndedHelpRequest,
   isWithdrawableHelpRequest,
   type HelpMode,
@@ -65,11 +67,6 @@ export type HelpOffer = {
   blockedKey: string | null
   /** Why the last request was refused (`chat` key). */
   errorKey: string | null
-  /**
-   * The student chooses between a text answer and the online classroom before
-   * asking (#705); otherwise every request is a text answer (`classroomHelpOffered`).
-   */
-  classroomOffered: boolean
 }
 
 /** Taking the request back (#543). */
@@ -132,12 +129,24 @@ const KEY_BY_STATUS: Record<number, string> = {
 }
 
 /**
+ * A classroom refused for the plan or the week says so of the classroom: the
+ * plan's words ("not switched on for this account") are about teacher help
+ * as a whole, which this student may well have as text answers (#705).
+ */
+const CLASSROOM_KEY_BY_CODE: Record<string, string> = {
+  teacher_support_not_included: 'ask.help.classroom.notIncluded',
+  teacher_support_allowance_exhausted: 'ask.help.classroom.usedUp',
+}
+
+/**
  * Why a request failed, in one sentence the student can act on. The server's
  * own vocabulary ("safely recoverable") told a student nothing; anything not
  * recognised falls back to the generic retry.
  */
-function requestErrorKey(error: unknown): string {
+export function requestErrorKey(error: unknown, mode: HelpMode): string {
   if (!(error instanceof ApiError)) return 'teacher.errors.generic'
+  const forClassroom = mode === 'classroom' && error.code ? CLASSROOM_KEY_BY_CODE[error.code] : undefined
+  if (forClassroom) return forClassroom
   const byCode = error.code ? KEY_BY_CODE[error.code] : undefined
   if (byCode) return byCode
   const byStatus = error.status ? KEY_BY_STATUS[error.status] : undefined
@@ -163,13 +172,22 @@ function withdrawErrorKey(error: unknown): string {
   return 'ask.help.withdraw.errors.generic'
 }
 
-/** Why "Ask a teacher" cannot be pressed, in the words a refusal would have used. */
-function blockedKeyOf(support: TeacherSupportStanding | null, paused: boolean): string | null {
+/**
+ * Why "Ask a teacher" cannot be pressed, in the words a refusal would have
+ * used: only when neither way can be asked (#705). A classroom the server did
+ * not report on (an older server) leaves it to the text answer, as before.
+ * Used up this week is said over "not in your plan" when it is either: that
+ * one comes back.
+ */
+export function blockedKeyOf(support: TeacherSupportStanding | null, paused: boolean): string | null {
   if (paused) return USAGE_PERIOD_PAUSED_KEY
-  if (support?.canRequest !== false) return null
-  return support.blockedReason === 'teacher_support_not_included'
-    ? KEY_BY_CODE.teacher_support_not_included
-    : KEY_BY_CODE.teacher_support_allowance_exhausted
+  const ways = (['text', 'classroom'] as const)
+    .map((mode) => helpModeStanding(support, mode))
+    .filter((way) => way !== null)
+  if (ways.length === 0 || ways.some((way) => way.canRequest !== false)) return null
+  return ways.some((way) => way.blockedReason !== 'teacher_support_not_included')
+    ? KEY_BY_CODE.teacher_support_allowance_exhausted
+    : KEY_BY_CODE.teacher_support_not_included
 }
 
 /** How often the request, and the conversation with it, is read again. */
@@ -287,9 +305,9 @@ export function useTeacherHelp({
       // One of the week's requests is gone: said now, not at the next minute's read (#506).
       void queryClient.invalidateQueries({ queryKey: chatQueryKeys.teacherAvailability() })
     },
-    onError: (error) => {
-      const key = requestErrorKey(error)
-      trackEvent('teacher_help_request_failed', { reason: key })
+    onError: (error, mode) => {
+      const key = requestErrorKey(error, mode)
+      trackEvent('teacher_help_request_failed', { reason: key, mode })
       setRequestError(key)
       // The period ended while Ask was open: greyed now, and read again.
       if (key === USAGE_PERIOD_PAUSED_KEY) noteUsagePeriodEnded(queryClient)
@@ -345,7 +363,6 @@ export function useTeacherHelp({
         blockedKey,
         // Said once: a refusal in the words the greyed button already says is not said again.
         errorKey: requestError === blockedKey ? null : requestError,
-        classroomOffered: classroomHelpOffered(),
       },
     }
   }, [help, isAsking, isStreaming, isWithdrawing, messages, paused, requestError, support, teachersOnline, withdrawError])

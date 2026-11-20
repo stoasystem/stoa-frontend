@@ -2,7 +2,6 @@
   "dashboardTitle": "Teacher support requests",
   "dashboardDescription": "Review student questions where qualified teacher guidance can help.",
   "loadRequestsFailed": "Failed to load requests.",
-  "markInProgress": "Start review",
   "markResolved": "Mark resolved",
   "notes": "Teacher notes",
   "availability": {
@@ -51,8 +50,6 @@
       "body": "It expired, or another teacher has taken it.",
       "back": "Back to requests"
     },
-    "resolutionNote": "Resolution note",
-    "resolutionNotePlaceholder": "Required before marking resolved.",
     "updateFailed": "Failed to update status.",
     "changedElsewhere": "Another teacher has taken this request, or it has changed. It has been reloaded — please check where it stands now.",
     "replyTitle": "Teacher reply",
@@ -91,6 +88,11 @@
     "ended": {
       "withdrawn": "The student withdrew this request. There is nothing left to do.",
       "expired": "This request expired before anyone accepted it. There is nothing left to do."
+    },
+    "resolveHint": "Done helping? Mark the request resolved. You can still add a reply afterwards.",
+    "classroomHelp": {
+      "title": "Online classroom",
+      "body": "The student chose the online classroom. Help them there with the whiteboard and voice call. When you are done, mark the request resolved."
     }
   },
   "profile": {

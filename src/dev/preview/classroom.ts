@@ -14,6 +14,12 @@
  *   ?teacherRequest=expired    nobody took it in time
  *   ?helpMode=classroom        the demo request asks for the classroom, not a
  *                              text answer (#705)
+ *   ?helpPlan=teacherSupported the student's plan has text answers only: the
+ *                              classroom is offered locked, with the upgrade (#705)
+ *   ?helpPlan=classroomUsedUp  this week's classrooms are used up
+ *   ?micPermission=granted|prompt|denied
+ *                              where the browser stands on the microphone
+ *                              before the student enters (`micPermission.ts`)
  *
  * A student who asks for a teacher here waits `TEACHER_JOINS_AFTER_MS`, then
  * the demo teacher has the request (`in_progress`), so the bar changes from
@@ -24,7 +30,7 @@ import { demo, demoConversation } from '@/dev/preview/demoSource'
 import type { VoiceConnector } from '@/features/classroom/classroomVoice'
 import type { ClassroomPass } from '@/types/classroom'
 import type { TeacherHelpRequestDetail, TeacherHelpRequestNote } from '@/types/teacher'
-import type { TeacherHelpStatus } from '@/types/teacherHelp'
+import type { TeacherAvailability, TeacherHelpStatus, TeacherSupportModeStanding } from '@/types/teacherHelp'
 import type { User } from '@/types/user'
 
 const setting = (name: string) => new URLSearchParams(window.location.search).get(name)
@@ -167,4 +173,20 @@ export const previewVoiceConnector: VoiceConnector = async (_room, events) => {
       for (const timer of timers) window.clearTimeout(timer)
     },
   }
+}
+
+/**
+ * `GET /teacher-help/availability` as `?helpPlan=` sets the student's plan:
+ * the online classroom plan by default (the demo data), text answers only, or
+ * this week's classrooms used up (stoa-backend#482).
+ */
+export function demoAvailabilityForPlan(availability: TeacherAvailability): TeacherAvailability {
+  const plan = setting('helpPlan')
+  const support = availability.teacherSupport
+  if (!support || (plan !== 'teacherSupported' && plan !== 'classroomUsedUp')) return availability
+  const classroom: TeacherSupportModeStanding =
+    plan === 'teacherSupported'
+      ? { canRequest: false, remainingCases: 0, weeklyCases: 0, blockedReason: 'teacher_support_not_included', resetsAt: null }
+      : { canRequest: false, remainingCases: 0, weeklyCases: 2, blockedReason: 'teacher_support_allowance_exhausted', resetsAt: null }
+  return { ...availability, teacherSupport: { ...support, classroom } }
 }

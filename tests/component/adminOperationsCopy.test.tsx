@@ -42,7 +42,7 @@ vi.mock('@/hooks/admin/useAdminAccountOperationsQuery', () => ({
       parentId: 'parent-1',
       supportState: { state: 'ready', blockers: [], warnings: [] },
       parent: { name: 'Rita Vogt', email: 'rita@example.ch', verification: { emailVerificationStatus: 'verified' } },
-      billing: { status: 'active', mode: 'provider', subscriptionTier: 'family', cancelAtPeriodEnd: false, events: [] },
+      billing: { status: 'active', mode: 'provider', subscriptionTier: 'online_classroom', cancelAtPeriodEnd: false, events: [] },
       children: [
         {
           studentId: 'student-1',
@@ -64,7 +64,7 @@ vi.mock('@/hooks/admin/useAdminBillingOperation', () => ({
       data: {
         checkoutRef: 'chk_public_1',
         parentId: 'parent-1',
-        targetPlan: 'family',
+        targetPlan: 'online_classroom',
         beneficiaryIds: ['student-1'],
         commandLifecycle: {
           state: 'completed',

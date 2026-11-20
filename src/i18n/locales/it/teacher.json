@@ -2,7 +2,6 @@
   "dashboardTitle": "Richieste di supporto",
   "dashboardDescription": "Rivedi le domande degli studenti in cui una guida qualificata può aiutare.",
   "loadRequestsFailed": "Impossibile caricare le richieste.",
-  "markInProgress": "Inizia revisione",
   "markResolved": "Segna risolta",
   "notes": "Note dell’insegnante",
   "availability": {
@@ -51,8 +50,6 @@
       "body": "È scaduta, oppure l’ha presa un altro insegnante.",
       "back": "Torna alle richieste"
     },
-    "resolutionNote": "Nota di risoluzione",
-    "resolutionNotePlaceholder": "Obbligatoria prima di segnare come risolta.",
     "updateFailed": "Impossibile aggiornare lo stato.",
     "changedElsewhere": "Un altro insegnante ha preso questa richiesta, oppure è cambiata. L’abbiamo ricaricata: controlla a che punto è.",
     "replyTitle": "Risposta dell’insegnante",
@@ -91,6 +88,11 @@
     "ended": {
       "withdrawn": "Lo studente ha ritirato questa richiesta. Non c’è più nulla da fare.",
       "expired": "Questa richiesta è scaduta prima che qualcuno la accettasse. Non c’è più nulla da fare."
+    },
+    "resolveHint": "Hai finito di aiutare? Segna la richiesta come risolta. Potrai comunque aggiungere una risposta dopo.",
+    "classroomHelp": {
+      "title": "Classe online",
+      "body": "Lo studente ha scelto la classe online. Aiutalo lì con la lavagna e la chiamata vocale. Quando hai finito, segna la richiesta come risolta."
     }
   },
   "profile": {

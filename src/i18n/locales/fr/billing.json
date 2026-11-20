@@ -50,22 +50,22 @@
     },
     "teacher_supported": {
       "name": "Formule avec enseignant",
-      "audience": "Familles qui souhaitent des questions hebdomadaires limitées à un enseignant.",
+      "audience": "Familles qui souhaitent qu’un enseignant réponde par écrit à quelques questions chaque semaine.",
       "cta": "Choisir enseignant",
       "features": [
         "Tout dans Élève",
         "Rapport hebdomadaire",
-        "Questions enseignant limitées chaque semaine"
+        "Réponses écrites d’un enseignant chaque semaine"
       ]
     },
-    "family": {
-      "name": "Formule famille",
-      "audience": "Familles qui veulent le niveau de soutien le plus élevé et un accès partagé.",
-      "cta": "Choisir famille",
+    "online_classroom": {
+      "name": "Formule classe en ligne",
+      "audience": "Familles qui veulent qu’un enseignant travaille les questions en direct avec leur enfant.",
+      "cta": "Choisir classe en ligne",
       "features": [
         "Tout dans Avec enseignant",
-        "5x plus de temps enseignant",
-        "Avantages partagés jusqu’à 3 personnes"
+        "Classe en ligne avec un enseignant (tableau blanc et voix)",
+        "Réponses écrites et classes en ligne chaque semaine"
       ]
     }
   }

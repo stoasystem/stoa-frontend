@@ -158,8 +158,6 @@ describe('what the student sees', () => {
         support: support(),
         blockedKey: null,
         errorKey: null,
-        // The classroom is not offered by default (#705): every request is a text answer.
-        classroomOffered: false,
       },
     })
   })
@@ -451,7 +449,7 @@ describe('asking a teacher', () => {
     await press(opened, 'request')
     expect(opened.result.current.view.kind).toBe('offer')
     expect(offerOf(opened).errorKey).toBe(key)
-    expect(track).toHaveBeenCalledWith('teacher_help_request_failed', { reason: key })
+    expect(track).toHaveBeenCalledWith('teacher_help_request_failed', { reason: key, mode: 'text' })
     expect(track).not.toHaveBeenCalledWith('teacher_help_requested', expect.anything())
     expect(readAvailability).toHaveBeenCalledTimes(2)
   })

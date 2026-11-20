@@ -214,11 +214,13 @@ describe('the teacher status card', () => {
     expect(ask.queryByRole('region', { name: 'Teacher support' })).not.toBeInTheDocument()
 
     await userEvent.click(ask.getByRole('button', { name: 'Ask a teacher' }))
+    // Asked how first (#705): a text answer.
+    await userEvent.click(await ask.findByRole('button', { name: 'Text answer' }))
 
     const card = await ask.findByRole('region', { name: 'Teacher support' })
     expect(card).toHaveAttribute('data-help-status', 'pending')
     expect(within(card).getByText('Waiting')).toBeInTheDocument()
-    expect(within(card).getByText('Teacher support requested')).toBeInTheDocument()
+    expect(within(card).getByText('Finding a teacher for you')).toBeInTheDocument()
     expect(ask.queryByText(/Posted Name/)).not.toBeInTheDocument()
     // Nothing here lets the student say a teacher joined (#12 point 2).
     expect(ask.queryByRole('button', { name: /joined|confirm/i })).not.toBeInTheDocument()
@@ -266,6 +268,8 @@ describe('the teacher status card', () => {
     await ask.findByText('Yes.')
 
     await userEvent.click(ask.getByRole('button', { name: 'Ask a teacher' }))
+    // Asked how first (#705): a text answer.
+    await userEvent.click(await ask.findByRole('button', { name: 'Text answer' }))
 
     const card = await ask.findByRole('region', { name: 'Teacher support' })
     await waitFor(() => expect(card).toHaveAttribute('data-help-status', 'waiting_no_teacher'))
@@ -321,7 +325,7 @@ describe('the teacher status card', () => {
   // Every status the card can carry, so showing it only while ACTIVE_HELP
   // would go red on the two ended ones.
   it.each([
-    ['pending', 'Teacher support requested'],
+    ['pending', 'Finding a teacher for you'],
     ['waiting_no_teacher', 'No teacher is free right now'],
     ['assigned', 'Ms Bergmann will join this conversation'],
     ['in_progress', 'Ms Bergmann is helping you'],

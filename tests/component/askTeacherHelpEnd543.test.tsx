@@ -334,6 +334,8 @@ describe('one request per conversation (#544)', () => {
     // Never escalated, and a request asked for is pending: the fake's own answers.
     const ask = openAsk()
     await userEvent.click(await ask.findByRole('button', { name: 'Ask a teacher' }))
+    // Asked how first (#705): a text answer.
+    await userEvent.click(await ask.findByRole('button', { name: 'Text answer' }))
     await waitFor(() => expect(requestHelpMock).toHaveBeenCalledWith({ conversationId: 'c1', mode: 'text' }))
   })
 

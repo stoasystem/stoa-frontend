@@ -221,13 +221,13 @@ describe("the first person's late answers after the next one signed in", () => {
           checkoutSessionId: `cs-${who}`,
           checkoutUrl: '',
           safeActions: [],
-          targetPlan: 'family',
+          targetPlan: 'online_classroom',
           beneficiaries: [],
         })
       }),
     )
     const result = renderAsAda()
-    const adaCheckout = createCheckoutSession({ plan: 'family' as never, beneficiaryIds: [] })
+    const adaCheckout = createCheckoutSession({ plan: 'online_classroom', beneficiaryIds: [] })
     await served.opened
 
     await adaLeavesAndBeaSignsIn(result)
@@ -240,7 +240,7 @@ describe("the first person's late answers after the next one signed in", () => {
     expectBeaStillSignedIn()
 
     // B starts a checkout of her own, under a key of her own.
-    await expect(createCheckoutSession({ plan: 'family' as never, beneficiaryIds: [] })).resolves.toEqual(
+    await expect(createCheckoutSession({ plan: 'online_classroom', beneficiaryIds: [] })).resolves.toEqual(
       expect.objectContaining({ checkoutRef: 'ref-b' }),
     )
     expect(getCheckoutOperation()?.checkoutRef).toBe('ref-b')
@@ -268,7 +268,7 @@ describe("the first person's late answers after the next one signed in", () => {
       CHECKOUT_OPERATION_STORAGE_KEY,
       JSON.stringify({ idempotencyKey: 'key-of-a-checkout', checkoutRef: 'ref-a' }),
     )
-    const adaReplacement = supersedeCheckoutCommand('ref-a', { plan: 'family' as never, beneficiaryIds: [] })
+    const adaReplacement = supersedeCheckoutCommand('ref-a', { plan: 'online_classroom', beneficiaryIds: [] })
     await served.opened
 
     await adaLeavesAndBeaSignsIn(result)

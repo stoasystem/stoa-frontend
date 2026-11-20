@@ -65,6 +65,9 @@ for (const viewport of [
     await expect(thread.getByText('x = 5', { exact: true })).toBeVisible()
 
     await thread.getByRole('button', { name: 'Ask a teacher' }).click()
+    // Asked how first (#705): a text answer, here in the conversation.
+    await thread.getByRole('button', { name: 'Text answer' }).click()
+    await expect.poll(() => asked).not.toBeNull()
     const card = ask.getByRole('region', { name: 'Teacher support' })
     await expect(card).toContainText('Test Teacher will join this conversation')
     // What an assistive tool does to reach the first step: bring it into view.

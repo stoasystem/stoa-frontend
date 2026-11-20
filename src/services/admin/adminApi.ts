@@ -1004,7 +1004,7 @@ export async function applySubscriptionRequest(input: { requestId: string; admin
   return response.data
 }
 
-export type AdminBillingPlan = 'student' | 'teacher_supported' | 'family'
+export type AdminBillingPlan = 'student' | 'teacher_supported' | 'online_classroom'
 
 export type AdminBillingCommandLifecycle = {
   state: string

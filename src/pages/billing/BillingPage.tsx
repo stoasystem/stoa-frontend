@@ -24,14 +24,14 @@ import { trackEvent } from '@/services/analytics/analyticsClient'
 import type { PurchasableSubscriptionPlan, SubscriptionPlan } from '@/types/billing'
 
 function isSubscriptionPlan(plan: string | null): plan is SubscriptionPlan {
-  return ['free_trial', 'student', 'teacher_supported', 'family'].includes(plan ?? '')
+  return ['free_trial', 'student', 'teacher_supported', 'online_classroom'].includes(plan ?? '')
 }
 
 export function BillingPage() {
   const { t } = useTranslation(['billing', 'common'])
   const [searchParams] = useSearchParams()
   const requestedPlan = searchParams.get('plan')
-  const selectedPlan = isSubscriptionPlan(requestedPlan) ? requestedPlan : 'family'
+  const selectedPlan = isSubscriptionPlan(requestedPlan) ? requestedPlan : 'online_classroom'
   const plansQuery = useBillingPlansQuery()
   const usageQuery = useBillingUsageQuery()
   const featureAccessQuery = useFeatureAccessQuery()
@@ -320,7 +320,6 @@ function isValidBeneficiarySelection(
   const uniqueCount = new Set(beneficiaryIds).size
   if (uniqueCount !== beneficiaryIds.length) return false
   if (plan === 'free_trial') return false
-  if (plan === 'family') return uniqueCount >= 1 && uniqueCount <= 3
   return uniqueCount === 1
 }
 
@@ -330,7 +329,6 @@ function sameBeneficiaries(left: string[], right: string[]) {
 
 function beneficiaryRequirement(plan: SubscriptionPlan) {
   if (plan === 'free_trial') return 'Free trial does not require checkout'
-  if (plan === 'family') return 'Select 1 to 3 beneficiaries'
   return 'Select exactly one beneficiary'
 }
 

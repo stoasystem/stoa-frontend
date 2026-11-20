@@ -442,8 +442,8 @@
     "loadingAccount": "Chargement du compte…",
     "pending": "En attente",
     "plan": {
-      "family": "Formule famille",
       "free_trial": "Essai gratuit",
+      "online_classroom": "Formule classe en ligne",
       "student": "Formule élève",
       "teacher_supported": "Formule avec enseignant"
     },

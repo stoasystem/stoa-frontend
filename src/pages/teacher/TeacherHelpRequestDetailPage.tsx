@@ -24,18 +24,12 @@ import { DashboardLayout } from '@/layouts/DashboardLayout'
 import { trackEvent } from '@/services/analytics/analyticsClient'
 import { normalizeCurriculumSubjectId } from '@/services/practice/practiceApi'
 import { isHelpRequestConflict, isHelpRequestOutOfReach } from '@/lib/teacherHelpRequestConflict'
-import { acceptsTeacherReply, awaitsTeacherAcceptance, helpModeOf, teacherStatusActions } from '@/types/teacherHelp'
-
-const statusActionKey: Record<string, string> = {
-  in_progress: 'markInProgress',
-  resolved: 'markResolved',
-}
+import { acceptsTeacherReply, awaitsTeacherAcceptance, helpModeOf } from '@/types/teacherHelp'
 
 export function TeacherHelpRequestDetailPage() {
   const { t } = useTranslation('practice')
   const { t: tTeacher } = useTranslation('teacher')
   const { requestId } = useParams()
-  const [resolutionNote, setResolutionNote] = useState('')
   const requestCardRef = useRef<HTMLDivElement>(null)
   // A change that failed takes focus to the failure, not to the request: there a
   // screen reader read the card out and the teacher took it for done (#410).
@@ -75,7 +69,9 @@ export function TeacherHelpRequestDetailPage() {
   // the one step, and nothing else is offered until then (#705). The backend
   // refuses a reply before it (stoa-backend#479).
   const awaitingAcceptance = canAct && awaitsTeacherAcceptance(status)
-  const statusActions = canAct && !awaitingAcceptance ? teacherStatusActions(status) : []
+  // Held, the one change left is to finish it: no review step, no closing
+  // note (it was stored and never read), one "Mark resolved" (#705).
+  const resolvable = canAct && status === 'in_progress'
   const changedElsewhere = isHelpRequestConflict(updateStatus.error) || reply.conflict
   // A reply refused as not accepted yet (409 `accept_help_request`): the copy
   // on screen said otherwise, so the teacher is led to accept it, the draft
@@ -87,16 +83,28 @@ export function TeacherHelpRequestDetailPage() {
   // a classroom request is answered in the classroom. An older request is text.
   const mode = helpModeOf(requestQuery.data)
   const repliesHere = mode === 'text' || status === 'resolved'
-  const accept = () =>
+  const changeStatus = (next: 'in_progress' | 'resolved') =>
     requestId &&
     updateStatus.mutate(
-      { requestId, status: 'in_progress' },
+      { requestId, status: next },
       {
         onSettled: (_request, error) => {
           if (focusLost()) setRefocus({ failed: Boolean(error) })
         },
       },
     )
+  const accept = () => changeStatus('in_progress')
+  const resolveButton = resolvable ? (
+    <Button
+      type="button"
+      variant="outline"
+      data-resolve-request
+      disabled={readFailed || updateStatus.isPending || !requestId}
+      onClick={() => changeStatus('resolved')}
+    >
+      {tTeacher('markResolved')}
+    </Button>
+  ) : null
 
   return (
     <DashboardLayout>
@@ -236,63 +244,20 @@ export function TeacherHelpRequestDetailPage() {
                 {tTeacher('detail.changedElsewhere')}
               </p>
             )}
-            {/* Only the changes the server takes in this status: a finished request
-                takes none (#162), one in progress can only be finished (#269). */}
-            {statusActions.length > 0 && (
-              <>
-              <div className="rounded-lg border p-4">
-                <label className="text-sm font-medium" htmlFor="resolution-note">
-                  {tTeacher('detail.resolutionNote')}
-                </label>
-                {/* That it is required is said in text, not only in a placeholder
-                    that disappears as soon as the teacher types (#332). */}
-                <p id="resolution-note-hint" className="mt-1 text-xs text-muted-foreground">
-                  {tTeacher('detail.resolutionNotePlaceholder')}
-                </p>
-                <textarea
-                  id="resolution-note"
-                  className="mt-2 min-h-20 w-full rounded-md border bg-background px-3 py-2 text-sm"
-                  value={resolutionNote}
-                  onChange={(event) => setResolutionNote(event.target.value)}
-                  aria-describedby="resolution-note-hint"
-                />
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {statusActions.map((status) => (
-                  <Button
-                    key={status}
-                    type="button"
-                    variant="outline"
-                    aria-describedby={status === 'resolved' ? 'resolution-note-hint' : undefined}
-                    disabled={
-                      readFailed ||
-                      updateStatus.isPending ||
-                      !requestId ||
-                      (status === 'resolved' && resolutionNote.trim().length === 0)
-                    }
-                    onClick={() =>
-                      requestId &&
-                      updateStatus.mutate(
-                        {
-                          requestId,
-                          status,
-                          resolutionNote: status === 'resolved' ? resolutionNote.trim() : undefined,
-                        },
-                        {
-                          // Whether focus was lost is read now, while the pressed
-                          // button is still disabled; where it goes, once rendered.
-                          onSettled: (_request, error) => {
-                            if (focusLost()) setRefocus({ failed: Boolean(error) })
-                          },
-                        },
-                      )
-                    }
-                  >
-                    {tTeacher(statusActionKey[status] ?? 'markResolved')}
-                  </Button>
-                ))}
-              </div>
-              </>
+            {/* Accepted, a classroom request is answered there: the way in is the
+                page's primary button; finishing it is here (#705). */}
+            {resolvable && mode === 'classroom' && (
+              <section
+                aria-labelledby="classroom-help-title"
+                data-classroom-help
+                className="rounded-lg border bg-card p-4"
+              >
+                <h2 id="classroom-help-title" className="m-0 text-base font-semibold text-foreground">
+                  {tTeacher('detail.classroomHelp.title')}
+                </h2>
+                <p className="mb-0 mt-1 text-sm leading-6 text-muted-foreground">{tTeacher('detail.classroomHelp.body')}</p>
+                <div className="mt-3">{resolveButton}</div>
+              </section>
             )}
             {updateStatus.isError && !changedElsewhere && (
               <p ref={failureLine} tabIndex={-1} role="alert" className="text-sm text-destructive">
@@ -312,6 +277,13 @@ export function TeacherHelpRequestDetailPage() {
                 )}
                 {/* Pictures go up the way a student's do (#513). */}
                 <TeacherReplyComposer reply={reply} disabled={readFailed} />
+                {/* Finished once answered: in the reply area, not a step of its own (#705). */}
+                {resolveButton && (
+                  <div className="flex flex-col items-start gap-1">
+                    <p className="m-0 text-sm text-muted-foreground">{tTeacher('detail.resolveHint')}</p>
+                    {resolveButton}
+                  </div>
+                )}
               </>
             )}
             <TeacherRequestTimeline requestId={requestQuery.data.requestId} notes={requestQuery.data.notes ?? []} />

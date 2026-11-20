@@ -139,7 +139,7 @@
         "expired": "Abgelaufen"
       },
       "title": {
-        "pending": "Lehrperson angefragt",
+        "pending": "Wir suchen eine Lehrperson für dich",
         "waiting_no_teacher": "Gerade ist keine Lehrperson frei",
         "assigned": "{{name}} kommt in diese Unterhaltung",
         "in_progress": "{{name}} hilft dir",
@@ -183,13 +183,38 @@
         "text": "Textantwort",
         "classroom": "Online-Klassenzimmer",
         "cancel": "Abbrechen",
-        "hint": "Textantwort: Die Lehrperson antwortet hier in der Unterhaltung. Online-Klassenzimmer: Whiteboard und Sprachanruf, am Computer oder Tablet."
+        "about": {
+          "text": "Die Lehrperson antwortet hier in der Unterhaltung.",
+          "classroom": "Whiteboard und Sprachanruf, am Computer oder Tablet."
+        },
+        "left_one": "Diese Woche noch {{count}}",
+        "left_other": "Diese Woche noch {{count}}",
+        "usedUp": "Für diese Woche aufgebraucht. Nächste Woche wieder verfügbar.",
+        "classroomUpgrade": "Mit der Option Online-Klassenzimmer verfügbar.",
+        "notIncluded": "Für dich noch nicht freigeschaltet."
       },
       "classroom": {
         "waiting": "Du hast das Online-Klassenzimmer gewählt. Sobald eine Lehrperson deine Anfrage annimmt, kannst du hier eintreten.",
         "ready": "Deine Lehrperson wartet im Klassenzimmer auf dich.",
         "enter": "Klassenzimmer betreten",
-        "biggerScreen": "Das Klassenzimmer funktioniert am Computer oder Tablet. Öffne es dort."
+        "biggerScreen": "Das Klassenzimmer funktioniert am Computer oder Tablet. Öffne es dort.",
+        "notIncluded": "Das Online-Klassenzimmer gibt es mit der Option Online-Klassenzimmer, die für dich noch nicht freigeschaltet ist. Du kannst stattdessen eine Textantwort anfragen.",
+        "usedUp": "Die Online-Klassenzimmer für diese Woche sind aufgebraucht. Du kannst stattdessen eine Textantwort anfragen.",
+        "mic": {
+          "title": "Das Klassenzimmer braucht dein Mikrofon",
+          "body": "Im Klassenzimmer sprichst du mit deiner Lehrperson in einem Sprachanruf. Dein Browser fragt gleich, ob STOA dein Mikrofon verwenden darf. Bitte erlaube es.",
+          "deniedTitle": "Dein Browser blockiert das Mikrofon",
+          "deniedBody": "Damit du mit deiner Lehrperson sprechen kannst, erlaube das Mikrofon für diese Seite in den Browser-Einstellungen (meist das Schloss-Symbol neben der Adresse) und lade die Seite neu. Du kannst auch ohne Mikrofon eintreten und Whiteboard und Chat verwenden.",
+          "continue": "Weiter",
+          "withoutMic": "Ohne Mikrofon eintreten",
+          "cancel": "Jetzt nicht"
+        }
+      },
+      "remainingByMode": {
+        "line": "Diese Woche: {{list}}",
+        "left_one": "{{mode}} noch {{count}}",
+        "left_other": "{{mode}} noch {{count}}",
+        "upgrade": "{{mode}} mit der Option Online-Klassenzimmer"
       }
     },
     "practice": {

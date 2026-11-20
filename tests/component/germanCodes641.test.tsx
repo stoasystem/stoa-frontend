@@ -65,7 +65,7 @@ vi.mock('@/hooks/admin/useAdminAccountOperationsQuery', () => ({
         email: 'rita@example.ch',
         verification: { emailVerificationStatus: 'verified', emailVerificationPolicy: 'legacy_or_verified' },
       },
-      billing: { status: 'active', mode: 'provider', subscriptionTier: 'family', cancelAtPeriodEnd: false, events: [] },
+      billing: { status: 'active', mode: 'provider', subscriptionTier: 'online_classroom', cancelAtPeriodEnd: false, events: [] },
       children: [],
       usage: [
         {

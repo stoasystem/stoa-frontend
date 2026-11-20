@@ -347,6 +347,8 @@ describe('refused usage_period_ended while Ask was open', () => {
     server.refuseNextWith(periodEnded(), 'createTeacherHelpRequest')
 
     await userEvent.click(teacherButton(panel))
+    // Asked how first (#705): a text answer.
+    await userEvent.click(await panel.findByRole('button', { name: i18n.t('chat:ask.help.mode.text') }))
 
     await waitFor(() => expect(teacherButton(panel)).toBeDisabled())
     expect(teacherButton(panel)).toHaveAccessibleDescription(i18n.t('chat:ask.help.usagePeriodPaused'))

@@ -141,7 +141,7 @@
         "expired": "Expirée"
       },
       "title": {
-        "pending": "Aide d’un enseignant demandée",
+        "pending": "Nous cherchons un enseignant pour toi",
         "waiting_no_teacher": "Aucun enseignant n’est disponible pour le moment",
         "assigned": "{{name}} va rejoindre cette conversation",
         "in_progress": "{{name}} t’aide",
@@ -185,13 +185,40 @@
         "text": "Réponse écrite",
         "classroom": "Classe en ligne",
         "cancel": "Annuler",
-        "hint": "Réponse écrite : l’enseignant répond ici, dans la conversation. Classe en ligne : tableau blanc et appel vocal, sur ordinateur ou tablette."
+        "about": {
+          "text": "L’enseignant répond ici, dans la conversation.",
+          "classroom": "Tableau blanc et appel vocal, sur ordinateur ou tablette."
+        },
+        "left_one": "Encore {{count}} cette semaine",
+        "left_other": "Encore {{count}} cette semaine",
+        "usedUp": "Épuisé cette semaine. De nouveau disponible la semaine prochaine.",
+        "classroomUpgrade": "Disponible avec l’option Classe en ligne.",
+        "notIncluded": "Pas encore activé pour toi.",
+        "left_many": "Encore {{count}} cette semaine"
       },
       "classroom": {
         "waiting": "Tu as choisi la classe en ligne. Dès qu’un enseignant accepte ta demande, tu pourras y entrer ici.",
         "ready": "Ton enseignant t’attend dans la classe.",
         "enter": "Entrer dans la classe",
-        "biggerScreen": "La classe fonctionne sur ordinateur ou tablette. Ouvre-la là-bas."
+        "biggerScreen": "La classe fonctionne sur ordinateur ou tablette. Ouvre-la là-bas.",
+        "notIncluded": "La classe en ligne vient avec l’option Classe en ligne, qui n’est pas encore activée pour toi. Tu peux demander une réponse écrite à la place.",
+        "usedUp": "Les classes en ligne de cette semaine sont épuisées. Tu peux demander une réponse écrite à la place.",
+        "mic": {
+          "title": "La classe a besoin de ton micro",
+          "body": "Dans la classe, tu parles avec ton enseignant lors d’un appel vocal. Ton navigateur va maintenant demander si STOA peut utiliser ton micro. Autorise-le, s’il te plaît.",
+          "deniedTitle": "Ton navigateur bloque le micro",
+          "deniedBody": "Pour parler avec ton enseignant, autorise le micro pour ce site dans les réglages du navigateur (souvent le cadenas à côté de l’adresse), puis recharge la page. Tu peux aussi entrer sans micro et utiliser le tableau blanc et le chat.",
+          "continue": "Continuer",
+          "withoutMic": "Entrer sans micro",
+          "cancel": "Pas maintenant"
+        }
+      },
+      "remainingByMode": {
+        "line": "Cette semaine : {{list}}",
+        "left_one": "{{mode}} : encore {{count}}",
+        "left_other": "{{mode}} : encore {{count}}",
+        "upgrade": "{{mode}} : avec l’option Classe en ligne",
+        "left_many": "{{mode}} : encore {{count}}"
       }
     },
     "practice": {

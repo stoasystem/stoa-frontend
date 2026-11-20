@@ -59,7 +59,8 @@ const PAGES = [
 // part of the current plan" and that "a parent can add it from the plan page"
 // - a price, a plan, and a page that was withdrawn, on a live chat screen. It
 // is reached from a page, so it is read the same way.
-const COPY_MAPS = ['src/features/ask/teacherHelp/useTeacherHelp.ts']
+// The choice of way (#705) says why the classroom is locked, on the same screen.
+const COPY_MAPS = ['src/features/ask/teacherHelp/useTeacherHelp.ts', 'src/features/ask/teacherHelp/TeacherHelp.tsx']
 
 /** Strip block and line comments, so a withdrawn key does not count. */
 function withoutComments(source: string): string {

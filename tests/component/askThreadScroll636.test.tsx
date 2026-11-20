@@ -129,6 +129,8 @@ describe.each([
     expect(heldOutside()).toEqual([])
 
     await userEvent.click(within(thread).getByRole('button', { name: 'Ask a teacher' }))
+    // Asked how first (#705): a text answer.
+    await userEvent.click(await within(thread).findByRole('button', { name: 'Text answer' }))
     await screen.findByRole('region', { name: 'Teacher support' })
     expect(heldOutside()).toEqual([])
   })

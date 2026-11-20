@@ -40,11 +40,11 @@ test.skip('phase476 real hosted checkout converges signed facts and role project
   )
   expect(parent.role).toBe('parent')
 
-  for (const plan of ['student', 'teacher_supported', 'family']) {
+  for (const plan of ['student', 'teacher_supported', 'online_classroom']) {
     await page.goto(`${webOrigin}/billing?plan=${plan}`)
     await expect(page.getByText(new RegExp(plan.replace('_', ' '), 'i')).first()).toBeVisible()
   }
-  await page.goto(`${webOrigin}/billing?plan=family`)
+  await page.goto(`${webOrigin}/billing?plan=online_classroom`)
   for (const beneficiary of beneficiaries) {
     await page.getByLabel(beneficiary, { exact: true }).check()
   }
