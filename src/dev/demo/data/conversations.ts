@@ -3,13 +3,13 @@
  * a human-help request a teacher is working on, so the status card above the
  * thread and a teacher's message both show; another answered in sections
  * (#506), with "Ask a teacher" under it and three quick replies above that
- * (#682). In the shapes Ask reads
+ * (#682), and two common mistakes under the answer (#683). In the shapes Ask reads
  * (`GET /conversations`, `GET /conversations/:id`, the teacher-help status and
  * availability).
  */
 import { DEMO_KNOWLEDGE_POINT, localize, type Localized } from '@/dev/demo/sky/demoSky'
 import type { SupportedLanguage } from '@/i18n/languages'
-import type { ChatMessage, ChatRole, Conversation, ConversationListResponse, StructuredAnswer } from '@/types/chat'
+import type { ChatMessage, ChatRole, CommonMistake, Conversation, ConversationListResponse, StructuredAnswer } from '@/types/chat'
 import type { TeacherAvailability, TeacherHelpRequest } from '@/types/teacherHelp'
 
 const L = (en: string, de: string, fr: string, it: string): Localized => ({ en, de, fr, it })
@@ -51,7 +51,7 @@ function joined({ steps = [], answer = '', hints = [] }: StructuredAnswer): stri
   return [steps.map((step, index) => `${index + 1}. ${step}`).join('\n'), answer, hints[0] ?? ''].filter(Boolean).join('\n\n')
 }
 
-const FRACTION_SECTIONS: Record<SupportedLanguage, StructuredAnswer> = {
+const FRACTION_STEPS: Record<SupportedLanguage, StructuredAnswer> = {
   en: sections(
     [
       'Find a number both 3 and 4 go into: 12.',
@@ -100,6 +100,36 @@ const FRACTION_SECTIONS: Record<SupportedLanguage, StructuredAnswer> = {
     ['Frazioni', 'Denominatore comune'],
     ['Non capisco il passaggio 2', 'Perché 12 e non 24?', 'Dammi un esercizio simile'],
   ),
+}
+
+/**
+ * The common mistakes on the fraction answer (#683): one with a category, one
+ * without, as stoa-backend#444 sends them.
+ */
+const FRACTION_MISTAKES: Record<SupportedLanguage, CommonMistake[]> = {
+  en: [
+    { text: 'Adding the denominators too: $\\frac{1}{3} + \\frac{1}{4}$ is not $\\frac{2}{7}$.', errorCause: 'structural' },
+    { text: 'Changing the denominator without multiplying the numerator by the same number.', errorCause: null },
+  ],
+  de: [
+    { text: 'Auch die Nenner addieren: $\\frac{1}{3} + \\frac{1}{4}$ ist nicht $\\frac{2}{7}$.', errorCause: 'structural' },
+    { text: 'Den Nenner ändern, ohne den Zähler mit derselben Zahl zu multiplizieren.', errorCause: null },
+  ],
+  fr: [
+    { text: 'Additionner aussi les dénominateurs : $\\frac{1}{3} + \\frac{1}{4}$ ne fait pas $\\frac{2}{7}$.', errorCause: 'structural' },
+    { text: 'Changer le dénominateur sans multiplier le numérateur par le même nombre.', errorCause: null },
+  ],
+  it: [
+    { text: 'Sommare anche i denominatori: $\\frac{1}{3} + \\frac{1}{4}$ non fa $\\frac{2}{7}$.', errorCause: 'structural' },
+    { text: 'Cambiare il denominatore senza moltiplicare il numeratore per lo stesso numero.', errorCause: null },
+  ],
+}
+
+const FRACTION_SECTIONS: Record<SupportedLanguage, StructuredAnswer> = {
+  en: { ...FRACTION_STEPS.en, commonMistakes: FRACTION_MISTAKES.en },
+  de: { ...FRACTION_STEPS.de, commonMistakes: FRACTION_MISTAKES.de },
+  fr: { ...FRACTION_STEPS.fr, commonMistakes: FRACTION_MISTAKES.fr },
+  it: { ...FRACTION_STEPS.it, commonMistakes: FRACTION_MISTAKES.it },
 }
 
 const SINE: Spec = {
