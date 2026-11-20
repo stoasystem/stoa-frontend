@@ -1,9 +1,9 @@
 import { expect, test, type APIRequestContext } from '@playwright/test'
-import { SmokeApi } from './api'
+import { ANSWER_WAIT_LIMIT_MS, SmokeApi, askViaApi, timedOutNote } from './api'
 import { expectApiClean, signIn, watchApiFailures, watchPageErrors } from './helpers'
-import { findErrorCode } from './judge'
+import { findErrorCode, screenAnswer, type Screen } from './judge'
 import { anyLanguage } from './locales'
-import { record } from './run'
+import { record, rememberConversations } from './run'
 
 // The teacher side of 2026-11-20 that writes (items 11-13). Off unless
 // `STOA_SMOKE_TEACHER_WRITES=1`, until the coordinator has read a first run
@@ -27,6 +27,10 @@ import { record } from './run'
 //            student@ as an assignment, then the assignment and the draft
 //            archived. The backend has no delete: archived rows stay, hidden
 //            from the student.
+//   item 14  one German equation question in Ask as student@: one generation
+//            request, the run's fourth of five, and a conversation in
+//            student@'s history like items 2 and 3. Behind the same switch
+//            until confirmed; then it belongs with the other @generation items.
 
 const ENABLED = process.env.STOA_SMOKE_TEACHER_WRITES === '1'
 const SUBJECT = 'math'
@@ -419,4 +423,98 @@ test.describe('the teacher side that writes (items 11-13)', () => {
     const after = await myAssignments(student)
     expect(after.map((item) => item.assignmentId), 'archived, it is gone from student@\'s list').not.toContain(assignmentId)
   })
+})
+
+const ERROR_CAUSES = ['structural', 'deviation', 'application', 'metacognitive']
+
+test('item 14: a new equation question is answered with its common mistakes, on screen (#722, backend #514)', {
+  tag: ['@item14', '@generation'],
+}, async ({ page, request, baseURL }, testInfo) => {
+  test.skip(!ENABLED, 'STOA_SMOKE_TEACHER_WRITES is not 1: item 14 waits for the coordinator')
+  test.setTimeout(ANSWER_WAIT_LIMIT_MS + 90_000)
+  // A question with mistakes everybody makes (the 3 not multiplied into the
+  // bracket, a sign lost moving a term), so an answer without any is the
+  // feature failing, not the model judging there were none (decided
+  // 2026-11-20; the derivative of item 3 is a concept question and may have
+  // none). 3(x - 2) = 2x + 5 gives x = 11.
+  const api = await SmokeApi.signIn(request, baseURL!, 'student')
+  const grade = (await api.call<{ grade: string }>('GET', '/students/me/profile', { expect: 200 })).body.grade
+  const asked = await askViaApi(api, {
+    label: 'item14-common-mistakes',
+    subject: 'math',
+    grade,
+    content: 'Wie löse ich die Gleichung 3(x - 2) = 2x + 5?',
+    acceptLanguage: 'de',
+  })
+  rememberConversations(baseURL!, [asked.conversationId])
+  const base = {
+    conversationId: asked.conversationId,
+    idempotencyKey: asked.idempotencyKey,
+    sendStatus: asked.sendStatus,
+    acceptMs: asked.acceptMs,
+    outcome: asked.outcome,
+  }
+  if (asked.outcome.kind !== 'completed') {
+    await record(testInfo, 'item14-common-mistakes-answer', {
+      ...base,
+      note: asked.outcome.kind === 'timed_out' ? timedOutNote(asked.outcome) : null,
+    })
+    if (asked.outcome.kind === 'timed_out') throw new Error(timedOutNote(asked.outcome))
+  }
+  expect(asked.outcome, 'the command ended in a successful terminal state').toMatchObject({ kind: 'completed' })
+  const assistantId = (asked.outcome as { assistantMessageId: string }).assistantMessageId
+
+  const detail = (await api.call<{
+    messages: Array<{ id: string; structured?: { kind?: string; commonMistakes?: Array<{ text: string; errorCause: string | null }> } | null }>
+  }>('GET', `/conversations/${asked.conversationId}`, { expect: 200 })).body
+  const structured = detail.messages.find((message) => message.id === assistantId)?.structured ?? null
+  const mistakes = structured?.commonMistakes ?? null
+  const screen: Screen = { language: 'de', topic: /Klammer|ausmultiplizier|Gleichung|x\s*=\s*11/i, minLength: 40 }
+  const problems = screenAnswer(asked.answer ?? '', screen)
+  // Written before the checks, so a failure still leaves the answer for a person.
+  await record(testInfo, 'item14-common-mistakes-answer', {
+    ...base,
+    kind: structured?.kind ?? null,
+    commonMistakes: mistakes,
+    screenProblems: problems,
+    answer: asked.answer,
+    needsHumanConfirmation: {
+      language: 'de',
+      explainsRatherThanRefuses: true,
+      mistakesAreTypicalForThisQuestion: true,
+    },
+  })
+
+  expect(structured?.kind, 'a new question gets an answer, not a follow-up').toBe('answer')
+  expect(Array.isArray(mistakes), 'commonMistakes is an array').toBe(true)
+  expect(mistakes!.length, 'one or two common mistakes').toBeGreaterThanOrEqual(1)
+  expect(mistakes!.length, 'one or two common mistakes').toBeLessThanOrEqual(2)
+  for (const mistake of mistakes!) {
+    expect(mistake.text.trim(), 'a mistake has words').not.toBe('')
+    expect(mistake.text.length, 'at most 300 characters').toBeLessThanOrEqual(300)
+    expect(mistake.text, 'one line').not.toMatch(/\n/)
+    expect([...ERROR_CAUSES, null], 'errorCause').toContain(mistake.errorCause)
+  }
+  expect.soft(problems, 'keyword screen (a person still reads the answer)').toEqual([])
+
+  // Ask shows them under that answer, one entry each.
+  const failures = watchApiFailures(page)
+  const errors = watchPageErrors(page)
+  await signIn(page, 'student')
+  await page.goto(`/ask/${asked.conversationId}`)
+  const entries = page
+    .locator('[data-answer-section="commonMistakes"]')
+    .getByRole('list', { name: anyLanguage('chat', 'ask.answer.commonMistakes') })
+  await expect(entries, 'the common mistakes section').toBeVisible({ timeout: 20_000 })
+  await expect(entries.getByRole('listitem'), 'one entry per mistake').toHaveCount(mistakes!.length)
+  expect(errors, 'uncaught page errors').toEqual([])
+  await expectApiClean(failures, [
+    {
+      method: 'GET',
+      path: /\/teacher-help\/conversations\/[^/]+\/request$/,
+      status: 404,
+      optional: true,
+      why: 'no teacher help was asked for',
+    },
+  ])
 })

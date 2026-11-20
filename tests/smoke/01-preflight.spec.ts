@@ -39,6 +39,8 @@ import { readStateFile, record } from './run'
  *   01 preflight  release, function versions, the two student profiles    read-only
  *   02 read-only  roles sign in, admin console, item 1, 9 (404 control), 6, 7
  *   02 teacher    items 11-14, the teacher side of 2026-11-20, read only
+ *   03 teacher    items 11-13 (help, assign, draft; no model), 14 (one question)
+ *                 only with STOA_SMOKE_TEACHER_WRITES=1, until confirmed    1 generation
  *   03 writes     item 5 (no model), 4 (PDF), 2 (E03), 3 (E01 x2)         3 generations
  *   04 logout     item 8, last, because it revokes every parent@ session
  * Item 10 is the removal of the old `3x + 5 = 20` question; item 3 replaces it.
@@ -46,8 +48,9 @@ import { readStateFile, record } from './run'
  * 12 assigning practice, 13 exercise drafts, 14 common mistakes under an answer.
  * Item 5's hint needs #154 live (frontend 5778408 or later).
  *
- * Generation budget: three requests in a normal run (items 2 and 3), at most
- * five per run counting any repeat; run.ts refuses the sixth.
+ * Generation budget: three requests in a normal run (items 2 and 3), four with
+ * item 14 switched on, at most five per run counting any repeat; run.ts
+ * refuses the sixth.
  */
 
 const FUNCTIONS = [
