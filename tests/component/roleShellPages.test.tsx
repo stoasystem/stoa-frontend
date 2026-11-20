@@ -1,6 +1,6 @@
 /**
  * The pages #52 restyled keep their jobs: a teacher's Requests holds the way
- * into learning automation, a parent's Overview the way into each child's
+ * into recommending practice, a parent's Overview the way into each child's
  * detail, and the administrator's System and Users pages the other pages of
  * their sections -- all as chevron rows in grouped lists.
  */
@@ -150,11 +150,11 @@ const rowLinks = () =>
   [...screen.getByRole('main').querySelectorAll('a[data-row]')].map((row) => row.getAttribute('href'))
 
 describe('a teacher\'s Requests', () => {
-  it('lists requests as chevron rows, filters with one segmented control, and no longer leads into learning automation (#703)', () => {
+  it('lists requests as chevron rows, filters with one segmented control, and leads into recommending practice (#703)', () => {
     renderAs('teacher', '/teacher', <TeacherDashboardPage />)
 
-    expect(rowLinks()).toEqual(['/teacher/requests/r-1', '/teacher/requests/r-2'])
-    expect(screen.queryByRole('link', { name: /learning automation/i })).not.toBeInTheDocument()
+    expect(rowLinks()).toEqual(['/teacher/requests/r-1', '/teacher/requests/r-2', '/teacher/learning-automation'])
+    expect(screen.getByRole('link', { name: /Recommend practice/ })).toHaveAttribute('href', '/teacher/learning-automation')
     expect(screen.getByRole('region', { name: 'Requests' })).toBeInTheDocument()
     const row = screen.getByRole('link', { name: /Lina Meier/ })
     expect(row.querySelector('[data-chevron]')).not.toBeNull()

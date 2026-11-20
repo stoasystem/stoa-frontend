@@ -1,10 +1,13 @@
 import { useMemo, useState } from 'react'
+import { Sparkles } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
+import { Group, Row } from '@/components/base'
 import { PageContainer } from '@/components/common/PageContainer'
 import { PageHeader } from '@/components/common/PageHeader'
 import { HelpRequestList } from '@/components/teacher/HelpRequestList'
 import { TeacherDashboardSkeleton } from '@/components/teacher/TeacherDashboardSkeleton'
 import { TeacherStatsCards } from '@/components/teacher/TeacherStatsCards'
+import { TEACHER_PRACTICE_PATH } from '@/features/assignPractice/practicePath'
 import {
   TeacherRequestFilters,
   type TeacherRequestFilter,
@@ -77,7 +80,15 @@ export function TeacherDashboardPage() {
             />
           </div>
         )}
-        {/* No learning automation entry: hidden from teachers until #703. */}
+        {/* Recommending practice: the secondary entry inside Requests (#13 point 6, #703). */}
+        <Group title={t('assignPractice.entry.group')}>
+          <Row
+            to={TEACHER_PRACTICE_PATH}
+            leading={{ kind: 'icon', icon: Sparkles }}
+            title={t('assignPractice.entry.title')}
+            subtitle={t('assignPractice.entry.description')}
+          />
+        </Group>
       </PageContainer>
     </DashboardLayout>
   )

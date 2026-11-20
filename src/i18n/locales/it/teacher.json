@@ -328,6 +328,12 @@
     "eyebrow": "Esercizi",
     "title": "Consiglia esercizi",
     "description": "Scegli un allievo che hai aiutato e cosa deve esercitare. Spunta gli esercizi che vuoi e assegnali: compaiono tra i compiti dell’allievo.",
+    "entry": {
+      "group": "Altro",
+      "title": "Consiglia esercizi",
+      "description": "Assegna esercizi agli allievi che hai aiutato",
+      "forStudent": "Consiglia esercizi a {{name}}"
+    },
     "choose": {
       "title": "Chi e cosa"
     },

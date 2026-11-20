@@ -3,9 +3,9 @@
  *
  * T5 - the learning automation console asks for a student id, and a teacher
  *      sees no student id anywhere. The help request linked to the console
- *      with its student filled in, until the console was hidden from
- *      teachers (#703): the link is gone, and the console still reads
- *      `?studentId=` on the routes that keep it.
+ *      with its student filled in. Since #703 it links to the teacher's own
+ *      practice page instead, with its student and itself; the admin and
+ *      organisation console still reads `?studentId=`.
  * T7 - the "Assigned" filter was always empty (the teacher list carries the
  *      stored status, which is never "assigned"), and an empty filter said
  *      "No teacher support requests are available", as if there were none.
@@ -90,10 +90,22 @@ afterAll(async () => {
 })
 
 describe('T5: from a help request to the automation console', () => {
-  it('no longer links the request to the console: it is hidden from teachers (#703)', async () => {
+  it.each(['in_progress', 'resolved'] as const)('links a request %s to practice for its student (#703)', async (status) => {
     vi.mocked(teacherApi.getTeacherHelpRequestDetail).mockResolvedValue({
-      requestId: 'r1', conversationId: 'c1', student: { id: 'stu/42', name: 'Lea', grade: '8' },
-      subject: 'mathematics', status: 'in_progress', messages: [], notes: [],
+      requestId: 'r1', conversationId: 'c1', student: { id: 'stu-42', name: 'Lea', grade: '8' },
+      subject: 'mathematics', status, messages: [], notes: [],
+    } as never)
+    renderAt('/teacher/requests/r1', <Route path="/teacher/requests/:requestId" element={<TeacherHelpRequestDetailPage />} />)
+
+    const link = await screen.findByRole('link', { name: 'Recommend practice for Lea' })
+    // The student's id goes in the link, the name does not.
+    expect(link).toHaveAttribute('href', '/teacher/learning-automation?studentId=stu-42&request=r1')
+  })
+
+  it('offers no practice for a request not yet accepted: that is no relation with the student (#703)', async () => {
+    vi.mocked(teacherApi.getTeacherHelpRequestDetail).mockResolvedValue({
+      requestId: 'r1', conversationId: 'c1', student: { id: 'stu-42', name: 'Lea', grade: '8' },
+      subject: 'mathematics', status: 'pending', messages: [], notes: [],
     } as never)
     renderAt('/teacher/requests/r1', <Route path="/teacher/requests/:requestId" element={<TeacherHelpRequestDetailPage />} />)
 
@@ -102,7 +114,6 @@ describe('T5: from a help request to the automation console', () => {
     for (const link of screen.queryAllByRole('link')) {
       expect(link.getAttribute('href') ?? '').not.toContain('learning-automation')
     }
-    expect(screen.queryByRole('link', { name: /learning automation/i })).not.toBeInTheDocument()
   })
 
   it('starts the console on the student named in the address', async () => {
@@ -119,9 +130,10 @@ describe('T5: from a help request to the automation console', () => {
     expect(getStudentAssignments).not.toHaveBeenCalled()
   })
 
-  it('has the filter copy in all four languages, and no longer the link copy', () => {
+  it('has the filter and link copy in all four languages, and no longer the console link copy', () => {
     for (const lng of ['en', 'de', 'fr', 'it']) {
       expect(i18n.getResource(lng, 'teacher', 'detail.openAutomation')).toBeUndefined()
+      expect(i18n.getResource(lng, 'teacher', 'assignPractice.entry.forStudent')).toContain('{{name}}')
       expect(i18n.getResource(lng, 'teacher', 'requests.emptyFiltered')).toContain('{{status}}')
     }
   })
