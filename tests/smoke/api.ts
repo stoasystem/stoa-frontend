@@ -103,7 +103,10 @@ export class SmokeApi {
       expect(failure, `${where}: ${summarise(body)}`).toBeNull()
     } else {
       const allowed = Array.isArray(options.expect) ? options.expect : [options.expect]
-      expect(allowed, `${where} answered ${status}: ${summarise(body)}`).toContain(status)
+      // A 5xx carries no correlation id in its body; the response headers'
+      // request ids are what the backend's logs can be searched by.
+      const ids = status >= 500 ? requestIds(response.headers()) : ''
+      expect(allowed, `${where} answered ${status}${ids}: ${summarise(body)}`).toContain(status)
       if (status < 400) {
         const failure = describeApiFailure({ status, method, url, body })
         expect(failure, `${where}: a success that carries an error`).toBeNull()
@@ -111,6 +114,14 @@ export class SmokeApi {
     }
     return { status, body: body as T, ms }
   }
+}
+
+/** The request ids a response's headers carry, as " (name=value, ...)", or nothing. */
+function requestIds(headers: Record<string, string>): string {
+  const found = Object.entries(headers)
+    .filter(([name]) => /request-?id|correlation|trace-?id|amz-cf-id/i.test(name))
+    .map(([name, value]) => `${name}=${value}`)
+  return found.length ? ` (${found.join(', ')})` : ''
 }
 
 function summarise(body: unknown): string {
