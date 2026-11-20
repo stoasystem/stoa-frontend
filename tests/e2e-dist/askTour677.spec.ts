@@ -81,7 +81,9 @@ test('the tour on the microphone leaves the answer’s "Ask a teacher" free to p
   expect(end).toBeLessThanOrEqual((await bubble.boundingBox())!.y)
 
   // A press asks the teacher (before, it waited out its timeout on the bubble); the tour stays where it was.
+  // It first asks how (#705): the choice is just as free to press.
   await teacher.click({ timeout: 5_000 })
+  await thread.getByRole('button', { name: 'Text answer' }).click({ timeout: 5_000 })
   await expect(ask.getByRole('region', { name: 'Teacher support' })).toContainText('Test Teacher will join this conversation')
   await expect(bubble).toBeVisible()
 })
