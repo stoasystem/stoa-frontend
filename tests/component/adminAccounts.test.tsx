@@ -235,7 +235,12 @@ describe('admin accounts console', () => {
 
     await userEvent.type(screen.getByLabelText('accounts.emailLabel'), 'new@stoa.test')
     await userEvent.type(screen.getByLabelText('accounts.dateOfBirthLabel'), '2012-05-06')
-    await userEvent.click(screen.getByText('accounts.invite'))
+    // #736: a button is clicked only once it can be. A click that lands while it
+    // is still disabled does nothing, and the wait below then times out with a
+    // message that says nothing about why.
+    const inviteButton = screen.getByText('accounts.invite').closest('button')!
+    await waitFor(() => expect(inviteButton).toBeEnabled())
+    await userEvent.click(inviteButton)
 
     await waitFor(() => expect(mockedInvite).toHaveBeenCalled())
     expect(mockedInvite.mock.calls[0][0].dateOfBirth).toBe('2012-05-06')
@@ -248,7 +253,12 @@ describe('admin accounts console', () => {
     await userEvent.type(screen.getByLabelText('accounts.dateOfBirthLabel'), '2012-05-06')
     await userEvent.click(screen.getByText('accounts.assign'))
     const dialog = await screen.findByRole('dialog')
-    await userEvent.click(within(dialog).getByText('accounts.assignDialogSubmit'))
+    // The dialog seeds its form from the card when it opens, and its submit
+    // stays disabled until then. On a loaded CI machine the click could land
+    // first, on a disabled button, and `assign` was never called (#736).
+    const submit = within(dialog).getByText('accounts.assignDialogSubmit').closest('button')!
+    await waitFor(() => expect(submit).toBeEnabled())
+    await userEvent.click(submit)
     await waitFor(() => expect(mockedAssign).toHaveBeenCalled())
     expect(mockedAssign.mock.calls[0][0].dateOfBirth).toBe('2012-05-06')
   })
