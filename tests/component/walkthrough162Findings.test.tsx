@@ -26,7 +26,7 @@ const adminEvents = vi.hoisted(() => ({ items: [] as unknown[] }))
 
 vi.mock('@/layouts/DashboardLayout', () => ({ DashboardLayout: ({ children }: { children: ReactNode }) => <>{children}</> }))
 vi.mock('@/components/practice/CurriculumRolloutPanel', () => ({ CurriculumRolloutPanel: () => null }))
-vi.mock('@/components/teacher/TeacherAssistanceSummaryCard', () => ({ TeacherAssistanceSummaryCard: () => null }))
+vi.mock('@/components/teacher/TeacherPrepTable', () => ({ TeacherPrepTable: () => null }))
 vi.mock('@/components/teacher/HelpRequestDetailCard', () => ({ HelpRequestDetailCard: () => null }))
 vi.mock('@/hooks/practice/useCurriculumCatalogQuery', () => ({ useCurriculumCatalogQuery: () => ({}) }))
 vi.mock('@/hooks/teacher/useTeacherHelpRequestDetailQuery', () => ({

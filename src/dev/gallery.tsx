@@ -32,15 +32,13 @@ async function start() {
   const { AppLayout } = await import('@/layouts/AppLayout')
   const { useAuthStore } = await import('@/store/authStore')
   // Voice questions (#697): the stand-in microphone, and a transcription that answers after a moment.
-  const [{ installPreviewMicrophone }, { recordingTypeHere }] = await Promise.all([
+  const [{ installPreviewMicrophone }, { canRecordVoiceHere }] = await Promise.all([
     import('@/dev/preview/voice'),
     import('@/lib/voiceRecording'),
   ])
   installPreviewMicrophone()
-  const voiceType = recordingTypeHere()
-  const galleryVoice = voiceType
+  const galleryVoice = canRecordVoiceHere()
     ? {
-        recordingType: voiceType,
         transcribe: () => new Promise<string>((resolve) => window.setTimeout(() => resolve('How do I work out the sine of 30 degrees?'), 1_200)),
       }
     : undefined

@@ -83,6 +83,35 @@ export type TeacherHelpRequestDetail = {
   notes?: TeacherHelpRequestNote[]
   firstTeacherActionAt?: string
   sla?: TeacherSlaSnapshot
+  /*
+   * The preparation table (#704), picked by the backend (stoa-backend#517);
+   * the page never picks them out of `messages` itself.
+   */
+  /** The student's first question of the conversation; `null` when they asked none. */
+  firstQuestion?: TeacherPrepQuestion | null
+  /**
+   * Their last question before asking for help (anything sent after it does
+   * not count); `null` when it is the first one, which is then the only row.
+   */
+  lastQuestion?: TeacherPrepQuestion | null
+  /** Everything the student sent in the conversation, in order, each once. */
+  uploads?: AttachmentSummary[]
+  /** Stars on the star map the conversation's Ask answers named, newest first, titled in the teacher's language. */
+  askedStars?: TeacherAskedStar[]
+}
+
+/** One of the student's questions as the preparation table shows it (stoa-backend#517). */
+export type TeacherPrepQuestion = {
+  /** The message's id in `messages`: the table leads to it in the conversation. */
+  messageId: string
+  content: string
+  createdAt: string
+  attachments?: AttachmentSummary[]
+}
+
+export type TeacherAskedStar = {
+  unitId: string
+  title: string
 }
 
 export type TeacherStats = {

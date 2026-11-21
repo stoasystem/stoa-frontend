@@ -55,6 +55,9 @@
     "replyTitle": "Réponse de l’enseignant",
     "replyDescription": "Consignez l’intervention, la prochaine étape ou le suivi dont l’élève a besoin.",
     "requestSummary": "La demande",
+    "conversation_one": "Conversation complète ({{count}} message)",
+    "conversation_many": "Conversation complète ({{count}} messages)",
+    "conversation_other": "Conversation complète ({{count}} messages)",
     "roles": {
       "student": "Élève",
       "assistant": "Explication de l’assistant d’apprentissage",
@@ -159,11 +162,19 @@
     "firstActionNone": "Première action de l’enseignant : pas encore enregistrée",
     "statsLoadFailed": "Les chiffres n’ont pas pu être chargés."
   },
-  "assistance": {
-    "title": "Résumé de préparation",
-    "student": "Élève",
+  "prep": {
+    "title": "Préparation",
     "question": "Question",
-    "noQuestion": "Aucun texte de question disponible."
+    "firstQuestion": "Première question",
+    "lastQuestion": "Dernière question avant la demande d’aide",
+    "noQuestion": "L’élève n’a posé aucune question dans la conversation.",
+    "uploads": "Fichiers envoyés",
+    "noUploads": "Aucun",
+    "stars": "Étoiles liées",
+    "showInConversation": "Voir dans la conversation",
+    "attachmentCount_one": "{{count}} pièce jointe",
+    "attachmentCount_many": "{{count}} pièces jointes",
+    "attachmentCount_other": "{{count}} pièces jointes"
   },
   "reply": {
     "label": "Réponse de l’enseignant·e",

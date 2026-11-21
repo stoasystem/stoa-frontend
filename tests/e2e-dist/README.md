@@ -79,6 +79,14 @@ marked new; the preview and execute bodies are held to the backend's schema,
 and nothing runs off a phone's width (#703). `STOA_E2E_SHOTS=<dir>` saves the
 page at desktop and phone width.
 
+`teacherPrepTable704.spec.ts`: a teacher opens a help request and reads the
+preparation table first: the first question, the last one before asking for
+help, every upload (drawn once) and the related stars, with the detail held to
+the backend's schema (stoa-backend#517). The conversation is folded; "Show in
+conversation" opens it on that message, focused and in view, at 1280 and 375
+px with nothing running off the side (#704). `STOA_E2E_SHOTS=<dir>` saves the
+page before and after.
+
 `attachments.spec.ts`: a photo chosen in Ask is shrunk to a JPEG in the
 browser, goes up by intent, part URL, a PUT straight to S3 (answered in
 `support/uploads.ts`, which refuses a part whose SHA-256 is not the one signed

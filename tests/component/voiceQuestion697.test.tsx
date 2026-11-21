@@ -6,9 +6,11 @@
  * the browser refuses the microphone or cannot record, the microphone says
  * how to dictate, as before (#515).
  *
- * The browser's recorder is a stand-in here (jsdom has none): these tests
- * show what the composer does with it, not that a real browser records in a
- * format the model takes. That is for the device checklist in the PR.
+ * The recording is a 16 kHz mono WAV the page writes itself with Web Audio
+ * (#726: the speech model takes only mp3 and wav). Web Audio is a stand-in
+ * here (jsdom has none, `fakeWebAudio.ts`): these tests show what the
+ * composer does with the samples it is given, not that a real browser hears
+ * the microphone. That is for the device checks in the PR.
  */
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
@@ -24,10 +26,10 @@ import { ChildVoiceQuestionsCard } from '@/components/parent/ChildVoiceQuestions
 import { useVoiceQuestionInput } from '@/hooks/student/useVoiceQuestionInput'
 import i18n from '@/i18n'
 import {
+  canRecordVoiceHere,
   insertAtCursor,
   MAX_RECORDING_BYTES,
-  pickRecordingType,
-  recordingTypeHere,
+  MAX_SENDS_PER_RECORDING,
   VOICE_FAILURE_CODES,
   VoiceFailure,
   type VoiceFailureKind,
@@ -36,48 +38,14 @@ import { PrivacyPage } from '@/pages/legal/PrivacyPage'
 import { ApiError, httpClient } from '@/services/api/httpClient'
 import { transcribeVoiceQuestion, voiceFailureOf } from '@/services/student/voiceQuestionsApi'
 import { useAuthStore } from '@/store/authStore'
+import { FakeAudioContext, FakeAudioWorkletNode, installWebAudio, readWav, removeWebAudio } from './fakeWebAudio'
 
 const LOCALES = ['de', 'en', 'fr', 'it'] as const
 const WINDOWS =
   'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36'
 const LINUX = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36'
 
-/* ---- the browser's recorder and microphone, stand-ins ---------------- */
-
-class FakeRecorder {
-  static instances: FakeRecorder[] = []
-  static supported = (type: string) => type.startsWith('audio/webm')
-  static isTypeSupported = (type: string) => FakeRecorder.supported(type)
-  state: 'inactive' | 'recording' = 'inactive'
-  mimeType: string
-  options: MediaRecorderOptions | undefined
-  /** What the recording holds when it stops. */
-  bytes: BlobPart[] = ['opus-bytes']
-  private listeners: Record<string, Array<(event: unknown) => void>> = {}
-  constructor(_stream: MediaStream, options?: MediaRecorderOptions) {
-    this.options = options
-    this.mimeType = options?.mimeType ?? ''
-    FakeRecorder.instances.push(this)
-  }
-  addEventListener(type: string, listener: (event: unknown) => void) {
-    ;(this.listeners[type] ??= []).push(listener)
-  }
-  start() {
-    this.state = 'recording'
-  }
-  stop() {
-    if (this.state === 'inactive') return
-    this.state = 'inactive'
-    // As a browser does: the data, then `stop`, after the call returns.
-    void Promise.resolve().then(() => {
-      this.emit('dataavailable', { data: new Blob(this.bytes, { type: this.mimeType }) })
-      this.emit('stop', {})
-    })
-  }
-  private emit(type: string, event: unknown) {
-    for (const listener of this.listeners[type] ?? []) listener(event)
-  }
-}
+/* ---- the browser's audio and microphone, stand-ins ------------------- */
 
 const trackStopped = vi.fn()
 const getUserMedia = vi.fn(async () => ({ getTracks: () => [{ stop: trackStopped }] }) as unknown as MediaStream)
@@ -87,16 +55,17 @@ function pretend(userAgent: string) {
   Object.defineProperty(window.navigator, 'maxTouchPoints', { value: 0, configurable: true })
 }
 
-function installBrowser({ recorder = true }: { recorder?: boolean } = {}) {
+function installBrowser({ webAudio = true }: { webAudio?: boolean } = {}) {
   Object.defineProperty(window.navigator, 'mediaDevices', { value: { getUserMedia }, configurable: true })
-  if (recorder) Object.defineProperty(window, 'MediaRecorder', { value: FakeRecorder, configurable: true, writable: true })
-  else Reflect.deleteProperty(window, 'MediaRecorder')
+  if (webAudio) installWebAudio()
+  else removeWebAudio()
 }
+
+/** The capture worklet's node of the latest recording. */
+const capture = () => FakeAudioWorkletNode.instances[FakeAudioWorkletNode.instances.length - 1]
 
 beforeEach(async () => {
   await i18n.changeLanguage('de')
-  FakeRecorder.instances = []
-  FakeRecorder.supported = (type: string) => type.startsWith('audio/webm')
   getUserMedia.mockReset()
   getUserMedia.mockImplementation(async () => ({ getTracks: () => [{ stop: trackStopped }] }) as unknown as MediaStream)
   trackStopped.mockReset()
@@ -110,7 +79,7 @@ afterEach(() => {
   Reflect.deleteProperty(window.navigator, 'userAgent')
   Reflect.deleteProperty(window.navigator, 'maxTouchPoints')
   Reflect.deleteProperty(window.navigator, 'mediaDevices')
-  Reflect.deleteProperty(window, 'MediaRecorder')
+  removeWebAudio()
   useAuthStore.setState({ user: null, isAuthenticated: false } as never)
 })
 
@@ -142,39 +111,29 @@ function Harness({
 }
 
 function voiceWith(transcribe: VoiceInput['transcribe'], extra: Partial<VoiceInput> = {}): VoiceInput {
-  return { recordingType: 'audio/webm;codecs=opus', transcribe, ...extra }
+  return { transcribe, ...extra }
 }
 
 const field = () => screen.getByRole('textbox', { name: 'Ask' }) as HTMLTextAreaElement
 const voiceBubble = () => document.querySelector<HTMLElement>('[data-composer-voice]')
 
-async function recordAndStop() {
+/** Records `seconds` of speech and stops. */
+async function recordAndStop(seconds = 1) {
   await userEvent.click(screen.getByRole('button', { name: startName() }))
   await screen.findByRole('button', { name: stopName() })
+  act(() => capture().hear(seconds))
   await userEvent.click(screen.getByRole('button', { name: stopName() }))
 }
 
-describe('the recorder type (#697)', () => {
-  it('asks for WebM first, then Ogg, then MP4 with AAC, and is null with none of them', () => {
-    expect(pickRecordingType(() => true)).toBe('audio/webm;codecs=opus')
-    expect(pickRecordingType((type) => type.startsWith('audio/ogg'))).toBe('audio/ogg;codecs=opus')
-    // Safari: MP4 only.
-    expect(pickRecordingType((type) => type.startsWith('audio/mp4'))).toBe('audio/mp4;codecs=mp4a.40.2')
-    expect(pickRecordingType((type) => type === 'audio/mp4')).toBe('audio/mp4')
-    expect(pickRecordingType((type) => type === 'audio/wav')).toBeNull()
-    expect(
-      pickRecordingType(() => {
-        throw new Error('old engine')
-      }),
-    ).toBeNull()
-  })
-
-  it('is null without MediaRecorder or without getUserMedia', () => {
-    expect(recordingTypeHere({ navigator: { mediaDevices: { getUserMedia: () => {} } } })).toBeNull()
-    expect(recordingTypeHere({ MediaRecorder: { isTypeSupported: () => true }, navigator: {} })).toBeNull()
-    expect(
-      recordingTypeHere({ MediaRecorder: { isTypeSupported: () => true }, navigator: { mediaDevices: { getUserMedia: () => {} } } }),
-    ).toBe('audio/webm;codecs=opus')
+describe('whether this browser can record (#726)', () => {
+  const mic = { navigator: { mediaDevices: { getUserMedia: () => {} } } }
+  it('needs Web Audio with an audio worklet, and a microphone to ask for', () => {
+    expect(canRecordVoiceHere({ AudioContext: class {}, AudioWorkletNode: class {}, ...mic })).toBe(true)
+    // Safari before 14.1: Web Audio, but no worklet.
+    expect(canRecordVoiceHere({ AudioContext: class {}, ...mic })).toBe(false)
+    expect(canRecordVoiceHere({ AudioWorkletNode: class {}, ...mic })).toBe(false)
+    // Not a secure page: no getUserMedia.
+    expect(canRecordVoiceHere({ AudioContext: class {}, AudioWorkletNode: class {}, navigator: {} })).toBe(false)
   })
 })
 
@@ -204,16 +163,29 @@ describe('recording a voice question (#697)', () => {
     expect(document.querySelector('[data-composer-voice-clock]')).toHaveTextContent('0:00 / 1:00')
     expect(screen.getByRole('button', { name: stopName() })).toHaveAttribute('aria-pressed', 'true')
     expect(getUserMedia).toHaveBeenCalledWith({ audio: true })
-    expect(FakeRecorder.instances).toHaveLength(1)
-    expect(FakeRecorder.instances[0].options).toMatchObject({ mimeType: 'audio/webm;codecs=opus', audioBitsPerSecond: 32_000 })
+    // The microphone goes through the capture worklet, which is connected so every engine runs it.
+    const context = FakeAudioContext.instances[0]
+    expect(context.audioWorklet.addModule).toHaveBeenCalledTimes(1)
+    expect(FakeAudioWorkletNode.instances).toHaveLength(1)
+    expect(capture().processor).toBe('stoa-mono-capture')
+    expect(context.sources[0].connect).toHaveBeenCalledWith(capture())
+    expect(capture().connect).toHaveBeenCalledWith(context.destination)
 
+    act(() => capture().hear(2.5))
     await userEvent.click(screen.getByRole('button', { name: stopName() }))
     await waitFor(() => expect(field().value).toBe('Hallo. Wie rechne ich den Sinus aus?'))
     const [recording] = transcribe.mock.calls[0] as unknown as [Blob]
     expect(recording).toBeInstanceOf(Blob)
-    expect(recording.type).toBe('audio/webm;codecs=opus')
+    // A 16 kHz mono 16-bit WAV, as long as what was heard.
+    expect(recording.type).toBe('audio/wav')
+    const wav = await readWav(recording)
+    expect(wav).toMatchObject({ riff: 'RIFF', wave: 'WAVE', format: 1, channels: 1, sampleRate: 16_000, bitsPerSample: 16 })
+    expect(wav.seconds).toBeCloseTo(2.5, 2)
     expect(onSubmit).not.toHaveBeenCalled()
+    // The microphone let go of, the audio closed.
     expect(trackStopped).toHaveBeenCalled()
+    expect(context.close).toHaveBeenCalled()
+    expect(capture().port.onmessage).toBeNull()
     expect(voiceBubble()).toBeNull()
     await waitFor(() => expect(field()).toHaveFocus())
   })
@@ -230,26 +202,40 @@ describe('recording a voice question (#697)', () => {
     await waitFor(() => expect(field().value).toBe('Fertig'))
   })
 
-  it('stops by itself at the minute and sends what it has', async () => {
+  it('stops by itself at the minute and sends exactly a minute, under 2 MiB', async () => {
+    const transcribe = vi.fn(async () => 'Eine lange Frage')
+    render(<Harness voice={voiceWith(transcribe)} />)
+    await userEvent.click(screen.getByRole('button', { name: startName() }))
+    await screen.findByRole('button', { name: stopName() })
+    // The child keeps talking past the minute: the samples, not a timer, say when it is up.
+    act(() => capture().hear(30))
+    expect(transcribe).not.toHaveBeenCalled()
+    act(() => capture().hear(31))
+    await waitFor(() => expect(field().value).toBe('Eine lange Frage'))
+    expect(transcribe).toHaveBeenCalledTimes(1)
+    const [recording] = transcribe.mock.calls[0] as unknown as [Blob]
+    const wav = await readWav(recording)
+    expect(wav.seconds).toBe(60)
+    expect(wav.totalBytes).toBe(44 + 60 * 16_000 * 2)
+    expect(recording.size).toBeLessThan(MAX_RECORDING_BYTES)
+    expect(trackStopped).toHaveBeenCalled()
+  })
+
+  it('stops at the minute by the clock too, should the samples be slow', async () => {
     vi.useFakeTimers()
     const transcribe = vi.fn(async () => 'Eine lange Frage')
     render(<Harness voice={voiceWith(transcribe)} />)
     await act(async () => {
       fireEvent.click(screen.getByRole('button', { name: startName() }))
     })
-    expect(FakeRecorder.instances[0]?.state).toBe('recording')
+    act(() => capture().hear(12))
     await act(async () => {
       vi.advanceTimersByTime(30_000)
     })
     expect(document.querySelector('[data-composer-voice-clock]')).toHaveTextContent('0:30 / 1:00')
-    expect(FakeRecorder.instances[0].state).toBe('recording')
+    expect(transcribe).not.toHaveBeenCalled()
     await act(async () => {
       vi.advanceTimersByTime(30_000)
-    })
-    expect(FakeRecorder.instances[0].state).toBe('inactive')
-    await act(async () => {
-      await Promise.resolve()
-      await Promise.resolve()
     })
     expect(transcribe).toHaveBeenCalledTimes(1)
     await act(async () => {
@@ -259,16 +245,78 @@ describe('recording a voice question (#697)', () => {
     expect(field().value).toBe('Eine lange Frage')
   })
 
-  it('does not send a recording over 2 MiB', async () => {
+  it('makes the audio context in the press itself, before the microphone is asked for (Safari, iOS)', async () => {
+    let contextsWhenAsked = -1
+    let resumedWhenAsked = false
+    getUserMedia.mockImplementationOnce(async () => {
+      contextsWhenAsked = FakeAudioContext.instances.length
+      resumedWhenAsked = (FakeAudioContext.instances[0]?.resume.mock.calls.length ?? 0) > 0
+      return { getTracks: () => [{ stop: trackStopped }] } as unknown as MediaStream
+    })
+    render(<Harness voice={voiceWith(vi.fn(async () => 'x'))} />)
+    await userEvent.click(screen.getByRole('button', { name: startName() }))
+    await screen.findByRole('button', { name: stopName() })
+    expect(contextsWhenAsked).toBe(1)
+    expect(resumedWhenAsked).toBe(true)
+  })
+
+  it('writes 16 kHz from a 44.1 kHz microphone too', async () => {
+    FakeAudioContext.rate = 44_100
+    const transcribe = vi.fn(async () => 'Hallo')
+    render(<Harness voice={voiceWith(transcribe)} />)
+    await recordAndStop(2)
+    await waitFor(() => expect(transcribe).toHaveBeenCalled())
+    const wav = await readWav((transcribe.mock.calls[0] as unknown as [Blob])[0])
+    expect(wav.sampleRate).toBe(16_000)
+    expect(wav.seconds).toBeCloseTo(2, 2)
+  })
+
+  it('sends nothing when nothing was heard', async () => {
     const transcribe = vi.fn(async () => 'never')
     render(<Harness voice={voiceWith(transcribe)} initial="Mein Text" />)
     await userEvent.click(screen.getByRole('button', { name: startName() }))
     await screen.findByRole('button', { name: stopName() })
-    FakeRecorder.instances[0].bytes = [new Uint8Array(MAX_RECORDING_BYTES + 1)]
     await userEvent.click(screen.getByRole('button', { name: stopName() }))
-    await waitFor(() => expect(voiceBubble()).toHaveAttribute('data-composer-voice-failure', 'tooLarge'))
+    await waitFor(() => expect(voiceBubble()).toHaveAttribute('data-composer-voice-failure', 'silent'))
     expect(transcribe).not.toHaveBeenCalled()
     expect(field().value).toBe('Mein Text')
+  })
+
+  it('lets go of the microphone and the audio when the composer goes away mid-recording', async () => {
+    const { unmount } = render(<Harness voice={voiceWith(vi.fn(async () => 'never'))} />)
+    await userEvent.click(screen.getByRole('button', { name: startName() }))
+    await screen.findByRole('button', { name: stopName() })
+    act(() => capture().hear(1))
+    unmount()
+    expect(trackStopped).toHaveBeenCalled()
+    expect(FakeAudioContext.instances[0].close).toHaveBeenCalled()
+    expect(capture().disconnect).toHaveBeenCalled()
+  })
+
+  it('lets go of a microphone granted after the composer went away', async () => {
+    let grant: (stream: MediaStream) => void = () => {}
+    getUserMedia.mockImplementationOnce(() => new Promise<MediaStream>((resolve) => (grant = resolve)))
+    const { unmount } = render(<Harness voice={voiceWith(vi.fn(async () => 'never'))} />)
+    await userEvent.click(screen.getByRole('button', { name: startName() }))
+    unmount()
+    expect(FakeAudioContext.instances[0].close).toHaveBeenCalled()
+    await act(async () => grant({ getTracks: () => [{ stop: trackStopped }] } as unknown as MediaStream))
+    expect(trackStopped).toHaveBeenCalled()
+    expect(FakeAudioWorkletNode.instances).toHaveLength(0)
+  })
+
+  it('says the recording broke off when the worklet cannot be loaded', async () => {
+    const transcribe = vi.fn(async () => 'never')
+    let grant: (stream: MediaStream) => void = () => {}
+    getUserMedia.mockImplementationOnce(() => new Promise<MediaStream>((resolve) => (grant = resolve)))
+    render(<Harness voice={voiceWith(transcribe)} />)
+    await userEvent.click(screen.getByRole('button', { name: startName() }))
+    FakeAudioContext.instances[0].audioWorklet.addModule.mockRejectedValueOnce(new DOMException('no', 'AbortError'))
+    await act(async () => grant({ getTracks: () => [{ stop: trackStopped }] } as unknown as MediaStream))
+    await waitFor(() => expect(voiceBubble()).toHaveAttribute('data-composer-voice-failure', 'recorder'))
+    expect(trackStopped).toHaveBeenCalled()
+    expect(FakeAudioContext.instances[0].close).toHaveBeenCalled()
+    expect(transcribe).not.toHaveBeenCalled()
   })
 
   it('puts the recording away with Esc, keeping the field', async () => {
@@ -276,6 +324,7 @@ describe('recording a voice question (#697)', () => {
     render(<Harness voice={voiceWith(transcribe)} initial="Mein Text" />)
     await userEvent.click(screen.getByRole('button', { name: startName() }))
     await screen.findByRole('button', { name: stopName() })
+    act(() => capture().hear(1))
     await userEvent.keyboard('{Escape}')
     await waitFor(() => expect(voiceBubble()).toBeNull())
     await act(async () => {
@@ -283,6 +332,7 @@ describe('recording a voice question (#697)', () => {
     })
     expect(transcribe).not.toHaveBeenCalled()
     expect(trackStopped).toHaveBeenCalled()
+    expect(FakeAudioContext.instances[0].close).toHaveBeenCalled()
     expect(field().value).toBe('Mein Text')
   })
 })
@@ -293,7 +343,7 @@ describe('where the microphone only says how to dictate', () => {
     await userEvent.click(screen.getByRole('button', { name: dictationName() }))
     expect(document.querySelector('[data-composer-dictation="windows"]')).not.toBeNull()
     expect(getUserMedia).not.toHaveBeenCalled()
-    expect(FakeRecorder.instances).toHaveLength(0)
+    expect(FakeAudioContext.instances).toHaveLength(0)
   })
 
   it('when the browser refuses the microphone: the dictation help, saying so, and no recorder', async () => {
@@ -308,7 +358,8 @@ describe('where the microphone only says how to dictate', () => {
     })
     expect(help).toHaveTextContent(common('composer.voice.failed.micBlocked'))
     expect(help).toHaveTextContent(common('composer.dictation.windows'))
-    expect(FakeRecorder.instances).toHaveLength(0)
+    expect(FakeAudioWorkletNode.instances).toHaveLength(0)
+    expect(FakeAudioContext.instances[0].close).toHaveBeenCalled()
     expect(transcribe).not.toHaveBeenCalled()
     expect(field().value).toBe('Mein Text')
     // From now on the microphone is the way to dictate.
@@ -366,14 +417,77 @@ describe('when it does not become text', () => {
     await waitFor(() => expect(field().value).toBe('Zweiter Versuch'))
     expect(transcribe).toHaveBeenCalledTimes(2)
     expect(transcribe.mock.calls[1][0]).toBe(transcribe.mock.calls[0][0])
-    expect(FakeRecorder.instances).toHaveLength(1)
+    expect(FakeAudioContext.instances).toHaveLength(1)
+  })
+
+  it(`sends one recording at most ${MAX_SENDS_PER_RECORDING} times, then offers only typing (stoa-backend#542)`, async () => {
+    const transcribe = vi.fn<VoiceInput['transcribe']>(async () => {
+      throw new VoiceFailure('unavailable')
+    })
+    render(<Harness voice={voiceWith(transcribe)} initial="Schon getippt" />)
+    await recordAndStop()
+    for (let send = 2; send <= MAX_SENDS_PER_RECORDING; send += 1) {
+      await userEvent.click(await screen.findByRole('button', { name: common('composer.voice.sendAgain') }))
+      await waitFor(() => expect(transcribe).toHaveBeenCalledTimes(send))
+    }
+    await waitFor(() => expect(voiceBubble()).toHaveAttribute('data-composer-voice-failure', 'gaveUp'))
+    expect(voiceBubble()).toHaveTextContent(common('composer.voice.failed.gaveUp'))
+    expect(document.querySelector('[data-composer-voice-retry]')).toBeNull()
+    expect(screen.getByRole('button', { name: common('composer.voice.typeInsteadAction') })).toBeInTheDocument()
+    expect(transcribe).toHaveBeenCalledTimes(MAX_SENDS_PER_RECORDING)
+    expect(field().value).toBe('Schon getippt')
+  })
+
+  it('a new recording starts its own count', async () => {
+    let calls = 0
+    const transcribe = vi.fn<VoiceInput['transcribe']>(async () => {
+      calls += 1
+      if (calls === 1) throw new VoiceFailure('unavailable')
+      if (calls === 2) throw new VoiceFailure('silent')
+      if (calls === 3) throw new VoiceFailure('unavailable')
+      return 'Geht doch'
+    })
+    render(<Harness voice={voiceWith(transcribe)} />)
+    await recordAndStop()
+    await userEvent.click(await screen.findByRole('button', { name: common('composer.voice.sendAgain') }))
+    await userEvent.click(await screen.findByRole('button', { name: common('composer.voice.recordAgain') }))
+    await screen.findByRole('button', { name: stopName() })
+    act(() => capture().hear(1))
+    await userEvent.click(screen.getByRole('button', { name: stopName() }))
+    // The new recording may be tried again once, like the first.
+    await userEvent.click(await screen.findByRole('button', { name: common('composer.voice.sendAgain') }))
+    await waitFor(() => expect(field().value).toBe('Geht doch'))
+    expect(transcribe).toHaveBeenCalledTimes(4)
+  })
+
+  it('offline is the connection, not the server: "try again" stays as long as it takes', async () => {
+    let calls = 0
+    const transcribe = vi.fn<VoiceInput['transcribe']>(async () => {
+      calls += 1
+      if (calls <= 3) throw new VoiceFailure('offline')
+      return 'Wieder online'
+    })
+    render(<Harness voice={voiceWith(transcribe)} />)
+    await recordAndStop()
+    for (let send = 0; send < 3; send += 1) {
+      await userEvent.click(await screen.findByRole('button', { name: common('composer.voice.sendAgain') }))
+    }
+    await waitFor(() => expect(field().value).toBe('Wieder online'))
+  })
+
+  it('refused by the model (502): says to type, and offers no "try again" (stoa-backend#542)', async () => {
+    await failWith('refused')
+    expect(voiceBubble()).toHaveTextContent(common('composer.voice.failed.refused'))
+    expect(document.querySelector('[data-composer-voice-retry]')).toBeNull()
+    expect(screen.getByRole('button', { name: common('composer.voice.typeInsteadAction') })).toBeInTheDocument()
+    expect(voiceFailureOf(new ApiError('refused', { status: 502, code: 'voice_transcription_refused' }))).toBe('refused')
   })
 
   it('silent: "record again" starts a new recording', async () => {
     await failWith('silent')
     await userEvent.click(screen.getByRole('button', { name: common('composer.voice.recordAgain') }))
     await screen.findByRole('button', { name: stopName() })
-    expect(FakeRecorder.instances).toHaveLength(2)
+    expect(FakeAudioContext.instances).toHaveLength(2)
   })
 
   it('not allowed (a parent switched it off): tells the host, and offers dictation', async () => {
@@ -399,12 +513,12 @@ describe('when it does not become text', () => {
 describe('the transcription request', () => {
   it('sends the recording as the body, declared with its own type', async () => {
     const post = vi.spyOn(httpClient, 'post').mockResolvedValue({ data: { text: 'Hallo' } })
-    const recording = new Blob(['bytes'], { type: 'audio/mp4' })
+    const recording = new Blob(['bytes'], { type: 'audio/wav' })
     await expect(transcribeVoiceQuestion(recording)).resolves.toBe('Hallo')
     const [path, body, config] = post.mock.calls[0]
     expect(path).toBe('/students/me/voice-questions/transcriptions')
     expect(body).toBe(recording)
-    expect(config?.headers).toMatchObject({ 'Content-Type': 'audio/mp4' })
+    expect(config?.headers).toMatchObject({ 'Content-Type': 'audio/wav' })
   })
 
   it('reads each refusal by its code', async () => {
@@ -415,7 +529,7 @@ describe('the transcription request', () => {
     expect(voiceFailureOf(new ApiError('offline', { transportCode: 'ERR_NETWORK' }))).toBe('offline')
     expect(voiceFailureOf(new ApiError('odd', { status: 500, code: 'internal_error' }))).toBe('failed')
     vi.spyOn(httpClient, 'post').mockRejectedValue(new ApiError('limit', { status: 429, code: 'voice_transcription_daily_limit' }))
-    await expect(transcribeVoiceQuestion(new Blob(['x'], { type: 'audio/webm' }))).rejects.toMatchObject({ kind: 'dailyLimit' })
+    await expect(transcribeVoiceQuestion(new Blob(['x'], { type: 'audio/wav' }))).rejects.toMatchObject({ kind: 'dailyLimit' })
   })
 })
 
@@ -465,17 +579,11 @@ describe("the student's switch (GET /students/me/voice-questions)", () => {
     expect(screen.getByRole('button', { name: dictationName() })).toHaveAttribute('data-composer-mic', 'dictation')
   })
 
-  it('on, in a browser with no MediaRecorder: not even asked, the dictation help', async () => {
-    installBrowser({ recorder: false })
+  it('on, in a browser without Web Audio worklets: not even asked, the dictation help', async () => {
+    installBrowser({ webAudio: false })
     const get = renderStudentAsk(true)
     expect(screen.getByRole('button', { name: dictationName() })).toHaveAttribute('data-composer-mic', 'dictation')
     expect(get).not.toHaveBeenCalled()
-  })
-
-  it('on, in a browser that records none of the three formats: the dictation help', async () => {
-    FakeRecorder.supported = (type) => type === 'audio/wav'
-    renderStudentAsk(true)
-    expect(screen.getByRole('button', { name: dictationName() })).toHaveAttribute('data-composer-mic', 'dictation')
   })
 })
 
@@ -547,7 +655,7 @@ describe("the parent's switch for one child", () => {
 describe('the voice question copy in every language', () => {
   const KINDS: VoiceFailureKind[] = [
     'notAllowed', 'unsupported', 'tooLarge', 'tooLong', 'unreadable', 'silent', 'dailyLimit',
-    'unavailable', 'offline', 'failed', 'micBlocked', 'micMissing', 'recorder',
+    'unavailable', 'refused', 'offline', 'failed', 'gaveUp', 'micBlocked', 'micMissing', 'recorder',
   ]
   const KEYS = ['start', 'stop', 'listening', 'stopHint', 'privacy', 'transcribing', 'sendAgain', 'recordAgain', 'typeInsteadAction', 'typeInstead']
 
