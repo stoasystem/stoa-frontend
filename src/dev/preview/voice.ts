@@ -8,7 +8,8 @@
  *                          says how to dictate (#515)
  *   ?voiceFails=<kind>     the transcription is refused: `unavailable` (503,
  *                          the first time only, so "Try again" goes through),
- *                          `limit` (429), `unsupported` (415), `silent`,
+ *                          `refused` (502, the model refused it), `limit`
+ *                          (429), `unsupported` (415), `silent`,
  *                          `tooLong`, `unreadable` (422), `notAllowed` (403)
  *   ?mic=denied            the browser refuses the microphone
  *   ?mic=real              the device's own microphone, not the stand-in
@@ -16,8 +17,8 @@
  *                          page, /parent/children/demo-student, holds the switch
  *
  * The microphone is a stand-in unless `mic=real`: a quiet tone made by the
- * page's own audio, so the browser's real MediaRecorder records real bytes
- * in its own format without asking for a microphone. The switch the parent
+ * page's own audio, so the real recorder (Web Audio and its worklet, #726)
+ * writes a real WAV without asking for a microphone. The switch the parent
  * sets is the one the student reads, for as long as the page is open.
  */
 import { DEMO_STUDENT_ID } from '@/dev/demo/data/student'
@@ -89,10 +90,12 @@ const SAID: Record<string, string> = {
   it: 'Come calcolo il seno di 30 gradi?',
 }
 
-const ACCEPTED = new Set(['audio/webm', 'video/webm', 'audio/ogg', 'application/ogg', 'audio/mp4', 'audio/m4a', 'audio/x-m4a', 'video/mp4'])
+/** What the backend takes (stoa-backend#542): a WAV, under any of its four names; nothing MediaRecorder makes. */
+const ACCEPTED = new Set(['audio/wav', 'audio/x-wav', 'audio/wave', 'audio/vnd.wave'])
 const FAILS: Record<string, [number, string]> = {
   limit: [429, 'voice_transcription_daily_limit'],
   unavailable: [503, 'voice_transcription_unavailable'],
+  refused: [502, 'voice_transcription_refused'],
   unsupported: [415, 'voice_recording_unsupported'],
   silent: [422, 'voice_recording_silent'],
   tooLong: [422, 'voice_recording_too_long'],
@@ -102,9 +105,27 @@ const FAILS: Record<string, [number, string]> = {
 let failedOnce = false
 
 /**
+ * The last recording the preview took, for checking a browser's recorder by
+ * hand or from a test: `window.__stoaLastVoiceRecording`.
+ */
+let lastRecording: { type: string; bytes: number; seconds: number } | null = null
+Object.defineProperty(window, '__stoaLastVoiceRecording', { get: () => lastRecording, configurable: true })
+
+/** A WAV's length in seconds, read from its header as the backend does; `null` when it is not one. */
+async function wavSeconds(body: Blob): Promise<number | null> {
+  const head = new DataView(await body.slice(0, 44).arrayBuffer())
+  if (head.byteLength < 44) return null
+  const tag = (at: number) => String.fromCharCode(...[0, 1, 2, 3].map((i) => head.getUint8(at + i)))
+  if (tag(0) !== 'RIFF' || tag(8) !== 'WAVE' || tag(12) !== 'fmt ' || tag(36) !== 'data') return null
+  const byteRate = head.getUint32(28, true)
+  return byteRate > 0 ? head.getUint32(40, true) / byteRate : null
+}
+
+/**
  * `POST /students/me/voice-questions/transcriptions`: the checks the backend
- * makes before the model (on, a type it takes, at most 2 MiB, not empty), a
- * moment's wait so "turning it into text" can be seen, then a fixed sentence.
+ * makes before the model (on, a type it takes, at most 2 MiB, not empty, a
+ * WAV no longer than a minute), a moment's wait so "turning it into text" can
+ * be seen, then a fixed sentence.
  */
 export async function demoTranscription(body: unknown): Promise<{ text: string } | [number, string]> {
   if (!voiceSwitchNow().allowed) return FAILS.notAllowed
@@ -112,6 +133,10 @@ export async function demoTranscription(body: unknown): Promise<{ text: string }
   if (!ACCEPTED.has(body.type.split(';', 1)[0].trim().toLowerCase())) return FAILS.unsupported
   if (body.size > 2 * 1024 * 1024) return [413, 'voice_recording_too_large']
   if (body.size === 0) return FAILS.unreadable
+  const wav = await wavSeconds(body)
+  if (wav === null) return FAILS.unreadable
+  if (wav > 60) return FAILS.tooLong
+  lastRecording = { type: body.type, bytes: body.size, seconds: wav }
   await new Promise((resolve) => window.setTimeout(resolve, 1_200))
   const fails = setting('voiceFails')
   if (fails && FAILS[fails]) {
@@ -186,6 +211,9 @@ export function installPreviewMicrophone() {
     }
     return stream
   }
-  Object.defineProperty(devices, 'getUserMedia', { value: getUserMedia, configurable: true })
+  // On the prototype where there is one: WebKit does not keep a property set on
+  // `navigator.mediaDevices` itself, so in Safari the real microphone was asked for (#726).
+  const target = typeof MediaDevices === 'function' && navigator.mediaDevices instanceof MediaDevices ? MediaDevices.prototype : devices
+  Object.defineProperty(target, 'getUserMedia', { value: getUserMedia, configurable: true, writable: true })
   if (!navigator.mediaDevices) Object.defineProperty(navigator, 'mediaDevices', { value: devices, configurable: true })
 }

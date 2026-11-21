@@ -60,8 +60,10 @@
         "silent": "I didn’t hear anything. Speak a little closer to the microphone and try again.",
         "dailyLimit": "You’ve used all of today’s voice questions. You can ask by voice again tomorrow; until then you can type.",
         "unavailable": "Turning speech into text isn’t working right now. Try again in a moment or type your question.",
+        "refused": "Voice questions aren’t working at the moment. Please type your question.",
         "offline": "No connection to STOA. Check the internet and try again.",
         "failed": "That didn’t work. Try again or type your question.",
+        "gaveUp": "It still isn’t working. Type your question for now; you can ask by voice again later.",
         "micBlocked": "The browser isn’t letting STOA use the microphone. You can allow it in the browser’s settings.",
         "micMissing": "I can’t find a microphone, or it’s busy elsewhere. Try again or type your question.",
         "recorder": "The recording stopped unexpectedly. Try again."
