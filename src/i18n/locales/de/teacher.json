@@ -55,6 +55,8 @@
     "replyTitle": "Antwort der Lehrperson",
     "replyDescription": "Halten Sie die Massnahme, den nächsten Schritt oder die Nachbetreuung fest, die die Lernenden brauchen.",
     "requestSummary": "Die Anfrage",
+    "conversation_one": "Ganzes Gespräch ({{count}} Nachricht)",
+    "conversation_other": "Ganzes Gespräch ({{count}} Nachrichten)",
     "roles": {
       "student": "Lernende Person",
       "assistant": "Erklärung des Lernassistenten",
@@ -159,11 +161,18 @@
     "firstActionNone": "Erste Aktion der Lehrperson: noch nicht erfasst",
     "statsLoadFailed": "Die Kennzahlen konnten nicht geladen werden."
   },
-  "assistance": {
-    "title": "Zusammenfassung zur Vorbereitung",
-    "student": "Lernende Person",
+  "prep": {
+    "title": "Zur Vorbereitung",
     "question": "Frage",
-    "noQuestion": "Kein Fragetext verfügbar."
+    "firstQuestion": "Erste Frage",
+    "lastQuestion": "Letzte Frage vor der Hilfeanfrage",
+    "noQuestion": "Im Gespräch wurde keine Frage gestellt.",
+    "uploads": "Hochgeladen",
+    "noUploads": "Nichts",
+    "stars": "Zugehörige Sterne",
+    "showInConversation": "Im Gespräch zeigen",
+    "attachmentCount_one": "{{count}} Anhang",
+    "attachmentCount_other": "{{count}} Anhänge"
   },
   "reply": {
     "label": "Antwort der Lehrperson",

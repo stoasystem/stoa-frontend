@@ -55,6 +55,8 @@
     "replyTitle": "Teacher reply",
     "replyDescription": "Record the intervention, next step, or follow-up the student needs.",
     "requestSummary": "The request",
+    "conversation_one": "Whole conversation ({{count}} message)",
+    "conversation_other": "Whole conversation ({{count}} messages)",
     "roles": {
       "student": "Student",
       "assistant": "Learning assistant explanation",
@@ -159,11 +161,18 @@
     "firstActionNone": "First teacher action: not recorded yet",
     "statsLoadFailed": "The figures could not be loaded."
   },
-  "assistance": {
-    "title": "Preparation summary",
-    "student": "Student",
+  "prep": {
+    "title": "Preparation",
     "question": "Question",
-    "noQuestion": "No question text available."
+    "firstQuestion": "First question",
+    "lastQuestion": "Last question before asking for help",
+    "noQuestion": "The student asked no question in the conversation.",
+    "uploads": "Uploads",
+    "noUploads": "None",
+    "stars": "Related stars",
+    "showInConversation": "Show in conversation",
+    "attachmentCount_one": "{{count}} attachment",
+    "attachmentCount_other": "{{count}} attachments"
   },
   "reply": {
     "label": "Teacher reply",

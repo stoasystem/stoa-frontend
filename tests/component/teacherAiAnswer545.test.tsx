@@ -3,8 +3,8 @@
  * detail showed it as written -- `1. **Schritt 1: …**`, `$$\frac{18 \div 6}…$$`
  * -- where the student saw it drawn in Ask. It is now drawn the same way.
  *
- * The preparation summary no longer carries the start of that answer: since
- * #704 it shows only the student's name and first question
+ * The preparation table above the conversation does not carry that answer:
+ * since #704 it holds the student's questions, uploads and related stars
  * (teacherPrepSummary704.test.tsx).
  */
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
