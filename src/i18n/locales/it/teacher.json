@@ -55,6 +55,9 @@
     "replyTitle": "Risposta dell’insegnante",
     "replyDescription": "Registra l’intervento, il passo successivo o il follow-up di cui lo studente ha bisogno.",
     "requestSummary": "La richiesta",
+    "conversation_one": "Conversazione completa ({{count}} messaggio)",
+    "conversation_many": "Conversazione completa ({{count}} messaggi)",
+    "conversation_other": "Conversazione completa ({{count}} messaggi)",
     "roles": {
       "student": "Studente",
       "assistant": "Spiegazione dell’assistente di apprendimento",
@@ -159,11 +162,19 @@
     "firstActionNone": "Prima azione del docente: non ancora registrata",
     "statsLoadFailed": "Non è stato possibile caricare i dati."
   },
-  "assistance": {
-    "title": "Sintesi per la preparazione",
-    "student": "Studente",
+  "prep": {
+    "title": "Preparazione",
     "question": "Domanda",
-    "noQuestion": "Nessun testo della domanda disponibile."
+    "firstQuestion": "Prima domanda",
+    "lastQuestion": "Ultima domanda prima della richiesta di aiuto",
+    "noQuestion": "Lo studente non ha posto domande nella conversazione.",
+    "uploads": "File caricati",
+    "noUploads": "Nessuno",
+    "stars": "Stelle collegate",
+    "showInConversation": "Mostra nella conversazione",
+    "attachmentCount_one": "{{count}} allegato",
+    "attachmentCount_many": "{{count}} allegati",
+    "attachmentCount_other": "{{count}} allegati"
   },
   "reply": {
     "label": "Risposta del/la docente",

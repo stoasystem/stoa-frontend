@@ -150,12 +150,12 @@ describe('the parent reports page', () => {
 })
 
 describe('the teacher request page', () => {
-  it.each(Object.entries(TEACHER))('%s carries the assistance card copy', (language, bundle) => {
-    const assistance = (bundle as unknown as { assistance?: Record<string, string> }).assistance
+  it.each(Object.entries(TEACHER))('%s carries the preparation table copy', (language, bundle) => {
+    const prep = (bundle as unknown as { prep?: Record<string, string> }).prep
 
-    // Since #704 the card holds the student's name and first question, nothing generated.
-    for (const key of ['title', 'student', 'question', 'noQuestion']) {
-      expect(typeof assistance?.[key], `${language}.assistance.${key}`).toBe('string')
+    // Since #704 the page opens with the backend's preparation table, nothing generated.
+    for (const key of ['title', 'question', 'firstQuestion', 'lastQuestion', 'noQuestion', 'uploads', 'noUploads', 'stars']) {
+      expect(typeof prep?.[key], `${language}.prep.${key}`).toBe('string')
     }
   })
 
@@ -169,8 +169,8 @@ describe('the teacher request page', () => {
 
   it('has no generated summary bodies left to translate', () => {
     // `studentContextSummary` and `suggestedFocus` were written by
-    // teacher_assistance_service.py; the card no longer asks for them (#704).
-    const card = source('components/teacher/TeacherAssistanceSummaryCard.tsx')
+    // teacher_assistance_service.py; the table never asked for them (#704).
+    const card = source('components/teacher/TeacherPrepTable.tsx')
 
     expect(card).not.toContain('studentContextSummary')
     expect(card).not.toContain('suggestedFocus')
