@@ -155,6 +155,23 @@ describe('a question that has come back', () => {
     expect(mockedAnswer).toHaveBeenCalledWith('brueche-l1-c1', { answer: '3/4' })
   })
 
+  it('keeps the question’s own lines, as its lesson does (#732)', async () => {
+    mockedDue.mockResolvedValue({
+      items: [card({ prompt: 'Gegeben: $a = 3$.\n\nWie gross ist $2a$?', type: 'text_input', options: [] })],
+      dueCount: 1,
+      generatedAt: '2026-03-02T09:00:00+00:00',
+    })
+    renderSession()
+
+    const kept = await waitFor(() => {
+      const text = document.querySelector('[data-review-card] [data-bank-text]')
+      expect(text).not.toBeNull()
+      return text!
+    })
+    expect(kept).toHaveClass('whitespace-pre-line')
+    expect(kept.textContent).toContain('\n\nWie gross ist')
+  })
+
   it('does not reveal the answer before one is chosen', async () => {
     mockedDue.mockResolvedValue({
       items: [card()],

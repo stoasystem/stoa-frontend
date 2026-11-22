@@ -24,6 +24,28 @@
   }
 }
 
+/*
+ * A long question is read, not glanced at, and it is sized by its column, not
+ * by the window (#732): the column is as narrow with Ask open beside it as on
+ * a phone. From the title size at full width it comes down to the reading size,
+ * so that an equation on a line of its own fits on that line (ZAP 2023-4 at
+ * 375 px, and at 1280 with Ask open). Its formulas are a little smaller than
+ * KaTeX's 1.21em for the same reason.
+ */
+[data-stage-exercise] {
+  container-type: inline-size;
+}
+
+[data-stage-prompt='long'] {
+  font: var(--t-title2);
+  font-size: clamp(17px, calc(8px + 2.4cqi), 22px);
+  letter-spacing: var(--t-title2-tracking);
+}
+
+[data-stage-prompt='long'] .katex {
+  font-size: 1.1em;
+}
+
 /* A heart lost in the quiz beats once; `data-motion='none'` under reduced motion. */
 @keyframes chapter-heart-lost {
   from {
