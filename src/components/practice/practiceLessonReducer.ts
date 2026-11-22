@@ -10,7 +10,8 @@ export type PracticeLessonState = {
 
 export type PracticeLessonAction =
   | { type: 'answer'; answer: string | string[] }
-  | { type: 'feedback'; feedback: PracticeAnswerResult }
+  /** `answer`: the answer this verdict is for. A verdict for another one is dropped (#733). */
+  | { type: 'feedback'; feedback: PracticeAnswerResult; answer?: string | string[] }
   | { type: 'hint' }
   | { type: 'retry' }
   | { type: 'next'; challenges: PracticeChallenge[] }
@@ -23,6 +24,14 @@ export const initialPracticeLessonState: PracticeLessonState = {
   incorrectAttempts: 0,
 }
 
+/** The same answer: the same text, or the same pieces in the same order. */
+export function sameAnswer(a: string | string[], b: string | string[]): boolean {
+  if (Array.isArray(a) || Array.isArray(b)) {
+    return Array.isArray(a) && Array.isArray(b) && a.length === b.length && a.every((item, index) => item === b[index])
+  }
+  return a === b
+}
+
 export function practiceLessonReducer(
   state: PracticeLessonState,
   action: PracticeLessonAction,
@@ -31,6 +40,9 @@ export function practiceLessonReducer(
     case 'answer':
       return { ...state, answer: action.answer }
     case 'feedback':
+      // The answer was changed, or the exercise left, after it was sent: the
+      // verdict would be drawn beside an answer it was not given for.
+      if (action.answer !== undefined && !sameAnswer(action.answer, state.answer)) return state
       return {
         ...state,
         feedback: action.feedback,

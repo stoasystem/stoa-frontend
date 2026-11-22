@@ -196,36 +196,49 @@ export function useLessonRun(lesson: PracticeLesson | undefined, { testOut = fal
     void begin('testOut')
   }, [begin, lesson, testOut])
 
+  // One answer on its way at a time, and the answer held as it was sent until
+  // it comes back (#733). Set in the press itself, not from state: two presses
+  // before the next render both saw "not checking" and sent two requests, and
+  // the slower verdict landed beside whatever was chosen by then -- after a
+  // "could not be checked", even beside another option.
+  const sending = useRef(false)
+
   const check = useCallback(async () => {
-    if (!challenge || !answered || answering) return
-    if (quiz) {
-      setAnswering(true)
-      setQuizCheckFailed(false)
-      try {
-        // The exercise on screen stays until advance, so a resend after a lost
-        // reply names the same one and gets the first verdict back (#589).
-        setQuizResult(
-          await answerLessonQuiz(quiz.view.lessonId, quiz.view.quizId, {
-            exerciseId: challenge.challengeId,
-            answer: state.answer,
-          }),
-        )
-      } catch (error) {
-        if (quizRefused(error)) refuse(error, true)
-        else setQuizCheckFailed(true)
-      } finally {
-        setAnswering(false)
+    if (!challenge || !answered || sending.current) return
+    sending.current = true
+    const sent = state.answer
+    try {
+      if (quiz) {
+        setAnswering(true)
+        setQuizCheckFailed(false)
+        try {
+          // The exercise on screen stays until advance, so a resend after a lost
+          // reply names the same one and gets the first verdict back (#589).
+          setQuizResult(
+            await answerLessonQuiz(quiz.view.lessonId, quiz.view.quizId, {
+              exerciseId: challenge.challengeId,
+              answer: sent,
+            }),
+          )
+        } catch (error) {
+          if (quizRefused(error)) refuse(error, true)
+          else setQuizCheckFailed(true)
+        } finally {
+          setAnswering(false)
+        }
+        return
       }
-      return
+      // A check that fails on the way keeps the answer: the next press sends it again.
+      const judged = await submitAnswer.mutateAsync({
+        challengeId: challenge.challengeId,
+        payload: { answer: sent, ...askConversation() },
+      })
+      if (!judged.correct) setTries({ challengeId: challenge.challengeId, wrong: wrong + 1 })
+      dispatch({ type: 'feedback', feedback: judged, answer: sent })
+    } finally {
+      sending.current = false
     }
-    if (submitAnswer.isPending) return
-    const judged = await submitAnswer.mutateAsync({
-      challengeId: challenge.challengeId,
-      payload: { answer: state.answer, ...askConversation() },
-    })
-    if (!judged.correct) setTries({ challengeId: challenge.challengeId, wrong: wrong + 1 })
-    dispatch({ type: 'feedback', feedback: judged })
-  }, [answered, answering, challenge, quiz, refuse, state.answer, submitAnswer, wrong])
+  }, [answered, challenge, quiz, refuse, state.answer, submitAnswer, wrong])
 
   // The press a hint is being asked for. One that fails on the way is sent
   // again with the same key, so the backend counts it once (#325).
@@ -281,7 +294,7 @@ export function useLessonRun(lesson: PracticeLesson | undefined, { testOut = fal
 
   /** No credit: the exercise goes to the back of the queue. Not in a quiz, nor once the quiz is offered. */
   const skip = useCallback(() => {
-    if (!challenge || quiz || quizOffered || state.feedback?.correct) return
+    if (!challenge || quiz || quizOffered || state.feedback?.correct || sending.current) return
     setQueue((list) => [...list.filter((id) => id !== challenge.challengeId), challenge.challengeId])
     setSkipped((list) => (list.includes(challenge.challengeId) ? list : [...list, challenge.challengeId]))
     clearFailures()
@@ -306,7 +319,10 @@ export function useLessonRun(lesson: PracticeLesson | undefined, { testOut = fal
   }, [clearFailures])
 
   const retry = useCallback(() => dispatch({ type: 'retry' }), [])
-  const answer = useCallback((value: string | string[]) => dispatch({ type: 'answer', answer: value }), [])
+  // The answer on its way is the one on screen until its verdict or failure.
+  const answer = useCallback((value: string | string[]) => {
+    if (!sending.current) dispatch({ type: 'answer', answer: value })
+  }, [])
 
   return {
     challenge,

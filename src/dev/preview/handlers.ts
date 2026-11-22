@@ -153,6 +153,8 @@ const field = <T>(body: unknown, name: string): T | undefined =>
 
 /** Exercises answered right on this page, for the lesson's result. */
 const answeredRight = new Set<string>()
+/** Exercises whose first check was refused under `?answerFails=once` (#733). */
+const answerFailedOnce = new Set<string>()
 
 /** Teachers asked for on this page, by conversation. */
 const askedForTeacher = new Map<string, { requestId: string; conversationId: string; status: string; createdAt: string; mode: string; teacherName?: string }>()
@@ -386,7 +388,17 @@ const routes: Array<[method: string, pattern: string, handler: Handler]> = [
     return params.subjectId === roadmap.subjectId && params.topicId === roadmap.topicId ? roadmap : null
   }],
   ['GET', '/practice/lessons/:lessonId', ({ params }) => demoChapterNow().lessons.find((lesson) => lesson.id === params.lessonId) ?? null],
-  ['POST', '/practice/challenges/:challengeId/answer', ({ params, body }) => {
+  ['POST', '/practice/challenges/:challengeId/answer', async ({ params, body }) => {
+    // `?answerFails=once` (#733): each exercise's first check is the backend's
+    // 503, the next one is judged; both take a second, so a press made while
+    // one is on its way can be tried.
+    if (new URLSearchParams(window.location.search).get('answerFails') === 'once') {
+      await new Promise((resolve) => window.setTimeout(resolve, 1_000))
+      if (!answerFailedOnce.has(params.challengeId)) {
+        answerFailedOnce.add(params.challengeId)
+        return refuse(503, 'service_unavailable', 'Your answer could not be checked right now.')
+      }
+    }
     const result = checkDemoAnswer(params.challengeId, field<string | string[]>(body, 'answer') ?? '', demoLanguage())
     if (result?.correct) answeredRight.add(params.challengeId)
     return result
