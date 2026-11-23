@@ -212,6 +212,34 @@ describe('a question that has come back', () => {
     expect(screen.getByRole('button', { name: /try again/i })).toBeInTheDocument()
   })
 
+  // #730, with stoa-backend#565: the line a wrong answer is told is the
+  // backend's, for that answer. Each attempt shows its own receipt's, as it came.
+  it('tells each wrong answer the backend’s line for that answer, as it came (#730)', async () => {
+    mockedDue.mockResolvedValue({ items: [card()], dueCount: 1, generatedAt: '2026-03-02T09:00:00+00:00' })
+    const wrong = (feedback: string) => ({ challengeId: 'brueche-l1-c1', correct: false, feedback, attemptsRemaining: 1 })
+    const first = 'Der Wert stimmt – kürze den Bruch noch vollständig.'
+    const second = 'Nicht ganz. Schau dir die Aufgabe nochmals an und versuch es nochmal.'
+    mockedAnswer.mockResolvedValueOnce(wrong(first)).mockResolvedValueOnce(wrong(second))
+    const user = userEvent.setup()
+    renderSession()
+    const verdict = () => document.querySelector<HTMLElement>('[data-review-feedback="wrong"]')!
+
+    await screen.findByText('Was ist 1/2 + 1/4?')
+    await user.click(screen.getByRole('radio', { name: '2/6' }))
+    await user.click(screen.getByRole('button', { name: 'Check answer' }))
+    await screen.findByText(first)
+    // The heading and the backend's line, and nothing else.
+    expect(verdict().textContent).toBe(`Not quite${first}`)
+
+    await user.click(screen.getByRole('button', { name: /try again/i }))
+    expect(screen.queryByText(first)).not.toBeInTheDocument()
+    await user.click(screen.getByRole('radio', { name: '1/6' }))
+    await user.click(screen.getByRole('button', { name: 'Check answer' }))
+    await screen.findByText(second)
+    expect(verdict().textContent).toBe(`Not quite${second}`)
+    expect(screen.queryByText(first)).not.toBeInTheDocument()
+  })
+
   it('keeps the explanation back until the student has found the answer', async () => {
     // The explanation states the answer, so showing it beside "try again"
     // would hand over the retry.
