@@ -140,7 +140,11 @@ export function cleanFigure(source: string, idPrefix: string): CleanFigure | nul
   svg.style.width = '100%'
   svg.style.height = 'auto'
   svg.style.maxHeight = FIGURE_MAX_HEIGHT
-  if (natural) svg.style.maxWidth = `${natural}px`
+  if (natural) {
+    svg.style.maxWidth = `${natural}px`
+    // What a minimum width may not go past (chapter.css, #735).
+    svg.style.setProperty('--figure-width', `${natural}px`)
+  }
   if (ratio) svg.style.aspectRatio = `${ratio.width} / ${ratio.height}`
 
   const named = Boolean(svg.getAttribute('aria-label')?.trim() || svg.querySelector(':scope > title')?.textContent?.trim())

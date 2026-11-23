@@ -5,7 +5,7 @@
  * out; what a run does with them stays with the screen.
  */
 import { Check, X } from 'lucide-react'
-import type { ReactNode } from 'react'
+import { useId, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { MathRenderer } from '@/components/ui/MathRenderer'
 import { ExerciseFigure } from '@/features/chapter/ExerciseFigure'
@@ -128,6 +128,7 @@ export function AnswerInput({
   disabled: boolean
 }) {
   const { t } = useTranslation('chapter')
+  const optionId = useId()
   const options = challenge.options ?? []
 
   if (challenge.type === 'multiple_choice' && options.length > 0) {
@@ -151,6 +152,7 @@ export function AnswerInput({
             const row = (
               <>
                 <span
+                  id={`${optionId}-${index}-badge`}
                   aria-hidden="true"
                   className={cn(
                     'inline-flex size-[30px] shrink-0 items-center justify-center rounded-full text-[13px] font-semibold',
@@ -159,7 +161,7 @@ export function AnswerInput({
                 >
                   {letter ?? String.fromCharCode(65 + index)}
                 </span>
-                <span className={letter ? 'sr-only' : 'flex-1 text-[17px] font-medium text-on-sky'}>
+                <span id={`${optionId}-${index}`} className={letter ? 'sr-only' : 'flex-1 text-[17px] font-medium text-on-sky'}>
                   <MathRenderer>{option}</MathRenderer>
                 </span>
                 {letter && <span className="flex-1" />}
@@ -185,6 +187,9 @@ export function AnswerInput({
                   checked={chosen}
                   disabled={disabled}
                   onChange={() => onChange(option)}
+                  // Named by the option as shown, not by whatever else the
+                  // row holds (#735); an option with no text by its letter.
+                  aria-labelledby={option.trim() ? `${optionId}-${index}` : `${optionId}-${index}-badge`}
                   className="sr-only"
                 />
                 {figure ? (
