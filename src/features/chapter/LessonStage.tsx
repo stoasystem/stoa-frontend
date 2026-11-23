@@ -27,7 +27,7 @@ import { BUTTON_SIZES, ICON } from '@/components/base/sizes'
 import { MathRenderer } from '@/components/ui/MathRenderer'
 import { pathForTarget } from '@/features/starmap/view/layers'
 import type { AskPractice } from '@/features/ask/practiceContext'
-import { AnswerInput, bodyOnSky, FeedbackCard, glass } from '@/features/chapter/answerControls'
+import { AnswerInput, BankText, bodyOnSky, FeedbackCard, glass, withoutBreaksAroundDisplayMath } from '@/features/chapter/answerControls'
 import { ExerciseFigure } from '@/features/chapter/ExerciseFigure'
 import { StageWithAsk, STAGE_SIDE_QUERY } from '@/features/chapter/StageAsk'
 import { quizTroubleIsRestartable, quizTroubleKey } from '@/features/chapter/quiz'
@@ -240,14 +240,6 @@ function LessonRunStage({
  * button on to the exercises. Each card's text is the backend's, already in
  * the student's language.
  */
-/**
- * A display formula is a block of its own: the line breaks written round it
- * would stand as empty lines under `pre-line`.
- */
-function withoutBreaksAroundDisplayMath(body: string) {
-  return body.replace(/[ \t]*\n?(\$\$[\s\S]+?\$\$)[ \t]*\n?/g, '$1')
-}
-
 function LessonCards({ sections, side, start }: { sections: LessonSection[]; side: boolean; start: () => void }) {
   const { t } = useTranslation('chapter')
   const cardId = useId()
@@ -525,15 +517,12 @@ function Exercise({
                 ref={prompt}
                 id={promptId}
                 tabIndex={-1}
-                data-stage-prompt
+                data-stage-prompt={long ? 'long' : 'short'}
                 className="m-0 text-on-sky outline-none"
-                style={
-                  long
-                    ? { font: 'var(--t-title2)', letterSpacing: 'var(--t-title2-tracking)' }
-                    : { font: 'var(--t-question)', letterSpacing: 'var(--t-question-tracking)', fontSize: side ? 44 : 36 }
-                }
+                // A long question is sized by its column (chapter.css).
+                style={long ? undefined : { font: 'var(--t-question)', letterSpacing: 'var(--t-question-tracking)', fontSize: side ? 44 : 36 }}
               >
-                <MathRenderer>{challenge.prompt}</MathRenderer>
+                <BankText>{challenge.prompt}</BankText>
               </h2>
               {challenge.figure && <ExerciseFigure svg={challenge.figure} labelledBy={promptId} className="mt-2" />}
             </div>

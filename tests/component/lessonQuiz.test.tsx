@@ -1134,6 +1134,24 @@ describe('testing out of a lesson from the chapter', () => {
   })
 })
 
+// The bank's line breaks are kept wherever a question is shown (#732); what
+// `BankText` does with them is `bankTextLines732.test.tsx`.
+describe('a question keeps its own lines (#732)', () => {
+  const kept = () => document.querySelector('[data-stage-prompt] > [data-bank-text]')
+
+  it('in the lesson', async () => {
+    open('/chapter/u-5/l-2')
+    await onScreen()
+    expect(kept()).toHaveClass('whitespace-pre-line')
+  })
+
+  it('in the quiz that tests out of it', async () => {
+    open('/chapter/u-5/l-2?mode=quiz')
+    await screen.findByText(/Quiz · Question 1 of 5$/)
+    expect(kept()).toHaveClass('whitespace-pre-line')
+  })
+})
+
 describe('Hint (#325)', () => {
   const hintButton = () => screen.getByRole('button', { name: 'Hint' })
 

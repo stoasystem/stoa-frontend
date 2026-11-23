@@ -26,9 +26,8 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import { RotateCcw } from 'lucide-react'
 import { Button } from '@/components/base'
-import { MathRenderer } from '@/components/ui/MathRenderer'
 import { EmptyState } from '@/components/common/EmptyState'
-import { AnswerInput, bodyOnSky, FeedbackCard, glass, type AnswerValue } from '@/features/chapter/answerControls'
+import { AnswerInput, BankText, bodyOnSky, FeedbackCard, glass, type AnswerValue } from '@/features/chapter/answerControls'
 import { ExerciseFigure } from '@/features/chapter/ExerciseFigure'
 import { submitChallengeAnswer } from '@/services/practice/practiceApi'
 import { practiceQueryKeys } from '@/services/practice/practiceQueryKeys'
@@ -182,7 +181,7 @@ function ReviewQuestion({ card, onAnswer }: { card: ReviewCard; onAnswer: () => 
     <article data-review-card className="flex flex-col gap-4 rounded-[16px] border px-[18px] py-5 text-on-sky" style={glass}>
       <div className="flex flex-wrap items-start justify-between gap-3">
         <p id={promptId} className="m-0 min-w-0 flex-1 text-[17px] font-semibold leading-[1.4] text-on-sky">
-          <MathRenderer>{card.prompt}</MathRenderer>
+          <BankText>{card.prompt}</BankText>
         </p>
         {card.lapses > 0 ? (
           <span className="whitespace-nowrap rounded-full bg-accent-tint px-2 py-1 text-xs font-medium text-primary">

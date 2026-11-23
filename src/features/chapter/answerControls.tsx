@@ -39,6 +39,30 @@ export const glass = {
   WebkitBackdropFilter: 'blur(var(--sky-glass-blur))',
 } as const
 
+/**
+ * A display formula is a block of its own: the line breaks written round it
+ * would stand as empty lines under `pre-line`.
+ */
+export function withoutBreaksAroundDisplayMath(body: string) {
+  return body.replace(/[ \t]*\n?(\$\$[\s\S]+?\$\$)[ \t]*\n?/g, '$1')
+}
+
+/**
+ * Text from the exercise bank -- a question, its working, the feedback on an
+ * answer -- with its own line breaks kept (#732): a question's equations one
+ * to a line, the working one step to a line. Run together they read as one
+ * long number ("= 9.35. 31 ..."). A formula is not broken in the middle; one
+ * wider than the column scrolls inside it rather than wrapping at an operator.
+ * The same in the lesson, its quizzes and the review.
+ */
+export function BankText({ children }: { children: string }) {
+  return (
+    <span data-bank-text className="block overflow-x-auto overflow-y-hidden whitespace-pre-line [&_.katex]:whitespace-nowrap">
+      <MathRenderer>{withoutBreaksAroundDisplayMath(children)}</MathRenderer>
+    </span>
+  )
+}
+
 /** "Richtig." under the heading "Richtig" says nothing new. */
 function repeatsVerdict(text: string, verdict: string) {
   const bare = (value: string) => value.toLocaleLowerCase().replace(/[^\p{L}\p{N}]+/gu, '')
@@ -72,12 +96,12 @@ export function FeedbackCard({
       </p>
       {feedback && !repeatsVerdict(feedback, verdict) && (
         <p className={cn('m-0 text-[15px]', bodyOnSky)}>
-          <MathRenderer>{feedback}</MathRenderer>
+          <BankText>{feedback}</BankText>
         </p>
       )}
       {correct && explanation && (
         <p className="m-0 text-[15px]">
-          <MathRenderer>{explanation}</MathRenderer>
+          <BankText>{explanation}</BankText>
         </p>
       )}
       {children}
