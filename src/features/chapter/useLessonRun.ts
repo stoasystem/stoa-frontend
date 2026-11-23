@@ -329,6 +329,19 @@ export function useLessonRun(lesson: PracticeLesson | undefined, { testOut = fal
     /** Exercises done so far, of the lesson or of the quiz. */
     index: quiz ? quiz.size - quiz.view.remaining : ids.length - queue.length,
     count: quiz ? quiz.size : challenges.length,
+    /**
+     * Which exercise this is, counted from 1 (#734): in a lesson its place in
+     * the lesson's own order, so a skip moves the number on and a skipped one
+     * keeps its number when it comes back; in a quiz, which question of the
+     * paper. Counting what was done instead stood still on a skip.
+     */
+    position: quiz
+      ? Math.min(quiz.size - quiz.view.remaining + 1, quiz.size)
+      : challenge
+        ? ids.indexOf(challenge.challengeId) + 1
+        : Math.min(ids.length - queue.length + 1, challenges.length),
+    /** The exercise on screen was skipped before and has come round again (#734, #729). */
+    skippedBefore: !quiz && challenge !== undefined && skipped.includes(challenge.challengeId),
     last,
     answer: state.answer,
     answered,

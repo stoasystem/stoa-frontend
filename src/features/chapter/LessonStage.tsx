@@ -322,7 +322,9 @@ function StageStrip({
     side ? chapterTitle : null,
     chapter && lessonNumber > 0 ? t('stage.lessonOf', { lesson: lessonNumber, lessons: chapter.total }) : null,
     run.quiz ? t('quiz.label') : null,
-    run.count > 0 && !run.finished && !run.failed ? t('stage.questionOf', { question: Math.min(run.index + 1, run.count), questions: run.count }) : null,
+    run.count > 0 && !run.finished && !run.failed ? t('stage.questionOf', { question: run.position, questions: run.count }) : null,
+    // A skipped exercise come round again says so, beside its own number (#734, #729).
+    run.skippedBefore && !run.finished && !run.failed ? t('stage.skippedBefore') : null,
   ]
     .filter(Boolean)
     .join(' · ')
@@ -445,8 +447,10 @@ function Exercise({
   side: boolean
   arrived: MutableRefObject<boolean>
 }) {
+  const { t } = useTranslation('chapter')
   const prompt = useRef<HTMLHeadingElement>(null)
   const promptId = useId()
+  const skippedId = useId()
   const mode = run.quiz ? 'quiz' : 'lesson'
 
   // A new exercise, the quiz begun, or back from it: the keyboard and the
@@ -511,12 +515,19 @@ function Exercise({
             className="flex w-full max-w-[620px] flex-col"
             style={{ gap: side ? 26 : 20 }}
           >
+            {/* The strip says it; the question, which takes the keyboard, says it to a screen reader (#734). */}
+            {run.skippedBefore && (
+              <span id={skippedId} data-stage-skipped-before className="sr-only">
+                {t('stage.skippedBefore')}
+              </span>
+            )}
             <div data-quote-source="exercise" className="flex flex-col gap-2">
               {challenge.topic && <p className={cn('m-0 text-[17px]', bodyOnSky)}>{challenge.topic}</p>}
               <h2
                 ref={prompt}
                 id={promptId}
                 tabIndex={-1}
+                aria-describedby={run.skippedBefore ? skippedId : undefined}
                 data-stage-prompt={long ? 'long' : 'short'}
                 className="m-0 text-on-sky outline-none"
                 // A long question is sized by its column (chapter.css).
@@ -977,7 +988,7 @@ function StarQuizStrip({ run, chapter, starPath, side }: { run: StarQuizRun; cha
   const where = [
     side ? title : null,
     t('starQuiz.label'),
-    run.count > 0 && run.quiz ? t('stage.questionOf', { question: Math.min(run.index + 1, run.count), questions: run.count }) : null,
+    run.count > 0 && run.quiz ? t('stage.questionOf', { question: run.position, questions: run.count }) : null,
   ]
     .filter(Boolean)
     .join(' · ')

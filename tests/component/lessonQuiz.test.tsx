@@ -951,11 +951,18 @@ describe('skipping inside a lesson', () => {
 
     expect(await skip()).toBe('l-2-e1')
     expect(await onScreen()).toBe('l-2-e2')
-    expect(screen.getByText(/Question 1 of 6/)).toBeInTheDocument()
+    // The header names the exercise on screen, by its place in the lesson
+    // (#734): it moved on with the skip, where it used to stay at 1.
+    expect(screen.getByText(/Question 2 of 6$/)).toBeInTheDocument()
 
-    for (const expected of ['l-2-e2', 'l-2-e3', 'l-2-e4', 'l-2-e5', 'l-2-e6']) expect(await answerRight()).toBe(expected)
+    for (const [n, expected] of ['l-2-e2', 'l-2-e3', 'l-2-e4', 'l-2-e5', 'l-2-e6'].entries()) {
+      expect(screen.getByText(new RegExp(`Question ${n + 2} of 6$`))).toBeInTheDocument()
+      expect(await answerRight()).toBe(expected)
+    }
+    // The skipped one comes round again with its own number, and says it was skipped.
     expect(await onScreen()).toBe('l-2-e1')
-    expect(screen.getByText(/Question 6 of 6/)).toBeInTheDocument()
+    expect(screen.getByText(/Question 1 of 6 · Skipped earlier$/)).toBeInTheDocument()
+    expect(document.querySelector('[data-stage-prompt]')).toHaveAccessibleDescription('Skipped earlier')
     expect(seen.completes).toEqual([])
 
     await answer('2')

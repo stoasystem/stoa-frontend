@@ -106,6 +106,7 @@
       "empty": "Rien de choisi pour l’instant."
     },
     "questionOf": "Question {{question}} sur {{questions}}",
+    "skippedBefore": "Passée tout à l’heure",
     "retry": "Réessayer",
     "skip": "Passer",
     "trouble": {

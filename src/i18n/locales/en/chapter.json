@@ -101,6 +101,7 @@
       "empty": "Nothing chosen yet."
     },
     "questionOf": "Question {{question}} of {{questions}}",
+    "skippedBefore": "Skipped earlier",
     "retry": "Try again",
     "skip": "Skip",
     "trouble": {

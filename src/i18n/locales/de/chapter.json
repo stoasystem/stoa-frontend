@@ -101,6 +101,7 @@
       "empty": "Noch nichts gewählt."
     },
     "questionOf": "Aufgabe {{question}} von {{questions}}",
+    "skippedBefore": "Vorhin übersprungen",
     "retry": "Erneut versuchen",
     "skip": "Überspringen",
     "trouble": {
