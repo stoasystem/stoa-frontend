@@ -562,6 +562,73 @@ describe('the practice stage', () => {
     expect(nextChoice.closest('label')).toHaveAttribute('data-answer-option', 'right')
   })
 
+  // #730, with stoa-backend#565: what a wrong answer is told is the backend's,
+  // chosen when it judged that answer, and comes in the receipt's `feedback`.
+  // The stage shows that line as it came, for every attempt: the second and
+  // third wrong answer get their own, not the first one's, through Try again,
+  // a check that failed on the way (#733) and a skip (#734). Nothing of its
+  // own is added -- no "not reduced" worked out here, no error cause.
+  it('tells each wrong answer the backend’s line for that answer, as it came (#730)', async () => {
+    const said = {
+      sign: 'Almost – check the sign.',
+      close: 'Very close – check your calculation and your rounding.',
+      working: 'Not quite. Check your working and try again.',
+    }
+    const wrong = (feedback: string) => ({ challengeId: 'ch-1', correct: false, feedback, attemptsRemaining: 1 })
+    vi.mocked(submitChallengeAnswer)
+      .mockResolvedValueOnce(wrong(said.sign))
+      .mockRejectedValueOnce(new ApiError('Service Unavailable', { status: 503 }))
+      .mockResolvedValueOnce(wrong(said.close))
+      .mockResolvedValueOnce(wrong(said.working))
+    open('/chapter/u-5/l-2')
+    const card = () => document.querySelector<HTMLElement>('[data-stage-feedback]')!
+    const onlySaid = (line: string) => {
+      expect(card()).toHaveAttribute('data-stage-feedback', 'wrong')
+      // The heading and the backend's line, and nothing else.
+      expect(card()).toHaveTextContent(new RegExp(`^Not quite${line.replace(/[.?]/g, '\\$&')}$`))
+    }
+
+    await userEvent.click(await screen.findByRole('radio', { name: /x = 3/ }))
+    await userEvent.click(screen.getByRole('button', { name: 'Check answer' }))
+    await screen.findByText(said.sign)
+    onlySaid(said.sign)
+
+    await userEvent.click(screen.getByRole('button', { name: 'Try again' }))
+    expect(card()).toBeNull()
+    expect(screen.queryByText(said.sign)).not.toBeInTheDocument()
+
+    // The second attempt fails on the way: no verdict, and not the first one's.
+    await userEvent.click(screen.getByRole('radio', { name: /x = 15/ }))
+    await userEvent.click(screen.getByRole('button', { name: 'Check answer' }))
+    expect(await screen.findByText('Your answer could not be checked. Try again.')).toBeInTheDocument()
+    expect(screen.queryByText(said.sign)).not.toBeInTheDocument()
+    await userEvent.click(screen.getByRole('button', { name: 'Check answer' }))
+    await screen.findByText(said.close)
+    onlySaid(said.close)
+
+    // The third, its line beginning as the heading does: shown whole all the same.
+    await userEvent.click(screen.getByRole('button', { name: 'Try again' }))
+    await userEvent.click(screen.getByRole('radio', { name: /x = 25/ }))
+    await userEvent.click(screen.getByRole('button', { name: 'Check answer' }))
+    await screen.findByText(said.working)
+    onlySaid(said.working)
+    expect(vi.mocked(submitChallengeAnswer).mock.calls.map(([id, payload]) => [id, payload.answer])).toEqual([
+      ['ch-1', 'x = 3'],
+      ['ch-1', 'x = 15'],
+      ['ch-1', 'x = 15'],
+      ['ch-1', 'x = 25'],
+    ])
+
+    // Skipped and come round again: asked afresh, with no line left from before.
+    await userEvent.click(within(document.querySelector<HTMLElement>('[data-stage-actions]')!).getByRole('button', { name: 'Skip' }))
+    await waitFor(() => expect(screen.queryByRole('heading', { level: 2, name: '3x + 5 = 20' })).not.toBeInTheDocument())
+    expect(card()).toBeNull()
+    await userEvent.click(within(document.querySelector<HTMLElement>('[data-stage-actions]')!).getByRole('button', { name: 'Skip' }))
+    expect(await screen.findByRole('heading', { level: 2, name: '3x + 5 = 20' })).toBeInTheDocument()
+    expect(card()).toBeNull()
+    for (const line of Object.values(said)) expect(screen.queryByText(line)).not.toBeInTheDocument()
+  })
+
   it('keeps the way back into Ask beside the composer, off the exercise, on a phone (#180)', async () => {
     open('/chapter/u-5/l-2', { width: 375 })
     await screen.findByRole('heading', { level: 2, name: '3x + 5 = 20' })
