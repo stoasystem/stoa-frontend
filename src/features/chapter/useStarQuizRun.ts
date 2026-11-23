@@ -203,6 +203,9 @@ export function useStarQuizRun(unitId: string | undefined): StarQuizRun {
     challenge,
     index: shown ? Math.min(shown.answered, shown.total) : 0,
     count: shown?.total ?? 0,
+    // Asked once each, in the paper's order: which question this is.
+    position: shown ? Math.min(shown.answered + 1, shown.total) : 0,
+    skippedBefore: false,
     last: shown ? shown.total - shown.answered <= 1 : false,
     answer: state.answer,
     answered,

@@ -106,6 +106,7 @@
       "empty": "Ancora niente scelto."
     },
     "questionOf": "Domanda {{question}} di {{questions}}",
+    "skippedBefore": "Saltata prima",
     "retry": "Riprova",
     "skip": "Salta",
     "trouble": {
