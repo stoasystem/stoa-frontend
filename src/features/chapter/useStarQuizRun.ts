@@ -151,8 +151,13 @@ export function useStarQuizRun(unitId: string | undefined): StarQuizRun {
   const answered = Array.isArray(state.answer) ? state.answer.length > 0 : state.answer.trim().length > 0
   const feedback: StageFeedback | null = result ? { correct: result.correct } : null
 
+  // One answer on its way at a time, held as sent until it comes back (#733),
+  // as on the lesson stage (`useLessonRun`).
+  const sending = useRef(false)
+
   const check = useCallback(async () => {
-    if (!unitId || !view || !challenge || !answered || answering || result) return
+    if (!unitId || !view || !challenge || !answered || sending.current || result) return
+    sending.current = true
     setAnswering(true)
     setCheckFailed(false)
     try {
@@ -166,9 +171,10 @@ export function useStarQuizRun(unitId: string | undefined): StarQuizRun {
         setCheckFailed(true)
       }
     } finally {
+      sending.current = false
       setAnswering(false)
     }
-  }, [answered, answering, challenge, result, state.answer, unitId, view])
+  }, [answered, challenge, result, state.answer, unitId, view])
 
   /** On from the feedback: the next exercise the backend sent, or the verdict it gave. */
   const advance = useCallback(() => {
@@ -188,7 +194,9 @@ export function useStarQuizRun(unitId: string | undefined): StarQuizRun {
 
   const nothing = useCallback(() => {}, [])
   const retry = useCallback(() => dispatch({ type: 'retry' }), [])
-  const setAnswer = useCallback((value: string | string[]) => dispatch({ type: 'answer', answer: value }), [])
+  const setAnswer = useCallback((value: string | string[]) => {
+    if (!sending.current) dispatch({ type: 'answer', answer: value })
+  }, [])
   const hearts = shown ? Math.max(0, shown.mistakesAllowed + 1 - shown.mistakes) : 0
 
   return {
