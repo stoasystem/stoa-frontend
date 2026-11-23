@@ -414,6 +414,7 @@ function YouAreHere({ chapter }: { chapter: Chapter }) {
   const { t } = useTranslation('chapter')
   return (
     <aside
+      data-stage-you-are-here
       aria-label={t('stage.youAreHere')}
       className="absolute top-5 left-6 flex h-[190px] w-[300px] flex-col justify-between overflow-hidden rounded-[16px] border p-3 text-on-sky"
       style={{ ...glass, boxShadow: 'var(--shadow-glass)' }}
@@ -491,17 +492,16 @@ function Exercise({
 
   return (
     <>
-      <div className="relative min-h-0 flex-1 overflow-y-auto">
+      <div data-stage-scroll className="relative min-h-0 flex-1 overflow-y-auto">
         <div
           aria-hidden="true"
           className="pointer-events-none absolute inset-0"
           style={{ background: 'radial-gradient(60% 60% at 55% 45%, rgba(214, 160, 70, 0.14) 0%, rgba(10, 16, 32, 0) 70%)' }}
         />
         {side && chapter && <YouAreHere chapter={chapter} />}
-        <div
-          className="relative flex min-h-full items-center justify-center"
-          style={{ padding: side ? '40px 48px 40px 360px' : '22px 16px 16px' }}
-        >
+        {/* Room for "You are here" only where the stage is wide enough for it
+          * and the question both (chapter.css, #735). */}
+        <div data-stage-center={side ? 'side' : 'phone'} className="relative flex min-h-full items-center justify-center">
           <div
             key={challenge.challengeId}
             ref={exercise}
@@ -519,12 +519,11 @@ function Exercise({
                 tabIndex={-1}
                 data-stage-prompt={long ? 'long' : 'short'}
                 className="m-0 text-on-sky outline-none"
-                // A long question is sized by its column (chapter.css).
-                style={long ? undefined : { font: 'var(--t-question)', letterSpacing: 'var(--t-question-tracking)', fontSize: side ? 44 : 36 }}
+                // Sized by its column, long or short (chapter.css).
               >
                 <BankText>{challenge.prompt}</BankText>
               </h2>
-              {challenge.figure && <ExerciseFigure svg={challenge.figure} labelledBy={promptId} className="mt-2" />}
+              {challenge.figure && <ExerciseFigure svg={challenge.figure} labelledBy={promptId} className="mt-2" question />}
             </div>
 
             <form

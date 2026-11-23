@@ -17,7 +17,18 @@ import { useId, useLayoutEffect, useMemo, useRef } from 'react'
 import { cleanFigure } from '@/features/chapter/figure'
 import { cn } from '@/lib/utils'
 
-export function ExerciseFigure({ svg, labelledBy, className }: { svg: string; labelledBy?: string; className?: string }) {
+export function ExerciseFigure({
+  svg,
+  labelledBy,
+  className,
+  question = false,
+}: {
+  svg: string
+  labelledBy?: string
+  className?: string
+  /** The question's own drawing on the stage, which keeps a readable width (chapter.css, #735). */
+  question?: boolean
+}) {
   const prefix = `figure-${useId().replace(/[^\w-]/g, '')}-`
   const figure = useMemo(() => cleanFigure(svg, prefix), [svg, prefix])
   const paper = useRef<HTMLSpanElement>(null)
@@ -34,7 +45,7 @@ export function ExerciseFigure({ svg, labelledBy, className }: { svg: string; la
   return (
     <span
       ref={paper}
-      data-exercise-figure=""
+      data-exercise-figure={question ? 'question' : ''}
       {...reading}
       className={cn('flex min-w-0 max-w-full justify-center overflow-hidden rounded-[12px] bg-white p-3 text-[#1D1D1F]', className)}
     />

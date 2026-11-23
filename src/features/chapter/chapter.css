@@ -46,6 +46,67 @@
   font-size: 1.1em;
 }
 
+/*
+ * A short question is the maths itself in large type (44 px at full width),
+ * and comes down with its column as a long one does (#735): at 36 px in the
+ * 196 px left beside Ask at 1024 it broke one word to a line, and at an
+ * operator ("470 + / 250 = ?"). Never below 32 px, about the phone's size.
+ */
+[data-stage-prompt='short'] {
+  font: var(--t-question);
+  font-size: clamp(32px, calc(8px + 6cqi), 44px);
+  letter-spacing: var(--t-question-tracking);
+}
+
+/* A word longer than the column wraps inside it rather than running under Ask ("Standardnormalverteilung"). */
+[data-stage-prompt] {
+  overflow-wrap: break-word;
+  hyphens: auto;
+}
+
+/*
+ * The stage measures itself, too (#735). "You are here" takes 360 px at the
+ * left of the stage; beside Ask at 1024 that left the question 196 px. Where
+ * the stage is narrower than the card and a 400 px question, the card goes
+ * (the strip above still says which lesson and question this is) and the
+ * question has the stage.
+ */
+[data-stage-scroll] {
+  container: stage / inline-size;
+}
+
+[data-stage-center='side'] {
+  padding: 40px 48px 40px 360px;
+}
+
+[data-stage-center='phone'] {
+  padding: 22px 16px 16px;
+}
+
+@container stage (max-width: 819px) {
+  [data-stage-you-are-here] {
+    display: none;
+  }
+
+  [data-stage-center='side'] {
+    padding-left: 48px;
+  }
+}
+
+/*
+ * The question's drawing keeps a width its labels can be read at (#735): it
+ * is never squeezed below 280 px, or below its own width when that is less;
+ * a column narrower than that scrolls the drawing sideways.
+ */
+[data-exercise-figure='question'] {
+  overflow-x: auto;
+  justify-content: safe center;
+}
+
+[data-exercise-figure='question'] > svg {
+  min-width: min(280px, var(--figure-width, 280px));
+}
+
 /* A heart lost in the quiz beats once; `data-motion='none'` under reduced motion. */
 @keyframes chapter-heart-lost {
   from {
