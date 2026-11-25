@@ -1238,7 +1238,20 @@
       "questionsPerDay": "Questions à l’IA par jour",
       "escalation": "{{rate}} transmises à un enseignant",
       "aiP50": "Temps de réponse de l’IA (médiane)",
-      "teacherP50": "Temps de réponse de l’enseignant (médiane)"
+      "teacherP50": "Temps de réponse de l’enseignant (médiane)",
+      "wauChange": "{{change}} par rapport à la semaine dernière",
+      "mauChange": "{{change}} par rapport aux 30 jours précédents",
+      "questionsPerDayChange": "{{change}} par rapport aux {{days}} jours précédents",
+      "costPerActiveUser": "Coût par utilisateur actif",
+      "costNoActiveUsers": "Aucun utilisateur actif ce mois-ci pour l’instant",
+      "costUnavailable": "Données de facturation indisponibles",
+      "costTotal": "{{total}} depuis le début du mois · {{people}} personnes",
+      "costPeriod": "{{start}} – {{end}}",
+      "costServices": {
+        "ai": "IA",
+        "database": "Base de données",
+        "other": "Autres"
+      }
     },
     "units": {
       "ms": "{{value}} ms",

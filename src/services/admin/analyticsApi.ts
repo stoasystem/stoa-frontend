@@ -8,11 +8,28 @@ export type AnalyticsRole = (typeof ANALYTICS_ROLES)[number]
 
 export const FUNNEL_STEPS = ['invited', 'activated', 'first_question', 'first_exercise', 'week2_active'] as const
 
+export const COST_SERVICES = ['ai', 'database', 'other'] as const
+export type CostService = (typeof COST_SERVICES)[number]
+
+/** Month to date; null as a whole when the bill could not be read. */
+export type CostPerActiveUser = {
+  amountUsd: number | null
+  totalUsd: number
+  activeUsers: number
+  periodStart: string
+  periodEnd: string
+  breakdown: { service: CostService | string; amountUsd: number }[]
+}
+
 export type AnalyticsKpis = {
   dau: number | null
   wau: number | null
   mau: number | null
   dauChange: number | null
+  wauChange?: number | null
+  mauChange?: number | null
+  questionsPerDayChange?: number | null
+  costPerActiveUser?: CostPerActiveUser | null
   questionsPerDay: number | null
   escalationRate: number | null
   aiP50Ms: number | null

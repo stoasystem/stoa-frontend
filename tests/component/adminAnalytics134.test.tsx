@@ -33,6 +33,21 @@ function overview(extra: Partial<AnalyticsOverview> = {}): AnalyticsOverview {
       wau: 120,
       mau: 310,
       dauChange: 0.12,
+      wauChange: 0.05,
+      mauChange: null,
+      questionsPerDayChange: -0.1,
+      costPerActiveUser: {
+        amountUsd: 0.21,
+        totalUsd: 33.2,
+        activeUsers: 158,
+        periodStart: '2026-11-01',
+        periodEnd: '2026-11-26',
+        breakdown: [
+          { service: 'database', amountUsd: 0.04 },
+          { service: 'ai', amountUsd: 0.15 },
+          { service: 'other', amountUsd: 0.02 },
+        ],
+      },
       questionsPerDay: 85,
       escalationRate: 0.08,
       aiP50Ms: 2400,
@@ -110,6 +125,71 @@ describe('usage statistics page (134-F2)', () => {
     expect(within(kpi('teacher')).getByText(copy.missing)).toBeInTheDocument()
     expect(requests[0].get('days')).toBe('30')
     expect(requests[0].get('role')).toBe('all')
+  })
+
+  it('shows the change of weekly, monthly and question KPIs, coloured by sign, and nothing when null', async () => {
+    serve(overview())
+    renderPage()
+
+    await screen.findByText(copy.kpis.wau)
+    const wau = within(kpi('wau')).getByText('+5% vs last week')
+    expect(wau).toHaveClass('text-green')
+    const questions = within(kpi('questions')).getByText('-10% vs the previous 30 days')
+    expect(questions).toHaveClass('text-red')
+    expect(kpi('mau').querySelector('[data-change]')).toBeNull()
+    expect(within(kpi('mau')).getByText('310')).toBeInTheDocument()
+  })
+
+  it('leaves the change out when an older backend does not send it', async () => {
+    const base = overview()
+    const kpis: Record<string, unknown> = { ...base.kpis }
+    for (const key of ['wauChange', 'mauChange', 'questionsPerDayChange', 'costPerActiveUser']) delete kpis[key]
+    serve({ ...base, kpis: kpis as AnalyticsOverview['kpis'] })
+    renderPage()
+
+    await screen.findByText(copy.kpis.wau)
+    expect(kpi('wau').querySelector('[data-change]')).toBeNull()
+    expect(kpi('questions').querySelector('[data-change]')).toBeNull()
+    expect(within(kpi('cost')).getByText(copy.kpis.costUnavailable)).toBeInTheDocument()
+  })
+
+  it('shows the cost per active user with its split and month to date total', async () => {
+    serve(overview())
+    renderPage()
+
+    await screen.findByText(copy.kpis.costPerActiveUser)
+    const cost = kpi('cost')
+    expect(cost.querySelector('dd')?.textContent).toMatch(/0\.21/)
+    expect(cost.querySelector('[data-cost-breakdown]')).toHaveTextContent('AI 71% · Database 19% · Other 10%')
+    expect(cost.querySelector('[data-cost-total]')?.textContent).toMatch(/33\.20 month to date · 158 people$/)
+    expect(cost.querySelector('[data-cost-period]')).toHaveTextContent('1 Nov – 26 Nov')
+    expect(cost.querySelector('[data-cost-state]')).toBeNull()
+  })
+
+  it('tells no active users apart from billing being unavailable', async () => {
+    const base = overview()
+    serve({
+      ...base,
+      kpis: {
+        ...base.kpis,
+        costPerActiveUser: { ...base.kpis.costPerActiveUser!, amountUsd: null, activeUsers: 0, breakdown: [] },
+      },
+    })
+    const { unmount } = renderPage()
+    await screen.findByText(copy.kpis.costPerActiveUser)
+    expect(within(kpi('cost')).getByText('—')).toBeInTheDocument()
+    expect(within(kpi('cost')).getByText(copy.kpis.costNoActiveUsers)).toBeInTheDocument()
+    expect(within(kpi('cost')).queryByText(copy.kpis.costUnavailable)).not.toBeInTheDocument()
+    expect(kpi('cost').querySelector('[data-cost-total]')).toHaveTextContent('· 0 people')
+    unmount()
+
+    serve({ ...base, kpis: { ...base.kpis, costPerActiveUser: null } })
+    renderPage()
+    await screen.findByText(copy.kpis.costPerActiveUser)
+    expect(within(kpi('cost')).getByText('—')).toBeInTheDocument()
+    expect(within(kpi('cost')).getByText(copy.kpis.costUnavailable)).toBeInTheDocument()
+    expect(within(kpi('cost')).queryByText(copy.kpis.costNoActiveUsers)).not.toBeInTheDocument()
+    expect(kpi('cost').querySelector('[data-cost-total]')).toBeNull()
   })
 
   it('shows each funnel step with its share of the first step', async () => {
