@@ -59,6 +59,13 @@ export const CLUSTERED_SKY = {
   discPadding: 0.9,
   /** Dark between two clusters, as a share of the largest cluster radius. */
   clusterGap: 0.6,
+  /**
+   * A subject's galaxy is drawn at least this share of the tallest one's height. Clusters are
+   * as large as their stars need, so a subject of a hundred stars beside one of seven hundred
+   * (mathematics beside the demo physics) would shrink to a speck on the panorama, which fits
+   * the tallest galaxy; its stars are spread wider instead.
+   */
+  minGalaxyShare: 0.6,
 } as const
 
 export type ClusterRegion = { x: number; y: number; r: number }
@@ -85,8 +92,8 @@ export type ClusteredSky = {
   stars: Star[]
   /** Each cluster's disc, which holds all its stars; no two overlap. */
   regions: Map<string, ClusterRegion>
-  /** One star step (`CLUSTERED_SKY`'s unit) in the sky's units. */
-  unit: number
+  /** One star step (`CLUSTERED_SKY`'s unit) in the sky's units, by cluster: a small subject's galaxy is drawn larger (`minGalaxyShare`). */
+  unit: Map<string, number>
   /** Each cluster's chapters, top to bottom. */
   chapters: Map<string, ChapterBand[]>
 }
@@ -220,8 +227,16 @@ export function layoutClusteredSky(
       const group = own.find((g) => g.clusterId === id)!
       return layoutCluster(id, membersOf.get(id)!, map.prerequisites, clusterOf, group.definition?.mainline, language, seed)
     })
-    return { locals, ...gridOf(locals) }
+    return { locals, ...gridOf(locals), grow: 1 }
   })
+  // A small subject beside large ones is drawn larger, its stars spread wider (`minGalaxyShare`).
+  const tallestRaw = Math.max(1e-9, ...galaxies.map((g) => g.h))
+  for (const galaxy of galaxies) {
+    galaxy.grow = Math.max(1, (CLUSTERED_SKY.minGalaxyShare * tallestRaw) / Math.max(1e-9, galaxy.h))
+    galaxy.w *= galaxy.grow
+    galaxy.h *= galaxy.grow
+    galaxy.centres = galaxy.centres.map((c) => ({ x: c.x * galaxy.grow, y: c.y * galaxy.grow }))
+  }
 
   // Along the band, as `layoutSky` lays galaxies out: half a gap at each end.
   const tallest = Math.max(1e-9, ...galaxies.map((g) => g.h))
@@ -231,19 +246,22 @@ export function layoutClusteredSky(
   const placedAt = new Map<string, { x: number; y: number }>()
   const regions = new Map<string, ClusterRegion>()
   const chapters = new Map<string, ChapterBand[]>()
+  const unit = new Map<string, number>()
   let cursor = gap / 2
   for (const galaxy of galaxies) {
+    const g = galaxy.grow
     galaxy.locals.forEach((local, i) => {
       const cx = cursor + galaxy.centres[i].x
       const cy = galaxy.centres[i].y - galaxy.h / 2
-      regions.set(local.id, { x: cx * k, y: 0.5 + cy * k, r: local.r * k })
-      for (const [unitId, p] of local.points) placedAt.set(unitId, { x: (cx + p.x) * k, y: 0.5 + (cy + p.y) * k })
-      chapters.set(local.id, local.bands.map((band) => ({ ...band, x: (cx + band.x) * k, y: 0.5 + (cy + band.y) * k })))
+      regions.set(local.id, { x: cx * k, y: 0.5 + cy * k, r: local.r * g * k })
+      for (const [unitId, p] of local.points) placedAt.set(unitId, { x: (cx + p.x * g) * k, y: 0.5 + (cy + p.y * g) * k })
+      chapters.set(local.id, local.bands.map((band) => ({ ...band, x: (cx + band.x * g) * k, y: 0.5 + (cy + band.y * g) * k })))
+      unit.set(local.id, g * k)
     })
     cursor += galaxy.w + gap
   }
 
   const nebulae: Nebula[] = withStars.map((g, i) => ({ topicId: g.clusterId, name: g.name, order: i + 1, subjectId: g.subjectId }))
   const stars = map.stars.map((star) => ({ ...star, nebulaId: clusterOf.get(star.unitId)!, ...placedAt.get(star.unitId)! }))
-  return { nebulae, stars, regions, chapters, unit: k }
+  return { nebulae, stars, regions, chapters, unit }
 }
