@@ -225,7 +225,7 @@
     "description": "Teacher response times, operational notifications, and the system pages.",
     "pages": "In System",
     "status": "System status",
-    "statusDescription": "Not available yet",
+    "statusDescription": "Health of each feature, alarms and deploys",
     "learningOperations": "Learning operations",
     "learningOperationsDescription": "Signals, completions and data readiness by subject",
     "learningAutomation": "Learning automation",
@@ -233,7 +233,7 @@
     "scope": {
       "title": "Operations scope",
       "covers": "Administrators manage accounts under Users (invitations, assignments, password resets, suspension and archiving) and review teacher applications, the curriculum and moderation in their own sections.",
-      "notYet": "Support cases are not handled here yet, and system status is still to come."
+      "notYet": "Support cases are not handled here yet."
     },
     "readiness": {
       "title": "Service readiness",
@@ -1067,6 +1067,122 @@
       "change": "Change the period",
       "failed": "Account {{accountNumber}} was opened, but its usage period was not set. {{reason}} Set it below.",
       "conflict": "Someone changed this period at the same moment."
+    }
+  },
+  "systemHealth": {
+    "title": "System health",
+    "description": "Requests, errors and response times for each feature. Open a card for details.",
+    "windowLabel": "Time window",
+    "window": {
+      "1h": "1 hour",
+      "24h": "24 hours",
+      "7d": "7 days"
+    },
+    "generatedAt": "Updated {{time}}",
+    "loading": "Loading system health…",
+    "loadFailed": "System health could not be loaded.",
+    "featureGrid": "Features",
+    "sparkLabel": "p95 response time of {{name}} over the time window",
+    "ms": "{{value}} ms",
+    "frontendErrors24h": "Frontend errors, last 24 hours",
+    "features": {
+      "auth": "Sign-in and accounts",
+      "practice": "Star map and practice",
+      "ask_ai": "AI questions",
+      "teacher_help": "Teacher help",
+      "voice": "Voice questions",
+      "notifications": "Notifications",
+      "parent_reports": "Parent reports",
+      "admin": "Admin console",
+      "other": "Other"
+    },
+    "status": {
+      "ok": "Healthy",
+      "warn": "Slow",
+      "bad": "Failing",
+      "unknown": "No data"
+    },
+    "metric": {
+      "requests": "Requests",
+      "errorRate": "Error rate",
+      "p50": "p50",
+      "p95": "p95",
+      "p95Limit": "p95 limit",
+      "openAlarms": "Open alarms"
+    },
+    "alarms": {
+      "title": "Current alarms",
+      "empty": "No alarm is firing. Everything is within its limits.",
+      "errorRate": "{{feature}}: too many errors",
+      "latency": "{{feature}}: responses too slow",
+      "since": "since {{time}}",
+      "state": {
+        "ALARM": "Firing",
+        "OK": "Cleared",
+        "INSUFFICIENT_DATA": "Not enough data"
+      }
+    },
+    "deploys": {
+      "title": "Recent deploys",
+      "empty": "No deploys in this time window."
+    },
+    "detail": {
+      "back": "Back to system health",
+      "unknownFeature": "Unknown feature",
+      "unknownFeatureHint": "There is no feature with this name. Pick one from the system health overview.",
+      "loadFailed": "The statistics for this feature could not be loaded.",
+      "count": "Count",
+      "at": "Time",
+      "alarmState": "State",
+      "alarmName": "Alarm",
+      "chart": {
+        "title": "Requests and p95 over time",
+        "label": "Requests per interval as bars, p95 response time as a line, the p95 limit dashed",
+        "requests": "Requests",
+        "errors": "Server errors",
+        "p95": "p95 response time",
+        "limit": "p95 limit",
+        "empty": "No requests in this time window",
+        "emptyHint": "Nobody used this feature in the chosen window. Try a longer one."
+      },
+      "routes": {
+        "title": "Routes",
+        "method": "Method",
+        "route": "Route",
+        "overLimit": "Over limit",
+        "empty": "No route of this feature was called in this time window."
+      },
+      "recentErrors": {
+        "title": "Recent server errors",
+        "status": "Status",
+        "empty": "No server errors in this time window."
+      },
+      "frontendErrors": {
+        "title": "Frontend errors",
+        "message": "Message",
+        "release": "Version",
+        "lastAt": "Last seen",
+        "noMessage": "No message",
+        "empty": "No frontend errors in this time window."
+      },
+      "probes": {
+        "title": "Probe runs",
+        "result": "Result",
+        "ok": "Passed",
+        "failed": "Failed",
+        "latency": "Duration",
+        "step": "Step",
+        "empty": "No probe runs in this time window."
+      },
+      "alarms": {
+        "title": "Alarms for this feature",
+        "empty": "This feature has no alarms."
+      },
+      "usage": {
+        "title": "Usage events",
+        "event": "Event",
+        "empty": "No usage events in this time window."
+      }
     }
   }
 }

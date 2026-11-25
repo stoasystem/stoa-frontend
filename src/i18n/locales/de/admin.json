@@ -225,7 +225,7 @@
     "description": "Antwortzeiten der Lehrpersonen, Betriebsmeldungen und die Systemseiten.",
     "pages": "Im Bereich System",
     "status": "Systemstatus",
-    "statusDescription": "Noch nicht verfügbar",
+    "statusDescription": "Zustand jeder Funktion, Alarme und Deployments",
     "learningOperations": "Lernbetrieb",
     "learningOperationsDescription": "Signale, Abschlüsse und Datenbereitschaft nach Fach",
     "learningAutomation": "Lernautomatisierung",
@@ -233,7 +233,7 @@
     "scope": {
       "title": "Umfang der Verwaltung",
       "covers": "Administratorinnen und Administratoren verwalten Konten unter «Benutzer» (Einladungen, Zuordnungen, Passwort-Zurücksetzungen, Sperren und Archivieren) und prüfen Bewerbungen von Lehrpersonen, den Lehrplan und die Moderation in eigenen Bereichen.",
-      "notYet": "Supportfälle werden hier noch nicht bearbeitet, und der Systemstatus folgt noch."
+      "notYet": "Supportfälle werden hier noch nicht bearbeitet."
     },
     "readiness": {
       "title": "Betriebsbereitschaft",
@@ -1067,6 +1067,122 @@
       "change": "Nutzungsdauer ändern",
       "failed": "Das Konto {{accountNumber}} wurde eröffnet, aber seine Nutzungsdauer wurde nicht festgelegt. {{reason}} Legen Sie sie unten fest.",
       "conflict": "Jemand hat diese Nutzungsdauer im selben Moment geändert."
+    }
+  },
+  "systemHealth": {
+    "title": "Systemzustand",
+    "description": "Anfragen, Fehler und Antwortzeiten pro Funktion. Für Details eine Karte öffnen.",
+    "windowLabel": "Zeitraum",
+    "window": {
+      "1h": "1 Stunde",
+      "24h": "24 Stunden",
+      "7d": "7 Tage"
+    },
+    "generatedAt": "Stand {{time}}",
+    "loading": "Systemzustand wird geladen…",
+    "loadFailed": "Der Systemzustand konnte nicht geladen werden.",
+    "featureGrid": "Funktionen",
+    "sparkLabel": "p95-Antwortzeit von {{name}} im Zeitraum",
+    "ms": "{{value}} ms",
+    "frontendErrors24h": "Frontend-Fehler, letzte 24 Stunden",
+    "features": {
+      "auth": "Anmeldung und Konten",
+      "practice": "Sternkarte und Üben",
+      "ask_ai": "KI-Fragen",
+      "teacher_help": "Hilfe durch Lehrpersonen",
+      "voice": "Sprachfragen",
+      "notifications": "Benachrichtigungen",
+      "parent_reports": "Elternberichte",
+      "admin": "Verwaltung",
+      "other": "Sonstiges"
+    },
+    "status": {
+      "ok": "Normal",
+      "warn": "Langsam",
+      "bad": "Gestört",
+      "unknown": "Keine Daten"
+    },
+    "metric": {
+      "requests": "Anfragen",
+      "errorRate": "Fehlerquote",
+      "p50": "p50",
+      "p95": "p95",
+      "p95Limit": "p95-Grenze",
+      "openAlarms": "Offene Alarme"
+    },
+    "alarms": {
+      "title": "Aktuelle Alarme",
+      "empty": "Kein Alarm ausgelöst. Alles liegt innerhalb der Grenzen.",
+      "errorRate": "{{feature}}: zu viele Fehler",
+      "latency": "{{feature}}: Antworten zu langsam",
+      "since": "seit {{time}}",
+      "state": {
+        "ALARM": "Ausgelöst",
+        "OK": "Behoben",
+        "INSUFFICIENT_DATA": "Zu wenig Daten"
+      }
+    },
+    "deploys": {
+      "title": "Letzte Deployments",
+      "empty": "Keine Deployments in diesem Zeitraum."
+    },
+    "detail": {
+      "back": "Zurück zum Systemzustand",
+      "unknownFeature": "Unbekannte Funktion",
+      "unknownFeatureHint": "Eine Funktion mit diesem Namen gibt es nicht. Bitte in der Übersicht zum Systemzustand eine wählen.",
+      "loadFailed": "Die Statistik dieser Funktion konnte nicht geladen werden.",
+      "count": "Anzahl",
+      "at": "Zeit",
+      "alarmState": "Zustand",
+      "alarmName": "Alarm",
+      "chart": {
+        "title": "Anfragen und p95 im Verlauf",
+        "label": "Anfragen pro Intervall als Balken, p95-Antwortzeit als Linie, die p95-Grenze gestrichelt",
+        "requests": "Anfragen",
+        "errors": "Serverfehler",
+        "p95": "p95-Antwortzeit",
+        "limit": "p95-Grenze",
+        "empty": "Keine Anfragen in diesem Zeitraum",
+        "emptyHint": "Im gewählten Zeitraum hat niemand diese Funktion genutzt. Ein längerer Zeitraum zeigt mehr."
+      },
+      "routes": {
+        "title": "Routen",
+        "method": "Methode",
+        "route": "Route",
+        "overLimit": "Über der Grenze",
+        "empty": "In diesem Zeitraum wurde keine Route dieser Funktion aufgerufen."
+      },
+      "recentErrors": {
+        "title": "Letzte Serverfehler",
+        "status": "Statuscode",
+        "empty": "Keine Serverfehler in diesem Zeitraum."
+      },
+      "frontendErrors": {
+        "title": "Frontend-Fehler",
+        "message": "Meldung",
+        "release": "Version",
+        "lastAt": "Zuletzt gesehen",
+        "noMessage": "Ohne Meldung",
+        "empty": "Keine Frontend-Fehler in diesem Zeitraum."
+      },
+      "probes": {
+        "title": "Prüfläufe",
+        "result": "Ergebnis",
+        "ok": "Bestanden",
+        "failed": "Fehlgeschlagen",
+        "latency": "Dauer",
+        "step": "Schritt",
+        "empty": "Keine Prüfläufe in diesem Zeitraum."
+      },
+      "alarms": {
+        "title": "Alarme dieser Funktion",
+        "empty": "Für diese Funktion gibt es keine Alarme."
+      },
+      "usage": {
+        "title": "Nutzungsereignisse",
+        "event": "Ereignis",
+        "empty": "Keine Nutzungsereignisse in diesem Zeitraum."
+      }
     }
   }
 }
