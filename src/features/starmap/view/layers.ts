@@ -16,6 +16,7 @@
  * dimensions: a long move pulls back first, a short one zooms straight in.
  */
 import type { Star, StarMap } from '@/features/starmap/model/starMap'
+import { clusterIdOf } from '@/features/starmap/route/clusters'
 import { baseScale, overviewView, usableHeight, type Bounds, type View, type Viewport } from '@/features/starmap/view/camera'
 import { SHEET, ZOOM } from '@/features/starmap/view/semanticZoom'
 import type { NebulaDisc } from '@/features/starmap/view/geometry'
@@ -207,13 +208,17 @@ export function starFrameY(viewport: Viewport): number {
  * have falls back to the nearest choice it does have.
  */
 export function resolveTarget(map: StarMap, topicId: string | undefined, unitId: string | undefined): LayerTarget {
-  const nebula = topicId ? map.nebulae.find((candidate) => candidate.topicId === topicId) : undefined
-  if (!nebula || !map.stars.some((star) => star.nebulaId === nebula.topicId)) return { layer: 'map' }
-  const star = unitId
-    ? map.stars.find((candidate) => candidate.unitId === unitId && candidate.nebulaId === nebula.topicId)
-    : undefined
-  if (!star) return { layer: 'nebula', nebulaId: nebula.topicId }
-  return { layer: 'star', nebulaId: nebula.topicId, unitId: star.unitId }
+  if (!topicId) return { layer: 'map' }
+  const hasStars = (id: string) => map.nebulae.some((candidate) => candidate.topicId === id) && map.stars.some((star) => star.nebulaId === id)
+  const named = unitId ? map.stars.find((candidate) => candidate.unitId === unitId) : undefined
+  // The map's nebulae are star clusters (#747), and a link made from the
+  // backend's own topic (the chapter, Ask, a lighting) names the topic: its
+  // cluster is meant, else the cluster of the star it names.
+  const nebulaId = [topicId, clusterIdOf(topicId)].find(hasStars) ?? named?.nebulaId
+  if (!nebulaId) return { layer: 'map' }
+  const star = named?.nebulaId === nebulaId ? named : undefined
+  if (!star) return { layer: 'nebula', nebulaId }
+  return { layer: 'star', nebulaId, unitId: star.unitId }
 }
 
 /** The choice one step out: a star's card closed (its nebula), a nebula let go (the galaxy). */
@@ -236,6 +241,15 @@ export function pathForTarget(subjectId: string, target: LayerTarget): string {
   const nebula = `${subject}/${encodeURIComponent(target.nebulaId)}`
   if (target.layer === 'nebula') return nebula
   return `${nebula}/${encodeURIComponent(target.unitId)}`
+}
+
+/**
+ * The learning route scene of one star cluster (#747, ADR 0007):
+ * `/map/:subjectId/cluster/:clusterId`, with `?star=` to open it on that star.
+ */
+export function clusterPath(subjectId: string, clusterId: string, unitId?: string | null): string {
+  const scene = `/map/${encodeURIComponent(subjectId)}/cluster/${encodeURIComponent(clusterId)}`
+  return unitId ? `${scene}?star=${encodeURIComponent(unitId)}` : scene
 }
 
 /**

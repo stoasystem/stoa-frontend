@@ -1,10 +1,11 @@
 /*
- * Star clusters (prototype, the design preview's `starmap-clusters`): a
- * subject drawn as a few large clusters instead of many nebulae. A cluster is
- * a group of topics, defined by the table below; a topic the table does not
- * name is a cluster of its own under its own id, so every subject works
- * without an entry. On the map each cluster is one nebula
- * (`clusteredSky.ts`).
+ * Star clusters (#747, ADR 0007): a subject drawn as a few large clusters
+ * instead of many nebulae. A cluster is a group of topics, defined by the
+ * table below; a topic the table does not name is a cluster of its own under
+ * its own id, so every subject works without an entry. On the map each
+ * cluster is one nebula (`clusteredSky.ts`, laid out by the read model's
+ * `placed()`), and a cluster chosen on the whole view opens its learning
+ * route (`ClusterScene.tsx`).
  *
  * The names are the table's own, in four languages, until the backend names
  * clusters itself.
@@ -73,7 +74,8 @@ export function clustersOf(
   const nebulae = orderedNebulae(map).filter((n) => subjectOfNebula(map, n.topicId) === subjectId)
   const groups: { definition: ClusterDefinition | null; clusterId: string; name: string; topicIds: string[] }[] = []
   for (const nebula of nebulae) {
-    const definition = table.find((d) => d.topicIds.includes(nebula.topicId)) ?? null
+    // A sky already gathered into clusters names each nebula by its cluster's id.
+    const definition = table.find((d) => d.topicIds.includes(nebula.topicId)) ?? table.find((d) => d.clusterId === nebula.topicId) ?? null
     const clusterId = clusterIdOf(nebula.topicId, table)
     const group = groups.find((g) => g.clusterId === clusterId)
     if (group) group.topicIds.push(nebula.topicId)

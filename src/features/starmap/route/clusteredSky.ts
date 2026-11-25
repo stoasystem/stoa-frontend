@@ -1,7 +1,6 @@
 /*
- * The sky gathered into a few large star clusters (prototype, the design
- * preview's `starmap-clusters`): the same map, the same stars, the same
- * engine -- only the step before the engine changes.
+ * The sky gathered into a few large star clusters (#747): the same map, the
+ * same stars, the same engine -- only the step before the engine changes.
  *
  *   - Each cluster (`clusters.ts`: a group of topics) becomes one nebula: the
  *     stars' `nebulaId` is their cluster's, and `nebulae` is the list of
@@ -23,8 +22,8 @@
  * Pure and seeded: the same map gives the same sky. The output is normalised
  * like `layoutSky`'s: x across the band in [0, 1], y centred on 0.5.
  *
- * Not used by the production read model yet (`readModelSource.placed()`);
- * wiring it in is one call there.
+ * The production read model places its sky with this
+ * (`readModelSource.placed()`).
  */
 import { GALAXY_GAP, galaxyOrder, seededRandom } from '@/features/starmap/layout/layout'
 import { orderedNebulae, type Nebula, type Star, type StarMap } from '@/features/starmap/model/starMap'

@@ -1,6 +1,5 @@
 /*
- * A star cluster's learning route (prototype, the design preview's `starmap-clusters`): the
- * cluster's stars laid out left to right as one main line, with at most
+ * A star cluster's learning route (#747): the cluster's stars laid out left to right as one main line, with at most
  * `MAX_BRANCH_LANES` side paths beside it in any column.
  *
  * Pure: the same stars and prerequisites always give the same route, whatever
