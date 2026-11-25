@@ -79,7 +79,7 @@ describe('layoutClusteredSky on the mathematics knowledge base', () => {
         const above = Math.max(...bands[k - 1].stars.map((id) => at.get(id)!.y))
         const below = Math.min(...band.stars.map((id) => at.get(id)!.y))
         // A clear gap, not just no overlap: wider than any band's own lane spread.
-        expect(below - above, `${clusterId} ${k}`).toBeGreaterThan(CLUSTERED_SKY.chapterGap * 0.99 * sky.unit.get(clusterId)!)
+        expect(below - above, `${clusterId} ${k}`).toBeGreaterThan(CLUSTERED_SKY.chapterGap * 0.99 * sky.unit)
         expect(bands[k - 1].y, clusterId).toBeLessThan(band.y)
       })
     }
@@ -88,7 +88,7 @@ describe('layoutClusteredSky on the mathematics knowledge base', () => {
   it('starts every band at the cluster left edge', () => {
     for (const [clusterId, bands] of sky.chapters) {
       const firsts = bands.map((band) => Math.min(...band.stars.map((id) => at.get(id)!.x)))
-      for (const x of firsts) expect(Math.abs(x - firsts[0]), clusterId).toBeLessThan(2 * CLUSTERED_SKY.jitterX * sky.unit.get(clusterId)! + 1e-9)
+      for (const x of firsts) expect(Math.abs(x - firsts[0]), clusterId).toBeLessThan(2 * CLUSTERED_SKY.jitterX * sky.unit + 1e-9)
       for (const band of bands) expect(band.x, clusterId).toBeLessThanOrEqual(Math.min(...firsts) + 1e-9)
     }
   })
@@ -129,7 +129,7 @@ describe('layoutClusteredSky on the mathematics knowledge base', () => {
       const onMain = new Set(cluster.route.mainline)
       for (const band of sky.chapters.get(cluster.clusterId)!) {
         for (const id of band.stars) {
-          const dy = (at.get(id)!.y - band.y) / sky.unit.get(cluster.clusterId)!
+          const dy = (at.get(id)!.y - band.y) / sky.unit
           if (onMain.has(id)) expect(Math.abs(dy), id).toBeLessThanOrEqual(CLUSTERED_SKY.jitterMainY + 1e-9)
           else expect(Math.abs(dy), id).toBeLessThanOrEqual(2 * CLUSTERED_SKY.laneStep + CLUSTERED_SKY.jitterY + 1e-9)
         }
@@ -218,36 +218,32 @@ describe('layoutClusteredSky with automatic chapters', () => {
     ])
     for (let k = 1; k < bands.length; k += 1) {
       expect(Math.min(...bands[k].stars.map((id) => byId.get(id)!.y))).toBeGreaterThan(Math.max(...bands[k - 1].stars.map((id) => byId.get(id)!.y)))
-      expect(Math.abs(byId.get(bands[k].stars[0])!.x - byId.get('l0')!.x)).toBeLessThan(2 * CLUSTERED_SKY.jitterX * out.unit.get('logic')! + 1e-9)
+      expect(Math.abs(byId.get(bands[k].stars[0])!.x - byId.get('l0')!.x)).toBeLessThan(2 * CLUSTERED_SKY.jitterX * out.unit + 1e-9)
     }
     expect(layoutClusteredSky(chain, 'en')).toEqual(out)
   })
 })
 
-describe('layoutClusteredSky with a small subject beside a large one', () => {
-  const big = Array.from({ length: 400 }, (_, i) => `b${i}`)
-  const both: Pick<StarMap, 'nebulae' | 'stars' | 'prerequisites' | 'subjects' | 'subject'> = {
-    ...map,
-    subjects: [...map.subjects, { subjectId: 'big', name: 'Big', lit: 0, total: big.length, enrolled: true }],
-    nebulae: [...map.nebulae, { topicId: 'everything', name: 'Everything', order: 99, subjectId: 'big' }],
-    stars: [...map.stars, ...big.map((unitId, i): Star => ({ ...map.stars[0], unitId, nebulaId: 'everything', order: i + 1, name: unitId }))],
-    prerequisites: [...map.prerequisites, ...big.slice(1).map((to, i) => ({ from: big[i], to }))],
+describe('layoutClusteredSky with a long chapter', () => {
+  // One root and thirty stars that need only it: a main line of two, so one automatic chapter of 31.
+  const ids = Array.from({ length: 30 }, (_, i) => `f${i}`)
+  const star = (unitId: string, order: number): Star => ({ ...map.stars[0], unitId, nebulaId: 'fan', order, name: unitId })
+  const fan: Pick<StarMap, 'nebulae' | 'stars' | 'prerequisites' | 'subjects' | 'subject'> = {
+    subject: { subjectId: 'art', name: 'Art' },
+    subjects: [{ subjectId: 'art', name: 'Art', lit: 0, total: 31, enrolled: true }],
+    nebulae: [{ topicId: 'fan', name: 'Fan', order: 1, subjectId: 'art' }],
+    stars: [star('root', 0), ...ids.map((id, i) => star(id, i + 1))],
+    prerequisites: ids.map((to) => ({ from: 'root', to })),
   }
 
-  it('draws the small galaxy no smaller than about half the tall one, its clusters still apart', () => {
-    const out = layoutClusteredSky(both, 'en')
-    const height = (subjectId: string) => {
-      const regions = out.nebulae.filter((n) => n.subjectId === subjectId).map((n) => out.regions.get(n.topicId)!)
-      return Math.max(...regions.map((r) => r.y + r.r)) - Math.min(...regions.map((r) => r.y - r.r))
-    }
-    expect(height(map.subject.subjectId)).toBeGreaterThan(0.5 * height('big'))
-    const regions = [...out.regions.values()]
-    for (let i = 0; i < regions.length; i += 1) {
-      for (let j = i + 1; j < regions.length; j += 1) {
-        expect(Math.hypot(regions[i].x - regions[j].x, regions[i].y - regions[j].y)).toBeGreaterThan(regions[i].r + regions[j].r)
-      }
-    }
-    // Spread wider, not reshaped: inside a cluster the step is larger, the bands the same.
-    expect(out.unit.get('geometry')!).toBeGreaterThan(out.unit.get('everything')!)
+  it('goes on in rows below, none longer than `rowStars`, so the cluster stays round rather than a long line', () => {
+    const out = layoutClusteredSky(fan, 'en')
+    expect(out.chapters.get('fan')!.map((b) => b.stars.length)).toEqual([31])
+    const steps = out.stars.map((s) => ({ x: s.x / out.unit, y: s.y / out.unit }))
+    const wide = Math.max(...steps.map((p) => p.x)) - Math.min(...steps.map((p) => p.x))
+    const tall = Math.max(...steps.map((p) => p.y)) - Math.min(...steps.map((p) => p.y))
+    // At most `rowStars` steps across (and the gaps where the route moves to its next column).
+    expect(wide).toBeLessThan(CLUSTERED_SKY.rowStars * (CLUSTERED_SKY.starStep + CLUSTERED_SKY.columnGap))
+    expect(wide).toBeLessThan(4 * tall)
   })
 })

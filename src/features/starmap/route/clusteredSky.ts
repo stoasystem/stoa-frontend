@@ -18,7 +18,9 @@
  *     four lanes, so one step per column would stack the bands into a narrow
  *     pillar. The main line runs along the band's middle, side lanes just
  *     above and below. A small seeded jitter keeps it a field of stars rather
- *     than a grid, never enough to cross a neighbour or another lane.
+ *     than a grid, never enough to cross a neighbour or another lane. A
+ *     chapter of more than `rowStars` stars goes on in rows below, like a
+ *     line of text, so a cluster stays round whatever its route.
  *   - The clusters of one subject sit on a grid of their own, neighbours in
  *     the order of the prerequisites they share (`galaxyOrder`), snaking so
  *     each one is beside the one before; the dark between two clusters is
@@ -49,6 +51,16 @@ export const CLUSTERED_SKY = {
   laneStep: 0.45,
   /** Dark between two chapters' bands: from the lowest star one band can reach to the highest the next can. */
   chapterGap: 2.2,
+  /**
+   * The most stars in one row of a band. A longer chapter goes on in rows below it, `rowGap`
+   * apart: a route with a short main line and many side stars (an automatic chapter of 50-80
+   * stars in the demo physics and chemistry) would otherwise be one row some 90 steps long,
+   * its cluster's disc seven times the width of a mathematics one, and the panorama, which fits
+   * the largest galaxy, would draw the mathematics clusters some 40 px across.
+   */
+  rowStars: 12,
+  /** Dark between two rows of one chapter: less than between chapters. */
+  rowGap: 0.9,
   /** Horizontal jitter, either way: well below half a star step, so no star crosses its neighbour. */
   jitterX: 0.16,
   /** Vertical jitter of a side-lane star, either way: below half a lane, so no star crosses its neighbour's lane. */
@@ -59,13 +71,6 @@ export const CLUSTERED_SKY = {
   discPadding: 0.9,
   /** Dark between two clusters, as a share of the largest cluster radius. */
   clusterGap: 0.6,
-  /**
-   * A subject's galaxy is drawn at least this share of the tallest one's height. Clusters are
-   * as large as their stars need, so a subject of a hundred stars beside one of seven hundred
-   * (mathematics beside the demo physics) would shrink to a speck on the panorama, which fits
-   * the tallest galaxy; its stars are spread wider instead.
-   */
-  minGalaxyShare: 0.6,
 } as const
 
 export type ClusterRegion = { x: number; y: number; r: number }
@@ -92,8 +97,8 @@ export type ClusteredSky = {
   stars: Star[]
   /** Each cluster's disc, which holds all its stars; no two overlap. */
   regions: Map<string, ClusterRegion>
-  /** One star step (`CLUSTERED_SKY`'s unit) in the sky's units, by cluster: a small subject's galaxy is drawn larger (`minGalaxyShare`). */
-  unit: Map<string, number>
+  /** One star step (`CLUSTERED_SKY`'s unit) in the sky's units. */
+  unit: number
   /** Each cluster's chapters, top to bottom. */
   chapters: Map<string, ChapterBand[]>
 }
@@ -127,20 +132,29 @@ function layoutCluster(
   // Where the next band's highest star may reach: a gap below the lowest the band before can reach.
   let top = 0
   for (const chapter of chaptersOf(route, id, language)) {
-    const rows = chapter.stars.map((unitId) => laneRow(nodeOf.get(unitId)!.lane))
-    const high = Math.min(0, ...rows)
-    const low = Math.max(0, ...rows)
-    const mainY = top + reach(high) - high * c.laneStep
-    // Left to right in route order (by column, then the main line before its side lanes), each star a step of its own.
-    chapter.stars.forEach((unitId, slot) => {
-      const rand = seededRandom(hash(unitId, seed))
-      const jx = (rand() * 2 - 1) * c.jitterX
-      const jy = (rand() * 2 - 1) * reach(rows[slot])
-      const col = nodeOf.get(unitId)!.col - chapter.fromCol
-      raw.set(unitId, { x: slot * c.starStep + col * c.columnGap + jx, y: mainY + rows[slot] * c.laneStep + jy })
-    })
-    bands.push({ chapterId: chapter.chapterId, number: chapter.number, name: chapter.name, stars: chapter.stars, x: -c.jitterX, y: mainY })
-    top = mainY + low * c.laneStep + reach(low) + c.chapterGap
+    // A long chapter goes on in a row below, like a line of text: rows of even length, at most `rowStars`.
+    const count = Math.ceil(chapter.stars.length / c.rowStars)
+    const length = Math.ceil(chapter.stars.length / count)
+    let bandY = 0
+    for (let r = 0; r < count; r += 1) {
+      const row = chapter.stars.slice(r * length, (r + 1) * length)
+      const lanes = row.map((unitId) => laneRow(nodeOf.get(unitId)!.lane))
+      const high = Math.min(0, ...lanes)
+      const low = Math.max(0, ...lanes)
+      const mainY = top + reach(high) - high * c.laneStep
+      if (r === 0) bandY = mainY
+      const firstCol = nodeOf.get(row[0])!.col
+      // Left to right in route order (by column, then the main line before its side lanes), each star a step of its own.
+      row.forEach((unitId, slot) => {
+        const rand = seededRandom(hash(unitId, seed))
+        const jx = (rand() * 2 - 1) * c.jitterX
+        const jy = (rand() * 2 - 1) * reach(lanes[slot])
+        const col = nodeOf.get(unitId)!.col - firstCol
+        raw.set(unitId, { x: slot * c.starStep + col * c.columnGap + jx, y: mainY + lanes[slot] * c.laneStep + jy })
+      })
+      top = mainY + low * c.laneStep + reach(low) + (r + 1 < count ? c.rowGap : c.chapterGap)
+    }
+    bands.push({ chapterId: chapter.chapterId, number: chapter.number, name: chapter.name, stars: chapter.stars, x: -c.jitterX, y: bandY })
   }
   let cx = 0
   let cy = 0
@@ -227,16 +241,8 @@ export function layoutClusteredSky(
       const group = own.find((g) => g.clusterId === id)!
       return layoutCluster(id, membersOf.get(id)!, map.prerequisites, clusterOf, group.definition?.mainline, language, seed)
     })
-    return { locals, ...gridOf(locals), grow: 1 }
+    return { locals, ...gridOf(locals) }
   })
-  // A small subject beside large ones is drawn larger, its stars spread wider (`minGalaxyShare`).
-  const tallestRaw = Math.max(1e-9, ...galaxies.map((g) => g.h))
-  for (const galaxy of galaxies) {
-    galaxy.grow = Math.max(1, (CLUSTERED_SKY.minGalaxyShare * tallestRaw) / Math.max(1e-9, galaxy.h))
-    galaxy.w *= galaxy.grow
-    galaxy.h *= galaxy.grow
-    galaxy.centres = galaxy.centres.map((c) => ({ x: c.x * galaxy.grow, y: c.y * galaxy.grow }))
-  }
 
   // Along the band, as `layoutSky` lays galaxies out: half a gap at each end.
   const tallest = Math.max(1e-9, ...galaxies.map((g) => g.h))
@@ -246,17 +252,14 @@ export function layoutClusteredSky(
   const placedAt = new Map<string, { x: number; y: number }>()
   const regions = new Map<string, ClusterRegion>()
   const chapters = new Map<string, ChapterBand[]>()
-  const unit = new Map<string, number>()
   let cursor = gap / 2
   for (const galaxy of galaxies) {
-    const g = galaxy.grow
     galaxy.locals.forEach((local, i) => {
       const cx = cursor + galaxy.centres[i].x
       const cy = galaxy.centres[i].y - galaxy.h / 2
-      regions.set(local.id, { x: cx * k, y: 0.5 + cy * k, r: local.r * g * k })
-      for (const [unitId, p] of local.points) placedAt.set(unitId, { x: (cx + p.x * g) * k, y: 0.5 + (cy + p.y * g) * k })
-      chapters.set(local.id, local.bands.map((band) => ({ ...band, x: (cx + band.x * g) * k, y: 0.5 + (cy + band.y * g) * k })))
-      unit.set(local.id, g * k)
+      regions.set(local.id, { x: cx * k, y: 0.5 + cy * k, r: local.r * k })
+      for (const [unitId, p] of local.points) placedAt.set(unitId, { x: (cx + p.x) * k, y: 0.5 + (cy + p.y) * k })
+      chapters.set(local.id, local.bands.map((band) => ({ ...band, x: (cx + band.x) * k, y: 0.5 + (cy + band.y) * k })))
     })
     cursor += galaxy.w + gap
   }
@@ -264,5 +267,5 @@ export function layoutClusteredSky(
   const nebulae: Nebula[] = withStars.map((g, i) => ({ topicId: g.clusterId, name: g.name, order: i + 1, subjectId: g.subjectId }))
   const chapterOf = new Map([...chapters.values()].flatMap((bands) => bands.flatMap((band) => band.stars.map((id) => [id, band.chapterId] as const))))
   const stars = map.stars.map((star) => ({ ...star, nebulaId: clusterOf.get(star.unitId)!, routeChapterId: chapterOf.get(star.unitId)!, ...placedAt.get(star.unitId)! }))
-  return { nebulae, stars, regions, chapters, unit }
+  return { nebulae, stars, regions, chapters, unit: k }
 }
