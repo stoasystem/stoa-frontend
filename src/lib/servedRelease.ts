@@ -83,12 +83,13 @@ const RELEASE_KEYS = [
 ] as const
 const OBJECT_KEYS = ['key', 'versionId', 'url', 'sha256'] as const
 const SECRET_KEY_PATTERN = /(?:secret|password|credential|private|token|api.?key|client.?id|user.?pool|cognito|amplify|auth.?provider|mobile|native|demo)/i
+const JWT_SHAPE = /^[A-Za-z0-9_-]{8,}\.[A-Za-z0-9_-]{8,}\.[A-Za-z0-9_-]{8,}$/
 const SECRET_VALUE_PATTERNS = [
   /^(?:Bearer|Basic)\s+\S+/i,
   /^-----BEGIN [A-Z ]*(?:PRIVATE KEY|CERTIFICATE)-----/,
   /^(?:AKIA|ASIA)[A-Z0-9]{16}$/,
   /^sk-[A-Za-z0-9_-]{16,}$/,
-  /^[A-Za-z0-9_-]{8,}\.[A-Za-z0-9_-]{8,}\.[A-Za-z0-9_-]{8,}$/,
+  JWT_SHAPE,
 ] as const
 
 export class ServedReleaseError extends Error {
@@ -139,8 +140,14 @@ function requireVersionId(value: unknown): string {
   return text
 }
 
-function rejectSecretLikeString(value: string): void {
-  if (SECRET_VALUE_PATTERNS.some((pattern) => pattern.test(value))) fail()
+function rejectSecretLikeString(value: string, isVersionId = false): void {
+  // An S3 version id is 32 random characters of [A-Za-z0-9._]; one that falls
+  // into three dotted runs of eight looks like a JWT and stopped every start of
+  // the 2026-11-25 release. It is held to VERSION_ID_PATTERN instead.
+  const patterns = isVersionId
+    ? SECRET_VALUE_PATTERNS.filter((pattern) => pattern !== JWT_SHAPE)
+    : SECRET_VALUE_PATTERNS
+  if (patterns.some((pattern) => pattern.test(value))) fail()
   if (/^https?:\/\//i.test(value)) {
     let parsed: URL
     try {
@@ -168,7 +175,8 @@ function rejectSecretShapedValues(value: unknown, seen = new Set<object>()): voi
   const record = requireRecord(value)
   for (const [key, item] of Object.entries(record)) {
     if (SECRET_KEY_PATTERN.test(key)) fail()
-    rejectSecretShapedValues(item, seen)
+    if (key === 'versionId' && typeof item === 'string') rejectSecretLikeString(item, true)
+    else rejectSecretShapedValues(item, seen)
   }
   seen.delete(value)
 }

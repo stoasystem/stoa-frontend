@@ -223,7 +223,9 @@ test('closed validation rejects unknown, secret, provider, demo, and native fiel
     ['native field', (value) => { value.mobile = { ios: true } }],
     ['AWS key value', (value) => { value.runtimeConfig.versionId = 'AKIA1234567890ABCDEF' }],
     ['Bearer value', (value) => { value.webEntry.versionId = 'Bearer abc.def.ghi' }],
-    ['JWT value', (value) => { value.webEntry.versionId = 'abcdefgh.ijklmnop.qrstuvwx' }],
+    // A JWT-shaped value has no field left to hide in: every string but the
+    // version ids is held to a stricter shape of its own, and the version ids
+    // are S3's to choose (see the test at the end).
   ]
 
   for (const [name, mutate] of cases) {
@@ -340,4 +342,18 @@ test('loader rejects redirects, final URL drift, wrong media, duplicates, and ov
     }),
     (error) => error.name === 'ServedReleaseError' && error.code === 'served_release_fetch_failed',
   )
+})
+
+test('an S3 version id that happens to look like a JWT is still a version id', async () => {
+  // The runtime config's version id of the 2026-11-25 release: rejected as a
+  // JWT, so no browser could start the application until it was published again.
+  const served = await loadServedReleaseModule()
+  for (const versionId of ['FSaK9Ep7_MZO.cdLlhkl8ON.OZ3wotql', 'abcdefgh.ijklmnop.qrstuvwx']) {
+    for (const field of ['runtimeConfig', 'webEntry']) {
+      const value = validDescriptor()
+      value[field].versionId = versionId
+      const parsed = served.validateServedRelease(value, { expectedWebOrigin: 'https://staging.stoaedu.ch' })
+      assert.equal(parsed[field].versionId, versionId)
+    }
+  }
 })
