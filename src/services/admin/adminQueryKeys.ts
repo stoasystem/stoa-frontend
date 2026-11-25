@@ -36,4 +36,5 @@ export const adminQueryKeys = {
   curriculumDiffsOf: (publicLessonId: string) => [...adminQueryKeys.curriculumAll(), 'diff', publicLessonId] as const,
   curriculumDiff: (publicLessonId: string, fromVersionId: string, toVersionId: string) => [...adminQueryKeys.curriculumDiffsOf(publicLessonId), fromVersionId, toVersionId] as const,
   curriculumMigrationEvidence: (migrationId: string) => [...adminQueryKeys.curriculumAll(), 'migration', migrationId] as const,
+  analyticsOverview: (days: number, role: string) => [...adminQueryKeys.all, 'analytics-overview', days, role] as const,
 }

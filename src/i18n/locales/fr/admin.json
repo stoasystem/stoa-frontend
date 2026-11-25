@@ -1088,5 +1088,138 @@
       "failed": "Le compte {{accountNumber}} a été ouvert, mais sa période d'utilisation n'a pas été fixée. {{reason}} Fixez-la ci-dessous.",
       "conflict": "Quelqu'un a modifié cette période au même moment."
     }
+  },
+  "usageAnalytics": {
+    "title": "Statistiques d’utilisation",
+    "description": "Comment la plateforme est utilisée : activité, fonctions, prise en main et fidélisation.",
+    "filters": {
+      "role": "Rôle",
+      "days": "Période",
+      "daysOption_one": "{{count}} jour",
+      "daysOption_other": "{{count}} jours",
+      "daysOption_many": "{{count}} jours"
+    },
+    "roles": {
+      "all": "Tous",
+      "student": "Élèves",
+      "parent": "Parents",
+      "teacher": "Enseignants"
+    },
+    "incomplete": "Cette période est encore en cours de synthèse : les chiffres peuvent être incomplets.",
+    "loading": "Chargement des statistiques d’utilisation",
+    "loadFailed": "Les statistiques d’utilisation n’ont pas pu être chargées.",
+    "empty": {
+      "title": "Aucune utilisation enregistrée",
+      "description": "Dès que des comptes utilisent la plateforme sur cette période, leur activité apparaît ici."
+    },
+    "noData": "Aucune donnée pour cette période.",
+    "missing": "Pas encore assez de données",
+    "kpis": {
+      "dau": "Actifs par jour",
+      "wau": "Actifs par semaine",
+      "mau": "Actifs par mois",
+      "dauChange": "{{change}} par rapport à la semaine dernière",
+      "questionsPerDay": "Questions à l’IA par jour",
+      "escalation": "{{rate}} transmises à un enseignant",
+      "aiP50": "Temps de réponse de l’IA (médiane)",
+      "teacherP50": "Temps de réponse de l’enseignant (médiane)"
+    },
+    "units": {
+      "ms": "{{value}} ms",
+      "seconds": "{{value}} s",
+      "minutes": "{{value}} min",
+      "hours": "{{value}} h"
+    },
+    "trend": {
+      "title": "Utilisateurs actifs par jour",
+      "summary": "{{count}} actifs le {{day}}",
+      "latest": "Dernier : {{count}}"
+    },
+    "ranking": {
+      "title": "Utilisation des fonctions",
+      "feature": "Fonction",
+      "uses": "Utilisations",
+      "people": "Personnes"
+    },
+    "funnel": {
+      "title": "Parcours des nouveaux comptes",
+      "steps": {
+        "invited": "Invités",
+        "activated": "Activés",
+        "first_question": "Première question",
+        "first_exercise": "Premier exercice",
+        "week2_active": "Toujours actifs en semaine 2"
+      }
+    },
+    "retention": {
+      "title": "Fidélisation par semaine d’inscription",
+      "cohort": "Semaine d’inscription",
+      "size": "Comptes",
+      "week": "Semaine {{n}}",
+      "noValue": "Pas encore atteinte"
+    },
+    "events": {
+      "page_viewed": "Page consultée",
+      "web_vitals": "Vitesse de page mesurée",
+      "user_login": "Connexion",
+      "user_register": "Inscription",
+      "chat_conversation_created": "Conversation commencée",
+      "chat_message_sent": "Question envoyée",
+      "chat_response_started": "Réponse commencée",
+      "chat_response_completed": "Réponse terminée",
+      "chat_response_stopped": "Réponse arrêtée",
+      "file_uploaded": "Fichier téléversé",
+      "teacher_help_requested": "Aide d’un enseignant demandée",
+      "teacher_help_request_failed": "Demande d’aide échouée",
+      "login_submitted": "Connexion envoyée",
+      "login_authenticated": "Connexion confirmée",
+      "login_first_screen_ready": "Premier écran après connexion",
+      "teacher_help_assigned": "Aide attribuée à un enseignant",
+      "teacher_help_resolved": "Aide d’un enseignant résolue",
+      "parent_child_summary_viewed": "Résumé de l’enfant consulté",
+      "parent_report_viewed": "Rapport parent consulté",
+      "parent_upgrade_cta_clicked": "Bouton de mise à niveau (parent) cliqué",
+      "pricing_page_viewed": "Page des tarifs consultée",
+      "pricing_plan_selected": "Formule choisie",
+      "checkout_started": "Paiement commencé",
+      "plan_review_completed": "Vérification de la formule terminée",
+      "billing_page_viewed": "Page de facturation consultée",
+      "feature_locked_viewed": "Fonction verrouillée vue",
+      "upgrade_prompt_clicked": "Invitation à la mise à niveau cliquée",
+      "parent_landing_viewed": "Page d’accueil parents consultée",
+      "parent_value_cta_clicked": "Bouton avantages parents cliqué",
+      "referral_page_viewed": "Page de parrainage consultée",
+      "referral_link_copied": "Lien de parrainage copié",
+      "teacher_availability_viewed": "Disponibilités enseignant consultées",
+      "teacher_availability_updated": "Disponibilités enseignant modifiées",
+      "teacher_credential_uploaded": "Justificatif enseignant téléversé",
+      "support_ticket_created": "Demande d’assistance créée",
+      "support_ticket_viewed": "Demande d’assistance consultée",
+      "admin_analytics_viewed": "Statistiques admin consultées",
+      "utm_captured": "Source de campagne enregistrée",
+      "billing_checkout_started": "Paiement de facturation commencé",
+      "billing_virtual_checkout_completed": "Paiement test terminé",
+      "billing_virtual_checkout_canceled": "Paiement test annulé",
+      "teacher_request_opened": "Demande d’aide ouverte par l’enseignant",
+      "teacher_request_status_updated": "Statut de la demande d’aide modifié",
+      "teacher_time_to_first_action_recorded": "Première action de l’enseignant mesurée",
+      "teacher_note_added": "Note de l’enseignant ajoutée",
+      "feedback_submitted": "Avis envoyé",
+      "organization_dashboard_viewed": "Vue d’ensemble de l’organisation consultée",
+      "organization_switched": "Organisation changée",
+      "organization_student_opened": "Élève de l’organisation ouvert",
+      "learning_profile_viewed": "Profil d’apprentissage consulté",
+      "curriculum_graph_viewed": "Carte du programme consultée",
+      "curriculum_topic_selected": "Thème du programme choisi",
+      "weak_point_diagnosis_viewed": "Points faibles consultés",
+      "learning_operations_dashboard_viewed": "Suivi pédagogique consulté",
+      "teacher_assignment_board_viewed": "Tableau d’attribution consulté",
+      "teacher_assignment_suggested_clicked": "Enseignant suggéré choisi",
+      "parent_monthly_report_viewed": "Rapport mensuel consulté",
+      "advanced_analytics_viewed": "Statistiques détaillées consultées",
+      "retention_page_viewed": "Page de fidélisation consultée",
+      "partnership_page_viewed": "Page partenariats consultée",
+      "partnership_interest_submitted": "Intérêt de partenariat envoyé"
+    }
   }
 }

@@ -1,6 +1,7 @@
 import { apiBaseUrl, enableAnalytics, isDevelopment } from '@/lib/env'
 import { newRandomId } from '@/lib/randomId'
 import { currentSessionToken } from '@/store/authStore'
+import { matchRouteTemplate } from '@/services/analytics/routeTemplate'
 
 export type AnalyticsEventName =
   | 'user_login'
@@ -62,6 +63,8 @@ export type AnalyticsEventName =
   | 'retention_page_viewed'
   | 'partnership_page_viewed'
   | 'partnership_interest_submitted'
+  | 'page_viewed'
+  | 'web_vitals'
 
 export type AnalyticsPayload = Record<string, unknown>
 
@@ -161,7 +164,8 @@ export function trackEvent(name: AnalyticsEventName, payload: AnalyticsPayload =
   const body = {
     name,
     payload: sanitizedPayload,
-    path: window.location.pathname,
+    // The route pattern, never the address: an address can carry ids (card 134).
+    path: matchRouteTemplate(window.location.pathname),
     sessionId: getSessionId(),
     createdAt: new Date().toISOString(),
   }
