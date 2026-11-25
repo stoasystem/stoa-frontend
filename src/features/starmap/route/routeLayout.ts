@@ -1,5 +1,5 @@
 /*
- * A star cluster's learning route (prototype, `src/dev/clusters.html`): the
+ * A star cluster's learning route (prototype, the design preview's `starmap-clusters`): the
  * cluster's stars laid out left to right as one main line, with at most
  * `MAX_BRANCH_LANES` side paths beside it in any column.
  *
@@ -45,6 +45,12 @@ export type RouteInput = {
   clusterOf: ReadonlyMap<string, string>
   /** A hand-made main line, to override the computed one (in order, left to right). */
   mainline?: readonly string[]
+  /**
+   * Lay out entrances (default true). Off where a cross-cluster prerequisite
+   * is drawn some other way, such as the star map's lines between nebulae:
+   * then no column or lane is kept for them.
+   */
+  entrances?: boolean
 }
 
 export type RouteStarNode = {
@@ -92,7 +98,7 @@ export type RouteLayout = {
 
 const byId = (a: string, b: string) => (a < b ? -1 : a > b ? 1 : 0)
 
-export function layoutRoute({ stars, prerequisites, clusterOf, mainline: override }: RouteInput): RouteLayout {
+export function layoutRoute({ stars, prerequisites, clusterOf, mainline: override, entrances = true }: RouteInput): RouteLayout {
   const order = new Map(stars.map((star) => [star.unitId, star.order]))
   const inCluster = (unitId: string) => order.has(unitId)
   const cmp = (a: string, b: string) => (order.get(a) ?? 0) - (order.get(b) ?? 0) || byId(a, b)
@@ -168,7 +174,7 @@ export function layoutRoute({ stars, prerequisites, clusterOf, mainline: overrid
     const wanted = isMain ? Math.max(min, lastMainCol + 1) : min
 
     // Entrances for what this star needs from other clusters.
-    const needed = outside.get(unitId)!
+    const needed = entrances ? outside.get(unitId)! : []
     const fresh = needed
       .filter((s) => !opened.has(s))
       .filter((s) => ![...needed, ...opened].some((other) => other !== s && reaches(s, other)))

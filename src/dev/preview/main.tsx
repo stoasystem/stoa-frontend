@@ -16,7 +16,8 @@
  * messages); `role=teacher`, `classroom=` and `mic=` set up the virtual
  * classroom (#696, see `classroom.ts`); `voice=on`, `voiceFails=`, `mic=` and
  * `role=parent` voice questions and the parent's switch for them (#697, see `voice.ts`).
- * `/clusters/math` (`surface=clusters`) is the star cluster prototype, a route of the preview's own. Moving around inside the page writes the route back to `path` (with
+ * `sky=clusters` draws the real mathematics knowledge base gathered into four
+ * star clusters (prototype, `src/features/starmap/route/clusteredSky.ts`). Moving around inside the page writes the route back to `path` (with
  * `signedIn=0` once signed out, and `lang` once the language changes), so a
  * reload stays where it was -- also back on the surface's own route.
  *
@@ -41,10 +42,12 @@ const longNames = params.get('longNames') === '1'
 const newcomer = params.get('newcomer') === '1' || surface?.demo === 'newcomer'
 const aboutYouLater = params.get('aboutYou') === 'later' || surface?.aboutYou === 'later'
 const languageFirst = params.get('languageFirst') === '1' || surface?.languageFirst === true
+const clustered = params.get('sky') === 'clusters' || surface?.sky === 'clusters'
 // Kept in the address: once the page moves, `path` replaces the surface, and a reload stays a newcomer's.
-if ((newcomer && !params.has('newcomer')) || (aboutYouLater && !params.has('aboutYou')) || (languageFirst && !params.has('languageFirst'))) {
+if ((newcomer && !params.has('newcomer')) || (aboutYouLater && !params.has('aboutYou')) || (languageFirst && !params.has('languageFirst')) || (clustered && !params.has('sky'))) {
   const url = new URL(window.location.href)
   if (newcomer) url.searchParams.set('newcomer', '1')
+  if (clustered) url.searchParams.set('sky', 'clusters')
   if (aboutYouLater) url.searchParams.set('aboutYou', 'later')
   if (languageFirst) url.searchParams.set('languageFirst', '1')
   window.history.replaceState(null, '', url)
@@ -90,7 +93,7 @@ async function start() {
   if (surface?.demo === 'review-due') makeReviewDue()
   if (surface?.demo === 'review-scheduled') makeReviewScheduled()
 
-  const [{ StrictMode, Suspense }, { createRoot }, { MemoryRouter, Route, Routes }] = await Promise.all([
+  const [{ StrictMode, Suspense }, { createRoot }, { MemoryRouter }] = await Promise.all([
     import('react'),
     import('react-dom/client'),
     import('react-router-dom'),
@@ -107,7 +110,6 @@ async function start() {
     { ClassroomVoiceProvider },
     { demoTeacher, previewAsTeacher, previewVoiceConnector },
     { demoParentNow, installPreviewMicrophone, previewAsParent },
-    { ClusterPrototype },
   ] =
     await Promise.all([
       import('@/app/providers/AppProviders'),
@@ -121,7 +123,6 @@ async function start() {
       import('@/features/classroom/classroomVoice'),
       import('@/dev/preview/classroom'),
       import('@/dev/preview/voice'),
-      import('@/dev/clusters/ClusterPrototype'),
     ])
   // Voice questions (#697): a stand-in microphone, unless `mic=real`.
   installPreviewMicrophone()
@@ -139,7 +140,7 @@ async function start() {
   createRoot(root).render(
     <StrictMode>
       <AppProviders>
-        <PreviewLighting longNames={longNames} newcomer={newcomer}>
+        <PreviewLighting longNames={longNames} newcomer={newcomer} clustered={clustered}>
           <MemoryRouter initialEntries={[path]}>
             <AuthBootstrap />
             <PreviewChrome initialPath={path} open={surface?.open} focus={surface?.focus} pending={surface?.pending} readyWhen={surface?.readyWhen} />
@@ -147,12 +148,7 @@ async function start() {
               <Suspense fallback={<PageSkeleton rows={4} />}>
                 {/* The classroom's voice is a stand-in here: nothing joins a real room (#696). */}
                 <ClassroomVoiceProvider value={previewVoiceConnector}>
-                  <Routes>
-                    {/* The star cluster prototype: the preview's own routes, not the app's. */}
-                    <Route path="/clusters/:subjectId" element={<ClusterPrototype />} />
-                    <Route path="/clusters/:subjectId/:clusterId" element={<ClusterPrototype />} />
-                    <Route path="*" element={<AppRoutes />} />
-                  </Routes>
+                  <AppRoutes />
                 </ClassroomVoiceProvider>
               </Suspense>
             </RouteArrival>

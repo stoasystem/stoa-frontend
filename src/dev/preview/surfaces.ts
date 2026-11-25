@@ -25,6 +25,8 @@ export type Surface = {
   signedIn: boolean
   /** Whether the star map is on screen, so the star count changes what it shows. */
   stars: boolean
+  /** `clusters`: the star cluster prototype's sky (`sky=clusters`) instead of the demo sky. */
+  sky?: 'clusters'
   /** Something to do once the page is up, to show a state behind a click. */
   open?: 'account-menu'
   /**
@@ -184,10 +186,17 @@ export const SURFACES: readonly Surface[] = [
     demo: 'review-scheduled',
     readyWhen: '[data-review-reminder="sleeping"]',
   },
-  // The star cluster prototype (src/dev/clusters): the real mathematics knowledge base as four
-  // clusters, each a left-to-right learning route. The preview's own route, not the app's.
-  { id: 'clusters', label: 'Star clusters · overview (prototype)', path: () => '/clusters/math', signedIn: true, stars: false, readyWhen: '[data-cluster-overview]' },
-  { id: 'clusters-route', label: 'Star clusters · Equations and algebra route (prototype)', path: () => '/clusters/math/algebra', signedIn: true, stars: false, readyWhen: '[data-cluster-route]' },
+  // The star cluster prototype: the real mathematics knowledge base (98 stars) gathered into four
+  // clusters, each a nebula whose stars run left to right along its learning route.
+  { id: 'starmap-clusters', label: 'Star map · four star clusters (prototype)', path: () => '/map/math', signedIn: true, stars: false, sky: 'clusters' },
+  {
+    id: 'starmap-clusters-algebra',
+    label: 'Star map · cluster Equations and algebra (prototype)',
+    path: () => '/map/math/algebra',
+    signedIn: true,
+    stars: false,
+    sky: 'clusters',
+  },
   { id: 'chapter', label: 'Chapter', path: () => `/chapter/${unitId}`, signedIn: true, stars: false },
   { id: 'lesson', label: 'Practice stage', path: () => `/chapter/${unitId}/${nextLesson.lessonId}`, signedIn: true, stars: false },
   // #586: a student new to Ask on the practice stage for the first time: Murmi points at Ask.

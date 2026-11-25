@@ -1,5 +1,5 @@
 /*
- * Star clusters and their learning routes (prototype, `src/dev/clusters.html`):
+ * Star clusters and their learning routes (prototype, `starmap-clusters`):
  * the layout's invariants on small hand-made graphs and on the real
  * mathematics knowledge base.
  */
@@ -162,6 +162,6 @@ describe('the real mathematics knowledge base', () => {
     }
     const all = clustersOf(extra, 'en')
     const own = all[all.length - 1]
-    expect(own).toMatchObject({ clusterId: 'topic:logik', name: 'Logic', total: 1 })
+    expect(own).toMatchObject({ clusterId: 'logik', name: 'Logic', total: 1 })
   })
 })

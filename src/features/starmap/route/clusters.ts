@@ -1,8 +1,10 @@
 /*
- * Star clusters (prototype, `src/dev/clusters.html`): a subject shown as a few
- * large clusters instead of one sky of nebulae. A cluster is a group of
- * topics (nebulae), defined by the table below; a topic the table does not
- * name is a cluster of its own, so every subject works without an entry.
+ * Star clusters (prototype, the design preview's `starmap-clusters`): a
+ * subject drawn as a few large clusters instead of many nebulae. A cluster is
+ * a group of topics, defined by the table below; a topic the table does not
+ * name is a cluster of its own under its own id, so every subject works
+ * without an entry. On the map each cluster is one nebula
+ * (`clusteredSky.ts`).
  *
  * The names are the table's own, in four languages, until the backend names
  * clusters itself.
@@ -56,6 +58,11 @@ export type StarCluster = {
   route: RouteLayout
 }
 
+/** The cluster a topic belongs to: its table entry's, else the topic's own id. */
+export function clusterIdOf(topicId: string, table: readonly ClusterDefinition[] = CLUSTER_TABLE): string {
+  return table.find((d) => d.topicIds.includes(topicId))?.clusterId ?? topicId
+}
+
 /** The clusters of the subject in focus, in the order of their first nebula. */
 export function clustersOf(
   map: Pick<StarMap, 'subject' | 'nebulae' | 'stars' | 'prerequisites'>,
@@ -67,7 +74,7 @@ export function clustersOf(
   const groups: { definition: ClusterDefinition | null; clusterId: string; name: string; topicIds: string[] }[] = []
   for (const nebula of nebulae) {
     const definition = table.find((d) => d.topicIds.includes(nebula.topicId)) ?? null
-    const clusterId = definition?.clusterId ?? `topic:${nebula.topicId}`
+    const clusterId = clusterIdOf(nebula.topicId, table)
     const group = groups.find((g) => g.clusterId === clusterId)
     if (group) group.topicIds.push(nebula.topicId)
     else groups.push({ definition, clusterId, name: definition?.names[language] ?? nebula.name, topicIds: [nebula.topicId] })

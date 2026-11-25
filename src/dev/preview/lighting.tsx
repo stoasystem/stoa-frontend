@@ -25,6 +25,9 @@
  * and with `newcomer` (`&newcomer=1`, the `map-newcomer` surface) the sky of
  * a student who has not started anything (`src/dev/demo/sky/newcomer.ts`),
  * which follows the demo knowledge point's lessons completed on the page.
+ * With `clustered` (`&sky=clusters`) it is the star cluster prototype's sky
+ * instead (`src/dev/demo/clusters`): the real mathematics knowledge base,
+ * gathered into four clusters by `layoutClusteredSky`.
  */
 import type { TFunction } from 'i18next'
 import { useMemo, useSyncExternalStore, type ReactNode } from 'react'
@@ -40,6 +43,7 @@ import {
   onDemoServerChange,
   unacknowledgedLit,
 } from '@/dev/preview/demoSource'
+import { demoClusteredStarMap } from '@/dev/demo/clusters/demoClusterMap'
 import { asNewcomer } from '@/dev/demo/sky/newcomer'
 import { readDemoStarMap } from '@/dev/demo/sky/source'
 import { LightingEventSourceContext, type LightingEventSource } from '@/features/starmap/lighting/lightingEvents'
@@ -243,7 +247,18 @@ export function withLongNebulaNames(map: StarMap, t: TFunction<'starmap'>): Star
   return { ...map, nebulae }
 }
 
-export function PreviewLighting({ children, longNames = false, newcomer = false }: { children: ReactNode; longNames?: boolean; newcomer?: boolean }) {
+export function PreviewLighting({
+  children,
+  longNames = false,
+  newcomer = false,
+  clustered = false,
+}: {
+  children: ReactNode
+  longNames?: boolean
+  newcomer?: boolean
+  /** The star cluster prototype (`sky=clusters`): the real mathematics knowledge base in four clusters, its own made-up progress. */
+  clustered?: boolean
+}) {
   const version = useSyncExternalStore(onDemoServerChange, demoServerVersion)
   const { t } = useTranslation('starmap')
   // A new source when the demo backend changes, so the map is drawn again.
@@ -252,6 +267,7 @@ export function PreviewLighting({ children, longNames = false, newcomer = false 
     const completed = completedLessons()
     // The year group saved in "About you" moves a newcomer's start (#591).
     const grade = demoGradeNow()
+    if (clustered) return { demo: true, read: (request) => demoClusteredStarMap(request.language) }
     return {
       demo: true,
       read: (request) => {
@@ -263,7 +279,7 @@ export function PreviewLighting({ children, longNames = false, newcomer = false 
         return longNames ? withLongNebulaNames(followed, t) : followed
       },
     }
-  }, [version, longNames, newcomer, t])
+  }, [version, longNames, newcomer, clustered, t])
   return (
     <LightingEventSourceContext.Provider value={demoLightingSource}>
       <StarMapSourceContext.Provider value={source}>{children}</StarMapSourceContext.Provider>

@@ -1,5 +1,5 @@
 /*
- * The star cluster prototype's sky (`src/dev/clusters.html`): the real
+ * The star cluster prototype's sky (the design preview's `starmap-clusters`): the real
  * mathematics knowledge base (`mathKnowledgeBase.ts`) as a `StarMap`, shaped
  * like `GET /practice/knowledge-map` so the prototype could read the backend
  * as it is. Dev only (#131).
@@ -10,6 +10,7 @@
  * the rest are ready -- drawn as waiting where a prerequisite is not lit yet.
  * The system recommends the star in progress in Numbers and operations.
  */
+import { layoutClusteredSky } from '@/features/starmap/route/clusteredSky'
 import { clustersOf } from '@/features/starmap/route/clusters'
 import type { Nebula, Star, StarMap } from '@/features/starmap/model/starMap'
 import type { SupportedLanguage } from '@/i18n/languages'
@@ -91,4 +92,21 @@ export function demoClusterMap(language: SupportedLanguage): StarMap {
     summary: { lit: litCount, total: stars.length, streakDays: 4, score: 1280 },
     subjects: [{ subjectId: DEMO_CLUSTER_SUBJECT, name: subject.name, lit: litCount, total: stars.length, enrolled: true }],
   }
+}
+
+const clustered = new Map<SupportedLanguage, StarMap>()
+
+/**
+ * The same sky gathered into clusters (`layoutClusteredSky`), as the star map
+ * route draws it on the `starmap-clusters` surface. One map per language, the
+ * same arrays every time, so the engine keeps its scene.
+ */
+export function demoClusteredStarMap(language: SupportedLanguage): StarMap {
+  const known = clustered.get(language)
+  if (known) return known
+  const map = demoClusterMap(language)
+  const { nebulae, stars } = layoutClusteredSky(map, language)
+  const made = { ...map, nebulae, stars }
+  clustered.set(language, made)
+  return made
 }

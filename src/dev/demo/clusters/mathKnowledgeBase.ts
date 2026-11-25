@@ -1,6 +1,6 @@
 /*
  * The mathematics stars of the real knowledge base, for the star cluster
- * prototype (`src/dev/clusters.html`). Dev only: nothing under src/dev reaches
+ * prototype (the design preview's `starmap-clusters`). Dev only: nothing under src/dev reaches
  * the production bundle (#131, docs/agents/design-preview.md).
  *
  * Copied from stoasystem/stoa-backend, src/stoa/services/knowledge_base_stars.json:
