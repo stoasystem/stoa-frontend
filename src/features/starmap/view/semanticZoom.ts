@@ -93,6 +93,12 @@ export const REVEAL = {
    */
   nebulaNameIn: [150, 230] as Ramp,
   nebulaNamePastPanorama: [1.15, 1.45] as Ramp,
+  /**
+   * On the whole view every star cluster is named (#747), whatever its size
+   * on screen; past it the names hand over to the rule above over this range
+   * (a factor of the farthest zoom, from `panoramaBand` on).
+   */
+  clusterNamesUntil: [1.25, 1.5] as Ramp,
   /** ...and out again as star names take over, by `starPx`. */
   nebulaNameOut: [18, 24] as Ramp,
   /**

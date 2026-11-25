@@ -132,8 +132,9 @@ export type ZoomState = {
   pickable: boolean
   /**
    * Within `REVEAL.panoramaBand` of the farthest zoom: the whole view, where a
-   * chosen nebula is let go back to the map. Unlike `band` it does not depend
-   * on how large a sparse map's glyphs are at that zoom.
+   * chosen nebula is let go back to the map, no star is named and a cluster
+   * chosen opens its route scene (#747). Unlike `band` it does not depend on
+   * how large a sparse map's glyphs are at that zoom.
    */
   wholeView: boolean
 }
@@ -173,6 +174,12 @@ export type StarMapEngineOptions = {
   onVisibleChange?: (stars: VisibleStar[], glyphSize: number, nebulae: NebulaDiscOnScreen[], zoom: ZoomState) => void
   /** The first frame with the map on it has been drawn. */
   onFirstFrame?: () => void
+  /**
+   * A star cluster chosen on the whole view (#747, ADR 0007): a tap on a
+   * cluster, its name or a star in it. True when the page opened it (its
+   * route scene); false, or absent, the map flies there as before.
+   */
+  onOpenCluster?: (nebulaId: string) => boolean
 }
 
 type Transition =
@@ -304,12 +311,6 @@ export class StarMapEngine {
   private dotSpacing = 0.05
   /** One sky: the option is on and the map says which galaxy each nebula is in. */
   private sky = false
-  /**
-   * Star names stay out on the whole view (`ZoomState.wholeView`) and come in
-   * as usual once zoomed past it. Off unless set (the star cluster mock-up,
-   * `StarMapSource.quietPanorama`); off, nothing changes.
-   */
-  quietPanorama = false
   private skyGalaxies: SkyGalaxy[] = []
   /** The galaxy the header names: the route's, then whichever is at the centre of the view at rest. */
   private centred = ''
@@ -1462,6 +1463,11 @@ export class StarMapEngine {
     const reach = starPickRadius(this.glyphSize, this.zoom.pickable)
     const hit = this.pickStar(x, y) ?? this.beaconAt(x, y)
     const target = this.target
+    // On the whole view a cluster opens its route scene, by its name, a star in it or its cloud (#747).
+    if (this.zoom.wholeView && this.options.onOpenCluster) {
+      const cluster = hit?.nebulaId ?? this.nebulaNameAt(x, y) ?? this.nebulaAt(x, y) ?? this.nearestStar(x, y, reach)?.nebulaId ?? null
+      if (cluster && this.options.onOpenCluster(cluster)) return true
+    }
     if (hit) {
       // A tap on the star already open brings it back to its place beside the card.
       if (target.layer === 'star' && hit.unitId === target.unitId) this.recentre()
@@ -1771,7 +1777,11 @@ export class StarMapEngine {
      * map's glyphs happen to be at the one zoom that shows the whole map.
      */
     const priorityName = this.sky ? Math.max(giveWay, 1 - ramp(pastPanorama, REVEAL.nebulaNamePastPanorama)) : 1
-    for (let n = 0; n < this.nebulaNames.length; n += 1) this.nebulaNames[n] = this.sky ? nebulaNameAlpha(this.nebulaR[n], starPx, pastPanorama) : 1
+    // Every star cluster is named on the whole view (#747); past it, by its size on screen.
+    const clusterNames = 1 - ramp(pastPanorama, REVEAL.clusterNamesUntil)
+    for (let n = 0; n < this.nebulaNames.length; n += 1) this.nebulaNames[n] = this.sky ? Math.max(clusterNames, nebulaNameAlpha(this.nebulaR[n], starPx, pastPanorama)) : 1
+    // The whole view says what the clusters are, not what is in them: no star names, no star picked out by the pointer (#747).
+    const wholeView = this.sky && pastPanorama < REVEAL.panoramaBand
     const { width, height } = this.viewport
     return {
       dotBlend: Math.max(dotBlendFor(glyphSize), 1 - ramp(pastPanorama, REVEAL.dotsPastPanorama)),
@@ -1792,10 +1802,9 @@ export class StarMapEngine {
       sharpness: this.sharpness,
       glyphSize,
       breath,
-      starLabelAlpha: this.quietPanorama && pastPanorama < REVEAL.panoramaBand ? 0 : starNameAlpha(starPx),
+      starLabelAlpha: wholeView ? 0 : starNameAlpha(starPx),
       restStarNames: restStarNameAlpha(starPx),
-      // The quiet whole view does not pick out a star under the pointer either.
-      hoveredStar: this.quietPanorama && pastPanorama < REVEAL.panoramaBand ? -1 : this.hoveredStar,
+      hoveredStar: wholeView ? -1 : this.hoveredStar,
       pressedStar: this.pressedStar,
       starNameReach: { x: width * this.view.fx, y: height * this.view.fy, ...starNameReach(starPx, Math.min(width, height)) },
       nebulaLabelAlpha: 1,

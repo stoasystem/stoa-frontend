@@ -59,7 +59,6 @@ import { arrowDirection, courseNebulae, nearestInDirection } from '@/features/st
 import { isWide, nebulaFocusSpot, NEBULA_FOCUS_HEIGHT, outerTarget, pathForTarget, sheetBand, starHintSpot, starLinkSize, type LayerTarget, type StarCardFocus } from '@/features/starmap/view/layers'
 import { CHOICE, SHEET, ZOOM } from '@/features/starmap/view/semanticZoom'
 import { ringNeighbour, SKY_WRAP } from '@/features/starmap/view/sky'
-import { useStarMapSource } from '@/features/starmap/starMapSource'
 import { cn } from '@/lib/utils'
 import '@/features/starmap/starmap.css'
 
@@ -123,6 +122,13 @@ export type StarMapViewProps = {
   /** For tests: the frame clock and the renderer. */
   scheduler?: FrameScheduler
   createRendererFor?: (canvas: HTMLCanvasElement) => StarMapRenderer
+  /**
+   * A star cluster chosen on the whole view (#747, ADR 0007): a tap or click
+   * on it, or its link taken from the keyboard. The page opens the cluster's
+   * route scene instead of flying in; zoomed in past the whole view, nebulae
+   * and stars are chosen as before. Absent, the map flies in at every zoom.
+   */
+  onOpenCluster?: (clusterId: string) => void
   /** Drawn above the canvas, below the controls: the lighting layer (#51), told where a star is drawn. */
   overlay?: (locate: (unitId: string) => StarOnScreen | null, watch: (listener: () => void) => () => void) => ReactNode
 }
@@ -268,21 +274,17 @@ function LegendHow({ t }: { t: UseTranslationResponse<'starmap', undefined>['t']
 const OVERLAY_LINK =
   'inline-flex min-h-11 items-center text-on-sky hover:opacity-70 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring'
 
-export function StarMapView({ map, demo = false, target, path, marked, onNavigate, land, onFirstFrame, onCentreGalaxy, foveate, scheduler, createRendererFor, overlay }: StarMapViewProps) {
+export function StarMapView({ map, demo = false, target, path, marked, onNavigate, land, onFirstFrame, onCentreGalaxy, onOpenCluster, foveate, scheduler, createRendererFor, overlay }: StarMapViewProps) {
   const { t, i18n } = useTranslation('starmap')
   // The map's own links keep the query (`?points=`, the dev switches), as its
   // navigation does: a switch must hand the engine the same sky (#123).
   const { search, state: arrival, key: arrivalKey } = useLocation()
   const here = (path: string) => path + search
   const reducedMotion = usePrefersReducedMotion()
-  const { quietPanorama = false } = useStarMapSource()
   const stageRef = useRef<HTMLDivElement>(null)
   const watchers = useRef(new Set<() => void>())
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const engineRef = useRef<StarMapEngine | null>(null)
-  useEffect(() => {
-    if (engineRef.current) engineRef.current.quietPanorama = quietPanorama
-  }, [quietPanorama])
   const [visible, setVisible] = useState<{ stars: VisibleStar[]; glyph: number; nebulae: NebulaDiscOnScreen[]; focus: StarOnScreen | null; zoom: ZoomState }>({
     stars: [],
     glyph: 12,
@@ -311,11 +313,20 @@ export function StarMapView({ map, demo = false, target, path, marked, onNavigat
   const navigateRef = useRef(onNavigate)
   const firstFrameRef = useRef(onFirstFrame)
   const centreRef = useRef(onCentreGalaxy)
+  const openClusterRef = useRef(onOpenCluster)
   useLayoutEffect(() => {
     navigateRef.current = onNavigate
     firstFrameRef.current = onFirstFrame
     centreRef.current = onCentreGalaxy
+    openClusterRef.current = onOpenCluster
   })
+  /** On the whole view, a cluster chosen opens its route scene (#747): whether it did. Reads refs only, so the engine may keep it. */
+  const openCluster = (clusterId: string) => {
+    const open = openClusterRef.current
+    if (!open || !engineRef.current?.zoom.wholeView) return false
+    open(clusterId)
+    return true
+  }
 
   const stars = useMemo(() => orderedStars(map), [map])
   // The steps of a found path's main chain (#489), by unit id: the parallel DOM says which step a star is.
@@ -364,9 +375,9 @@ export function StarMapView({ map, demo = false, target, path, marked, onNavigat
       },
       onFirstFrame: () => firstFrameRef.current?.(),
       onCentreGalaxy: (id) => centreRef.current?.(id),
+      onOpenCluster: openCluster,
     })
     engineRef.current = engine
-    engine.quietPanorama = quietPanorama
 
     // Follow the page area's own size, not the window's: it narrows when the
     // Ask panel opens beside it (#49).
@@ -892,8 +903,8 @@ export function StarMapView({ map, demo = false, target, path, marked, onNavigat
           if (!event.currentTarget.contains(event.relatedTarget)) focusWithin.current = false
         }}
         data-zoom-band={visible.zoom.band}
-        // Only for a source that keeps the whole view quiet (the star cluster mock-up).
-        data-whole-view={quietPanorama ? String(visible.zoom.wholeView) : undefined}
+        // On the whole view star names are off and a cluster chosen opens its route scene (#747).
+        data-whole-view={String(visible.zoom.wholeView)}
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
         onPointerUp={onPointerUp}
@@ -968,6 +979,10 @@ export function StarMapView({ map, demo = false, target, path, marked, onNavigat
                         // between the page's controls, never under the legend (WCAG 2.4.11).
                         style={spot ? { transform: `translate(${spot.x}px, ${spot.y}px) translateX(-50%)`, height: pill?.height ?? NEBULA_FOCUS_HEIGHT, maxWidth: Math.max(32, stageSize.width - 32) } : undefined}
                         data-focus-top={spot?.y}
+                        onClick={(event) => {
+                          if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || event.button !== 0) return
+                          if (openCluster(nebula.topicId)) event.preventDefault()
+                        }}
                         onFocus={(event) => { measureFocusPill(event.currentTarget); focusNebula(nebulaIndex) }}
                         onBlur={() => focusNebula(-1)}
                         onKeyDown={stepNebula}
@@ -1003,6 +1018,7 @@ export function StarMapView({ map, demo = false, target, path, marked, onNavigat
                                 onClick={(event) => {
                                   if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || event.button !== 0) return
                                   event.preventDefault()
+                                  if (openCluster(star.nebulaId)) return
                                   chooseRef.current(to)
                                 }}
                                 onFocus={() => focusStar(entry.index)}
