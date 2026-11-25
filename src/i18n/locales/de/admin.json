@@ -1243,7 +1243,20 @@
       "questionsPerDay": "KI-Fragen pro Tag",
       "escalation": "{{rate}} an Lehrkraft weitergegeben",
       "aiP50": "KI-Antwortzeit (Median)",
-      "teacherP50": "Antwortzeit der Lehrkraft (Median)"
+      "teacherP50": "Antwortzeit der Lehrkraft (Median)",
+      "wauChange": "{{change}} gegenüber Vorwoche",
+      "mauChange": "{{change}} gegenüber den 30 Tagen davor",
+      "questionsPerDayChange": "{{change}} gegenüber den {{days}} Tagen davor",
+      "costPerActiveUser": "Kosten pro aktiver Person",
+      "costNoActiveUsers": "Diesen Monat noch keine aktiven Personen",
+      "costUnavailable": "Abrechnungsdaten nicht verfügbar",
+      "costTotal": "{{total}} seit Monatsbeginn · {{people}} Personen",
+      "costPeriod": "{{start}} – {{end}}",
+      "costServices": {
+        "ai": "KI",
+        "database": "Datenbank",
+        "other": "Sonstiges"
+      }
     },
     "units": {
       "ms": "{{value}} ms",

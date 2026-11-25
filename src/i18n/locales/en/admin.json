@@ -1243,7 +1243,20 @@
       "questionsPerDay": "AI questions per day",
       "escalation": "{{rate}} passed to a teacher",
       "aiP50": "AI answer time (median)",
-      "teacherP50": "Teacher response time (median)"
+      "teacherP50": "Teacher response time (median)",
+      "wauChange": "{{change}} vs last week",
+      "mauChange": "{{change}} vs the previous 30 days",
+      "questionsPerDayChange": "{{change}} vs the previous {{days}} days",
+      "costPerActiveUser": "Cost per active user",
+      "costNoActiveUsers": "No active users this month yet",
+      "costUnavailable": "Billing data unavailable",
+      "costTotal": "{{total}} month to date · {{people}} people",
+      "costPeriod": "{{start}} – {{end}}",
+      "costServices": {
+        "ai": "AI",
+        "database": "Database",
+        "other": "Other"
+      }
     },
     "units": {
       "ms": "{{value}} ms",
