@@ -45,10 +45,30 @@ export function featureName(t: TFunction, key: string | null | undefined) {
 
 const ALARM_NAME = /^stoa-feature-([a-z_]+)-(error-rate|latency)$/
 
-/** `stoa-feature-voice-error-rate` reads as «Voice questions: error rate too high». */
+const KNOWN_ALARMS: Record<string, string> = {
+  'stoa-api-error-rate': 'apiErrorRate',
+  'stoa-api-p99-latency': 'apiLatency',
+  'stoa-owner-registry-sweep-findings': 'ownerRegistrySweep',
+  'stoa-conversation-needs-reconciliation-settled': 'conversationReconciliation',
+  'stoa-teacher-help-waiting-no-teacher': 'teacherHelpNoTeacher',
+  'stoa-voice-transcription-refused': 'voiceRefused',
+}
+
+const DLQ_ALARM = /^stoa-(.+)-dlq-messages$/
+const JOB_ALARM = /^stoa-(.+)-errors$/
+
+/** Known alarm names read as words; others fall back to their description, then their name. */
 export function alarmTitle(t: TFunction, alarm: SystemAlarm) {
   const match = ALARM_NAME.exec(alarm.name)
-  if (!match) return alarm.name
-  const kind = match[2] === 'latency' ? 'latency' : 'errorRate'
-  return t(`systemHealth.alarms.${kind}`, { feature: featureName(t, alarm.feature ?? match[1]) })
+  if (match) {
+    const kind = match[2] === 'latency' ? 'latency' : 'errorRate'
+    return t(`systemHealth.alarms.${kind}`, { feature: featureName(t, alarm.feature ?? match[1]) })
+  }
+  const known = KNOWN_ALARMS[alarm.name]
+  if (known) return t(`systemHealth.alarms.known.${known}`)
+  const dlq = DLQ_ALARM.exec(alarm.name)
+  if (dlq) return t('systemHealth.alarms.known.deadLetters', { name: dlq[1] })
+  const job = JOB_ALARM.exec(alarm.name)
+  if (job) return t('systemHealth.alarms.known.jobFailed', { name: job[1] })
+  return alarm.description?.trim() || alarm.name
 }

@@ -39,7 +39,7 @@ export type FeatureHealth = {
   status: FeatureStatus
   requests: number | null
   errorRate: number | null
-  /** Not in the card 134 contract yet; the detail page shows a dash without it. */
+  /** Added in 134-R1; older backends leave it out. */
   p50Ms?: number | null
   p95Ms: number | null
   p95LimitMs: number | null
@@ -54,15 +54,21 @@ export type SystemAlarm = {
   state: AlarmState
   since: string | null
   reason: string | null
+  /** CloudWatch AlarmDescription, added in 134-R1. */
+  description?: string | null
 }
+
+export type SystemDeploy = { at: string; release: string; label?: string | null }
+
+export type SystemFrontendErrors = { total: number | null; items?: FeatureFrontendError[] | null }
 
 export type SystemHealthResponse = {
   generatedAt: string
   window: SystemWindow
   features: FeatureHealth[]
   alarms: SystemAlarm[] | null
-  deploys: { at: string; release: string }[] | null
-  frontendErrors: { total: number | null } | null
+  deploys: SystemDeploy[] | null
+  frontendErrors: SystemFrontendErrors | null
 }
 
 export type FeatureSeriesPoint = {

@@ -1120,6 +1120,16 @@
         "ALARM": "Firing",
         "OK": "Cleared",
         "INSUFFICIENT_DATA": "Not enough data"
+      },
+      "known": {
+        "apiErrorRate": "Whole API: too many server errors",
+        "apiLatency": "Whole API: slowest responses too slow",
+        "ownerRegistrySweep": "Account deletion check found leftover data",
+        "conversationReconciliation": "AI answers needed a manual repair",
+        "teacherHelpNoTeacher": "Students waited for help with no teacher available",
+        "voiceRefused": "Voice transcription refused recordings",
+        "deadLetters": "Queue {{name}}: messages could not be processed",
+        "jobFailed": "Background task {{name}} failed"
       }
     },
     "deploys": {
@@ -1183,6 +1193,22 @@
         "event": "Event",
         "empty": "No usage events in this time window."
       }
+    },
+    "trends": {
+      "title": "p95 response time per feature over the time window",
+      "label": "p95 response time of every feature on one scale, deploys as dashed vertical lines",
+      "legend": "Features in the chart",
+      "deploy": "Deploy {{label}} at {{time}}",
+      "deployLegend": "Deploy",
+      "empty": "No response times in this time window",
+      "emptyHint": "No feature was called in the chosen window. Try a longer one."
+    },
+    "frontendErrors": {
+      "title": "Frontend errors",
+      "total": "Total in this time window",
+      "count_one": "{{value}} time",
+      "count_other": "{{value}} times",
+      "lastAt": "last {{time}}"
     }
   },
   "usageAnalytics": {

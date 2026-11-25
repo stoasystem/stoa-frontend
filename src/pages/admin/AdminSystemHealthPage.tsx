@@ -1,9 +1,11 @@
 import { useTranslation } from 'react-i18next'
+import { FeatureTrends, hasTrendData } from '@/components/admin/systemHealth/charts'
 import { FeatureCard } from '@/components/admin/systemHealth/FeatureCard'
-import { alarmTitle, formatCount, formatWhen } from '@/components/admin/systemHealth/format'
+import { NO_VALUE, alarmTitle, formatCount, formatWhen } from '@/components/admin/systemHealth/format'
 import { Section, SectionEmpty } from '@/components/admin/systemHealth/Section'
 import { AlarmStateBadge } from '@/components/admin/systemHealth/StatusBadge'
 import { WindowSwitch, useWindowParam } from '@/components/admin/systemHealth/WindowSwitch'
+import { EmptyState } from '@/components/common/EmptyState'
 import { ErrorState } from '@/components/common/ErrorState'
 import { PageContainer } from '@/components/common/PageContainer'
 import { PageHeader } from '@/components/common/PageHeader'
@@ -35,6 +37,7 @@ export function AdminSystemHealthPage() {
   const features = SYSTEM_FEATURES.map((key) => data?.features.find((item) => item.key === key) ?? emptyFeature(key))
   const alarms = (data?.alarms ?? []).filter((alarm) => alarm.state === 'ALARM')
   const deploys = data?.deploys ?? []
+  const frontendErrors = data?.frontendErrors?.items ?? []
 
   return (
     <DashboardLayout>
@@ -66,6 +69,13 @@ export function AdminSystemHealthPage() {
                 <FeatureCard key={feature.key} feature={feature} window={window} />
               ))}
             </section>
+            <Section title={t('systemHealth.trends.title')}>
+              {data && hasTrendData(features) ? (
+                <FeatureTrends features={features} deploys={deploys} window={window} generatedAt={data.generatedAt} />
+              ) : (
+                <EmptyState title={t('systemHealth.trends.empty')} description={t('systemHealth.trends.emptyHint')} />
+              )}
+            </Section>
             <div className="grid gap-4 lg:grid-cols-2">
               <Section title={t('systemHealth.alarms.title')}>
                 {alarms.length === 0 ? (
@@ -75,7 +85,9 @@ export function AdminSystemHealthPage() {
                     {alarms.map((alarm) => (
                       <li key={alarm.name} className="flex items-center gap-3 border-t border-hairline py-2 first:border-t-0">
                         <AlarmStateBadge state={alarm.state} />
-                        <span className="min-w-0 flex-1 text-sm text-ink">{alarmTitle(t, alarm)}</span>
+                        <span title={alarm.name} className="min-w-0 flex-1 text-sm text-ink">
+                          {alarmTitle(t, alarm)}
+                        </span>
                         <span className="text-xs whitespace-nowrap text-caption">
                           {t('systemHealth.alarms.since', { time: formatWhen(alarm.since) })}
                         </span>
@@ -94,20 +106,52 @@ export function AdminSystemHealthPage() {
                         key={`${deploy.at}-${deploy.release}`}
                         className="flex items-center justify-between gap-3 border-t border-hairline py-2 text-sm first:border-t-0"
                       >
-                        <span className="min-w-0 truncate font-mono text-ink">{deploy.release}</span>
+                        <span data-deploy title={deploy.label || deploy.release} className="min-w-0 truncate font-mono text-ink">
+                          {deploy.label || deploy.release}
+                        </span>
                         <span className="text-xs whitespace-nowrap text-caption">{formatWhen(deploy.at)}</span>
                       </li>
                     ))}
                   </ul>
                 )}
-                <p className="m-0 flex items-baseline justify-between gap-3 border-t border-hairline pt-3 text-sm">
-                  <span className="text-caption">{t('systemHealth.frontendErrors24h')}</span>
+              </Section>
+            </div>
+            <Section
+              title={t('systemHealth.frontendErrors.title')}
+              actions={
+                <span className="flex items-baseline gap-2 text-sm">
+                  <span className="text-caption">{t('systemHealth.frontendErrors.total')}</span>
                   <span data-frontend-errors className="font-semibold text-ink tabular-nums">
                     {formatCount(data?.frontendErrors?.total)}
                   </span>
-                </p>
-              </Section>
-            </div>
+                </span>
+              }
+            >
+              {frontendErrors.length > 0 ? (
+                <ul data-frontend-error-list className="m-0 flex list-none flex-col p-0">
+                  {frontendErrors.map((item) => (
+                    <li
+                      key={item.messageHash}
+                      data-frontend-error={item.messageHash}
+                      className="flex flex-wrap items-baseline gap-x-3 gap-y-1 border-t border-hairline py-2 text-sm first:border-t-0"
+                    >
+                      <span className="min-w-0 flex-1 break-words text-ink">
+                        {item.message || t('systemHealth.detail.frontendErrors.noMessage')}
+                      </span>
+                      <span className="font-mono text-xs break-all text-caption">{item.route ?? NO_VALUE}</span>
+                      <span className="text-xs whitespace-nowrap text-caption">
+                        {t('systemHealth.frontendErrors.count', { count: item.count, value: formatCount(item.count) })}
+                      </span>
+                      <span className="text-xs whitespace-nowrap text-caption">
+                        {t('systemHealth.frontendErrors.lastAt', { time: formatWhen(item.lastAt) })}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              ) : data?.frontendErrors?.total === 0 ? (
+                <SectionEmpty>{t('systemHealth.detail.frontendErrors.empty')}</SectionEmpty>
+              ) : null}
+            </Section>
           </>
         )}
       </PageContainer>

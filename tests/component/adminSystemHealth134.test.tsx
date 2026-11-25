@@ -177,7 +177,9 @@ describe('system health overview', () => {
     expect(within(alarms).queryByText(/Sign-in and accounts/)).not.toBeInTheDocument()
     const deploys = screen.getByRole('region', { name: copy.deploys.title })
     expect(within(deploys).getByText('fe-abc1234')).toBeInTheDocument()
-    expect(deploys.querySelector('[data-frontend-errors]')).toHaveTextContent('7')
+    const frontend = screen.getByRole('region', { name: copy.frontendErrors.title })
+    expect(frontend.querySelector('[data-frontend-errors]')).toHaveTextContent('7')
+    expect(frontend.querySelector('[data-frontend-error-list]')).toBeNull()
   })
 
   it('says so when nothing fired and nothing shipped, and a feature without data reads as no data', async () => {
@@ -210,6 +212,137 @@ describe('system health overview', () => {
       expect(screen.getByRole('link', { name: /Star map and practice/ })).toHaveAttribute('href', '/admin/system/practice?window=7d'),
     )
     expect(screen.getByRole('button', { name: copy.window['7d'] })).toHaveAttribute('aria-pressed', 'true')
+  })
+})
+
+describe('134-R3: trends, alarms in words, deploy labels, frontend errors, p50', () => {
+  const trendChart = () => screen.getByRole('group', { name: copy.trends.label })
+
+  it('draws one p95 line per feature with data and a dashed vertical only for deploys inside the window', async () => {
+    serve(
+      health({
+        features: ORDER.map((key) => (key === 'admin' ? feature(key, { spark: null }) : feature(key))),
+        deploys: [
+          { at: '2026-11-25T09:00:00Z', release: 'v481', label: 'a1b2c3d4 Gzip every answer over a kilobyte' },
+          { at: '2026-11-25T11:30:00Z', release: 'v482', label: null },
+          { at: '2026-11-20T09:00:00Z', release: 'v470', label: 'old one' },
+        ],
+      }),
+    )
+    renderAt('/admin/system')
+    const section = await screen.findByRole('region', { name: copy.trends.title })
+    const chart = trendChart()
+    expect(Array.from(chart.querySelectorAll('[data-trend-line]')).map((line) => line.getAttribute('data-trend-line'))).toEqual(
+      ORDER.filter((key) => key !== 'admin'),
+    )
+    expect(section.querySelectorAll('[data-legend]')).toHaveLength(8)
+    const markers = Array.from(chart.querySelectorAll('[data-deploy-marker]'))
+    expect(markers.map((marker) => marker.getAttribute('data-deploy-marker'))).toEqual(['v481', 'v482'])
+    expect(markers[0].querySelector('title')).toHaveTextContent('a1b2c3d4 Gzip every answer over a kilobyte')
+    expect(markers[0]).toHaveAttribute('tabindex', '0')
+    expect(markers[1].querySelector('title')).toHaveTextContent('v482')
+    expect(chart.querySelector('[data-deploy-marker="v470"]')).toBeNull()
+  })
+
+  it('shows the designed empty state when no feature has response times', async () => {
+    serve(health({ features: ORDER.map((key) => feature(key, { spark: [] })) }))
+    renderAt('/admin/system')
+    const section = await screen.findByRole('region', { name: copy.trends.title })
+    expect(within(section).getByText(copy.trends.empty)).toBeInTheDocument()
+    expect(screen.queryByRole('group', { name: copy.trends.label })).not.toBeInTheDocument()
+  })
+
+  it('names alarms in words, falls back to the description, then to the raw name', async () => {
+    const firing = (name: string, extra: Record<string, unknown> = {}) => ({
+      name,
+      feature: null,
+      state: 'ALARM' as const,
+      since: '2026-11-25T10:00:00Z',
+      reason: null,
+      ...extra,
+    })
+    serve(
+      health({
+        alarms: [
+          firing('stoa-feature-practice-latency', { feature: 'practice' }),
+          firing('stoa-api-p99-latency'),
+          firing('stoa-owner-registry-sweep-findings'),
+          firing('stoa-voice-dlq-messages'),
+          firing('stoa-daily-rollup-errors'),
+          firing('stoa-custom-thing', { description: 'practice: p95 latency above 1500 ms for 15 minutes' }),
+          firing('stoa-mystery-alarm', { description: null }),
+        ],
+      }),
+    )
+    renderAt('/admin/system')
+    const alarms = await screen.findByRole('region', { name: copy.alarms.title })
+    const texts = within(alarms).getAllByRole('listitem').map((item) => item.querySelector('[title]'))
+    expect(texts.map((node) => node?.textContent)).toEqual([
+      'Star map and practice: responses too slow',
+      copy.alarms.known.apiLatency,
+      copy.alarms.known.ownerRegistrySweep,
+      'Queue voice: messages could not be processed',
+      'Background task daily-rollup failed',
+      'practice: p95 latency above 1500 ms for 15 minutes',
+      'stoa-mystery-alarm',
+    ])
+    expect(texts.map((node) => node?.getAttribute('title'))).toEqual([
+      'stoa-feature-practice-latency',
+      'stoa-api-p99-latency',
+      'stoa-owner-registry-sweep-findings',
+      'stoa-voice-dlq-messages',
+      'stoa-daily-rollup-errors',
+      'stoa-custom-thing',
+      'stoa-mystery-alarm',
+    ])
+  })
+
+  it('shows a deploy by its label, else by its release', async () => {
+    serve(
+      health({
+        deploys: [
+          { at: '2026-11-25T09:00:00Z', release: 'v481', label: 'a1b2c3d4 Gzip every answer over a kilobyte' },
+          { at: '2026-11-25T08:00:00Z', release: 'v480', label: null },
+        ],
+      }),
+    )
+    renderAt('/admin/system')
+    const deploys = await screen.findByRole('region', { name: copy.deploys.title })
+    const shown = Array.from(deploys.querySelectorAll('[data-deploy]'))
+    expect(shown.map((node) => node.textContent)).toEqual(['a1b2c3d4 Gzip every answer over a kilobyte', 'v480'])
+    expect(shown[0]).toHaveAttribute('title', 'a1b2c3d4 Gzip every answer over a kilobyte')
+    expect(shown[0]).toHaveClass('font-mono', 'truncate')
+  })
+
+  it('lists frontend errors one by one with the total', async () => {
+    serve(
+      health({
+        frontendErrors: {
+          total: 9,
+          items: [
+            { messageHash: 'h1', message: 'TypeError: x is undefined', route: '/practice/:lessonId', release: 'r1', count: 7, lastAt: '2026-11-25T11:00:00Z' },
+            { messageHash: 'h2', message: null, route: null, release: null, count: 1, lastAt: null },
+          ],
+        },
+      }),
+    )
+    renderAt('/admin/system')
+    const frontend = await screen.findByRole('region', { name: copy.frontendErrors.title })
+    expect(frontend.querySelector('[data-frontend-errors]')).toHaveTextContent('9')
+    const rows = frontend.querySelectorAll('[data-frontend-error]')
+    expect(rows).toHaveLength(2)
+    expect(rows[0]).toHaveTextContent('TypeError: x is undefined')
+    expect(rows[0]).toHaveTextContent('/practice/:lessonId')
+    expect(rows[0]).toHaveTextContent('7 times')
+    expect(rows[1]).toHaveTextContent(copy.detail.frontendErrors.noMessage)
+    expect(rows[1]).toHaveTextContent('1 time')
+  })
+
+  it('shows the p50 from the feature on the detail summary', async () => {
+    serve(health(), detail({ feature: feature('practice', { status: 'warn', p95Ms: 1900, p50Ms: 120 }) }))
+    renderAt('/admin/system/practice')
+    const label = await screen.findByText(copy.metric.p50, { selector: 'dt' })
+    expect(label.parentElement?.querySelector('dd')).toHaveTextContent('120 ms')
   })
 })
 

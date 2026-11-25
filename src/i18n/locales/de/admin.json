@@ -1120,6 +1120,16 @@
         "ALARM": "Ausgelöst",
         "OK": "Behoben",
         "INSUFFICIENT_DATA": "Zu wenig Daten"
+      },
+      "known": {
+        "apiErrorRate": "Gesamte API: zu viele Serverfehler",
+        "apiLatency": "Gesamte API: langsamste Antworten zu langsam",
+        "ownerRegistrySweep": "Prüfung der Kontolöschung hat Datenreste gefunden",
+        "conversationReconciliation": "KI-Antworten mussten von Hand repariert werden",
+        "teacherHelpNoTeacher": "Schüler warteten auf Hilfe, aber keine Lehrkraft war verfügbar",
+        "voiceRefused": "Spracherkennung hat Aufnahmen abgelehnt",
+        "deadLetters": "Warteschlange {{name}}: Nachrichten konnten nicht verarbeitet werden",
+        "jobFailed": "Hintergrundaufgabe {{name}} ist fehlgeschlagen"
       }
     },
     "deploys": {
@@ -1183,6 +1193,22 @@
         "event": "Ereignis",
         "empty": "Keine Nutzungsereignisse in diesem Zeitraum."
       }
+    },
+    "trends": {
+      "title": "p95-Antwortzeit je Funktion im gewählten Zeitraum",
+      "label": "p95-Antwortzeit aller Funktionen auf einer Skala, Deployments als gestrichelte senkrechte Linien",
+      "legend": "Funktionen im Diagramm",
+      "deploy": "Deployment {{label}} um {{time}}",
+      "deployLegend": "Deployment",
+      "empty": "Keine Antwortzeiten in diesem Zeitraum",
+      "emptyHint": "Im gewählten Zeitraum wurde keine Funktion aufgerufen. Wähle einen längeren."
+    },
+    "frontendErrors": {
+      "title": "Frontend-Fehler",
+      "total": "Insgesamt in diesem Zeitraum",
+      "count_one": "{{value}}-mal",
+      "count_other": "{{value}}-mal",
+      "lastAt": "zuletzt {{time}}"
     }
   },
   "usageAnalytics": {

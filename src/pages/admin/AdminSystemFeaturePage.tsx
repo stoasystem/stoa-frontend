@@ -102,7 +102,7 @@ function probeColumns(t: TFunction): Column<FeatureProbeRun>[] {
 function alarmColumns(t: TFunction): Column<SystemAlarm>[] {
   return [
     { key: 'state', header: t('systemHealth.detail.alarmState'), cell: (row) => <AlarmStateBadge state={row.state} /> },
-    { key: 'name', header: t('systemHealth.detail.alarmName'), cell: (row) => alarmTitle(t, row) },
+    { key: 'name', header: t('systemHealth.detail.alarmName'), cell: (row) => <span title={row.name}>{alarmTitle(t, row)}</span> },
     { key: 'since', header: t('systemHealth.detail.at'), numeric: true, cell: (row) => formatWhen(row.since) },
   ]
 }
