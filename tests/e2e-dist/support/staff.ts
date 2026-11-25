@@ -44,7 +44,8 @@ export type ParentUsagePeriods = {
  * One member of staff and the parts of the backend their pages touch here:
  * sign-in, the account and the bell; for a teacher, an empty request queue
  * with its counts. An administrator's home asks for more, so a test signs
- * them in at a page that asks for nothing (`/admin/system`). A parent gets the
+ * them in at the system health page, answered here with nothing measured
+ * (`/admin/system`, card 134). A parent gets the
  * Overview's reads: the children, the account and the usage periods (#616).
  */
 export class StaffWorld {
@@ -92,6 +93,18 @@ export class StaffWorld {
     b.on('GET', '/auth/me', answer(user))
     b.on('POST', '/auth/logout', () => ({ status: 204 }))
     b.on('GET', '/notifications', answer({ items: [], count: 0 }))
+    if (account.role === 'admin') {
+      // The system health page (card 134), with nothing measured yet.
+      b.on('GET', '/admin/system/health', answer({
+        generatedAt: '2026-11-25T00:00:00Z',
+        window: '24h',
+        features: [],
+        alarms: [],
+        deploys: [],
+        frontendErrors: { total: 0 },
+        partial: false,
+      }))
+    }
     if (account.role === 'teacher') {
       b.on('GET', '/teachers/me/help-requests', answer({ items: [] }))
       b.on('GET', '/teachers/me/stats', answer({ pendingRequests: 0, resolvedToday: 0, averageResponseTimeMinutes: 0 }))
