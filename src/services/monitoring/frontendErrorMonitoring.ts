@@ -1,5 +1,6 @@
 import { appEnv } from '@/lib/env'
 import { getRuntimeConfig } from '@/lib/runtimeConfig'
+import { matchRouteTemplate, UNMATCHED_ROUTE } from '@/services/analytics/routeTemplate'
 import { httpClient } from '@/services/api/httpClient'
 import { logger } from '@/services/logging'
 
@@ -30,6 +31,9 @@ const SENSITIVE_TEXT_PATTERN =
   /(authorization|bearer|chat|conversation|cookie|file|password|secret|token)\s*[:=]/i
 const JWT_PATTERN = /\beyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\b/g
 const BEARER_PATTERN = /bearer\s+[A-Za-z0-9._~+/=-]+/gi
+const ID_PATTERN = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\b[0-9a-f]{24,}\b/gi
+const NUMERIC_SEGMENT_PATTERN = /\/\d{6,}\b/g
+const URL_QUERY_PATTERN = /(https?:\/\/[^\s?#)]*)[?#][^\s)]*/g
 
 function isMonitoringEnabled() {
   try {
@@ -47,12 +51,21 @@ function buildErrorId() {
   return `${Date.now()}-${Math.random().toString(36).slice(2)}`
 }
 
+// The route pattern, never the address: an address can carry ids.
 function getCurrentRoute() {
   if (typeof window === 'undefined') {
-    return 'unknown'
+    return UNMATCHED_ROUTE
   }
 
-  return window.location.pathname || '/'
+  try {
+    return matchRouteTemplate(window.location.pathname)
+  } catch {
+    return UNMATCHED_ROUTE
+  }
+}
+
+function redactIds(value: string) {
+  return value.replace(URL_QUERY_PATTERN, '$1').replace(ID_PATTERN, ':id').replace(NUMERIC_SEGMENT_PATTERN, '/:id')
 }
 
 function truncate(value: string, maxLength: number) {
@@ -64,7 +77,9 @@ function truncate(value: string, maxLength: number) {
 }
 
 function sanitizeText(value: string, fallback: string) {
-  const withoutSecrets = value.replace(JWT_PATTERN, '[redacted-token]').replace(BEARER_PATTERN, 'Bearer [redacted-token]')
+  const withoutSecrets = redactIds(
+    value.replace(JWT_PATTERN, '[redacted-token]').replace(BEARER_PATTERN, 'Bearer [redacted-token]'),
+  )
 
   if (SENSITIVE_TEXT_PATTERN.test(withoutSecrets)) {
     return fallback
@@ -84,7 +99,7 @@ function sanitizeStack(stack?: string | null) {
     .split('\n')
     .filter((line) => !SENSITIVE_TEXT_PATTERN.test(line))
     .slice(0, MAX_STACK_FRAMES)
-    .map((line) => truncate(line.replace(/\?.*$/u, ''), MAX_STACK_FRAME_LENGTH))
+    .map((line) => truncate(redactIds(line.replace(/\?.*$/u, '')), MAX_STACK_FRAME_LENGTH))
 
   if (sanitizedFrames.length === 0) {
     return undefined
