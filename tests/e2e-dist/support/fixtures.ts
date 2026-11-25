@@ -24,6 +24,10 @@ export const test = base.extend<Fixtures, WorkerFixtures>({
   backend: async ({ page, contract, pageErrors }, use) => {
     void pageErrors
     const backend = new MockBackend(contract)
+    // Production ships usage events and error reports on (card 134): every
+    // page sends them, so every world answers them as the backend does.
+    backend.on('POST', '/analytics/events', () => ({ status: 202, body: { status: 'accepted' } }))
+    backend.on('POST', '/monitoring/frontend-errors', () => ({ status: 202, body: { status: 'accepted' } }))
     await backend.refuseEverythingElse(page)
     await serveSite(page, backend.problems)
     await backend.attach(page)
