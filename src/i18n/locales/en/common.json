@@ -180,7 +180,8 @@
       "moderation": "Moderation",
       "system": "System",
       "teacherApplications": "Teacher applications",
-      "users": "Users"
+      "users": "Users",
+      "analytics": "Usage analytics"
     },
     "administration": "Administration",
     "analytics": "Analytics",

@@ -41,6 +41,7 @@ const expectedNav = {
       ['/admin/curriculum', 'Curriculum', 'primary', 'curriculum', false, 'navigation.admin.curriculum'],
       ['/admin/moderation', 'Moderation', 'primary', 'moderation', true, 'navigation.admin.moderation'],
       ['/admin', 'System', 'primary', 'settings', true, 'navigation.admin.system'],
+      ['/admin/analytics', 'Usage analytics', 'primary', 'analytics', false, 'navigation.admin.analytics'],
     ],
     mobile: ['/admin/moderation', '/admin'],
   },
@@ -77,6 +78,8 @@ const changedSince45: Record<string, Partial<Record<Viewer, { pathname: string; 
   '/tutor/requests/requestId-1': {
     teacher: { pathname: '/teacher/requests/requestId-1', page: 'TeacherHelpRequestDetailPage' },
   },
+  // Card 134: the placeholder became the system health page.
+  '/admin/system': { admin: { pathname: '/admin/system', page: 'AdminSystemHealthPage' } },
 }
 const expectedOutcome = (recorded: Recorded) => changedSince45[recorded.path]?.[recorded.viewer] ?? recorded
 

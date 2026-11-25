@@ -170,12 +170,12 @@ describe('usage statistics page (134-F2)', () => {
     await screen.findByText(copy.kpis.dau)
 
     await userEvent.click(screen.getByRole('button', { name: copy.roles.teacher }))
-    await waitFor(() => expect(requests.at(-1)?.get('role')).toBe('teacher'))
-    expect(requests.at(-1)?.get('days')).toBe('30')
+    await waitFor(() => expect(requests[requests.length - 1]?.get('role')).toBe('teacher'))
+    expect(requests[requests.length - 1]?.get('days')).toBe('30')
 
     await userEvent.click(screen.getByRole('button', { name: '7 days' }))
-    await waitFor(() => expect(requests.at(-1)?.get('days')).toBe('7'))
-    expect(requests.at(-1)?.get('role')).toBe('teacher')
+    await waitFor(() => expect(requests[requests.length - 1]?.get('days')).toBe('7'))
+    expect(requests[requests.length - 1]?.get('role')).toBe('teacher')
   })
 
   it('shows the empty state when nothing was recorded', async () => {
