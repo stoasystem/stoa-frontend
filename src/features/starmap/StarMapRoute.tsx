@@ -182,7 +182,7 @@ export function StarMapRoute({ relations = false, longNames = false }: { relatio
       overlay={(locate, watch) => (
         <>
           <LightingOverlay map={map} locate={locate} watch={watch} onReveal={firstReveal.onReveal} onBusy={setLightingBusy} />
-          {hint.clusterId && <ClusterHintBubble key={hint.clusterId} clusterId={hint.clusterId} changed={hint.changed} locate={locate} watch={watch} onDismiss={hint.dismiss} />}
+          {hint.clusterId && <ClusterHintBubble key={hint.clusterId} clusterId={hint.clusterId} others={hint.others} changed={hint.changed} locate={locate} watch={watch} onDismiss={hint.dismiss} />}
           {language.open && <LanguageFirst chosen={language.chosen} saving={language.saving} onPick={language.pick} onConfirm={language.confirm} />}
           {aboutYouUp && (
             <AboutYou

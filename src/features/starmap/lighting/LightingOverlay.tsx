@@ -61,7 +61,7 @@ export type LightingOverlayProps = {
   watch?: (listener: () => void) => () => void
   /** The star may be drawn lit now: the flare's brightest moment, or the moment shown without one (#140). */
   onReveal?: (unitId: string) => void
-  /** Told whether a moment is on (waiting for its star, playing, or its still label up): other hints keep away (#747). */
+  /** Told whether a moment is on (its flare playing, or its still label up): other hints keep away (#747). */
   onBusy?: (busy: boolean) => void
   /** For tests: the frame clock. */
   scheduler?: FrameScheduler
@@ -275,7 +275,8 @@ export function LightingOverlay({ map, locate, watch, onReveal, onBusy, schedule
     }
   }, [still, locate, scheduler])
 
-  const busy = current !== null || still !== null
+  // Not while a moment only waits for its star: one whose star never comes on screen would keep every hint away.
+  const busy = playing || still !== null
   useEffect(() => {
     onBusy?.(busy)
   }, [busy, onBusy])

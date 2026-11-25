@@ -43,6 +43,8 @@ const newcomer = params.get('newcomer') === '1' || surface?.demo === 'newcomer'
 const aboutYouLater = params.get('aboutYou') === 'later' || surface?.aboutYou === 'later'
 const languageFirst = params.get('languageFirst') === '1' || surface?.languageFirst === true
 const guideFresh = params.get('guide') === 'fresh' || surface?.guide === 'fresh'
+// The demo backend from its opening state: `fresh=1`, or a surface that needs it (#747).
+const fresh = params.get('fresh') === '1' || surface?.fresh === true
 // Kept in the address: once the page moves, `path` replaces the surface, and a reload stays a newcomer's.
 if ((newcomer && !params.has('newcomer')) || (aboutYouLater && !params.has('aboutYou')) || (languageFirst && !params.has('languageFirst')) || (guideFresh && !params.has('guide'))) {
   const url = new URL(window.location.href)
@@ -75,9 +77,9 @@ async function start() {
   // The demo account reads in the page's language, so `/auth/me` does not switch it back.
   const reading = i18n.resolvedLanguage ?? i18n.language
   setDemoLanguage(isSupportedLanguage(reading) ? reading : 'en')
-  if (params.get('fresh') === '1') resetDemoServer()
-  if (newcomer) startAsNewcomer(params.get('fresh') === '1')
-  if (languageFirst) forgetDemoLanguage(params.get('fresh') === '1')
+  if (fresh) resetDemoServer()
+  if (newcomer) startAsNewcomer(fresh)
+  if (languageFirst) forgetDemoLanguage(fresh)
   if (aboutYouLater) {
     // "About you" put off in this tab (#591), as its "Later" leaves it: the page's storage is the preview's own.
     const [{ putAboutYouOff }, { DEMO_STUDENT_ID }] = await Promise.all([

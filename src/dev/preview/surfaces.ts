@@ -48,6 +48,11 @@ export type Surface = {
    * the map and the scenes as they are.
    */
   guide?: 'fresh'
+  /**
+   * The demo backend from its opening state on every load, whatever an earlier surface left in
+   * this tab (a newcomer's sky and profile with no year group, lessons done): as `fresh=1`.
+   */
+  fresh?: true
   /** What must be on the page before it counts as ready, for the screenshot. */
   readyWhen?: string
   /** Why the surface cannot be shown yet, if it cannot. */
@@ -226,6 +231,9 @@ export const SURFACES: readonly Surface[] = [
     path: (points) => withPoints(`/map/${subjectId}`, points),
     signedIn: true,
     stars: true,
+    // A returning student, whatever the tab saw before, with "About you" put off: nothing goes before the hint.
+    fresh: true,
+    aboutYou: 'later',
     guide: 'fresh',
     readyWhen: '[data-cluster-hint] [data-shown]',
   },
@@ -236,6 +244,8 @@ export const SURFACES: readonly Surface[] = [
     path: () => `/map/${subjectId}/cluster/${clusterId}`,
     signedIn: true,
     stars: false,
+    fresh: true,
+    aboutYou: 'later',
     guide: 'fresh',
     readyWhen: '[data-route-tour]',
   },

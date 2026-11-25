@@ -12,7 +12,7 @@
  * question, the first landing, a lighting moment and the first reveal come
  * first.
  */
-import { useCallback, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/base'
 import { MurmiBubble } from '@/features/starmap/components/MurmiBubble'
@@ -36,6 +36,8 @@ export function hintCluster(map: StarMap): string | null {
 export type ClusterHint = {
   /** The cluster Murmi stands beside, while the hint is up. */
   clusterId: string | null
+  /** The galaxy's other clusters, which the bubble keeps clear of. */
+  others: string[]
   /** The student knew the map before clusters: "a new look". */
   changed: boolean
   /** Waved away (✕, "Got it", Escape): gone, and remembered. */
@@ -54,11 +56,26 @@ export function useClusterHint(map: StarMap, ownerId: string, { blocked }: { blo
     setDone(true)
   }, [ownerId])
   const up = !done && !blocked && isClusterSky(map)
-  return { clusterId: up ? hintCluster(map) : null, changed: changed ?? false, dismiss: remember, opened: remember }
+  const clusterId = up ? hintCluster(map) : null
+  const others = useMemo(
+    () =>
+      clusterId === null
+        ? []
+        : orderedNebulae(map)
+            .filter((nebula) => nebula.topicId !== clusterId && subjectOfNebula(map, nebula.topicId) === map.subject.subjectId)
+            .map((nebula) => nebula.topicId),
+    [map, clusterId],
+  )
+  return { clusterId, others, changed: changed ?? false, dismiss: remember, opened: remember }
 }
+
+/** The share of a cluster's disc its stars fill: the disc keeps room round them, which the bubble need not. */
+export const CLUSTER_STARS_SHARE = 0.72
 
 export type ClusterHintBubbleProps = {
   clusterId: string
+  /** The other clusters on screen: the bubble keeps clear of them. */
+  others?: readonly string[]
   changed: boolean
   /** Where a star or a cluster is drawn now, from the map's engine. */
   locate: (id: string) => StarOnScreen | null
@@ -68,16 +85,26 @@ export type ClusterHintBubbleProps = {
   scheduler?: FrameScheduler
 }
 
-export function ClusterHintBubble({ clusterId, changed, locate, watch, onDismiss, scheduler }: ClusterHintBubbleProps) {
+export function ClusterHintBubble({ clusterId, others, changed, locate, watch, onDismiss, scheduler }: ClusterHintBubbleProps) {
   const { t } = useTranslation('starmap')
+  // A cluster by the part its stars fill, so Murmi stands close to them and the others stay clear.
+  const clusters = useMemo(() => new Set([clusterId, ...(others ?? [])]), [clusterId, others])
+  const near = useCallback(
+    (id: string) => {
+      const spot = locate(id)
+      return spot && clusters.has(id) ? { ...spot, size: spot.size * CLUSTER_STARS_SHARE } : spot
+    },
+    [locate, clusters],
+  )
   return (
     <MurmiBubble
       unitId={clusterId}
+      avoid={others}
       marker="data-cluster-hint"
       title={changed ? t('clusterGuide.hintTitleChanged') : t('clusterGuide.hintTitle')}
       body={changed ? t('clusterGuide.hintBodyChanged') : t('clusterGuide.hintBody')}
       closeLabel={t('clusterGuide.close')}
-      locate={locate}
+      locate={near}
       watch={watch}
       onDismiss={onDismiss}
       scheduler={scheduler}

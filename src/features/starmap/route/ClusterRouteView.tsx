@@ -100,6 +100,11 @@ function useDragScroll() {
   return { ref, dragging, handlers: { onPointerDown, onPointerMove, onPointerUp: end, onPointerCancel: end } }
 }
 
+/** Murmi's landing bubble on the route (#747): its width, its gap from the star's glyph and name, and how far left of the star it starts. */
+const LANDING_WIDTH_PX = 320
+const LANDING_GAP_PX = 46
+const LANDING_POINT_PX = 32
+
 export function ClusterRouteView({
   map,
   clusters,
@@ -537,18 +542,32 @@ export function ClusterRouteView({
               </button>
             )
           })}
+          {landingUp && focusUnitId && position.get(focusUnitId) && (() => {
+            // Murmi by the star it names, on the route: below it in the upper half, above it in the lower.
+            const p = position.get(focusUnitId)!
+            const below = p.y < height / 2
+            const left = Math.max(8, Math.min(p.x - LANDING_POINT_PX, width - LANDING_WIDTH_PX - 8))
+            return (
+              <div
+                className="absolute z-20"
+                style={{ left, width: LANDING_WIDTH_PX, ...(below ? { top: p.y + LANDING_GAP_PX } : { bottom: height - p.y + LANDING_GAP_PX }) }}
+              >
+                <SceneLandingBubble
+                  name={starById.get(focusUnitId)?.name ?? ''}
+                  cluster={cluster.name}
+                  point={{ x: p.x - left, side: below ? 'top' : 'bottom' }}
+                  onFindOwn={onFindOwn}
+                  onDismiss={() => setLandingUp(false)}
+                />
+              </div>
+            )
+          })()}
           </div>
         </div>
       </div>
 
-      {(selectedNode || landingUp) && (
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 z-20 flex flex-col items-center gap-2 p-3 sm:flex-row sm:items-end sm:justify-between sm:p-5">
-          {landingUp && focusUnitId ? (
-            <SceneLandingBubble name={starById.get(focusUnitId)?.name ?? ''} cluster={cluster.name} onFindOwn={onFindOwn} onDismiss={() => setLandingUp(false)} />
-          ) : (
-            <span aria-hidden="true" />
-          )}
-          {selectedNode && (
+      {selectedNode && (
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 z-20 flex justify-center p-3 sm:justify-end sm:p-5">
           <div
             ref={cardRef}
             tabIndex={-1}
@@ -593,7 +612,6 @@ export function ClusterRouteView({
               />
             )}
           </div>
-          )}
         </div>
       )}
       {touring && <RouteTour steps={steps} root={sectionRef} scroller={scroller} onClose={() => setTouring(false)} />}

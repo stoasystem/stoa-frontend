@@ -20,6 +20,8 @@ import { I18nextProvider } from 'react-i18next'
 import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { demoClusterMap } from '@/dev/demo/clusters/demoClusterMap'
+import { SURFACES } from '@/dev/preview/surfaces'
+import { AskServerProvider } from '@/features/ask/server/askServer'
 import { hintCluster, isClusterSky, useClusterHint } from '@/features/starmap/onboarding/ClusterHint'
 import { markShown, onceKey, shownBefore } from '@/features/starmap/onboarding/shownOnce'
 import { StarMapRoute } from '@/features/starmap/StarMapRoute'
@@ -28,6 +30,9 @@ import i18n from '@/i18n'
 import { getKnowledgeMap } from '@/services/practice/practiceApi'
 import { useAuthStore } from '@/store/authStore'
 import type { KnowledgeMapResponse } from '@/types/practice'
+import type { StudentProfile } from '@/types/student'
+import { createFakeAskServer, type FakeAskServer } from '../fakes/askServer'
+import { GRADES } from '../fakes/profileChoices'
 
 vi.mock('@/services/analytics/analyticsClient', () => ({ trackEvent: vi.fn() }))
 vi.mock('@/services/practice/practiceApi', async (importOriginal) => ({
@@ -73,24 +78,25 @@ function Where() {
 }
 const where = () => screen.getByTestId('where').textContent
 
-async function openAt(path: string, sky: KnowledgeMapResponse = knowledgeBaseSky()) {
+async function openAt(path: string, sky: KnowledgeMapResponse = knowledgeBaseSky(), server?: FakeAskServer) {
   vi.mocked(getKnowledgeMap).mockResolvedValue(sky)
   const client = new QueryClient({ defaultOptions: { queries: { retry: false, gcTime: 0 } } })
+  const routes = (
+    <KnowledgeMapSourceProvider>
+      <MemoryRouter initialEntries={[path]}>
+        <Routes>
+          <Route path="/map/:subjectId" element={<StarMapRoute />} />
+          <Route path="/map/:subjectId/:topicId" element={<StarMapRoute />} />
+          <Route path="/map/:subjectId/cluster/:clusterId" element={<StarMapRoute />} />
+          <Route path="*" element={null} />
+        </Routes>
+        <Where />
+      </MemoryRouter>
+    </KnowledgeMapSourceProvider>
+  )
   const view = render(
     <I18nextProvider i18n={i18n}>
-      <QueryClientProvider client={client}>
-        <KnowledgeMapSourceProvider>
-          <MemoryRouter initialEntries={[path]}>
-            <Routes>
-              <Route path="/map/:subjectId" element={<StarMapRoute />} />
-              <Route path="/map/:subjectId/:topicId" element={<StarMapRoute />} />
-              <Route path="/map/:subjectId/cluster/:clusterId" element={<StarMapRoute />} />
-              <Route path="*" element={null} />
-            </Routes>
-            <Where />
-          </MemoryRouter>
-        </KnowledgeMapSourceProvider>
-      </QueryClientProvider>
+      <QueryClientProvider client={client}>{server ? <AskServerProvider value={server}>{routes}</AskServerProvider> : routes}</QueryClientProvider>
     </I18nextProvider>,
   )
   await waitFor(() => expect(view.container.querySelector('[data-starmap-stage], [data-cluster-route]')).not.toBeNull())
@@ -172,6 +178,30 @@ describe('A. the panorama hint', () => {
     first.unmount()
     const again = await openAt('/map/math')
     expect(again.container.querySelector('[data-cluster-hint]')).toBeNull()
+  })
+
+  it('waits for "About you" on the real route, and comes once it is put off', async () => {
+    // A profile with no year group: "About you" asks first (#591), through the real hooks.
+    const server = createFakeAskServer()
+    server.profile = {
+      id: 'p-1', userId: OWNER, name: 'Ada', email: 'ada@example.com', grade: '', primarySubjects: [], preferredAnswerLanguage: 'en',
+      guardianStatus: 'not_linked', createdAt: '2026-09-01T09:00:00Z', updatedAt: '2026-09-01T09:00:00Z', choices: { grade: GRADES },
+    } as StudentProfile
+    const user = userEvent.setup()
+    const { container } = await openAt('/map/math', knowledgeBaseSky(), server)
+    await waitFor(() => expect(container.querySelector('[data-about-you]')).not.toBeNull())
+    expect(container.querySelector('[data-cluster-hint]')).toBeNull()
+    await user.click(screen.getByRole('button', { name: 'Later' }))
+    await waitFor(() => expect(container.querySelector('[data-about-you]')).toBeNull())
+    await waitFor(() => expect(container.querySelector('[data-cluster-hint]')).not.toBeNull())
+  })
+
+  it("the preview's surfaces for it start from nothing that goes first", () => {
+    for (const id of ['map-cluster-hint', 'map-cluster-tour']) {
+      const surface = SURFACES.find((candidate) => candidate.id === id)!
+      expect(surface, id).toMatchObject({ guide: 'fresh', aboutYou: 'later', fresh: true, signedIn: true })
+      expect(surface.demo, id).toBeUndefined()
+    }
   })
 
   it('goes, remembered, with the first cluster opened', async () => {

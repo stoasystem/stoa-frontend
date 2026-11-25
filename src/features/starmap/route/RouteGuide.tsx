@@ -23,18 +23,46 @@ import { Button } from '@/components/base'
 import { Murmi } from '@/components/brand/Murmi'
 import { usePrefersReducedMotion } from '@/features/starmap/motion/usePrefersReducedMotion'
 
+/** The pointer stays on the bubble's rounded edge. */
+const LANDING_POINTER_MAX = 290
+
 const GLASS = { background: 'var(--sky-glass)', backdropFilter: 'blur(var(--sky-glass-blur))', WebkitBackdropFilter: 'blur(var(--sky-glass-blur))' }
 
-export function SceneLandingBubble({ name, cluster, onFindOwn, onDismiss }: { name: string; cluster: string; onFindOwn?: () => void; onDismiss: () => void }) {
+export function SceneLandingBubble({
+  name,
+  cluster,
+  point,
+  onFindOwn,
+  onDismiss,
+}: {
+  name: string
+  cluster: string
+  /** Where its star is, from the bubble's left edge, and on which side: a small pointer there. */
+  point?: { x: number; side: 'top' | 'bottom' }
+  onFindOwn?: () => void
+  onDismiss: () => void
+}) {
   const { t } = useTranslation('starmap')
   const titleId = useId()
   return (
     <aside
       data-scene-landing
       aria-labelledby={titleId}
-      className="pointer-events-auto w-full max-w-[360px] space-y-2 rounded-[var(--corner-card)] border border-solid border-[color:var(--sky-glass-border)] px-4 py-3 text-on-sky"
+      className="pointer-events-auto relative w-full space-y-2 rounded-[var(--corner-card)] border border-solid border-[color:var(--sky-glass-border)] px-4 py-3 text-on-sky"
       style={GLASS}
     >
+      {point && (
+        <span
+          aria-hidden="true"
+          data-scene-landing-pointer={point.side}
+          className="absolute size-3 rotate-45 border-solid border-[color:var(--sky-glass-border)]"
+          style={{
+            ...GLASS,
+            left: Math.max(14, Math.min(point.x, LANDING_POINTER_MAX)) - 6,
+            ...(point.side === 'top' ? { top: -7, borderWidth: '1px 0 0 1px' } : { bottom: -7, borderWidth: '0 1px 1px 0' }),
+          }}
+        />
+      )}
       <p role="status" className="sr-only">
         {t('clusterGuide.landingTitle', { name })}
       </p>
