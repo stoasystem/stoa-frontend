@@ -63,6 +63,10 @@ async function monitoringHarness({ errorMonitoring = false, runtimeError, postEr
     const delegate = globalThis[${JSON.stringify(key)}]
     export const getRuntimeConfig = () => delegate.getRuntimeConfig()
   `, 'runtime-stub')
+  const routeStub = moduleUrl(`
+    export const UNMATCHED_ROUTE = '*'
+    export const matchRouteTemplate = () => UNMATCHED_ROUTE
+  `, 'route-stub')
   const httpStub = moduleUrl(`
     const delegate = globalThis[${JSON.stringify(key)}]
     export const httpClient = { post: (...args) => delegate.post(...args) }
@@ -80,6 +84,10 @@ async function monitoringHarness({ errorMonitoring = false, runtimeError, postEr
     .replace(
       /from ['"]@\/lib\/runtimeConfig['"]/,
       `from ${JSON.stringify(runtimeStub)}`,
+    )
+    .replace(
+      /from ['"]@\/services\/analytics\/routeTemplate['"]/,
+      `from ${JSON.stringify(routeStub)}`,
     )
     .replace(
       /from ['"]@\/services\/api\/httpClient['"]/,
