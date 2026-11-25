@@ -13,6 +13,7 @@ import {
   canonicalize,
   digestCanonical,
   hashFileTree,
+  main,
   PRODUCTION_DEFAULTS,
   publishWebRelease,
   runtimeConfigKeyFor,
@@ -90,6 +91,45 @@ test('production publishes no realtime endpoint until the WebSocket exists', asy
     expectedWebOrigin: PRODUCTION_DEFAULTS.webOrigin,
   })
   assert.equal(parsed.realtime.endpoint, null)
+})
+
+test('production publishes analytics and frontend error monitoring switched on', async () => {
+  // Card 134-R5: the backend takes /analytics/events and /monitoring/frontend-errors.
+  assert.equal(PRODUCTION_DEFAULTS.features.analytics, true)
+  assert.equal(PRODUCTION_DEFAULTS.features.errorMonitoring, true)
+
+  // The path the workflow runs: the CLI, with no feature override.
+  const distDir = await mkdir(path.join(os.tmpdir(), `stoa-publish-flags-${Date.now()}`), { recursive: true })
+  await writeFile(path.join(distDir, 'index.html'), '<html></html>')
+  const runner = async (argv) => {
+    if (argv.includes('get-bucket-versioning')) return JSON.stringify({ Status: 'Enabled' })
+    if (argv.includes('put-object')) return 'version-abcdefgh'
+    if (argv.includes('create-invalidation')) return 'I0'
+    throw new Error(argv.join(' '))
+  }
+  const written = []
+  const stdout = process.stdout.write
+  process.stdout.write = (chunk) => { written.push(String(chunk)); return true }
+  try {
+    await main(['--dist', distDir, '--backend-artifact-sha256', sha('4')], { runner })
+  } finally {
+    process.stdout.write = stdout
+  }
+  const { runtimeConfigSha256 } = JSON.parse(written.join(''))
+  const config = JSON.parse(await readFile(path.join(distDir, runtimeConfigKeyFor(runtimeConfigSha256)), 'utf8'))
+  assert.equal(config.environment, 'production')
+  assert.equal(config.features.analytics, true)
+  assert.equal(config.features.errorMonitoring, true)
+
+  const runtime = await loadRuntimeModule()
+  const parsed = await runtime.validateRuntimeConfig(config, {
+    expectedDigest: runtimeConfigSha256,
+    expectedRelease: { ...config.release },
+    expectedEnvironment: 'production',
+    expectedWebOrigin: PRODUCTION_DEFAULTS.webOrigin,
+  })
+  assert.equal(parsed.features.analytics, true)
+  assert.equal(parsed.features.errorMonitoring, true)
 })
 
 test('publish uploads hashed assets, then the pointer documents, and refuses an unversioned bucket', async () => {
