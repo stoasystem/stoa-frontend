@@ -100,7 +100,7 @@ export function AdminAnalyticsPage() {
           />
         ) : (
           <>
-            <AnalyticsKpis kpis={data.kpis} />
+            <AnalyticsKpis kpis={data.kpis} days={data.days} />
             <Section title={t('usageAnalytics.trend.title')}>
               <ActiveTrendChart series={data.activeSeries} />
             </Section>

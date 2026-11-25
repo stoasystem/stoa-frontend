@@ -1140,6 +1140,16 @@
         "ALARM": "Déclenchée",
         "OK": "Résolue",
         "INSUFFICIENT_DATA": "Données insuffisantes"
+      },
+      "known": {
+        "apiErrorRate": "API entière : trop d’erreurs serveur",
+        "apiLatency": "API entière : réponses les plus lentes trop lentes",
+        "ownerRegistrySweep": "La vérification des suppressions de compte a trouvé des données restantes",
+        "conversationReconciliation": "Des réponses de l’IA ont dû être réparées à la main",
+        "teacherHelpNoTeacher": "Des élèves ont attendu de l’aide sans enseignant disponible",
+        "voiceRefused": "La transcription vocale a refusé des enregistrements",
+        "deadLetters": "File {{name}} : des messages n’ont pas pu être traités",
+        "jobFailed": "La tâche de fond {{name}} a échoué"
       }
     },
     "deploys": {
@@ -1203,6 +1213,23 @@
         "event": "Événement",
         "empty": "Aucun événement d’utilisation sur cette période."
       }
+    },
+    "trends": {
+      "title": "Temps de réponse p95 par fonction sur la période",
+      "label": "Temps de réponse p95 de chaque fonction sur une même échelle, déploiements en lignes verticales pointillées",
+      "legend": "Fonctions du graphique",
+      "deploy": "Déploiement {{label}} à {{time}}",
+      "deployLegend": "Déploiement",
+      "empty": "Aucun temps de réponse sur cette période",
+      "emptyHint": "Aucune fonction n’a été appelée sur la période choisie. Essayez-en une plus longue."
+    },
+    "frontendErrors": {
+      "title": "Erreurs frontend",
+      "total": "Total sur cette période",
+      "count_one": "{{value}} occurrence",
+      "count_many": "{{value}} occurrences",
+      "count_other": "{{value}} occurrences",
+      "lastAt": "dernière le {{time}}"
     }
   },
   "usageAnalytics": {
@@ -1238,7 +1265,20 @@
       "questionsPerDay": "Questions à l’IA par jour",
       "escalation": "{{rate}} transmises à un enseignant",
       "aiP50": "Temps de réponse de l’IA (médiane)",
-      "teacherP50": "Temps de réponse de l’enseignant (médiane)"
+      "teacherP50": "Temps de réponse de l’enseignant (médiane)",
+      "wauChange": "{{change}} par rapport à la semaine dernière",
+      "mauChange": "{{change}} par rapport aux 30 jours précédents",
+      "questionsPerDayChange": "{{change}} par rapport aux {{days}} jours précédents",
+      "costPerActiveUser": "Coût par utilisateur actif",
+      "costNoActiveUsers": "Aucun utilisateur actif ce mois-ci pour l’instant",
+      "costUnavailable": "Données de facturation indisponibles",
+      "costTotal": "{{total}} depuis le début du mois · {{people}} personnes",
+      "costPeriod": "{{start}} – {{end}}",
+      "costServices": {
+        "ai": "IA",
+        "database": "Base de données",
+        "other": "Autres"
+      }
     },
     "units": {
       "ms": "{{value}} ms",

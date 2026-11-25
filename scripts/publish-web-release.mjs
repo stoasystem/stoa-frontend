@@ -46,8 +46,9 @@ export const PRODUCTION_DEFAULTS = Object.freeze({
   bucket: 'stoa-frontend-562923011260',
   distributionId: 'E27CVAMQHDMW80',
   features: Object.freeze({
-    analytics: false,
-    errorMonitoring: false,
+    // Card 134-R5: the backend accepts both since card 134.
+    analytics: true,
+    errorMonitoring: true,
     feedback: true,
     parentReports: true,
     payments: false,

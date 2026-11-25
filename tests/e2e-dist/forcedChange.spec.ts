@@ -16,6 +16,9 @@ const ANSWERED_WHILE_RESET = new Set([
   'post /auth/password-change/confirm',
   // Public and takes no account; the sign-in page wakes the backend with it (#601).
   'get /health',
+  // Usage events and error reports: public, and read nothing of the account (card 134).
+  'post /analytics/events',
+  'post /monitoring/frontend-errors',
 ])
 
 /** The student world, with the student's password reset until the change is confirmed. */

@@ -1140,6 +1140,16 @@
         "ALARM": "Attivo",
         "OK": "Rientrato",
         "INSUFFICIENT_DATA": "Dati insufficienti"
+      },
+      "known": {
+        "apiErrorRate": "Intera API: troppi errori del server",
+        "apiLatency": "Intera API: risposte più lente troppo lente",
+        "ownerRegistrySweep": "Il controllo delle cancellazioni account ha trovato dati residui",
+        "conversationReconciliation": "Alcune risposte dell’IA hanno richiesto una correzione manuale",
+        "teacherHelpNoTeacher": "Studenti in attesa di aiuto senza insegnanti disponibili",
+        "voiceRefused": "La trascrizione vocale ha rifiutato delle registrazioni",
+        "deadLetters": "Coda {{name}}: messaggi non elaborati",
+        "jobFailed": "Attività in background {{name}} non riuscita"
       }
     },
     "deploys": {
@@ -1203,6 +1213,23 @@
         "event": "Evento",
         "empty": "Nessun evento di utilizzo in questo periodo."
       }
+    },
+    "trends": {
+      "title": "Tempo di risposta p95 per funzione nel periodo",
+      "label": "Tempo di risposta p95 di ogni funzione sulla stessa scala, rilasci come linee verticali tratteggiate",
+      "legend": "Funzioni nel grafico",
+      "deploy": "Rilascio {{label}} alle {{time}}",
+      "deployLegend": "Rilascio",
+      "empty": "Nessun tempo di risposta in questo periodo",
+      "emptyHint": "Nessuna funzione è stata chiamata nel periodo scelto. Prova un periodo più lungo."
+    },
+    "frontendErrors": {
+      "title": "Errori frontend",
+      "total": "Totale in questo periodo",
+      "count_one": "{{value}} volta",
+      "count_many": "{{value}} volte",
+      "count_other": "{{value}} volte",
+      "lastAt": "ultimo {{time}}"
     }
   },
   "usageAnalytics": {
@@ -1238,7 +1265,20 @@
       "questionsPerDay": "Domande all’IA al giorno",
       "escalation": "{{rate}} passate a un docente",
       "aiP50": "Tempo di risposta dell’IA (mediana)",
-      "teacherP50": "Tempo di risposta del docente (mediana)"
+      "teacherP50": "Tempo di risposta del docente (mediana)",
+      "wauChange": "{{change}} rispetto alla settimana scorsa",
+      "mauChange": "{{change}} rispetto ai 30 giorni precedenti",
+      "questionsPerDayChange": "{{change}} rispetto ai {{days}} giorni precedenti",
+      "costPerActiveUser": "Costo per utente attivo",
+      "costNoActiveUsers": "Ancora nessun utente attivo questo mese",
+      "costUnavailable": "Dati di fatturazione non disponibili",
+      "costTotal": "{{total}} dall’inizio del mese · {{people}} persone",
+      "costPeriod": "{{start}} – {{end}}",
+      "costServices": {
+        "ai": "IA",
+        "database": "Database",
+        "other": "Altro"
+      }
     },
     "units": {
       "ms": "{{value}} ms",
