@@ -33,7 +33,7 @@ import {
 import { teacherPracticePathFor } from '@/features/assignPractice/practicePath'
 import { chapterPath, quizPath, skillPath } from '@/features/chapter/useChapter'
 import { StarCard } from '@/features/starmap/components/StarCard'
-import { pathForTarget } from '@/features/starmap/view/layers'
+import { clusterPath, pathForTarget } from '@/features/starmap/view/layers'
 import { reviewReturnPath } from '@/features/starmap/view/reviewReturn'
 import i18n from '@/i18n'
 import { getDefaultRouteForRole, getPostLoginTarget, getReturnPath, getReturnTarget } from '@/lib/authRoutes'
@@ -181,6 +181,10 @@ function builtTargets(): Built[] {
     add('pathForTarget map', id, pathForTarget(id, { layer: 'map' }))
     add('pathForTarget nebula', id, pathForTarget(id, { layer: 'nebula', nebulaId: id }))
     add('pathForTarget star', id, pathForTarget(id, { layer: 'star', nebulaId: id, unitId: id }))
+    // A star cluster's route scene (#747): from the map, and from an entrance in another cluster's scene.
+    add('clusterPath', id, clusterPath(id, id))
+    add('clusterPath star', id, clusterPath(id, id, id))
+    add('clusterPath star in math', id, clusterPath('math', 'numbers', id))
     add('chapterPath', id, chapterPath(id))
     add('chapterPath lesson', id, chapterPath(id, id))
     add('quizPath', id, quizPath(id, id))

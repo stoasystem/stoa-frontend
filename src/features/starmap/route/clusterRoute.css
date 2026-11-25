@@ -1,9 +1,38 @@
 /*
- * Star clusters and their learning routes (prototype). Only the sky's own
- * tokens: the page carries `data-surface="sky"`.
+ * Star clusters and their learning routes (#747). Only the sky's own
+ * tokens: the scene carries `data-surface="sky"`.
  */
+
+/* The scene over the star map: in and out by a short fade, none under reduced motion. */
+.cluster-scene {
+  animation: cluster-scene-in 180ms ease-out both;
+}
+
+.cluster-scene[data-leaving] {
+  opacity: 0;
+  transition: opacity 180ms ease-in;
+}
+
+@keyframes cluster-scene-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cluster-scene {
+    animation: none;
+  }
+
+  .cluster-scene[data-leaving] {
+    transition: none;
+  }
+}
+
 .cluster-page {
-  min-height: 100dvh;
   background:
     radial-gradient(120% 80% at 20% 0%, rgba(120, 110, 220, 0.16), transparent 60%),
     radial-gradient(90% 70% at 100% 100%, rgba(242, 197, 114, 0.08), transparent 60%),
@@ -14,27 +43,6 @@
 .cluster-focus:focus-visible {
   outline: var(--focus-ring-width, 3px) solid var(--focus-ring);
   outline-offset: var(--focus-ring-offset, 2px);
-}
-
-/* The overview's tiles. */
-.cluster-tile {
-  border: 1px solid var(--sky-glass-border);
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.015));
-  border-radius: 20px;
-  transition: border-color 160ms ease, background-color 160ms ease, transform 160ms ease;
-}
-
-.cluster-tile:hover {
-  border-color: rgba(242, 197, 114, 0.45);
-  transform: translateY(-2px);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .cluster-tile,
-  .cluster-tile:hover {
-    transition: none;
-    transform: none;
-  }
 }
 
 /* The route: scrolls sideways; a mouse can drag it. */

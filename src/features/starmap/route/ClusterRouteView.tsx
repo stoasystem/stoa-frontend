@@ -1,5 +1,5 @@
 /*
- * One star cluster's learning route (prototype): its stars left to right
+ * One star cluster's learning route (#747): its stars left to right
  * along a bright main line, side paths branching off it and joining again
  * (at most three beside it in any column), and entrances that lead to the
  * clusters a stretch of the route builds on. Laid out by `routeLayout.ts`.
@@ -7,6 +7,9 @@
  * The route scrolls sideways (a mouse can drag it) and opens on the star to
  * go on with, or on the star asked for. Every star and entrance is a button in
  * route order, so Tab follows the route; Enter opens its card, Escape closes it.
+ *
+ * It fills the box it is given (`ClusterScene` lays it over the star map);
+ * the card sits at the bottom of that box.
  */
 import { ArrowRight, ChevronLeft, LogIn, X } from 'lucide-react'
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, type PointerEvent as ReactPointerEvent } from 'react'
@@ -133,11 +136,14 @@ export function ClusterRouteView({
 
   // Open on the star asked for, else the one to go on with.
   const target = focusUnitId ?? nextId
+  const titleRef = useRef<HTMLHeadingElement>(null)
   useLayoutEffect(() => {
     const el = scroller.current
     const p = target ? position.get(target) : undefined
     if (el && p) el.scrollLeft = Math.max(0, p.x - el.clientWidth / 2)
+    // Focus comes along from the map: to the star asked for, else to the cluster's name, so Tab walks the route from the start.
     if (focusUnitId) nodeRefs.current.get(focusUnitId)?.focus({ preventScroll: true })
+    else titleRef.current?.focus({ preventScroll: true })
     // Only when the cluster, the star asked for or the screen width changes.
   }, [cluster.clusterId, focusUnitId, compact])
 
@@ -189,14 +195,16 @@ export function ClusterRouteView({
   const selectedNode = selected ? nodeById.get(selected) : undefined
 
   return (
-    <main data-surface="sky" data-cluster-route={cluster.clusterId} className="cluster-page flex h-dvh flex-col pb-4">
+    <section data-surface="sky" data-cluster-route={cluster.clusterId} aria-labelledby="cluster-route-title" className="cluster-page relative flex h-full min-h-0 flex-col pb-4">
       <header className="flex flex-wrap items-center gap-x-4 gap-y-2 px-4 pb-3 pt-5 sm:px-8">
         <Button variant="onSkyPlain" size="small" onClick={onBack} data-cluster-back className="-ml-2">
           <ChevronLeft size={18} aria-hidden="true" />
           {t('nav.backToMap')}
         </Button>
         <div className="flex min-w-0 flex-1 basis-full flex-col sm:basis-auto">
-          <h1 className="text-[24px] font-semibold leading-tight sm:text-[28px]">{cluster.name}</h1>
+          <h1 ref={titleRef} id="cluster-route-title" tabIndex={-1} className="text-[24px] font-semibold leading-tight outline-none sm:text-[28px]">
+            {cluster.name}
+          </h1>
           <p className="text-[14px]" style={{ color: 'var(--on-sky-text-body)' }}>
             {t('summary.lit', { lit: cluster.lit, total: cluster.total })}
           </p>
@@ -342,7 +350,7 @@ export function ClusterRouteView({
       </div>
 
       {selectedNode && (
-        <div className="pointer-events-none fixed inset-x-0 bottom-0 z-20 flex justify-center p-3 sm:justify-end sm:p-5">
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 z-20 flex justify-center p-3 sm:justify-end sm:p-5">
           <div
             ref={cardRef}
             tabIndex={-1}
@@ -385,7 +393,7 @@ export function ClusterRouteView({
           </div>
         </div>
       )}
-    </main>
+    </section>
   )
 }
 

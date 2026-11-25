@@ -11,8 +11,14 @@
  * empty an empty state, each instead of the renderer (#329); the Demo notice
  * shows only when the source says its map is demo content (the design
  * preview, the bench).
+ *
+ * The map's nebulae are star clusters (#747, ADR 0007). On the whole view a
+ * cluster chosen opens its learning route scene,
+ * `/map/:subjectId/cluster/:clusterId` (`ClusterScene`), laid over the map:
+ * the map stays mounted under it, inert and on the view the student left,
+ * so back from the scene is back to that view.
  */
-import { useCallback, useEffect, useMemo, useRef } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/base'
 import { useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom'
@@ -33,7 +39,8 @@ import { useFirstReveal } from '@/features/starmap/onboarding/useFirstReveal'
 import { ReviewReminderBubble, ReviewReminderCorner } from '@/features/starmap/reviewReminder/ReviewReminderMurmi'
 import { useReviewReminder } from '@/features/starmap/reviewReminder/useReviewReminder'
 import { DEFAULT_SUBJECT_ID, DEMO_STAR_COUNT, fixtureSizeFrom, foveationFrom, useStarMap } from '@/features/starmap/useStarMap'
-import { pathForTarget, resolveTarget, type LayerTarget } from '@/features/starmap/view/layers'
+import { clusterPath, pathForTarget, resolveTarget, type LayerTarget } from '@/features/starmap/view/layers'
+import { ClusterScene, type ClusterSceneState } from '@/features/starmap/route/ClusterScene'
 import { markLoginFirstScreenReady } from '@/lib/loginTiming'
 import { subjectOfNebula } from '@/features/starmap/model/starMap'
 import { defaultSubject, useStarMapSource } from '@/features/starmap/starMapSource'
@@ -63,8 +70,13 @@ export function StarMapRoute({ relations = false, longNames = false }: { relatio
       remember(ownerId, map.subject.subjectId)
     }
   }, [map, lastSubject, ownerId, remember])
-  const { topicId, unitId } = params
-  const routeTarget = useMemo(() => resolveTarget(map, topicId, unitId), [map, topicId, unitId])
+  const { topicId, unitId, clusterId } = params
+  const sceneUp = clusterId !== undefined
+  const asked = useMemo(() => resolveTarget(map, topicId, unitId), [map, topicId, unitId])
+  // Under a cluster's route scene the map keeps the choice it was left on, so back from the scene finds it as it was (#747).
+  const [left, setLeft] = useState(asked)
+  if (!sceneUp && left !== asked) setLeft(asked)
+  const routeTarget = sceneUp ? left : asked
   // A point waiting for its lighting moment is drawn in progress until it, and its star's route
   // (or a tap on it) opens on its nebula (#140, #145).
   const stage = useLightingStage(map, routeTarget)
@@ -76,7 +88,8 @@ export function StarMapRoute({ relations = false, longNames = false }: { relatio
   // A student who has not started anything is asked which subject school is on (plan B), unless the
   // profile says, lands on its recommended star with Murmi beside it, and after the first lighting sees
   // the galaxy (plan A).
-  const first = useFirstLanding(map, stage.target, ownerId, { hold: language.hold || aboutYou.hold, subjects: aboutYou.subjects })
+  // Not under a cluster's route scene either: the landing is the map's, and the map is not on screen.
+  const first = useFirstLanding(map, stage.target, ownerId, { hold: language.hold || aboutYou.hold || sceneUp, subjects: aboutYou.subjects })
   const firstReveal = useFirstReveal(map, first.target, stage.reveal)
   // A star found from Ask with stars missing on the way: the path to it, and Murmi beside it (#489).
   const findStar = useFindStar(map)
@@ -108,6 +121,28 @@ export function StarMapRoute({ relations = false, longNames = false }: { relatio
       navigate({ pathname: pathForTarget(next.layer === 'map' ? map.subject.subjectId : subjectOfNebula(map, next.nebulaId), next), search: location.search }),
     [navigate, map, location.search],
   )
+  // A star cluster chosen on the whole view (#747): its route scene, over the map; the sky stays the step back.
+  const onOpenCluster = useCallback(
+    (id: string) => {
+      const state: ClusterSceneState = { fromSky: true }
+      navigate({ pathname: clusterPath(subjectOfNebula(map, id), id), search: location.search }, { state })
+    },
+    [navigate, map, location.search],
+  )
+  // Back from a scene, focus goes back to the cluster it opened, when nothing else has it.
+  const openedCluster = useRef<string | null>(null)
+  useEffect(() => {
+    if (clusterId) {
+      openedCluster.current = clusterId
+      return
+    }
+    const opened = openedCluster.current
+    openedCluster.current = null
+    if (!opened) return
+    const link = document.querySelector<HTMLElement>(`[data-nebula-link="${CSS.escape(opened)}"]`)
+    if (link && (document.activeElement === null || document.activeElement === document.body)) link.focus({ preventScroll: true })
+  }, [clusterId])
+
   // Panned to another galaxy: the route (and with it the header and the switcher) follows, in place.
   const onCentreGalaxy = useCallback(
     (id: string) => {
@@ -128,8 +163,8 @@ export function StarMapRoute({ relations = false, longNames = false }: { relatio
   if (status === 'error') return <StarMapError onRetry={retry} />
   if (map.subjects.length === 0) return <EmptyStarMap onShown={onFirstFrame} />
 
-  return (
-    <StarMapView demo={demo} map={stage.map} target={firstReveal.target ?? findStar.target ?? (reminderBubble ? reminder.target : null) ?? first.target} path={findStar.path} marked={reminderBubble?.unitId ?? null} onNavigate={onNavigate} land={stage.land} onFirstFrame={onFirstFrame} onCentreGalaxy={onCentreGalaxy} foveate={search.has('foveation') ? foveationFrom(search) : false}
+  const sky = (
+    <StarMapView demo={demo} map={stage.map} target={firstReveal.target ?? findStar.target ?? (reminderBubble ? reminder.target : null) ?? first.target} path={findStar.path} marked={reminderBubble?.unitId ?? null} onNavigate={onNavigate} land={stage.land} onFirstFrame={onFirstFrame} onCentreGalaxy={onCentreGalaxy} onOpenCluster={onOpenCluster} foveate={search.has('foveation') ? foveationFrom(search) : false}
       overlay={(locate, watch) => (
         <>
           <LightingOverlay map={map} locate={locate} watch={watch} onReveal={firstReveal.onReveal} />
@@ -174,6 +209,16 @@ export function StarMapRoute({ relations = false, longNames = false }: { relatio
           )}
         </>
       )} />
+  )
+
+  return (
+    <div data-starmap-route className="relative flex h-full min-h-0 w-full flex-1 flex-col">
+      {/* Under a cluster's route scene the map can be neither seen nor used, and nothing in it moves (#747). */}
+      <div inert={sceneUp} className="flex h-full min-h-0 w-full flex-1 flex-col">
+        {sky}
+      </div>
+      {clusterId !== undefined && <ClusterScene map={map} clusterId={clusterId} />}
+    </div>
   )
 }
 

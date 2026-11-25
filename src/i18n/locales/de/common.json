@@ -489,6 +489,9 @@
     "chapter": {
       "title": "Kapitel"
     },
+    "cluster": {
+      "title": "Lernweg"
+    },
     "home": {
       "title": "Deine Sternkarte"
     },
