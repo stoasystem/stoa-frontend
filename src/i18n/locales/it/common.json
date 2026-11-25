@@ -181,7 +181,8 @@
       "system": "Sistema",
       "teacherApplications": "Candidature dei docenti",
       "users": "Utenti",
-      "analytics": "Statistiche d’uso"
+      "analytics": "Statistiche d’uso",
+      "systemHealth": "Stato del sistema"
     },
     "administration": "Amministrazione",
     "analytics": "Analisi",

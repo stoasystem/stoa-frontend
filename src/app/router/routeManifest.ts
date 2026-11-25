@@ -499,7 +499,7 @@ export const pageRoutes: readonly PageRoute[] = [
     access: ADMIN,
     page: AdminDashboardPage,
     copy: ADMIN_COPY,
-    nav: [{ area: 'admin', label: 'System', labelKey: 'navigation.admin.system', priority: 'primary', icon: 'settings', mobile: true, covers: ['/admin/system', '/admin/learning-operations', '/admin/learning-automation'], description: 'Operations overview, system status, learning operations and learning automation.' }],
+    nav: [{ area: 'admin', label: 'System', labelKey: 'navigation.admin.system', priority: 'primary', icon: 'settings', mobile: true, covers: ['/admin/learning-operations', '/admin/learning-automation'], description: 'Operations overview, learning operations and learning automation.' }],
     meta: { module: 'Admin', status: 'core', purpose: 'Admin operations overview.' },
   },
   { path: '/admin/learning-operations', access: ADMIN, page: LearningOperationsDashboardPage, copy: ADMIN_COPY, titleKey: 'routes.learningOperations.title', meta: { module: 'Admin', status: 'core', purpose: 'Platform learning operations.' } },
@@ -509,7 +509,16 @@ export const pageRoutes: readonly PageRoute[] = [
   { path: '/admin/users/:userId/usage-period', access: ADMIN, page: AdminUsagePeriodPage, copy: ADMIN_COPY, titleKey: 'routes.usagePeriod.title', meta: { module: 'Admin', status: 'core', purpose: 'Usage period of one account: extend, change the end date, records.' } },
   { path: '/admin/usage-periods', access: ADMIN, page: AdminEndingUsagePeriodsPage, copy: ADMIN_COPY, titleKey: 'routes.endingUsagePeriods.title', meta: { module: 'Admin', status: 'core', purpose: 'Usage periods ending within two weeks or ended in the last thirty days.' } },
   // Card 134: per-feature health, alarms and deploys; each feature opens its own page.
-  { path: '/admin/system', access: ADMIN, page: AdminSystemHealthPage, copy: ADMIN_COPY, titleKey: 'routes.systemStatus.title', meta: { module: 'Admin', status: 'core', purpose: 'System health: per-feature status, alarms, deploys.' } },
+  {
+    path: '/admin/system',
+    access: ADMIN,
+    page: AdminSystemHealthPage,
+    copy: ADMIN_COPY,
+    titleKey: 'routes.systemStatus.title',
+    // Its own item: behind System it was one click further than anyone looked.
+    nav: [{ area: 'admin', label: 'System health', labelKey: 'navigation.admin.systemHealth', priority: 'primary', icon: 'dashboard', description: 'Per-feature status, alarms and deploys.' }],
+    meta: { module: 'Admin', status: 'core', purpose: 'System health: per-feature status, alarms, deploys.' },
+  },
   { path: '/admin/system/:feature', access: ADMIN, page: AdminSystemFeaturePage, copy: ADMIN_COPY, titleKey: 'routes.systemStatus.title', meta: { module: 'Admin', status: 'core', purpose: 'One feature: series, routes, errors, probes, alarms, usage.' } },
   {
     path: '/admin/analytics',

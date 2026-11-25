@@ -66,8 +66,9 @@ describe('what each role is offered beside the logo', () => {
       ['/admin/curriculum', 'navigation.admin.curriculum', []],
       ['/admin/moderation', 'navigation.admin.moderation', []],
       // Subscriptions and billing is frozen (card 007) and comes back here.
-      ['/admin', 'navigation.admin.system', ['/admin/system', '/admin/learning-operations', '/admin/learning-automation']],
+      ['/admin', 'navigation.admin.system', ['/admin/learning-operations', '/admin/learning-automation']],
       // Card 134.
+      ['/admin/system', 'navigation.admin.systemHealth', []],
       ['/admin/analytics', 'navigation.admin.analytics', []],
     ])
   })
