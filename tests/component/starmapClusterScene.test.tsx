@@ -237,6 +237,38 @@ describe('the cluster route scene, on the map route', () => {
     expect(next).toHaveFocus()
   })
 
+  it('draws a quiet metro map by default, and a star picked out brings its whole context forward', async () => {
+    const user = userEvent.setup()
+    const { container } = await openAt('/map/math/cluster/data')
+    const scene = container.querySelector<HTMLElement>('[data-cluster-route]')!
+    const stars = scene.querySelectorAll('[data-unit]').length
+    const lines = () => scene.querySelectorAll('[data-route-line="main"], [data-route-line="branch"]').length
+    const context = () => scene.querySelectorAll('[data-route-line="context"]').length
+    expect(lines()).toBeLessThanOrEqual(stars - 1)
+    expect(context()).toBe(0)
+    // One chip per outside cluster, no dashed line from any by default.
+    const chips = [...scene.querySelectorAll<HTMLElement>('[data-route-entrance]')].map((chip) => chip.dataset.routeEntrance)
+    expect(new Set(chips).size).toBe(chips.length)
+
+    // Hovering a star that needs another cluster: its prerequisites and the chip's dashed line come forward, the rest dims.
+    const needy = scene.querySelector<HTMLElement>('[data-unit="daten-statistische-untersuchungen-durchfuehren"]')!
+    fireEvent.pointerEnter(needy)
+    expect(context()).toBeGreaterThan(0)
+    const dimmed = [...scene.querySelectorAll<HTMLElement>('[data-unit]')].filter((n) => n.style.opacity === '0.35')
+    expect(dimmed.length).toBeGreaterThan(0)
+    expect(needy.style.opacity).toBe('1')
+    fireEvent.pointerLeave(needy)
+    expect(context()).toBe(0)
+
+    // Selected by click (and so focused): the same; cleared, quiet again.
+    await user.click(needy)
+    expect(context()).toBeGreaterThan(0)
+    await user.keyboard('{Escape}')
+    fireEvent.pointerLeave(needy)
+    act(() => needy.blur())
+    expect(context()).toBe(0)
+  })
+
   it('leads from an entrance to the star in the other cluster, with its card', async () => {
     const user = userEvent.setup()
     const { container } = await openAt('/map/math/cluster/algebra')

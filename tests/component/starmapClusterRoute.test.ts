@@ -1,13 +1,15 @@
 /*
- * Star clusters and their learning routes (prototype, `starmap-clusters`):
- * the layout's invariants on small hand-made graphs and on the real
- * mathematics knowledge base.
+ * Star clusters and their learning routes (#747): the layout's invariants on
+ * small hand-made graphs and on the real mathematics knowledge base, and the
+ * metro map drawn by default -- one line into each side star, from its anchor
+ * -- with one entrance chip per outside cluster.
  */
 import { describe, expect, it } from 'vitest'
 import { demoClusterMap } from '@/dev/demo/clusters/demoClusterMap'
 import { MATH_KNOWLEDGE_BASE } from '@/dev/demo/clusters/mathKnowledgeBase'
 import { clustersOf, type StarCluster } from '@/features/starmap/route/clusters'
-import { layoutRoute, MAX_BRANCH_LANES, type RouteLayout } from '@/features/starmap/route/routeLayout'
+import { NARROW_NAME, routeGeometry, WIDE, type Point } from '@/features/starmap/route/routeGeometry'
+import { layoutRoute, laneRow, MAX_BRANCH_LANES, type RouteLayout, type RouteStarNode } from '@/features/starmap/route/routeLayout'
 import type { Prerequisite } from '@/features/starmap/model/starMap'
 
 const stars = (...ids: string[]) => ids.map((unitId, i) => ({ unitId, order: i + 1 }))
@@ -24,9 +26,9 @@ function expectInvariants(route: RouteLayout, unitIds: readonly string[], prereq
   for (const { from, to } of prerequisites) {
     if (members.has(from) && members.has(to)) expect(col.get(from)!, `${from} -> ${to}`).toBeLessThan(col.get(to)!)
   }
-  // At most three side nodes (entrances included) in any column, one per lane; one main star per column.
+  // At most three side stars in any column, one per lane; one main star per column.
   const byColumn = new Map<number, number[]>()
-  for (const n of route.nodes) byColumn.set(n.col, [...(byColumn.get(n.col) ?? []), n.lane])
+  for (const n of route.nodes) if (n.kind === 'star') byColumn.set(n.col, [...(byColumn.get(n.col) ?? []), n.lane])
   for (const lanes of byColumn.values()) {
     expect(lanes.filter((l) => l > 0).length).toBeLessThanOrEqual(MAX_BRANCH_LANES)
     expect(new Set(lanes).size).toBe(lanes.length)
@@ -35,10 +37,22 @@ function expectInvariants(route: RouteLayout, unitIds: readonly string[], prereq
   // The main line strictly left to right, on lane 0, and only main stars on lane 0.
   const mainCols = route.mainline.map((id) => col.get(id)!)
   mainCols.forEach((c, i) => i > 0 && expect(c).toBeGreaterThan(mainCols[i - 1]))
-  for (const n of route.nodes) expect(n.lane === 0).toBe(n.kind === 'star' && route.mainline.includes(n.unitId))
-  // Entrances come before every star they lead into.
-  for (const n of route.nodes) {
-    if (n.kind === 'entrance') for (const t of n.targets) expect(n.col).toBeLessThan(col.get(t)!)
+  for (const n of route.nodes) if (n.kind === 'star') expect(n.lane === 0).toBe(route.mainline.includes(n.unitId))
+  // Entrances sit in their own column, before every star.
+  for (const n of route.nodes) if (n.kind === 'entrance') expect(n.col).toBe(-1)
+  // A forest by default: the main line, and at most one line into each side star, from a prerequisite left of it.
+  const stars = route.nodes.filter((n): n is RouteStarNode => n.kind === 'star')
+  expect(route.edges.length).toBeLessThanOrEqual(Math.max(0, stars.length - 1))
+  const into = new Map<string, number>()
+  for (const e of route.edges) into.set(e.to, (into.get(e.to) ?? 0) + 1)
+  for (const n of stars) expect(into.get(n.id) ?? 0, n.id).toBeLessThanOrEqual(1)
+  for (const e of route.edges) {
+    expect(e.kind === 'main' || e.kind === 'branch').toBe(true)
+    if (e.kind === 'branch') expect(prerequisites.some((p) => p.from === e.from && p.to === e.to), `${e.from} -> ${e.to}`).toBe(true)
+  }
+  // The context holds every in-cluster prerequisite.
+  for (const { from, to } of prerequisites) {
+    if (members.has(from) && members.has(to)) expect(route.context.some((e) => e.from === from && e.to === to), `${from} -> ${to}`).toBe(true)
   }
 }
 
@@ -59,7 +73,7 @@ describe('layoutRoute', () => {
     expect(route.mainline).toEqual(['a', 'b', 'z'])
   })
 
-  it('never opens a fourth side path in a column: the fifth parallel star moves right', () => {
+  it('never opens a fourth side path in a column: the fourth and fifth parallel stars move right', () => {
     // root -> s1..s5 and root -> m1 -> m2: five side stars all wanting column 1.
     const ids = ['root', 'm1', 'm2', 's1', 's2', 's3', 's4', 's5']
     const prereqs = edges(['root', 'm1'], ['m1', 'm2'], ...['s1', 's2', 's3', 's4', 's5'].map((s): [string, string] => ['root', s]))
@@ -70,17 +84,35 @@ describe('layoutRoute', () => {
     expectInvariants(route, ids, prereqs)
   })
 
-  it('merges entrances in one column and opens each outside star once', () => {
+  it('gives each outside cluster one entrance chip, stacked left of the route, with every star it stands for', () => {
     const clusterOf = new Map([['x1', 'other'], ['x2', 'other'], ['y1', 'third']])
-    // a and b both start the cluster and need outside stars; c needs x1 again.
+    // a and b both start the cluster and need outside stars; c needs x1 again, far to the right.
     const prereqs = edges(['x1', 'a'], ['x2', 'b'], ['y1', 'b'], ['a', 'c'], ['x1', 'c'], ['b', 'c'])
     const route = layoutRoute({ stars: stars('a', 'b', 'c'), prerequisites: prereqs, clusterOf })
-    const entrances = route.nodes.filter((n) => n.kind === 'entrance')
-    expect(entrances).toHaveLength(1)
-    expect(entrances[0]).toMatchObject({ col: 0, targets: ['a', 'b'] })
-    expect(entrances[0].kind === 'entrance' && entrances[0].sources.map((s) => s.unitId)).toEqual(['x1', 'x2', 'y1'])
+    const chips = route.nodes.filter((n) => n.kind === 'entrance')
+    expect(chips.map((n) => n.kind === 'entrance' && [n.clusterId, n.col, n.row, n.sources.map((s) => s.unitId), n.targets])).toEqual([
+      ['other', -1, 0, ['x1', 'x2'], ['a', 'b', 'c']],
+      ['third', -1, 1, ['y1'], ['b']],
+    ])
     expect(route.crossPrerequisites).toEqual({ total: 4, shown: 3 })
+    // No dashed line by default; the context has one from each chip a star needs.
+    expect(route.edges.some((e) => e.kind === 'entrance')).toBe(false)
+    expect(route.context.filter((e) => e.kind === 'entrance').map((e) => `${e.from}>${e.to}`)).toEqual([
+      'entrance:other>a',
+      'entrance:other>b',
+      'entrance:third>b',
+      'entrance:other>c',
+    ])
     expectInvariants(route, ['a', 'b', 'c'], prereqs)
+  })
+
+  it('leads a side star with nothing before it in the cluster in by a stub from its entrance', () => {
+    const clusterOf = new Map([['x1', 'other']])
+    // a -> b -> c is the main line; s starts a side path from outside.
+    const prereqs = edges(['a', 'b'], ['b', 'c'], ['x1', 's'])
+    const route = layoutRoute({ stars: stars('a', 'b', 'c', 's'), prerequisites: prereqs, clusterOf })
+    expect(route.stubs).toEqual(['s'])
+    expect(route.edges.some((e) => e.to === 's')).toBe(false)
   })
 
   it('leaves out an outside star that another outside star the same star needs builds on', () => {
@@ -91,11 +123,37 @@ describe('layoutRoute', () => {
     expect(entrance?.kind === 'entrance' && entrance.sources.map((s) => s.unitId)).toEqual(['x2'])
   })
 
-  it('draws only the edges no longer path implies', () => {
-    const prereqs = edges(['a', 'b'], ['b', 'c'], ['a', 'c'], ['a', 'd'], ['d', 'c'])
-    const route = layoutRoute({ stars: stars('a', 'b', 'c', 'd'), prerequisites: prereqs, clusterOf: none })
-    const drawn = route.edges.map((e) => `${e.from}>${e.to}:${e.kind}`).sort()
-    expect(drawn).toEqual(['a>b:main', 'a>d:branch', 'b>c:main', 'd>c:branch'])
+  it('draws one line into each side star, from its anchor; the rest only in its context', () => {
+    // a -> b -> c -> e main; d needs a and b (anchor b, the one further right); e also needs d.
+    const prereqs = edges(['a', 'b'], ['b', 'c'], ['c', 'e'], ['a', 'd'], ['b', 'd'], ['d', 'e'])
+    const route = layoutRoute({ stars: stars('a', 'b', 'c', 'd', 'e'), prerequisites: prereqs, clusterOf: none })
+    expect(route.mainline).toEqual(['a', 'b', 'c', 'e'])
+    expect(route.edges.map((e) => `${e.from}>${e.to}:${e.kind}`)).toEqual(['a>b:main', 'b>c:main', 'c>e:main', 'b>d:branch'])
+    expect(route.context.filter((e) => e.kind === 'prerequisite').map((e) => `${e.from}>${e.to}`).sort()).toEqual(['a>d', 'd>e'])
+  })
+
+  it('puts a side star in its anchor lane when it is free, else on the same side, and only then further right', () => {
+    // m0 -> m1 -> m2 -> m3 main. s1 forks off m0 (lane 1), t1 follows s1: it takes lane 1 too.
+    // u1 and u2 also follow s1 in the same column: lane 1 is t1's, and lane 1 is the only lane above,
+    // so they move right rather than cross to the other side.
+    const ids = ['m0', 'm1', 'm2', 'm3', 's1', 't1', 'u1']
+    const prereqs = edges(['m0', 'm1'], ['m1', 'm2'], ['m2', 'm3'], ['m0', 's1'], ['s1', 't1'], ['s1', 'u1'])
+    const route = layoutRoute({ stars: stars(...ids), prerequisites: prereqs, clusterOf: none })
+    const at = (id: string) => route.nodes.find((n) => n.id === id) as RouteStarNode
+    expect([at('s1').col, at('s1').lane]).toEqual([1, 1])
+    expect([at('t1').col, at('t1').lane]).toEqual([2, 1])
+    expect([at('u1').col, at('u1').lane]).toEqual([3, 1])
+    expect(route.shifted).toBe(1)
+    // Below the main line the same: lane 2's follower takes lane 2, then lane 3 next to it.
+    const below = layoutRoute({
+      stars: stars('m0', 'm1', 'm2', 'm3', 'up', 'down', 'd1', 'd2'),
+      prerequisites: edges(['m0', 'm1'], ['m1', 'm2'], ['m2', 'm3'], ['m0', 'up'], ['m0', 'down'], ['down', 'd1'], ['down', 'd2']),
+      clusterOf: none,
+    })
+    const b = (id: string) => below.nodes.find((n) => n.id === id) as RouteStarNode
+    expect([b('up').lane, b('down').lane]).toEqual([1, 2])
+    expect([b('d1').col, b('d1').lane, b('d2').col, b('d2').lane]).toEqual([2, 2, 2, 3])
+    expectInvariants(route, ids, prereqs)
   })
 
   it('takes a hand-made main line, and refuses one against the prerequisites', () => {
@@ -136,12 +194,65 @@ describe('the real mathematics knowledge base', () => {
     expect(cluster.route.cycleBreaks).toEqual([])
   })
 
+  it.each(['numbers', 'geometry', 'algebra', 'data'])('gives %s one entrance chip per outside cluster', (clusterId) => {
+    const route = byId.get(clusterId)!.route
+    const chips = route.nodes.filter((n) => n.kind === 'entrance')
+    const outside = chips.map((n) => n.kind === 'entrance' && n.clusterId)
+    expect(new Set(outside).size).toBe(outside.length)
+    expect(outside).not.toContain(clusterId)
+    for (const n of chips) if (n.kind === 'entrance') expect(n.sources.every((s) => s.clusterId === n.clusterId)).toBe(true)
+  })
+
   it('keeps the entrances of Equations and algebra few', () => {
     const route = byId.get('algebra')!.route
-    const entrances = route.nodes.filter((n) => n.kind === 'entrance')
     expect(route.crossPrerequisites.total).toBeGreaterThan(20)
     expect(route.crossPrerequisites.shown).toBeLessThan(route.crossPrerequisites.total)
-    expect(entrances.length).toBeLessThanOrEqual(4)
+    expect(route.nodes.filter((n) => n.kind === 'entrance').length).toBeLessThanOrEqual(3)
+  })
+
+  it.each(['numbers', 'geometry', 'algebra', 'data'])('draws %s as a forest by default, its side stars in their anchor lanes where free', (clusterId) => {
+    const cluster = byId.get(clusterId)!
+    const route = cluster.route
+    const stars = route.nodes.filter((n): n is RouteStarNode => n.kind === 'star')
+    expect(route.edges.length).toBeLessThanOrEqual(stars.length - 1)
+    const lane = new Map(stars.map((n) => [n.id, n.lane]))
+    // A side star off a side star sits on its anchor's side of the main line.
+    for (const e of route.edges) {
+      if (e.kind !== 'branch' || lane.get(e.from) === 0) continue
+      expect(Math.sign(laneRow(lane.get(e.to)!)), `${e.from} -> ${e.to}`).toBe(Math.sign(laneRow(lane.get(e.from)!)))
+    }
+  })
+
+  it.each(['numbers', 'geometry', 'algebra', 'data'])('puts no name of %s on a line drawn by default', (clusterId) => {
+    const cluster = byId.get(clusterId)!
+    const route = cluster.route
+    const names = new Map(cluster.stars.map((s) => [s.unitId, s.name]))
+    const geometry = routeGeometry(route, WIDE, (unitId) => names.get(unitId) ?? '')
+    // Each name's box: as wide as its text (13 px type, two lines at most), on its side of the glyph.
+    const boxes = route.nodes.flatMap((n) => {
+      if (n.kind !== 'star') return []
+      const p = geometry.position.get(n.id)!
+      const half = geometry.glyph(n) / 2
+      const text = names.get(n.unitId) ?? ''
+      const align = geometry.labelAlign.get(n.id)
+      const max = align === 'narrow' ? (WIDE.colW - 12) * NARROW_NAME.share : WIDE.colW - 12
+      const w = Math.min(max, text.length * 7) / 2
+      const lines = Math.min(align === 'narrow' ? NARROW_NAME.lines : 2, Math.ceil((text.length * 7) / max))
+      const h = lines * 16
+      const above = geometry.labelSide.get(n.id) === 'above'
+      const [x0, x1] = align === 'end' ? [p.x + half - 2 * w, p.x + half] : align === 'start' ? [p.x - half, p.x - half + 2 * w] : [p.x - w, p.x + w]
+      return [{ id: n.id, x0, x1, y0: above ? p.y - half - 6 - h : p.y + half + 6, y1: above ? p.y - half - 6 : p.y + half + 6 + h }]
+    })
+    const inside = (q: Point, b: (typeof boxes)[number]) => q.x > b.x0 && q.x < b.x1 && q.y > b.y0 && q.y < b.y1
+    const hits: string[] = []
+    for (const e of route.edges) {
+      const points = geometry.line(e.from, e.to).points
+      for (const b of boxes) if (points.some((q) => inside(q, b))) hits.push(`${e.from} -> ${e.to} over ${b.id}`)
+    }
+    expect(hits).toEqual([])
+    // Nor on another name.
+    const covered = boxes.flatMap((a, i) => boxes.slice(i + 1).filter((b) => a.x0 < b.x1 && b.x0 < a.x1 && a.y0 < b.y1 && b.y0 < a.y1).map((b) => `${a.id} / ${b.id}`))
+    expect(covered).toEqual([])
   })
 
   it('lays out the same route whatever is lit', () => {

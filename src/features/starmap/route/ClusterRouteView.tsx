@@ -1,8 +1,15 @@
 /*
  * One star cluster's learning route (#747): its stars left to right
- * along a bright main line, side paths branching off it and joining again
- * (at most three beside it in any column), and entrances that lead to the
- * clusters a stretch of the route builds on. Laid out by `routeLayout.ts`.
+ * along a bright main line, side paths forking off it as parallel tracks
+ * (at most three beside it in any column), and one entrance chip per cluster
+ * the route builds on, stacked on the left. Laid out by `routeLayout.ts`,
+ * drawn by `routeGeometry.ts`.
+ *
+ * Quiet by default, like a metro map: the main line and one line into each
+ * side star, from its anchor. A star picked out -- selected, focused or under
+ * the pointer -- brings its whole context forward: every prerequisite into
+ * it, dashed lines from the entrances it needs, every star it unlocks; the
+ * rest dims.
  *
  * The route scrolls sideways (a mouse can drag it) and opens on the star to
  * go on with, or on the star asked for. Every star and entrance is a button in
@@ -18,7 +25,8 @@ import { Button } from '@/components/base'
 import { StarGlyph } from '@/features/starmap/components/StarGlyph'
 import { starLook, type Star, type StarMap } from '@/features/starmap/model/starMap'
 import { clusterOfStar, type StarCluster } from '@/features/starmap/route/clusters'
-import type { RouteEntranceNode, RouteNode } from '@/features/starmap/route/routeLayout'
+import { COMPACT, contextOf, curve, NARROW_NAME, routeGeometry, WIDE } from '@/features/starmap/route/routeGeometry'
+import type { RouteEntranceNode } from '@/features/starmap/route/routeLayout'
 import '@/features/starmap/route/clusterRoute.css'
 
 /** Narrow screens: tighter columns and lanes, the route still scrolls sideways. */
@@ -33,20 +41,6 @@ function useCompact() {
     return () => list.removeEventListener('change', change)
   }, [])
   return compact
-}
-
-/** Side lanes alternate around the main line: 1 above, 2 below, 3 further below. */
-const LANE_ROW = [0, -1, 1, 2] as const
-
-type Geometry = { colW: number; laneH: number; padX: number; padTop: number; padBottom: number; mainGlyph: number; sideGlyph: number }
-
-const WIDE: Geometry = { colW: 164, laneH: 118, padX: 96, padTop: 44, padBottom: 72, mainGlyph: 40, sideGlyph: 28 }
-const COMPACT: Geometry = { colW: 116, laneH: 84, padX: 60, padTop: 36, padBottom: 64, mainGlyph: 34, sideGlyph: 24 }
-
-function curve(x1: number, y1: number, x2: number, y2: number) {
-  if (y1 === y2) return `M ${x1} ${y1} L ${x2} ${y2}`
-  const dx = (x2 - x1) / 2
-  return `M ${x1} ${y1} C ${x1 + dx} ${y1}, ${x2 - dx} ${y2}, ${x2} ${y2}`
 }
 
 /** Scroll the route sideways to `left`, smoothly where the browser can. */
@@ -120,17 +114,17 @@ export function ClusterRouteView({
   const starById = useMemo(() => new Map(map.stars.map((s) => [s.unitId, s])), [map.stars])
   const nextId = cluster.next?.unitId ?? null
   const [selected, setSelected] = useState<string | null>(focusUnitId)
+  const [pointed, setPointed] = useState<string | null>(null)
+  const [focused, setFocused] = useState<string | null>(null)
   const nodeRefs = useRef(new Map<string, HTMLButtonElement>())
   const cardRef = useRef<HTMLDivElement>(null)
   const { ref: scroller, dragging, handlers } = useDragScroll()
 
-  const rows = route.nodes.map((n) => LANE_ROW[n.lane])
-  const topRow = Math.min(0, ...rows)
-  const bottomRow = Math.max(0, ...rows)
-  const width = g.padX * 2 + Math.max(0, route.columns - 1) * g.colW
-  const height = g.padTop + (bottomRow - topRow) * g.laneH + g.padBottom
-  const at = (n: Pick<RouteNode, 'col' | 'lane'>) => ({ x: g.padX + n.col * g.colW, y: g.padTop + (LANE_ROW[n.lane] - topRow) * g.laneH })
-  const position = new Map(route.nodes.map((n) => [n.id, at(n)]))
+  const geometry = useMemo(() => routeGeometry(route, g, (unitId) => starById.get(unitId)?.name ?? ''), [route, g, starById])
+  const { width, height, position, labelSide } = geometry
+  // The star or chip whose context is drawn: under the pointer, else with focus, else selected.
+  const active = pointed ?? focused ?? selected
+  const context = useMemo(() => contextOf(route, active), [route, active])
   const nodeById = new Map(route.nodes.map((n) => [n.id, n]))
   const lit = (id: string) => starById.get(id)?.state === 'lit'
 
@@ -240,40 +234,83 @@ export function ClusterRouteView({
         <div className="relative my-auto shrink-0" style={{ width, height }}>
           <svg width={width} height={height} className="absolute left-0 top-0" aria-hidden="true" focusable="false">
             {/* A faint track the main line runs along, end to end. */}
-            <line x1={g.padX / 2} x2={width - g.padX / 2} y1={g.padTop - topRow * g.laneH} y2={g.padTop - topRow * g.laneH} stroke="var(--lit)" strokeOpacity={0.08} strokeWidth={10} strokeLinecap="round" />
+            {route.mainline.length > 0 && (
+              <line
+                x1={position.get(route.mainline[0])!.x - g.colW / 2}
+                x2={width - g.padX / 2}
+                y1={geometry.mainY}
+                y2={geometry.mainY}
+                stroke="var(--lit)"
+                strokeOpacity={0.08}
+                strokeWidth={10}
+                strokeLinecap="round"
+              />
+            )}
             {route.edges
-              .filter((e) => e.kind !== 'main')
+              .filter((e) => e.kind === 'branch')
               .map((e) => {
-                const a = position.get(e.from)!
-                const b = position.get(e.to)!
-                const entrance = e.kind === 'entrance'
-                // The selected node's own lines stand out; a line over several columns stays quiet.
-                const touches = selected !== null && (e.from === selected || e.to === selected)
-                const long = (nodeById.get(e.to)?.col ?? 0) - (nodeById.get(e.from)?.col ?? 0) > 1
-                const quiet = selected !== null && !touches
+                const quiet = active !== null && !context.nodes.has(e.to)
                 return (
                   <path
                     key={`${e.from}>${e.to}`}
-                    d={curve(a.x, a.y, b.x, b.y)}
+                    data-route-line="branch"
+                    d={geometry.line(e.from, e.to).d}
                     fill="none"
-                    stroke={entrance ? 'var(--starmap-ice)' : touches || lit(e.from) ? 'var(--lit)' : 'var(--on-sky-text)'}
-                    strokeOpacity={touches ? 0.95 : quiet ? 0.1 : entrance ? 0.5 : long ? 0.2 : lit(e.from) ? 0.5 : 0.32}
-                    strokeWidth={touches ? 2.25 : 1.5}
-                    strokeDasharray={entrance ? '4 5' : undefined}
+                    stroke={lit(e.from) ? 'var(--lit)' : 'var(--on-sky-text)'}
+                    strokeOpacity={quiet ? 0.1 : lit(e.from) ? 0.5 : 0.32}
+                    strokeWidth={1.5}
                   />
                 )
               })}
+            {route.stubs.map((unitId) => {
+              const p = position.get(unitId)!
+              return (
+                <line
+                  key={`stub:${unitId}`}
+                  data-route-line="stub"
+                  x1={p.x - 40}
+                  x2={p.x - 16}
+                  y1={p.y}
+                  y2={p.y}
+                  stroke="var(--starmap-ice)"
+                  strokeOpacity={active !== null && !context.nodes.has(unitId) ? 0.1 : 0.55}
+                  strokeWidth={1.5}
+                  strokeDasharray="4 4"
+                />
+              )
+            })}
             {route.edges
               .filter((e) => e.kind === 'main')
               .map((e) => {
                 const a = position.get(e.from)!
                 const b = position.get(e.to)!
                 const done = lit(e.from) && lit(e.to)
+                const quiet = active !== null && !(context.nodes.has(e.from) && context.nodes.has(e.to))
                 return (
-                  <g key={`${e.from}>${e.to}`}>
-                    <path d={curve(a.x, a.y, b.x, b.y)} fill="none" stroke="var(--lit)" strokeOpacity={done ? 0.25 : 0.1} strokeWidth={12} strokeLinecap="round" />
-                    <path d={curve(a.x, a.y, b.x, b.y)} fill="none" stroke="var(--lit)" strokeOpacity={done ? 1 : 0.55} strokeWidth={done ? 4 : 3} strokeLinecap="round" />
+                  <g key={`${e.from}>${e.to}`} data-route-line="main" opacity={quiet ? 0.45 : 1}>
+                    <path d={curve(a, b)} fill="none" stroke="var(--lit)" strokeOpacity={done ? 0.25 : 0.1} strokeWidth={12} strokeLinecap="round" />
+                    <path d={curve(a, b)} fill="none" stroke="var(--lit)" strokeOpacity={done ? 1 : 0.55} strokeWidth={done ? 4 : 3} strokeLinecap="round" />
                   </g>
+                )
+              })}
+            {/* The picked-out star's context, over the quiet map. */}
+            {context.edges
+              .filter((e) => e.kind !== 'main')
+              .map((e) => {
+                const a = position.get(e.from)!
+                const b = position.get(e.to)!
+                const entrance = e.kind === 'entrance'
+                return (
+                  <path
+                    key={`context:${e.from}>${e.to}`}
+                    data-route-line="context"
+                    d={entrance ? curve(a, b) : geometry.line(e.from, e.to).d}
+                    fill="none"
+                    stroke={entrance ? 'var(--starmap-ice)' : 'var(--lit)'}
+                    strokeOpacity={0.9}
+                    strokeWidth={2}
+                    strokeDasharray={entrance ? '4 5' : undefined}
+                  />
                 )
               })}
           </svg>
@@ -293,8 +330,12 @@ export function ClusterRouteView({
                     else nodeRefs.current.delete(n.id)
                   }}
                   className="route-entrance px-3 py-1.5"
-                  style={{ left: p.x, top: p.y, width: g.colW - 8 }}
+                  style={{ left: p.x, top: p.y, width: g.chipW, opacity: active !== null && !context.nodes.has(n.id) ? 0.4 : 1 }}
                   data-route-entrance={n.id}
+                  onPointerEnter={() => setPointed(n.id)}
+                  onPointerLeave={() => setPointed(null)}
+                  onFocus={() => setFocused(n.id)}
+                  onBlur={() => setFocused(null)}
                   data-selected={selected === n.id ? '' : undefined}
                   aria-label={`${label}, ${count}`}
                   aria-expanded={selected === n.id}
@@ -310,8 +351,10 @@ export function ClusterRouteView({
             }
             const star = starById.get(n.unitId)
             if (!star) return null
-            const size = n.main ? g.mainGlyph : g.sideGlyph
+            const size = geometry.glyph(n)
             const isNext = n.unitId === nextId
+            const above = labelSide.get(n.id) === 'above'
+            const align = geometry.labelAlign.get(n.id) ?? 'center'
             return (
               <button
                 key={n.id}
@@ -321,8 +364,19 @@ export function ClusterRouteView({
                   else nodeRefs.current.delete(n.id)
                 }}
                 className="route-node"
-                style={{ left: p.x, top: p.y - size / 2, width: g.colW - 12 }}
+                // The name on the side of the glyph no line meets (`routeGeometry`): below it, or above it.
+                style={{
+                  left: p.x,
+                  width: g.colW - 12,
+                  opacity: active !== null && !context.nodes.has(n.id) ? 0.35 : 1,
+                  ...(above ? { bottom: height - (p.y + size / 2), flexDirection: 'column-reverse' } : { top: p.y - size / 2 }),
+                }}
                 data-unit={n.unitId}
+                data-label={above ? 'above' : 'below'}
+                onPointerEnter={() => setPointed(n.id)}
+                onPointerLeave={() => setPointed(null)}
+                onFocus={() => setFocused(n.id)}
+                onBlur={() => setFocused(null)}
                 data-main={n.main ? '' : undefined}
                 data-next={isNext ? '' : undefined}
                 data-selected={selected === n.id ? '' : undefined}
@@ -335,7 +389,14 @@ export function ClusterRouteView({
                 </span>
                 <span
                   className="route-node-label"
+                  data-align={align}
                   style={{
+                    // Out of the way of a line bending to this side (`routeGeometry`): ending at the glyph's right edge, or starting at its left.
+                    ...(align === 'center'
+                      ? {}
+                      : align === 'narrow'
+                        ? { maxWidth: `${NARROW_NAME.share * 100}%`, WebkitLineClamp: NARROW_NAME.lines }
+                        : { width: '100%', textAlign: align === 'end' ? 'right' : 'left', transform: `translateX(${(align === 'end' ? -1 : 1) * ((g.colW - 12) / 2 - size / 2)}px)` }),
                     fontSize: n.main ? (compact ? 12 : 13) : compact ? 11 : 12,
                     fontWeight: n.main || isNext ? 600 : 400,
                     color: n.main || isNext ? 'var(--on-sky-text)' : 'var(--on-sky-text-caption)',

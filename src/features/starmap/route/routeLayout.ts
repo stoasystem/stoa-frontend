@@ -9,29 +9,39 @@
  *     to the lower `order`, then the lower unit id. `mainline` overrides it
  *     with a hand-made list (checked against the prerequisites).
  *   - Every other star goes in the first column right of all its in-cluster
- *     prerequisites, in a side lane 1..3; when that column's lanes are full it
- *     moves right. Never a fourth side path in a column.
- *   - Prerequisites from other clusters become entrances: a node in a side
- *     lane just before the star that needs them, which leads to the other
- *     cluster. Restrained so they do not drown the route: each outside star
- *     opens one entrance only, at the first star that needs it (later stars
- *     reach it through that one); an outside star that is itself a
- *     prerequisite of another outside star already shown, or of another the
- *     same star needs, is left out (the nearer one says enough); entrances
- *     that land in one column are one node listing their sources, and a star
- *     whose entrance would open within `MERGE_REACH` columns after another
- *     joins that one instead.
- *   - Lines: the main line joins consecutive main stars; the side lines are the
- *     transitive reduction of the in-cluster prerequisites (an edge implied by
- *     a longer path is not drawn).
+ *     prerequisites. Its anchor is the prerequisite furthest right (ties: a
+ *     main-line star, then the lower lane, then the unit id); it takes the
+ *     anchor's own lane when that is free there, else the nearest free lane
+ *     on the anchor's side of the main line (`laneRow`), and only then moves
+ *     right. Never a fourth side path in a column. Branches read as parallel
+ *     tracks forking off the main line.
+ *   - Prerequisites from other clusters become entrances, one chip per
+ *     outside cluster, stacked in a column of their own left of column 0
+ *     (`col` -1). Each lists the outside stars this cluster builds on, less
+ *     the ones another listed outside star builds on (the nearer one says
+ *     enough).
+ *   - Lines, as a metro map: by default the main line and one line into each
+ *     side star, from its anchor (`edges`), so a forest of at most N - 1
+ *     lines; a side star with no prerequisite in the cluster but one outside
+ *     has a short stub instead (`stubs`). Every prerequisite, and the
+ *     entrance a star needs, is in `context`, drawn only for the star picked
+ *     out (selected, focused or hovered).
  */
 import type { Prerequisite } from '@/features/starmap/model/starMap'
 
-/** Side paths beside the main line in one column, entrances included. */
+/** Side paths beside the main line in one column. */
 export const MAX_BRANCH_LANES = 3
 
-/** How many columns back a star's entrance may sit, to share an entrance already there. */
-export const MERGE_REACH = 2
+/**
+ * Where a lane is drawn, in lane steps from the main line (negative above):
+ * lane 1 above it, lanes 2 and 3 below. A lane's side of the main line is the
+ * sign of its row.
+ */
+export const LANE_ROW = [0, -1, 1, 2] as const
+
+export function laneRow(lane: number): number {
+  return LANE_ROW[lane] ?? 0
+}
 
 export type RouteStarInput = { unitId: string; order: number }
 
@@ -64,32 +74,47 @@ export type RouteStarNode = {
 
 export type EntranceSource = { unitId: string; clusterId: string }
 
+/** One outside cluster this cluster builds on: a chip in the column left of the route. */
 export type RouteEntranceNode = {
   kind: 'entrance'
   id: string
+  clusterId: string
+  /** Always -1: the chips' own column, before column 0. */
   col: number
-  lane: number
-  /** The outside stars this entrance leads to, in the order first needed. */
+  /** Its place in the stack of chips, from 0 at the top. */
+  row: number
+  /** The outside stars it stands for, in the order first needed. */
   sources: EntranceSource[]
-  /** The stars of this cluster that need them. */
+  /** The stars of this cluster that build on that cluster, in route order. */
   targets: string[]
 }
 
 export type RouteNode = RouteStarNode | RouteEntranceNode
 
-export type RouteEdge = { from: string; to: string; kind: 'main' | 'branch' | 'entrance' }
+/**
+ * A line: `main` along the main line, `branch` from a side star's anchor,
+ * `prerequisite` any other in-cluster prerequisite, `entrance` from a chip to
+ * a star that needs that cluster.
+ */
+export type RouteEdge = { from: string; to: string; kind: 'main' | 'branch' | 'prerequisite' | 'entrance' }
 
 export type RouteLayout = {
   nodes: RouteNode[]
+  /** What is drawn by default: the main line and each side star's line from its anchor -- a forest. */
   edges: RouteEdge[]
+  /** Every prerequisite into or out of a star, and its entrances: drawn for the star picked out. */
+  context: RouteEdge[]
+  /** Side stars with no prerequisite in the cluster but one outside: a short stub leads in. */
+  stubs: string[]
   /** Unit ids of the main line, left to right. */
   mainline: string[]
+  /** Columns of stars (the entrance chips' column not counted). */
   columns: number
   /** The highest side lane in use (0 when there is only the main line). */
   lanesUsed: number
-  /** Nodes placed right of the first column their prerequisites allowed, for want of a free lane. */
+  /** Stars placed right of the first column their prerequisites allowed, for want of a free lane. */
   shifted: number
-  /** Prerequisites from other clusters, before and after the restraint above. */
+  /** Prerequisites from other clusters, and the outside stars the chips list. */
   crossPrerequisites: { total: number; shown: number }
   /** In-cluster prerequisites dropped to break a cycle (none in a sound knowledge base). */
   cycleBreaks: Prerequisite[]
@@ -155,73 +180,43 @@ export function layoutRoute({ stars, prerequisites, clusterOf, mainline: overrid
     if (!laneTaken.has(c)) laneTaken.set(c, Array.from({ length: MAX_BRANCH_LANES + 1 }, () => null))
     return laneTaken.get(c)!
   }
-  const freeLane = (c: number, preferred?: number) => {
-    const lanes = lanesAt(c)
-    if (preferred && preferred >= 1 && lanes[preferred] === null) return preferred
-    for (let l = 1; l <= MAX_BRANCH_LANES; l += 1) if (lanes[l] === null) return l
-    return null
+  /** The anchor among placed prerequisites: furthest right, then a main-line star, then `tie`, then the unit id. */
+  const anchorOf = (unitId: string, tie: (p: string) => number) => {
+    const ps = preds.get(unitId)!
+    if (ps.length === 0) return undefined
+    const far = Math.max(...ps.map((p) => col.get(p)!))
+    return ps
+      .filter((p) => col.get(p) === far)
+      .sort((a, b) => Number(onMain.has(b)) - Number(onMain.has(a)) || tie(a) - tie(b) || byId(a, b))[0]
   }
-  const entranceAt = new Map<number, RouteEntranceNode>()
-  const opened = new Set<string>()
+  /** Lanes to try, best first: the anchor's own, then the nearest on its side; off the main line, nearest it first. */
+  const lanesFor = (anchor: string | undefined) => {
+    const all = Array.from({ length: MAX_BRANCH_LANES }, (_, i) => i + 1)
+    const own = anchor === undefined ? 0 : lane.get(anchor)!
+    if (own === 0) return all.sort((a, b) => Math.abs(laneRow(a)) - Math.abs(laneRow(b)) || a - b)
+    const side = Math.sign(laneRow(own))
+    return all
+      .filter((l) => Math.sign(laneRow(l)) === side)
+      .sort((a, b) => Math.abs(laneRow(a) - laneRow(own)) - Math.abs(laneRow(b) - laneRow(own)) || a - b)
+  }
   let shifted = 0
-  let shown = 0
   let lastMainCol = -1
 
   for (const unitId of topo) {
-    let min = Math.max(0, ...preds.get(unitId)!.map((p) => col.get(p)! + 1))
-    const isMain = onMain.has(unitId)
-    const wanted = isMain ? Math.max(min, lastMainCol + 1) : min
-
-    // Entrances for what this star needs from other clusters.
-    const needed = entrances ? outside.get(unitId)! : []
-    const fresh = needed
-      .filter((s) => !opened.has(s))
-      .filter((s) => ![...needed, ...opened].some((other) => other !== s && reaches(s, other)))
-      .sort(byId)
-    if (fresh.length > 0) {
-      const target = Math.max(0, wanted - 1)
-      // Join an entrance up to MERGE_REACH columns back before opening another.
-      let c = target
-      for (let back = 0; back <= MERGE_REACH && target - back >= 0; back += 1) {
-        if (entranceAt.has(target - back)) {
-          c = target - back
-          break
-        }
-      }
-      for (;;) {
-        if (entranceAt.has(c) || freeLane(c) !== null) break
-        c += 1
-      }
-      if (c > target) shifted += 1
-      let entrance = entranceAt.get(c)
-      if (!entrance) {
-        const l = freeLane(c)!
-        entrance = { kind: 'entrance', id: `entrance:${c}`, col: c, lane: l, sources: [], targets: [] }
-        lanesAt(c)[l] = entrance.id
-        entranceAt.set(c, entrance)
-      }
-      for (const s of fresh) {
-        opened.add(s)
-        entrance.sources.push({ unitId: s, clusterId: clusterOf.get(s)! })
-      }
-      entrance.targets.push(unitId)
-      shown += fresh.length
-      min = Math.max(min, c + 1)
-    }
-
-    if (isMain) {
+    const min = Math.max(0, ...preds.get(unitId)!.map((p) => col.get(p)! + 1))
+    if (onMain.has(unitId)) {
       const c = Math.max(min, lastMainCol + 1)
       lastMainCol = c
       col.set(unitId, c)
       lane.set(unitId, 0)
       continue
     }
-    const preferred = preds.get(unitId)!.map((p) => lane.get(p)!).find((l) => l > 0)
+    const tryLanes = lanesFor(anchorOf(unitId, (p) => lane.get(p)!))
     let c = min
-    let l = freeLane(c, preferred)
-    while (l === null) {
+    let l = tryLanes.find((candidate) => lanesAt(c)[candidate] === null)
+    while (l === undefined) {
       c += 1
-      l = freeLane(c, preferred)
+      l = tryLanes.find((candidate) => lanesAt(c)[candidate] === null)
     }
     if (c > min) shifted += 1
     lanesAt(c)[l] = unitId
@@ -229,42 +224,59 @@ export function layoutRoute({ stars, prerequisites, clusterOf, mainline: overrid
     lane.set(unitId, l)
   }
 
-  const nodes: RouteNode[] = [
-    ...topo.map((unitId): RouteStarNode => ({
-      kind: 'star',
-      id: unitId,
-      unitId,
-      col: col.get(unitId)!,
-      lane: lane.get(unitId)!,
-      main: onMain.has(unitId),
-    })),
-    ...entranceAt.values(),
-  ].sort((a, b) => a.col - b.col || a.lane - b.lane)
+  // Entrances: one chip per outside cluster, listing what this cluster builds on there.
+  const routeOrder = new Map(topo.map((id, i) => [id, i]))
+  const firstNeed = new Map<string, number>()
+  for (const unitId of topo) for (const s of outside.get(unitId)!) if (!firstNeed.has(s)) firstNeed.set(s, routeOrder.get(unitId)!)
+  const allSources = [...firstNeed.keys()]
+  const kept = entrances ? allSources.filter((s) => !allSources.some((other) => other !== s && reaches(s, other))) : []
+  const chips = new Map<string, RouteEntranceNode>()
+  for (const s of [...kept].sort((a, b) => firstNeed.get(a)! - firstNeed.get(b)! || byId(a, b))) {
+    const clusterId = clusterOf.get(s)!
+    if (!chips.has(clusterId)) chips.set(clusterId, { kind: 'entrance', id: `entrance:${clusterId}`, clusterId, col: -1, row: chips.size, sources: [], targets: [] })
+    chips.get(clusterId)!.sources.push({ unitId: s, clusterId })
+  }
+  const chipNeeds = new Map<string, string[]>()
+  for (const unitId of topo) {
+    const needs = [...new Set(outside.get(unitId)!.map((s) => clusterOf.get(s)!))].filter((id) => chips.has(id))
+    chipNeeds.set(unitId, needs)
+    for (const id of needs) chips.get(id)!.targets.push(unitId)
+  }
 
+  const nodes: RouteNode[] = [
+    ...chips.values(),
+    ...topo
+      .map((unitId): RouteStarNode => ({ kind: 'star', id: unitId, unitId, col: col.get(unitId)!, lane: lane.get(unitId)!, main: onMain.has(unitId) }))
+      .sort((a, b) => a.col - b.col || a.lane - b.lane),
+  ]
+
+  // By default: the main line, and each side star's one line from its anchor (ties now to the same lane).
   const edges: RouteEdge[] = []
   for (let i = 1; i < mainline.length; i += 1) edges.push({ from: mainline[i - 1], to: mainline[i], kind: 'main' })
-  const mainPair = new Set(edges.map((e) => `${e.from}\n${e.to}`))
   for (const to of topo) {
-    const ps = preds.get(to)!
-    for (const from of ps) {
-      if (mainPair.has(`${from}\n${to}`)) continue
-      // Implied by a longer path: another prerequisite of `to` already builds on `from`.
-      if (ps.some((other) => other !== from && ancestors.get(other)!.has(from))) continue
-      edges.push({ from, to, kind: 'branch' })
-    }
+    if (onMain.has(to)) continue
+    const own = lane.get(to)!
+    const anchor = anchorOf(to, (p) => (lane.get(p) === own ? 0 : 1))
+    if (anchor !== undefined) edges.push({ from: anchor, to, kind: 'branch' })
   }
-  for (const entrance of entranceAt.values()) {
-    for (const to of entrance.targets) edges.push({ from: entrance.id, to, kind: 'entrance' })
+  const drawn = new Set(edges.map((e) => `${e.from}\n${e.to}`))
+  const context: RouteEdge[] = [...edges]
+  for (const to of topo) {
+    for (const from of preds.get(to)!) if (!drawn.has(`${from}\n${to}`)) context.push({ from, to, kind: 'prerequisite' })
+    for (const id of chipNeeds.get(to)!) context.push({ from: `entrance:${id}`, to, kind: 'entrance' })
   }
+  const stubs = topo.filter((unitId) => !onMain.has(unitId) && preds.get(unitId)!.length === 0 && chipNeeds.get(unitId)!.length > 0)
 
   return {
     nodes,
     edges,
+    context,
+    stubs,
     mainline,
-    columns: nodes.reduce((max, n) => Math.max(max, n.col + 1), 0),
-    lanesUsed: nodes.reduce((max, n) => Math.max(max, n.lane), 0),
+    columns: topo.reduce((max, unitId) => Math.max(max, col.get(unitId)! + 1), 0),
+    lanesUsed: topo.reduce((max, unitId) => Math.max(max, lane.get(unitId)!), 0),
     shifted,
-    crossPrerequisites: { total: crossTotal, shown },
+    crossPrerequisites: { total: crossTotal, shown: kept.length },
     cycleBreaks,
   }
 }
