@@ -209,6 +209,9 @@
     "inCluster": "dans {{cluster}}",
     "practise": "Commencer à m’exercer",
     "recommended": "La suite de ton parcours",
-    "close": "Fermer"
+    "close": "Fermer",
+    "chapterNumber": "Chapitre {{number}}",
+    "chapterOf": "Chapitre {{number}} · {{name}}",
+    "chapterProgress": "{{lit}} / {{total}} allumées"
   }
 }

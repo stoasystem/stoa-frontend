@@ -269,6 +269,69 @@ describe('the cluster route scene, on the map route', () => {
     expect(context()).toBe(0)
   })
 
+  it('cuts the route into chapters; pointing at one lights only its stars still to learn, a star picked out wins', async () => {
+    const user = userEvent.setup()
+    const { container } = await openAt('/map/math/cluster/geometry')
+    const scene = container.querySelector<HTMLElement>('[data-cluster-route]')!
+    const headers = [...scene.querySelectorAll<HTMLElement>('[data-chapter-header]')]
+    expect(headers.map((h) => h.dataset.chapterHeader)).toEqual(['geometry-shapes', 'geometry-angles', 'geometry-triangles', 'geometry-circles', 'geometry-vectors'])
+    expect(headers[2]).toHaveAccessibleName(/^Chapter 3 · Triangles, \d+ \/ 8 lit$/)
+    expect(scene.querySelectorAll('[data-chapter-tick]')).toHaveLength(4)
+
+    const map = projectStarMap(knowledgeBaseSky(), { subjectId: 'math', language: 'en' })
+    const state = new Map(map.stars.map((star) => [star.unitId, star.state]))
+    const bright = () => [...scene.querySelectorAll<HTMLElement>('[data-unit]')].filter((n) => !n.hasAttribute('data-dimmed')).map((n) => n.dataset.unit!)
+    const inChapter = (id: string) => [...scene.querySelectorAll<HTMLElement>('[data-unit]')].filter((n) => n.closest('[data-cluster-route]') && n.dataset.chapter === id).map((n) => n.dataset.unit!)
+
+    // Nothing dims by default.
+    expect(bright()).toHaveLength(32)
+
+    // Pointing at a chapter's header: only its stars not lit yet, and the lines between them.
+    fireEvent.pointerEnter(headers[2], { pointerType: 'mouse' })
+    const triangles = inChapter('geometry-triangles')
+    expect(triangles).toHaveLength(8)
+    const upcoming = triangles.filter((unitId) => state.get(unitId) !== 'lit')
+    expect(upcoming.length).toBeGreaterThan(0)
+    expect(bright().sort()).toEqual([...upcoming].sort())
+    // Never the whole main line: only stretches between those stars.
+    const mains = scene.querySelectorAll('[data-route-line="main"]')
+    const litMains = scene.querySelectorAll('[data-route-line="main"][data-chapter-lit]')
+    expect(litMains.length).toBeGreaterThan(0)
+    expect(litMains.length).toBeLessThan(mains.length)
+    // A star picked out wins over the chapter.
+    const other = scene.querySelector<HTMLElement>('[data-unit="geometrie-ebene-figuren-und-vielecke"]')!
+    fireEvent.pointerEnter(other)
+    expect(bright()).toContain('geometrie-ebene-figuren-und-vielecke')
+    expect(scene.querySelectorAll('[data-chapter-lit]')).toHaveLength(0)
+    fireEvent.pointerLeave(other)
+    expect(bright().sort()).toEqual([...upcoming].sort())
+    fireEvent.pointerLeave(headers[2])
+    expect(bright()).toHaveLength(32)
+
+    // Pointing at a stretch of the main line lights the chapter it leads into.
+    const stretch = scene.querySelector<SVGElement>('[data-chapter-line="geometry-vectors"]')!
+    fireEvent.pointerEnter(stretch)
+    const vectors = inChapter('geometry-vectors').filter((unitId) => state.get(unitId) !== 'lit')
+    expect(bright().sort()).toEqual([...vectors].sort())
+    fireEvent.pointerLeave(stretch)
+
+    // A tap on a header (no hover on a touch screen) holds it; a tap again, or elsewhere, lets it go.
+    await user.click(headers[1])
+    expect(headers[1]).toHaveAttribute('aria-pressed', 'true')
+    fireEvent.pointerLeave(headers[1])
+    act(() => headers[1].blur())
+    expect(bright().length).toBeLessThan(32)
+    await user.click(scene.querySelector<HTMLElement>('[data-route-line="main"]')!.closest('div')!)
+    expect(headers[1]).toHaveAttribute('aria-pressed', 'false')
+  })
+
+  it('names the chapter on a star card', async () => {
+    const user = userEvent.setup()
+    const { container } = await openAt('/map/math/cluster/geometry')
+    await user.click(container.querySelector<HTMLElement>('[data-unit="geometrie-trigonometrie"]')!)
+    expect(screen.getByRole('dialog').querySelector('[data-route-card-chapter]')).toHaveTextContent('Chapter 4 · Trigonometry and circles')
+  })
+
   it('leads from an entrance to the star in the other cluster, with its card', async () => {
     const user = userEvent.setup()
     const { container } = await openAt('/map/math/cluster/algebra')

@@ -61,6 +61,8 @@ export type RouteGeometry = {
    */
   labelAlign: Map<string, LabelAlign>
   glyph: (node: RouteStarNode) => number
+  /** The centre of a column of stars. */
+  colX: (col: number) => number
   /** The line between two nodes, routed clear of names and other stars where it can be. */
   line: (from: string, to: string) => LinePath
 }
@@ -206,6 +208,7 @@ export function routeGeometry(
     labelSide,
     labelBox,
     labelAlign,
+    colX: (col) => x0 + col * g.colW,
     glyph,
     line,
   }

@@ -98,6 +98,65 @@
   color: var(--on-sky-text);
 }
 
+/* A chapter's header, over its stretch of columns: its words stay in view while the stretch scrolls by. */
+.route-chapter {
+  display: block;
+  padding: 6px 0 0;
+  background: none;
+  border: 0;
+  border-left: 1px solid rgba(255, 255, 255, 0.12);
+  color: inherit;
+  cursor: pointer;
+}
+
+.route-chapter-text {
+  position: sticky;
+  left: 8px;
+  display: inline-flex;
+  flex-direction: column;
+  gap: 1px;
+  max-width: 100%;
+  padding: 4px 10px;
+  border-radius: 12px;
+  line-height: 1.2;
+}
+
+.route-chapter-number {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--on-sky-text-caption);
+}
+
+.route-chapter-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--on-sky-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.route-chapter-progress {
+  font-size: 11.5px;
+  color: var(--on-sky-text-body);
+}
+
+.route-chapter:hover .route-chapter-text,
+.route-chapter[data-on] .route-chapter-text {
+  background: rgba(242, 197, 114, 0.12);
+}
+
+.route-chapter:focus-visible {
+  outline: none;
+}
+
+.route-chapter:focus-visible .route-chapter-text {
+  outline: var(--focus-ring-width, 3px) solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
 /* An entrance: a dashed portal, not a star. */
 .route-entrance {
   position: absolute;

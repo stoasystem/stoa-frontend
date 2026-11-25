@@ -202,6 +202,9 @@
     "inCluster": "in {{cluster}}",
     "practise": "Üben beginnen",
     "recommended": "Als Nächstes auf deinem Weg",
-    "close": "Schliessen"
+    "close": "Schliessen",
+    "chapterNumber": "Kapitel {{number}}",
+    "chapterOf": "Kapitel {{number}} · {{name}}",
+    "chapterProgress": "{{lit}} / {{total}} leuchten"
   }
 }

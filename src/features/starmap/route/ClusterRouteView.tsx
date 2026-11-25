@@ -11,6 +11,14 @@
  * it, dashed lines from the entrances it needs, every star it unlocks; the
  * rest dims.
  *
+ * The route is cut into chapters (`chapters.ts`), like the units of a
+ * language course: a header over each stretch of columns names it and counts
+ * its lit stars, and a tick on the main line marks where the next begins.
+ * Pointing at a chapter's stretch of main line or at its header (a tap on a
+ * touch screen, focus from the keyboard) lights only that chapter's stars
+ * still to learn and the lines between them; everything else dims. A star
+ * picked out wins over a chapter.
+ *
  * The route scrolls sideways (a mouse can drag it) and opens on the star to
  * go on with, or on the star asked for. Every star and entrance is a button in
  * route order, so Tab follows the route; Enter opens its card, Escape closes it.
@@ -24,7 +32,9 @@ import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/base'
 import { StarGlyph } from '@/features/starmap/components/StarGlyph'
 import { starLook, type Star, type StarMap } from '@/features/starmap/model/starMap'
+import { chaptersOf, type RouteChapter } from '@/features/starmap/route/chapters'
 import { clusterOfStar, type StarCluster } from '@/features/starmap/route/clusters'
+import { isSupportedLanguage } from '@/i18n/languages'
 import { COMPACT, contextOf, curve, NARROW_NAME, routeGeometry, WIDE } from '@/features/starmap/route/routeGeometry'
 import type { RouteEntranceNode } from '@/features/starmap/route/routeLayout'
 import '@/features/starmap/route/clusterRoute.css'
@@ -107,15 +117,25 @@ export function ClusterRouteView({
   onGo: (clusterId: string, unitId: string) => void
   onPractise: (unitId: string) => void
 }) {
-  const { t } = useTranslation('starmap')
+  const { t, i18n } = useTranslation('starmap')
   const compact = useCompact()
   const g = compact ? COMPACT : WIDE
   const { route } = cluster
+  const reading = i18n.resolvedLanguage ?? i18n.language
+  const language = isSupportedLanguage(reading) ? reading : 'en'
+  const chapters = useMemo(() => chaptersOf(route, cluster.clusterId, language), [route, cluster.clusterId, language])
+  const chapterOfStar = useMemo(() => new Map(chapters.flatMap((c) => c.stars.map((unitId) => [unitId, c] as const))), [chapters])
+  const chapterTitle = (c: RouteChapter) => (c.name ? t('clusters.chapterOf', { number: c.number, name: c.name }) : t('clusters.chapterNumber', { number: c.number }))
+  const headerH = compact ? 50 : 58
   const starById = useMemo(() => new Map(map.stars.map((s) => [s.unitId, s])), [map.stars])
   const nextId = cluster.next?.unitId ?? null
   const [selected, setSelected] = useState<string | null>(focusUnitId)
   const [pointed, setPointed] = useState<string | null>(null)
   const [focused, setFocused] = useState<string | null>(null)
+  // A chapter lit up: under the pointer, with focus, or tapped (a touch screen has no hover).
+  const [chapterPointed, setChapterPointed] = useState<string | null>(null)
+  const [chapterFocused, setChapterFocused] = useState<string | null>(null)
+  const [chapterTapped, setChapterTapped] = useState<string | null>(null)
   const nodeRefs = useRef(new Map<string, HTMLButtonElement>())
   const cardRef = useRef<HTMLDivElement>(null)
   const { ref: scroller, dragging, handlers } = useDragScroll()
@@ -127,6 +147,14 @@ export function ClusterRouteView({
   const context = useMemo(() => contextOf(route, active), [route, active])
   const nodeById = new Map(route.nodes.map((n) => [n.id, n]))
   const lit = (id: string) => starById.get(id)?.state === 'lit'
+  // A star picked out wins; else a chapter lights only its stars still to learn.
+  const chapterId = active === null ? (chapterPointed ?? chapterFocused ?? chapterTapped) : null
+  const litChapter = chapterId ? chapters.find((c) => c.chapterId === chapterId) : undefined
+  const upcoming = litChapter ? new Set(litChapter.stars.filter((unitId) => !lit(unitId))) : null
+  const dimming = active !== null || upcoming !== null
+  const shown = (id: string) => (active !== null ? context.nodes.has(id) : upcoming ? upcoming.has(id) : true)
+  /** A line stays bright with both its ends shown (a star's context: its far end). */
+  const lineShown = (from: string, to: string) => (active !== null ? context.nodes.has(to) && context.nodes.has(from) : upcoming ? upcoming.has(from) && upcoming.has(to) : true)
 
   // Open on the star asked for, else the one to go on with.
   const target = focusUnitId ?? nextId
@@ -231,7 +259,47 @@ export function ClusterRouteView({
         aria-label={t('clusters.routeLabel', { name: cluster.name })}
         {...handlers}
       >
-        <div className="relative my-auto shrink-0" style={{ width, height }}>
+        <div
+          className="relative my-auto shrink-0"
+          style={{ width, height: height + headerH }}
+          // A tap anywhere but on a chapter's header lets a tapped chapter go.
+          onClickCapture={(event) => {
+            if (!(event.target as Element).closest('[data-chapter-header]')) setChapterTapped(null)
+          }}
+        >
+          {/* The chapters' headers, over their stretches of columns; each name stays in view while its stretch scrolls by. */}
+          <ol className="m-0 list-none p-0">
+            {chapters.map((c) => {
+              const x0 = c.fromCol === 0 ? geometry.colX(0) - g.colW / 2 : (geometry.colX(c.fromCol - 1) + geometry.colX(c.fromCol)) / 2
+              const x1 = c.number === chapters.length ? geometry.colX(c.toCol) + g.colW / 2 : (geometry.colX(c.toCol) + geometry.colX(c.toCol + 1)) / 2
+              const litCount = c.stars.filter(lit).length
+              const on = chapterId === c.chapterId
+              return (
+                <li key={c.chapterId} className="absolute top-0" style={{ left: x0, width: x1 - x0, height: headerH }}>
+                  <button
+                    type="button"
+                    className="route-chapter h-full w-full text-left"
+                    data-chapter-header={c.chapterId}
+                    data-on={on ? '' : undefined}
+                    aria-pressed={chapterTapped === c.chapterId}
+                    aria-label={`${chapterTitle(c)}, ${t('clusters.chapterProgress', { lit: litCount, total: c.stars.length })}`}
+                    onPointerEnter={(event) => event.pointerType === 'mouse' && setChapterPointed(c.chapterId)}
+                    onPointerLeave={() => setChapterPointed(null)}
+                    onFocus={() => setChapterFocused(c.chapterId)}
+                    onBlur={() => setChapterFocused(null)}
+                    onClick={() => setChapterTapped((was) => (was === c.chapterId ? null : c.chapterId))}
+                  >
+                    <span className="route-chapter-text">
+                      <span className="route-chapter-number">{t('clusters.chapterNumber', { number: c.number })}</span>
+                      <span className="route-chapter-name">{c.name ?? ''}</span>
+                      <span className="route-chapter-progress">{t('clusters.chapterProgress', { lit: litCount, total: c.stars.length })}</span>
+                    </span>
+                  </button>
+                </li>
+              )
+            })}
+          </ol>
+          <div className="absolute left-0" style={{ top: headerH, width, height }}>
           <svg width={width} height={height} className="absolute left-0 top-0" aria-hidden="true" focusable="false">
             {/* A faint track the main line runs along, end to end. */}
             {route.mainline.length > 0 && (
@@ -246,18 +314,29 @@ export function ClusterRouteView({
                 strokeLinecap="round"
               />
             )}
+            {/* Where each chapter after the first begins: a tick across the main line (short, so it meets no name). */}
+            {chapters.slice(1).map((c) => {
+              const x = (geometry.colX(c.fromCol - 1) + geometry.colX(c.fromCol)) / 2
+              return (
+                <g key={`tick:${c.chapterId}`} data-chapter-tick={c.chapterId}>
+                  <line x1={x} x2={x} y1={geometry.mainY - 14} y2={geometry.mainY + 14} stroke="var(--on-sky-text)" strokeOpacity={0.55} strokeWidth={2} strokeLinecap="round" />
+                </g>
+              )
+            })}
             {route.edges
               .filter((e) => e.kind === 'branch')
               .map((e) => {
-                const quiet = active !== null && !context.nodes.has(e.to)
+                const quiet = active !== null ? !context.nodes.has(e.to) : !lineShown(e.from, e.to)
+                const bright = upcoming !== null && !quiet
                 return (
                   <path
                     key={`${e.from}>${e.to}`}
                     data-route-line="branch"
+                    data-chapter-lit={bright ? '' : undefined}
                     d={geometry.line(e.from, e.to).d}
                     fill="none"
-                    stroke={lit(e.from) ? 'var(--lit)' : 'var(--on-sky-text)'}
-                    strokeOpacity={quiet ? 0.1 : lit(e.from) ? 0.5 : 0.32}
+                    stroke={lit(e.from) || bright ? 'var(--lit)' : 'var(--on-sky-text)'}
+                    strokeOpacity={quiet ? 0.1 : bright ? 0.9 : lit(e.from) ? 0.5 : 0.32}
                     strokeWidth={1.5}
                   />
                 )
@@ -273,7 +352,7 @@ export function ClusterRouteView({
                   y1={p.y}
                   y2={p.y}
                   stroke="var(--starmap-ice)"
-                  strokeOpacity={active !== null && !context.nodes.has(unitId) ? 0.1 : 0.55}
+                  strokeOpacity={dimming && !shown(unitId) ? 0.1 : 0.55}
                   strokeWidth={1.5}
                   strokeDasharray="4 4"
                 />
@@ -285,11 +364,26 @@ export function ClusterRouteView({
                 const a = position.get(e.from)!
                 const b = position.get(e.to)!
                 const done = lit(e.from) && lit(e.to)
-                const quiet = active !== null && !(context.nodes.has(e.from) && context.nodes.has(e.to))
+                const quiet = dimming && !lineShown(e.from, e.to)
+                const bright = upcoming !== null && !quiet
+                // Each stretch of main line belongs to the chapter it leads into: pointing at it lights that chapter.
+                const chapter = chapterOfStar.get(e.to)
                 return (
-                  <g key={`${e.from}>${e.to}`} data-route-line="main" opacity={quiet ? 0.45 : 1}>
-                    <path d={curve(a, b)} fill="none" stroke="var(--lit)" strokeOpacity={done ? 0.25 : 0.1} strokeWidth={12} strokeLinecap="round" />
-                    <path d={curve(a, b)} fill="none" stroke="var(--lit)" strokeOpacity={done ? 1 : 0.55} strokeWidth={done ? 4 : 3} strokeLinecap="round" />
+                  <g key={`${e.from}>${e.to}`} data-route-line="main" data-chapter-lit={bright ? '' : undefined} opacity={quiet ? (upcoming ? 0.25 : 0.45) : 1}>
+                    <path d={curve(a, b)} fill="none" stroke="var(--lit)" strokeOpacity={done || bright ? 0.25 : 0.1} strokeWidth={12} strokeLinecap="round" />
+                    <path d={curve(a, b)} fill="none" stroke="var(--lit)" strokeOpacity={done || bright ? 1 : 0.55} strokeWidth={done || bright ? 4 : 3} strokeLinecap="round" />
+                    {chapter && (
+                      <path
+                        d={curve(a, b)}
+                        fill="none"
+                        stroke="transparent"
+                        strokeWidth={22}
+                        pointerEvents="stroke"
+                        data-chapter-line={chapter.chapterId}
+                        onPointerEnter={() => setChapterPointed(chapter.chapterId)}
+                        onPointerLeave={() => setChapterPointed(null)}
+                      />
+                    )}
                   </g>
                 )
               })}
@@ -330,7 +424,7 @@ export function ClusterRouteView({
                     else nodeRefs.current.delete(n.id)
                   }}
                   className="route-entrance px-3 py-1.5"
-                  style={{ left: p.x, top: p.y, width: g.chipW, opacity: active !== null && !context.nodes.has(n.id) ? 0.4 : 1 }}
+                  style={{ left: p.x, top: p.y, width: g.chipW, opacity: dimming && !shown(n.id) ? 0.4 : 1 }}
                   data-route-entrance={n.id}
                   onPointerEnter={() => setPointed(n.id)}
                   onPointerLeave={() => setPointed(null)}
@@ -368,10 +462,12 @@ export function ClusterRouteView({
                 style={{
                   left: p.x,
                   width: g.colW - 12,
-                  opacity: active !== null && !context.nodes.has(n.id) ? 0.35 : 1,
+                  opacity: dimming && !shown(n.id) ? 0.35 : 1,
                   ...(above ? { bottom: height - (p.y + size / 2), flexDirection: 'column-reverse' } : { top: p.y - size / 2 }),
                 }}
                 data-unit={n.unitId}
+                data-dimmed={dimming && !shown(n.id) ? '' : undefined}
+                data-chapter={chapterOfStar.get(n.unitId)?.chapterId}
                 data-label={above ? 'above' : 'below'}
                 onPointerEnter={() => setPointed(n.id)}
                 onPointerLeave={() => setPointed(null)}
@@ -407,6 +503,7 @@ export function ClusterRouteView({
               </button>
             )
           })}
+          </div>
         </div>
       </div>
 
@@ -434,6 +531,10 @@ export function ClusterRouteView({
               <StarCardBody
                 star={starById.get(selectedNode.unitId)!}
                 isNext={selectedNode.unitId === nextId}
+                chapter={(() => {
+                  const c = chapterOfStar.get(selectedNode.unitId)
+                  return c ? chapterTitle(c) : null
+                })()}
                 stateLabel={lookLabel(starById.get(selectedNode.unitId)!)}
                 prerequisites={starById.get(selectedNode.unitId)!.unlitPrerequisiteIds.map((id) => starById.get(id)).filter((s): s is Star => Boolean(s))}
                 clusterNameOf={(id) => {
@@ -461,6 +562,7 @@ export function ClusterRouteView({
 function StarCardBody({
   star,
   isNext,
+  chapter,
   stateLabel,
   prerequisites,
   clusterNameOf,
@@ -469,6 +571,8 @@ function StarCardBody({
 }: {
   star: Star
   isNext: boolean
+  /** The chapter it is in: "Chapter 2 · Triangles". */
+  chapter: string | null
   stateLabel: string
   prerequisites: Star[]
   clusterNameOf: (unitId: string) => string | null
@@ -482,6 +586,11 @@ function StarCardBody({
       <div className="flex items-start gap-3 pr-8">
         <StarGlyph state={starLook(star)} size={40} progress={star.progress} recommended={isNext} />
         <div className="min-w-0">
+          {chapter && (
+            <p className="mb-0.5 text-[12px] font-semibold uppercase tracking-[0.06em]" style={{ color: 'var(--on-sky-text-caption)' }} data-route-card-chapter>
+              {chapter}
+            </p>
+          )}
           <h2 id="route-card-title" className="text-[18px] font-semibold leading-snug">
             {star.name}
           </h2>
