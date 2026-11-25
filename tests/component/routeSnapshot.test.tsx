@@ -41,6 +41,7 @@ const expectedNav = {
       ['/admin/curriculum', 'Curriculum', 'primary', 'curriculum', false, 'navigation.admin.curriculum'],
       ['/admin/moderation', 'Moderation', 'primary', 'moderation', true, 'navigation.admin.moderation'],
       ['/admin', 'System', 'primary', 'settings', true, 'navigation.admin.system'],
+      ['/admin/system', 'System health', 'primary', 'dashboard', false, 'navigation.admin.systemHealth'],
       ['/admin/analytics', 'Usage analytics', 'primary', 'analytics', false, 'navigation.admin.analytics'],
     ],
     mobile: ['/admin/moderation', '/admin'],
