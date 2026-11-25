@@ -103,6 +103,7 @@ async function start() {
     { useAuthStore },
     { PreviewChrome },
     { PreviewLighting },
+    { KnowledgeMapSourceProvider },
     { ClassroomVoiceProvider },
     { demoTeacher, previewAsTeacher, previewVoiceConnector },
     { demoParentNow, installPreviewMicrophone, previewAsParent },
@@ -116,6 +117,7 @@ async function start() {
       import('@/store/authStore'),
       import('@/dev/preview/PreviewChrome'),
       import('@/dev/preview/lighting'),
+      import('@/features/starmap/readModelSource'),
       import('@/features/classroom/classroomVoice'),
       import('@/dev/preview/classroom'),
       import('@/dev/preview/voice'),
@@ -140,14 +142,18 @@ async function start() {
           <MemoryRouter initialEntries={[path]}>
             <AuthBootstrap />
             <PreviewChrome initialPath={path} open={surface?.open} focus={surface?.focus} pending={surface?.pending} readyWhen={surface?.readyWhen} />
-            <RouteArrival>
-              <Suspense fallback={<PageSkeleton rows={4} />}>
-                {/* The classroom's voice is a stand-in here: nothing joins a real room (#696). */}
-                <ClassroomVoiceProvider value={previewVoiceConnector}>
-                  <AppRoutes />
-                </ClassroomVoiceProvider>
-              </Suspense>
-            </RouteArrival>
+            {/* The star map reads the demo backend through the production source, as AppRouter mounts it (#747);
+              * it yields to PreviewLighting's own sky under `newcomer` / `longNames`. */}
+            <KnowledgeMapSourceProvider>
+              <RouteArrival>
+                <Suspense fallback={<PageSkeleton rows={4} />}>
+                  {/* The classroom's voice is a stand-in here: nothing joins a real room (#696). */}
+                  <ClassroomVoiceProvider value={previewVoiceConnector}>
+                    <AppRoutes />
+                  </ClassroomVoiceProvider>
+                </Suspense>
+              </RouteArrival>
+            </KnowledgeMapSourceProvider>
           </MemoryRouter>
         </PreviewLighting>
       </AppProviders>
