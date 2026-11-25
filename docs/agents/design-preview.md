@@ -37,7 +37,7 @@ npm run dev -- --host 127.0.0.1 --port 5173
 | surface | 路由 | 状态 |
 | --- | --- | --- |
 | `login` | `/login` | 可看 |
-| `map` / `map-nebula` / `map-star` | `/map/math`、`/map/math/geometry`、`/map/math/geometry/demo-sine-cosine` | 可看；生产星图（#747）：全景是数学四个星团、团名常显、没有星名；`map-nebula` / `map-star` 是放大到「几何」星团 / 演示知识点，照旧出星名和星卡片（#134 的无级缩放）；演示知识点的星卡片「Continue」进入章节。在全景里点星团（或 Tab 到星团名按 Enter）进它的路线场景 |
+| `map` / `map-nebula` / `map-star` | `/map/math`、`/map/math/geometry`、`/map/math/geometry/demo-sine-cosine` | 可看；生产星图（#747）：全景是数学四个星团、团名常显、没有星名；`map-nebula` / `map-star` 是放大到「几何」星团 / 演示知识点，照旧出星名和星卡片（#134 的无级缩放）；星团里的星按章节排成横条，第 1 章在最上面，每条从星团左边起、沿路线从左往右；演示知识点的星卡片「Continue」进入章节。在全景里点星团（或 Tab 到星团名按 Enter）进它的路线场景 |
 | `map-cluster` | `/map/math/cluster/geometry` | 可看：「几何」星团的路线场景（#747），盖在星图上淡入；像地铁图：默认只画从左到右的主线和每颗支线星的一条线（从它最右边的团内前置来），支线沿前置所在的车道平行延伸，左边一列是通往其他星团的入口（每个外团一枚，写总星数，默认没有虚线）；悬停、聚焦或选中一颗星才画出它的全部前置、到所需入口的虚线和它解锁的星，其余变暗；路线分成几个章节（`src/features/starmap/route/chapters.ts` 的表，像多邻国的单元）：每段列上方有章节头（编号、名字、「3 / 7 lit」），主线上有刻度分隔；鼠标移到某章那段主线或章节头（触屏点章节头，再点或点别处取消；键盘聚焦章节头也一样），只亮这一章还没点亮的星和它们之间的线，其余变暗，选中一颗星时以星为准；星卡片上写「Chapter 2 · Triangles」；打开时滚到推荐点——演示知识点，它的卡片「Continue」进入真实的演示章节。「Back to the star map」淡出、回到星图（从星图点进来时回到离开时的视角，直接打开时回到全景）。减弱动效下不淡入淡出。截图等 `[data-cluster-route]` |
 | `map-cluster-star` | `/map/math/cluster/numbers?star=brueche-brueche-kuerzen-addieren-und-subtrahieren` | 可看：「数与运算」的路线场景，按 `?star=` 打开在那颗星上、卡片开着（从别的星团的入口过来就是这样）。截图等 `[data-route-card]` |
 | `map-focus-optics` / `map-focus-star` | `/map/physics`（键盘聚焦「光学」）、`/map/math/geometry`（聚焦演示知识点） | 可看：聚焦时点亮的连线（#121） |

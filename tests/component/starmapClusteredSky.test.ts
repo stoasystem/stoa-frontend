@@ -1,12 +1,14 @@
 /*
  * The sky gathered into star clusters (prototype, `starmap-clusters`):
- * `layoutClusteredSky` on the real mathematics knowledge base and on a small
- * hand-made sky.
+ * `layoutClusteredSky` on the real mathematics knowledge base and on small
+ * hand-made skies: clusters apart, and inside each cluster its chapters as
+ * bands from top to bottom, each band left to right along the route.
  */
 import { describe, expect, it } from 'vitest'
 import { demoClusterMap } from '@/dev/demo/clusters/demoClusterMap'
 import { nebulaDiscs } from '@/features/starmap/view/geometry'
-import { layoutClusteredSky } from '@/features/starmap/route/clusteredSky'
+import { CLUSTERED_SKY, layoutClusteredSky } from '@/features/starmap/route/clusteredSky'
+import { CHAPTER_TABLE } from '@/features/starmap/route/chapters'
 import { clustersOf } from '@/features/starmap/route/clusters'
 import type { Star, StarMap } from '@/features/starmap/model/starMap'
 
@@ -59,18 +61,77 @@ describe('layoutClusteredSky on the mathematics knowledge base', () => {
     }
   })
 
-  it('runs each main line strictly left to right', () => {
+  it('gives every star of a cluster exactly one chapter band, the table chapters for mathematics', () => {
     for (const cluster of clustersOf(map, 'en')) {
-      const xs = cluster.route.mainline.map((id) => at.get(id)!.x)
-      xs.forEach((x, i) => i > 0 && expect(x, cluster.clusterId).toBeGreaterThan(xs[i - 1]))
+      const bands = sky.chapters.get(cluster.clusterId)!
+      expect(bands.map((b) => b.chapterId)).toEqual(CHAPTER_TABLE[cluster.clusterId].map((c) => c.chapterId))
+      expect(bands.flatMap((b) => b.stars).sort()).toEqual(cluster.stars.map((s) => s.unitId).sort())
     }
   })
 
-  it('puts every in-cluster prerequisite left of what needs it', () => {
-    for (const { from, to } of map.prerequisites) {
-      const a = at.get(from)!
-      const b = at.get(to)!
-      if (a.nebulaId === b.nebulaId) expect(a.x, `${from} -> ${to}`).toBeLessThan(b.x)
+  it('stacks the chapters top to bottom, chapter k wholly above chapter k + 1', () => {
+    for (const [clusterId, bands] of sky.chapters) {
+      bands.forEach((band, k) => {
+        expect(band.number).toBe(k + 1)
+        if (k === 0) return
+        const above = Math.max(...bands[k - 1].stars.map((id) => at.get(id)!.y))
+        const below = Math.min(...band.stars.map((id) => at.get(id)!.y))
+        // A clear gap, not just no overlap: wider than any band's own lane spread.
+        expect(below - above, `${clusterId} ${k}`).toBeGreaterThan(CLUSTERED_SKY.chapterGap * 0.99 * sky.unit)
+        expect(bands[k - 1].y, clusterId).toBeLessThan(band.y)
+      })
+    }
+  })
+
+  it('starts every band at the cluster left edge', () => {
+    for (const [clusterId, bands] of sky.chapters) {
+      const firsts = bands.map((band) => Math.min(...band.stars.map((id) => at.get(id)!.x)))
+      for (const x of firsts) expect(Math.abs(x - firsts[0]), clusterId).toBeLessThan(2 * CLUSTERED_SKY.jitterX * sky.unit + 1e-9)
+      for (const band of bands) expect(band.x, clusterId).toBeLessThanOrEqual(Math.min(...firsts) + 1e-9)
+    }
+  })
+
+  it('runs each chapter left to right in route order: x never decreases with the route column', () => {
+    for (const cluster of clustersOf(map, 'en')) {
+      const col = new Map(cluster.route.nodes.flatMap((n) => (n.kind === 'star' ? [[n.unitId, n.col] as const] : [])))
+      for (const band of sky.chapters.get(cluster.clusterId)!) {
+        const stars = [...band.stars].sort((a, b) => col.get(a)! - col.get(b)!)
+        for (let i = 1; i < stars.length; i += 1) {
+          if (col.get(stars[i])! > col.get(stars[i - 1])!) expect(at.get(stars[i])!.x, `${stars[i - 1]} -> ${stars[i]}`).toBeGreaterThan(at.get(stars[i - 1])!.x)
+        }
+        // Every star of a column lies left of every star of a later column.
+        for (const a of band.stars) {
+          for (const b of band.stars) {
+            if (col.get(a)! < col.get(b)!) expect(at.get(a)!.x, `${a} | ${b}`).toBeLessThan(at.get(b)!.x)
+          }
+        }
+      }
+    }
+  })
+
+  it('runs each main line strictly left to right inside a chapter, and every in-chapter prerequisite too', () => {
+    for (const cluster of clustersOf(map, 'en')) {
+      const bandOf = new Map(sky.chapters.get(cluster.clusterId)!.flatMap((band) => band.stars.map((id) => [id, band.number] as const)))
+      const main = cluster.route.mainline
+      for (let i = 1; i < main.length; i += 1) {
+        if (bandOf.get(main[i]) === bandOf.get(main[i - 1])) expect(at.get(main[i])!.x, cluster.clusterId).toBeGreaterThan(at.get(main[i - 1])!.x)
+      }
+      for (const { from, to } of map.prerequisites) {
+        if (bandOf.has(from) && bandOf.get(from) === bandOf.get(to)) expect(at.get(from)!.x, `${from} -> ${to}`).toBeLessThan(at.get(to)!.x)
+      }
+    }
+  })
+
+  it('keeps the main line in its band: side lanes just above and below', () => {
+    for (const cluster of clustersOf(map, 'en')) {
+      const onMain = new Set(cluster.route.mainline)
+      for (const band of sky.chapters.get(cluster.clusterId)!) {
+        for (const id of band.stars) {
+          const dy = (at.get(id)!.y - band.y) / sky.unit
+          if (onMain.has(id)) expect(Math.abs(dy), id).toBeLessThanOrEqual(CLUSTERED_SKY.jitterMainY + 1e-9)
+          else expect(Math.abs(dy), id).toBeLessThanOrEqual(2 * CLUSTERED_SKY.laneStep + CLUSTERED_SKY.jitterY + 1e-9)
+        }
+      }
     }
   })
 
@@ -96,6 +157,9 @@ describe('layoutClusteredSky on the mathematics knowledge base', () => {
     const de = layoutClusteredSky(demoClusterMap('de'), 'de')
     expect(de.stars.map((s) => [s.unitId, s.x, s.y])).toEqual(sky.stars.map((s) => [s.unitId, s.x, s.y]))
     expect(de.nebulae[0].name).toBe('Zahlen und Rechnen')
+    // The learning state moves nothing.
+    const relit = layoutClusteredSky({ ...map, stars: map.stars.map((s, i) => ({ ...s, state: i % 2 ? ('lit' as const) : ('ready' as const) })) }, 'en')
+    expect(relit.stars.map((s) => [s.unitId, s.x, s.y])).toEqual(sky.stars.map((s) => [s.unitId, s.x, s.y]))
   })
 })
 
@@ -127,5 +191,33 @@ describe('layoutClusteredSky on a sky the table does not know', () => {
     expect(byId.get('o1')!.x).toBeLessThan(byId.get('o2')!.x)
     expect(byId.get('o2')!.x).toBeLessThan(byId.get('o3')!.x)
     expect(byId.get('m1')!.x).toBeLessThan(byId.get('m2')!.x)
+  })
+})
+
+describe('layoutClusteredSky with automatic chapters', () => {
+  const star = (unitId: string, order: number): Star => ({ ...map.stars[0], unitId, nebulaId: 'logic', order, name: unitId })
+  const ids = Array.from({ length: 10 }, (_, i) => `l${i}`)
+  const chain: Pick<StarMap, 'nebulae' | 'stars' | 'prerequisites' | 'subjects' | 'subject'> = {
+    subject: { subjectId: 'philosophy', name: 'Philosophy' },
+    subjects: [{ subjectId: 'philosophy', name: 'Philosophy', lit: 0, total: 10, enrolled: true }],
+    nebulae: [{ topicId: 'logic', name: 'Logic', order: 1, subjectId: 'philosophy' }],
+    stars: ids.map((id, i) => star(id, i + 1)),
+    prerequisites: ids.slice(1).map((id, i) => ({ from: ids[i], to: id })),
+  }
+
+  it('cuts a route the table does not know into bands too, top to bottom, each from the left edge', () => {
+    const out = layoutClusteredSky(chain, 'en')
+    const byId = new Map(out.stars.map((s) => [s.unitId, s]))
+    const bands = out.chapters.get('logic')!
+    expect(bands.map((b) => [b.name, b.stars])).toEqual([
+      [null, ['l0', 'l1', 'l2', 'l3']],
+      [null, ['l4', 'l5', 'l6', 'l7']],
+      [null, ['l8', 'l9']],
+    ])
+    for (let k = 1; k < bands.length; k += 1) {
+      expect(Math.min(...bands[k].stars.map((id) => byId.get(id)!.y))).toBeGreaterThan(Math.max(...bands[k - 1].stars.map((id) => byId.get(id)!.y)))
+      expect(Math.abs(byId.get(bands[k].stars[0])!.x - byId.get('l0')!.x)).toBeLessThan(2 * CLUSTERED_SKY.jitterX * out.unit + 1e-9)
+    }
+    expect(layoutClusteredSky(chain, 'en')).toEqual(out)
   })
 })

@@ -6,12 +6,19 @@
  *     stars' `nebulaId` is their cluster's, and `nebulae` is the list of
  *     clusters with their names from the table. The engine's idea of a nebula
  *     is untouched; it simply gets fewer, larger ones.
- *   - Inside a cluster the stars follow its learning route (`routeLayout.ts`,
- *     without entrances: the map's own lines between nebulae show what comes
- *     from another cluster): a column is a step to the right, the main line
- *     runs along the middle, the side lanes alternate above and below. A
- *     seeded jitter and a slow wave keep it a field of stars rather than a
- *     grid, never enough to turn a prerequisite or the main line round.
+ *   - Inside a cluster the stars are grouped by chapter (`chapters.ts`, from
+ *     the table or cut automatically): each chapter is one horizontal band,
+ *     chapter 1 at the top and the last at the bottom, with a clear gap
+ *     between bands. Inside a band the stars follow the cluster's learning
+ *     route (`routeLayout.ts`, without entrances: the map's own lines between
+ *     nebulae show what comes from another cluster) left to right, every band
+ *     starting at the cluster's left edge: column by column from the
+ *     chapter's first, and inside a column the main line before its side
+ *     lanes (`chaptersOf`'s order), each star a step of its own -- a chapter is only two to five columns of up to
+ *     four lanes, so one step per column would stack the bands into a narrow
+ *     pillar. The main line runs along the band's middle, side lanes just
+ *     above and below. A small seeded jitter keeps it a field of stars rather
+ *     than a grid, never enough to cross a neighbour or another lane.
  *   - The clusters of one subject sit on a grid of their own, neighbours in
  *     the order of the prerequisites they share (`galaxyOrder`), snaking so
  *     each one is beside the one before; the dark between two clusters is
@@ -28,37 +35,48 @@
 import { GALAXY_GAP, galaxyOrder, seededRandom } from '@/features/starmap/layout/layout'
 import { orderedNebulae, type Nebula, type Star, type StarMap } from '@/features/starmap/model/starMap'
 import { CLUSTER_TABLE, clusterIdOf, type ClusterDefinition } from '@/features/starmap/route/clusters'
-import { layoutRoute } from '@/features/starmap/route/routeLayout'
+import { chaptersOf } from '@/features/starmap/route/chapters'
+import { laneRow, layoutRoute } from '@/features/starmap/route/routeLayout'
 import type { SupportedLanguage } from '@/i18n/languages'
 
-/** The tuning, in route units (one column step is 1). */
+/** The tuning, in star steps (one star to the next along a band is 1). */
 export const CLUSTERED_SKY = {
-  /** One column of the route to the next. */
-  columnStep: 1,
-  /** One lane to the next, up or down. */
-  laneStep: 2.6,
-  /** Horizontal jitter, either way: below half a column, so no prerequisite turns round. */
-  jitterX: 0.26,
-  /** Vertical jitter of a side-lane star, either way. */
-  jitterY: 0.55,
-  /** Vertical jitter of a main-line star: small, so the line reads left to right. */
-  jitterMainY: 0.12,
-  /** A slow wave the whole route follows, so it is not ruler-straight. */
-  waveHeight: 0.6,
-  /** Columns per wave. */
-  waveLength: 9,
-  /** A short route is stretched sideways until it is at least this much wider than tall, so it still reads left to right. */
-  minAspect: 1.4,
+  /** One star to the next along a band, in route order. */
+  starStep: 1,
+  /** Extra room where a band moves on to the route's next column. */
+  columnGap: 0.5,
+  /** One lane to the next, up or down, inside a chapter's band. */
+  laneStep: 0.45,
+  /** Dark between two chapters' bands: from the lowest star one band can reach to the highest the next can. */
+  chapterGap: 2.2,
+  /** Horizontal jitter, either way: well below half a star step, so no star crosses its neighbour. */
+  jitterX: 0.16,
+  /** Vertical jitter of a side-lane star, either way: below half a lane, so no star crosses its neighbour's lane. */
+  jitterY: 0.08,
+  /** Vertical jitter of a main-line star: smaller, so the line reads left to right. */
+  jitterMainY: 0.04,
   /** Room left round a cluster's stars inside its disc. */
   discPadding: 0.9,
   /** Dark between two clusters, as a share of the largest cluster radius. */
   clusterGap: 0.6,
 } as const
 
-/** Side lanes alternate around the main line: 1 above, 2 below, 3 further above. */
-const LANE_ROW = [0, -1, 1, -2] as const
-
 export type ClusterRegion = { x: number; y: number; r: number }
+
+/** One chapter of a cluster as a band of the sky; x and y in the sky's units. */
+export type ChapterBand = {
+  chapterId: string
+  /** 1-based, top to bottom. */
+  number: number
+  /** The table's name in the language asked for; null for an automatic chapter (the caller says "Chapter n"). */
+  name: string | null
+  /** Its stars in route order. */
+  stars: string[]
+  /** The cluster's left edge, where every band starts. */
+  x: number
+  /** The height of the band's main line. */
+  y: number
+}
 
 export type ClusteredSky = {
   /** One nebula per cluster, in cluster order across the sky. */
@@ -67,6 +85,10 @@ export type ClusteredSky = {
   stars: Star[]
   /** Each cluster's disc, which holds all its stars; no two overlap. */
   regions: Map<string, ClusterRegion>
+  /** One star step (`CLUSTERED_SKY`'s unit) in the sky's units. */
+  unit: number
+  /** Each cluster's chapters, top to bottom. */
+  chapters: Map<string, ChapterBand[]>
 }
 
 function hash(text: string, seed: number): number {
@@ -75,35 +97,43 @@ function hash(text: string, seed: number): number {
   return h
 }
 
-type Local = { id: string; points: Map<string, { x: number; y: number }>; r: number }
+type Point = { x: number; y: number }
+type Local = { id: string; points: Map<string, Point>; r: number; bands: ChapterBand[] }
 
-/** One cluster's stars along its route, centred on (0, 0), with the radius that holds them. */
+/** One cluster's stars in chapter bands, centred on (0, 0), with the radius that holds them; bands in the same units. */
 function layoutCluster(
   id: string,
   members: readonly Star[],
   prerequisites: StarMap['prerequisites'],
   clusterOf: ReadonlyMap<string, string>,
   mainline: readonly string[] | undefined,
+  language: SupportedLanguage,
   seed: number,
 ): Local {
   const c = CLUSTERED_SKY
   const route = layoutRoute({ stars: members, prerequisites, clusterOf, mainline, entrances: false })
-  const raw = new Map<string, { x: number; y: number }>()
-  for (const node of route.nodes) {
-    if (node.kind !== 'star') continue
-    const rand = seededRandom(hash(node.unitId, seed))
-    const jx = (rand() * 2 - 1) * c.jitterX
-    const jy = (rand() * 2 - 1) * (node.main ? c.jitterMainY : c.jitterY)
-    const wave = Math.sin((node.col / c.waveLength) * 2 * Math.PI + (hash(id, seed) % 628) / 100) * c.waveHeight
-    raw.set(node.unitId, { x: node.col * c.columnStep + jx, y: LANE_ROW[node.lane] * c.laneStep + wave + jy })
-  }
-  const xs = [...raw.values()].map((p) => p.x)
-  const ys = [...raw.values()].map((p) => p.y)
-  const wide = Math.max(...xs) - Math.min(...xs)
-  const tall = Math.max(...ys) - Math.min(...ys)
-  if (wide > 0 && wide < c.minAspect * tall) {
-    const stretch = (c.minAspect * tall) / wide
-    for (const p of raw.values()) p.x *= stretch
+  const nodeOf = new Map(route.nodes.flatMap((n) => (n.kind === 'star' ? [[n.unitId, n] as const] : [])))
+  // How far a star of a row may stray up or down.
+  const reach = (row: number) => (row === 0 ? c.jitterMainY : c.jitterY)
+  const raw = new Map<string, Point>()
+  const bands: ChapterBand[] = []
+  // Where the next band's highest star may reach: a gap below the lowest the band before can reach.
+  let top = 0
+  for (const chapter of chaptersOf(route, id, language)) {
+    const rows = chapter.stars.map((unitId) => laneRow(nodeOf.get(unitId)!.lane))
+    const high = Math.min(0, ...rows)
+    const low = Math.max(0, ...rows)
+    const mainY = top + reach(high) - high * c.laneStep
+    // Left to right in route order (by column, then the main line before its side lanes), each star a step of its own.
+    chapter.stars.forEach((unitId, slot) => {
+      const rand = seededRandom(hash(unitId, seed))
+      const jx = (rand() * 2 - 1) * c.jitterX
+      const jy = (rand() * 2 - 1) * reach(rows[slot])
+      const col = nodeOf.get(unitId)!.col - chapter.fromCol
+      raw.set(unitId, { x: slot * c.starStep + col * c.columnGap + jx, y: mainY + rows[slot] * c.laneStep + jy })
+    })
+    bands.push({ chapterId: chapter.chapterId, number: chapter.number, name: chapter.name, stars: chapter.stars, x: -c.jitterX, y: mainY })
+    top = mainY + low * c.laneStep + reach(low) + c.chapterGap
   }
   let cx = 0
   let cy = 0
@@ -111,15 +141,16 @@ function layoutCluster(
     cx += p.x / raw.size
     cy += p.y / raw.size
   }
-  const points = new Map<string, { x: number; y: number }>()
+  const points = new Map<string, Point>()
   let r = 0
   for (const [unitId, p] of raw) {
     const q = { x: p.x - cx, y: p.y - cy }
     points.set(unitId, q)
     r = Math.max(r, Math.hypot(q.x, q.y))
   }
-  return { id, points, r: r + c.discPadding }
+  return { id, points, r: r + c.discPadding, bands: bands.map((b) => ({ ...b, x: b.x - cx, y: b.y - cy })) }
 }
+
 
 /** Clusters on a grid, snaking so each is beside the one before; centres relative to the grid's top left. */
 function gridOf(locals: readonly Local[]) {
@@ -187,7 +218,7 @@ export function layoutClusteredSky(
     const order = galaxyOrder(own.map((g) => g.clusterId), [...crossLinks.values()])
     const locals = order.map((id) => {
       const group = own.find((g) => g.clusterId === id)!
-      return layoutCluster(id, membersOf.get(id)!, map.prerequisites, clusterOf, group.definition?.mainline, seed)
+      return layoutCluster(id, membersOf.get(id)!, map.prerequisites, clusterOf, group.definition?.mainline, language, seed)
     })
     return { locals, ...gridOf(locals) }
   })
@@ -199,6 +230,7 @@ export function layoutClusteredSky(
   const k = 1 / length
   const placedAt = new Map<string, { x: number; y: number }>()
   const regions = new Map<string, ClusterRegion>()
+  const chapters = new Map<string, ChapterBand[]>()
   let cursor = gap / 2
   for (const galaxy of galaxies) {
     galaxy.locals.forEach((local, i) => {
@@ -206,11 +238,12 @@ export function layoutClusteredSky(
       const cy = galaxy.centres[i].y - galaxy.h / 2
       regions.set(local.id, { x: cx * k, y: 0.5 + cy * k, r: local.r * k })
       for (const [unitId, p] of local.points) placedAt.set(unitId, { x: (cx + p.x) * k, y: 0.5 + (cy + p.y) * k })
+      chapters.set(local.id, local.bands.map((band) => ({ ...band, x: (cx + band.x) * k, y: 0.5 + (cy + band.y) * k })))
     })
     cursor += galaxy.w + gap
   }
 
   const nebulae: Nebula[] = withStars.map((g, i) => ({ topicId: g.clusterId, name: g.name, order: i + 1, subjectId: g.subjectId }))
   const stars = map.stars.map((star) => ({ ...star, nebulaId: clusterOf.get(star.unitId)!, ...placedAt.get(star.unitId)! }))
-  return { nebulae, stars, regions }
+  return { nebulae, stars, regions, chapters, unit: k }
 }
