@@ -276,7 +276,9 @@ const AdminTeacherApplicationsPage = lazyPage('AdminTeacherApplicationsPage', ()
 const AdminAccountOperationsPage = lazyPage('AdminAccountOperationsPage', () => import('@/pages/admin/AdminAccountOperationsPage'))
 const AdminUsagePeriodPage = lazyPage('AdminUsagePeriodPage', () => import('@/pages/admin/AdminUsagePeriodPage'))
 const AdminEndingUsagePeriodsPage = lazyPage('AdminEndingUsagePeriodsPage', () => import('@/pages/admin/AdminEndingUsagePeriodsPage'))
-const AdminOperationsPlaceholderPage = lazyPage('AdminOperationsPlaceholderPage', () => import('@/pages/admin/OperationsPlaceholder'))
+const AdminSystemHealthPage = lazyPage('AdminSystemHealthPage', () => import('@/pages/admin/AdminSystemHealthPage'))
+const AdminSystemFeaturePage = lazyPage('AdminSystemFeaturePage', () => import('@/pages/admin/AdminSystemFeaturePage'))
+const AdminAnalyticsPage = lazyPage('AdminAnalyticsPage', () => import('@/pages/admin/AdminAnalyticsPage'))
 
 /* Card 007: payments and billing are frozen.
  *
@@ -302,7 +304,8 @@ const VirtualCheckoutPage = lazyPage('VirtualCheckoutPage', () => import('@/page
   { path: '/billing/checkout/result', access: SIGNED_IN, page: CheckoutResultPage, meta: { module: 'Billing', status: 'demo', purpose: 'Checkout result.' } },
   { path: '/billing/checkout/demo', access: SIGNED_IN, page: VirtualCheckoutPage, meta: { module: 'Billing', status: 'demo', purpose: 'Virtual checkout demo.' } },
   // The admin source list's fifth item (#13 point 6, #52), between Moderation and System; add its
-  // `navigation.admin.billing` key to the four `common` bundles when it comes back.
+  // `navigation.admin.billing` key to the four `common` bundles when it comes back, and declare
+  // AdminOperationsPlaceholderPage again (its last other use, /admin/system, became a page in card 134).
   { path: '/admin/subscriptions', access: ADMIN, page: AdminSubscriptionRequestsPage, nav: [{ area: 'admin', label: 'Subscriptions and billing', labelKey: 'navigation.admin.billing', priority: 'primary', icon: 'billing', covers: ['/admin/billing-interest', '/admin/billing/checkout-recovery'] }], meta: { module: 'Admin', status: 'core', purpose: 'Manual subscription request queue.' } },
   { path: '/admin/billing-interest', access: ADMIN, page: AdminOperationsPlaceholderPage, copy: ADMIN_COPY, props: { title: 'Billing interest' }, meta: { module: 'Admin', status: 'placeholder', purpose: 'Future billing interest admin placeholder.' } },
   { path: '/admin/billing/checkout-recovery', access: ADMIN, page: AdminBillingCheckoutPage, meta: { module: 'Admin', status: 'core', purpose: 'Checkout recovery.' } },
@@ -505,8 +508,17 @@ export const pageRoutes: readonly PageRoute[] = [
   // #614: one account's usage period, and the accounts whose period ends soon or just ended.
   { path: '/admin/users/:userId/usage-period', access: ADMIN, page: AdminUsagePeriodPage, copy: ADMIN_COPY, titleKey: 'routes.usagePeriod.title', meta: { module: 'Admin', status: 'core', purpose: 'Usage period of one account: extend, change the end date, records.' } },
   { path: '/admin/usage-periods', access: ADMIN, page: AdminEndingUsagePeriodsPage, copy: ADMIN_COPY, titleKey: 'routes.endingUsagePeriods.title', meta: { module: 'Admin', status: 'core', purpose: 'Usage periods ending within two weeks or ended in the last thirty days.' } },
-  // untranslated-ok: OperationsPlaceholder shows routes.systemStatus.title for this path; the English is its fallback.
-  { path: '/admin/system', access: ADMIN, page: AdminOperationsPlaceholderPage, copy: ADMIN_COPY, props: { title: 'System status' }, titleKey: 'routes.systemStatus.title', meta: { module: 'Admin', status: 'placeholder', purpose: 'Future system status admin placeholder.' } },
+  // Card 134: per-feature health, alarms and deploys; each feature opens its own page.
+  { path: '/admin/system', access: ADMIN, page: AdminSystemHealthPage, copy: ADMIN_COPY, titleKey: 'routes.systemStatus.title', meta: { module: 'Admin', status: 'core', purpose: 'System health: per-feature status, alarms, deploys.' } },
+  { path: '/admin/system/:feature', access: ADMIN, page: AdminSystemFeaturePage, copy: ADMIN_COPY, titleKey: 'routes.systemStatus.title', meta: { module: 'Admin', status: 'core', purpose: 'One feature: series, routes, errors, probes, alarms, usage.' } },
+  {
+    path: '/admin/analytics',
+    access: ADMIN,
+    page: AdminAnalyticsPage,
+    copy: ADMIN_COPY,
+    nav: [{ area: 'admin', label: 'Usage analytics', labelKey: 'navigation.admin.analytics', priority: 'primary', icon: 'analytics', description: 'Active users, feature use, onboarding funnel and retention.' }],
+    meta: { module: 'Admin', status: 'core', purpose: 'Usage statistics: active users, feature use, onboarding funnel and retention.' },
+  },
 ]
 
 // ---------------------------------------------------------------------------

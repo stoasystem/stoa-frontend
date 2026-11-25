@@ -10,8 +10,8 @@ import { ADMIN, signInAt, StaffWorld, TEACHER } from './support/staff'
 const MAP_CODE = /^\/assets\/MapPages-[\w-]+\.js$/
 // The teacher's home, their request queue.
 const TEACHER_HOME_CODE = /^\/assets\/TeacherDashboardPage-[\w-]+\.js$/
-// An administrator's page that asks the backend for nothing, and their copy.
-const ADMIN_PAGE_CODE = /^\/assets\/OperationsPlaceholder-[\w-]+\.js$/
+// The system health page (card 134), whose one read StaffWorld answers, and their copy.
+const ADMIN_PAGE_CODE = /^\/assets\/AdminSystemHealthPage-[\w-]+\.js$/
 const ADMIN_COPY = /^\/assets\/admin-[\w-]+\.js$/
 // Longer than a Lambda cold start (1-3 s): if the map's code waits for the
 // account, it is asked for only after this.
@@ -141,7 +141,7 @@ test("an administrator's reload loads the page's code and the administrators' co
 }) => {
   new StaffWorld(backend, ADMIN).install()
   await signInAt(page, ADMIN, '/admin/system')
-  const heading = page.getByRole('heading', { name: 'System status', exact: true })
+  const heading = page.getByRole('heading', { name: 'System health', exact: true })
   await expect(heading).toBeVisible()
   await page.waitForLoadState('networkidle')
   const seen = accountAfterCode(page, backend, ADMIN_PAGE_CODE)

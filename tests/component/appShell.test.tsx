@@ -240,6 +240,7 @@ describe('what sits beside the logo', () => {
       '/admin/curriculum',
       '/admin/moderation',
       '/admin',
+      '/admin/analytics',
     ])
     expect(within(list).getAllByRole('link').map((link) => link.textContent)).toEqual([
       'navigation.admin.users',
@@ -247,6 +248,7 @@ describe('what sits beside the logo', () => {
       'navigation.admin.curriculum',
       'navigation.admin.moderation',
       'navigation.admin.system',
+      'navigation.admin.analytics',
     ])
     expect(within(list).getByRole('link', { name: 'navigation.admin.users' })).toHaveAttribute('aria-current', 'page')
     expect(within(list).getByRole('link', { name: 'navigation.admin.system' })).not.toHaveAttribute('aria-current')
@@ -259,6 +261,8 @@ describe('what sits beside the logo', () => {
     ['/admin/account-operations', 'navigation.admin.users'],
     ['/admin', 'navigation.admin.system'],
     ['/admin/system', 'navigation.admin.system'],
+    ['/admin/system/practice', 'navigation.admin.system'],
+    ['/admin/analytics', 'navigation.admin.analytics'],
     ['/admin/learning-operations', 'navigation.admin.system'],
     ['/admin/learning-automation', 'navigation.admin.system'],
     ['/admin/moderation', 'navigation.admin.moderation'],

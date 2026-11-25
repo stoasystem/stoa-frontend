@@ -2,6 +2,8 @@ export const adminQueryKeys = {
   all: ['admin'] as const,
   platformStats: () => [...adminQueryKeys.all, 'platform-stats'] as const,
   usageSummary: () => [...adminQueryKeys.all, 'usage-summary'] as const,
+  systemHealth: (window: string) => [...adminQueryKeys.all, 'system-health', window] as const,
+  systemFeature: (feature: string, window: string) => [...adminQueryKeys.all, 'system-feature', feature, window] as const,
   feedback: () => [...adminQueryKeys.all, 'feedback'] as const,
   reportOperations: () => [...adminQueryKeys.all, 'report-operations'] as const,
   reportRecoveryJobs: () => [...adminQueryKeys.all, 'report-recovery-jobs'] as const,
@@ -36,4 +38,5 @@ export const adminQueryKeys = {
   curriculumDiffsOf: (publicLessonId: string) => [...adminQueryKeys.curriculumAll(), 'diff', publicLessonId] as const,
   curriculumDiff: (publicLessonId: string, fromVersionId: string, toVersionId: string) => [...adminQueryKeys.curriculumDiffsOf(publicLessonId), fromVersionId, toVersionId] as const,
   curriculumMigrationEvidence: (migrationId: string) => [...adminQueryKeys.curriculumAll(), 'migration', migrationId] as const,
+  analyticsOverview: (days: number, role: string) => [...adminQueryKeys.all, 'analytics-overview', days, role] as const,
 }

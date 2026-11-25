@@ -225,7 +225,7 @@
     "description": "Teacher response times, operational notifications, and the system pages.",
     "pages": "In System",
     "status": "System status",
-    "statusDescription": "Not available yet",
+    "statusDescription": "Health of each feature, alarms and deploys",
     "learningOperations": "Learning operations",
     "learningOperationsDescription": "Signals, completions and data readiness by subject",
     "learningAutomation": "Learning automation",
@@ -233,7 +233,7 @@
     "scope": {
       "title": "Operations scope",
       "covers": "Administrators manage accounts under Users (invitations, assignments, password resets, suspension and archiving) and review teacher applications, the curriculum and moderation in their own sections.",
-      "notYet": "Support cases are not handled here yet, and system status is still to come."
+      "notYet": "Support cases are not handled here yet."
     },
     "readiness": {
       "title": "Service readiness",
@@ -1067,6 +1067,254 @@
       "change": "Change the period",
       "failed": "Account {{accountNumber}} was opened, but its usage period was not set. {{reason}} Set it below.",
       "conflict": "Someone changed this period at the same moment."
+    }
+  },
+  "systemHealth": {
+    "title": "System health",
+    "description": "Requests, errors and response times for each feature. Open a card for details.",
+    "windowLabel": "Time window",
+    "window": {
+      "1h": "1 hour",
+      "24h": "24 hours",
+      "7d": "7 days"
+    },
+    "generatedAt": "Updated {{time}}",
+    "loading": "Loading system health…",
+    "loadFailed": "System health could not be loaded.",
+    "featureGrid": "Features",
+    "sparkLabel": "p95 response time of {{name}} over the time window",
+    "ms": "{{value}} ms",
+    "frontendErrors24h": "Frontend errors, last 24 hours",
+    "features": {
+      "auth": "Sign-in and accounts",
+      "practice": "Star map and practice",
+      "ask_ai": "AI questions",
+      "teacher_help": "Teacher help",
+      "voice": "Voice questions",
+      "notifications": "Notifications",
+      "parent_reports": "Parent reports",
+      "admin": "Admin console",
+      "other": "Other"
+    },
+    "status": {
+      "ok": "Healthy",
+      "warn": "Slow",
+      "bad": "Failing",
+      "unknown": "No data"
+    },
+    "metric": {
+      "requests": "Requests",
+      "errorRate": "Error rate",
+      "p50": "p50",
+      "p95": "p95",
+      "p95Limit": "p95 limit",
+      "openAlarms": "Open alarms"
+    },
+    "alarms": {
+      "title": "Current alarms",
+      "empty": "No alarm is firing. Everything is within its limits.",
+      "errorRate": "{{feature}}: too many errors",
+      "latency": "{{feature}}: responses too slow",
+      "since": "since {{time}}",
+      "state": {
+        "ALARM": "Firing",
+        "OK": "Cleared",
+        "INSUFFICIENT_DATA": "Not enough data"
+      }
+    },
+    "deploys": {
+      "title": "Recent deploys",
+      "empty": "No deploys in this time window."
+    },
+    "detail": {
+      "back": "Back to system health",
+      "unknownFeature": "Unknown feature",
+      "unknownFeatureHint": "There is no feature with this name. Pick one from the system health overview.",
+      "loadFailed": "The statistics for this feature could not be loaded.",
+      "count": "Count",
+      "at": "Time",
+      "alarmState": "State",
+      "alarmName": "Alarm",
+      "chart": {
+        "title": "Requests and p95 over time",
+        "label": "Requests per interval as bars, p95 response time as a line, the p95 limit dashed",
+        "requests": "Requests",
+        "errors": "Server errors",
+        "p95": "p95 response time",
+        "limit": "p95 limit",
+        "empty": "No requests in this time window",
+        "emptyHint": "Nobody used this feature in the chosen window. Try a longer one."
+      },
+      "routes": {
+        "title": "Routes",
+        "method": "Method",
+        "route": "Route",
+        "overLimit": "Over limit",
+        "empty": "No route of this feature was called in this time window."
+      },
+      "recentErrors": {
+        "title": "Recent server errors",
+        "status": "Status",
+        "empty": "No server errors in this time window."
+      },
+      "frontendErrors": {
+        "title": "Frontend errors",
+        "message": "Message",
+        "release": "Version",
+        "lastAt": "Last seen",
+        "noMessage": "No message",
+        "empty": "No frontend errors in this time window."
+      },
+      "probes": {
+        "title": "Probe runs",
+        "result": "Result",
+        "ok": "Passed",
+        "failed": "Failed",
+        "latency": "Duration",
+        "step": "Step",
+        "empty": "No probe runs in this time window."
+      },
+      "alarms": {
+        "title": "Alarms for this feature",
+        "empty": "This feature has no alarms."
+      },
+      "usage": {
+        "title": "Usage events",
+        "event": "Event",
+        "empty": "No usage events in this time window."
+      }
+    }
+  },
+  "usageAnalytics": {
+    "title": "Usage statistics",
+    "description": "How the platform is used: activity, features, onboarding and retention.",
+    "filters": {
+      "role": "Role",
+      "days": "Period",
+      "daysOption_one": "{{count}} day",
+      "daysOption_other": "{{count}} days"
+    },
+    "roles": {
+      "all": "All",
+      "student": "Students",
+      "parent": "Parents",
+      "teacher": "Teachers"
+    },
+    "incomplete": "This period is still being summarised, so the figures may be incomplete.",
+    "loading": "Loading usage statistics",
+    "loadFailed": "Usage statistics could not be loaded.",
+    "empty": {
+      "title": "No usage recorded yet",
+      "description": "Once accounts use the platform in this period, their activity appears here."
+    },
+    "noData": "No data for this period.",
+    "missing": "Not enough data yet",
+    "kpis": {
+      "dau": "Daily active",
+      "wau": "Weekly active",
+      "mau": "Monthly active",
+      "dauChange": "{{change}} vs last week",
+      "questionsPerDay": "AI questions per day",
+      "escalation": "{{rate}} passed to a teacher",
+      "aiP50": "AI answer time (median)",
+      "teacherP50": "Teacher response time (median)"
+    },
+    "units": {
+      "ms": "{{value}} ms",
+      "seconds": "{{value}} s",
+      "minutes": "{{value}} min",
+      "hours": "{{value}} h"
+    },
+    "trend": {
+      "title": "Daily active users",
+      "summary": "{{count}} active on {{day}}",
+      "latest": "Latest: {{count}}"
+    },
+    "ranking": {
+      "title": "Feature usage",
+      "feature": "Feature",
+      "uses": "Uses",
+      "people": "People"
+    },
+    "funnel": {
+      "title": "New user funnel",
+      "steps": {
+        "invited": "Invited",
+        "activated": "Activated",
+        "first_question": "First question",
+        "first_exercise": "First exercise",
+        "week2_active": "Still active in week 2"
+      }
+    },
+    "retention": {
+      "title": "Retention by sign-up week",
+      "cohort": "Sign-up week",
+      "size": "Accounts",
+      "week": "Week {{n}}",
+      "noValue": "Not reached yet"
+    },
+    "events": {
+      "page_viewed": "Page viewed",
+      "web_vitals": "Page speed measured",
+      "user_login": "Signed in",
+      "user_register": "Registered",
+      "chat_conversation_created": "Conversation started",
+      "chat_message_sent": "Question sent",
+      "chat_response_started": "Answer started",
+      "chat_response_completed": "Answer completed",
+      "chat_response_stopped": "Answer stopped",
+      "file_uploaded": "File uploaded",
+      "teacher_help_requested": "Teacher help requested",
+      "teacher_help_request_failed": "Teacher help request failed",
+      "login_submitted": "Sign-in submitted",
+      "login_authenticated": "Sign-in confirmed",
+      "login_first_screen_ready": "First screen after sign-in shown",
+      "teacher_help_assigned": "Teacher help assigned",
+      "teacher_help_resolved": "Teacher help resolved",
+      "parent_child_summary_viewed": "Child summary viewed",
+      "parent_report_viewed": "Parent report viewed",
+      "parent_upgrade_cta_clicked": "Parent upgrade button clicked",
+      "pricing_page_viewed": "Pricing page viewed",
+      "pricing_plan_selected": "Plan selected",
+      "checkout_started": "Checkout started",
+      "plan_review_completed": "Plan review completed",
+      "billing_page_viewed": "Billing page viewed",
+      "feature_locked_viewed": "Locked feature seen",
+      "upgrade_prompt_clicked": "Upgrade prompt clicked",
+      "parent_landing_viewed": "Parent landing page viewed",
+      "parent_value_cta_clicked": "Parent benefits button clicked",
+      "referral_page_viewed": "Referral page viewed",
+      "referral_link_copied": "Referral link copied",
+      "teacher_availability_viewed": "Teacher availability viewed",
+      "teacher_availability_updated": "Teacher availability changed",
+      "teacher_credential_uploaded": "Teacher credential uploaded",
+      "support_ticket_created": "Support request created",
+      "support_ticket_viewed": "Support request viewed",
+      "admin_analytics_viewed": "Admin statistics viewed",
+      "utm_captured": "Campaign source recorded",
+      "billing_checkout_started": "Billing checkout started",
+      "billing_virtual_checkout_completed": "Test checkout completed",
+      "billing_virtual_checkout_canceled": "Test checkout cancelled",
+      "teacher_request_opened": "Help request opened by teacher",
+      "teacher_request_status_updated": "Help request status changed",
+      "teacher_time_to_first_action_recorded": "Teacher first action timed",
+      "teacher_note_added": "Teacher note added",
+      "feedback_submitted": "Feedback sent",
+      "organization_dashboard_viewed": "Organisation overview viewed",
+      "organization_switched": "Organisation switched",
+      "organization_student_opened": "Organisation student opened",
+      "learning_profile_viewed": "Learning profile viewed",
+      "curriculum_graph_viewed": "Curriculum map viewed",
+      "curriculum_topic_selected": "Curriculum topic chosen",
+      "weak_point_diagnosis_viewed": "Weak points viewed",
+      "learning_operations_dashboard_viewed": "Learning operations viewed",
+      "teacher_assignment_board_viewed": "Teacher assignment board viewed",
+      "teacher_assignment_suggested_clicked": "Suggested teacher chosen",
+      "parent_monthly_report_viewed": "Monthly report viewed",
+      "advanced_analytics_viewed": "Detailed statistics viewed",
+      "retention_page_viewed": "Retention page viewed",
+      "partnership_page_viewed": "Partnership page viewed",
+      "partnership_interest_submitted": "Partnership interest sent"
     }
   }
 }

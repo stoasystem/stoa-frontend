@@ -264,6 +264,8 @@ const PARAMETER_NAMES = [
   'unitId',
   // An account of any role, where the page serves more than one (#614: a student's or a parent's usage period).
   'userId',
+  // A feature of the system health page (card 134): a fixed key such as `practice`, not a record id.
+  'feature',
 ]
 
 const allPatterns = [...pageRoutes.map((route) => route.path), ...legacyRedirects.map((redirect) => redirect.from)]
