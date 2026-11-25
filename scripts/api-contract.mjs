@@ -34,16 +34,9 @@ export const OFF_API_CALLS = [
 // Calls the backend does not serve yet, each with why that is safe for now.
 // An entry fails the check once it is no longer needed, so the list cannot
 // outlive the gap it excuses.
-export const KNOWN_GAPS = [
-  {
-    file: 'src/services/monitoring/frontendErrorMonitoring.ts',
-    call: 'POST /monitoring/frontend-errors',
-    // Sent only when the runtime config turns errorMonitoring on, and every
-    // release ships it off (tests/release/runtime-monitoring-flag.test.mjs).
-    // Found when this check started reading constant paths (#345).
-    reason: 'error reporting is switched off in every release',
-  },
-]
+// The last one, POST /monitoring/frontend-errors, closed when the backend
+// answered it (card 134).
+export const KNOWN_GAPS = []
 
 // `/students/${id}/summary` and `/students/{student_id}/summary` must compare equal.
 // A template literal holding a ternary ends the string match early, leaving an
