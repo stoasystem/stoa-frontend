@@ -154,6 +154,9 @@ describe('the cluster route scene, on the map route', () => {
       accessToken: 'token',
       isAuthenticated: true,
     })
+    // The clusters' hint and the scene's tour (#747) have their own tests (starmapClusterGuide747).
+    localStorage.setItem('stoa.starmap.clusterHint.u-1', '1')
+    localStorage.setItem('stoa.starmap.routeTour.u-1', '1')
   })
 
   async function openAt(path: string) {

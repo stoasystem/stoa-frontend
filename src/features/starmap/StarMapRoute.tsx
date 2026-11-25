@@ -27,6 +27,7 @@ import { LightingOverlay } from '@/features/starmap/lighting/LightingOverlay'
 import { useLightingStage } from '@/features/starmap/lighting/useLightingStage'
 import { FindStarBubble } from '@/features/starmap/findStar/FindStarBubble'
 import { useFindStar } from '@/features/starmap/findStar/useFindStar'
+import { ClusterHintBubble, useClusterHint } from '@/features/starmap/onboarding/ClusterHint'
 import { FirstLandingBubble } from '@/features/starmap/onboarding/FirstLandingBubble'
 import { findOwnExamples } from '@/features/starmap/onboarding/findOwnStar'
 import { FirstSubjectQuestion } from '@/features/starmap/onboarding/FirstSubjectQuestion'
@@ -101,6 +102,8 @@ export function StarMapRoute({ relations = false, longNames = false }: { relatio
   }, [landingStar, map, offerExamples, ownerId, t])
   // Reviews due: Murmi whistles in a corner, and a tap flies to the star with the most cards due (#593).
   const reminder = useReviewReminder(map, ownerId, student)
+  // A lighting moment on the map: the clusters' hint waits for it (#747).
+  const [lightingBusy, setLightingBusy] = useState(false)
   // A star picked -- by a tap, a link, a hint, a card from Ask -- loads its small stars if it has none yet;
   // with none picked, the stars around where the student last practised in the galaxy in focus (#503).
   const pickedStar = routeTarget.layer === 'star' ? routeTarget.unitId : null
@@ -122,8 +125,11 @@ export function StarMapRoute({ relations = false, longNames = false }: { relatio
     [navigate, map, location.search],
   )
   // A star cluster chosen on the whole view (#747): its route scene, over the map; the sky stays the step back.
+  // The clusters' hint has done its job then.
+  const hintOpened = useRef<() => void>(() => {})
   const onOpenCluster = useCallback(
     (id: string) => {
+      hintOpened.current()
       const state: ClusterSceneState = { fromSky: true }
       navigate({ pathname: clusterPath(subjectOfNebula(map, id), id), search: location.search }, { state })
     },
@@ -155,9 +161,17 @@ export function StarMapRoute({ relations = false, longNames = false }: { relatio
   // One Murmi bubble on the map at a time: the reminder gives way to the first landing and to finding a star.
   const firstLandingUp = Boolean(language.open || aboutYouUp || first.asking || (first.star && !findStar.path) || (firstReveal.star && firstReveal.next))
   const findStarUp = Boolean(findStar.star && findStar.first && !firstReveal.target)
-  const reminderBubble = !firstLandingUp && !findStarUp ? reminder.star : null
+  // The star clusters' hint (#747): once per account, on the whole view, after every first-run screen and Murmi above.
+  const hint = useClusterHint(map, ownerId, {
+    blocked: sceneUp || routeTarget.layer !== 'map' || firstLandingUp || findStarUp || lightingBusy || Boolean(firstReveal.target),
+  })
+  const hintUp = hint.clusterId !== null
+  useEffect(() => {
+    hintOpened.current = hintUp ? hint.opened : () => {}
+  }, [hintUp, hint.opened])
+  const reminderBubble = !firstLandingUp && !findStarUp && !hintUp ? reminder.star : null
   // Not with a star chosen either: its card or sheet has that side of the map.
-  const reminderCorner = !firstLandingUp && !findStarUp && !reminder.star && routeTarget.layer !== 'star' ? reminder.mood : null
+  const reminderCorner = !firstLandingUp && !findStarUp && !hintUp && !reminder.star && routeTarget.layer !== 'star' ? reminder.mood : null
 
   if (status === 'pending') return <StarMapLoading />
   if (status === 'error') return <StarMapError onRetry={retry} />
@@ -167,7 +181,8 @@ export function StarMapRoute({ relations = false, longNames = false }: { relatio
     <StarMapView demo={demo} map={stage.map} target={firstReveal.target ?? findStar.target ?? (reminderBubble ? reminder.target : null) ?? first.target} path={findStar.path} marked={reminderBubble?.unitId ?? null} onNavigate={onNavigate} land={stage.land} onFirstFrame={onFirstFrame} onCentreGalaxy={onCentreGalaxy} onOpenCluster={onOpenCluster} foveate={search.has('foveation') ? foveationFrom(search) : false}
       overlay={(locate, watch) => (
         <>
-          <LightingOverlay map={map} locate={locate} watch={watch} onReveal={firstReveal.onReveal} />
+          <LightingOverlay map={map} locate={locate} watch={watch} onReveal={firstReveal.onReveal} onBusy={setLightingBusy} />
+          {hint.clusterId && <ClusterHintBubble key={hint.clusterId} clusterId={hint.clusterId} changed={hint.changed} locate={locate} watch={watch} onDismiss={hint.dismiss} />}
           {language.open && <LanguageFirst chosen={language.chosen} saving={language.saving} onPick={language.pick} onConfirm={language.confirm} />}
           {aboutYouUp && (
             <AboutYou

@@ -206,5 +206,25 @@
     "chapterNumber": "Chapter {{number}}",
     "chapterOf": "Chapter {{number}} · {{name}}",
     "chapterProgress": "{{lit}} / {{total}} lit"
+  },
+  "clusterGuide": {
+    "hintTitle": "Your stars are in clusters now",
+    "hintTitleChanged": "The star map has a new look",
+    "hintBody": "Each cluster is one area of the subject. Tap a cluster to see its learning route.",
+    "hintBodyChanged": "Your stars are sorted into clusters now, one for each area. Tap a cluster to see its learning route.",
+    "gotIt": "Got it",
+    "close": "Close",
+    "landingTitle": "Start here: {{name}}",
+    "landingBody": "Your route through {{cluster}} runs from left to right. Tap “{{action}}” on the card to begin.",
+    "tourLabel": "How to read the learning route",
+    "tourStep": "{{step}} of {{count}}",
+    "tourMainTitle": "Follow the main route",
+    "tourMainBody": "Learn along the main route from left to right: that’s the order I recommend.",
+    "tourChapterTitle": "Chapters",
+    "tourChapterBody": "Tap a chapter to see which of its stars are still to learn.",
+    "tourEntranceTitle": "From other clusters",
+    "tourEntranceBody": "These come from other clusters: things you’ll need here.",
+    "next": "Next",
+    "replay": "How to read this map"
   }
 }

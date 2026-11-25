@@ -129,7 +129,7 @@ export type StarMapViewProps = {
    * and stars are chosen as before. Absent, the map flies in at every zoom.
    */
   onOpenCluster?: (clusterId: string) => void
-  /** Drawn above the canvas, below the controls: the lighting layer (#51), told where a star is drawn. */
+  /** Drawn above the canvas, below the controls: the lighting layer (#51), told where a star -- or, by its id, a nebula -- is drawn. */
   overlay?: (locate: (unitId: string) => StarOnScreen | null, watch: (listener: () => void) => () => void) => ReactNode
 }
 
@@ -681,7 +681,8 @@ export function StarMapView({ map, demo = false, target, path, marked, onNavigat
       watchers.current.delete(listener)
     }
   }, [])
-  const locateStar = useCallback((unitId: string) => engineRef.current?.starOnScreen(unitId) ?? null, [])
+  // A star, else a nebula by its id: the panorama hint stands beside a star cluster (#747).
+  const locateStar = useCallback((id: string) => engineRef.current?.starOnScreen(id) ?? engineRef.current?.nebulaOnScreen(id) ?? null, [])
   const focusNebula = useCallback((index: number) => engineRef.current?.setFocusNebula(index), [])
 
   // Tab follows the course: galaxy by galaxy, then nebula by nebula (#141).

@@ -26,7 +26,7 @@
  * It fills the box it is given (`ClusterScene` lays it over the star map);
  * the card sits at the bottom of that box.
  */
-import { ArrowRight, ChevronLeft, LogIn, X } from 'lucide-react'
+import { ArrowRight, ChevronLeft, CircleHelp, LogIn, X } from 'lucide-react'
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, type PointerEvent as ReactPointerEvent } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/base'
@@ -34,6 +34,8 @@ import { StarGlyph } from '@/features/starmap/components/StarGlyph'
 import { starLook, type Star, type StarMap } from '@/features/starmap/model/starMap'
 import { chaptersOf, type RouteChapter } from '@/features/starmap/route/chapters'
 import { clusterOfStar, type StarCluster } from '@/features/starmap/route/clusters'
+import { markShown, shownBefore } from '@/features/starmap/onboarding/shownOnce'
+import { RouteTour, SceneLandingBubble, tourSteps } from '@/features/starmap/route/RouteGuide'
 import { isSupportedLanguage } from '@/i18n/languages'
 import { COMPACT, contextOf, curve, NARROW_NAME, routeGeometry, WIDE } from '@/features/starmap/route/routeGeometry'
 import type { RouteEntranceNode } from '@/features/starmap/route/routeLayout'
@@ -106,6 +108,9 @@ export function ClusterRouteView({
   onBack,
   onGo,
   onPractise,
+  ownerId = 'demo',
+  landing = false,
+  onFindOwn,
 }: {
   map: Pick<StarMap, 'stars'>
   clusters: readonly StarCluster[]
@@ -116,6 +121,12 @@ export function ClusterRouteView({
   /** Go to a star, in this cluster or another. */
   onGo: (clusterId: string, unitId: string) => void
   onPractise: (unitId: string) => void
+  /** Whose first visit the tour is remembered for (#747). */
+  ownerId?: string
+  /** A newcomer's first landing on `focusUnitId`: Murmi says start here, and the tour waits for the next visit. */
+  landing?: boolean
+  /** On that landing: "Find my own star" (#586). */
+  onFindOwn?: () => void
 }) {
   const { t, i18n } = useTranslation('starmap')
   const compact = useCompact()
@@ -139,6 +150,14 @@ export function ClusterRouteView({
   const nodeRefs = useRef(new Map<string, HTMLButtonElement>())
   const cardRef = useRef<HTMLDivElement>(null)
   const { ref: scroller, dragging, handlers } = useDragScroll()
+  const sectionRef = useRef<HTMLElement>(null)
+  // Murmi on a newcomer's landing; else, on the first visit, the tour (#747).
+  const [landingUp, setLandingUp] = useState(landing && focusUnitId !== null)
+  const [touring, setTouring] = useState(() => !landing && !shownBefore('routeTour', ownerId))
+  useEffect(() => {
+    if (touring) markShown('routeTour', ownerId)
+  }, [touring, ownerId])
+  const steps = useMemo(() => tourSteps(t, route.nodes.some((n) => n.kind === 'entrance')), [t, route.nodes])
 
   const geometry = useMemo(() => routeGeometry(route, g, (unitId) => starById.get(unitId)?.name ?? ''), [route, g, starById])
   const { width, height, position, labelSide } = geometry
@@ -217,7 +236,7 @@ export function ClusterRouteView({
   const selectedNode = selected ? nodeById.get(selected) : undefined
 
   return (
-    <section data-surface="sky" data-cluster-route={cluster.clusterId} aria-labelledby="cluster-route-title" className="cluster-page relative flex h-full min-h-0 flex-col pb-4">
+    <section ref={sectionRef} data-surface="sky" data-cluster-route={cluster.clusterId} aria-labelledby="cluster-route-title" className="cluster-page relative flex h-full min-h-0 flex-col pb-4">
       <header className="flex flex-wrap items-center gap-x-4 gap-y-2 px-4 pb-3 pt-5 sm:px-8">
         <Button variant="onSkyPlain" size="small" onClick={onBack} data-cluster-back className="-ml-2">
           <ChevronLeft size={18} aria-hidden="true" />
@@ -243,6 +262,21 @@ export function ClusterRouteView({
           <li className="flex items-center gap-1.5">
             <LogIn size={14} aria-hidden="true" style={{ color: 'var(--starmap-ice)' }} />
             {t('clusters.legendEntrance')}
+          </li>
+          <li>
+            <button
+              type="button"
+              data-route-tour-replay
+              onClick={() => {
+                setLandingUp(false)
+                setTouring(true)
+              }}
+              className="cluster-focus inline-flex cursor-pointer items-center gap-1 rounded-full border-0 bg-transparent px-1 py-0.5 text-[12.5px] underline underline-offset-2"
+              style={{ color: 'var(--on-sky-text-body)' }}
+            >
+              <CircleHelp size={14} aria-hidden="true" />
+              {t('clusterGuide.replay')}
+            </button>
           </li>
         </ul>
       </header>
@@ -507,8 +541,14 @@ export function ClusterRouteView({
         </div>
       </div>
 
-      {selectedNode && (
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 z-20 flex justify-center p-3 sm:justify-end sm:p-5">
+      {(selectedNode || landingUp) && (
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 z-20 flex flex-col items-center gap-2 p-3 sm:flex-row sm:items-end sm:justify-between sm:p-5">
+          {landingUp && focusUnitId ? (
+            <SceneLandingBubble name={starById.get(focusUnitId)?.name ?? ''} cluster={cluster.name} onFindOwn={onFindOwn} onDismiss={() => setLandingUp(false)} />
+          ) : (
+            <span aria-hidden="true" />
+          )}
+          {selectedNode && (
           <div
             ref={cardRef}
             tabIndex={-1}
@@ -553,8 +593,10 @@ export function ClusterRouteView({
               />
             )}
           </div>
+          )}
         </div>
       )}
+      {touring && <RouteTour steps={steps} root={sectionRef} scroller={scroller} onClose={() => setTouring(false)} />}
     </section>
   )
 }

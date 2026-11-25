@@ -1107,6 +1107,12 @@ export class StarMapEngine {
     return index < 0 ? null : { x: this.x[index], y: this.y[index], size: this.glyphSize, keepClear: this.renderer.stats.edgeLabels }
   }
 
+  /** Where `topicId`'s nebula (a star cluster, #747) was drawn in the last frame, its disc as the size; null before one or for none. */
+  nebulaOnScreen(topicId: string): StarOnScreen | null {
+    const index = this.drewFirstFrame ? (this.nebulaIndex.get(topicId) ?? -1) : -1
+    return index < 0 ? null : { x: this.nebulaX[index], y: this.nebulaY[index], size: 2 * this.nebulaR[index], keepClear: this.renderer.stats.edgeLabels }
+  }
+
   /** With a star chosen, where it was drawn in the last frame (it may be panned off screen, #132); else null. */
   get focusedStarOnScreen(): StarOnScreen | null {
     return this.target.layer === 'star' ? this.starOnScreen(this.target.unitId) : null

@@ -23,10 +23,15 @@ import { usePrefersReducedMotion } from '@/features/starmap/motion/usePrefersRed
 import { ClusterRouteView } from '@/features/starmap/route/ClusterRouteView'
 import { clustersOf } from '@/features/starmap/route/clusters'
 import { clusterPath, pathForTarget } from '@/features/starmap/view/layers'
+import { sceneLandingStar } from '@/features/starmap/onboarding/useFirstLanding'
+import { isNewcomer } from '@/features/starmap/onboarding/firstLanding'
+import { findOwnExamples } from '@/features/starmap/onboarding/findOwnStar'
+import { useAskStore } from '@/store/askStore'
+import { useAuthStore } from '@/store/authStore'
 import { isSupportedLanguage } from '@/i18n/languages'
 
 /** The navigation state the map hands the scene: the sky is the entry before it in the history. */
-export type ClusterSceneState = { fromSky: true }
+export type ClusterSceneState = { fromSky: true; firstLanding?: string }
 
 /** How long the scene takes to fade out on the way back (ms); `clusterRoute.css` fades it in over as long. */
 export const SCENE_FADE_MS = 180
@@ -36,13 +41,15 @@ export function isFromSky(state: unknown): boolean {
 }
 
 export function ClusterScene({ map, clusterId }: { map: StarMap; clusterId: string }) {
-  const { i18n } = useTranslation()
+  const { i18n, t } = useTranslation('starmap')
+  const offerExamples = useAskStore((state) => state.offerExamples)
   const reading = i18n.resolvedLanguage ?? i18n.language
   const language = isSupportedLanguage(reading) ? reading : 'en'
   const [search] = useSearchParams()
   const location = useLocation()
   const navigate = useNavigate()
   const reducedMotion = usePrefersReducedMotion()
+  const ownerId = useAuthStore((state) => state.user?.id) ?? 'demo'
   const [leaving, setLeaving] = useState(false)
   const left = useRef(false)
   const subjectId = map.subject.subjectId
@@ -54,6 +61,8 @@ export function ClusterScene({ map, clusterId }: { map: StarMap; clusterId: stri
   if (!cluster) return <Navigate to={sky} replace />
   const star = search.get('star')
   const focusUnitId = star && cluster.stars.some((s) => s.unitId === star) ? star : null
+  // A newcomer's first landing opened the scene on this star (#747): Murmi says start here.
+  const landing = focusUnitId !== null && sceneLandingStar(location.state) === focusUnitId && isNewcomer(map)
 
   const back = () => {
     if (left.current) return
@@ -75,6 +84,9 @@ export function ClusterScene({ map, clusterId }: { map: StarMap; clusterId: stri
         clusters={clusters}
         cluster={cluster}
         focusUnitId={focusUnitId}
+        ownerId={ownerId}
+        landing={landing}
+        onFindOwn={landing ? () => offerExamples(ownerId, findOwnExamples(t, subjectId)) : undefined}
         onBack={back}
         // Another cluster's star: its scene in place of this one, the sky still the step back.
         onGo={(id, unitId) => navigate(clusterPath(subjectId, id, unitId), { replace: true, state: location.state })}

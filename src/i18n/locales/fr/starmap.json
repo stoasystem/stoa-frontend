@@ -213,5 +213,25 @@
     "chapterNumber": "Chapitre {{number}}",
     "chapterOf": "Chapitre {{number}} · {{name}}",
     "chapterProgress": "{{lit}} / {{total}} allumées"
+  },
+  "clusterGuide": {
+    "hintTitle": "Tes étoiles sont maintenant en amas",
+    "hintTitleChanged": "La carte des étoiles a changé",
+    "hintBody": "Chaque amas est un domaine de la matière. Touche un amas pour voir son parcours.",
+    "hintBodyChanged": "Tes étoiles sont maintenant rangées en amas, un par domaine. Touche un amas pour voir son parcours.",
+    "gotIt": "Compris",
+    "close": "Fermer",
+    "landingTitle": "Commence ici : {{name}}",
+    "landingBody": "Ton parcours dans {{cluster}} va de gauche à droite. Touche « {{action}} » sur la carte pour démarrer.",
+    "tourLabel": "Comment lire le parcours",
+    "tourStep": "{{step}} sur {{count}}",
+    "tourMainTitle": "Suis le parcours principal",
+    "tourMainBody": "Apprends le long du parcours principal, de gauche à droite : c’est l’ordre que je te conseille.",
+    "tourChapterTitle": "Chapitres",
+    "tourChapterBody": "Touche un chapitre pour voir quelles étoiles il te reste à apprendre.",
+    "tourEntranceTitle": "D’autres amas",
+    "tourEntranceBody": "Elles viennent d’autres amas : tu en auras besoin ici.",
+    "next": "Suivant",
+    "replay": "Comment lire cette carte"
   }
 }

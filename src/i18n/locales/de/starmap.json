@@ -206,5 +206,25 @@
     "chapterNumber": "Kapitel {{number}}",
     "chapterOf": "Kapitel {{number}} · {{name}}",
     "chapterProgress": "{{lit}} / {{total}} leuchten"
+  },
+  "clusterGuide": {
+    "hintTitle": "Deine Sterne sind jetzt in Sternhaufen",
+    "hintTitleChanged": "Die Sternkarte sieht jetzt anders aus",
+    "hintBody": "Jeder Sternhaufen ist ein Bereich des Fachs. Tipp auf einen Sternhaufen, dann siehst du seine Lernroute.",
+    "hintBodyChanged": "Deine Sterne sind jetzt in Sternhaufen sortiert, einer pro Bereich. Tipp auf einen Sternhaufen, dann siehst du seine Lernroute.",
+    "gotIt": "Verstanden",
+    "close": "Schliessen",
+    "landingTitle": "Hier anfangen: {{name}}",
+    "landingBody": "Deine Route durch {{cluster}} geht von links nach rechts. Tipp auf der Karte auf «{{action}}», dann geht’s los.",
+    "tourLabel": "So liest du die Lernroute",
+    "tourStep": "{{step}} von {{count}}",
+    "tourMainTitle": "Folge der Hauptroute",
+    "tourMainBody": "Lern entlang der Hauptroute von links nach rechts: Das ist die Reihenfolge, die ich dir empfehle.",
+    "tourChapterTitle": "Kapitel",
+    "tourChapterBody": "Tipp auf ein Kapitel, dann siehst du, welche Sterne darin noch vor dir liegen.",
+    "tourEntranceTitle": "Aus anderen Sternhaufen",
+    "tourEntranceBody": "Die kommen aus anderen Sternhaufen: Das brauchst du hier.",
+    "next": "Weiter",
+    "replay": "So liest du diese Karte"
   }
 }
