@@ -72,6 +72,7 @@ type SanitizedAnalyticsPayload = Record<string, string | number | boolean | null
 
 const ANALYTICS_ENDPOINT = '/analytics/events'
 const SESSION_ID_KEY = 'stoa_analytics_session_id'
+const ID_KEY_PATTERN = /Id$|_id$|^id$/
 const BLOCKED_PAYLOAD_KEYS = new Set([
   'attachment',
   'attachments',
@@ -141,6 +142,9 @@ function sanitizeValue(value: unknown): string | number | boolean | null | undef
 export function sanitizeAnalyticsPayload(payload: AnalyticsPayload = {}) {
   return Object.entries(payload).reduce<SanitizedAnalyticsPayload>((result, [key, value]) => {
     if (BLOCKED_PAYLOAD_KEYS.has(key.toLowerCase())) return result
+    // An identifier names a person or their record; the backend drops it, and
+    // now it is not sent at all (card 134 audit).
+    if (ID_KEY_PATTERN.test(key)) return result
 
     const sanitizedValue = sanitizeValue(value)
     if (sanitizedValue !== undefined) {

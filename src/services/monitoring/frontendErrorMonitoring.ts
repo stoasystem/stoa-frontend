@@ -34,6 +34,12 @@ const BEARER_PATTERN = /bearer\s+[A-Za-z0-9._~+/=-]+/gi
 const ID_PATTERN = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\b[0-9a-f]{24,}\b/gi
 const NUMERIC_SEGMENT_PATTERN = /\/\d{6,}\b/g
 const URL_QUERY_PATTERN = /(https?:\/\/[^\s?#)]*)[?#][^\s)]*/g
+// What a person may have typed or been: an email, quoted words, a query on a bare
+// path, a token cut short of three parts (card 134 audit).
+const EMAIL_PATTERN = /[^\s@"'<>()]+@[^\s@"'<>()]+\.[A-Za-z]{2,}/g
+const QUOTED_PATTERN = /"[^"]*"|\u201c[^\u201d]*\u201d|\u00ab[^\u00bb]*\u00bb|\u201e[^\u201c\u201d]*[\u201c\u201d]/g
+const BARE_QUERY_PATTERN = /\?[A-Za-z0-9_.-]+=[^\s)]*/g
+const TOKEN_START_PATTERN = /\beyJ[A-Za-z0-9_-]{8,}(?:\.[A-Za-z0-9_-]+)*/g
 
 function isMonitoringEnabled() {
   try {
@@ -76,10 +82,20 @@ function truncate(value: string, maxLength: number) {
   return `${value.slice(0, maxLength)}...`
 }
 
-function sanitizeText(value: string, fallback: string) {
-  const withoutSecrets = redactIds(
-    value.replace(JWT_PATTERN, '[redacted-token]').replace(BEARER_PATTERN, 'Bearer [redacted-token]'),
+function withoutPersonalText(value: string) {
+  return redactIds(
+    value
+      .replace(JWT_PATTERN, '[redacted-token]')
+      .replace(TOKEN_START_PATTERN, '[redacted-token]')
+      .replace(BEARER_PATTERN, 'Bearer [redacted-token]')
+      .replace(EMAIL_PATTERN, '[email]')
+      .replace(QUOTED_PATTERN, '"…"')
+      .replace(BARE_QUERY_PATTERN, ''),
   )
+}
+
+function sanitizeText(value: string, fallback: string) {
+  const withoutSecrets = withoutPersonalText(value)
 
   if (SENSITIVE_TEXT_PATTERN.test(withoutSecrets)) {
     return fallback
@@ -99,7 +115,7 @@ function sanitizeStack(stack?: string | null) {
     .split('\n')
     .filter((line) => !SENSITIVE_TEXT_PATTERN.test(line))
     .slice(0, MAX_STACK_FRAMES)
-    .map((line) => truncate(redactIds(line.replace(/\?.*$/u, '')), MAX_STACK_FRAME_LENGTH))
+    .map((line) => truncate(withoutPersonalText(line.replace(/\?.*$/u, '')), MAX_STACK_FRAME_LENGTH))
 
   if (sanitizedFrames.length === 0) {
     return undefined

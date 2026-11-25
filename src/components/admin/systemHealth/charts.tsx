@@ -358,7 +358,7 @@ export function FeatureTrends({
                 role="img"
                 aria-label={t('systemHealth.trends.deploy', { label: text, time: formatBucket(window, deploy.at) })}
                 tabIndex={0}
-                className="group outline-none"
+                className="group"
               >
                 <title>{text}</title>
                 <line

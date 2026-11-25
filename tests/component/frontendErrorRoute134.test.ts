@@ -53,4 +53,17 @@ describe('frontend error report route', () => {
     expect(serialized).toContain('index-Bx12abcd.js:1:234')
     expect(payload.message).toBe('Request to https://api.stoaedu.ch/teacher/requests/:id failed')
   })
+
+  it.each([
+    'Profile not found for anna.muster@schule.ch',
+    'Unexpected token, "Mein Sohn versteht Brüche nicht" is not valid JSON',
+    'failed /teacher/requests/abc?email=anna@x.ch',
+    'token eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIn0 rejected',
+  ])('keeps no email, quoted words, bare query or short token in the message: %s', async (message) => {
+    // Card 134 audit: these passed the id rules untouched.
+    const error = new Error(message)
+    error.stack = `Error: ${message}\n    at load (https://app.stoaedu.ch/assets/index-Bx12abcd.js:1:234)`
+    await reportFrontendError(error)
+    expect(JSON.stringify(lastPayload())).not.toMatch(/anna|schule|Mein Sohn|email=|eyJzdWIi/)
+  })
 })
