@@ -59,6 +59,7 @@ import { arrowDirection, courseNebulae, nearestInDirection } from '@/features/st
 import { isWide, nebulaFocusSpot, NEBULA_FOCUS_HEIGHT, outerTarget, pathForTarget, sheetBand, starHintSpot, starLinkSize, type LayerTarget, type StarCardFocus } from '@/features/starmap/view/layers'
 import { CHOICE, SHEET, ZOOM } from '@/features/starmap/view/semanticZoom'
 import { ringNeighbour, SKY_WRAP } from '@/features/starmap/view/sky'
+import { useStarMapSource } from '@/features/starmap/starMapSource'
 import { cn } from '@/lib/utils'
 import '@/features/starmap/starmap.css'
 
@@ -274,16 +275,20 @@ export function StarMapView({ map, demo = false, target, path, marked, onNavigat
   const { search, state: arrival, key: arrivalKey } = useLocation()
   const here = (path: string) => path + search
   const reducedMotion = usePrefersReducedMotion()
+  const { quietPanorama = false } = useStarMapSource()
   const stageRef = useRef<HTMLDivElement>(null)
   const watchers = useRef(new Set<() => void>())
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const engineRef = useRef<StarMapEngine | null>(null)
+  useEffect(() => {
+    if (engineRef.current) engineRef.current.quietPanorama = quietPanorama
+  }, [quietPanorama])
   const [visible, setVisible] = useState<{ stars: VisibleStar[]; glyph: number; nebulae: NebulaDiscOnScreen[]; focus: StarOnScreen | null; zoom: ZoomState }>({
     stars: [],
     glyph: 12,
     nebulae: [],
     focus: null,
-    zoom: { starPx: 0, band: 'panorama', atMin: true, atMax: false, pickable: false },
+    zoom: { starPx: 0, band: 'panorama', atMin: true, atMax: false, pickable: false, wholeView: true },
   })
   const cardRef = useRef<HTMLDivElement>(null)
   // The phone's star sheet at rest: how tall (#139). The way back to the star sits above it.
@@ -361,6 +366,7 @@ export function StarMapView({ map, demo = false, target, path, marked, onNavigat
       onCentreGalaxy: (id) => centreRef.current?.(id),
     })
     engineRef.current = engine
+    engine.quietPanorama = quietPanorama
 
     // Follow the page area's own size, not the window's: it narrows when the
     // Ask panel opens beside it (#49).
@@ -886,6 +892,8 @@ export function StarMapView({ map, demo = false, target, path, marked, onNavigat
           if (!event.currentTarget.contains(event.relatedTarget)) focusWithin.current = false
         }}
         data-zoom-band={visible.zoom.band}
+        // Only for a source that keeps the whole view quiet (the star cluster mock-up).
+        data-whole-view={quietPanorama ? String(visible.zoom.wholeView) : undefined}
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
         onPointerUp={onPointerUp}

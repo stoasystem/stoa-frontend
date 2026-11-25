@@ -65,6 +65,8 @@ export type StarMapSource = {
   retrySkills?: () => void
   /** The map came on screen (#503): a source whose sky went stale reads it again. */
   arrive?: () => void
+  /** Keep star names off the whole view (the star cluster mock-up); absent or false, nothing changes. */
+  quietPanorama?: boolean
 }
 
 /** A sky with nothing in it yet: what the application draws until #48. */

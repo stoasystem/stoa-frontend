@@ -267,7 +267,8 @@ export function PreviewLighting({
     const completed = completedLessons()
     // The year group saved in "About you" moves a newcomer's start (#591).
     const grade = demoGradeNow()
-    if (clustered) return { demo: true, read: (request) => demoClusteredStarMap(request.language) }
+    // Star names stay off the whole view: a cluster chosen there opens its route scene (`ClusterRouteScene`).
+    if (clustered) return { demo: true, quietPanorama: true, read: (request) => demoClusteredStarMap(request.language) }
     return {
       demo: true,
       read: (request) => {

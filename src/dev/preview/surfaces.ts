@@ -197,6 +197,15 @@ export const SURFACES: readonly Surface[] = [
     stars: false,
     sky: 'clusters',
   },
+  {
+    id: 'starmap-clusters-route',
+    label: 'Star map · route scene of Numbers and operations (prototype)',
+    path: () => '/map/math/cluster/numbers',
+    signedIn: true,
+    stars: false,
+    sky: 'clusters',
+    readyWhen: '[data-cluster-route]',
+  },
   { id: 'chapter', label: 'Chapter', path: () => `/chapter/${unitId}`, signedIn: true, stars: false },
   { id: 'lesson', label: 'Practice stage', path: () => `/chapter/${unitId}/${nextLesson.lessonId}`, signedIn: true, stars: false },
   // #586: a student new to Ask on the practice stage for the first time: Murmi points at Ask.

@@ -17,7 +17,9 @@
  * classroom (#696, see `classroom.ts`); `voice=on`, `voiceFails=`, `mic=` and
  * `role=parent` voice questions and the parent's switch for them (#697, see `voice.ts`).
  * `sky=clusters` draws the real mathematics knowledge base gathered into four
- * star clusters (prototype, `src/features/starmap/route/clusteredSky.ts`). Moving around inside the page writes the route back to `path` (with
+ * star clusters (prototype, `src/features/starmap/route/clusteredSky.ts`);
+ * star names stay off its whole view, and a cluster chosen there opens its
+ * learning route scene, `/map/math/cluster/<clusterId>` (`src/dev/clusters`). Moving around inside the page writes the route back to `path` (with
  * `signedIn=0` once signed out, and `lang` once the language changes), so a
  * reload stays where it was -- also back on the surface's own route.
  *
@@ -93,7 +95,7 @@ async function start() {
   if (surface?.demo === 'review-due') makeReviewDue()
   if (surface?.demo === 'review-scheduled') makeReviewScheduled()
 
-  const [{ StrictMode, Suspense }, { createRoot }, { MemoryRouter }] = await Promise.all([
+  const [{ StrictMode, Suspense }, { createRoot }, { MemoryRouter, Route, Routes }] = await Promise.all([
     import('react'),
     import('react-dom/client'),
     import('react-router-dom'),
@@ -110,6 +112,7 @@ async function start() {
     { ClassroomVoiceProvider },
     { demoTeacher, previewAsTeacher, previewVoiceConnector },
     { demoParentNow, installPreviewMicrophone, previewAsParent },
+    { ClusterRedirect, ClusterRouteScene },
   ] =
     await Promise.all([
       import('@/app/providers/AppProviders'),
@@ -123,6 +126,7 @@ async function start() {
       import('@/features/classroom/classroomVoice'),
       import('@/dev/preview/classroom'),
       import('@/dev/preview/voice'),
+      import('@/dev/clusters/ClusterRouteScene'),
     ])
   // Voice questions (#697): a stand-in microphone, unless `mic=real`.
   installPreviewMicrophone()
@@ -148,7 +152,18 @@ async function start() {
               <Suspense fallback={<PageSkeleton rows={4} />}>
                 {/* The classroom's voice is a stand-in here: nothing joins a real room (#696). */}
                 <ClassroomVoiceProvider value={previewVoiceConnector}>
-                  <AppRoutes />
+                  {clustered ? (
+                    // The star cluster mock-up: a cluster chosen on the whole view opens its route scene.
+                    <>
+                      <ClusterRedirect />
+                      <Routes>
+                        <Route path="/map/:subjectId/cluster/:clusterId" element={<ClusterRouteScene />} />
+                        <Route path="*" element={<AppRoutes />} />
+                      </Routes>
+                    </>
+                  ) : (
+                    <AppRoutes />
+                  )}
                 </ClassroomVoiceProvider>
               </Suspense>
             </RouteArrival>

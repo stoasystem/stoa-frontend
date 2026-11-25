@@ -124,7 +124,19 @@ export type StarOnScreen = {
  * band, whether a limit is reached, and whether stars can be picked one by
  * one (a tap, a Tab stop): big enough, and no longer the panorama's dots.
  */
-export type ZoomState = { starPx: number; band: ZoomBand; atMin: boolean; atMax: boolean; pickable: boolean }
+export type ZoomState = {
+  starPx: number
+  band: ZoomBand
+  atMin: boolean
+  atMax: boolean
+  pickable: boolean
+  /**
+   * Within `REVEAL.panoramaBand` of the farthest zoom: the whole view, where a
+   * chosen nebula is let go back to the map. Unlike `band` it does not depend
+   * on how large a sparse map's glyphs are at that zoom.
+   */
+  wholeView: boolean
+}
 
 /**
  * How the camera answers a new choice: `fly` there (a tap on a nebula or a
@@ -292,6 +304,12 @@ export class StarMapEngine {
   private dotSpacing = 0.05
   /** One sky: the option is on and the map says which galaxy each nebula is in. */
   private sky = false
+  /**
+   * Star names stay out on the whole view (`ZoomState.wholeView`) and come in
+   * as usual once zoomed past it. Off unless set (the star cluster mock-up,
+   * `StarMapSource.quietPanorama`); off, nothing changes.
+   */
+  quietPanorama = false
   private skyGalaxies: SkyGalaxy[] = []
   /** The galaxy the header names: the route's, then whichever is at the centre of the view at rest. */
   private centred = ''
@@ -1073,7 +1091,7 @@ export class StarMapEngine {
     const starPx = this.starPx()
     const { min, max } = this.zoomLimits()
     const pickable = starPx >= REVEAL.starsPickableFrom && ramp(this.view.k / min, REVEAL.dotsPastPanorama) >= 0.5
-    return { starPx, band: zoomBand(starPx), atMin: this.view.k <= min * 1.001, atMax: this.view.k >= max * 0.999, pickable }
+    return { starPx, band: zoomBand(starPx), atMin: this.view.k <= min * 1.001, atMax: this.view.k >= max * 0.999, pickable, wholeView: this.view.k < min * REVEAL.panoramaBand }
   }
 
   /** The zoom's limits now: the panorama (and the ring's least zoom), and a star glyph of `ZOOM.maxGlyph` px. */
@@ -1774,7 +1792,7 @@ export class StarMapEngine {
       sharpness: this.sharpness,
       glyphSize,
       breath,
-      starLabelAlpha: starNameAlpha(starPx),
+      starLabelAlpha: this.quietPanorama && pastPanorama < REVEAL.panoramaBand ? 0 : starNameAlpha(starPx),
       restStarNames: restStarNameAlpha(starPx),
       hoveredStar: this.hoveredStar,
       pressedStar: this.pressedStar,

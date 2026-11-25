@@ -193,5 +193,22 @@
     "group": "Zoom",
     "in": "Zoomer",
     "out": "Dézoomer"
+  },
+  "clusters": {
+    "routeLabel": "Parcours : {{name}}",
+    "dragHint": "Balaie ou fais glisser sur le côté pour suivre le parcours.",
+    "legendMain": "Parcours principal",
+    "legendBranch": "Chemin secondaire",
+    "legendEntrance": "Depuis un autre amas",
+    "entranceLabel": "Depuis {{clusters}}",
+    "entranceCount_one": "{{count}} étoile",
+    "entranceCount_many": "{{count}} étoiles",
+    "entranceCount_other": "{{count}} étoiles",
+    "entranceTitle": "S’appuie sur d’autres amas",
+    "neededFor": "Aide pour : {{names}}",
+    "inCluster": "dans {{cluster}}",
+    "practise": "Commencer à m’exercer",
+    "recommended": "La suite de ton parcours",
+    "close": "Fermer"
   }
 }
