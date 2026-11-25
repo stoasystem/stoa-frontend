@@ -181,7 +181,8 @@
       "system": "System",
       "teacherApplications": "Bewerbungen von Lehrpersonen",
       "users": "Benutzer",
-      "analytics": "Nutzungsstatistik"
+      "analytics": "Nutzungsstatistik",
+      "systemHealth": "Systemzustand"
     },
     "administration": "Verwaltung",
     "analytics": "Analysen",
