@@ -193,5 +193,26 @@
     "group": "Zoom",
     "in": "Ingrandisci",
     "out": "Riduci"
+  },
+  "clusters": {
+    "pick": "Scegli un ammasso per vedere il suo percorso.",
+    "next": "Prossima:",
+    "allLit": "Qui tutte le stelle sono accese",
+    "back": "Tutti gli ammassi",
+    "routeLabel": "Percorso: {{name}}",
+    "dragHint": "Scorri o trascina di lato per seguire il percorso.",
+    "legendMain": "Percorso principale",
+    "legendBranch": "Sentiero laterale",
+    "legendEntrance": "Da un altro ammasso",
+    "entranceLabel": "Da {{clusters}}",
+    "entranceCount_one": "{{count}} stella",
+    "entranceCount_many": "{{count}} stelle",
+    "entranceCount_other": "{{count}} stelle",
+    "entranceTitle": "Si basa su altri ammassi",
+    "neededFor": "Aiuta per: {{names}}",
+    "inCluster": "in {{cluster}}",
+    "practise": "Inizia a esercitarti",
+    "recommended": "Il prossimo passo del tuo percorso",
+    "close": "Chiudi"
   }
 }

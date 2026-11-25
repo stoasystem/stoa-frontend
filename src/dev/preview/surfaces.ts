@@ -184,6 +184,10 @@ export const SURFACES: readonly Surface[] = [
     demo: 'review-scheduled',
     readyWhen: '[data-review-reminder="sleeping"]',
   },
+  // The star cluster prototype (src/dev/clusters): the real mathematics knowledge base as four
+  // clusters, each a left-to-right learning route. The preview's own route, not the app's.
+  { id: 'clusters', label: 'Star clusters · overview (prototype)', path: () => '/clusters/math', signedIn: true, stars: false, readyWhen: '[data-cluster-overview]' },
+  { id: 'clusters-route', label: 'Star clusters · Equations and algebra route (prototype)', path: () => '/clusters/math/algebra', signedIn: true, stars: false, readyWhen: '[data-cluster-route]' },
   { id: 'chapter', label: 'Chapter', path: () => `/chapter/${unitId}`, signedIn: true, stars: false },
   { id: 'lesson', label: 'Practice stage', path: () => `/chapter/${unitId}/${nextLesson.lessonId}`, signedIn: true, stars: false },
   // #586: a student new to Ask on the practice stage for the first time: Murmi points at Ask.

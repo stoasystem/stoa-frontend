@@ -187,5 +187,25 @@
     "group": "Zoom",
     "in": "Zoom in",
     "out": "Zoom out"
+  },
+  "clusters": {
+    "pick": "Pick a cluster to see its learning route.",
+    "next": "Next:",
+    "allLit": "Every star here is lit",
+    "back": "All clusters",
+    "routeLabel": "Learning route: {{name}}",
+    "dragHint": "Swipe or drag sideways to follow the route.",
+    "legendMain": "Main route",
+    "legendBranch": "Side path",
+    "legendEntrance": "From another cluster",
+    "entranceLabel": "From {{clusters}}",
+    "entranceCount_one": "{{count}} star",
+    "entranceCount_other": "{{count}} stars",
+    "entranceTitle": "Builds on other clusters",
+    "neededFor": "Helps with: {{names}}",
+    "inCluster": "in {{cluster}}",
+    "practise": "Start practising",
+    "recommended": "Next on your route",
+    "close": "Close"
   }
 }
