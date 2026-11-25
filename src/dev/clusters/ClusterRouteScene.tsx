@@ -85,8 +85,9 @@ export function ClusterRedirect() {
     // Only a choice made on the whole view: from the bare sky, with the stage still there and on the panorama.
     if (wasParts.length !== 2 || wasParts[0] !== 'map') return
     if (bandAtChoice.current !== 'true') return
-    const [, subjectId, clusterId, unitId] = parts
-    const to = `/map/${encodeURIComponent(subjectId)}/cluster/${encodeURIComponent(clusterId)}${unitId ? `?star=${encodeURIComponent(unitId)}` : ''}`
+    // A cluster chosen, even through a star under the pointer: the scene opens on the star to go on with, no card.
+    const [, subjectId, clusterId] = parts
+    const to = `/map/${encodeURIComponent(subjectId)}/cluster/${encodeURIComponent(clusterId)}`
     // In place of the map's own step: the sky stays under it in the history, so "back" returns there.
     navigate(to, { replace: true, state: { fromSky: true } })
   }, [location.pathname, navigate])

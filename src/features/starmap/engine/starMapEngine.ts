@@ -1794,7 +1794,8 @@ export class StarMapEngine {
       breath,
       starLabelAlpha: this.quietPanorama && pastPanorama < REVEAL.panoramaBand ? 0 : starNameAlpha(starPx),
       restStarNames: restStarNameAlpha(starPx),
-      hoveredStar: this.hoveredStar,
+      // The quiet whole view does not pick out a star under the pointer either.
+      hoveredStar: this.quietPanorama && pastPanorama < REVEAL.panoramaBand ? -1 : this.hoveredStar,
       pressedStar: this.pressedStar,
       starNameReach: { x: width * this.view.fx, y: height * this.view.fy, ...starNameReach(starPx, Math.min(width, height)) },
       nebulaLabelAlpha: 1,
