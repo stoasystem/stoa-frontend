@@ -30,7 +30,9 @@
  * who has not started anything, `src/dev/demo/sky/newcomer.ts`, which follows
  * the demo knowledge point's lessons completed on the page) does it put a
  * star map source of its own in front of the app's: the demo sky as it was
- * before star clusters, laid out by the demo sky itself.
+ * before star clusters -- for `newcomer` gathered into star clusters as
+ * production lays every sky out (`layoutClusteredSky`), so the first landing
+ * opens a cluster's route scene as it does for a real newcomer (#747).
  */
 import type { TFunction } from 'i18next'
 import { useMemo, useSyncExternalStore, type ReactNode } from 'react'
@@ -48,6 +50,8 @@ import {
 } from '@/dev/preview/demoSource'
 import { withKnowledgeBaseMath } from '@/dev/demo/clusters/demoClusterMap'
 import { asNewcomer } from '@/dev/demo/sky/newcomer'
+import { layoutClusteredSky } from '@/features/starmap/route/clusteredSky'
+import type { SupportedLanguage } from '@/i18n/languages'
 import { readDemoStarMap } from '@/dev/demo/sky/source'
 import { LightingEventSourceContext, type LightingEventSource } from '@/features/starmap/lighting/lightingEvents'
 import { orderedStars, subjectOfNebula, type Nebula, type Star, type StarMap } from '@/features/starmap/model/starMap'
@@ -251,6 +255,20 @@ export function withLongNebulaNames(map: StarMap, t: TFunction<'starmap'>): Star
   return { ...map, nebulae }
 }
 
+const clustered = new WeakMap<Star[], Map<string, StarMap>>()
+
+/** `map` gathered into star clusters, as production places every sky (#747); the same map for the same stars and language. */
+function asClusters(map: StarMap, language: SupportedLanguage): StarMap {
+  const known = clustered.get(map.stars) ?? new Map<string, StarMap>()
+  clustered.set(map.stars, known)
+  const hit = known.get(language)
+  if (hit) return { ...map, nebulae: hit.nebulae, stars: hit.stars }
+  const sky = layoutClusteredSky(map, language, { seed: 116 })
+  const made = { ...map, nebulae: sky.nebulae, stars: sky.stars }
+  known.set(language, made)
+  return made
+}
+
 export function PreviewLighting({ children, longNames = false, newcomer = false }: { children: ReactNode; longNames?: boolean; newcomer?: boolean }) {
   const version = useSyncExternalStore(onDemoServerChange, demoServerVersion)
   const { t } = useTranslation('starmap')
@@ -268,7 +286,7 @@ export function PreviewLighting({ children, longNames = false, newcomer = false 
         const read = readDemoStarMap(request)
         // The newcomer's sky is built from the demo sky's own arrays, so the engine keeps its tiles.
         const followed = newcomer
-          ? asNewcomer({ ...read, prerequisites: read.prerequisites.length > 0 ? read.prerequisites : demoSky(request.size).prerequisites }, completed, demoLanguage(), grade)
+          ? asClusters(asNewcomer({ ...read, prerequisites: read.prerequisites.length > 0 ? read.prerequisites : demoSky(request.size).prerequisites }, completed, demoLanguage(), grade), demoLanguage())
           : withDemoReviews(demoStarMapOverride(read, request.size, completed))
         return longNames ? withLongNebulaNames(followed, t) : followed
       },

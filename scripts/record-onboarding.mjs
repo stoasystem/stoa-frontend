@@ -109,14 +109,14 @@ await page.locator('[data-first-question]').waitFor({ timeout: 15000 })
 await step('question', '3 · Which subject is school on? (plan B)', 2600)
 await page.locator('[data-first-question] [data-subject="math"]').click()
 
-// 4. Plan A: the first landing.
-await page.locator('[data-first-landing] [data-shown]').waitFor({ timeout: 15000 })
-await step('landing', '4 · First landing: Murmi beside the recommended star', 3200)
-// 5. Looking around first: Murmi goes, the camera stays. The first star ("Integers", where the
+// 4. Plan A: the first landing, in the recommended star's cluster scene (#747).
+await page.locator('[data-scene-landing]').waitFor({ timeout: 15000 })
+await step('landing', '4 · First landing: the cluster scene on the recommended star, Murmi there', 3200)
+// 5. "Got it": Murmi goes, the star's card stays. The first star ("Integers", where the
 // course starts) is a placeholder in the preview, with no chapter to start.
-await page.locator('[data-first-landing] button').last().click()
-await page.locator('[data-first-landing]').waitFor({ state: 'detached' })
-await step('look-around', '5 · Look around first: Murmi goes, the camera stays', 1800)
+await page.locator('[data-scene-landing] button').last().click()
+await page.locator('[data-scene-landing]').waitFor({ state: 'detached' })
+await step('look-around', '5 · Got it: Murmi goes, the card stays', 1800)
 
 const video = page.video()
 await context.close()

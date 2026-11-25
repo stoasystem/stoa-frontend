@@ -42,6 +42,12 @@ export type Surface = {
   aboutYou?: 'later'
   /** An account that never stored a language: the language first (#627) asks it before "About you". */
   languageFirst?: true
+  /**
+   * `fresh`: the star clusters' panorama hint and the route scene's tour (#747) not seen yet by
+   * the demo account, so they show. Without it both count as seen, and the other surfaces show
+   * the map and the scenes as they are.
+   */
+  guide?: 'fresh'
   /** What must be on the page before it counts as ready, for the screenshot. */
   readyWhen?: string
   /** Why the surface cannot be shown yet, if it cannot. */
@@ -145,17 +151,19 @@ export const SURFACES: readonly Surface[] = [
     readyWhen: '[data-about-you] [data-shown]',
   },
   // The first landing (plan A): a student who has not started anything opens the app on
-  // the recommended star's nebula, Murmi beside the star, instead of the whole sky.
-  // "About you" put off, so it lands where the course starts.
+  // the recommended star in its star cluster's route scene (#747), its card open and Murmi
+  // there, instead of the whole sky. "About you" put off, so it lands where the course starts.
+  // Back to the star map, the clusters' hint for a new student takes over.
   {
     id: 'map-newcomer',
-    label: 'Star map · newcomer, first landing',
+    label: 'Star map · newcomer, first landing in the cluster scene',
     path: (points) => withPoints('/', points),
     signedIn: true,
     stars: true,
     demo: 'newcomer',
     aboutYou: 'later',
-    readyWhen: '[data-first-landing] [data-shown]',
+    guide: 'fresh',
+    readyWhen: '[data-scene-landing]',
   },
   // The whole first sign-in (docs/research/user-onboarding-design.md): the invitation link,
   // signing in, which subject school is on, and the first landing on "Integers", where the
@@ -170,6 +178,7 @@ export const SURFACES: readonly Surface[] = [
     signedIn: false,
     stars: false,
     demo: 'newcomer',
+    guide: 'fresh',
   },
   // #593: the review reminder -- Murmi whistling in the map's corner with reviews due, asleep
   // with reviews scheduled and none due yet.
@@ -208,6 +217,27 @@ export const SURFACES: readonly Surface[] = [
     signedIn: true,
     stars: false,
     readyWhen: '[data-route-card]',
+  },
+  // Guiding a returning student into the star clusters (#747): on the whole view, Murmi beside
+  // the cluster of the recommended star says the map has a new look; once per account.
+  {
+    id: 'map-cluster-hint',
+    label: 'Star map · whole view, the star clusters hint (returning student)',
+    path: (points) => withPoints(`/map/${subjectId}`, points),
+    signedIn: true,
+    stars: true,
+    guide: 'fresh',
+    readyWhen: '[data-cluster-hint] [data-shown]',
+  },
+  // The route scene's first visit (#747): a three-step tour, main line, chapter, entrance.
+  {
+    id: 'map-cluster-tour',
+    label: 'Star map · route scene of Geometry, the first-visit tour',
+    path: () => `/map/${subjectId}/cluster/${clusterId}`,
+    signedIn: true,
+    stars: false,
+    guide: 'fresh',
+    readyWhen: '[data-route-tour]',
   },
   { id: 'chapter', label: 'Chapter', path: () => `/chapter/${unitId}`, signedIn: true, stars: false },
   { id: 'lesson', label: 'Practice stage', path: () => `/chapter/${unitId}/${nextLesson.lessonId}`, signedIn: true, stars: false },
