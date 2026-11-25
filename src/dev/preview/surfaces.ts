@@ -25,8 +25,6 @@ export type Surface = {
   signedIn: boolean
   /** Whether the star map is on screen, so the star count changes what it shows. */
   stars: boolean
-  /** `clusters`: the star cluster prototype's sky (`sky=clusters`) instead of the demo sky. */
-  sky?: 'clusters'
   /** Something to do once the page is up, to show a state behind a click. */
   open?: 'account-menu'
   /**
@@ -50,7 +48,14 @@ export type Surface = {
   pending?: string
 }
 
-const { subjectId, topicId, unitId } = DEMO_KNOWLEDGE_POINT
+const { subjectId, unitId } = DEMO_KNOWLEDGE_POINT
+/**
+ * The star cluster the demo knowledge point is in (#747): the demo backend
+ * puts it in the knowledge base's Geometry (`withKnowledgeBaseMath`), which
+ * `route/clusters.ts` gathers into `geometry`. Spelled out: no application
+ * module loads before the preview's interception.
+ */
+const clusterId = 'geometry'
 const [firstLesson] = DEMO_KNOWLEDGE_POINT.lessons
 /** The lesson the chapter goes on with: the first one not done when the preview opens. */
 const nextLesson = DEMO_KNOWLEDGE_POINT.lessons[DEMO_KNOWLEDGE_POINT.lessonsDone] ?? firstLesson
@@ -69,24 +74,24 @@ const withPoints = (path: string, points: StarCount) => `${path}?points=${points
 
 export const SURFACES: readonly Surface[] = [
   { id: 'login', label: 'Login', path: () => '/login', signedIn: false, stars: false },
-  { id: 'map', label: 'Star map · panorama', path: (points) => withPoints(`/map/${subjectId}`, points), signedIn: true, stars: true },
+  { id: 'map', label: 'Star map · whole view, four star clusters', path: (points) => withPoints(`/map/${subjectId}`, points), signedIn: true, stars: true },
   {
     id: 'map-nebula',
-    label: 'Star map · nebula',
-    path: (points) => withPoints(`/map/${subjectId}/${topicId}`, points),
+    label: 'Star map · star cluster Geometry, zoomed in',
+    path: (points) => withPoints(`/map/${subjectId}/${clusterId}`, points),
     signedIn: true,
     stars: true,
   },
   {
     id: 'map-star',
     label: 'Star map · demo knowledge point',
-    path: (points) => withPoints(`/map/${subjectId}/${topicId}/${unitId}`, points),
+    path: (points) => withPoints(`/map/${subjectId}/${clusterId}/${unitId}`, points),
     signedIn: true,
     stars: true,
   },
   // The connection lines (#121): what lights up when a nebula or a star is in
   // focus, and the cross-subject prerequisite (physics optics needs
-  // mathematics trigonometry; Refraction waits for the demo knowledge point).
+  // mathematics' demo knowledge point; Refraction waits for it).
   {
     id: 'map-focus-optics',
     label: 'Star map · panorama, optics in focus',
@@ -98,7 +103,7 @@ export const SURFACES: readonly Surface[] = [
   {
     id: 'map-focus-star',
     label: 'Star map · nebula, a star in focus',
-    path: (points) => withPoints(`/map/${subjectId}/${topicId}`, points),
+    path: (points) => withPoints(`/map/${subjectId}/${clusterId}`, points),
     signedIn: true,
     stars: true,
     focus: `[data-unit="${unitId}"]`,
@@ -186,25 +191,23 @@ export const SURFACES: readonly Surface[] = [
     demo: 'review-scheduled',
     readyWhen: '[data-review-reminder="sleeping"]',
   },
-  // The star cluster prototype: the real mathematics knowledge base (98 stars) gathered into four
-  // clusters, each a nebula whose stars run left to right along its learning route.
-  { id: 'starmap-clusters', label: 'Star map · four star clusters (prototype)', path: () => '/map/math', signedIn: true, stars: false, sky: 'clusters' },
+  // A star cluster's learning route (#747), laid over the map: Geometry opens on the demo knowledge
+  // point, whose "Start practising" opens its chapter; Numbers and operations on a star asked for.
   {
-    id: 'starmap-clusters-algebra',
-    label: 'Star map · cluster Equations and algebra (prototype)',
-    path: () => '/map/math/algebra',
+    id: 'map-cluster',
+    label: 'Star map · route scene of Geometry',
+    path: () => `/map/${subjectId}/cluster/${clusterId}`,
     signedIn: true,
     stars: false,
-    sky: 'clusters',
+    readyWhen: '[data-cluster-route]',
   },
   {
-    id: 'starmap-clusters-route',
-    label: 'Star map · route scene of Numbers and operations (prototype)',
-    path: () => '/map/math/cluster/numbers',
+    id: 'map-cluster-star',
+    label: 'Star map · route scene of Numbers and operations, a star asked for',
+    path: () => `/map/${subjectId}/cluster/numbers?star=brueche-brueche-kuerzen-addieren-und-subtrahieren`,
     signedIn: true,
     stars: false,
-    sky: 'clusters',
-    readyWhen: '[data-cluster-route]',
+    readyWhen: '[data-route-card]',
   },
   { id: 'chapter', label: 'Chapter', path: () => `/chapter/${unitId}`, signedIn: true, stars: false },
   { id: 'lesson', label: 'Practice stage', path: () => `/chapter/${unitId}/${nextLesson.lessonId}`, signedIn: true, stars: false },
@@ -236,7 +239,7 @@ export const SURFACES: readonly Surface[] = [
     // flare plays once on the star; the screenshot is taken once it is over.
     id: 'lighting',
     label: 'Lighting moment',
-    path: (points) => withPoints(`/map/${subjectId}/${topicId}/${unitId}`, points),
+    path: (points) => withPoints(`/map/${subjectId}/${clusterId}/${unitId}`, points),
     signedIn: true,
     stars: true,
     demo: 'demo-point-finished',

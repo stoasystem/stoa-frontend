@@ -1,20 +1,23 @@
 /*
- * The star cluster prototype's sky (the design preview's `starmap-clusters`): the real
- * mathematics knowledge base (`mathKnowledgeBase.ts`) as a `StarMap`, shaped
- * like `GET /practice/knowledge-map` so the prototype could read the backend
- * as it is. Dev only (#131).
+ * Mathematics as the demo backend sends it (#747): the real mathematics
+ * knowledge base (`mathKnowledgeBase.ts`) as a `StarMap`, shaped like
+ * `GET /practice/knowledge-map`, so the design preview draws the production
+ * star map -- the read model's `placed()` gathers it into the four star
+ * clusters of `route/clusters.ts`. Dev only (#131).
  *
  * The learning state is made up, and the same every time: in each cluster the
  * first few stars along its route are lit (a prefix of the route, so nothing
  * is lit before its in-cluster prerequisites), the next one is in progress and
  * the rest are ready -- drawn as waiting where a prerequisite is not lit yet.
- * The system recommends the star in progress in Numbers and operations.
+ * `demoClusterMap` recommends the star in progress in Numbers and operations;
+ * the demo backend's sky (`withKnowledgeBaseMath`) recommends the demo
+ * knowledge point instead.
  */
-import { layoutClusteredSky } from '@/features/starmap/route/clusteredSky'
 import { clustersOf } from '@/features/starmap/route/clusters'
-import type { Nebula, Star, StarMap } from '@/features/starmap/model/starMap'
+import type { Nebula, Sky, Star, StarMap } from '@/features/starmap/model/starMap'
 import type { SupportedLanguage } from '@/i18n/languages'
 import { MATH_KNOWLEDGE_BASE } from '@/dev/demo/clusters/mathKnowledgeBase'
+import { DEMO_KNOWLEDGE_POINT } from '@/dev/demo/sky/demoSky'
 
 export const DEMO_CLUSTER_SUBJECT = 'math'
 
@@ -94,19 +97,52 @@ export function demoClusterMap(language: SupportedLanguage): StarMap {
   }
 }
 
-const clustered = new Map<SupportedLanguage, StarMap>()
+/** The demo knowledge point's place in the knowledge base: in Geometry, after Trigonometry. */
+export const DEMO_POINT_TOPIC = 'geometrie'
+const DEMO_POINT_AFTER = 'geometrie-trigonometrie'
+
+const withMath = new WeakMap<Sky, Map<SupportedLanguage, Sky>>()
 
 /**
- * The same sky gathered into clusters (`layoutClusteredSky`), as the star map
- * route draws it on the `starmap-clusters` surface. One map per language, the
- * same arrays every time, so the engine keeps its scene.
+ * The demo sky with its mathematics replaced by the knowledge base's
+ * (`demoClusterMap`), as the demo backend answers `GET /practice/knowledge-map`
+ * (#747). The demo knowledge point stays, the one star with a chapter
+ * (`src/dev/demo/data`): in Geometry after Trigonometry, and mathematics'
+ * recommendation, so the Geometry cluster's route opens on it and "Start
+ * practising" there opens its chapter. Physics and chemistry are the demo
+ * sky's, each topic a cluster of its own (no table entry). The same sky for
+ * the same input, so the map keeps its scene.
  */
-export function demoClusteredStarMap(language: SupportedLanguage): StarMap {
-  const known = clustered.get(language)
+export function withKnowledgeBaseMath(sky: Sky, language: SupportedLanguage): Sky {
+  const known = withMath.get(sky)?.get(language)
   if (known) return known
-  const map = demoClusterMap(language)
-  const { nebulae, stars } = layoutClusteredSky(map, language)
-  const made = { ...map, nebulae, stars }
-  clustered.set(language, made)
+  const mathTopics = new Set(sky.nebulae.filter((nebula) => nebula.subjectId === DEMO_CLUSTER_SUBJECT).map((nebula) => nebula.topicId))
+  const point = sky.stars.find((star) => star.unitId === DEMO_KNOWLEDGE_POINT.unitId)
+  const others = sky.stars.filter((star) => !mathTopics.has(star.nebulaId))
+  const base = demoClusterMap(language)
+  // One recommendation per subject (#9 point 8): the demo knowledge point's.
+  const knowledgeBase = base.stars.map((star) => (star.recommendation ? { ...star, recommendation: null } : star))
+  const litIds = new Set(knowledgeBase.filter((star) => star.state === 'lit').map((star) => star.unitId))
+  const pointStars: Star[] = point
+    ? [{ ...point, nebulaId: DEMO_POINT_TOPIC, unlitPrerequisiteIds: litIds.has(DEMO_POINT_AFTER) || point.state === 'lit' ? [] : [DEMO_POINT_AFTER] }]
+    : []
+  const kept = new Set([...others, ...pointStars].map((star) => star.unitId))
+  const prerequisites = [
+    ...base.prerequisites,
+    ...(point ? [{ from: DEMO_POINT_AFTER, to: point.unitId }] : []),
+    ...sky.prerequisites.filter((edge) => kept.has(edge.from) && kept.has(edge.to)),
+  ]
+  const math = [...knowledgeBase, ...pointStars]
+  const lit = math.filter((star) => star.state === 'lit').length
+  const made: Sky = {
+    galaxies: sky.galaxies.map((galaxy) => (galaxy.subjectId === DEMO_CLUSTER_SUBJECT ? { ...galaxy, lit, total: math.length } : galaxy)),
+    nebulae: [...base.nebulae.map((nebula) => ({ ...nebula, subjectId: DEMO_CLUSTER_SUBJECT })), ...sky.nebulae.filter((nebula) => !mathTopics.has(nebula.topicId))],
+    stars: [...math, ...others],
+    prerequisites,
+    summary: { ...sky.summary, lit, total: math.length },
+  }
+  const byLanguage = withMath.get(sky) ?? new Map<SupportedLanguage, Sky>()
+  byLanguage.set(language, made)
+  withMath.set(sky, byLanguage)
   return made
 }

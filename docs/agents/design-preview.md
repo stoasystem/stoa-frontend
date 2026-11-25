@@ -20,11 +20,11 @@ npm run dev -- --host 127.0.0.1 --port 5173
 ## 参数
 
 - `surface`：见下表；与 `path` 同给时 `path` 优先。
-- `points`：整片天空的星数 `10` / `1000` / `2000`，默认 1000（演示天空 `src/dev/demo/sky/demoSky.ts`，只经星图数据源接缝注入，见下文「演示数据」，#131）。
+- `points`：演示天空 `src/dev/demo/sky/demoSky.ts` 的星数 `10` / `1000` / `2000`，默认 1000，只影响物理和化学；数学一律是真实知识库的 98 点加演示知识点（#747，见下文「星团」）。
 - `lang`：`de` / `en` / `fr` / `it`；不给时按浏览器语言。界面文字和演示内容（章节、对话、通知、星名）同一种语言；在 /me 或账号菜单改语言后，后续请求也按新语言作答。
 - `signedIn=0`：以未登录访客打开（`login` 默认如此）。
-- `longNames=1`：星云用四语里最长的名字（经预览自己的星图覆盖，`withLongNebulaNames`）；全景只画悬停的那团星云名，放大后（#134 按星云屏上大小淡入）才看得到。
-- `newcomer=1`：新生的天空（`src/dev/demo/sky/newcomer.ts`）：零点亮、零进行中，所有星都可开始（ADR 0004）；每个在修学科按 #474 推荐外缘里课程顺序上的第一颗，数学是「Integers」（占位星，没有章节）。用来看首次落点（方案 A，`docs/research/user-onboarding-design.md`）。演示知识点跟着页面里完成的课时走：做完它的课时就点亮，推荐随之移动。新生的资料里没有年级、也没有勾科目，所以落点之前先出现「关于你」（#591）：年级下拉的选项和四语名称来自演示后端的 `choices.grade`（与后端 `message_catalog` 同一份，前端不另存），科目按星图的星系列出、在修的预先勾上；「Fertig / Done」写进演示后端的资料（`PATCH /students/me/profile`，年级只收列表里的码值，形如码值但不在列表里的答 422 `profile_choice_unknown`，与 stoa-backend#310 一致），之后按年级推荐：选中学年级（初中：7–9 年级或「Sekundarstufe I」；高中：「Sekundarstufe II」，演示后端的年级列表最后一项，stoa-backend#419）时数学推荐换成演示知识点（reason `grade`），镜头落到三角函数星云，气泡说「For your year group, start here: Sine and cosine」，能直接「Start this star」；选小学年级时仍是「Integers」，气泡同样说按年级。勾了科目之后不再问「在学哪科」（方案 B）。「Später / Later」或 Esc 跳过：照旧落到「Integers」，修多科时照旧问在学哪科；本标签页内不再问。新生也没有问过任何问题：Ask 里没有演示对话（只有在页面里新建的），所以练习页会出现第一次的提示（#586），第一次打开 Ask 时会有 Ask 的首次导览（#677，见下文 `onboarding`）。`map-newcomer`、`onboarding`、`lesson-first` 界面自带这个参数。
+- `longNames=1`：（仍是星团以前的演示天空，经预览自己的星图数据源，见下文「星团」）星云用四语里最长的名字（经预览自己的星图覆盖，`withLongNebulaNames`）；全景只画悬停的那团星云名，放大后（#134 按星云屏上大小淡入）才看得到。
+- `newcomer=1`：（仍是星团以前的演示天空，经预览自己的星图数据源，见下文「星团」）新生的天空（`src/dev/demo/sky/newcomer.ts`）：零点亮、零进行中，所有星都可开始（ADR 0004）；每个在修学科按 #474 推荐外缘里课程顺序上的第一颗，数学是「Integers」（占位星，没有章节）。用来看首次落点（方案 A，`docs/research/user-onboarding-design.md`）。演示知识点跟着页面里完成的课时走：做完它的课时就点亮，推荐随之移动。新生的资料里没有年级、也没有勾科目，所以落点之前先出现「关于你」（#591）：年级下拉的选项和四语名称来自演示后端的 `choices.grade`（与后端 `message_catalog` 同一份，前端不另存），科目按星图的星系列出、在修的预先勾上；「Fertig / Done」写进演示后端的资料（`PATCH /students/me/profile`，年级只收列表里的码值，形如码值但不在列表里的答 422 `profile_choice_unknown`，与 stoa-backend#310 一致），之后按年级推荐：选中学年级（初中：7–9 年级或「Sekundarstufe I」；高中：「Sekundarstufe II」，演示后端的年级列表最后一项，stoa-backend#419）时数学推荐换成演示知识点（reason `grade`），镜头落到三角函数星云，气泡说「For your year group, start here: Sine and cosine」，能直接「Start this star」；选小学年级时仍是「Integers」，气泡同样说按年级。勾了科目之后不再问「在学哪科」（方案 B）。「Später / Later」或 Esc 跳过：照旧落到「Integers」，修多科时照旧问在学哪科；本标签页内不再问。新生也没有问过任何问题：Ask 里没有演示对话（只有在页面里新建的），所以练习页会出现第一次的提示（#586），第一次打开 Ask 时会有 Ask 的首次导览（#677，见下文 `onboarding`）。`map-newcomer`、`onboarding`、`lesson-first` 界面自带这个参数。
 - `aboutYou=later`：本标签页里「关于你」（#591）已按过「Later」，新生直接看到后面的落点；`map-newcomer` 自带。
 - `period`：使用期限提示（#616，stoa-backend#343）。`soon` 剩 3 天（家长付）、`today` 最后一天、`expired` 已到期（自己付）；不给时期限在几个月后，不出横幅。`expired` 时提问框也停用（#615）。演示后端的 `GET /students/me/entitlement` 和 `GET /parents/me/usage-period` 都按它作答。
 - 语音提问（#697，`src/dev/preview/voice.ts`）：`voice=on` 表示家长已允许演示学生用语音提问（不给时和真孩子一样是关的，麦克风只显示系统听写说明）；麦克风默认是替身：页面自己用 AudioContext 发一个轻声音调，真实的录音（Web Audio 加 audio worklet，#726）照常把它写成 16 kHz 单声道 WAV，不弹权限框（`mic=real` 用真麦克风，`mic=denied` 模拟浏览器拒绝）。转写接口在演示后端里照后端的顺序先查开关、类型（只收 WAV，stoa-backend#542）、2 MiB、空录音和 WAV 头里的时长，等 1.2 秒后答一句固定的话（按页面语言）；最后收到的那段录音的类型、字节数和秒数记在 `window.__stoaLastVoiceRecording`。`voiceFails=unavailable` 第一次答 503、重试成功；`refused`（502，模型拒收，不可重试）/ `limit` / `unsupported` / `silent` / `tooLong` / `unreadable` / `notAllowed` 一直答对应的错误码。`role=parent` 以演示家长登录，打开 `path=/parent/children/demo-student` 看「允许语音提问」开关；家长改的开关就是学生读到的那个（页面不刷新时）。组件画廊的 Composer 一节也有两个开了语音的提问框。
@@ -37,8 +37,10 @@ npm run dev -- --host 127.0.0.1 --port 5173
 | surface | 路由 | 状态 |
 | --- | --- | --- |
 | `login` | `/login` | 可看 |
-| `map` / `map-nebula` / `map-star` | `/map/math`、`/map/math/trigonometry`、`/map/math/trigonometry/demo-sine-cosine` | 可看；#134 起这三个是「什么都没选 / 选了三角函数 / 选了演示知识点」，打开时缩放分别是全景、星形 28 px、34 px，之后可以无级缩放；演示知识点的星卡片「Continue」进入章节 |
-| `map-focus-optics` / `map-focus-star` | `/map/physics`（键盘聚焦「光学」）、`/map/math/trigonometry`（聚焦演示知识点） | 可看：聚焦时点亮的连线（#121） |
+| `map` / `map-nebula` / `map-star` | `/map/math`、`/map/math/geometry`、`/map/math/geometry/demo-sine-cosine` | 可看；生产星图（#747）：全景是数学四个星团、团名常显、没有星名；`map-nebula` / `map-star` 是放大到「几何」星团 / 演示知识点，照旧出星名和星卡片（#134 的无级缩放）；演示知识点的星卡片「Continue」进入章节。在全景里点星团（或 Tab 到星团名按 Enter）进它的路线场景 |
+| `map-cluster` | `/map/math/cluster/geometry` | 可看：「几何」星团的路线场景（#747），盖在星图上淡入；从左到右的主线、最多三条支线、通往其他星团的入口；打开时滚到推荐点——演示知识点，它的卡片「Continue」进入真实的演示章节。「Back to the star map」淡出、回到星图（从星图点进来时回到离开时的视角，直接打开时回到全景）。减弱动效下不淡入淡出。截图等 `[data-cluster-route]` |
+| `map-cluster-star` | `/map/math/cluster/numbers?star=brueche-brueche-kuerzen-addieren-und-subtrahieren` | 可看：「数与运算」的路线场景，按 `?star=` 打开在那颗星上、卡片开着（从别的星团的入口过来就是这样）。截图等 `[data-route-card]` |
+| `map-focus-optics` / `map-focus-star` | `/map/physics`（键盘聚焦「光学」）、`/map/math/geometry`（聚焦演示知识点） | 可看：聚焦时点亮的连线（#121） |
 | `map-optics` / `map-refraction` | `/map/physics/optics`、`/map/physics/optics/demo-refraction` | 可看：跨学科前置（#121） |
 | `chapter` | `/chapter/demo-sine-cosine` | 可看：3 个核心课时加 1 个拓展练习集，开场时第 1 课已完成 |
 | `lesson` | `/chapter/demo-sine-cosine/demo-sine-cosine--rechnen--1` | 可看：5 道题（单选 ×2、填空、排序、选项是图的单选），能答错、重试、答对、完成课时；第 1 题带题干图（图上「Hypotenuse」随界面语言变），第 5 题三个选项都是图（#504） |
@@ -53,11 +55,17 @@ npm run dev -- --host 127.0.0.1 --port 5173
 | `map-newcomer` | `/` → `/map/math/numbers` | 可看：新生首次落点（「关于你」已按「Later」，`aboutYou=later`）。没有点亮、没有进行中，打开 `/` 时不看全景，落到推荐星（演示知识点）所在星云的整团视野，Murmi 气泡在星旁边（窄于 560 px 时停靠在底部控件上方）。起点「Integers」是占位星，所以气泡里没有「Start this star」，只有「Find my own star」（#586）和次要的「Look around first」；「Look around first」或 Esc 收起气泡、镜头不动；截图等气泡出现（`[data-first-landing] [data-shown]`）后再拍。「Find my own star」见下一行 |
 | `onboarding` | `/activate?token=demo-invitation` → … → `/map/math/numbers` → `/chapter/demo-sine-cosine/…` | 可看：首次登录一路走完。激活邀请、登录、「关于你」（#591，见上文 `newcomer=1`；选中学年级则直接落到演示知识点，下面这段「找我自己的星」改用「Later」跳过后再走）、（跳过且修多科时）回答在学哪科、落到「Integers」，然后（#586）：点「Find my own star」→ 气泡收起，底部 Ask 输入框获焦、高亮一次（减弱动效下只淡入淡出），上方出现按科目给的 2–3 条示例说法（数学三条），Esc、打字或打开 Ask 都会收起示例 → 点「We're doing sine and cosine at school」（各语言同一条）→ Ask 打开、作为新对话发出 → Ask 的首次导览（#677）：Murmi 气泡依次指向一个控件，一句话，配「Next」和「Skip」——麦克风（「Rather talk than type? …」；设备没有麦克风按钮时跳过，Linux 等）→「+」（照片或文件，触屏上加一句可以直接用相机）→ 等第一条回答出来后指向回答下面的「Ask a teacher」（只有「Got it」）。非模态、不抢焦点，被指的控件高亮一次（减弱动效下只淡入淡出），`aria-live` 读出每一步；输入框里打字会结束麦克风和「+」两步（老师那步照样随回答出现），指着老师时打字结束整个导览；「Skip」或 Esc 结束导览（Esc 只收导览，再按一次才关 Ask），本标签页内不再出现。宽屏的升起面板、地图旁的面板、全屏和手机底部面板上都一样；截图等 `[data-ask-tour-bubble]`，`data-ask-tour-bubble` 的值是当前一步（`mic` / `add` / `teacher`）→ 回答带演示知识点的卡片 → 点「See the way on the star map」→ 路径与 Murmi 的建议（找星 #489，未改）→「Learn Sine and cosine right away」进章节 → 开始第一课。示例发起的那段对话也算学生问过 Ask，所以走过这一步之后练习页**不会**出现第 3 步提示；第 3 步单独看 `lesson-first` |
 | `lesson-first` | `/chapter/demo-sine-cosine/demo-sine-cosine--seiten--1` | 可看：第一次进练习、还没问过 Ask 的学生（#586）。Murmi 指向 Ask：「Stuck? Ask me here.」并说可以拍草稿或作业题发来；窄屏在底部输入框上方，输入框高亮一次。宽屏上 Ask 面板一进来就开着，这时 Ask 自己的首次导览（#677）先来、提示让路：导览在麦克风和「+」两步时提示不出现，过了这两步（或 Skip / Esc 之后）提示才出现在右侧面板里、输入框正上方，而且只说「Stuck? Ask me here.」，不再重复拍照那句，也不再高亮「+」；本标签页内导览开始过，提示都不再说拍照。非模态、不抢焦点，`aria-live` 读出同样的话；「Got it」或 Esc 收起，本标签页内不再出现；测验中不出现。截图等 `[data-stage-ask-tip]` |
-| `lighting` | `/map/math/trigonometry/demo-sine-cosine` | 可看：打开前把演示知识点的课时全部记为完成、点亮尚未确认；打开这颗星的地址，落在它所在星云的整团视野（地址换成星云的，#140），在这颗星上播放一次点亮动画（#51）；截图等动画结束（`data-lighting="done"`）后再拍 |
-| `starmap-clusters` / `starmap-clusters-algebra` | `/map/math`、`/map/math/algebra`，带 `sky=clusters` | 原型：真实数学知识库 98 点（`src/dev/demo/clusters/`，CC BY-NC 4.0）按 `src/features/starmap/route/clusters.ts` 的映射表聚成 4 个星团，每团是画布上的一个星云，团内按学习路线从左到右排星（`route/clusteredSky.ts` 的 `layoutClusteredSky`）。星图路由、引擎、星形、连线和卡片都是现有的，只换了星图数据源（`PreviewLighting` 的 `clustered`）；学习状态是造的，「开始练习」进章节路由，演示后端没有这些星的章节。`sky=clusters` 也可以加在任何 `path=/map/...` 上。样稿：全景（离最远缩放 `REVEAL.panoramaBand` 以内）不出星名；在全景里点星团或星，改进 `/map/math/cluster/<团>` 的路线场景（`src/dev/clusters/ClusterRouteScene.tsx`，预览里的临时接法），放大后照旧 |
-| `starmap-clusters-route` | `/map/math/cluster/numbers`，带 `sky=clusters` | 样稿：数与运算的路线场景，返回回到星空 |
+| `lighting` | `/map/math/geometry/demo-sine-cosine` | 可看：打开前把演示知识点的课时全部记为完成、点亮尚未确认；打开这颗星的地址，落在它所在星云的整团视野（地址换成星云的，#140），在这颗星上播放一次点亮动画（#51）；截图等动画结束（`data-lighting="done"`）后再拍 |
 
-演示知识点按知识库的形状组织（#501，stoa-backend#127）：三颗小星是题型 `demo-sine-cosine--<题型>`，练习集 id 是 `<小星>--<阶段>`；「Begründen und Beweisen」是拓展小星，做完只点亮它自己，星只按三个核心课时点亮。演示后端也答 `GET /practice/knowledge-map`（按页面的 `points`；`view=skeleton` 时不带小星）和 `GET /practice/knowledge-map/stars`（#503，一颗星和它周边的星，带小星与练习集），章节和小星页从后者读小星的点亮、提示和练习集归属。星图本身仍走演示数据源，不经这两个接口。
+演示知识点按知识库的形状组织（#501，stoa-backend#127）：三颗小星是题型 `demo-sine-cosine--<题型>`，练习集 id 是 `<小星>--<阶段>`；「Begründen und Beweisen」是拓展小星，做完只点亮它自己，星只按三个核心课时点亮。演示后端也答 `GET /practice/knowledge-map`（按页面的 `points`；`view=skeleton` 时不带小星）和 `GET /practice/knowledge-map/stars`（#503，一颗星和它周边的星，带小星与练习集），章节和小星页从后者读小星的点亮、提示和练习集归属。星图也读这两个接口，经生产的数据源（见下文「星团」）。
+
+### 星团（#747）
+
+预览里的星图走生产那一条路：`PreviewLighting` 默认不再提供自己的星图数据源，应用自己的 `KnowledgeMapSourceProvider` / `readModelSource.tsx` 读演示后端的 `GET /practice/knowledge-map`，由 `placed()` 的 `layoutClusteredSky` 聚成星团，`StarMapRoute` 的 `onOpenCluster` 在全景点星团时进路线场景 `/map/:subjectId/cluster/:clusterId`。没有预览专用的开关或跳转改写。
+
+演示后端的天空（`lighting.tsx` 的 `demoFollowedSky`）里，数学换成真实数学知识库 98 点（`src/dev/demo/clusters/`，CC BY-NC 4.0，`withKnowledgeBaseMath`），按 `src/features/starmap/route/clusters.ts` 的映射表聚成「数与运算」「几何」「方程与代数」「数据与概率」四团；学习状态是造的（每团沿路线点亮前几颗）。演示知识点「Sine and cosine」放进知识库的 `geometrie`（排在「Trigonometrie」之后），是数学的推荐，所以「几何」的路线场景打开在它上面，「Continue」进真实的演示章节。其他知识库星没有演示章节，它们的「开始练习」进章节路由后显示章节的「找不到」状态。物理、化学仍是演示天空，每个 topic 各成一团（映射表里没有）。
+
+`newcomer=1`（含 `map-newcomer`、`onboarding`）和 `longNames=1` 仍由 `PreviewLighting` 提供星团以前的演示天空（`readDemoStarMap`）；星图引擎的全景规则和点星团进场景对它们同样生效，只是每个演示 topic 各是一团。星图走生产数据源时 `demo` 为假，所以不显示 Demo 横幅。
 
 ## 拦截：怎么做到零后端请求
 
@@ -136,7 +144,7 @@ npm run design-preview:capture -- --base http://127.0.0.1:5173 --label after
 
 **星图的数据源接缝**（#131，由 #51 的覆盖接缝泛化而来）：`src/features/starmap/starMapSource.ts` 的 `StarMapSourceContext`，值是 `{ read(request), demo }`。`useStarMap` 只读它，不 import 任何演示数据。生产默认 `emptyStarMapSource`：空天空（没有学科、星云、星）、`demo: false`，正式路由显示空状态（`starmap:emptySky.*`），不显示 Demo 横幅；#48 接读模型时就换掉这个默认。演示天空、生成器和演示专用文案在 `src/dev/demo/sky/`（`demo-sky.json`、`demoSky.ts`、`demoStarMap.ts`、`strings.ts`、`source.tsx`）；`source.tsx` 的 `demoStarMapSource` / `<DemoStarMapSource>` 给台架和测试用，import 它时把 `starmap:demo.*` 文案加进 i18next（这些文案已不在 locale 文件里，所以不进生产包，也不进 `check:untranslated` 的视野）。
 
-完成一个课时后，章节与路线图跟着前进（例如 1/3 → 2/3）。星图也跟着走（#51）：`src/dev/preview/lighting.tsx` 的 `PreviewLighting` 经数据源接缝提供演示天空，再过一遍 `demoStarMapOverride`，把演示知识点的状态换成 #116 的 `demoKnowledgePointState(completed)`；课时全部完成后它点亮，物理里唯一还差它这个前置的 Refraction 变成可开始，推荐标记按后端规则移到下一个（#9 第 8 条）。
+完成一个课时后，章节与路线图跟着前进（例如 1/3 → 2/3）。星图也跟着走（#51）：演示后端的天空（默认经生产数据源读取；`newcomer` / `longNames` 时是 `PreviewLighting` 经数据源接缝提供的演示天空）过一遍 `demoStarMapOverride`，把演示知识点的状态换成 #116 的 `demoKnowledgePointState(completed)`；课时全部完成后它点亮，物理里唯一还差它这个前置的 Refraction 变成可开始，推荐标记按后端规则移到下一个（#9 第 8 条）。
 
 ### 演示后端的状态（#51）
 

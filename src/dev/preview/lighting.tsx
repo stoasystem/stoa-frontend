@@ -8,7 +8,11 @@
  *     does not replay the celebration); known at once (`known`, #140), so
  *     the point is drawn in progress until the flare's brightest moment and
  *     its star's route opens on its nebula seen whole.
- *   - the star map source: the demo sky (`readDemoStarMap`), passed through
+ *   - the star map's data: by default none of its own -- the app's
+ *     production source (`readModelSource.tsx`) reads the demo backend's
+ *     `GET /practice/knowledge-map` (`demoKnowledgeMap`), whose mathematics is
+ *     the real knowledge base gathered into star clusters (#747,
+ *     `withKnowledgeBaseMath`). The demo sky behind it is passed through
  *     `demoStarMapOverride`, so the star map follows the lessons completed on the
  *     page. The demo knowledge point's state is #116's
  *     `demoKnowledgePointState(completed)`; once it is lit, "Refraction" in
@@ -20,14 +24,13 @@
  *     application's own source has no sky at all (#131); only this preview,
  *     like the bench's `&relations=fixture`, puts the prerequisites in.
  *
- * `PreviewLighting` provides both around the app; with `longNames` (the
- * preview's `&longNames=1`) the source also gives the nebulae long names,
- * and with `newcomer` (`&newcomer=1`, the `map-newcomer` surface) the sky of
- * a student who has not started anything (`src/dev/demo/sky/newcomer.ts`),
- * which follows the demo knowledge point's lessons completed on the page.
- * With `clustered` (`&sky=clusters`) it is the star cluster prototype's sky
- * instead (`src/dev/demo/clusters`): the real mathematics knowledge base,
- * gathered into four clusters by `layoutClusteredSky`.
+ * `PreviewLighting` provides the lighting source around the app. Only with
+ * `longNames` (the preview's `&longNames=1`: the nebulae get long names) or
+ * `newcomer` (`&newcomer=1`, the `map-newcomer` surface: the sky of a student
+ * who has not started anything, `src/dev/demo/sky/newcomer.ts`, which follows
+ * the demo knowledge point's lessons completed on the page) does it put a
+ * star map source of its own in front of the app's: the demo sky as it was
+ * before star clusters, laid out by the demo sky itself.
  */
 import type { TFunction } from 'i18next'
 import { useMemo, useSyncExternalStore, type ReactNode } from 'react'
@@ -43,7 +46,7 @@ import {
   onDemoServerChange,
   unacknowledgedLit,
 } from '@/dev/preview/demoSource'
-import { demoClusteredStarMap } from '@/dev/demo/clusters/demoClusterMap'
+import { withKnowledgeBaseMath } from '@/dev/demo/clusters/demoClusterMap'
 import { asNewcomer } from '@/dev/demo/sky/newcomer'
 import { readDemoStarMap } from '@/dev/demo/sky/source'
 import { LightingEventSourceContext, type LightingEventSource } from '@/features/starmap/lighting/lightingEvents'
@@ -215,7 +218,8 @@ export function demoSkyReviewDue(size: FixtureSize): number {
 
 /** The whole sky as the demo backend has it after the lessons completed so far, small stars included. */
 function demoFollowedSky(size: FixtureSize): KnowledgeMapResponse {
-  const sky = demoSky(size, demoLanguage())
+  // Mathematics is the real knowledge base, which the read model gathers into star clusters (#747).
+  const sky = withKnowledgeBaseMath(demoSky(size, demoLanguage()), demoLanguage())
   const subjectId = DEMO_KNOWLEDGE_POINT.subjectId
   const map = withDemoReviews(demoStarMapOverride(
     {
@@ -247,28 +251,17 @@ export function withLongNebulaNames(map: StarMap, t: TFunction<'starmap'>): Star
   return { ...map, nebulae }
 }
 
-export function PreviewLighting({
-  children,
-  longNames = false,
-  newcomer = false,
-  clustered = false,
-}: {
-  children: ReactNode
-  longNames?: boolean
-  newcomer?: boolean
-  /** The star cluster prototype (`sky=clusters`): the real mathematics knowledge base in four clusters, its own made-up progress. */
-  clustered?: boolean
-}) {
+export function PreviewLighting({ children, longNames = false, newcomer = false }: { children: ReactNode; longNames?: boolean; newcomer?: boolean }) {
   const version = useSyncExternalStore(onDemoServerChange, demoServerVersion)
   const { t } = useTranslation('starmap')
   // A new source when the demo backend changes, so the map is drawn again.
-  const source = useMemo<StarMapSource>(() => {
+  // None by default: the app's own source reads the demo backend (#747).
+  const source = useMemo<StarMapSource | null>(() => {
     void version
+    if (!newcomer && !longNames) return null
     const completed = completedLessons()
     // The year group saved in "About you" moves a newcomer's start (#591).
     const grade = demoGradeNow()
-    // Star names stay off the whole view: a cluster chosen there opens its route scene (`ClusterRouteScene`).
-    if (clustered) return { demo: true, quietPanorama: true, read: (request) => demoClusteredStarMap(request.language) }
     return {
       demo: true,
       read: (request) => {
@@ -280,10 +273,10 @@ export function PreviewLighting({
         return longNames ? withLongNebulaNames(followed, t) : followed
       },
     }
-  }, [version, longNames, newcomer, clustered, t])
+  }, [version, longNames, newcomer, t])
   return (
     <LightingEventSourceContext.Provider value={demoLightingSource}>
-      <StarMapSourceContext.Provider value={source}>{children}</StarMapSourceContext.Provider>
+      {source ? <StarMapSourceContext.Provider value={source}>{children}</StarMapSourceContext.Provider> : children}
     </LightingEventSourceContext.Provider>
   )
 }
