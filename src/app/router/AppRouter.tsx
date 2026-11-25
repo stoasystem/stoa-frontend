@@ -5,6 +5,7 @@ import { AppRoutes } from '@/app/router/AppRoutes'
 import { AuthBootstrap } from '@/app/router/AuthBootstrap'
 import { RouteArrival } from '@/app/router/RouteArrival'
 import { RoleSwitcher } from '@/components/dev/RoleSwitcher'
+import { PageViewTracker } from '@/services/analytics/PageViewTracker'
 import { KnowledgeMapSourceProvider } from '@/features/starmap/readModelSource'
 import { LightingEventsProvider } from '@/features/starmap/lighting/readModelLighting'
 
@@ -14,6 +15,7 @@ export function AppRouter() {
   return (
     <BrowserRouter>
       <AuthBootstrap />
+      <PageViewTracker />
       <RoleSwitcher />
       {/* Every page is loaded on demand, so one boundary covers them all. */}
       {/* #48: the star map reads the backend read model from here down. The

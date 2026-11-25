@@ -1184,5 +1184,137 @@
         "empty": "Keine Nutzungsereignisse in diesem Zeitraum."
       }
     }
+  },
+  "usageAnalytics": {
+    "title": "Nutzungsstatistik",
+    "description": "Wie die Plattform genutzt wird: Aktivität, Funktionen, Einstieg und Bindung.",
+    "filters": {
+      "role": "Rolle",
+      "days": "Zeitraum",
+      "daysOption_one": "{{count}} Tag",
+      "daysOption_other": "{{count}} Tage"
+    },
+    "roles": {
+      "all": "Alle",
+      "student": "Lernende",
+      "parent": "Eltern",
+      "teacher": "Lehrkräfte"
+    },
+    "incomplete": "Dieser Zeitraum wird noch zusammengefasst, die Zahlen können unvollständig sein.",
+    "loading": "Nutzungsstatistik wird geladen",
+    "loadFailed": "Die Nutzungsstatistik konnte nicht geladen werden.",
+    "empty": {
+      "title": "Noch keine Nutzung erfasst",
+      "description": "Sobald Konten die Plattform in diesem Zeitraum nutzen, erscheint ihre Aktivität hier."
+    },
+    "noData": "Keine Daten für diesen Zeitraum.",
+    "missing": "Noch zu wenige Daten",
+    "kpis": {
+      "dau": "Täglich aktiv",
+      "wau": "Wöchentlich aktiv",
+      "mau": "Monatlich aktiv",
+      "dauChange": "{{change}} gegenüber Vorwoche",
+      "questionsPerDay": "KI-Fragen pro Tag",
+      "escalation": "{{rate}} an Lehrkraft weitergegeben",
+      "aiP50": "KI-Antwortzeit (Median)",
+      "teacherP50": "Antwortzeit der Lehrkraft (Median)"
+    },
+    "units": {
+      "ms": "{{value}} ms",
+      "seconds": "{{value}} s",
+      "minutes": "{{value}} Min.",
+      "hours": "{{value}} Std."
+    },
+    "trend": {
+      "title": "Täglich aktive Nutzende",
+      "summary": "{{count}} aktiv am {{day}}",
+      "latest": "Zuletzt: {{count}}"
+    },
+    "ranking": {
+      "title": "Nutzung der Funktionen",
+      "feature": "Funktion",
+      "uses": "Aufrufe",
+      "people": "Personen"
+    },
+    "funnel": {
+      "title": "Einstieg neuer Konten",
+      "steps": {
+        "invited": "Eingeladen",
+        "activated": "Aktiviert",
+        "first_question": "Erste Frage",
+        "first_exercise": "Erste Übung",
+        "week2_active": "In Woche 2 noch aktiv"
+      }
+    },
+    "retention": {
+      "title": "Bindung nach Startwoche",
+      "cohort": "Startwoche",
+      "size": "Konten",
+      "week": "Woche {{n}}",
+      "noValue": "Noch nicht erreicht"
+    },
+    "events": {
+      "page_viewed": "Seite aufgerufen",
+      "web_vitals": "Seitentempo gemessen",
+      "user_login": "Angemeldet",
+      "user_register": "Registriert",
+      "chat_conversation_created": "Unterhaltung begonnen",
+      "chat_message_sent": "Frage gesendet",
+      "chat_response_started": "Antwort begonnen",
+      "chat_response_completed": "Antwort fertig",
+      "chat_response_stopped": "Antwort abgebrochen",
+      "file_uploaded": "Datei hochgeladen",
+      "teacher_help_requested": "Lehrkraft-Hilfe angefragt",
+      "teacher_help_request_failed": "Anfrage an Lehrkraft fehlgeschlagen",
+      "login_submitted": "Anmeldung abgeschickt",
+      "login_authenticated": "Anmeldung bestätigt",
+      "login_first_screen_ready": "Erster Bildschirm nach Anmeldung",
+      "teacher_help_assigned": "Lehrkraft-Hilfe zugeteilt",
+      "teacher_help_resolved": "Lehrkraft-Hilfe erledigt",
+      "parent_child_summary_viewed": "Kinderübersicht angesehen",
+      "parent_report_viewed": "Elternbericht angesehen",
+      "parent_upgrade_cta_clicked": "Upgrade-Knopf (Eltern) geklickt",
+      "pricing_page_viewed": "Preisseite angesehen",
+      "pricing_plan_selected": "Tarif gewählt",
+      "checkout_started": "Bezahlvorgang begonnen",
+      "plan_review_completed": "Tarifprüfung abgeschlossen",
+      "billing_page_viewed": "Abrechnungsseite angesehen",
+      "feature_locked_viewed": "Gesperrte Funktion gesehen",
+      "upgrade_prompt_clicked": "Upgrade-Hinweis geklickt",
+      "parent_landing_viewed": "Eltern-Startseite angesehen",
+      "parent_value_cta_clicked": "Eltern-Vorteilsknopf geklickt",
+      "referral_page_viewed": "Empfehlungsseite angesehen",
+      "referral_link_copied": "Empfehlungslink kopiert",
+      "teacher_availability_viewed": "Verfügbarkeit der Lehrkraft angesehen",
+      "teacher_availability_updated": "Verfügbarkeit der Lehrkraft geändert",
+      "teacher_credential_uploaded": "Nachweis der Lehrkraft hochgeladen",
+      "support_ticket_created": "Supportanfrage erstellt",
+      "support_ticket_viewed": "Supportanfrage angesehen",
+      "admin_analytics_viewed": "Admin-Statistik angesehen",
+      "utm_captured": "Kampagnenquelle erfasst",
+      "billing_checkout_started": "Bezahlung begonnen",
+      "billing_virtual_checkout_completed": "Testbezahlung abgeschlossen",
+      "billing_virtual_checkout_canceled": "Testbezahlung abgebrochen",
+      "teacher_request_opened": "Hilfeanfrage von Lehrkraft geöffnet",
+      "teacher_request_status_updated": "Status der Hilfeanfrage geändert",
+      "teacher_time_to_first_action_recorded": "Erste Reaktion der Lehrkraft gemessen",
+      "teacher_note_added": "Notiz der Lehrkraft hinzugefügt",
+      "feedback_submitted": "Rückmeldung gesendet",
+      "organization_dashboard_viewed": "Organisationsübersicht angesehen",
+      "organization_switched": "Organisation gewechselt",
+      "organization_student_opened": "Lernende der Organisation geöffnet",
+      "learning_profile_viewed": "Lernprofil angesehen",
+      "curriculum_graph_viewed": "Lehrplankarte angesehen",
+      "curriculum_topic_selected": "Lehrplanthema gewählt",
+      "weak_point_diagnosis_viewed": "Schwachstellen angesehen",
+      "learning_operations_dashboard_viewed": "Lernbetrieb angesehen",
+      "teacher_assignment_board_viewed": "Zuteilungsübersicht angesehen",
+      "teacher_assignment_suggested_clicked": "Vorgeschlagene Lehrkraft gewählt",
+      "parent_monthly_report_viewed": "Monatsbericht angesehen",
+      "advanced_analytics_viewed": "Detailstatistik angesehen",
+      "retention_page_viewed": "Bindungsseite angesehen",
+      "partnership_page_viewed": "Partnerschaftsseite angesehen",
+      "partnership_interest_submitted": "Partnerschaftsinteresse gesendet"
+    }
   }
 }
