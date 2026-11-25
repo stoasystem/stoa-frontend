@@ -226,7 +226,7 @@
     "description": "Tempi di risposta dei docenti, notifiche operative e pagine di sistema.",
     "pages": "In Sistema",
     "status": "Stato del sistema",
-    "statusDescription": "Non ancora disponibile",
+    "statusDescription": "Stato di ogni funzione, allarmi e rilasci",
     "learningOperations": "Gestione dell’apprendimento",
     "learningOperationsDescription": "Segnali, completamenti e disponibilità dei dati per materia",
     "learningAutomation": "Automazione dell’apprendimento",
@@ -234,7 +234,7 @@
     "scope": {
       "title": "Ambito dell’amministrazione",
       "covers": "Gli amministratori gestiscono gli account in «Utenti» (inviti, assegnazioni, reimpostazioni della password, sospensione e archiviazione) ed esaminano le candidature dei docenti, il programma e la moderazione nelle rispettive sezioni.",
-      "notYet": "Le richieste di assistenza non sono ancora gestite qui e lo stato del sistema arriverà in seguito."
+      "notYet": "Le richieste di assistenza non sono ancora gestite qui."
     },
     "readiness": {
       "title": "Disponibilità del servizio",
@@ -1087,6 +1087,122 @@
       "change": "Modifica il periodo",
       "failed": "L'account {{accountNumber}} è stato aperto, ma il suo periodo di utilizzo non è stato impostato. {{reason}} Impostalo qui sotto.",
       "conflict": "Qualcuno ha modificato questo periodo nello stesso momento."
+    }
+  },
+  "systemHealth": {
+    "title": "Salute del sistema",
+    "description": "Richieste, errori e tempi di risposta per funzione. Aprire una scheda per i dettagli.",
+    "windowLabel": "Periodo",
+    "window": {
+      "1h": "1 ora",
+      "24h": "24 ore",
+      "7d": "7 giorni"
+    },
+    "generatedAt": "Aggiornato {{time}}",
+    "loading": "Caricamento della salute del sistema…",
+    "loadFailed": "Non è stato possibile caricare la salute del sistema.",
+    "featureGrid": "Funzioni",
+    "sparkLabel": "Tempo di risposta p95 di {{name}} nel periodo",
+    "ms": "{{value}} ms",
+    "frontendErrors24h": "Errori frontend, ultime 24 ore",
+    "features": {
+      "auth": "Accesso e account",
+      "practice": "Mappa stellare ed esercizi",
+      "ask_ai": "Domande all’IA",
+      "teacher_help": "Aiuto di un docente",
+      "voice": "Domande vocali",
+      "notifications": "Notifiche",
+      "parent_reports": "Rapporti ai genitori",
+      "admin": "Console di amministrazione",
+      "other": "Altro"
+    },
+    "status": {
+      "ok": "Normale",
+      "warn": "Lento",
+      "bad": "Guasto",
+      "unknown": "Nessun dato"
+    },
+    "metric": {
+      "requests": "Richieste",
+      "errorRate": "Tasso di errore",
+      "p50": "p50",
+      "p95": "p95",
+      "p95Limit": "Limite p95",
+      "openAlarms": "Allarmi aperti"
+    },
+    "alarms": {
+      "title": "Allarmi in corso",
+      "empty": "Nessun allarme attivo. Tutto è entro i limiti.",
+      "errorRate": "{{feature}}: troppi errori",
+      "latency": "{{feature}}: risposte troppo lente",
+      "since": "dalle {{time}}",
+      "state": {
+        "ALARM": "Attivo",
+        "OK": "Rientrato",
+        "INSUFFICIENT_DATA": "Dati insufficienti"
+      }
+    },
+    "deploys": {
+      "title": "Rilasci recenti",
+      "empty": "Nessun rilascio in questo periodo."
+    },
+    "detail": {
+      "back": "Torna alla salute del sistema",
+      "unknownFeature": "Funzione sconosciuta",
+      "unknownFeatureHint": "Non esiste una funzione con questo nome. Sceglierne una dalla panoramica della salute del sistema.",
+      "loadFailed": "Non è stato possibile caricare le statistiche di questa funzione.",
+      "count": "Numero",
+      "at": "Ora",
+      "alarmState": "Stato",
+      "alarmName": "Allarme",
+      "chart": {
+        "title": "Richieste e p95 nel tempo",
+        "label": "Richieste per intervallo come barre, tempo di risposta p95 come linea, il limite p95 tratteggiato",
+        "requests": "Richieste",
+        "errors": "Errori del server",
+        "p95": "Tempo di risposta p95",
+        "limit": "Limite p95",
+        "empty": "Nessuna richiesta in questo periodo",
+        "emptyHint": "Nessuno ha usato questa funzione nel periodo scelto. Un periodo più lungo ne mostrerà di più."
+      },
+      "routes": {
+        "title": "Percorsi",
+        "method": "Metodo",
+        "route": "Percorso",
+        "overLimit": "Oltre il limite",
+        "empty": "Nessun percorso di questa funzione è stato chiamato in questo periodo."
+      },
+      "recentErrors": {
+        "title": "Errori del server recenti",
+        "status": "Codice",
+        "empty": "Nessun errore del server in questo periodo."
+      },
+      "frontendErrors": {
+        "title": "Errori frontend",
+        "message": "Messaggio",
+        "release": "Versione",
+        "lastAt": "Ultima occorrenza",
+        "noMessage": "Senza messaggio",
+        "empty": "Nessun errore frontend in questo periodo."
+      },
+      "probes": {
+        "title": "Controlli automatici",
+        "result": "Esito",
+        "ok": "Superato",
+        "failed": "Fallito",
+        "latency": "Durata",
+        "step": "Passo",
+        "empty": "Nessun controllo automatico in questo periodo."
+      },
+      "alarms": {
+        "title": "Allarmi di questa funzione",
+        "empty": "Questa funzione non ha allarmi."
+      },
+      "usage": {
+        "title": "Eventi di utilizzo",
+        "event": "Evento",
+        "empty": "Nessun evento di utilizzo in questo periodo."
+      }
     }
   }
 }
