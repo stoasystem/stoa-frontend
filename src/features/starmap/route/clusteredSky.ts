@@ -88,7 +88,7 @@ export type ChapterBand = {
 export type ClusteredSky = {
   /** One nebula per cluster, in cluster order across the sky. */
   nebulae: Nebula[]
-  /** The same stars, each with its cluster as `nebulaId` and its new place. */
+  /** The same stars, each with its cluster as `nebulaId`, its route chapter as `routeChapterId` and its new place. */
   stars: Star[]
   /** Each cluster's disc, which holds all its stars; no two overlap. */
   regions: Map<string, ClusterRegion>
@@ -262,6 +262,7 @@ export function layoutClusteredSky(
   }
 
   const nebulae: Nebula[] = withStars.map((g, i) => ({ topicId: g.clusterId, name: g.name, order: i + 1, subjectId: g.subjectId }))
-  const stars = map.stars.map((star) => ({ ...star, nebulaId: clusterOf.get(star.unitId)!, ...placedAt.get(star.unitId)! }))
+  const chapterOf = new Map([...chapters.values()].flatMap((bands) => bands.flatMap((band) => band.stars.map((id) => [id, band.chapterId] as const))))
+  const stars = map.stars.map((star) => ({ ...star, nebulaId: clusterOf.get(star.unitId)!, routeChapterId: chapterOf.get(star.unitId)!, ...placedAt.get(star.unitId)! }))
   return { nebulae, stars, regions, chapters, unit }
 }

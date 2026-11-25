@@ -26,9 +26,9 @@ describe('layoutClusteredSky on the mathematics knowledge base', () => {
     ])
     expect(sky.stars).toHaveLength(98)
     expect(new Set(sky.stars.map((s) => s.nebulaId))).toEqual(new Set(['numbers', 'geometry', 'algebra', 'data']))
-    // Only the nebula and the place change: the star is otherwise the same.
+    // Only the nebula, the route chapter and the place change: the star is otherwise the same.
     const before = map.stars.find((s) => s.unitId === sky.stars[0].unitId)!
-    expect({ ...sky.stars[0], nebulaId: before.nebulaId, x: before.x, y: before.y }).toEqual(before)
+    expect({ ...sky.stars[0], nebulaId: before.nebulaId, x: before.x, y: before.y, routeChapterId: undefined }).toEqual(before)
   })
 
   it('keeps every star inside [0, 1]', () => {
@@ -66,6 +66,8 @@ describe('layoutClusteredSky on the mathematics knowledge base', () => {
       const bands = sky.chapters.get(cluster.clusterId)!
       expect(bands.map((b) => b.chapterId)).toEqual(CHAPTER_TABLE[cluster.clusterId].map((c) => c.chapterId))
       expect(bands.flatMap((b) => b.stars).sort()).toEqual(cluster.stars.map((s) => s.unitId).sort())
+      // Each star carries its band for the engine's lines (`routeChapterId`).
+      for (const band of bands) for (const id of band.stars) expect(at.get(id)!.routeChapterId).toBe(band.chapterId)
     }
   })
 

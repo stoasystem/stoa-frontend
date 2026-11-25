@@ -14,6 +14,9 @@
  *             near its own star (direction only), and from the chosen
  *             nebula the nebula it leads to is named at the screen's edge
  *             when it is off screen -- with its subject when that is another one.
+ *             On a sky of star clusters (#747, `scene.routeChapter`) only the
+ *             lines inside one chapter of a cluster's route: a line to another
+ *             cluster, subject or chapter waits for a star in focus (`quiet`).
  *   a star    chosen: its own lines, all four tiers, drawn to the other star.
  *
  * Names at the screen's edge (where a line or a bridge leads, #121, #136,
@@ -383,6 +386,9 @@ function prepare(scene: SceneData): Prepared {
     }
     const [ga, gb] = [galaxyOf[line.fromNebula] ?? -1, galaxyOf[line.toNebula] ?? -1]
     if (ga >= 0 && gb >= 0 && ga !== gb) line.crossSubject = true
+    // A sky of star clusters (#747): a line leaving its cluster, or its chapter, waits for its star to be in focus.
+    const chapter = scene.routeChapter
+    if (chapter && (line.fromNebula !== line.toNebula || chapter[from] !== chapter[to])) line.quiet = true
     lines.push(line)
   }
   const bridges: NebulaBridge[] = scene.links.map((link) => ({
@@ -607,8 +613,8 @@ export function drawLinks(
       if (onPath?.has(`${line.from}:${line.to}`)) continue
       const look = starLineLook(line, lineView)
       const { reach, lit } = look
-      // The waiting web far out: tier 4 where neither the bridges nor the focus rule reach it.
-      const strength = line.tier === TIER_WAITING ? Math.max(look.strength, web) : look.strength
+      // The waiting web far out: tier 4 where neither the bridges nor the focus rule reach it (not a quiet line, #747).
+      const strength = line.tier === TIER_WAITING && !line.quiet ? Math.max(look.strength, web) : look.strength
       if (strength <= 0.001) continue
       // Anchored on the dragged star, else the focused star, else on the end in the chosen nebula;
       // a line between two other nebulae is drawn from both ends, each fading out.

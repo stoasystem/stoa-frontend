@@ -35,7 +35,7 @@
  * to the layout. A press on empty space, or a swipe before the hold, still
  * pans; a drag is never a tap.
  */
-import { nebulaLinks, starLinkIndices } from '@/features/starmap/model/links'
+import { nebulaLinks, routeChapterIndices, starLinkIndices } from '@/features/starmap/model/links'
 import { orderedNebulae, orderedStars, STAR_LOOKS, starLook, type Star, type StarMap } from '@/features/starmap/model/starMap'
 import { breathAt, easeStandard, motionPolicy, type MotionPolicy } from '@/features/starmap/motion/motionPolicy'
 import type { EdgeLabelBox, SceneData, SceneFrame, StarMapRenderer, StarMapTheme } from '@/features/starmap/render/types'
@@ -538,6 +538,7 @@ export class StarMapEngine {
         .map((link) => ({ a: this.nebulaIndex.get(link.a) ?? -1, b: this.nebulaIndex.get(link.b) ?? -1, count: link.count }))
         .filter((link) => link.a >= 0 && link.b >= 0),
       starLinks: starLinkIndices(map, starIndex),
+      routeChapter: routeChapterIndices(this.stars),
     }
     this.stars.forEach((star, i) => {
       scene.mapX[i] = star.x

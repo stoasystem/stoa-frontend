@@ -22,7 +22,7 @@ import {
   type LinkView,
   type StarLine,
 } from '@/features/starmap/model/linkTiers'
-import { nebulaLinks } from '@/features/starmap/model/links'
+import { nebulaLinks, routeChapterIndices } from '@/features/starmap/model/links'
 import { orderedNebulae, orderedStars, type StarMap } from '@/features/starmap/model/starMap'
 import { createCanvas2DRenderer, withAlpha } from '@/features/starmap/render/canvas2d'
 import { drawLinks, LINE, LINK_INK, shortestDx, type LinkObstacles } from '@/features/starmap/render/links'
@@ -582,3 +582,119 @@ function recordingContext() {
   })
   return ctx as unknown as CanvasRenderingContext2D & { strokes: typeof strokes; beads: typeof beads }
 }
+
+describe('a sky of star clusters: lines between clusters and chapters wait for their star (#747)', () => {
+  const at = (starPx: number, more: Partial<LinkView> = {}): LinkView => ({ ...lineReveal(starPx), star: 0, chosen: -1, focusStar: -1, ...more })
+  const zoomedIn = at(34, { chosen: 0 })
+  const line = (more: Partial<StarLine>): StarLine => ({ from: 1, to: 2, fromNebula: 0, toNebula: 0, tier: TIER_WALKED, ...more })
+
+  it('zoomed in with nothing in focus: no quiet line, whatever its tier; the cross-subject floor neither', () => {
+    for (const tier of [1, 2, 3, 4] as const) {
+      expect(starLineLook(line({ tier, quiet: true }), zoomedIn).strength).toBe(0)
+      expect(starLineLook(line({ tier, quiet: true, toNebula: 5 }), zoomedIn).strength).toBe(0)
+      expect(starLineLook(line({ tier, quiet: true, toNebula: 5, crossSubject: true }), zoomedIn).strength).toBe(0)
+    }
+    // Not quiet (inside one chapter, or not a sky of clusters): as before.
+    expect(starLineLook(line({}), zoomedIn).strength).toBe(1)
+    expect(starLineLook(line({ toNebula: 5, crossSubject: true, tier: TIER_WAITING }), zoomedIn).strength).toBeGreaterThan(0)
+  })
+
+  it('a star in focus, or chosen, or dragged: its own quiet lines appear, the others stay dark', () => {
+    const focused = at(34, { chosen: 0, focusStar: 1 })
+    expect(starLineLook(line({ quiet: true }), focused).strength).toBe(1)
+    expect(starLineLook(line({ quiet: true, toNebula: 5, crossSubject: true, tier: TIER_WAITING }), focused).strength).toBe(1)
+    expect(starLineLook(line({ quiet: true, from: 7, to: 8 }), focused).strength).toBe(0)
+    const chosen = at(34, { chosen: 0, focusStar: 1, star: 1 })
+    expect(starLineLook(line({ quiet: true, toNebula: 5 }), chosen)).toEqual({ strength: 1, reach: 1, lit: 0 })
+    const dragged = at(34, { chosen: 0, dragStar: 2, drag: 1 })
+    expect(starLineLook(line({ quiet: true, toNebula: 5 }), dragged).lit).toBe(1)
+  })
+
+  /** Star 0 in chapter 0 of nebula 0; 1 in its chapter, 2 in the next chapter, 3 in another nebula; all lit (tier 3). */
+  function clusterScene(): { scene: SceneData; frame: SceneFrame } {
+    const mapX = [0.5, 0.7, 0.3, 0.5]
+    const mapY = [0.5, 0.5, 0.5, 0.2]
+    const scene: SceneData = {
+      mapKey: 'clusters',
+      count: 4,
+      mapX: Float32Array.from(mapX),
+      mapY: Float32Array.from(mapY),
+      state: Uint8Array.from([STATE_LIT, STATE_LIT, STATE_LIT, STATE_LIT]),
+      progress: new Float32Array(4),
+      reviewDue: new Uint8Array(4),
+      recommended: -1,
+      recommendations: [],
+      nebula: Uint16Array.from([0, 0, 0, 1]),
+      names: ['centre', 'same chapter', 'next chapter', 'other cluster'],
+      skills: [[], [], [], []],
+      nebulae: [
+        { topicId: 'n0', name: 'Zero', x: 0.5, y: 0.5, r: 0.3, lit: 3, total: 3 },
+        { topicId: 'n1', name: 'One', x: 0.5, y: 0.1, r: 0.1, lit: 1, total: 1 },
+      ],
+      links: [{ a: 0, b: 1, count: 1 }],
+      starLinks: [1, 2, 3].map((to) => ({ from: 0, to })),
+      routeChapter: Int32Array.from([0, 0, 1, 2]),
+    }
+    const scale = 1000
+    const frame = {
+      viewport: { width: 1000, height: 1000 },
+      scale,
+      ox: 0,
+      oy: 0,
+      x: Float32Array.from(mapX.map((v) => v * scale)),
+      y: Float32Array.from(mapY.map((v) => v * scale)),
+      starAlpha: new Float32Array(4).fill(1),
+      nebulaX: Float32Array.from([500, 500]),
+      nebulaY: Float32Array.from([500, 100]),
+      nebulaR: Float32Array.from([300, 100]),
+      sharpness: Float32Array.from([1, 1]),
+      glyphSize: 30,
+      dotBlend: 0,
+      dotRadius: 1.5,
+      breath: null,
+      starLabelAlpha: 1,
+      nebulaLabelAlpha: 0,
+      // Zoomed in to the cluster, nothing in focus.
+      lineReveal: lineReveal(34),
+      starFocus: 0,
+      chosenNebula: 0,
+      focusStar: -1,
+      highlightNebula: -1,
+      dim: 1,
+      showSkills: 0,
+      crossfade: 0,
+    } satisfies SceneFrame
+    return { scene, frame }
+  }
+
+  /** Which of stars 1-3 a stroke from the centre star leads to. */
+  const ledTo = (ctx: { strokes: [number, number, number, number][] }, frame: SceneFrame) =>
+    [1, 2, 3].filter((to) => ctx.strokes.some(([x0, y0, x1, y1]) => near((x0 + x1) / 2, (y0 + y1) / 2, frame.x[0], frame.y[0], frame.x[to], frame.y[to])))
+
+  it('zoomed in with nothing in focus: only the line inside the chapter', () => {
+    const { scene, frame } = clusterScene()
+    const ctx = recordingContext()
+    expect(drawLinks(ctx, scene, frame, THEME, { segments: [], boxes: [] }).lines).toBe(1)
+    expect(ledTo(ctx, frame)).toEqual([1])
+  })
+
+  it('the centre star in focus: its lines to the next chapter and to the other cluster appear too', () => {
+    const { scene, frame } = clusterScene()
+    const ctx = recordingContext()
+    expect(drawLinks(ctx, scene, { ...frame, focusStar: 0 }, THEME, { segments: [], boxes: [] }).lines).toBe(3)
+    expect(ledTo(ctx, frame)).toEqual([1, 2, 3])
+  })
+
+  it('without route chapters (not a sky of clusters), every line by zoom as before', () => {
+    const { scene, frame } = clusterScene()
+    const ctx = recordingContext()
+    expect(drawLinks(ctx, { ...scene, routeChapter: undefined }, frame, THEME, { segments: [], boxes: [] }).lines).toBe(3)
+  })
+})
+
+describe('routeChapterIndices (#747)', () => {
+  it('indexes the route chapters a sky of clusters gives its stars, and is absent elsewhere', () => {
+    expect(Array.from(routeChapterIndices([{ routeChapterId: 'a' }, { routeChapterId: 'b' }, {}, { routeChapterId: 'a' }])!)).toEqual([0, 1, -1, 0])
+    expect(routeChapterIndices([{}, {}])).toBeUndefined()
+  })
+})
