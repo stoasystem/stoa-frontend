@@ -541,4 +541,51 @@ describe('#614 the users list', () => {
     await waitFor(() => expect(heading).toHaveFocus())
     expect(await screen.findByRole('button', { name: copy.addSubmit })).toBeInTheDocument()
   })
+
+  it('leaves focus in the card when the period lands while the next address is typed', async () => {
+    // The period is sent after the account exists and answers a moment later.
+    // Its line used to take focus whenever that was: an administrator already
+    // typing the next address lost the rest of it to the line, and a loaded CI
+    // machine did the same to "sends the date of birth" in adminAccounts.test.
+    const user = userEvent.setup()
+    mockedList.mockResolvedValue({ items: [], count: 0, groups: {}, nextCursor: null })
+    mockedAssign.mockResolvedValue({
+      userId: 'stud-new',
+      role: 'student',
+      accountNumber: 'S26-0011',
+      email: 'new@example.ch',
+      accountStatus: 'active',
+      initialPassword: 'Initial12345678',
+    })
+    let answer: (value: UsagePeriodRead) => void = () => {}
+    mockedRead.mockReturnValue(new Promise((resolve) => (answer = resolve)))
+    mockedExtend.mockResolvedValue({
+      userId: 'stud-new',
+      role: 'student',
+      endsOn: '2026-11-12',
+      state: 'active',
+      version: 3,
+      record: record({ unit: 'days', amount: 3, source: 'gifted', newEndsOn: '2026-11-12' }),
+    })
+    wrap(<AdminAccountsPage />, '/admin/users')
+
+    await user.click(await screen.findByRole('button', { name: enAdmin.accounts.assign }))
+    const dialog = await screen.findByRole('dialog')
+    await user.type(within(dialog).getByLabelText(new RegExp(enAdmin.accounts.emailLabel)), 'new@example.ch')
+    await user.click(within(dialog).getByRole('button', { name: enAdmin.accounts.assignDialogSubmit }))
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument())
+    await waitFor(() => expect(mockedRead).toHaveBeenCalledWith('stud-new'))
+
+    const email = screen.getByLabelText(new RegExp(enAdmin.accounts.emailLabel))
+    await user.type(email, 'next@')
+    answer(period({ userId: 'stud-new', endsOn: null, state: 'none', version: 2, effective: null }))
+    const done = await screen.findByText(new RegExp('Usage period of S26-0011 set'))
+    // The focus move is queued behind a timer; let it run before typing on.
+    await new Promise((resolve) => setTimeout(resolve, 20))
+    await user.keyboard('example.ch')
+
+    expect(email).toHaveValue('next@example.ch')
+    expect(email).toHaveFocus()
+    expect(done).not.toHaveFocus()
+  })
 })
