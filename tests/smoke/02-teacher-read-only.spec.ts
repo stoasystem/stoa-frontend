@@ -265,52 +265,13 @@ test('item 12: a teacher recommends practice only to a student they helped (#720
   await expectTeacherPage(page, '/teacher/learning-automation', failures, errors)
 })
 
-test('item 13: exercise drafts are bank exercises in the new difficulties (backend #519 #535)', {
+test('item 13: the retired exercise-draft route stays gone (backend #518)', {
   tag: ['@item13', '@readonly'],
 }, async ({ request, baseURL }, testInfo) => {
-  // The frontend has no exercise card yet (#519: not before there is a
-  // delivery path), so this is read at the API.
+  // backend #518 retired the exercise-draft routes; this used to read them (#519 #535).
   const teacher = await SmokeApi.signIn(request, baseURL!, 'teacher')
-  const { body } = await teacher.call<{
-    items: Array<{
-      draftId: string
-      draftType: string
-      status: string
-      difficulty?: string | null
-      createdAt?: string | null
-      items: Array<Record<string, unknown>>
-      studentDeliveryStatus: string
-      deliveredAssignmentId?: string | null
-    }>
-    count: number
-  }>('GET', '/teachers/ai-tools/drafts?draft_type=practice_exercise', { expect: 200 })
-  const drafts = body.items.filter((draft) => draft.draftType === 'practice_exercise')
-  expect(body.count, 'count is the number of items').toBe(body.items.length)
-  // Drafts from before #519 keep easy/medium/hard; new ones are only the three.
-  const NEW = ['targeted', 'standard', 'stretch']
-  const OLD = ['easy', 'medium', 'hard']
-  for (const draft of drafts) {
-    expect([...NEW, ...OLD], `draft ${draft.draftId}: difficulty`).toContain(draft.difficulty)
-    if (draft.studentDeliveryStatus === 'delivered') {
-      expect(draft.status, `draft ${draft.draftId}: only an accepted draft is delivered`).toMatch(/accepted|archived/)
-      expect(draft.deliveredAssignmentId, `draft ${draft.draftId}: delivered names its assignment`).toBeTruthy()
-    }
-    if (NEW.includes(draft.difficulty ?? '')) {
-      expect(draft.items.length, `draft ${draft.draftId}: 1-5 bank exercises`).toBeGreaterThan(0)
-      expect(draft.items.length, `draft ${draft.draftId}: 1-5 bank exercises`).toBeLessThanOrEqual(5)
-    }
-  }
-  await record(testInfo, 'item13-exercise-drafts', {
-    drafts: drafts.length,
-    byDifficulty: drafts.reduce<Record<string, number>>((counts, draft) => {
-      const key = `${draft.difficulty}/${draft.status}/${draft.studentDeliveryStatus}`
-      counts[key] = (counts[key] ?? 0) + 1
-      return counts
-    }, {}),
-  })
-  if (!drafts.some((draft) => NEW.includes(draft.difficulty ?? ''))) {
-    testInfo.annotations.push({ type: 'coverage', description: '还没有 #519 之后的出题草稿：题来自题库这一条未读' })
-  }
+  const { status } = await teacher.call('GET', '/teachers/ai-tools/drafts?draft_type=practice_exercise', { expect: 404 })
+  await record(testInfo, 'item13-exercise-drafts-retired', { status })
 })
 
 type CommonMistake = { text: string; errorCause: string | null }
