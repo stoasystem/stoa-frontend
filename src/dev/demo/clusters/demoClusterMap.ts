@@ -15,7 +15,7 @@
  * cluster; the demo backend's sky (`withKnowledgeBase`) recommends the demo
  * knowledge point in mathematics instead.
  */
-import { CLUSTER_TABLE, clustersOf } from '@/features/starmap/route/clusters'
+import { clustersOf } from '@/features/starmap/route/clusters'
 import type { Galaxy, Nebula, Prerequisite, Sky, SkyNebula, Star, StarMap } from '@/features/starmap/model/starMap'
 import type { SupportedLanguage } from '@/i18n/languages'
 import { KNOWLEDGE_BASE, KNOWLEDGE_BASE_TOPICS, type KnowledgeBaseStar, type KnowledgeBaseSubject } from '@/dev/demo/clusters/knowledgeBase'
@@ -78,14 +78,14 @@ export function knowledgeBaseOf(subject: DemoClusterSubject): KnowledgeBaseStar[
 }
 
 /**
- * A subject's nebulae, ordered so its clusters come in the table's order (a
- * cluster's place is its first nebula's). Production orders them by the
- * backend's topic order, which for German and English is not the table's.
+ * A subject's nebulae in the backend's order: mathematics' as listed above,
+ * the others' as the knowledge base numbers them. The clusters still come in
+ * the cluster table's order (`clustersOf`), as in production.
  */
 function nebulaeOf(subject: DemoClusterSubject, language: SupportedLanguage): Nebula[] {
   const topics = [...new Set(knowledgeBaseOf(subject).map((star) => star.topicId))]
-  const tableOrder = CLUSTER_TABLE.flatMap((d) => d.topicIds)
-  const place = (topicId: string) => (tableOrder.includes(topicId) ? tableOrder.indexOf(topicId) : tableOrder.length)
+  const backendOrder = [...Object.keys(MATH_NEBULA_NAMES), ...KNOWLEDGE_BASE_TOPICS.map((t) => t.topicId)]
+  const place = (topicId: string) => KNOWLEDGE_BASE_TOPICS.find((t) => t.topicId === topicId)?.order ?? backendOrder.indexOf(topicId) + 1
   const ordered = topics.sort((a, b) => place(a) - place(b) || (a < b ? -1 : 1))
   const names = (topicId: string): Names => MATH_NEBULA_NAMES[topicId] ?? KNOWLEDGE_BASE_TOPICS.find((t) => t.topicId === topicId)?.titles ?? { de: topicId, en: topicId, fr: topicId, it: topicId }
   return ordered.map((topicId, i) => ({ topicId, name: names(topicId)[language], order: i + 1, subjectId: subject }))

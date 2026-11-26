@@ -241,7 +241,7 @@ export function clusterIdOf(topicId: string, table: readonly ClusterDefinition[]
   return table.find((d) => d.topicIds.includes(topicId))?.clusterId ?? topicId
 }
 
-/** The clusters of the subject in focus, in the order of their first nebula. */
+/** The clusters of the subject in focus: the table's in its order, any other in the order of its first nebula. */
 export function clustersOf(
   map: Pick<StarMap, 'subject' | 'nebulae' | 'stars' | 'prerequisites'>,
   language: SupportedLanguage,
@@ -258,6 +258,11 @@ export function clustersOf(
     if (group) group.topicIds.push(nebula.topicId)
     else groups.push({ definition, clusterId, name: definition?.names[language] ?? nebula.name, topicIds: [nebula.topicId] })
   }
+  // The table's clusters come in the table's order, whatever order the backend gives their topics;
+  // a cluster the table does not name keeps the place of its first topic.
+  const slots = groups.flatMap((g, i) => (g.definition ? [i] : []))
+  const inTableOrder = slots.map((i) => groups[i]).sort((a, b) => table.indexOf(a.definition!) - table.indexOf(b.definition!))
+  slots.forEach((slot, i) => (groups[slot] = inTableOrder[i]))
 
   const clusterOfTopic = new Map(groups.flatMap((g) => g.topicIds.map((t) => [t, g.clusterId] as const)))
   const clusterOf = new Map<string, string>()

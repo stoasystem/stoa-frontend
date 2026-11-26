@@ -8,8 +8,19 @@ import type { Bounds } from '@/features/starmap/view/camera'
 
 export type NebulaDisc = { x: number; y: number; r: number }
 
-/** A nebula of one star still gets a small disc. */
-const MIN_RADIUS = 0.02
+/**
+ * How a nebula's disc is drawn round its stars, in the map's units: its
+ * farthest star from the centre times `stretch`, plus `pad`, and never under
+ * `minRadius` (a nebula of one star still gets a small disc). `pad` and
+ * `minRadius` are absolute, so whoever lays clusters out apart must allow for
+ * them (`clusteredSky.ts`).
+ */
+export const NEBULA_DISC = { minRadius: 0.02, stretch: 1.12, pad: 0.01 } as const
+
+/** The disc of a nebula whose farthest star is `farthest` from its centre. */
+export function discRadius(farthest: number): number {
+  return Math.max(NEBULA_DISC.minRadius, farthest * NEBULA_DISC.stretch + NEBULA_DISC.pad)
+}
 
 export function nebulaDiscs(map: Pick<StarMap, 'nebulae' | 'stars'>): Map<string, NebulaDisc> {
   const sums = new Map<string, { x: number; y: number; n: number }>()
@@ -21,11 +32,12 @@ export function nebulaDiscs(map: Pick<StarMap, 'nebulae' | 'stars'>): Map<string
     sums.set(star.nebulaId, sum)
   }
   const discs = new Map<string, NebulaDisc>()
-  for (const [id, sum] of sums) discs.set(id, { x: sum.x / sum.n, y: sum.y / sum.n, r: MIN_RADIUS })
+  for (const [id, sum] of sums) discs.set(id, { x: sum.x / sum.n, y: sum.y / sum.n, r: 0 })
   for (const star of map.stars) {
     const disc = discs.get(star.nebulaId)!
-    disc.r = Math.max(disc.r, Math.hypot(star.x - disc.x, star.y - disc.y) * 1.12 + 0.01)
+    disc.r = Math.max(disc.r, Math.hypot(star.x - disc.x, star.y - disc.y))
   }
+  for (const disc of discs.values()) disc.r = discRadius(disc.r)
   return discs
 }
 
@@ -52,7 +64,7 @@ export function mapBounds(discs: ReadonlyMap<string, NebulaDisc>): Bounds {
 export function typicalSpacing(map: Pick<StarMap, 'stars'>, discs: ReadonlyMap<string, NebulaDisc>): number {
   const counts = new Map<string, number>()
   for (const star of map.stars) counts.set(star.nebulaId, (counts.get(star.nebulaId) ?? 0) + 1)
-  const spacings = [...counts].map(([id, n]) => (discs.get(id)?.r ?? MIN_RADIUS) * Math.sqrt(Math.PI / n))
+  const spacings = [...counts].map(([id, n]) => (discs.get(id)?.r ?? NEBULA_DISC.minRadius) * Math.sqrt(Math.PI / n))
   if (spacings.length === 0) return 0.05
   spacings.sort((a, b) => a - b)
   return spacings[Math.floor(spacings.length / 2)]

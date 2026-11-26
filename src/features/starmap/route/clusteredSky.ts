@@ -36,6 +36,7 @@
  */
 import { GALAXY_GAP, galaxyOrder, seededRandom } from '@/features/starmap/layout/layout'
 import { orderedNebulae, type Nebula, type Star, type StarMap } from '@/features/starmap/model/starMap'
+import { discRadius } from '@/features/starmap/view/geometry'
 import { CLUSTER_TABLE, clusterIdOf, type ClusterDefinition } from '@/features/starmap/route/clusters'
 import { chaptersOf } from '@/features/starmap/route/chapters'
 import { laneRow, layoutRoute } from '@/features/starmap/route/routeLayout'
@@ -173,8 +174,11 @@ function layoutCluster(
 }
 
 
-/** Clusters on a grid, snaking so each is beside the one before; centres relative to the grid's top left. */
-function gridOf(locals: readonly Local[]) {
+/**
+ * Clusters on a grid, snaking so each is beside the one before; centres relative to the grid's top left.
+ * Each cell holds its cluster's disc as drawn (`radius`), `clusterGap` of the largest cluster apart.
+ */
+function gridOf(locals: readonly Local[], radius: (local: Local) => number) {
   const n = locals.length
   const cols = Math.max(1, Math.ceil(Math.sqrt(n)))
   const rows = Math.ceil(n / cols)
@@ -184,8 +188,8 @@ function gridOf(locals: readonly Local[]) {
     const k = i % cols
     return { row, col: row % 2 === 0 ? k : cols - 1 - k }
   })
-  const width = Array.from({ length: cols }, (_, col) => Math.max(0, ...locals.filter((_, i) => cell[i].col === col).map((l) => 2 * l.r)) + gap)
-  const height = Array.from({ length: rows }, (_, row) => Math.max(0, ...locals.filter((_, i) => cell[i].row === row).map((l) => 2 * l.r)) + gap)
+  const width = Array.from({ length: cols }, (_, col) => Math.max(0, ...locals.filter((_, i) => cell[i].col === col).map((l) => 2 * radius(l))) + gap)
+  const height = Array.from({ length: rows }, (_, row) => Math.max(0, ...locals.filter((_, i) => cell[i].row === row).map((l) => 2 * radius(l))) + gap)
   const left = width.map((_, col) => width.slice(0, col).reduce((a, b) => a + b, 0))
   const top = height.map((_, row) => height.slice(0, row).reduce((a, b) => a + b, 0))
   const centres = locals.map((_, i) => ({ x: left[cell[i].col] + width[cell[i].col] / 2, y: top[cell[i].row] + height[cell[i].row] / 2 }))
@@ -202,7 +206,7 @@ export function layoutClusteredSky(
   const clusterOf = new Map<string, string>()
   for (const star of map.stars) clusterOf.set(star.unitId, clusterIdOf(star.nebulaId, table))
 
-  // The clusters of each subject, in the order of their first topic, with their names.
+  // The clusters of each subject, in the order of their first topic, with their names (the table's then put in its order below).
   type Group = { clusterId: string; subjectId: string; name: string; definition?: ClusterDefinition }
   const groups: Group[] = []
   for (const nebula of topicOrder) {
@@ -216,6 +220,11 @@ export function layoutClusteredSky(
     const id = clusterOf.get(star.unitId)!
     membersOf.set(id, [...(membersOf.get(id) ?? []), star])
   }
+  // The table's clusters in the table's order (#747), each where its first topic would have put it among the others.
+  const tablePlace = (g: Group) => (g.definition ? table.indexOf(g.definition) : -1)
+  const tableSlots = groups.map((g, i) => (g.definition ? i : -1)).filter((i) => i >= 0)
+  const inTableOrder = groups.filter((g) => g.definition).sort((a, b) => tablePlace(a) - tablePlace(b))
+  tableSlots.forEach((slot, i) => (groups[slot] = inTableOrder[i]))
   const withStars = groups.filter((g) => (membersOf.get(g.clusterId)?.length ?? 0) > 0)
 
   // How many prerequisites run between two clusters, for who sits beside whom.
@@ -234,21 +243,35 @@ export function layoutClusteredSky(
   const subjects = [...map.subjects.map((s) => s.subjectId), ...withStars.map((g) => g.subjectId)].filter(
     (id, i, all) => all.indexOf(id) === i && withStars.some((g) => g.subjectId === id),
   )
-  const galaxies = subjects.map((subjectId) => {
+  const localsOf = subjects.map((subjectId) => {
     const own = withStars.filter((g) => g.subjectId === subjectId)
+    // Placed on the grid beside the clusters they share most prerequisites with (ADR 0007); listed in `nebulae` in the table's order.
     const order = galaxyOrder(own.map((g) => g.clusterId), [...crossLinks.values()])
-    const locals = order.map((id) => {
+    return order.map((id) => {
       const group = own.find((g) => g.clusterId === id)!
       return layoutCluster(id, membersOf.get(id)!, map.prerequisites, clusterOf, group.definition?.mainline, language, seed)
     })
-    return { locals, ...gridOf(locals) }
   })
 
-  // Along the band, as `layoutSky` lays galaxies out: half a gap at each end.
-  const tallest = Math.max(1e-9, ...galaxies.map((g) => g.h))
-  const gap = GALAXY_GAP * tallest
-  const length = galaxies.reduce((sum, g) => sum + g.w + gap, 0) || 1
-  const k = 1 / length
+  // Along the band, as `layoutSky` lays galaxies out: half a gap at each end. The engine draws each
+  // cluster's disc a little wider than its stars, by a margin fixed in the sky's units
+  // (`NEBULA_DISC`): the more there is on the band, the more star steps that margin is, so the
+  // grid makes room for the discs as drawn at the scale it ends up at -- found in a few rounds,
+  // each scale a little smaller than the one before. Without it a subject of small clusters drew
+  // its discs into each other and the whole view had no room left to name them.
+  const arrange = (radius: (local: Local) => number) => {
+    const galaxies = localsOf.map((locals) => ({ locals, ...gridOf(locals, radius) }))
+    const tallest = Math.max(1e-9, ...galaxies.map((g) => g.h))
+    const gap = GALAXY_GAP * tallest
+    const length = galaxies.reduce((sum, g) => sum + g.w + gap, 0) || 1
+    return { galaxies, gap, k: 1 / length }
+  }
+  let arranged = arrange((local) => local.r)
+  for (let round = 0; round < 6; round += 1) {
+    const k = arranged.k
+    arranged = arrange((local) => Math.max(local.r, discRadius((local.r - CLUSTERED_SKY.discPadding) * k) / k))
+  }
+  const { galaxies, gap, k } = arranged
   const placedAt = new Map<string, { x: number; y: number }>()
   const regions = new Map<string, ClusterRegion>()
   const chapters = new Map<string, ChapterBand[]>()
