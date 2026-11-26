@@ -1,7 +1,8 @@
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { isHelpRequestOutOfReach, retryUnlessOutOfReach } from '@/lib/teacherHelpRequestConflict'
 import { getTeacherHelpRequestDetail } from '@/services/teacher/teacherApi'
 import { teacherQueryKeys } from '@/services/teacher/teacherQueryKeys'
+import type { TeacherHelpRequestDetail } from '@/types/teacher'
 
 /** The teacher is working on it — poll fast for near-real-time updates. */
 const ACTIVE_STATUSES = new Set(['in_progress'])
@@ -9,10 +10,24 @@ const ACTIVE_STATUSES = new Set(['in_progress'])
 /** Not yet being worked on — a slower poll is enough. */
 const WAITING_STATUSES = new Set(['pending', 'assigned'])
 
+/** The poll reads no evidence: what the first load read is kept. */
+function withEvidenceOf(
+  loaded: TeacherHelpRequestDetail,
+  live: TeacherHelpRequestDetail,
+): TeacherHelpRequestDetail {
+  return { ...live, commonErrorCause: loaded.commonErrorCause, aiHelpedStars: loaded.aiHelpedStars }
+}
+
 export function useTeacherHelpRequestDetailQuery(requestId: string | undefined) {
+  const queryClient = useQueryClient()
+  const queryKey = teacherQueryKeys.helpRequestDetail(requestId ?? '')
   return useQuery({
-    queryKey: teacherQueryKeys.helpRequestDetail(requestId ?? ''),
-    queryFn: () => getTeacherHelpRequestDetail(requestId ?? ''),
+    queryKey,
+    queryFn: async () => {
+      const loaded = queryClient.getQueryData<TeacherHelpRequestDetail>(queryKey)
+      if (!loaded) return getTeacherHelpRequestDetail(requestId ?? '')
+      return withEvidenceOf(loaded, await getTeacherHelpRequestDetail(requestId ?? '', 'live'))
+    },
     enabled: Boolean(requestId),
     retry: retryUnlessOutOfReach,
     refetchInterval: (query) => {
