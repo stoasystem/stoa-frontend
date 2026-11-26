@@ -1,4 +1,4 @@
-import { Fragment, useMemo, useRef, useState } from 'react'
+import { Fragment, type RefObject, useMemo, useRef, useState } from 'react'
 import { CalendarClock, ClipboardList } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
@@ -96,6 +96,22 @@ const NEXT_STATUS: Record<string, Exclude<AccountStatus, 'invited'>[]> = {
   active: ['suspended', 'archived'],
   suspended: ['active', 'archived'],
   archived: [],
+}
+
+/**
+ * Moves focus to what the period line or panel says, unless the administrator
+ * has gone on to type somewhere. The period is sent once the account exists and
+ * answers a moment later; by then the card may already hold the next address.
+ * Taking focus then sent the rest of what was being typed to a heading, and the
+ * card was left with half an address.
+ */
+function focusUnlessTyping(target: RefObject<HTMLElement | null>) {
+  window.setTimeout(() => {
+    const active = document.activeElement
+    const typing =
+      active instanceof HTMLElement && (active.isContentEditable || active.matches('input, textarea, select'))
+    if (!typing) target.current?.focus()
+  }, 0)
 }
 
 export function AdminAccountsPage() {
@@ -210,7 +226,7 @@ export function AdminAccountsPage() {
   /** Opens the period panel under the notice, and moves focus to its heading. */
   function showPanel(account: OpenedAccount) {
     setOpened(account)
-    window.setTimeout(() => openedHeading.current?.focus(), 0)
+    focusUnlessTyping(openedHeading)
   }
 
   /**
@@ -248,7 +264,7 @@ export function AdminAccountsPage() {
         onSuccess: (change) => {
           if (run !== periodRun.current) return
           setOpened({ ...account, period: { kind: 'set', endsOn: change.endsOn, summary: periodSummary(chosen) } })
-          window.setTimeout(() => periodSetLine.current?.focus(), 0)
+          focusUnlessTyping(periodSetLine)
         },
         onError: (error) => {
           if (run !== periodRun.current) return
