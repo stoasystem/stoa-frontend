@@ -142,6 +142,8 @@ const OUTLINE_OFF_SITES: Record<string, { why: ('moved' | 'programmatic')[]; mar
   'features/starmap/onboarding/FirstSubjectQuestion.tsx': { why: ['programmatic'] },
   // A star cluster's route scene (#747): its title is focused by code when the scene opens.
   'features/starmap/route/ClusterRouteView.tsx': { why: ['programmatic'] },
+  // The route scene's tour (#747): each step's heading is focused by code when the step opens.
+  'features/starmap/route/RouteGuide.tsx': { why: ['programmatic'] },
   // A chapter's header: the ring moves from the full-width button to the words that stay in view.
   'features/starmap/route/clusterRoute.css': {
     why: ['moved'],
