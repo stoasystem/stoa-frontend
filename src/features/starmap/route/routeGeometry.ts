@@ -67,14 +67,17 @@ export type RouteGeometry = {
   line: (from: string, to: string) => LinePath
 }
 
-/** Name type sizes, as the scene sets them; widths are estimated, at most two lines. */
-const NAME = { charPx: 7.2, linePx: 17, gap: 6 }
+/** Name type sizes, as the scene sets them; widths are estimated, at most `NAME_LINES` lines. */
+const NAME = { charPx: 7.2, linePx: 17, gap: 6, headroom: 4 }
+
+/** A name wraps to at most this many lines, and past them ends in an ellipsis (`clusterRoute.css`). */
+export const NAME_LINES = 3
 
 /** How wide a name is drawn, estimated from its length: at most the column less a margin. */
 export function nameWidth(text: string, g: RouteGeometryConfig): { width: number; lines: number } {
   const full = text.length * NAME.charPx
   const max = g.colW - 12
-  return { width: Math.min(full, max), lines: full > max ? 2 : 1 }
+  return { width: Math.min(full, max), lines: Math.min(NAME_LINES, Math.max(1, Math.ceil(full / max))) }
 }
 
 export function routeGeometry(
@@ -94,7 +97,7 @@ export function routeGeometry(
   const lanesBottom = g.padTop + (bottomRow - topRow) * g.laneH
   const chipsBottom = g.padTop + Math.max(0, chips.length - 1) * g.chipStep
   const width = x0 + Math.max(0, route.columns - 1) * g.colW + g.padX
-  const height = Math.max(lanesBottom, chipsBottom) + g.padBottom
+  let height = Math.max(lanesBottom, chipsBottom) + g.padBottom
 
   const row = new Map(stars.map((n) => [n.id, laneRow(n.lane)]))
   const up = new Map<string, number>()
@@ -116,6 +119,18 @@ export function routeGeometry(
     labelSide.set(n.id, u < d ? 'above' : d < u ? 'below' : r < 0 ? 'above' : 'below')
   }
   const glyph = (node: RouteStarNode) => (node.main ? g.mainGlyph : g.sideGlyph)
+  // Room above the top lane for its names drawn above their stars, all their lines: the routes
+  // start that much lower, so a name never runs up into the chapters' headers over them.
+  const lift = Math.max(
+    0,
+    ...stars
+      .filter((n) => laneRow(n.lane) === topRow && labelSide.get(n.id) === 'above')
+      .map((n) => Math.ceil(glyph(n) / 2 + NAME.gap + nameWidth(nameOf(n.unitId), g).lines * NAME.linePx + NAME.headroom - g.padTop)),
+  )
+  if (lift > 0) {
+    for (const p of position.values()) p.y += lift
+    height += lift
+  }
   // A line bending to the name's side, out to the right or in from the left: the name moves out of its way.
   const sideOf = (at: string, other: string): LabelSide | null => {
     const d = (row.get(other) ?? 0) - (row.get(at) ?? 0)
@@ -158,6 +173,8 @@ export function routeGeometry(
     if (align === 'center') continue
     for (const tried of [align, 'narrow'] as const) {
       const moved = boxOf(n, tried)
+      // Never past the scene's edge, where the name would be cut off unseen (the first column's, on a phone).
+      if (moved.x0 < 0 || moved.x1 > width) continue
       if ([...labelBox].some(([id, box]) => id !== n.id && overlaps(moved, box))) continue
       labelAlign.set(n.id, tried)
       labelBox.set(n.id, moved)
@@ -204,7 +221,7 @@ export function routeGeometry(
     width,
     height,
     position,
-    mainY: g.padTop - topRow * g.laneH,
+    mainY: g.padTop + lift - topRow * g.laneH,
     labelSide,
     labelBox,
     labelAlign,

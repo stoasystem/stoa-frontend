@@ -102,8 +102,11 @@ function useDragScroll() {
 
 /** Murmi's landing bubble on the route (#747): its width, its gap from the star's glyph and name, and how far left of the star it starts. */
 const LANDING_WIDTH_PX = 320
-const LANDING_GAP_PX = 46
+/** Its gap from the star's glyph, or from its name when the name is on that side. */
+const LANDING_GAP_PX = 10
 const LANDING_POINT_PX = 32
+/** The least dark between the bubble and the star's card under it (a phone), CSS px. */
+const LANDING_CARD_GAP_PX = 12
 
 export function ClusterRouteView({
   map,
@@ -163,6 +166,10 @@ export function ClusterRouteView({
     if (touring) markShown('routeTour', ownerId)
   }, [touring, ownerId])
   const steps = useMemo(() => tourSteps(t, route.nodes.some((n) => n.kind === 'entrance')), [t, route.nodes])
+  // The landing bubble and the star's card under it (a phone): a small gap between them, never edge to edge.
+  const landingRef = useRef<HTMLDivElement>(null)
+  const [landingLift, setLandingLift] = useState(0)
+  const landingLiftRef = useRef(0)
 
   const geometry = useMemo(() => routeGeometry(route, g, (unitId) => starById.get(unitId)?.name ?? ''), [route, g, starById])
   const { width, height, position, labelSide } = geometry
@@ -192,6 +199,33 @@ export function ClusterRouteView({
     else titleRef.current?.focus({ preventScroll: true })
     // Only when the cluster, the star asked for or the screen width changes.
   }, [cluster.clusterId, focusUnitId, compact])
+
+  // Lift the landing bubble off the card where they would meet, never onto its own star.
+  useLayoutEffect(() => {
+    const measure = () => {
+      const bubble = landingRef.current
+      const card = cardRef.current
+      const star = focusUnitId ? nodeRefs.current.get(focusUnitId) : undefined
+      let lift = 0
+      if (bubble && card && star) {
+        const b = bubble.getBoundingClientRect()
+        const c = card.getBoundingClientRect()
+        const top = b.top + landingLiftRef.current
+        const bottom = b.bottom + landingLiftRef.current
+        if (b.left < c.right && c.left < b.right && top > star.getBoundingClientRect().top) {
+          const room = top - (star.getBoundingClientRect().bottom + 4)
+          lift = Math.max(0, Math.min(room, bottom + LANDING_CARD_GAP_PX - c.top))
+        }
+      }
+      if (Math.abs(lift - landingLiftRef.current) > 0.5) {
+        landingLiftRef.current = lift
+        setLandingLift(lift)
+      }
+    }
+    measure()
+    window.addEventListener('resize', measure)
+    return () => window.removeEventListener('resize', measure)
+  }, [landingUp, selected, focusUnitId, compact, width, height])
 
   const close = () => {
     const was = selected
@@ -329,9 +363,12 @@ export function ClusterRouteView({
                     onClick={() => setChapterTapped((was) => (was === c.chapterId ? null : c.chapterId))}
                   >
                     <span className="route-chapter-text">
-                      <span className="route-chapter-number">{t('clusters.chapterNumber', { number: c.number })}</span>
+                      {/* Two lines, the progress beside the number: the header stays inside its band, clear of the top lane's names. */}
+                      <span className="route-chapter-line">
+                        <span className="route-chapter-number">{t('clusters.chapterNumber', { number: c.number })}</span>
+                        <span className="route-chapter-progress">{t('clusters.chapterProgress', { lit: litCount, total: c.stars.length })}</span>
+                      </span>
                       <span className="route-chapter-name">{c.name ?? ''}</span>
-                      <span className="route-chapter-progress">{t('clusters.chapterProgress', { lit: litCount, total: c.stars.length })}</span>
                     </span>
                   </button>
                 </li>
@@ -543,14 +580,22 @@ export function ClusterRouteView({
             )
           })}
           {landingUp && focusUnitId && position.get(focusUnitId) && (() => {
-            // Murmi by the star it names, on the route: below it in the upper half, above it in the lower.
+            // Murmi by the star it names, on the route: below it in the upper half, above it in the lower,
+            // clear of the star's glyph and, on that side, of its name.
             const p = position.get(focusUnitId)!
             const below = p.y < height / 2
+            const node = nodeById.get(focusUnitId)
+            const half = node?.kind === 'star' ? geometry.glyph(node) / 2 : 20
+            const name = geometry.labelBox.get(focusUnitId)
+            const nameHere = labelSide.get(focusUnitId) === (below ? 'below' : 'above')
+            const top = (nameHere && name ? name.y1 : p.y + half) + LANDING_GAP_PX
+            const bottom = height - (nameHere && name ? name.y0 : p.y - half) + LANDING_GAP_PX
             const left = Math.max(8, Math.min(p.x - LANDING_POINT_PX, width - LANDING_WIDTH_PX - 8))
             return (
               <div
+                ref={landingRef}
                 className="absolute z-20"
-                style={{ left, width: LANDING_WIDTH_PX, ...(below ? { top: p.y + LANDING_GAP_PX } : { bottom: height - p.y + LANDING_GAP_PX }) }}
+                style={{ left, width: LANDING_WIDTH_PX, ...(below ? { top } : { bottom }), transform: landingLift ? `translateY(-${landingLift}px)` : undefined }}
               >
                 <SceneLandingBubble
                   name={starById.get(focusUnitId)?.name ?? ''}

@@ -8,7 +8,7 @@ import { describe, expect, it } from 'vitest'
 import { demoClusterMap } from '@/dev/demo/clusters/demoClusterMap'
 import { MATH_KNOWLEDGE_BASE } from '@/dev/demo/clusters/mathKnowledgeBase'
 import { clustersOf, type StarCluster } from '@/features/starmap/route/clusters'
-import { NARROW_NAME, routeGeometry, WIDE, type Point } from '@/features/starmap/route/routeGeometry'
+import { COMPACT, NAME_LINES, NARROW_NAME, nameWidth, routeGeometry, WIDE, type Point } from '@/features/starmap/route/routeGeometry'
 import { layoutRoute, laneRow, MAX_BRANCH_LANES, type RouteLayout, type RouteStarNode } from '@/features/starmap/route/routeLayout'
 import type { Prerequisite } from '@/features/starmap/model/starMap'
 
@@ -274,5 +274,33 @@ describe('the real mathematics knowledge base', () => {
     const all = clustersOf(extra, 'en')
     const own = all[all.length - 1]
     expect(own).toMatchObject({ clusterId: 'logik', name: 'Logic', total: 1 })
+  })
+})
+
+describe('names on the route, on a phone and a wide screen (#747)', () => {
+  const map = demoClusterMap('en')
+  const nameOf = new Map(map.stars.map((s) => [s.unitId, s.name]))
+
+  it.each([
+    ['phone', COMPACT],
+    ['wide', WIDE],
+  ] as const)('keeps every name inside the scene, clear of the chapter headers above it: %s', (_size, g) => {
+    for (const cluster of clustersOf(map, 'en')) {
+      const geometry = routeGeometry(cluster.route, g, (id) => nameOf.get(id) ?? '')
+      for (const [id, box] of geometry.labelBox) {
+        // Not past the left or right edge, where it would be cut off unseen.
+        expect(box.x0, `${cluster.clusterId} ${id}`).toBeGreaterThanOrEqual(0)
+        expect(box.x1, `${cluster.clusterId} ${id}`).toBeLessThanOrEqual(geometry.width)
+        // Not up into the headers' band, which ends where the route's own area begins.
+        expect(box.y0, `${cluster.clusterId} ${id}`).toBeGreaterThanOrEqual(0)
+      }
+    }
+  })
+
+  it('wraps a long name to at most three lines, then an ellipsis', () => {
+    expect(NAME_LINES).toBe(3)
+    expect(nameWidth('Organising data and showing it in charts', COMPACT).lines).toBe(3)
+    expect(nameWidth('A name far, far too long to ever fit in three narrow lines of a phone', COMPACT).lines).toBe(3)
+    expect(nameWidth('Angles', COMPACT).lines).toBe(1)
   })
 })

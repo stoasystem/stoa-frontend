@@ -84,11 +84,14 @@
   filter: drop-shadow(0 0 10px rgba(242, 197, 114, 0.6));
 }
 
+/* At most three lines (`NAME_LINES`), then an ellipsis: never a name cut off without one. */
 .route-node-label {
   text-align: center;
   line-height: 1.25;
   display: -webkit-box;
-  -webkit-line-clamp: 2;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  overflow-wrap: anywhere;
   -webkit-box-orient: vertical;
   overflow: hidden;
   text-shadow: 0 1px 6px var(--sky);
@@ -121,6 +124,13 @@
   line-height: 1.2;
 }
 
+.route-chapter-line {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  white-space: nowrap;
+}
+
 .route-chapter-number {
   font-size: 11px;
   font-weight: 600;
@@ -143,9 +153,14 @@
   color: var(--on-sky-text-body);
 }
 
-.route-chapter:hover .route-chapter-text,
-.route-chapter[data-on] .route-chapter-text {
+.route-chapter:hover .route-chapter-text {
   background: rgba(242, 197, 114, 0.12);
+}
+
+/* The chapter lit up (pointed at, focused, or tapped on a touch screen): plain to see without hover. */
+.route-chapter[data-on] .route-chapter-text {
+  background: rgba(242, 197, 114, 0.2);
+  box-shadow: inset 0 0 0 1px rgba(242, 197, 114, 0.6);
 }
 
 .route-chapter:focus-visible {

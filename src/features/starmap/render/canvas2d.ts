@@ -65,6 +65,24 @@ function smallCutScale(box: number): number {
  */
 const NEBULA_NAME_RING = 160
 
+/**
+ * Narrower than this, a nebula's name (a star cluster's, #747) is set a size
+ * smaller and wraps to two lines: four clusters side by side on a phone have
+ * no room for "NUMBERS AND OPERATIONS" in one line, and each name that found
+ * no place was simply left out.
+ */
+export const NEBULA_NAME_NARROW = { below: 560, px: 11, letterSpacing: '1px', lineHeight: 14, maxWidth: 120 } as const
+
+/** `text` in at most two lines no wider than `max` where it can be: broken at the space nearest its middle. */
+export function wrapNebulaName(text: string, max: number, measure: (line: string) => number): string[] {
+  if (measure(text) <= max) return [text]
+  const spaces = [...text.matchAll(/ /g)].map((match) => match.index!)
+  if (spaces.length === 0) return [text]
+  const middle = text.length / 2
+  const at = spaces.reduce((best, i) => (Math.abs(i - middle) < Math.abs(best - middle) ? i : best), spaces[0])
+  return [text.slice(0, at), text.slice(at + 1)]
+}
+
 /** At most this many star names at once. */
 const STAR_NAMES_AT_MOST = REVEAL.starNamesAtMost
 
@@ -338,7 +356,8 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
   let starNameWidths: (number | undefined)[] = []
   /** Star names as drawn: cut with an ellipsis past `REVEAL.keyName.maxWidthPx` (#76, #144). */
   let starNameTexts: (string | undefined)[] = []
-  let nebulaNameWidths: (number | undefined)[] = []
+  /** Each nebula name as drawn, wide or narrow (`NEBULA_NAME_NARROW`): its lines and its width. */
+  let nebulaNameWidths: ({ lines: string[]; width: number; narrow: boolean } | undefined)[] = []
   const stats: RenderStats = { frames: 0, starDraws: 0, tileDraws: 0, tilePaints: 0, highlightNebula: -1 }
 
   const buildSprites = (cut: GlyphCut, largestBox: number): Sprite[] => {
@@ -1201,8 +1220,14 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
       // name opens that nebula (#125).
       const nebulaNameBoxes: NebulaNameBox[] = []
       if (frame.nebulaLabelAlpha > 0.01) {
-        setFont(12, 600)
-        setLetterSpacing('1.5px')
+        const narrowNames = width < NEBULA_NAME_NARROW.below
+        if (narrowNames) {
+          setFont(NEBULA_NAME_NARROW.px, 600)
+          setLetterSpacing(NEBULA_NAME_NARROW.letterSpacing)
+        } else {
+          setFont(12, 600)
+          setLetterSpacing('1.5px')
+        }
         ctx.textAlign = 'center'
         ctx.textBaseline = 'top'
         const priority = frame.highlightNebula >= 0 ? frame.highlightNebula : frame.hoveredNebula ?? -1
@@ -1223,10 +1248,18 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
         for (const { n, base } of order) {
           const entry = fadeOf(`n${n}`)
           const text = scene.nebulae[n].name.toLocaleUpperCase()
-          const nameWidth = (nebulaNameWidths[n] ??= ctx.measureText(text).width + 8)
+          let measured = nebulaNameWidths[n]
+          if (!measured || measured.narrow !== narrowNames) {
+            const lines = narrowNames ? wrapNebulaName(text, NEBULA_NAME_NARROW.maxWidth, (line) => ctx.measureText(line).width) : [text]
+            measured = { lines, width: Math.max(...lines.map((line) => ctx.measureText(line).width)) + 8, narrow: narrowNames }
+            nebulaNameWidths[n] = measured
+          }
+          const nameWidth = measured.width
+          const lineHeight = narrowNames ? NEBULA_NAME_NARROW.lineHeight : 16
+          const nameHeight = measured.lines.length === 1 ? 16 : measured.lines.length * lineHeight + 2
           const own = { x: nebulaX[n], y: nebulaY[n], r: nebulaR[n] }
           const others = cores.filter((_, m) => m !== n)
-          const candidates = aroundDisc(own.x, own.y, Math.min(own.r * 0.95, NEBULA_NAME_RING), nameWidth, 16, 6)
+          const candidates = aroundDisc(own.x, own.y, Math.min(own.r * 0.95, NEBULA_NAME_RING), nameWidth, nameHeight, 6)
           let box: Box | null = null
           entry.backed = false
           if (base >= 0.01 && (labelled < limit || n === priority)) {
@@ -1268,7 +1301,7 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
             ctx.fill()
           }
           ctx.globalAlpha = nameAlpha
-          outlinedText(text, (at.x0 + at.x1) / 2, at.y0 + 2, colours.textBody, colours.sky, INK.nebulaName.outline)
+          measured.lines.forEach((line, i) => outlinedText(line, (at.x0 + at.x1) / 2, at.y0 + 2 + i * lineHeight, colours.textBody, colours.sky, INK.nebulaName.outline))
           nebulaNameBoxes.push({ nebula: n, x0: at.x0, y0: at.y0, x1: at.x1, y1: at.y1, alpha: nameAlpha })
           names.nebulae += 1
         }
