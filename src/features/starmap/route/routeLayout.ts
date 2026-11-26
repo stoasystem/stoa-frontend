@@ -144,15 +144,19 @@ export function layoutRoute({ stars, prerequisites, clusterOf, mainline: overrid
     }
   }
 
-  const { topo, cycleBreaks } = topologicalOrder(stars.map((s) => s.unitId), preds, succs, cmp)
+  const ids = stars.map((s) => s.unitId)
+  const { topo: prerequisiteOrder, cycleBreaks } = topologicalOrder(ids, preds, succs, cmp)
   for (const { from, to } of cycleBreaks) {
     preds.set(to, preds.get(to)!.filter((p) => p !== from))
     succs.set(from, succs.get(from)!.filter((s) => s !== to))
   }
-  const ancestors = ancestorSets(topo, preds)
+  const ancestors = ancestorSets(prerequisiteOrder, preds)
 
-  const mainline = override ? checkedMainline(override, inCluster, ancestors) : longestChain(topo, succs, cmp)
+  const mainline = override ? checkedMainline(override, inCluster, ancestors) : longestChain(prerequisiteOrder, succs, cmp)
   const onMain = new Set(mainline)
+  // Stars are placed in this order. A hand-made main line need not follow `order`: placed in its
+  // own order (it never puts a star before one of its prerequisites), its columns run left to right.
+  const topo = override ? topologicalOrder(ids, withChain(preds, mainline), withChain(succs, mainline, true), cmp).topo : prerequisiteOrder
 
   // Outside stars and how they relate, for leaving out the ones a nearer one implies.
   const globalPreds = new Map<string, string[]>()
@@ -305,6 +309,16 @@ function topologicalOrder(
     for (const s of succs.get(next) ?? []) waiting.get(s)?.delete(next)
   }
   return { topo, cycleBreaks }
+}
+
+/** `links` with each star of `chain` also linked to the one after it (`forward`) or before it. */
+function withChain(links: ReadonlyMap<string, string[]>, chain: readonly string[], forward = false) {
+  const out = new Map([...links].map(([id, list]) => [id, [...list]]))
+  for (let i = 1; i < chain.length; i += 1) {
+    const [at, other] = forward ? [chain[i - 1], chain[i]] : [chain[i], chain[i - 1]]
+    if (!out.get(at)!.includes(other)) out.get(at)!.push(other)
+  }
+  return out
 }
 
 function ancestorSets(topo: readonly string[], preds: ReadonlyMap<string, string[]>) {
