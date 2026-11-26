@@ -24,9 +24,11 @@ export async function getTeacherHelpRequests() {
   return response.data
 }
 
-export async function getTeacherHelpRequestDetail(requestId: string) {
+/** `live` is the poll: everything but the student's evidence, which it leaves empty. */
+export async function getTeacherHelpRequestDetail(requestId: string, view?: 'live') {
   const response = await httpClient.get<TeacherHelpRequestDetail>(
     apiPath`/teachers/me/help-requests/${requestId}`,
+    ...(view ? [{ params: { view } }] : []),
   )
   return response.data
 }

@@ -98,6 +98,23 @@ export type TeacherHelpRequestDetail = {
   uploads?: AttachmentSummary[]
   /** Stars on the star map the conversation's Ask answers named, newest first, titled in the teacher's language. */
   askedStars?: TeacherAskedStar[]
+  /** Read from the student's answers by the full view only; the poll's `view=live` leaves both empty. */
+  commonErrorCause?: TeacherErrorCause | null
+  aiHelpedStars?: TeacherAiHelpedStar[]
+}
+
+export type TeacherErrorCause = {
+  category: string
+  misconception: string
+  count: number
+  recentMistakes: number
+}
+
+export type TeacherAiHelpedStar = {
+  unitId: string
+  title: string
+  independent: number
+  askedAi: number
 }
 
 /** One of the student's questions as the preparation table shows it (stoa-backend#517). */

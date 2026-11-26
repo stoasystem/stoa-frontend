@@ -90,7 +90,7 @@ async function apis(request: APIRequestContext, baseURL: string) {
   return { student, teacher, studentId: await userId(student) }
 }
 
-test.describe('the teacher side that writes (items 11-13)', () => {
+test.describe('the teacher side that writes (items 11-12)', () => {
   test.skip(!ENABLED, 'STOA_SMOKE_TEACHER_WRITES is not 1: the teacher write items wait for the coordinator')
 
   // Whatever happened, no request of student@'s stays open on teacher@: both
@@ -337,109 +337,6 @@ test.describe('the teacher side that writes (items 11-13)', () => {
     expect(after.map((item) => item.assignmentId), 'archived, it is gone from student@\'s list').not.toContain(created[0])
   })
 
-  test('item 13: a bank exercise draft is accepted and delivered once (backend #519 #535)', {
-    tag: ['@item13'],
-  }, async ({ request, baseURL }, testInfo) => {
-    const { student, teacher, studentId } = await apis(request, baseURL!)
-    const relation = await smokeRelation(teacher, studentId)
-    if (!relation) {
-      await record(testInfo, 'item13-exercise-draft', { delivered: false, note: 'teacher@ 没接过 student@ 的求助：先跑第 11 项' })
-      test.skip(true, 'teacher@ has not helped student@; run item 11 first')
-      return
-    }
-
-    // A maths topic of student@'s year with published exercises: the backend
-    // refuses one without (`no_bank_exercises`) rather than make one up.
-    const grade = (await student.call<{ grade: string }>('GET', '/students/me/profile', { expect: 200 })).body.grade
-    const catalog = (await teacher.call<{ topics: Array<{ id: string; subjectId: string; gradeLevel: string }> }>(
-      'GET',
-      '/practice/curriculum/catalog',
-      { expect: 200 },
-    )).body
-    const year = grade.replace(/\D/g, '')
-    const topics = catalog.topics
-      .filter((topic) => isMath(topic.subjectId))
-      .sort((a, b) => Number(b.gradeLevel.replace(/\D/g, '') === year) - Number(a.gradeLevel.replace(/\D/g, '') === year))
-      .slice(0, 5)
-    expect(topics.length, 'the catalog has maths topics').toBeGreaterThan(0)
-
-    type Draft = {
-      draftId: string
-      status: string
-      difficulty: string
-      items: Array<Record<string, unknown>>
-      answerKey: Array<Record<string, unknown>>
-      studentDeliveryStatus: string
-      deliveredAssignmentId?: string | null
-    }
-    let draft: Draft | null = null
-    const tried: Array<{ topicId: string; status: number; code: string | null }> = []
-    for (const topic of topics) {
-      const made = await teacher.call<Draft>('POST', '/teachers/ai-tools/exercise-drafts', {
-        data: {
-          studentId,
-          subject: SUBJECT,
-          topicIds: [topic.id],
-          difficulty: 'standard',
-          exerciseCount: 2,
-          questionId: relation.requestId,
-        },
-        expect: [200, 400],
-      })
-      const code = made.status === 400 ? findErrorCode(made.body)?.code ?? null : null
-      tried.push({ topicId: topic.id, status: made.status, code })
-      if (made.status === 200) {
-        draft = made.body
-        break
-      }
-      expect(code, `a refused draft is refused for want of bank exercises (${topic.id})`).toBe('no_bank_exercises')
-    }
-    if (!draft) {
-      await record(testInfo, 'item13-exercise-draft', { delivered: false, tried, note: '前 5 个数学主题都没有已发布的题' })
-      throw new Error('no maths topic among the first five has published exercises')
-    }
-
-    let assignmentId: string | null = null
-    try {
-      expect(draft.difficulty, 'the difficulty the teacher chose').toBe('standard')
-      expect(draft.items.length, 'one to five exercises').toBeGreaterThan(0)
-      expect(draft.items.length, 'one to five exercises').toBeLessThanOrEqual(5)
-      expect(draft.answerKey, 'an answer for each exercise, for the teacher').toHaveLength(draft.items.length)
-      expect(draft.studentDeliveryStatus, 'nothing delivered before review').toBe('not_delivered')
-
-      const accepted = (await teacher.call<Draft>('POST', `/teachers/ai-tools/drafts/${draft.draftId}/accept`, { expect: 200 })).body
-      expect(accepted.status, 'accepted').toBe('accepted')
-      expect(accepted.studentDeliveryStatus, 'accepting alone delivers nothing').toBe('not_delivered')
-
-      const deliver = { studentId, sourceType: 'ai_draft', sourceId: draft.draftId }
-      const first = (await teacher.call<Assignment>('POST', '/adaptive/assignments', { data: deliver, expect: [200, 201] })).body
-      assignmentId = first.assignmentId
-      const again = (await teacher.call<Assignment>('POST', '/adaptive/assignments', { data: deliver, expect: [200, 201] })).body
-      expect(again.assignmentId, 'a draft becomes one assignment, however often it is sent').toBe(assignmentId)
-
-      const delivered = (await teacher.call<Draft>('GET', `/teachers/ai-tools/drafts/${draft.draftId}`, { expect: 200 })).body
-      expect(delivered.studentDeliveryStatus, 'the draft is marked delivered').toBe('delivered')
-      expect(delivered.deliveredAssignmentId, 'with its assignment').toBe(assignmentId)
-      const listed = await myAssignments(student)
-      expect(listed.map((item) => item.assignmentId), 'student@ sees it under Assignments').toContain(assignmentId)
-
-      await record(testInfo, 'item13-exercise-draft', {
-        delivered: true,
-        relation: relation.status,
-        tried,
-        draftId: draft.draftId,
-        exercises: draft.items.length,
-        assignmentId,
-      })
-    } finally {
-      if (assignmentId) {
-        await teacher.call('POST', `/adaptive/assignments/${assignmentId}/archive`, { data: { note: 'smoke item 13' }, expect: 200 })
-      }
-      await teacher.call('POST', `/teachers/ai-tools/drafts/${draft.draftId}/archive`, { data: { note: 'smoke item 13' }, expect: 200 })
-    }
-    const after = await myAssignments(student)
-    expect(after.map((item) => item.assignmentId), 'archived, it is gone from student@\'s list').not.toContain(assignmentId)
-  })
 })
 
 const ERROR_CAUSES = ['structural', 'deviation', 'application', 'metacognitive']

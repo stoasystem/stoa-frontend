@@ -185,6 +185,29 @@ describe('a help request the teacher has open', () => {
     expect(mockedDetail).toHaveBeenCalledTimes(1)
   })
 
+  // Card 135: the student's evidence costs ~1,240 read units a read; the poll leaves it out.
+  it('reads the evidence once and polls without it, keeping what it read', async () => {
+    const cause = { category: 'structural', misconception: 'm', count: 2, recentMistakes: 3 }
+    const star = { unitId: 'u1', title: 'Brüche', independent: 1, askedAi: 3 }
+    mockedDetail.mockImplementation(async (_id, view) =>
+      (view === 'live'
+        ? { status: 'in_progress', notes: [{ id: 'n1' }], commonErrorCause: null, aiHelpedStars: [] }
+        : { status: 'in_progress', notes: [], commonErrorCause: cause, aiHelpedStars: [star] }) as never,
+    )
+    const { result } = renderHook(() => useTeacherHelpRequestDetailQuery('req-1'), { wrapper })
+    await advance(0)
+    expect(mockedDetail).toHaveBeenNthCalledWith(1, 'req-1')
+
+    await advance(5_000)
+    await advance(5_000)
+    expect(mockedDetail).toHaveBeenCalledTimes(3)
+    expect(mockedDetail).toHaveBeenNthCalledWith(2, 'req-1', 'live')
+    expect(mockedDetail).toHaveBeenNthCalledWith(3, 'req-1', 'live')
+    expect(result.current.data?.notes).toEqual([{ id: 'n1' }])
+    expect(result.current.data?.commonErrorCause).toEqual(cause)
+    expect(result.current.data?.aiHelpedStars).toEqual([star])
+  })
+
   it('is not fetched without a request id', async () => {
     renderHook(() => useTeacherHelpRequestDetailQuery(undefined), { wrapper })
     await advance(60_000)
