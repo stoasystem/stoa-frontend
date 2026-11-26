@@ -34,6 +34,9 @@ import { setTimeout as delay } from 'node:timers/promises'
 
 const SHOTS = process.env.LIGHTING_SHOTS || '.codex-screenshots/design-preview/lighting'
 
+/** The star cluster Refraction is in on the preview's map (#747): the knowledge base's Light, sound and modern physics. */
+const BRIDGE_CLUSTER = 'physics-waves'
+
 export async function lightingFlows({ browser, API, flow, watch, open, collect, previewUrl, answer, feedback, button, settle }) {
   mkdirSync(SHOTS, { recursive: true })
   const sky = JSON.parse(readFileSync('src/dev/demo/sky/demo-sky.json', 'utf8'))
@@ -161,7 +164,7 @@ export async function lightingFlows({ browser, API, flow, watch, open, collect, 
   await flow('lighting: Refraction is now ready to start', async () => {
     // Its own nebula, opened by address: the switcher has a step of its own, and the
     // whole sky holds Refraction's star whichever galaxy is in focus.
-    await open({ path: `/map/physics/${bridge.topicId}?points=1000` }, walk)
+    await open({ path: `/map/physics/${BRIDGE_CLUSTER}?points=1000` }, walk)
     const star = walk.locator(`a[data-unit="${bridge.unitId}"]`)
     await star.waitFor({ state: 'attached', timeout: 8000 })
     await settle()
@@ -187,7 +190,7 @@ export async function lightingFlows({ browser, API, flow, watch, open, collect, 
   })
 
   await flow('lighting: Refraction\'s star card reads Ready to start', async () => {
-    await open({ path: `/map/physics/${bridge.topicId}/${bridge.unitId}` }, walk)
+    await open({ path: `/map/physics/${BRIDGE_CLUSTER}/${bridge.unitId}` }, walk)
     const card = walk.getByRole('heading', { name: bridge.name.en })
     await card.first().waitFor({ timeout: 8000 })
     await settle()

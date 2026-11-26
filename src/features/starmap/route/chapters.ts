@@ -7,7 +7,7 @@
  * not move a star: the route is laid out first (`routeLayout.ts`), then cut.
  *
  * The table below names the chapters of the clusters in `clusters.ts`. A
- * cluster without an entry (other subjects for now) is cut automatically:
+ * cluster without an entry (a topic the cluster table does not name) is cut automatically:
  * about `AUTO_CHAPTER_MAIN_STARS` main-line stars a chapter, named "Chapter n"
  * by the caller. So is a cluster whose entry does not fit its route (a start
  * that is not on the main line, or starts out of order); in development that
@@ -23,7 +23,7 @@ export type ChapterDefinition = {
   start: string
 }
 
-/** Mathematics, cut by its real knowledge base's routes. */
+/** The knowledge base's subjects, cut by their routes. */
 export const CHAPTER_TABLE: Readonly<Record<string, readonly ChapterDefinition[]>> = {
   numbers: [
     {
@@ -106,6 +106,210 @@ export const CHAPTER_TABLE: Readonly<Record<string, readonly ChapterDefinition[]
       chapterId: 'data-probability',
       start: 'daten-wahrscheinlichkeiten-berechnen',
       names: { de: 'Wahrscheinlichkeit', en: 'Probability', fr: 'Probabilités', it: 'Probabilità' },
+    },
+  ],
+
+  // Physics.
+  'physics-mechanics': [
+    {
+      chapterId: 'physics-mechanics-forces',
+      start: 'physik-mechanik-masse-dichte-und-gewichtskraft',
+      names: { de: 'Masse, Kräfte und Bewegung', en: 'Mass, forces and motion', fr: 'Masse, forces et mouvement', it: 'Massa, forze e moto' },
+    },
+    {
+      chapterId: 'physics-mechanics-newton',
+      start: 'physik-mechanik-kraefte-elastische-kraft-und-reibung',
+      names: { de: 'Newtonsche Gesetze und Arbeit', en: 'Newton’s laws and work', fr: 'Lois de Newton et travail', it: 'Leggi di Newton e lavoro' },
+    },
+    {
+      chapterId: 'physics-mechanics-energy',
+      start: 'physik-mechanik-freier-fall-und-wurfbewegungen',
+      names: { de: 'Energie und Schwingungen', en: 'Energy and oscillations', fr: 'Énergie et oscillations', it: 'Energia e oscillazioni' },
+    },
+    {
+      chapterId: 'physics-mechanics-gravitation',
+      start: 'physik-mechanik-kreisbewegung-und-gravitation',
+      names: { de: 'Gravitation, Wärme und Impuls', en: 'Gravitation, heat and momentum', fr: 'Gravitation, chaleur et quantité de mouvement', it: 'Gravitazione, calore e quantità di moto' },
+    },
+  ],
+  'physics-electricity': [
+    {
+      chapterId: 'physics-electricity-charge',
+      start: 'physik-elektrizitaet-ladung-strom-und-stromkreise',
+      names: { de: 'Ladung, Strom und Felder', en: 'Charge, current and fields', fr: 'Charge, courant et champs', it: 'Carica, corrente e campi' },
+    },
+    {
+      chapterId: 'physics-electricity-circuits',
+      start: 'physik-elektrizitaet-elektrische-energie-leistung-und-haushalt',
+      names: { de: 'Energie und Schaltungen', en: 'Energy and circuits', fr: 'Énergie et circuits', it: 'Energia e circuiti' },
+    },
+    {
+      chapterId: 'physics-electricity-induction',
+      start: 'physik-elektrizitaet-elektromagnetische-induktion',
+      names: { de: 'Induktion und Wellen', en: 'Induction and waves', fr: 'Induction et ondes', it: 'Induzione e onde' },
+    },
+  ],
+  'physics-waves': [
+    {
+      chapterId: 'physics-waves-all',
+      start: 'physik-optik-akustik-ausbreitung-reflexion-und-brechung-des-lichts',
+      names: { de: 'Wellen und moderne Physik', en: 'Waves and modern physics', fr: 'Ondes et physique moderne', it: 'Onde e fisica moderna' },
+    },
+  ],
+
+  // German.
+  'german-words': [
+    {
+      chapterId: 'german-words-classes',
+      start: 'deutsch-woerter-verb',
+      names: { de: 'Wortarten', en: 'Word classes', fr: 'Classes de mots', it: 'Classi di parole' },
+    },
+    {
+      chapterId: 'german-words-tenses',
+      start: 'deutsch-formen-praesens-praeteritum-perfekt',
+      names: { de: 'Zeiten, Pronomen und Partikeln', en: 'Tenses, pronouns and particles', fr: 'Temps, pronoms et particules', it: 'Tempi, pronomi e particelle' },
+    },
+    {
+      chapterId: 'german-words-forms',
+      start: 'deutsch-formen-plusquamperfekt-futur',
+      names: { de: 'Modus, Passiv und Fälle', en: 'Mood, passive and cases', fr: 'Mode, passif et cas', it: 'Modo, passivo e casi' },
+    },
+  ],
+  'german-sentences': [
+    {
+      chapterId: 'german-sentences-parts',
+      start: 'deutsch-saetze-satzarten',
+      names: { de: 'Satzarten und Satzglieder', en: 'Sentence types and parts', fr: 'Types et éléments de phrase', it: 'Tipi ed elementi della frase' },
+    },
+    {
+      chapterId: 'german-sentences-clauses',
+      start: 'deutsch-saetze-praepositionalgruppen',
+      names: { de: 'Satzbau und Zeichensetzung', en: 'Clauses and punctuation', fr: 'Propositions et ponctuation', it: 'Proposizioni e punteggiatura' },
+    },
+    {
+      chapterId: 'german-sentences-letters',
+      start: 'deutsch-rechtschreibung-buchstaben-abc',
+      names: { de: 'Buchstaben und Laute', en: 'Letters and sounds', fr: 'Lettres et sons', it: 'Lettere e suoni' },
+    },
+    {
+      chapterId: 'german-sentences-spelling',
+      start: 'deutsch-rechtschreibung-s-ss',
+      names: { de: 'Knifflige Schreibungen', en: 'Tricky spellings', fr: 'Orthographe délicate', it: 'Grafie difficili' },
+    },
+  ],
+  'german-reading': [
+    {
+      chapterId: 'german-reading-texts',
+      start: 'deutsch-texte-woerter-saetze-lesen',
+      names: { de: 'Texte verstehen', en: 'Understanding texts', fr: 'Comprendre des textes', it: 'Capire i testi' },
+    },
+    {
+      chapterId: 'german-reading-stories',
+      start: 'deutsch-literatur-erzaehlende-texte',
+      names: { de: 'Erzählen', en: 'Stories and narrators', fr: 'Récits et narrateurs', it: 'Racconti e narratori' },
+    },
+    {
+      chapterId: 'german-reading-poems',
+      start: 'deutsch-literatur-stilmittel',
+      names: { de: 'Stil und Gedichte', en: 'Style and poems', fr: 'Style et poèmes', it: 'Stile e poesie' },
+    },
+    {
+      chapterId: 'german-reading-periods',
+      start: 'deutsch-literatur-drama',
+      names: { de: 'Drama und Epochen', en: 'Drama and literary periods', fr: 'Théâtre et époques littéraires', it: 'Teatro ed epoche letterarie' },
+    },
+  ],
+  'german-language': [
+    {
+      chapterId: 'german-language-vocabulary',
+      start: 'deutsch-wortschatz-wortfelder',
+      names: { de: 'Wortschatz', en: 'Vocabulary', fr: 'Vocabulaire', it: 'Lessico' },
+    },
+    {
+      chapterId: 'german-language-language',
+      start: 'deutsch-sprache-sprachvarietaeten',
+      names: { de: 'Sprache untersuchen', en: 'Looking at language', fr: 'Observer la langue', it: 'Osservare la lingua' },
+    },
+  ],
+
+  // English: grammar cut along its route; the theme clusters one chapter a topic, named as the topic.
+  'english-grammar': [
+    {
+      chapterId: 'english-grammar-basics',
+      start: 'englisch-verben-be-have-und-simple-present',
+      names: { de: 'Buchstaben, be und have', en: 'Letters, be and have', fr: 'Lettres, be et have', it: 'Lettere, be e have' },
+    },
+    {
+      chapterId: 'english-grammar-words',
+      start: 'englisch-woerter-this-these-und-plural-von-nomen',
+      names: { de: 'Wörter und Laute', en: 'Words and sounds', fr: 'Mots et sons', it: 'Parole e suoni' },
+    },
+    {
+      chapterId: 'english-grammar-questions',
+      start: 'englisch-saetze-fragen-mit-fragewoertern',
+      names: { de: 'Fragen und Sätze', en: 'Questions and sentences', fr: 'Questions et phrases', it: 'Domande e frasi' },
+    },
+    {
+      chapterId: 'english-grammar-tenses',
+      start: 'englisch-verben-pflicht-erlaubnis-und-vermutung',
+      names: { de: 'Vergangenheit und Modalverben', en: 'Past tense and modal verbs', fr: 'Passé et verbes modaux', it: 'Passato e verbi modali' },
+    },
+    {
+      chapterId: 'english-grammar-conditionals',
+      start: 'englisch-saetze-bedingung-gegensatz-und-zweck',
+      names: { de: 'Bedingungssätze und Passiv', en: 'Conditionals and the passive', fr: 'Conditionnel et passif', it: 'Periodo ipotetico e passivo' },
+    },
+  ],
+  'english-me': [
+    {
+      chapterId: 'english-me-people',
+      start: 'englisch-ich-familie',
+      names: { de: 'Ich und die anderen', en: 'Me and other people', fr: 'Moi et les autres', it: 'Io e gli altri' },
+    },
+    {
+      chapterId: 'english-me-home',
+      start: 'englisch-alltag-zahlen-und-ordnungszahlen',
+      names: { de: 'Alltag und Zuhause', en: 'Daily life and home', fr: 'Quotidien et maison', it: 'Vita quotidiana e casa' },
+    },
+    {
+      chapterId: 'english-me-food',
+      start: 'englisch-essen-essen-anbieten-und-bestellen',
+      names: { de: 'Essen und Einkaufen', en: 'Food and shopping', fr: 'Repas et achats', it: 'Cibo e acquisti' },
+    },
+    {
+      chapterId: 'english-me-health',
+      start: 'englisch-gesundheit-gesicht-beschwerden-und-erste-hilfe',
+      names: { de: 'Körper und Gesundheit', en: 'Body and health', fr: 'Corps et santé', it: 'Corpo e salute' },
+    },
+  ],
+  'english-out': [
+    {
+      chapterId: 'english-out-school',
+      start: 'englisch-schule-schulzimmer-und-schulsachen',
+      names: { de: 'Schule und Arbeit', en: 'School and work', fr: 'École et travail', it: 'Scuola e lavoro' },
+    },
+    {
+      chapterId: 'english-out-free-time',
+      start: 'englisch-freizeit-spielsachen-hobbys-und-faehigkeiten',
+      names: { de: 'Freizeit und Feste', en: 'Free time and celebrations', fr: 'Loisirs et fêtes', it: 'Tempo libero e feste' },
+    },
+    {
+      chapterId: 'english-out-about',
+      start: 'englisch-unterwegs-laender-sprachen-und-umgangsformen',
+      names: { de: 'Unterwegs', en: 'Out and about', fr: 'En route', it: 'In giro' },
+    },
+  ],
+  'english-world': [
+    {
+      chapterId: 'english-world-nature',
+      start: 'englisch-natur-tiere',
+      names: { de: 'Natur und Umwelt', en: 'Nature and the environment', fr: 'Nature et environnement', it: 'Natura e ambiente' },
+    },
+    {
+      // Communicating, one star, comes last in this chapter.
+      chapterId: 'english-world-society',
+      start: 'englisch-gesellschaft-regeln-in-schule-und-alltag',
+      names: { de: 'Gesellschaft und Wissen', en: 'Society and knowledge', fr: 'Société et savoir', it: 'Società e sapere' },
     },
   ],
 }
