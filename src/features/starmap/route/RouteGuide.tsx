@@ -67,7 +67,7 @@ export function SceneLandingBubble({
         {t('clusterGuide.landingTitle', { name })}
       </p>
       <div className="flex items-center gap-2">
-        <Murmi mood="pointing" size={32} facing="right" animated />
+        <Murmi mood="pointing" size={32} facing="right" />
         <h2 id={titleId} className="m-0 min-w-0 flex-1 text-[15px] font-semibold text-[color:var(--on-sky-text)]">
           {t('clusterGuide.landingTitle', { name })}
         </h2>
@@ -275,7 +275,7 @@ export function RouteTour({
         style={{ ...GLASS, ...(place ? { left: place.left, top: place.top, width: cardWidth } : {}) }}
       >
         <div className="flex items-center gap-2">
-          <Murmi mood="pointing" size={32} facing="right" animated={!reducedMotion} />
+          <Murmi mood="pointing" size={32} facing="right" />
           <h2 ref={headingRef} id={titleId} tabIndex={-1} className="m-0 min-w-0 flex-1 text-[15px] font-semibold text-[color:var(--on-sky-text)] outline-none">
             {step.title}
           </h2>
