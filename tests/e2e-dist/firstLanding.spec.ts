@@ -2,24 +2,29 @@ import { expect, test } from './support/fixtures'
 import { signInAsStudent } from './support/signIn'
 import { StudentWorld } from './support/student'
 
-// The first landing (#467): a student who has not started anything does not
-// open on the whole galaxy but on the recommended star's nebula, the route put
-// right to it, with Murmi beside the star; "Look around first" sends Murmi away
-// and leaves the camera where it is.
+// The first landing (#467; on star clusters #747): a student who has not started anything does
+// not open on the whole galaxy but in the recommended star's cluster, its learning route scene
+// opened on that star with its card, and Murmi beside the star; "Got it" sends Murmi away and
+// leaves the scene as it is; back to the star map is the whole view, the landing not made again.
 test('a newcomer lands on the recommended star, Murmi beside it, and can wave Murmi away', async ({ page, backend }) => {
   const world = new StudentWorld(backend)
   world.newcomer = true
   world.install()
   await signInAsStudent(page)
 
-  await expect(page).toHaveURL('/map/math/fractions')
+  await expect(page).toHaveURL('/map/math/cluster/fractions?star=reducing')
   const bubble = page.getByRole('complementary', { name: 'Start here: Reducing fractions' })
   await expect(bubble).toBeVisible()
-  await expect(bubble.getByRole('link', { name: 'Start this star' })).toHaveAttribute('href', '/chapter/reducing')
+  const card = page.getByRole('dialog', { name: 'Reducing fractions' })
+  await expect(card.getByRole('button', { name: 'Start practising' })).toBeVisible()
 
-  await bubble.getByRole('button', { name: 'Look around first' }).click()
+  await bubble.getByRole('button', { name: 'Got it' }).click()
   await expect(bubble).toBeHidden()
-  await expect(page).toHaveURL('/map/math/fractions')
+  await expect(page).toHaveURL('/map/math/cluster/fractions?star=reducing')
+
+  await page.getByRole('button', { name: 'Back to the star map' }).click()
+  await expect(page).toHaveURL('/map/math')
+  await expect(page.getByRole('complementary', { name: 'Your stars are in clusters now' })).toBeVisible()
 })
 
 // "About you" (#591): a newcomer whose profile has no year group is asked it,
@@ -47,7 +52,7 @@ test('a newcomer with no year group is asked first, and lands where the year gro
 
   await expect(about).toBeHidden()
   expect(world.profileWrites).toEqual([{ grade: 'grade_6_primary', primarySubjects: ['math'] }])
-  await expect(page).toHaveURL('/map/math/fractions')
+  await expect(page).toHaveURL('/map/math/cluster/fractions?star=reducing')
   await expect(page.getByRole('complementary', { name: 'For your year group, start here: Reducing fractions' })).toBeVisible()
 })
 
@@ -66,7 +71,7 @@ test('"Later" (or Escape) lands as before, and is not asked again in this tab', 
 
   await expect(about).toBeHidden()
   expect(world.profileWrites).toEqual([])
-  await expect(page).toHaveURL('/map/math/fractions')
+  await expect(page).toHaveURL('/map/math/cluster/fractions?star=reducing')
   await expect(page.getByRole('complementary', { name: 'Start here: Reducing fractions' })).toBeVisible()
 
   await page.reload()

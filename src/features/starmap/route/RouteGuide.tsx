@@ -30,12 +30,15 @@ const GLASS = { background: 'var(--sky-glass)', backdropFilter: 'blur(var(--sky-
 
 export function SceneLandingBubble({
   name,
+  forGrade = false,
   cluster,
   point,
   onFindOwn,
   onDismiss,
 }: {
   name: string
+  /** Recommended for the year group the profile says (#591): Murmi says so, as on the map. */
+  forGrade?: boolean
   cluster: string
   /** Where its star is, from the bubble's left edge, and on which side: a small pointer there. */
   point?: { x: number; side: 'top' | 'bottom' }
@@ -44,6 +47,7 @@ export function SceneLandingBubble({
 }) {
   const { t } = useTranslation('starmap')
   const titleId = useId()
+  const title = forGrade ? t('firstLanding.titleGrade', { name }) : t('clusterGuide.landingTitle', { name })
   return (
     <aside
       data-scene-landing
@@ -64,12 +68,12 @@ export function SceneLandingBubble({
         />
       )}
       <p role="status" className="sr-only">
-        {t('clusterGuide.landingTitle', { name })}
+        {title}
       </p>
       <div className="flex items-center gap-2">
         <Murmi mood="pointing" size={32} facing="right" />
         <h2 id={titleId} className="m-0 min-w-0 flex-1 text-[15px] font-semibold text-[color:var(--on-sky-text)]">
-          {t('clusterGuide.landingTitle', { name })}
+          {title}
         </h2>
         <CloseButton label={t('clusterGuide.close')} onClick={onDismiss} />
       </div>

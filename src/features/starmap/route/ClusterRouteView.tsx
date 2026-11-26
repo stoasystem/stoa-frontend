@@ -599,6 +599,7 @@ export function ClusterRouteView({
               >
                 <SceneLandingBubble
                   name={starById.get(focusUnitId)?.name ?? ''}
+                  forGrade={starById.get(focusUnitId)?.recommendation?.reason === 'grade'}
                   cluster={cluster.name}
                   point={{ x: p.x - left, side: below ? 'top' : 'bottom' }}
                   onFindOwn={onFindOwn}

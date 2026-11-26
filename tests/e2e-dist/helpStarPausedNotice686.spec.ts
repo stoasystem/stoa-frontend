@@ -1,5 +1,6 @@
 import type { Locator, Page } from '@playwright/test'
 import { expect, test } from './support/fixtures'
+import { guideAlreadySeen } from './support/guide'
 import { signInAsStudent } from './support/signIn'
 import { StudentWorld } from './support/student'
 
@@ -36,6 +37,8 @@ async function signInExpired(page: Page, backend: ConstructorParameters<typeof S
   world.reviewSummary = { dueCount: 3, scheduledCount: 5, nextDueAt: '2026-09-29T08:00:00Z' }
   world.install()
   await page.setViewportSize(viewport)
+  // The star clusters' hint (#747) seen: it would stand in front of the review Murmi the first time.
+  await guideAlreadySeen(page)
   await signInAsStudent(page)
 }
 
