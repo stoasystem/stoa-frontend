@@ -1,0 +1,219 @@
+/*
+ * Star clusters and their learning routes (#747). Only the sky's own
+ * tokens: the scene carries `data-surface="sky"`.
+ */
+
+/* The scene over the star map: in and out by a short fade, none under reduced motion. */
+.cluster-scene {
+  animation: cluster-scene-in 180ms ease-out both;
+}
+
+.cluster-scene[data-leaving] {
+  opacity: 0;
+  transition: opacity 180ms ease-in;
+}
+
+@keyframes cluster-scene-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cluster-scene {
+    animation: none;
+  }
+
+  .cluster-scene[data-leaving] {
+    transition: none;
+  }
+}
+
+.cluster-page {
+  background:
+    radial-gradient(120% 80% at 20% 0%, rgba(120, 110, 220, 0.16), transparent 60%),
+    radial-gradient(90% 70% at 100% 100%, rgba(242, 197, 114, 0.08), transparent 60%),
+    var(--sky);
+  color: var(--on-sky-text);
+}
+
+.cluster-focus:focus-visible {
+  outline: var(--focus-ring-width, 3px) solid var(--focus-ring);
+  outline-offset: var(--focus-ring-offset, 2px);
+}
+
+/* The route: scrolls sideways; a mouse can drag it. */
+.route-scroller {
+  overflow-x: auto;
+  overflow-y: auto;
+  overscroll-behavior-x: contain;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.25) transparent;
+  cursor: grab;
+}
+
+.route-scroller[data-dragging] {
+  cursor: grabbing;
+  user-select: none;
+}
+
+.route-node {
+  position: absolute;
+  transform: translate(-50%, 0);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: 0;
+  padding: 0;
+  color: inherit;
+  cursor: pointer;
+  border-radius: 14px;
+}
+
+.route-node:focus-visible {
+  outline: var(--focus-ring-width, 3px) solid var(--focus-ring);
+  outline-offset: 4px;
+}
+
+.route-node[data-selected] .route-node-glyph {
+  filter: drop-shadow(0 0 10px rgba(242, 197, 114, 0.6));
+}
+
+/* At most three lines (`NAME_LINES`), then an ellipsis: never a name cut off without one. */
+.route-node-label {
+  text-align: center;
+  line-height: 1.25;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  overflow-wrap: anywhere;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-shadow: 0 1px 6px var(--sky);
+}
+
+.route-node:hover .route-node-label {
+  color: var(--on-sky-text);
+}
+
+/* A chapter's header, over its stretch of columns: its words stay in view while the stretch scrolls by. */
+.route-chapter {
+  display: block;
+  padding: 6px 0 0;
+  background: none;
+  border: 0;
+  border-left: 1px solid rgba(255, 255, 255, 0.12);
+  color: inherit;
+  cursor: pointer;
+}
+
+.route-chapter-text {
+  position: sticky;
+  left: 8px;
+  display: inline-flex;
+  flex-direction: column;
+  gap: 1px;
+  max-width: 100%;
+  padding: 4px 10px;
+  border-radius: 12px;
+  line-height: 1.2;
+}
+
+.route-chapter-line {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+.route-chapter-number {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--on-sky-text-caption);
+}
+
+.route-chapter-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--on-sky-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.route-chapter-progress {
+  font-size: 11.5px;
+  color: var(--on-sky-text-body);
+}
+
+.route-chapter:hover .route-chapter-text {
+  background: rgba(242, 197, 114, 0.12);
+}
+
+/* The chapter lit up (pointed at, focused, or tapped on a touch screen): plain to see without hover. */
+.route-chapter[data-on] .route-chapter-text {
+  background: rgba(242, 197, 114, 0.2);
+  box-shadow: inset 0 0 0 1px rgba(242, 197, 114, 0.6);
+}
+
+.route-chapter:focus-visible {
+  outline: none;
+}
+
+.route-chapter:focus-visible .route-chapter-text {
+  outline: var(--focus-ring-width, 3px) solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+/* An entrance: a dashed portal, not a star. */
+.route-entrance {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border: 1.5px dashed var(--starmap-ice);
+  background: rgba(196, 220, 255, 0.08);
+  color: var(--starmap-ice);
+  border-radius: 18px;
+  cursor: pointer;
+  text-align: left;
+  line-height: 1.2;
+}
+
+.route-entrance-name {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.route-entrance:hover {
+  background: rgba(196, 220, 255, 0.16);
+}
+
+.route-entrance:focus-visible {
+  outline: var(--focus-ring-width, 3px) solid var(--focus-ring);
+  outline-offset: 3px;
+}
+
+.route-entrance[data-selected] {
+  border-style: solid;
+  background: rgba(196, 220, 255, 0.2);
+}
+
+.route-card {
+  background: var(--sky-glass);
+  backdrop-filter: blur(var(--sky-glass-blur));
+  -webkit-backdrop-filter: blur(var(--sky-glass-blur));
+  border: 1px solid var(--sky-glass-border);
+  box-shadow: var(--shadow-glass);
+  border-radius: 20px;
+}

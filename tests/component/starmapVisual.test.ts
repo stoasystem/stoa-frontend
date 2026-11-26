@@ -228,13 +228,12 @@ describe('one sky: galaxies of nebulae (#119)', () => {
     engine.destroy()
   })
 
-  it.each([[1440, 900], [390, 844]])('names only the nebula under the pointer at %s×%s, never another (#123)', (width, height) => {
+  it.each([[1440, 900], [390, 844]])('names the nebula under the pointer on the whole view, among the others (#123, #747)', (width, height) => {
     for (const points of [1000, 2000] as const) {
       const s = scene(points, width, height, true)
       const nebulae = orderedNebulae(s.map)
       const names = nebulae.map((n) => n.name.toLocaleUpperCase())
       const f = s.frame()
-      const wrong: string[] = []
       const unnamed: string[] = []
       for (let n = 0; n < nebulae.length; n += 1) {
         const [x, y] = [f.nebulaX[n], f.nebulaY[n]]
@@ -246,46 +245,37 @@ describe('one sky: galaxies of nebulae (#119)', () => {
         const hovered = s.frame().hoveredNebula ?? -1
         expect(hovered, `pointer on ${names[n]}`).toBe(n)
         const drawn = s.counter.texts.filter((t) => names.includes(t.text)).map((t) => t.text)
-        for (const text of drawn) if (text !== names[n]) wrong.push(`${names[n]} -> ${text}`)
         if (!drawn.includes(names[n])) unnamed.push(names[n])
       }
-      expect(wrong, `${points} stars`).toEqual([])
-      // And the name drawn is its own: every nebula on screen is named when hovered.
+      // Every nebula on screen is named when hovered, whoever else is named beside it.
       expect(unnamed, `${points} stars`).toEqual([])
       s.engine.destroy()
     }
   })
 
-  it.each([[1440, 900], [390, 844]])('keyboard focus on the whole sky names no other nebula, of any galaxy, at %s×%s (#123)', (width, height) => {
+  it.each([[1440, 900], [390, 844]])('the whole view names star clusters and no star, focused or not, at %s×%s (#747)', (width, height) => {
     const s = scene(1000, width, height, true)
     const nebulae = orderedNebulae(s.map)
     const names = nebulae.map((n) => n.name.toLocaleUpperCase())
+    const starNames = new Set(orderedStars(s.map).map((star) => star.name.toLocaleUpperCase()))
     const stars = orderedStars(s.map)
-    const named = () => {
+    const drawn = () => {
       s.counter.texts = []
       s.real.draw(s.frame())
-      return s.counter.texts.filter((t) => names.includes(t.text)).map((t) => t.text)
+      return s.counter.texts.map((t) => t.text)
     }
-    const others: string[] = []
-    // A nebula's link: its name is the focus pill (parallel DOM); the canvas adds none.
-    for (let n = 0; n < nebulae.length; n += 1) {
-      s.engine.setFocusNebula(n)
-      s.clock.advance(400)
-      expect(s.frame().highlightNebula).toBe(n)
-      for (const text of named()) if (text !== names[n]) others.push(`${names[n]}: ${text}`)
-      s.engine.setFocusNebula(-1)
-      s.clock.advance(20)
-    }
-    // A recommended star's link on the whole map: no nebula's name either, but its own.
+    expect(s.engine.zoom.wholeView).toBe(true)
+    expect(drawn().filter((text) => names.includes(text)).length).toBeGreaterThan(0)
+    const starNamed: string[] = []
+    // A recommended star's link on the whole view: still no star's name.
     for (const i of stars.flatMap((star, k) => (star.recommendation ? [k] : []))) {
-      const own = names[nebulae.findIndex((n) => n.topicId === stars[i].nebulaId)]
       s.engine.setFocusStar(i)
       s.clock.advance(20)
-      for (const text of named()) if (text !== own) others.push(`star in ${own}: ${text}`)
+      for (const text of drawn()) if (starNames.has(text) && !names.includes(text)) starNamed.push(text)
       s.engine.setFocusStar(-1)
       s.clock.advance(20)
     }
-    expect(others).toEqual([])
+    expect(starNamed).toEqual([])
     s.engine.destroy()
   })
 

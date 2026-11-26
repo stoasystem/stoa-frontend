@@ -363,11 +363,12 @@ describe('a cloud under the pointer says its name (card 125)', () => {
     expect(engine.zoom.starPx, 'a sparse map draws big glyphs even here').toBeGreaterThanOrEqual(REVEAL.nebulaNameOut[1])
   })
 
-  it('and no nebula names itself there by its own size', () => {
+  it('and since star clusters (#747) every nebula names itself there in full, whatever its size', () => {
     const { engine } = engineOn(1440, 900)
     const names = frameNow(engine).nebulaNames!
 
-    expect([...Array(names.length).keys()].map((i) => names[i]).every((alpha) => alpha === 0)).toBe(true)
+    expect(engine.zoom.wholeView).toBe(true)
+    expect([...Array(names.length).keys()].map((i) => names[i]).every((alpha) => alpha === 1)).toBe(true)
   })
 
   it('so the one under the pointer is named instead, at full strength', () => {

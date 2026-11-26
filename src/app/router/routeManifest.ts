@@ -366,6 +366,8 @@ export const pageRoutes: readonly PageRoute[] = [
   { path: '/map/:subjectId', access: STUDENT, page: MapPage, titleKey: 'studentRoutes.map.title', meta: { module: 'Star map', status: 'demo', purpose: 'A subject star map.' } },
   { path: '/map/:subjectId/:topicId', access: STUDENT, page: MapPage, titleKey: 'studentRoutes.nebula.title', meta: { module: 'Star map', status: 'demo', purpose: 'A nebula (topic) of a star map.' } },
   { path: '/map/:subjectId/:topicId/:unitId', access: STUDENT, page: MapPage, titleKey: 'studentRoutes.unit.title', meta: { module: 'Star map', status: 'demo', purpose: 'A star (unit, knowledge point) of a nebula.' } },
+  // A star cluster's learning route (#747, ADR 0007), laid over the map: the same page, so the map under it keeps its view.
+  { path: '/map/:subjectId/cluster/:clusterId', access: STUDENT, page: MapPage, titleKey: 'studentRoutes.cluster.title', meta: { module: 'Star map', status: 'core', purpose: 'The learning route of one star cluster, left to right; ?star= opens it on that star.' } },
   { path: '/chapter/:unitId', access: STUDENT, page: ChapterPage, titleKey: 'studentRoutes.chapter.title', meta: { module: 'Chapter', status: 'core', purpose: 'The chapter of a knowledge point: its lessons in order, with progress.' } },
   { path: '/chapter/:unitId/:lessonId', access: STUDENT, page: LessonStagePage, titleKey: 'studentRoutes.lesson.title', meta: { module: 'Chapter', status: 'core', purpose: 'The practice stage of a lesson, with Ask beside it.' } },
   { path: '/star-quiz/:unitId', access: STUDENT, page: StarQuizPage, titleKey: 'studentRoutes.starQuiz.title', meta: { module: 'Chapter', status: 'core', purpose: 'The star quiz: a whole knowledge point tested in one paper, to light it without its lessons.' } },

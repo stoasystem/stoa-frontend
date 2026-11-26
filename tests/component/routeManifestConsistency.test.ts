@@ -255,6 +255,8 @@ describe('#21 point 3: each area\'s navigation only holds pages its roles may op
  */
 const PARAMETER_NAMES = [
   'childId',
+  // A star cluster of a subject's star map (#747): a fixed key such as `numbers`, or a topic's id.
+  'clusterId',
   'conversationId',
   'lessonId',
   'requestId',

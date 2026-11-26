@@ -149,6 +149,12 @@ export type Star = {
   litAtSource?: 'observed' | 'backfilled' | 'quiz' | null
   /** When a lost star quiz can be taken again, ISO 8601; null or absent when it can now (stoa-backend#165). */
   starQuizRetryAt?: string | null
+  /**
+   * The chapter of its star cluster's route this star sits in (#747, `route/chapters.ts`), set
+   * where the sky is laid out as star clusters (`layoutClusteredSky`). Its presence marks such a
+   * sky: the lines between chapters and between clusters are then drawn for a star in focus only.
+   */
+  routeChapterId?: string
 }
 
 /** `from` is best lit before `to` (stoa-backend#56); it does not lock `to` (ADR 0004). Units, not topics. */

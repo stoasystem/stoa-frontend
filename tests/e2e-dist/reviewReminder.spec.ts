@@ -1,4 +1,5 @@
 import { expect, test } from './support/fixtures'
+import { guideAlreadySeen } from './support/guide'
 import { signInAsStudent } from './support/signIn'
 import { StudentWorld } from './support/student'
 
@@ -8,6 +9,8 @@ test('with reviews due, the corner Murmi says how many and leads to the star’s
   const world = new StudentWorld(backend)
   world.reviewSummary = { dueCount: 3, scheduledCount: 5, nextDueAt: '2026-09-29T08:00:00Z' }
   world.install()
+  // The star clusters' hint (#747), which goes first, already seen.
+  await guideAlreadySeen(page)
   await signInAsStudent(page)
 
   const reminder = page.getByRole('button', { name: '3 cards due for review' })
@@ -17,6 +20,26 @@ test('with reviews due, the corner Murmi says how many and leads to the star’s
   const bubble = page.getByRole('complementary', { name: 'Reducing fractions' })
   await expect(bubble).toBeVisible()
   await expect(bubble.getByRole('link', { name: 'Review 3 exercises' })).toHaveAttribute('href', '/review/reducing')
+})
+
+// The star clusters' hint (#747) the first time, then the reminder: one Murmi on the map at a time.
+test('the star clusters hint comes first, and the review Murmi once it is waved away', async ({ page, backend }) => {
+  const world = new StudentWorld(backend)
+  world.reviewSummary = { dueCount: 3, scheduledCount: 5, nextDueAt: '2026-09-29T08:00:00Z' }
+  world.install()
+  await signInAsStudent(page)
+
+  const hint = page.getByRole('complementary', { name: 'The star map has a new look' })
+  await expect(hint).toBeVisible()
+  await expect(page.getByRole('button', { name: '3 cards due for review' })).toHaveCount(0)
+
+  await hint.getByRole('button', { name: 'Got it' }).click()
+  await expect(hint).toBeHidden()
+  await expect(page.getByRole('button', { name: '3 cards due for review' })).toBeVisible()
+  // Remembered for the account: not again after a reload.
+  await page.reload()
+  await expect(page.getByRole('button', { name: '3 cards due for review' })).toBeVisible()
+  await expect(page.locator('[data-cluster-hint]')).toHaveCount(0)
 })
 
 // Nothing scheduled (the default): no Murmi in the corner at all.

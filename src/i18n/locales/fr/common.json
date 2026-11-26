@@ -489,6 +489,9 @@
     "chapter": {
       "title": "Chapitre"
     },
+    "cluster": {
+      "title": "Parcours d'apprentissage"
+    },
     "home": {
       "title": "Ta carte du ciel"
     },

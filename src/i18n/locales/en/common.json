@@ -489,6 +489,9 @@
     "chapter": {
       "title": "Chapter"
     },
+    "cluster": {
+      "title": "Learning route"
+    },
     "home": {
       "title": "Your star map"
     },

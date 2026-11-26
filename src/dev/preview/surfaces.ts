@@ -42,13 +42,31 @@ export type Surface = {
   aboutYou?: 'later'
   /** An account that never stored a language: the language first (#627) asks it before "About you". */
   languageFirst?: true
+  /**
+   * `fresh`: the star clusters' panorama hint and the route scene's tour (#747) not seen yet by
+   * the demo account, so they show. Without it both count as seen, and the other surfaces show
+   * the map and the scenes as they are.
+   */
+  guide?: 'fresh'
+  /**
+   * The demo backend from its opening state on every load, whatever an earlier surface left in
+   * this tab (a newcomer's sky and profile with no year group, lessons done): as `fresh=1`.
+   */
+  fresh?: true
   /** What must be on the page before it counts as ready, for the screenshot. */
   readyWhen?: string
   /** Why the surface cannot be shown yet, if it cannot. */
   pending?: string
 }
 
-const { subjectId, topicId, unitId } = DEMO_KNOWLEDGE_POINT
+const { subjectId, unitId } = DEMO_KNOWLEDGE_POINT
+/**
+ * The star cluster the demo knowledge point is in (#747): the demo backend
+ * puts it in the knowledge base's Geometry (`withKnowledgeBaseMath`), which
+ * `route/clusters.ts` gathers into `geometry`. Spelled out: no application
+ * module loads before the preview's interception.
+ */
+const clusterId = 'geometry'
 const [firstLesson] = DEMO_KNOWLEDGE_POINT.lessons
 /** The lesson the chapter goes on with: the first one not done when the preview opens. */
 const nextLesson = DEMO_KNOWLEDGE_POINT.lessons[DEMO_KNOWLEDGE_POINT.lessonsDone] ?? firstLesson
@@ -67,24 +85,24 @@ const withPoints = (path: string, points: StarCount) => `${path}?points=${points
 
 export const SURFACES: readonly Surface[] = [
   { id: 'login', label: 'Login', path: () => '/login', signedIn: false, stars: false },
-  { id: 'map', label: 'Star map · panorama', path: (points) => withPoints(`/map/${subjectId}`, points), signedIn: true, stars: true },
+  { id: 'map', label: 'Star map · whole view, four star clusters', path: (points) => withPoints(`/map/${subjectId}`, points), signedIn: true, stars: true },
   {
     id: 'map-nebula',
-    label: 'Star map · nebula',
-    path: (points) => withPoints(`/map/${subjectId}/${topicId}`, points),
+    label: 'Star map · star cluster Geometry, zoomed in',
+    path: (points) => withPoints(`/map/${subjectId}/${clusterId}`, points),
     signedIn: true,
     stars: true,
   },
   {
     id: 'map-star',
     label: 'Star map · demo knowledge point',
-    path: (points) => withPoints(`/map/${subjectId}/${topicId}/${unitId}`, points),
+    path: (points) => withPoints(`/map/${subjectId}/${clusterId}/${unitId}`, points),
     signedIn: true,
     stars: true,
   },
   // The connection lines (#121): what lights up when a nebula or a star is in
   // focus, and the cross-subject prerequisite (physics optics needs
-  // mathematics trigonometry; Refraction waits for the demo knowledge point).
+  // mathematics' demo knowledge point; Refraction waits for it).
   {
     id: 'map-focus-optics',
     label: 'Star map · panorama, optics in focus',
@@ -96,7 +114,7 @@ export const SURFACES: readonly Surface[] = [
   {
     id: 'map-focus-star',
     label: 'Star map · nebula, a star in focus',
-    path: (points) => withPoints(`/map/${subjectId}/${topicId}`, points),
+    path: (points) => withPoints(`/map/${subjectId}/${clusterId}`, points),
     signedIn: true,
     stars: true,
     focus: `[data-unit="${unitId}"]`,
@@ -138,17 +156,19 @@ export const SURFACES: readonly Surface[] = [
     readyWhen: '[data-about-you] [data-shown]',
   },
   // The first landing (plan A): a student who has not started anything opens the app on
-  // the recommended star's nebula, Murmi beside the star, instead of the whole sky.
-  // "About you" put off, so it lands where the course starts.
+  // the recommended star in its star cluster's route scene (#747), its card open and Murmi
+  // there, instead of the whole sky. "About you" put off, so it lands where the course starts.
+  // Back to the star map, the clusters' hint for a new student takes over.
   {
     id: 'map-newcomer',
-    label: 'Star map · newcomer, first landing',
+    label: 'Star map · newcomer, first landing in the cluster scene',
     path: (points) => withPoints('/', points),
     signedIn: true,
     stars: true,
     demo: 'newcomer',
     aboutYou: 'later',
-    readyWhen: '[data-first-landing] [data-shown]',
+    guide: 'fresh',
+    readyWhen: '[data-scene-landing]',
   },
   // The whole first sign-in (docs/research/user-onboarding-design.md): the invitation link,
   // signing in, which subject school is on, and the first landing on "Integers", where the
@@ -163,6 +183,7 @@ export const SURFACES: readonly Surface[] = [
     signedIn: false,
     stars: false,
     demo: 'newcomer',
+    guide: 'fresh',
   },
   // #593: the review reminder -- Murmi whistling in the map's corner with reviews due, asleep
   // with reviews scheduled and none due yet.
@@ -183,6 +204,50 @@ export const SURFACES: readonly Surface[] = [
     stars: true,
     demo: 'review-scheduled',
     readyWhen: '[data-review-reminder="sleeping"]',
+  },
+  // A star cluster's learning route (#747), laid over the map: Geometry opens on the demo knowledge
+  // point, whose "Start practising" opens its chapter; Numbers and operations on a star asked for.
+  {
+    id: 'map-cluster',
+    label: 'Star map · route scene of Geometry',
+    path: () => `/map/${subjectId}/cluster/${clusterId}`,
+    signedIn: true,
+    stars: false,
+    readyWhen: '[data-cluster-route]',
+  },
+  {
+    id: 'map-cluster-star',
+    label: 'Star map · route scene of Numbers and operations, a star asked for',
+    path: () => `/map/${subjectId}/cluster/numbers?star=brueche-brueche-kuerzen-addieren-und-subtrahieren`,
+    signedIn: true,
+    stars: false,
+    readyWhen: '[data-route-card]',
+  },
+  // Guiding a returning student into the star clusters (#747): on the whole view, Murmi beside
+  // the cluster of the recommended star says the map has a new look; once per account.
+  {
+    id: 'map-cluster-hint',
+    label: 'Star map · whole view, the star clusters hint (returning student)',
+    path: (points) => withPoints(`/map/${subjectId}`, points),
+    signedIn: true,
+    stars: true,
+    // A returning student, whatever the tab saw before, with "About you" put off: nothing goes before the hint.
+    fresh: true,
+    aboutYou: 'later',
+    guide: 'fresh',
+    readyWhen: '[data-cluster-hint] [data-shown]',
+  },
+  // The route scene's first visit (#747): a three-step tour, main line, chapter, entrance.
+  {
+    id: 'map-cluster-tour',
+    label: 'Star map · route scene of Geometry, the first-visit tour',
+    path: () => `/map/${subjectId}/cluster/${clusterId}`,
+    signedIn: true,
+    stars: false,
+    fresh: true,
+    aboutYou: 'later',
+    guide: 'fresh',
+    readyWhen: '[data-route-tour]',
   },
   { id: 'chapter', label: 'Chapter', path: () => `/chapter/${unitId}`, signedIn: true, stars: false },
   { id: 'lesson', label: 'Practice stage', path: () => `/chapter/${unitId}/${nextLesson.lessonId}`, signedIn: true, stars: false },
@@ -214,7 +279,7 @@ export const SURFACES: readonly Surface[] = [
     // flare plays once on the star; the screenshot is taken once it is over.
     id: 'lighting',
     label: 'Lighting moment',
-    path: (points) => withPoints(`/map/${subjectId}/${topicId}/${unitId}`, points),
+    path: (points) => withPoints(`/map/${subjectId}/${clusterId}/${unitId}`, points),
     signedIn: true,
     stars: true,
     demo: 'demo-point-finished',

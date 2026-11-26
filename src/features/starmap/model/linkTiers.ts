@@ -88,9 +88,22 @@ export type LinkView = {
 
 /**
  * A prerequisite between two stars, by index, with their nebulae and its
- * tier; `crossSubject`: its ends are in two galaxies (#138 D2).
+ * tier; `crossSubject`: its ends are in two galaxies (#138 D2); `quiet`: drawn for a star in focus only (#747).
  */
-export type StarLine = { from: number; to: number; fromNebula: number; toNebula: number; tier: LinkTier; crossSubject?: boolean }
+export type StarLine = {
+  from: number
+  to: number
+  fromNebula: number
+  toNebula: number
+  tier: LinkTier
+  crossSubject?: boolean
+  /**
+   * On a sky of star clusters (#747): its ends are in two nebulae (clusters, or subjects) or in
+   * two chapters of one cluster's route. Such a line is drawn for a star in focus (keyboard focus,
+   * the chosen star) or dragged only, never by the zoom alone; a line inside one chapter is not quiet.
+   */
+  quiet?: boolean
+}
 
 /** A relation across subjects keeps at least this share of its ink once tiers 1-2 are in (#138 D2). */
 export const CROSS_SUBJECT_LINE = REVEAL.crossSubjectLine
@@ -111,6 +124,8 @@ export function starLineLook(line: StarLine, view: LinkView): { strength: number
   let tier = line.tier === TIER_WAITING ? (focused ? share(TIER_WAITING) : 0) : share(line.tier)
   // Across subjects, whatever its tier, at least a faint direction (#138 D2).
   if (line.crossSubject) tier = Math.max(tier, CROSS_SUBJECT_LINE * share(TIER_RECOMMENDED))
+  // On a sky of star clusters, a line between clusters or chapters waits for its star to be in focus (#747).
+  if (line.quiet && !focused) tier = 0
   const atZoom = view.focusStar >= 0 && !focused ? tier * UNFOCUSED_LINE : tier
   // A chosen star: only its own lines, every tier.
   const atStar = focused ? 1 : 0

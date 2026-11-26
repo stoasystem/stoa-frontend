@@ -11,7 +11,7 @@
  * nebula, between nebulae and across subjects; which are drawn, and how
  * brightly, is `linkTiers.ts` (#121).
  */
-import type { StarMap } from '@/features/starmap/model/starMap'
+import type { Star, StarMap } from '@/features/starmap/model/starMap'
 
 export type NebulaLink = {
   /** The two topics, in id order. */
@@ -57,4 +57,18 @@ export function linkWeight(count: number): { width: number; alpha: number } {
     width: Math.min(4, 0.8 + 0.6 * Math.sqrt(Math.max(1, count))),
     alpha: Math.min(0.5, 0.14 + 0.06 * Math.max(1, count)),
   }
+}
+
+/**
+ * Each star's route chapter as an index, -1 for none, on a sky of star
+ * clusters (#747: some star has `routeChapterId`); undefined elsewhere.
+ */
+export function routeChapterIndices(stars: readonly Pick<Star, 'routeChapterId'>[]): Int32Array | undefined {
+  if (!stars.some((star) => star.routeChapterId !== undefined)) return undefined
+  const index = new Map<string, number>()
+  return Int32Array.from(stars, ({ routeChapterId: id }) => {
+    if (id === undefined) return -1
+    if (!index.has(id)) index.set(id, index.size)
+    return index.get(id)!
+  })
 }

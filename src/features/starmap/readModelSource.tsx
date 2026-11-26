@@ -39,24 +39,25 @@ import {
   type StarMapRequest,
   type StarMapSource,
 } from '@/features/starmap/starMapSource'
-import type { Star, StarMap } from '@/features/starmap/model/starMap'
-import { nebulaLinks } from '@/features/starmap/model/links'
-import { layoutSky } from '@/features/starmap/layout/layout'
+import type { Nebula, Star, StarMap } from '@/features/starmap/model/starMap'
+import { layoutClusteredSky } from '@/features/starmap/route/clusteredSky'
 import { KNOWLEDGE_MAP_KEY, KNOWLEDGE_MAP_STALE_MS, useKnowledgeMapQuery } from '@/hooks/practice/useKnowledgeMapQuery'
 import { useKnowledgeMapStarsQuery, useStarDetails, type StarDetails } from '@/hooks/practice/useKnowledgeMapStars'
 import { useAuthStore } from '@/store/authStore'
 import type { KnowledgeMapResponse } from '@/types/practice'
+import type { SupportedLanguage } from '@/i18n/languages'
 
 /**
  * One seed for every sky, so a student's map keeps its arrangement between
- * visits and between devices. The same number the demo sky uses, so what the
- * design was accepted against is what real content is laid out by.
+ * visits and between devices.
  */
 const LAYOUT_SEED = 116
 
 /**
- * Place the sky the way the demo sky is placed: with the layout engine, not
- * with the coordinates the read model sends.
+ * Place the sky as star clusters (#747, ADR 0007): each subject's topics
+ * gathered into a few large clusters (`route/clusters.ts`), each cluster one
+ * nebula on the map, its stars from left to right along its learning route
+ * (`route/clusteredSky.ts`). Not the coordinates the read model sends.
  *
  * The backend derives `(x, y)` deterministically from identifiers as a
  * stand-in for the offline layout (stoa-backend#60). Passed straight through,
@@ -64,32 +65,22 @@ const LAYOUT_SEED = 116
  * zoomed into a single star with the rest of their subject off-screen -
  * measured on production: 1 of 10 knowledge points visible.
  *
- * `layoutSky` is the engine the design was accepted against: it groups a
- * galaxy's nebulae by their relations, sizes each by its star count, and
- * scatters stars inside them. Running it here costs one pass over the sky and
- * makes real content look like what was signed off.
+ * The stars' `nebulaId` becomes their cluster's, and the nebulae are the
+ * clusters, named in the language on screen; the layout does not look at the
+ * learning state, so the same sky always gives the same picture.
  */
-function placed(sky: KnowledgeMapResponse): Star[] {
-  const starsPerNebula = new Map<string, number>()
-  for (const star of sky.stars) {
-    starsPerNebula.set(star.nebulaId, (starsPerNebula.get(star.nebulaId) ?? 0) + 1)
-  }
-  const layout = layoutSky(
-    sky.galaxies.map((galaxy) => ({
-      id: galaxy.subjectId,
-      nebulae: sky.nebulae
-        .filter((nebula) => nebula.subjectId === galaxy.subjectId)
-        .map((nebula) => ({
-          id: nebula.topicId,
-          order: nebula.order,
-          size: starsPerNebula.get(nebula.topicId) ?? 1,
-        })),
-    })),
-    sky.stars,
-    nebulaLinks({ stars: sky.stars as never, prerequisites: sky.prerequisites }),
-    LAYOUT_SEED,
+function placed(sky: KnowledgeMapResponse, language: SupportedLanguage): { nebulae: Nebula[]; stars: Star[] } {
+  return layoutClusteredSky(
+    {
+      subject: { subjectId: sky.subjectId, name: '' },
+      subjects: sky.galaxies,
+      nebulae: sky.nebulae,
+      stars: sky.stars.map((star) => asStar(star, sky)),
+      prerequisites: sky.prerequisites,
+    },
+    language,
+    { seed: LAYOUT_SEED },
   )
-  return sky.stars.map((star) => ({ ...asStar(star, sky), ...(layout.stars.get(star.unitId) ?? { x: star.x, y: star.y }) }))
 }
 
 /**
@@ -120,6 +111,9 @@ type Placement = {
   galaxies: KnowledgeMapResponse['galaxies']
   nebulae: KnowledgeMapResponse['nebulae']
   prerequisites: KnowledgeMapResponse['prerequisites']
+  language: SupportedLanguage
+  /** The star clusters, one nebula each (#747). */
+  clusters: Nebula[]
   stars: Star[]
   subjects: KnowledgeMapResponse['galaxies']
 }
@@ -135,9 +129,9 @@ type Placement = {
  */
 const placements = new WeakMap<KnowledgeMapResponse['stars'], Placement>()
 
-function placement(sky: KnowledgeMapResponse): Placement {
+function placement(sky: KnowledgeMapResponse, language: SupportedLanguage): Placement {
   const known = placements.get(sky.stars)
-  if (known && known.galaxies === sky.galaxies && known.nebulae === sky.nebulae && known.prerequisites === sky.prerequisites) {
+  if (known && known.galaxies === sky.galaxies && known.nebulae === sky.nebulae && known.prerequisites === sky.prerequisites && known.language === language) {
     return known
   }
   // A subject with no knowledge points has no galaxy to fly to: listed in
@@ -145,11 +139,14 @@ function placement(sky: KnowledgeMapResponse): Placement {
   // put back there at rest (#329).
   const subjectOf = new Map(sky.nebulae.map((nebula) => [nebula.topicId, nebula.subjectId]))
   const withStars = new Set(sky.stars.map((star) => subjectOf.get(star.nebulaId)))
+  const { nebulae: clusters, stars } = placed(sky, language)
   const made = {
     galaxies: sky.galaxies,
     nebulae: sky.nebulae,
     prerequisites: sky.prerequisites,
-    stars: placed(sky),
+    language,
+    clusters,
+    stars,
     subjects: sky.galaxies.filter((galaxy) => withStars.has(galaxy.subjectId)),
   }
   placements.set(sky.stars, made)
@@ -194,13 +191,13 @@ function withDetails(
 
 export function projectStarMap(
   response: KnowledgeMapResponse,
-  { subjectId }: StarMapRequest,
+  { subjectId, language }: Pick<StarMapRequest, 'subjectId' | 'language'>,
   details: StarDetails = new Map(),
   failed: string | null = null,
 ): StarMap {
-  const { stars: placed, subjects } = placement(response)
+  const { stars: placed, subjects, clusters } = placement(response, language)
   const placedStars = withDetails(placed, response.view === 'skeleton', details, failed)
-  const sky = { ...response, stars: placedStars }
+  const sky = { ...response, nebulae: clusters, stars: placedStars }
   const focus = subjectId || sky.subjectId
   const nebulaeOfFocus = new Set(
     sky.nebulae.filter((nebula) => nebula.subjectId === focus).map((nebula) => nebula.topicId),

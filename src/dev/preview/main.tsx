@@ -11,7 +11,9 @@
  * the language; `longNames=1` gives the star map's nebulae long names, to
  * check labels; `newcomer=1` gives the sky of a student who has not started
  * anything, to see the first landing; `languageFirst=1` an account that never
- * stored a language, to see the language first (#627); `fresh=1` forgets what the demo backend kept in this tab
+ * stored a language, to see the language first (#627); `guide=fresh` the
+ * star clusters' hint and the route scene's tour not seen yet (#747; without
+ * it both count as seen); `fresh=1` forgets what the demo backend kept in this tab
  * (completed lessons, the lighting and its acknowledgement, #51, and Ask's
  * messages); `role=teacher`, `classroom=` and `mic=` set up the virtual
  * classroom (#696, see `classroom.ts`); `voice=on`, `voiceFails=`, `mic=` and
@@ -40,10 +42,14 @@ const longNames = params.get('longNames') === '1'
 const newcomer = params.get('newcomer') === '1' || surface?.demo === 'newcomer'
 const aboutYouLater = params.get('aboutYou') === 'later' || surface?.aboutYou === 'later'
 const languageFirst = params.get('languageFirst') === '1' || surface?.languageFirst === true
+const guideFresh = params.get('guide') === 'fresh' || surface?.guide === 'fresh'
+// The demo backend from its opening state: `fresh=1`, or a surface that needs it (#747).
+const fresh = params.get('fresh') === '1' || surface?.fresh === true
 // Kept in the address: once the page moves, `path` replaces the surface, and a reload stays a newcomer's.
-if ((newcomer && !params.has('newcomer')) || (aboutYouLater && !params.has('aboutYou')) || (languageFirst && !params.has('languageFirst'))) {
+if ((newcomer && !params.has('newcomer')) || (aboutYouLater && !params.has('aboutYou')) || (languageFirst && !params.has('languageFirst')) || (guideFresh && !params.has('guide'))) {
   const url = new URL(window.location.href)
   if (newcomer) url.searchParams.set('newcomer', '1')
+  if (guideFresh) url.searchParams.set('guide', 'fresh')
   if (aboutYouLater) url.searchParams.set('aboutYou', 'later')
   if (languageFirst) url.searchParams.set('languageFirst', '1')
   window.history.replaceState(null, '', url)
@@ -71,9 +77,9 @@ async function start() {
   // The demo account reads in the page's language, so `/auth/me` does not switch it back.
   const reading = i18n.resolvedLanguage ?? i18n.language
   setDemoLanguage(isSupportedLanguage(reading) ? reading : 'en')
-  if (params.get('fresh') === '1') resetDemoServer()
-  if (newcomer) startAsNewcomer(params.get('fresh') === '1')
-  if (languageFirst) forgetDemoLanguage(params.get('fresh') === '1')
+  if (fresh) resetDemoServer()
+  if (newcomer) startAsNewcomer(fresh)
+  if (languageFirst) forgetDemoLanguage(fresh)
   if (aboutYouLater) {
     // "About you" put off in this tab (#591), as its "Later" leaves it: the page's storage is the preview's own.
     const [{ putAboutYouOff }, { DEMO_STUDENT_ID }] = await Promise.all([
@@ -85,6 +91,14 @@ async function start() {
   // For a scripted walk-through (scripts/record-onboarding.mjs): the demo knowledge point's lessons
   // done at once, as finishing them on the page would leave the demo backend.
   ;(window as Window & { __stoaPreviewDemo?: unknown }).__stoaPreviewDemo = { finishDemoKnowledgePoint }
+  {
+    // The star clusters' hint and the route scene's tour (#747): seen, unless the surface asks for them.
+    const [{ onceKey }, { DEMO_STUDENT_ID }] = await Promise.all([import('@/features/starmap/onboarding/shownOnce'), import('@/dev/demo/data/student')])
+    for (const hint of ['clusterHint', 'routeTour'] as const) {
+      if (guideFresh) localStorage.removeItem(onceKey(hint, DEMO_STUDENT_ID))
+      else localStorage.setItem(onceKey(hint, DEMO_STUDENT_ID), '1')
+    }
+  }
   if (surface?.demo === 'demo-point-finished') finishDemoKnowledgePoint()
   if (surface?.demo === 'review-due') makeReviewDue()
   if (surface?.demo === 'review-scheduled') makeReviewScheduled()
@@ -103,6 +117,7 @@ async function start() {
     { useAuthStore },
     { PreviewChrome },
     { PreviewLighting },
+    { KnowledgeMapSourceProvider },
     { ClassroomVoiceProvider },
     { demoTeacher, previewAsTeacher, previewVoiceConnector },
     { demoParentNow, installPreviewMicrophone, previewAsParent },
@@ -116,6 +131,7 @@ async function start() {
       import('@/store/authStore'),
       import('@/dev/preview/PreviewChrome'),
       import('@/dev/preview/lighting'),
+      import('@/features/starmap/readModelSource'),
       import('@/features/classroom/classroomVoice'),
       import('@/dev/preview/classroom'),
       import('@/dev/preview/voice'),
@@ -140,14 +156,18 @@ async function start() {
           <MemoryRouter initialEntries={[path]}>
             <AuthBootstrap />
             <PreviewChrome initialPath={path} open={surface?.open} focus={surface?.focus} pending={surface?.pending} readyWhen={surface?.readyWhen} />
-            <RouteArrival>
-              <Suspense fallback={<PageSkeleton rows={4} />}>
-                {/* The classroom's voice is a stand-in here: nothing joins a real room (#696). */}
-                <ClassroomVoiceProvider value={previewVoiceConnector}>
-                  <AppRoutes />
-                </ClassroomVoiceProvider>
-              </Suspense>
-            </RouteArrival>
+            {/* The star map reads the demo backend through the production source, as AppRouter mounts it (#747);
+              * it yields to PreviewLighting's own sky under `newcomer` / `longNames`. */}
+            <KnowledgeMapSourceProvider>
+              <RouteArrival>
+                <Suspense fallback={<PageSkeleton rows={4} />}>
+                  {/* The classroom's voice is a stand-in here: nothing joins a real room (#696). */}
+                  <ClassroomVoiceProvider value={previewVoiceConnector}>
+                    <AppRoutes />
+                  </ClassroomVoiceProvider>
+                </Suspense>
+              </RouteArrival>
+            </KnowledgeMapSourceProvider>
           </MemoryRouter>
         </PreviewLighting>
       </AppProviders>

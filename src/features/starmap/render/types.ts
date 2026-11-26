@@ -121,6 +121,11 @@ export type SceneData = {
   links: readonly { a: number; b: number; count: number }[]
   /** Every prerequisite as star index pairs, across nebulae and subjects (#121; drawn by tier in `render/links.ts`). */
   starLinks: readonly { from: number; to: number }[]
+  /**
+   * Each star's route chapter as an index, -1 for none, on a sky of star clusters (#747); absent
+   * elsewhere. With it, a line between two chapters or two nebulae is drawn for a star in focus only.
+   */
+  routeChapter?: Int32Array
 }
 
 export type SceneFrame = {

@@ -21,6 +21,13 @@
  * once it is answered (and the sky read again) or put off, so it lands on the
  * star the backend recommends for the year group just saved.
  *
+ * On a sky of star clusters (#747) the landing is not a flight into the
+ * nebula: the recommended star's cluster opens its route scene on that star
+ * (`clusterPath`), its card open and Murmi there (`ClusterScene`). The sky
+ * stays the step back, marked as landed (`SceneLandingState`), so back from
+ * the scene is the whole view, where the clusters' hint takes over -- and the
+ * landing is not decided again.
+ *
  * The answer and "Look around first" are remembered for this tab only
  * (sessionStorage, one key per account): a reload or a way back to the map in
  * this tab does not ask again. A new tab does; the answer only steers the
@@ -30,7 +37,8 @@ import { useCallback, useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { firstLandingFor, isNewcomer, landingOn, startableSubjects } from '@/features/starmap/onboarding/firstLanding'
 import { subjectOfNebula, type Galaxy, type Star, type StarMap } from '@/features/starmap/model/starMap'
-import { pathForTarget, sameTarget, type LayerTarget } from '@/features/starmap/view/layers'
+import { isClusterSky } from '@/features/starmap/onboarding/ClusterHint'
+import { clusterPath, pathForTarget, sameTarget, type LayerTarget } from '@/features/starmap/view/layers'
 import { ZOOM } from '@/features/starmap/view/semanticZoom'
 
 const DISMISSED_KEY = 'stoa.starmap.firstLanding.dismissed'
@@ -40,6 +48,21 @@ const UNSURE = ''
 
 /** Router state: the route was put right to this landing's nebula, for this star. */
 type LandingState = { firstLanding: string }
+
+/** Router state of the sky under a scene landing (#747): the newcomer was landed in a cluster's scene from here. */
+export type SceneLandingState = { firstLandingSeen: string }
+/** Router state of that scene: opened from the sky (`ClusterSceneState`), as a newcomer's landing on this star. */
+export type SceneLandingSceneState = { fromSky: true; firstLanding: string }
+
+function sceneLandedIn(state: unknown): boolean {
+  return typeof state === 'object' && state !== null && typeof (state as Partial<SceneLandingState>).firstLandingSeen === 'string'
+}
+
+/** The star a newcomer's landing opened a cluster's scene on, from the scene's router state. */
+export function sceneLandingStar(state: unknown): string | null {
+  const star = typeof state === 'object' && state !== null ? (state as Partial<SceneLandingSceneState>).firstLanding : undefined
+  return typeof star === 'string' ? star : null
+}
 
 function landingStarIn(state: unknown): string | null {
   const star = typeof state === 'object' && state !== null ? (state as Partial<LandingState>).firstLanding : undefined
@@ -91,7 +114,7 @@ export function useFirstLanding(map: StarMap, target: LayerTarget, ownerId: stri
 
   type Arrival = { landing: LayerTarget | null; asking: boolean; followed: boolean }
   const arriving = (): Arrival => {
-    if (readTab(dismissedKey) === '1') return { landing: null, asking: false, followed: false }
+    if (readTab(dismissedKey) === '1' || sceneLandedIn(location.state)) return { landing: null, asking: false, followed: false }
     const carried = landingStarIn(location.state)
     const nebulaId = target.layer === 'nebula' ? target.nebulaId : null
     const star = carried && nebulaId && isNewcomer(map) ? map.stars.find((candidate) => candidate.unitId === carried) : undefined
@@ -131,9 +154,27 @@ export function useFirstLanding(map: StarMap, target: LayerTarget, ownerId: stri
     setFollowed(now.followed)
   }
 
-  const landed = landing !== null && (sameTarget(landing, target) || (!followed && target.layer === 'map'))
+  // A sky of star clusters (#747): the landing opens the recommended star's cluster scene instead.
+  const clusters = isClusterSky(map)
   useEffect(() => {
-    if (!landing || landing.layer !== 'nebula') return
+    if (!clusters || !landing || landing.layer !== 'nebula' || !landing.whole || target.layer !== 'map') return
+    const unitId = landing.whole.star
+    const star = map.stars.find((candidate) => candidate.unitId === unitId)
+    setLanding(null)
+    if (!star) return
+    const subjectId = subjectOfNebula(map, star.nebulaId)
+    const sky: SceneLandingState = { firstLandingSeen: unitId }
+    const scene: SceneLandingSceneState = { fromSky: true, firstLanding: unitId }
+    const query = new URLSearchParams(search)
+    query.set('star', unitId)
+    // The sky under the scene, marked as landed: back from the scene is the whole view, not another landing.
+    void navigate({ pathname: pathForTarget(subjectId, { layer: 'map' }), search }, { replace: true, state: sky })
+    void navigate({ pathname: clusterPath(subjectId, star.nebulaId), search: `?${query}` }, { state: scene })
+  }, [clusters, landing, target, map, navigate, search])
+
+  const landed = !clusters && landing !== null && (sameTarget(landing, target) || (!followed && target.layer === 'map'))
+  useEffect(() => {
+    if (clusters || !landing || landing.layer !== 'nebula') return
     if (sameTarget(landing, target)) {
       // The route has caught up with what is shown.
       if (!followed) setFollowed(true)
@@ -155,7 +196,7 @@ export function useFirstLanding(map: StarMap, target: LayerTarget, ownerId: stri
     }
     // The student moved on (another nebula, a star, back out to the galaxy): the landing is over.
     setLanding(null)
-  }, [landing, target, map, navigate, search, flying, followed])
+  }, [clusters, landing, target, map, navigate, search, flying, followed])
 
   const dismiss = useCallback(() => {
     writeTab(dismissedKey, '1')
