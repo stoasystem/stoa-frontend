@@ -58,7 +58,10 @@ describe.each(SUBJECTS)('the clusters of %s', (subject) => {
   const map = demoClusterMap('en', subject)
   const clusters = clustersOf(map, 'en')
 
-  it('come in the table’s order, every star in one', () => {
+  it('come in the table’s order, whatever the order of their topics, every star in one', () => {
+    // The demo data keeps the backend's topic order, which for German and English is not the table's.
+    const reversed = { ...map, nebulae: map.nebulae.map((n) => ({ ...n, order: 100 - n.order })) }
+    expect(clustersOf(reversed, 'en').map((c) => c.clusterId)).toEqual(CLUSTERS[subject])
     expect(clusters.map((c) => c.clusterId)).toEqual(CLUSTERS[subject])
     expect(clusters.reduce((sum, c) => sum + c.total, 0)).toBe(map.stars.length)
     for (const c of clusters) expect(c.route.cycleBreaks).toEqual([])
@@ -73,6 +76,8 @@ describe.each(SUBJECTS)('the clusters of %s', (subject) => {
       expect(chapters.flatMap((c) => c.stars).sort()).toEqual(cluster.stars.map((s) => s.unitId).sort())
       for (const d of CHAPTER_TABLE[cluster.clusterId]) expect(cluster.route.mainline, d.start).toContain(d.start)
       expect(chapters.length).toBeLessThanOrEqual(5)
+      // Two columns at least: a chapter's header spans its columns, and over one its name is cut short.
+      if (subject !== 'math') for (const c of chapters) expect(c.toCol - c.fromCol + 1, `${cluster.clusterId} ${c.chapterId}`).toBeGreaterThanOrEqual(2)
     }
     expect(warn).not.toHaveBeenCalled()
   })

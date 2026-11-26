@@ -124,12 +124,7 @@ export const CHAPTER_TABLE: Readonly<Record<string, readonly ChapterDefinition[]
     {
       chapterId: 'physics-mechanics-energy',
       start: 'physik-mechanik-freier-fall-und-wurfbewegungen',
-      names: { de: 'Energie und Schwingungen', en: 'Energy and oscillations', fr: 'Énergie et oscillations', it: 'Energia e oscillazioni' },
-    },
-    {
-      chapterId: 'physics-mechanics-gravitation',
-      start: 'physik-mechanik-kreisbewegung-und-gravitation',
-      names: { de: 'Gravitation, Wärme und Impuls', en: 'Gravitation, heat and momentum', fr: 'Gravitation, chaleur et quantité de mouvement', it: 'Gravitazione, calore e quantità di moto' },
+      names: { de: 'Energie, Schwingungen und Wärme', en: 'Energy, oscillations and heat', fr: 'Énergie, oscillations et chaleur', it: 'Energia, oscillazioni e calore' },
     },
   ],
   'physics-electricity': [
@@ -162,17 +157,12 @@ export const CHAPTER_TABLE: Readonly<Record<string, readonly ChapterDefinition[]
     {
       chapterId: 'german-words-classes',
       start: 'deutsch-woerter-verb',
-      names: { de: 'Wortarten', en: 'Word classes', fr: 'Classes de mots', it: 'Classi di parole' },
-    },
-    {
-      chapterId: 'german-words-tenses',
-      start: 'deutsch-formen-praesens-praeteritum-perfekt',
-      names: { de: 'Zeiten, Pronomen und Partikeln', en: 'Tenses, pronouns and particles', fr: 'Temps, pronoms et particules', it: 'Tempi, pronomi e particelle' },
+      names: { de: 'Wortarten und Zeiten', en: 'Word classes and tenses', fr: 'Classes de mots et temps', it: 'Classi di parole e tempi' },
     },
     {
       chapterId: 'german-words-forms',
       start: 'deutsch-formen-plusquamperfekt-futur',
-      names: { de: 'Modus, Passiv und Fälle', en: 'Mood, passive and cases', fr: 'Mode, passif et cas', it: 'Modo, passivo e casi' },
+      names: { de: 'Verbformen und Fälle', en: 'Verb forms and cases', fr: 'Formes verbales et cas', it: 'Forme verbali e casi' },
     },
   ],
   'german-sentences': [
@@ -237,12 +227,7 @@ export const CHAPTER_TABLE: Readonly<Record<string, readonly ChapterDefinition[]
     {
       chapterId: 'english-grammar-basics',
       start: 'englisch-verben-be-have-und-simple-present',
-      names: { de: 'Buchstaben, be und have', en: 'Letters, be and have', fr: 'Lettres, be et have', it: 'Lettere, be e have' },
-    },
-    {
-      chapterId: 'english-grammar-words',
-      start: 'englisch-woerter-this-these-und-plural-von-nomen',
-      names: { de: 'Wörter und Laute', en: 'Words and sounds', fr: 'Mots et sons', it: 'Parole e suoni' },
+      names: { de: 'Erste Wörter und Laute', en: 'First words and sounds', fr: 'Premiers mots et sons', it: 'Prime parole e suoni' },
     },
     {
       chapterId: 'english-grammar-questions',
