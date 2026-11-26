@@ -1,6 +1,6 @@
 /*
- * The sky gathered into star clusters (prototype, `starmap-clusters`):
- * `layoutClusteredSky` on the real mathematics knowledge base and on small
+ * The sky gathered into star clusters (#747):
+ * `layoutClusteredSky` on the real knowledge base's subjects and on small
  * hand-made skies: clusters apart, and inside each cluster its chapters as
  * bands from top to bottom, each band left to right along the route.
  */
@@ -14,7 +14,6 @@ import type { Star, StarMap } from '@/features/starmap/model/starMap'
 
 const map = demoClusterMap('en')
 const sky = layoutClusteredSky(map, 'en')
-const at = new Map(sky.stars.map((s) => [s.unitId, s]))
 
 describe('layoutClusteredSky on the mathematics knowledge base', () => {
   it('makes the four clusters of the table the nebulae, named from it', () => {
@@ -30,6 +29,36 @@ describe('layoutClusteredSky on the mathematics knowledge base', () => {
     const before = map.stars.find((s) => s.unitId === sky.stars[0].unitId)!
     expect({ ...sky.stars[0], nebulaId: before.nebulaId, x: before.x, y: before.y, routeChapterId: undefined }).toEqual(before)
   })
+
+  it('gives the same sky for the same map', () => {
+    expect(layoutClusteredSky(demoClusterMap('en'), 'en')).toEqual(sky)
+    // The language changes names only.
+    const de = layoutClusteredSky(demoClusterMap('de'), 'de')
+    expect(de.stars.map((s) => [s.unitId, s.x, s.y])).toEqual(sky.stars.map((s) => [s.unitId, s.x, s.y]))
+    expect(de.nebulae[0].name).toBe('Zahlen und Rechnen')
+    // The learning state moves nothing.
+    const relit = layoutClusteredSky({ ...map, stars: map.stars.map((s, i) => ({ ...s, state: i % 2 ? ('lit' as const) : ('ready' as const) })) }, 'en')
+    expect(relit.stars.map((s) => [s.unitId, s.x, s.y])).toEqual(sky.stars.map((s) => [s.unitId, s.x, s.y]))
+  })
+})
+
+describe('layoutClusteredSky on the other knowledge-base subjects (#747)', () => {
+  it.each([
+    ['physics', ['physics-mechanics', 'physics-electricity', 'physics-waves'], 35],
+    ['german', ['german-words', 'german-sentences', 'german-reading', 'german-language'], 52],
+    ['english', ['english-grammar', 'english-me', 'english-out', 'english-world'], 83],
+  ] as const)('makes %s the clusters of the table, in its order', (subject, clusters, stars) => {
+    const out = layoutClusteredSky(demoClusterMap('en', subject), 'en')
+    expect(out.nebulae.map((n) => n.topicId)).toEqual(clusters)
+    expect(out.stars).toHaveLength(stars)
+  })
+})
+
+// The same rules for every subject of the knowledge base.
+describe.each(['math', 'physics', 'german', 'english'] as const)('layoutClusteredSky on the %s knowledge base', (subject) => {
+  const map = demoClusterMap('en', subject)
+  const sky = layoutClusteredSky(map, 'en')
+  const at = new Map(sky.stars.map((s) => [s.unitId, s]))
 
   it('keeps every star inside [0, 1]', () => {
     for (const s of sky.stars) {
@@ -61,7 +90,7 @@ describe('layoutClusteredSky on the mathematics knowledge base', () => {
     }
   })
 
-  it('gives every star of a cluster exactly one chapter band, the table chapters for mathematics', () => {
+  it('gives every star of a cluster exactly one chapter band, the table’s chapters', () => {
     for (const cluster of clustersOf(map, 'en')) {
       const bands = sky.chapters.get(cluster.clusterId)!
       expect(bands.map((b) => b.chapterId)).toEqual(CHAPTER_TABLE[cluster.clusterId].map((c) => c.chapterId))
@@ -151,17 +180,6 @@ describe('layoutClusteredSky on the mathematics knowledge base', () => {
     )
     nearest.sort((a, b) => a - b)
     expect(gap).toBeGreaterThan(2 * nearest[Math.floor(nearest.length / 2)])
-  })
-
-  it('gives the same sky for the same map', () => {
-    expect(layoutClusteredSky(demoClusterMap('en'), 'en')).toEqual(sky)
-    // The language changes names only.
-    const de = layoutClusteredSky(demoClusterMap('de'), 'de')
-    expect(de.stars.map((s) => [s.unitId, s.x, s.y])).toEqual(sky.stars.map((s) => [s.unitId, s.x, s.y]))
-    expect(de.nebulae[0].name).toBe('Zahlen und Rechnen')
-    // The learning state moves nothing.
-    const relit = layoutClusteredSky({ ...map, stars: map.stars.map((s, i) => ({ ...s, state: i % 2 ? ('lit' as const) : ('ready' as const) })) }, 'en')
-    expect(relit.stars.map((s) => [s.unitId, s.x, s.y])).toEqual(sky.stars.map((s) => [s.unitId, s.x, s.y]))
   })
 })
 

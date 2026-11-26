@@ -20,7 +20,7 @@ npm run dev -- --host 127.0.0.1 --port 5173
 ## 参数
 
 - `surface`：见下表；与 `path` 同给时 `path` 优先。
-- `points`：演示天空 `src/dev/demo/sky/demoSky.ts` 的星数 `10` / `1000` / `2000`，默认 1000，只影响物理和化学；数学一律是真实知识库的 98 点加演示知识点（#747，见下文「星团」）。
+- `points`：演示天空 `src/dev/demo/sky/demoSky.ts` 的星数 `10` / `1000` / `2000`，默认 1000，只影响化学；数学、物理、德语、英语一律是真实知识库（98 / 35 / 52 / 83 点，数学加演示知识点、物理加「Refraction」，#747，见下文「星团」）。
 - `lang`：`de` / `en` / `fr` / `it`；不给时按浏览器语言。界面文字和演示内容（章节、对话、通知、星名）同一种语言；在 /me 或账号菜单改语言后，后续请求也按新语言作答。
 - `signedIn=0`：以未登录访客打开（`login` 默认如此）。
 - `longNames=1`：（仍是星团以前的演示天空，经预览自己的星图数据源，见下文「星团」）星云用四语里最长的名字（经预览自己的星图覆盖，`withLongNebulaNames`）；全景只画悬停的那团星云名，放大后（#134 按星云屏上大小淡入）才看得到。
@@ -43,8 +43,10 @@ npm run dev -- --host 127.0.0.1 --port 5173
 | `map-cluster-hint` | `/map/math` | 可看：老用户第一次看到星团化的全景（#747，`guide=fresh`；界面自带演示后端重置和「关于你」已按「Later」，同一标签页先开过 `map-newcomer` 也照样出）：Murmi 站在推荐星所在的星团（演示知识点所在的「几何」）旁边，说「The star map has a new look」，点一个星团看它的学习路线；新生（见 `map-newcomer`）看到的是「Your stars are in clusters now」。✕、「Got it」、Esc 或第一次打开星团就收起，每个账号只出一次（localStorage，按账号）；语言、「关于你」、在学哪科、首次落点、点亮时刻和首次揭示都在先，它们在时不出。截图等 `[data-cluster-hint] [data-shown]` |
 | `map-cluster-tour` | `/map/math/cluster/geometry` | 可看：第一次进路线场景的三步导览（#747，`guide=fresh`，同样自带重置和「Later」）：主线（「Follow the main route」）、章节头（「Chapters」）、来自别的星团的入口（「From other clusters」，没有入口的星团只有两步）；每步有一圈高亮，「Next」往下，最后一步「Got it」，✕ 或 Esc 关掉，焦点跟着每一步、关掉回到原处，减弱动效下不动画。每个账号只出一次；场景头部的「How to read this map」随时重看。截图等 `[data-route-tour]` |
 | `map-cluster-star` | `/map/math/cluster/numbers?star=brueche-brueche-kuerzen-addieren-und-subtrahieren` | 可看：「数与运算」的路线场景，按 `?star=` 打开在那颗星上、卡片开着（从别的星团的入口过来就是这样）。截图等 `[data-route-card]` |
-| `map-focus-optics` / `map-focus-star` | `/map/physics`（键盘聚焦「光学」）、`/map/math/geometry`（聚焦演示知识点） | 可看：聚焦时点亮的连线（#121） |
-| `map-optics` / `map-refraction` | `/map/physics/optics`、`/map/physics/optics/demo-refraction` | 可看：跨学科前置（#121） |
+| `map-focus-optics` / `map-focus-star` | `/map/physics`（键盘聚焦「Light, sound and modern physics」星团）、`/map/math/geometry`（聚焦演示知识点） | 可看：聚焦时点亮的连线（#121） |
+| `map-optics` / `map-refraction` | `/map/physics/physics-waves`、`/map/physics/physics-waves/demo-refraction` | 可看：跨学科前置（#121）；「Refraction」在知识库的「Schall und Licht」里、排在光的传播之后，所以在物理的「Light, sound and modern physics」星团 |
+| `map-physics` / `map-german` / `map-english` | `/map/physics`、`/map/german`、`/map/english` | 可看：别的知识库学科的全景（#747）：物理三团、德语四团、英语四团，团名常显 |
+| `map-cluster-physics` / `map-cluster-german` / `map-cluster-english` | `/map/physics/cluster/physics-mechanics`、`/map/german/cluster/german-sentences`、`/map/english/cluster/english-me` | 可看：别的学科各一个路线场景（#747）：「Mechanics and heat」按前置算出主线和支线；「Sentences and spelling」「Me and my day」是按 topic 排成的一条主线（映射表里的人工主线），每个 topic 一章。其他星团把路径里的星团 id 换掉即可，id 见 `src/features/starmap/route/clusters.ts`。截图等 `[data-cluster-route]` |
 | `chapter` | `/chapter/demo-sine-cosine` | 可看：3 个核心课时加 1 个拓展练习集，开场时第 1 课已完成 |
 | `lesson` | `/chapter/demo-sine-cosine/demo-sine-cosine--rechnen--1` | 可看：5 道题（单选 ×2、填空、排序、选项是图的单选），能答错、重试、答对、完成课时；第 1 题带题干图（图上「Hypotenuse」随界面语言变），第 5 题三个选项都是图（#504） |
 | `skill` | `/chapter/demo-sine-cosine?skill=demo-sine-cosine--rechnen` | 可看：一颗分两个 Stufe 的小星（#501），当前该做的那组高亮 |
@@ -66,7 +68,7 @@ npm run dev -- --host 127.0.0.1 --port 5173
 
 预览里的星图走生产那一条路：`PreviewLighting` 默认不再提供自己的星图数据源，应用自己的 `KnowledgeMapSourceProvider` / `readModelSource.tsx` 读演示后端的 `GET /practice/knowledge-map`，由 `placed()` 的 `layoutClusteredSky` 聚成星团，`StarMapRoute` 的 `onOpenCluster` 在全景点星团时进路线场景 `/map/:subjectId/cluster/:clusterId`。没有预览专用的开关或跳转改写。
 
-演示后端的天空（`lighting.tsx` 的 `demoFollowedSky`）里，数学换成真实数学知识库 98 点（`src/dev/demo/clusters/`，CC BY-NC 4.0，`withKnowledgeBaseMath`），按 `src/features/starmap/route/clusters.ts` 的映射表聚成「数与运算」「几何」「方程与代数」「数据与概率」四团；学习状态是造的（每团沿路线点亮前几颗）。演示知识点「Sine and cosine」放进知识库的 `geometrie`（排在「Trigonometrie」之后），是数学的推荐，所以「几何」的路线场景打开在它上面，「Continue」进真实的演示章节。其他知识库星没有演示章节，它们的「开始练习」进章节路由后显示章节的「找不到」状态。物理、化学仍是演示天空，每个 topic 各成一团（映射表里没有）。
+演示后端的天空（`lighting.tsx` 的 `demoFollowedSky`）里，数学、物理换成真实知识库，德语、英语从知识库加进来（`src/dev/demo/clusters/knowledgeBase.ts`，从后端 `knowledge_base_stars.json` 生成、不手改；数学、物理、英语源自 cn-math-taxonomy，CC BY-NC 4.0，德语为 STOA 自写；`withKnowledgeBase`），按 `src/features/starmap/route/clusters.ts` 的映射表聚成星团：数学「数与运算」「几何」「方程与代数」「数据与概率」四团，物理三团，德语四团，英语四团；四科都算在修，学习状态是造的（每团沿路线点亮前几颗，下一颗进行中、是该科第一团时为推荐，每第六颗点亮的星有到期复习卡）。各科星团按映射表的顺序排（`clustersOf` 和星空的星团列表都按表，不看后端的 topic 顺序），预览和生产一样；演示数据的星云保持后端的 topic 顺序。演示知识点「Sine and cosine」放进知识库的 `geometrie`（排在「Trigonometrie」之后），是数学的推荐，所以「几何」的路线场景打开在它上面，「Continue」进真实的演示章节。其他知识库星没有演示章节，它们的「开始练习」进章节路由后显示章节的「找不到」状态。物理的「Refraction」（演示天空里需要演示知识点的那颗）放进知识库的 `physik-optik-akustik`，排在光的传播之后，仍只差演示知识点这一个前置。化学仍是演示天空，未在修，每个 topic 各成一团（映射表里没有）。
 
 `newcomer=1`（含 `map-newcomer`、`onboarding`）和 `longNames=1` 仍由 `PreviewLighting` 提供星团以前的演示天空（`readDemoStarMap`）；`newcomer=1` 的天空再按生产的方式排成星团（`layoutClusteredSky`，每颗星带上章节），所以首次落点进的是星团场景（#747）；`longNames=1` 的不排，星图引擎的全景规则和点星团进场景对它同样生效，只是每个演示 topic 各是一团。星图走生产数据源时 `demo` 为假，所以不显示 Demo 横幅。
 

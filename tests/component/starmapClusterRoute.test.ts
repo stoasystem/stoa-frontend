@@ -5,8 +5,7 @@
  * -- with one entrance chip per outside cluster.
  */
 import { describe, expect, it } from 'vitest'
-import { demoClusterMap } from '@/dev/demo/clusters/demoClusterMap'
-import { MATH_KNOWLEDGE_BASE } from '@/dev/demo/clusters/mathKnowledgeBase'
+import { demoClusterMap, knowledgeBaseOf } from '@/dev/demo/clusters/demoClusterMap'
 import { clustersOf, type StarCluster } from '@/features/starmap/route/clusters'
 import { COMPACT, NAME_LINES, NARROW_NAME, nameWidth, routeGeometry, WIDE, type Point } from '@/features/starmap/route/routeGeometry'
 import { layoutRoute, laneRow, MAX_BRANCH_LANES, type RouteLayout, type RouteStarNode } from '@/features/starmap/route/routeLayout'
@@ -165,6 +164,21 @@ describe('layoutRoute', () => {
     expect(() => layoutRoute({ stars: stars('a', 'b'), prerequisites: prereqs, clusterOf: none, mainline: ['a', 'zz'] })).toThrow(/not in this cluster/)
   })
 
+  it('places a hand-made main line in its own order, not the stars’ order', () => {
+    // Two topics of unrelated stars, each numbered from 1: by `order` they would interleave.
+    const ids = ['x1', 'x2', 'x3', 'y1', 'y2']
+    const route = layoutRoute({
+      stars: [...ids.map((unitId) => ({ unitId, order: Number(unitId.slice(1)) })), { unitId: 'x2-side', order: 1 }],
+      prerequisites: edges(['y1', 'y2'], ['x2', 'x2-side']),
+      clusterOf: none,
+      mainline: ids,
+    })
+    const col = new Map(route.nodes.map((n) => [n.id, n.col]))
+    expect(ids.map((id) => col.get(id))).toEqual([0, 1, 2, 3, 4])
+    expect(col.get('x2-side')).toBe(2)
+    expectInvariants(route, [...ids, 'x2-side'], edges(['y1', 'y2'], ['x2', 'x2-side']))
+  })
+
   it('breaks a cycle instead of hanging', () => {
     const prereqs = edges(['a', 'b'], ['b', 'a'])
     const route = layoutRoute({ stars: stars('a', 'b'), prerequisites: prereqs, clusterOf: none })
@@ -179,7 +193,7 @@ describe('the real mathematics knowledge base', () => {
   const byId = new Map(clusters.map((c) => [c.clusterId, c]))
 
   it('has 98 stars in the four clusters of the table', () => {
-    expect(MATH_KNOWLEDGE_BASE).toHaveLength(98)
+    expect(knowledgeBaseOf('math')).toHaveLength(98)
     expect(clusters.map((c) => [c.clusterId, c.total])).toEqual([
       ['numbers', 29],
       ['geometry', 32],

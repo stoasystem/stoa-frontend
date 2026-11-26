@@ -18,7 +18,7 @@ import { KnowledgeMapSourceProvider } from '@/features/starmap/readModelSource'
 import i18n from '@/i18n'
 import { getKnowledgeMap } from '@/services/practice/practiceApi'
 import { useAuthStore } from '@/store/authStore'
-import { DEMO_KNOWLEDGE_POINT } from '@/dev/demo/sky/demoSky'
+import { DEMO_BRIDGE_STAR, DEMO_KNOWLEDGE_POINT } from '@/dev/demo/sky/demoSky'
 import { demoKnowledgeMap } from '@/dev/preview/lighting'
 import { SURFACES } from '@/dev/preview/surfaces'
 import { projectStarMap } from '@/features/starmap/readModelSource'
@@ -46,9 +46,27 @@ describe('the design preview star map (#747)', () => {
     expect(geometry.next?.chapter.lessonCount).toBeGreaterThan(0)
   })
 
-  it('keeps the other subjects, each topic a cluster of its own', () => {
-    const physics = projectStarMap(demoKnowledgeMap(1000), { subjectId: 'physics', language: 'en' })
-    expect(clustersOf(physics, 'en').map((cluster) => cluster.clusterId)).toContain('optics')
+  it('draws physics, German and English from the knowledge base too, in clusters, and keeps chemistry a cluster a topic', () => {
+    const of = (subjectId: string) => clustersOf(projectStarMap(demoKnowledgeMap(1000), { subjectId, language: 'en' }), 'en')
+    expect(of('physics').map((cluster) => [cluster.clusterId, cluster.total])).toEqual([
+      ['physics-mechanics', 18],
+      ['physics-electricity', 11],
+      // Refraction, the demo sky's star that builds on the demo knowledge point, joins Sound and light.
+      ['physics-waves', 7],
+    ])
+    expect(of('german').map((cluster) => cluster.clusterId)).toEqual(['german-words', 'german-sentences', 'german-reading', 'german-language'])
+    expect(of('english').map((cluster) => cluster.clusterId)).toEqual(['english-grammar', 'english-me', 'english-out', 'english-world'])
+    expect(of('chemistry').map((cluster) => cluster.clusterId)).toContain('reactions')
+    // Refraction still waits on the demo knowledge point, across subjects.
+    const refraction = of('physics')[2].stars.find((star) => star.unitId === DEMO_BRIDGE_STAR)!
+    expect(refraction.unlitPrerequisiteIds).toEqual([DEMO_KNOWLEDGE_POINT.unitId])
+  })
+
+  it('has one recommendation in each subject the demo student takes', () => {
+    const sky = demoKnowledgeMap(1000)
+    const subjectOf = new Map(sky.nebulae.map((nebula) => [nebula.topicId, nebula.subjectId]))
+    const recommended = sky.stars.filter((star) => star.recommendation).map((star) => subjectOf.get(star.nebulaId))
+    expect(recommended.sort()).toEqual(['english', 'german', 'math', 'physics'])
   })
 
   it('opens every star map surface on what it names', () => {
@@ -105,5 +123,47 @@ describe('the design preview mounts the production star map source (#747)', () =
     expect(container.querySelector('[data-starmap-empty]')).toBeNull()
     const clusters = [...container.querySelectorAll<HTMLElement>('[data-nebula-link]')].map((link) => link.dataset.nebulaLink)
     expect(clusters).toEqual(expect.arrayContaining(['numbers', 'geometry', 'algebra', 'data']))
+  })
+
+  it.each(['physics', 'german', 'english'])('opens the %s surfaces: the whole view of its clusters, and a route scene', async (subject) => {
+    vi.mocked(getKnowledgeMap).mockResolvedValue(demoKnowledgeMap(1000))
+    useAuthStore.setState({
+      user: { id: 'demo-student', name: 'Demo', email: 'demo@example.com', role: 'student', mustChangePassword: false } as never,
+      accessToken: 'design-preview',
+      isAuthenticated: true,
+    })
+    const mount = (path: string) => {
+      const client = new QueryClient({ defaultOptions: { queries: { retry: false, gcTime: 0 } } })
+      return render(
+        <I18nextProvider i18n={i18n}>
+          <QueryClientProvider client={client}>
+            <PreviewLighting>
+              <MemoryRouter initialEntries={[path]}>
+                <KnowledgeMapSourceProvider>
+                  <Routes>
+                    <Route path="/map/:subjectId" element={<StarMapRoute />} />
+                    <Route path="/map/:subjectId/cluster/:clusterId" element={<StarMapRoute />} />
+                  </Routes>
+                </KnowledgeMapSourceProvider>
+              </MemoryRouter>
+            </PreviewLighting>
+          </QueryClientProvider>
+        </I18nextProvider>,
+      )
+    }
+    const whole = SURFACES.find((s) => s.id === `map-${subject}`)!
+    const panorama = mount(whole.path(1000).split('?')[0])
+    await waitFor(() => expect(panorama.container.querySelector('[data-starmap-stage]')).not.toBeNull())
+    const own = clustersOf(projectStarMap(demoKnowledgeMap(1000), { subjectId: subject, language: 'en' }), 'en').map((c) => c.clusterId)
+    const links = [...panorama.container.querySelectorAll<HTMLElement>('[data-nebula-link]')].map((link) => link.dataset.nebulaLink)
+    expect(links).toEqual(expect.arrayContaining(own))
+    panorama.unmount()
+
+    const scene = SURFACES.find((s) => s.id === `map-cluster-${subject}`)!
+    const opened = mount(scene.path(1000))
+    await waitFor(() => expect(opened.container.querySelector('[data-cluster-route]')).not.toBeNull())
+    const [, , , , clusterId] = scene.path(1000).split('/')
+    expect(own).toContain(clusterId)
+    opened.unmount()
   })
 })

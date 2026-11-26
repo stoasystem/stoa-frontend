@@ -40,6 +40,8 @@ type LabelFade = {
   seen: number
   /** On a thin dark backing: it sits over a star or across a line (#144 B5). */
   backed: boolean
+  /** A nebula's name: which of its forms it took (0 one line, 1 two lines on a wide screen). */
+  form?: number
 }
 
 /** Glyph sizes (px) over which the small cut gives way to the large (#134). */
@@ -357,7 +359,9 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
   /** Star names as drawn: cut with an ellipsis past `REVEAL.keyName.maxWidthPx` (#76, #144). */
   let starNameTexts: (string | undefined)[] = []
   /** Each nebula name as drawn, wide or narrow (`NEBULA_NAME_NARROW`): its lines and its width. */
-  let nebulaNameWidths: ({ lines: string[]; width: number; narrow: boolean } | undefined)[] = []
+  type NameForm = { lines: string[]; width: number; height: number }
+  /** Each nebula's name as set: one line (on a phone already wrapped), and on a wide screen also in two lines. */
+  let nebulaNameWidths: ({ forms: NameForm[]; narrow: boolean } | undefined)[] = []
   const stats: RenderStats = { frames: 0, starDraws: 0, tileDraws: 0, tilePaints: 0, highlightNebula: -1 }
 
   const buildSprites = (cut: GlyphCut, largestBox: number): Sprite[] => {
@@ -1249,37 +1253,58 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
           const entry = fadeOf(`n${n}`)
           const text = scene.nebulae[n].name.toLocaleUpperCase()
           let measured = nebulaNameWidths[n]
+          const lineHeight = narrowNames ? NEBULA_NAME_NARROW.lineHeight : 16
           if (!measured || measured.narrow !== narrowNames) {
-            const lines = narrowNames ? wrapNebulaName(text, NEBULA_NAME_NARROW.maxWidth, (line) => ctx.measureText(line).width) : [text]
-            measured = { lines, width: Math.max(...lines.map((line) => ctx.measureText(line).width)) + 8, narrow: narrowNames }
+            const width = (line: string) => ctx.measureText(line).width
+            const form = (lines: string[]): NameForm => ({
+              lines,
+              width: Math.max(...lines.map(width)) + 8,
+              height: lines.length === 1 ? 16 : lines.length * lineHeight + 2,
+            })
+            const first = form(narrowNames ? wrapNebulaName(text, NEBULA_NAME_NARROW.maxWidth, width) : [text])
+            // A wide screen sets the name in one line; where that finds no place, in two, broken at the middle (#747).
+            const second = narrowNames ? null : form(wrapNebulaName(text, 0, width))
+            measured = { forms: second && second.lines.length > 1 ? [first, second] : [first], narrow: narrowNames }
             nebulaNameWidths[n] = measured
           }
-          const nameWidth = measured.width
-          const lineHeight = narrowNames ? NEBULA_NAME_NARROW.lineHeight : 16
-          const nameHeight = measured.lines.length === 1 ? 16 : measured.lines.length * lineHeight + 2
           const own = { x: nebulaX[n], y: nebulaY[n], r: nebulaR[n] }
           const others = cores.filter((_, m) => m !== n)
-          const candidates = aroundDisc(own.x, own.y, Math.min(own.r * 0.95, NEBULA_NAME_RING), nameWidth, nameHeight, 6)
+          const ringOf = (form: NameForm) => aroundDisc(own.x, own.y, Math.min(own.r * 0.95, NEBULA_NAME_RING), form.width, form.height, 6)
+          // The form it was drawn in last, until another is placed: so a name fading out keeps its shape.
+          let shown = measured.forms[Math.min(entry.form ?? 0, measured.forms.length - 1)]
+          let candidates = ringOf(shown)
           let box: Box | null = null
           entry.backed = false
           if (base >= 0.01 && (labelled < limit || n === priority)) {
-            const preferred = preferring(candidates, entry.slot)
-            const find = (covers: readonly Box[]) => {
-              const obstacles = { boxes: placed, circles: others, segments, covers }
-              return (
-                placeLabel(preferred, obstacles, labelArea,
-                  (candidate) => belongsTo(candidate, own, others) && !others.some((c) => boxHitsCircle(candidate, c)) ? 0 : Infinity) ??
-                // The hovered or focused name far out on one sky: a nebula packed
-                // among others has no side nearer itself than its neighbours, so
-                // there being nearer is a preference, not a rule -- the pointer says whose name it is.
-                (scene.galaxy && wholeMap && n === priority ? placeLabel(preferred, obstacles, labelArea, (candidate) => (belongsTo(candidate, own, others) ? 0 : 20)) : null)
-              )
-            }
-            // Off the galaxy names' letters if it can be; else on them, on a dark backing.
-            box = find(galaxyCovers)
-            if (!box && galaxyCovers.length > 0) {
-              box = find([])
-              entry.backed = box !== null
+            for (const [f, form] of measured.forms.entries()) {
+              const ring = ringOf(form)
+              const preferred = preferring(ring, entry.form === f ? entry.slot : -1)
+              const find = (covers: readonly Box[]) => {
+                const obstacles = { boxes: placed, circles: others, segments, covers }
+                return (
+                  placeLabel(preferred, obstacles, labelArea,
+                    (candidate) => belongsTo(candidate, own, others) && !others.some((c) => boxHitsCircle(candidate, c)) ? 0 : Infinity) ??
+                  // The hovered or focused name far out on one sky: a nebula packed
+                  // among others has no side nearer itself than its neighbours, so
+                  // there being nearer is a preference, not a rule -- the pointer says whose name it is.
+                  (scene.galaxy && wholeMap && n === priority ? placeLabel(preferred, obstacles, labelArea, (candidate) => (belongsTo(candidate, own, others) ? 0 : 20)) : null)
+                )
+              }
+              // Off the galaxy names' letters if it can be; else on them, on a dark backing.
+              box = find(galaxyCovers)
+              let backed = false
+              if (!box && galaxyCovers.length > 0) {
+                box = find([])
+                backed = box !== null
+              }
+              if (box) {
+                entry.backed = backed
+                if (entry.form !== f) entry.slot = -1
+                entry.form = f
+                shown = form
+                candidates = ring
+                break
+              }
             }
           }
           settle(entry, box !== null)
@@ -1301,7 +1326,7 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
             ctx.fill()
           }
           ctx.globalAlpha = nameAlpha
-          measured.lines.forEach((line, i) => outlinedText(line, (at.x0 + at.x1) / 2, at.y0 + 2 + i * lineHeight, colours.textBody, colours.sky, INK.nebulaName.outline))
+          shown.lines.forEach((line, i) => outlinedText(line, (at.x0 + at.x1) / 2, at.y0 + 2 + i * lineHeight, colours.textBody, colours.sky, INK.nebulaName.outline))
           nebulaNameBoxes.push({ nebula: n, x0: at.x0, y0: at.y0, x1: at.x1, y1: at.y1, alpha: nameAlpha })
           names.nebulae += 1
         }

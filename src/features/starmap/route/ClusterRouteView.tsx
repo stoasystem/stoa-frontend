@@ -145,7 +145,11 @@ export function ClusterRouteView({
   const chapters = useMemo(() => chaptersOf(route, cluster.clusterId, language), [route, cluster.clusterId, language])
   const chapterOfStar = useMemo(() => new Map(chapters.flatMap((c) => c.stars.map((unitId) => [unitId, c] as const))), [chapters])
   const chapterTitle = (c: RouteChapter) => (c.name ? t('clusters.chapterOf', { number: c.number, name: c.name }) : t('clusters.chapterNumber', { number: c.number }))
-  const headerH = compact ? 50 : 58
+  // The headers' band: a kicker line and a name; a header that wraps (#747) adds its lines, measured
+  // once laid out, so the route below starts clear of it -- only in a scene that needs it.
+  const headersRef = useRef<HTMLOListElement>(null)
+  const [nameExtra, setNameExtra] = useState(0)
+  const headerH = (compact ? 50 : 58) + nameExtra
   const starById = useMemo(() => new Map(map.stars.map((s) => [s.unitId, s])), [map.stars])
   const nextId = cluster.next?.unitId ?? null
   const [selected, setSelected] = useState<string | null>(focusUnitId)
@@ -186,6 +190,32 @@ export function ClusterRouteView({
   const shown = (id: string) => (active !== null ? context.nodes.has(id) : upcoming ? upcoming.has(id) : true)
   /** A line stays bright with both its ends shown (a star's context: its far end). */
   const lineShown = (from: string, to: string) => (active !== null ? context.nodes.has(to) && context.nodes.has(from) : upcoming ? upcoming.has(from) && upcoming.has(to) : true)
+
+  // How far the tallest chapter header runs past its two lines (a phone's narrow chapters, a long
+  // name): its name wrapped to a second line, its progress gone under its number.
+  useLayoutEffect(() => {
+    const measure = () => {
+      const texts = [...(headersRef.current?.querySelectorAll<HTMLElement>('.route-chapter-text') ?? [])]
+      const extra = Math.max(
+        0,
+        ...texts.map((text) => {
+          const name = text.querySelector<HTMLElement>('.route-chapter-name')
+          const line = text.querySelector<HTMLElement>('.route-chapter-line')
+          const nameMore = name ? name.offsetHeight - (parseFloat(getComputedStyle(name).lineHeight) || name.offsetHeight) : 0
+          const lineMore = line ? line.offsetHeight - Math.max(0, ...[...line.children].map((child) => (child as HTMLElement).offsetHeight)) : 0
+          return nameMore + lineMore
+        }),
+      )
+      setNameExtra(Math.ceil(extra))
+    }
+    measure()
+    let live = true
+    // Measured again once the web font is in: the fallback font sets the names at other widths.
+    void document.fonts?.ready.then(() => live && measure())
+    return () => {
+      live = false
+    }
+  }, [chapters, width, compact])
 
   // Open on the star asked for, else the one to go on with.
   const target = focusUnitId ?? nextId
@@ -341,7 +371,7 @@ export function ClusterRouteView({
           }}
         >
           {/* The chapters' headers, over their stretches of columns; each name stays in view while its stretch scrolls by. */}
-          <ol className="m-0 list-none p-0">
+          <ol ref={headersRef} className="m-0 list-none p-0">
             {chapters.map((c) => {
               const x0 = c.fromCol === 0 ? geometry.colX(0) - g.colW / 2 : (geometry.colX(c.fromCol - 1) + geometry.colX(c.fromCol)) / 2
               const x1 = c.number === chapters.length ? geometry.colX(c.toCol) + g.colW / 2 : (geometry.colX(c.toCol) + geometry.colX(c.toCol + 1)) / 2

@@ -62,7 +62,7 @@ export type Surface = {
 const { subjectId, unitId } = DEMO_KNOWLEDGE_POINT
 /**
  * The star cluster the demo knowledge point is in (#747): the demo backend
- * puts it in the knowledge base's Geometry (`withKnowledgeBaseMath`), which
+ * puts it in the knowledge base's Geometry (`withKnowledgeBase`), which
  * `route/clusters.ts` gathers into `geometry`. Spelled out: no application
  * module loads before the preview's interception.
  */
@@ -78,10 +78,21 @@ const extension = DEMO_KNOWLEDGE_POINT.skills.find((skill) => skill.extension)!
 /** `skillPath` of the chapter, spelled out: no application module loads before the preview's interception. */
 const skillPath = (unit: string, skillId: string) => `/chapter/${unit}?skill=${encodeURIComponent(skillId)}`
 
-/** The physics nebula of `DEMO_BRIDGE_STAR` (`demo-sky.json`'s `bridge.topicId`). */
-const DEMO_BRIDGE_TOPIC = 'optics'
+/**
+ * The physics star cluster of `DEMO_BRIDGE_STAR` (#747): the demo backend puts Refraction in the
+ * knowledge base's Sound and light (`withKnowledgeBase`), which `route/clusters.ts` gathers into
+ * Light, sound and modern physics. Spelled out, like `clusterId`.
+ */
+const DEMO_BRIDGE_CLUSTER = 'physics-waves'
 
 const withPoints = (path: string, points: StarCount) => `${path}?points=${points}`
+
+/** Physics, German and English: the knowledge base's other subjects, and the cluster each opens as an example. */
+const OTHER_SUBJECTS = [
+  { subject: 'physics', name: 'Physics', cluster: 'physics-mechanics', clusterName: 'Mechanics and heat' },
+  { subject: 'german', name: 'German', cluster: 'german-sentences', clusterName: 'Sentences and spelling' },
+  { subject: 'english', name: 'English', cluster: 'english-me', clusterName: 'Me and my day' },
+] as const
 
 export const SURFACES: readonly Surface[] = [
   { id: 'login', label: 'Login', path: () => '/login', signedIn: false, stars: false },
@@ -105,11 +116,11 @@ export const SURFACES: readonly Surface[] = [
   // mathematics' demo knowledge point; Refraction waits for it).
   {
     id: 'map-focus-optics',
-    label: 'Star map · panorama, optics in focus',
+    label: 'Star map · panorama, the cluster of optics in focus',
     path: (points) => withPoints('/map/physics', points),
     signedIn: true,
     stars: true,
-    focus: '[data-nebula-link="optics"]',
+    focus: `[data-nebula-link="${DEMO_BRIDGE_CLUSTER}"]`,
   },
   {
     id: 'map-focus-star',
@@ -121,15 +132,15 @@ export const SURFACES: readonly Surface[] = [
   },
   {
     id: 'map-optics',
-    label: 'Star map · optics nebula (cross-subject)',
-    path: (points) => withPoints(`/map/physics/${DEMO_BRIDGE_TOPIC}`, points),
+    label: 'Star map · star cluster Light, sound and modern physics (cross-subject)',
+    path: (points) => withPoints(`/map/physics/${DEMO_BRIDGE_CLUSTER}`, points),
     signedIn: true,
     stars: true,
   },
   {
     id: 'map-refraction',
     label: 'Star map · Refraction (waiting on a prerequisite, cross-subject)',
-    path: (points) => withPoints(`/map/physics/${DEMO_BRIDGE_TOPIC}/${DEMO_BRIDGE_STAR}`, points),
+    path: (points) => withPoints(`/map/physics/${DEMO_BRIDGE_CLUSTER}/${DEMO_BRIDGE_STAR}`, points),
     signedIn: true,
     stars: true,
   },
@@ -215,6 +226,19 @@ export const SURFACES: readonly Surface[] = [
     stars: false,
     readyWhen: '[data-cluster-route]',
   },
+  // The other subjects of the knowledge base (#747): the whole view of each, and one cluster's
+  // route scene -- a cluster laid out by its prerequisites, and one of themes, topic by topic.
+  ...OTHER_SUBJECTS.flatMap(({ subject, name, cluster, clusterName }): Surface[] => [
+    { id: `map-${subject}`, label: `Star map · whole view, ${name}'s star clusters`, path: (points) => withPoints(`/map/${subject}`, points), signedIn: true, stars: true },
+    {
+      id: `map-cluster-${subject}`,
+      label: `Star map · route scene of ${clusterName} (${name})`,
+      path: () => `/map/${subject}/cluster/${cluster}`,
+      signedIn: true,
+      stars: false,
+      readyWhen: '[data-cluster-route]',
+    },
+  ]),
   {
     id: 'map-cluster-star',
     label: 'Star map · route scene of Numbers and operations, a star asked for',

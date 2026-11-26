@@ -10,9 +10,9 @@
  *     its star's route opens on its nebula seen whole.
  *   - the star map's data: by default none of its own -- the app's
  *     production source (`readModelSource.tsx`) reads the demo backend's
- *     `GET /practice/knowledge-map` (`demoKnowledgeMap`), whose mathematics is
- *     the real knowledge base gathered into star clusters (#747,
- *     `withKnowledgeBaseMath`). The demo sky behind it is passed through
+ *     `GET /practice/knowledge-map` (`demoKnowledgeMap`), whose mathematics,
+ *     physics, German and English are the real knowledge base gathered into
+ *     star clusters (#747, `withKnowledgeBase`). The demo sky behind it is passed through
  *     `demoStarMapOverride`, so the star map follows the lessons completed on the
  *     page. The demo knowledge point's state is #116's
  *     `demoKnowledgePointState(completed)`; once it is lit, "Refraction" in
@@ -48,7 +48,7 @@ import {
   onDemoServerChange,
   unacknowledgedLit,
 } from '@/dev/preview/demoSource'
-import { withKnowledgeBaseMath } from '@/dev/demo/clusters/demoClusterMap'
+import { withKnowledgeBase } from '@/dev/demo/clusters/demoClusterMap'
 import { asNewcomer } from '@/dev/demo/sky/newcomer'
 import { layoutClusteredSky } from '@/features/starmap/route/clusteredSky'
 import type { SupportedLanguage } from '@/i18n/languages'
@@ -222,8 +222,8 @@ export function demoSkyReviewDue(size: FixtureSize): number {
 
 /** The whole sky as the demo backend has it after the lessons completed so far, small stars included. */
 function demoFollowedSky(size: FixtureSize): KnowledgeMapResponse {
-  // Mathematics is the real knowledge base, which the read model gathers into star clusters (#747).
-  const sky = withKnowledgeBaseMath(demoSky(size, demoLanguage()), demoLanguage())
+  // Mathematics, physics, German and English are the real knowledge base, which the read model gathers into star clusters (#747).
+  const sky = withKnowledgeBase(demoSky(size, demoLanguage()), demoLanguage())
   const subjectId = DEMO_KNOWLEDGE_POINT.subjectId
   const map = withDemoReviews(demoStarMapOverride(
     {
