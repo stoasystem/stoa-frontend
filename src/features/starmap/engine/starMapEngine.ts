@@ -1394,6 +1394,15 @@ export class StarMapEngine {
     return null
   }
 
+  /** The star whose name is drawn under `(x, y)`, or -1 (#755: hovering a name lifts its star). */
+  private starNameAt(x: number, y: number): number {
+    for (const box of this.renderer.stats.starNames ?? []) {
+      if (box.alpha <= 0.05) continue
+      if (x >= box.x0 && x <= box.x1 && y >= box.y0 && y <= box.y1) return box.star
+    }
+    return -1
+  }
+
   /**
    * The nebula the pointer is over, for naming it (#125). Not what a tap
    * chooses: naming is cosmetic, so it reaches further than `choose` does.
@@ -1505,7 +1514,9 @@ export class StarMapEngine {
     // The star under the pointer, not only one close enough to drag: on the
     // panorama nothing is draggable, so hovering a star did nothing at all
     // and the sky gave no answer to being pointed at.
-    const star = x === null ? -1 : this.hoverable(x, y)
+    // Over a star's name, that star (#755): the name and its star are lifted together.
+    const under = x === null ? -1 : this.hoverable(x, y)
+    const star = under >= 0 || x === null ? under : this.starNameAt(x, y)
     if (next === this.hoveredNebula && star === this.hoveredStar) return
     this.hoveredNebula = next
     this.hoveredStar = star

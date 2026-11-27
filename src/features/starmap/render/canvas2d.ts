@@ -9,7 +9,7 @@
  * the focus are never drawn one by one, and nothing is blurred per frame.
  */
 import { CHOSEN, DOT_CUT, dotBoxFor, GLOW_STOPS, GLYPH_LARGE, GLYPH_SMALL, HOVER, LINE_GLOW, ORB_TURN, RAY_STOPS, rayPath, STAR_INK, WAITING_RING_ALPHA, PRESS, SMALL_CUT_BELOW, type DotCut, type GlyphCut, type StarLight } from '@/features/starmap/render/glyph'
-import { aroundDisc, aroundDiscWide, belongsTo, boxHitsCircle, boxHitsSegment, coversAny, keyStars, nearerStars, placeInsisting, placeLabel, type Box, type Circle, type Segment } from '@/features/starmap/render/labels'
+import { aroundDisc, aroundDiscWide, backingBox, belongsTo, boxHitsCircle, boxHitsSegment, coversAny, keyStars, leaderLine, nearerStars, placeInsisting, placeLabel, wrapName, type Box, type Circle, type Segment } from '@/features/starmap/render/labels'
 import { DRAG, panoramaDot, panoramaLook, ramp, reachFade, REVEAL, type Ramp } from '@/features/starmap/view/semanticZoom'
 import { createTileCache, nebulaStateKeys, tileKey, tileSizeFor, TILE_REACH, type TileCache } from '@/features/starmap/render/nebulaTiles'
 import { CLOUD_REACH, galaxyHazeAlpha, galaxyHazeBox, nebulaGlowAlpha, paintGalaxy, paintGalaxyHaze, paintNebulaCloud } from '@/features/starmap/render/galaxy'
@@ -30,6 +30,7 @@ import {
   type SceneData,
   type StarMapRenderer,
   type StarMapTheme,
+  type StarNameBox,
 } from '@/features/starmap/render/types'
 
 /** A name's fade (#134): how far in it is, the side it took, whether it had a place last frame. */
@@ -38,7 +39,7 @@ type LabelFade = {
   slot: number
   placed: boolean
   seen: number
-  /** On a thin dark backing: it sits over a star or across a line (#144 B5). */
+  /** On the opaque backing (#755): it sits over a star or across a line (#144 B5). */
   backed: boolean
   /** A nebula's name: which of its forms it took (0 one line, 1 two lines on a wide screen). */
   form?: number
@@ -356,8 +357,8 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
   const stepSlots = new Map<number, number>()
   /** Measured name widths, CSS px, per star and nebula of the current data. */
   let starNameWidths: (number | undefined)[] = []
-  /** Star names as drawn: cut with an ellipsis past `REVEAL.keyName.maxWidthPx` (#76, #144). */
-  let starNameTexts: (string | undefined)[] = []
+  /** Star names as drawn: in up to two lines, cut only past them (#76, #144, #755). */
+  let starNameLines: (string[] | undefined)[] = []
   /** Each nebula name as drawn, wide or narrow (`NEBULA_NAME_NARROW`): its lines and its width. */
   type NameForm = { lines: string[]; width: number; height: number }
   /** Each nebula's name as set: one line (on a phone already wrapped), and on a wide screen also in two lines. */
@@ -525,7 +526,7 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
       dpr = nextDpr
       // A star name's cut depends on the screen's width (#144).
       starNameWidths = []
-      starNameTexts = []
+      starNameLines = []
       canvas.width = Math.max(1, Math.round(next.width * dpr))
       canvas.height = Math.max(1, Math.round(next.height * dpr))
       if (dprChanged || !sprites) rebuild()
@@ -536,7 +537,7 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
       theme = next
       galaxyNames.clear()
       starNameWidths = []
-      starNameTexts = []
+      starNameLines = []
       nebulaNameWidths = []
       rebuild()
       paintSky()
@@ -553,7 +554,7 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
       const sparse = Boolean(data?.galaxy)
       data = next
       starNameWidths = []
-      starNameTexts = []
+      starNameLines = []
       nebulaNameWidths = []
       labelFades.clear()
       hoverFades.clear()
@@ -1044,17 +1045,20 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
       // While a star is held (#144 B8: a finger's long press, or the mouse) it and its linked
       // stars are named at any zoom a star can be grabbed at, before the other names come in.
       const grabbed = (i: number) => (drag && (drag.star === i || drag.related[i] === 1) ? drag.amount : 0)
+      // Where each star name went, for the pointer (#755: hovering a name lifts its star).
+      const starNameBoxes: StarNameBox[] = []
+      stats.starNames = starNameBoxes
       if (frame.starLabelAlpha > 0.01 || (drag && drag.amount > 0.01)) {
         setFont(13, 500)
         ctx.textAlign = 'center'
         ctx.textBaseline = 'top'
-        const nameCut = Math.min(REVEAL.keyName.maxWidthPx, width - REVEAL.keyName.sideMarginPx)
-        /** `name` cut with an ellipsis to `max` px in the names' font (#76: the longest of four languages). */
-        const fitName = (name: string, max: number) => {
-          let out = name
-          while (ctx.measureText(out).width > max && out.length > 5) out = `${out.slice(0, -2)}…`
-          return out
-        }
+        const nameKeep = REVEAL.keyName
+        const lineCut = Math.min(nameKeep.lineWidthPx, width - nameKeep.sideMarginPx)
+        const wordCut = Math.min(nameKeep.maxWidthPx, width - nameKeep.sideMarginPx)
+        /** A name in its lines, in the names' font (#76: the longest of four languages; #755: two lines before a cut). */
+        const linesOf = (name: string) => wrapName(name, (t) => ctx.measureText(t).width, lineCut, nameKeep.lines, wordCut)
+        /** A name's box height for `lines` lines. */
+        const nameHeight = (lines: number) => 17 + (lines - 1) * nameKeep.lineHeightPx
         // The stars on screen, in a grid, so a name only checks its neighbours.
         const cell = 64
         const grid = new Map<number, number[]>()
@@ -1111,19 +1115,21 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
         candidates.sort((a, b) =>
           first(a.i) - first(b.i) || Number(b.key) - Number(a.key) || Number(b.was) - Number(a.was) || a.d - b.d)
         let placedNames = 0
-        for (const { i, base, key, insist } of candidates) {
+        for (const { i, base, insist } of candidates) {
           const entry = fadeOf(`s${i}`)
-          const text = (starNameTexts[i] ??= fitName(scene.names[i], nameCut))
-          const nameWidth = (starNameWidths[i] ??= ctx.measureText(text).width + 6)
-          // A key star also tries the corners: its lines often leave it on all four sides;
-          // one whose name insists (#144 B5) then the same eight a little further out.
+          const textLines = (starNameLines[i] ??= linesOf(scene.names[i]))
+          const nameWidth = (starNameWidths[i] ??= Math.max(...textLines.map((l) => ctx.measureText(l).width)) + 6)
+          // A name in two lines is placed as the box of both (#755).
+          const nameH = nameHeight(textLines.length)
+          // Every star tries the four sides, then the corners (#755: so a nebula's ordinary stars find room as it opens;
+          // a key star's lines often leave it on all four sides); one whose name insists (#144 B5) then the same eight further out.
           const r = radiusOf(i)
           const boxes = insist
-            ? [...aroundDiscWide(x[i], y[i], r, nameWidth, 17, 3), ...aroundDiscWide(x[i], y[i], r, nameWidth, 17, 3 + REVEAL.keyName.farGap)]
-            : (key ? aroundDiscWide : aroundDisc)(x[i], y[i], r, nameWidth, 17, 3)
+            ? [...aroundDiscWide(x[i], y[i], r, nameWidth, nameH, 3), ...aroundDiscWide(x[i], y[i], r, nameWidth, nameH, 3 + nameKeep.farGap)]
+            : aroundDiscWide(x[i], y[i], r, nameWidth, nameH, 3)
           let box: Box | null = null
           if (base >= 0.01 && placedNames < STAR_NAMES_AT_MOST) {
-            const reachY = r + 3 + (insist ? REVEAL.keyName.farGap : 0) + 17
+            const reachY = r + 3 + (insist ? nameKeep.farGap : 0) + nameH
             const region: Box = { x0: x[i] - nameWidth - reachY, y0: y[i] - reachY, x1: x[i] + nameWidth + reachY, y1: y[i] + reachY }
             const around = near(region, i)
             const circles = around.all
@@ -1140,7 +1146,8 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
             // A held name may sit on a galaxy name too (on its backing), but rather not.
             const heldCost = (b: Box) => (theirs ? theirs(b) : 0) + (onGalaxyName(b) ? REVEAL.keyName.galaxyNameCost : 0)
             // First the eight spots beside the star, free of stars, lines and galaxy names...
-            const beside = insist ? preferred.filter((b) => boxes.indexOf(b) < 8) : preferred
+            // (A held or hovered name may keep a spot on the far ring: hovered there, it stays put, #755.)
+            const beside = insist && !held ? preferred.filter((b) => boxes.indexOf(b) < 8) : preferred
             const found = held
               ? placeLabel(beside, { boxes: placed, circles, segments: [] }, labelArea, heldCost)
               : placeLabel(beside, { boxes: placed, circles, segments: lines, covers: galaxyCovers }, labelArea, theirs)
@@ -1160,7 +1167,8 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
           }
           settle(entry, box !== null)
           if (box) {
-            placed.push(box)
+            // A backed name keeps the others off its whole backing, not only its letters.
+            placed.push(entry.backed ? backingBox(box, nameKeep.backingPadPx) : box)
             placedNames += 1
             entry.slot = boxes.indexOf(box)
           }
@@ -1169,22 +1177,40 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
           const color =
             state[i] === STATE_LIT || state[i] === STATE_IN_PROGRESS ? colours.text : state[i] === STATE_READY ? colours.textBody : colours.textCaption
           const alpha = Math.min(1, base * entry.alpha * kept(i))
+          // A name on the far ring, or nearer another star than its own, is tied to its star
+          // by a thin leader (#755), drawn under the name so the name's backing ends it.
+          const far = insist && entry.slot >= 8
+          const leader = leaderLine(at, { x: x[i], y: y[i], r: radiusOf(i) }, near({ x0: at.x0 - cell / 2, y0: at.y0 - cell / 2, x1: at.x1 + cell / 2, y1: at.y1 + cell / 2 }, i).all, far, REVEAL.nameLeader.gapPx, REVEAL.nameLeader.minLengthPx, REVEAL.nameLeader.nearRatio)
+          if (leader) {
+            ctx.globalAlpha = alpha * REVEAL.nameLeader.alpha
+            ctx.strokeStyle = color
+            ctx.lineWidth = REVEAL.nameLeader.widthPx
+            ctx.lineCap = 'round'
+            ctx.beginPath()
+            ctx.moveTo(leader.x0, leader.y0)
+            ctx.lineTo(leader.x1, leader.y1)
+            ctx.stroke()
+          }
+          const textX = (at.x0 + at.x1) / 2
           if (entry.backed) {
-            // A thin dark backing: the name reads over the star or the line under it (#144 B5).
-            ctx.globalAlpha = alpha * REVEAL.keyName.backing
+            // An opaque backing (#755; #144 B5's thin one hardly showed): the name reads over the
+            // star or the line under it, and the line breaks off at it.
+            const back = backingBox(at, nameKeep.backingPadPx)
+            ctx.globalAlpha = alpha * nameKeep.backing
             ctx.fillStyle = colours.sky
             ctx.beginPath()
-            if (typeof ctx.roundRect === 'function') ctx.roundRect(at.x0, at.y0, at.x1 - at.x0, at.y1 - at.y0, 4)
-            else ctx.rect(at.x0, at.y0, at.x1 - at.x0, at.y1 - at.y0)
+            if (typeof ctx.roundRect === 'function') ctx.roundRect(back.x0, back.y0, back.x1 - back.x0, back.y1 - back.y0, nameKeep.backingRadiusPx)
+            else ctx.rect(back.x0, back.y0, back.x1 - back.x0, back.y1 - back.y0)
             ctx.fill()
             // The backing does the outline's work: the text alone over it (one stroke of text less a name).
             ctx.globalAlpha = alpha
             ctx.fillStyle = color
-            ctx.fillText(text, (at.x0 + at.x1) / 2, at.y0 + 1)
+            textLines.forEach((line, k) => ctx.fillText(line, textX, at.y0 + 1 + k * nameKeep.lineHeightPx))
           } else {
             ctx.globalAlpha = alpha
-            outlinedText(text, (at.x0 + at.x1) / 2, at.y0 + 1, color, colours.sky, 3)
+            textLines.forEach((line, k) => outlinedText(line, textX, at.y0 + 1 + k * nameKeep.lineHeightPx, color, colours.sky, 3))
           }
+          starNameBoxes.push({ star: i, x0: at.x0, y0: at.y0, x1: at.x1, y1: at.y1, alpha, leader: leader !== null, backed: entry.backed })
           names.stars += 1
         }
       }
@@ -1317,7 +1343,7 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
           if (!at || entry.alpha <= 0.001) continue
           const nameAlpha = Math.min(1, frame.nebulaLabelAlpha * base * entry.alpha * INK.nebulaName.alpha * nebulaDim(n))
           if (entry.backed) {
-            // On a galaxy name: the star names' thin dark backing, so the letters under it do not show through.
+            // On a galaxy name: the star names' opaque backing, so the letters under it do not show through.
             ctx.globalAlpha = nameAlpha * REVEAL.keyName.backing
             ctx.fillStyle = colours.sky
             ctx.beginPath()

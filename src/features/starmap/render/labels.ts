@@ -4,7 +4,7 @@
  * name, a nebula's core, a line between nebulae, or another star's glyph.
  * A name with nowhere free to go is left out -- the parallel DOM still has it.
  * Two kinds of name insist (#144): a key star's may sit over other stars and
- * lines, on a thin dark backing (`placeInsisting`), and a name at the
+ * lines, on an opaque backing (#755) (`placeInsisting`), and a name at the
  * screen's edge slides along it (`edgeSpots`) to keep clear of the key stars.
  * No name sits on a galaxy name's letters while it has a free spot off them
  * (`Obstacles.covers`); one that must sit there anyway gets the same backing.
@@ -149,7 +149,7 @@ export function edgeSpots(x: number, y: number, half: number, area: Box, horizon
 
 /**
  * A key star's name when no free place is left (#144 B5): it may sit over
- * other stars (`circles`) and cross lines, on a thin dark backing, but never
+ * other stars (`circles`) and cross lines, on an opaque backing (#755), but never
  * over a placed name, over a key star (`keyCircles`) while another spot is
  * clear of them, or outside `area`. Over a star weighs less than across a
  * line, a line less than a galaxy name's letters (`covers`); the nearer spots
@@ -189,6 +189,80 @@ export function nearerStars(box: Box, own: { x: number; y: number }, others: rea
   let count = 0
   for (const c of others) if (Math.hypot(cx - c.x, cy - c.y) < d) count += 1
   return count
+}
+
+/** `text` cut with an ellipsis until it fits `max` px; `cut`: it lost its end already, so it ends in one whatever its width. */
+export function cutToWidth(text: string, measure: (text: string) => number, max: number, cut = false): string {
+  if (!cut && measure(text) <= max) return text
+  let out = text
+  while (out.length > 1 && measure(`${out}…`) > max) out = out.slice(0, -1)
+  return `${out.trimEnd()}…`
+}
+
+/**
+ * A star's name set in lines (#755): one line while it fits `lineMax` px,
+ * else broken between words into at most `maxLines` lines of `lineMax` px
+ * each, so a long name (the longest of four languages is German's) reads in
+ * full instead of being cut. A single word wider than `lineMax` keeps a line
+ * of its own up to `wordMax` px. Only what still does not fit is cut, with an
+ * ellipsis at the end of the last line.
+ */
+export function wrapName(name: string, measure: (text: string) => number, lineMax: number, maxLines: number, wordMax = lineMax): string[] {
+  const text = name.trim().replace(/\s+/g, ' ')
+  if (measure(text) <= lineMax) return [text]
+  if (maxLines <= 1) return [cutToWidth(text, measure, Math.max(lineMax, wordMax))]
+  const lines: string[] = []
+  let line = ''
+  for (const word of text.split(' ')) {
+    if (line === '') line = word
+    else if (measure(`${line} ${word}`) <= lineMax) line = `${line} ${word}`
+    else {
+      lines.push(line)
+      line = word
+    }
+  }
+  lines.push(line)
+  /** A line of one word may run to `wordMax`; any other to `lineMax`. */
+  const fit = (l: string) => cutToWidth(l, measure, l.includes(' ') ? lineMax : Math.max(lineMax, wordMax))
+  if (lines.length <= maxLines) return lines.map(fit)
+  // More than fits: the last line takes the rest of the name, cut at its end.
+  const kept = lines.slice(0, maxLines - 1).map(fit)
+  const rest = cutToWidth(lines.slice(maxLines - 1).join(' '), measure, lineMax)
+  return [...kept, rest.endsWith('…') ? rest : `${rest}…`]
+}
+
+/**
+ * The backing under a name that has to sit over a line or a star (#755): the
+ * name's box (its text with 3 px either side and 2 px above and below) grown
+ * so the text has `pad` px of backing all round.
+ */
+export function backingBox(box: Box, pad: number): Box {
+  const dx = Math.max(0, pad - 3)
+  const dy = Math.max(0, pad - 2)
+  return { x0: box.x0 - dx, y0: box.y0 - dy, x1: box.x1 + dx, y1: box.y1 + dy }
+}
+
+/**
+ * A thin leader from a star to its name (#755), where the name alone might
+ * not say whose it is: it sits on the far ring (`far`), its middle is
+ * nearer another star than its own (`nearerStars`), or another star is
+ * about as near the box as its own -- within `ratio` times its own star's
+ * distance. It runs from `gap` px past the star's rim to the nearest point
+ * of the name's box; null when no leader is wanted, or the two nearly touch
+ * (under `minLength` px apart).
+ */
+export function leaderLine(box: Box, own: Circle, others: readonly Circle[], far: boolean, gap: number, minLength: number, ratio = 1): Segment | null {
+  const tx = Math.max(box.x0, Math.min(own.x, box.x1))
+  const ty = Math.max(box.y0, Math.min(own.y, box.y1))
+  const d = Math.hypot(tx - own.x, ty - own.y)
+  const toBox = (c: Circle) => Math.hypot(Math.max(box.x0, Math.min(c.x, box.x1)) - c.x, Math.max(box.y0, Math.min(c.y, box.y1)) - c.y)
+  const unclear = far || nearerStars(box, own, others) > 0 || others.some((c) => toBox(c) < d * ratio)
+  if (!unclear) return null
+  const start = own.r + gap
+  if (d - start < minLength) return null
+  const ux = (tx - own.x) / d
+  const uy = (ty - own.y) / d
+  return { x0: own.x + ux * start, y0: own.y + uy * start, x1: tx, y1: ty }
 }
 
 /** Every part of a label must lie nearer its own centre than another nebula's. */

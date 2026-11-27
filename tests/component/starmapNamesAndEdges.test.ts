@@ -1,7 +1,8 @@
 /**
- * Names and lines by importance (#138, round two of #123): at the nebula band
- * only the key stars are named (B2) -- recommended, in progress, on the gold
- * path -- the rest on hover or further in; locked lines only for the star in
+ * Names and lines by importance (#138, round two of #123): further out than a
+ * chosen nebula opens at only the key stars are named (B2; #755 brought the
+ * rest in by then) -- recommended, in progress, on the gold path -- the rest
+ * on hover or further in; locked lines only for the star in
  * focus or the dragged one (D1); a relation across subjects keeps a faint
  * direction and an edge name (D2); a focused nebula's bridge to another
  * galaxy, off screen, is pointed to at the edge (D3); edge names are painted
@@ -86,9 +87,19 @@ function sky(width: number, height: number, subjectId = 'math', points: 1000 | 2
   return { real, engine, clock, map, go, redraw, log, scene: () => scene!, frame: () => frame! }
 }
 
+/** A glyph size where the key stars' names are in and the other stars' not yet. */
+const between = () => (REVEAL.starNameIn[1] + REVEAL.starNamesRest[0]) / 2
+
+/** Zoom around the middle until a star's glyph is `glyph` px (reduced motion: at once). */
+function zoomToGlyph(s: { engine: StarMapEngine; clock: { advance(ms: number): void } }, glyph: number, width: number, height: number) {
+  s.engine.zoomBy(Math.log2(glyph / s.engine.zoom.starPx), width / 2, height / 2)
+  s.clock.advance(1500)
+  expect(s.engine.zoom.starPx).toBeCloseTo(glyph, 0)
+}
+
 const ARROW = /^[↖↗↙↘] /
 
-describe('B2: at the nebula band only the key stars are named', () => {
+describe('B2: zoomed out past a chosen nebula only the key stars are named', () => {
   it('the key stars are the recommended ones, those in progress, and the gold path’s', () => {
     // 0 lit -> 1 recommended (gold), 2 in progress, 3 lit -> 4 locked, 5 ready.
     const key = keyStars(
@@ -104,7 +115,7 @@ describe('B2: at the nebula band only the key stars are named', () => {
     expect([...key]).toEqual([1, 1, 1, 0, 0, 0])
   })
 
-  it('names fade in continuously and monotonically with the zoom: the key stars’ first, the rest past a chosen nebula’s zoom', () => {
+  it('names fade in continuously and monotonically with the zoom: the key stars’ first, the rest by the zoom a chosen nebula opens at (#755)', () => {
     let last = 0
     for (let px = 0; px <= ZOOM.maxGlyph; px += 0.05) {
       const now = restStarNameAlpha(px)
@@ -112,12 +123,13 @@ describe('B2: at the nebula band only the key stars are named', () => {
       expect(now - last).toBeLessThan(0.02)
       last = now
     }
-    expect(REVEAL.starNamesRest[0]).toBeGreaterThan(ZOOM.nebulaGlyph)
     expect(REVEAL.starNamesRest[0]).toBeGreaterThan(REVEAL.starNameIn[1])
+    // #755: a chosen nebula opens with every star's name in, no unnamed hollow rings.
+    expect(restStarNameAlpha(ZOOM.nebulaGlyph)).toBe(1)
   })
 
   for (const [width, height] of [[1440, 900], [390, 844], [375, 812]] as const) {
-    it(`${width}×${height}: a chosen trigonometry names only key stars, and more once zoomed all the way in`, () => {
+    it(`${width}×${height}: zoomed out between the two fades only key stars are named; a chosen trigonometry names the others too`, () => {
       const s = sky(width, height)
       s.go({ layer: 'nebula', nebulaId: 'trigonometry' })
       const scene = s.scene()
@@ -125,15 +137,14 @@ describe('B2: at the nebula band only the key stars are named', () => {
       const byName = new Map<string, number[]>()
       scene.names.forEach((name, i) => byName.set(name, [...(byName.get(name) ?? []), i]))
       const starNames = (ops: Op[]) => ops.flatMap((o) => (o.op === 'text' && byName.has(o.text) ? [o.text] : []))
+      // As the nebula opens, the others are named too (#755).
       const atNebula = starNames(s.redraw())
-      expect(atNebula.length).toBeGreaterThan(0)
-      for (const name of atNebula) expect(byName.get(name)!.some((i) => key[i] === 1), name).toBe(true)
-      // All the way in, around the same point, the rest are named too.
-      for (let k = 0; k < 40; k += 1) s.engine.zoomBy(0.25, width / 2, height / 2)
-      s.clock.advance(1500)
-      expect(s.engine.zoom.starPx).toBeGreaterThanOrEqual(REVEAL.starNamesRest[1])
-      const allIn = starNames(s.redraw())
-      expect(allIn.some((name) => byName.get(name)!.every((i) => key[i] === 0))).toBe(true)
+      expect(atNebula.some((name) => byName.get(name)!.every((i) => key[i] === 0))).toBe(true)
+      // A little further out, where the key stars' names are in and the rest not yet, only theirs.
+      zoomToGlyph(s, between(), width, height)
+      const keyOnly = starNames(s.redraw())
+      expect(keyOnly.length).toBeGreaterThan(0)
+      for (const name of keyOnly) expect(byName.get(name)!.some((i) => key[i] === 1), name).toBe(true)
       s.engine.destroy()
     })
   }
@@ -141,6 +152,8 @@ describe('B2: at the nebula band only the key stars are named', () => {
   it('hovering a star names it; the pointer leaving lets it go', () => {
     const s = sky(1440, 900)
     s.go({ layer: 'nebula', nebulaId: 'trigonometry' })
+    // Where only the key stars are named by the zoom.
+    zoomToGlyph(s, between(), 1440, 900)
     const scene = s.scene()
     const key = keyStars(scene, STATE_IN_PROGRESS)
     const f = s.frame()
@@ -162,6 +175,25 @@ describe('B2: at the nebula band only the key stars are named', () => {
       expect(named(i), scene.names[i]).toBe(false)
     }
     expect(revealed).toBeGreaterThan(plain.length / 2)
+    s.engine.destroy()
+  })
+
+  it('hovering a star’s name lifts its star, as hovering the star does (#755)', () => {
+    const s = sky(1440, 900)
+    s.go({ layer: 'nebula', nebulaId: 'trigonometry' })
+    s.redraw()
+    const f = s.frame()
+    // A name whose middle is clear of every star's glyph: the pointer there is on the name only.
+    const box = (s.real.stats.starNames ?? []).find((b) => {
+      const mx = (b.x0 + b.x1) / 2
+      const my = (b.y0 + b.y1) / 2
+      return b.alpha > 0.5 && [...Array(s.scene().count).keys()].every((j) => Math.hypot(f.x[j] - mx, f.y[j] - my) > f.glyphSize)
+    })
+    expect(box).toBeDefined()
+    s.engine.hoverAt((box!.x0 + box!.x1) / 2, (box!.y0 + box!.y1) / 2)
+    expect(s.engine.hoveredStarIndex).toBe(box!.star)
+    s.engine.hoverAt(null)
+    expect(s.engine.hoveredStarIndex).toBe(-1)
     s.engine.destroy()
   })
 })

@@ -434,9 +434,9 @@ describe('what appears, by zoom (#134 Z1, Z4)', () => {
     expect(lineReveal(18).tiers[3]).toBe(1)
     // Tier 4 is the star in focus's only (#138 D1, `starLineLook`): in by the zoom a nebula opens at.
     expect(lineReveal(ZOOM.nebulaGlyph).tiers[4]).toBe(1)
-    // Past the key stars' names, the rest only further in than a chosen nebula opens (#138 B2).
-    expect(restStarNameAlpha(ZOOM.nebulaGlyph)).toBe(0)
-    expect(restStarNameAlpha(ZOOM.starGlyph)).toBeGreaterThan(0)
+    // Past the key stars' names, the rest (#138 B2), all of them in by the zoom a chosen nebula opens at (#755).
+    expect(restStarNameAlpha(REVEAL.starNameIn[1])).toBe(0)
+    expect(restStarNameAlpha(ZOOM.nebulaGlyph)).toBe(1)
     expect(restStarNameAlpha(ZOOM.maxGlyph)).toBe(1)
     expect(nebulaNameAlpha(400, 10, 3)).toBe(1)
     expect(nebulaNameAlpha(400, 30, 3)).toBe(0)

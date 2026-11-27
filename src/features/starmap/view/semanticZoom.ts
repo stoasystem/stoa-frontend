@@ -108,12 +108,17 @@ export const REVEAL = {
    */
   starNameIn: [14, 18] as Ramp,
   /**
-   * Every other star's name fades in over this range (px): past the zoom a
-   * chosen nebula opens at (`ZOOM.nebulaGlyph`, 28), so the nebula band
-   * names only the key stars and the gold path reads clearly; a hovered star
-   * is named from `starNameIn` on (#138 B2).
+   * Every other star's name fades in over this range (px), after the key
+   * stars' (#138 B2: further out only they are named, and the gold path
+   * reads clearly); a hovered star is named from `starNameIn` on.
+   *
+   * It ends at the zoom a chosen nebula opens at (`ZOOM.nebulaGlyph`, 28;
+   * #755): a nebula flown into shows each star with its name where there is
+   * room for it, not a scatter of unnamed hollow rings. (Until #755 it was
+   * [31, 37], past that zoom. The other way, flying in closer, is one
+   * number: `ZOOM.nebulaGlyph` at 34 with this ramp kept.)
    */
-  starNamesRest: [31, 37] as Ramp,
+  starNamesRest: [22, 28] as Ramp,
   /** From this glyph size (px) a tap picks a star (and stars on screen are Tab stops); below it, its nebula. The recommended star can always be picked. */
   starsPickableFrom: 14,
   /**
@@ -176,14 +181,48 @@ export const REVEAL = {
    * eight around it, then the same eight `farGap` px further out; a spot
    * whose middle is nearer another star than its own costs `nearerStarCost`
    * for each such star, so it is not read as theirs. A drag's
-   * linked stars (B8) insist the same way. Star names longer than
-   * `maxWidthPx` (or the screen's width less `sideMarginPx`) are cut with an
-   * ellipsis, so the longest of four languages still fits (#76). A name is
-   * never put on a galaxy name's letters while a spot off them is free; one
-   * that insists may sit there (`galaxyNameCost` a galaxy name, more than a
-   * line, so a free spot further out wins) on the same backing.
+   * linked stars (B8) insist the same way. A name is never put on a galaxy
+   * name's letters while a spot off them is free; one that insists may sit
+   * there (`galaxyNameCost` a galaxy name, more than a line, so a free spot
+   * further out wins) on the same backing.
+   *
+   * The backing is opaque (#755: at 0.78 it hardly showed, and a line read
+   * straight through the letters), round-cornered `backingRadiusPx`, with
+   * `backingPadPx` px of it round the text, so a line under the name breaks
+   * off at it.
+   *
+   * A star name wider than `lineWidthPx` (or the screen's width less
+   * `sideMarginPx`) is broken between words into up to `lines` lines,
+   * `lineHeightPx` apart (#755), and placed as the box of all its lines; a
+   * single word may run to `maxWidthPx`. Only what still does not fit is cut
+   * with an ellipsis, so the longest of four languages reads whole (#76).
    */
-  keyName: { keyStarCost: 1000, starCost: 3, lineCost: 8, galaxyNameCost: 12, nearerStarCost: 4, backing: 0.78, farGap: 14, maxWidthPx: 240, sideMarginPx: 48 },
+  keyName: {
+    keyStarCost: 1000,
+    starCost: 3,
+    lineCost: 8,
+    galaxyNameCost: 12,
+    nearerStarCost: 4,
+    backing: 1,
+    backingPadPx: 4,
+    backingRadiusPx: 6,
+    farGap: 14,
+    lineWidthPx: 180,
+    lines: 2,
+    lineHeightPx: 15,
+    maxWidthPx: 240,
+    sideMarginPx: 48,
+  },
+  /**
+   * A thin leader from a star to its name (#755) where the name might be read
+   * as another star's: it sits on the far ring (`keyName.farGap`), or its
+   * middle is nearer another star than its own, or another star is about as
+   * near the name: within `nearRatio` times its own star's distance from the
+   * name's box. `widthPx` wide, at `alpha` of the name's ink, from `gapPx`
+   * past the star's rim; none shorter than `minLengthPx` (a name that close
+   * reads as its star's).
+   */
+  nameLeader: { alpha: 0.55, widthPx: 1, gapPx: 2, minLengthPx: 6, nearRatio: 1.3 },
   /**
    * The phone's zoom buttons, bottom right over the map (StarMapView: 16 px
    * from the right and above the bottom inset, a frame 40 wide and 74 tall

@@ -241,6 +241,10 @@ describe('B8: a long press names the held star and its linked stars; a short tap
     it(`${width}×${height}: held, the star and every linked star in view are named; let go, the others' names go`, () => {
       const s = session(width, height)
       s.go({ layer: 'nebula', nebulaId: 'trigonometry' })
+      // Out to where only the key stars are named by the zoom (#755 names the rest as a nebula opens).
+      const glyph = (REVEAL.starNameIn[1] + REVEAL.starNamesRest[0]) / 2
+      s.engine.zoomBy(Math.log2(glyph / s.engine.zoom.starPx), width / 2, height / 2)
+      s.clock.advance(1500)
       const scene = s.scene()
       const i = s.index(DEMO)
       const linked = linkedStars(scene.starLinks, i)
