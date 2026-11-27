@@ -67,6 +67,45 @@ function smallCutScale(box: number): number {
  * a rim that has left the screen (#134).
  */
 const NEBULA_NAME_RING = 160
+/** How strongly the ring round the cluster under the mouse is drawn (#756): a hint, under the keyboard focus's full ring. */
+const HOVER_RING_ALPHA = 0.55
+/** Room between that ring and the cluster's outermost star glyph, px. */
+const HOVER_RING_PAD = 8
+
+/**
+ * A cluster as drawn (#756): the centre and radius (px) of the box round its
+ * stars on screen, or null when none is drawn. Not the cloud's disc, which
+ * keeps room round the stars.
+ */
+export function clusterAsDrawn(
+  nebula: number,
+  of: ArrayLike<number>,
+  x: ArrayLike<number>,
+  y: ArrayLike<number>,
+  alpha: ArrayLike<number>,
+  count: number,
+): { x: number; y: number; r: number } | null {
+  let x0 = Infinity
+  let y0 = Infinity
+  let x1 = -Infinity
+  let y1 = -Infinity
+  for (let i = 0; i < count; i += 1) {
+    if (of[i] !== nebula || alpha[i] < DRAW_THRESHOLD) continue
+    x0 = Math.min(x0, x[i])
+    y0 = Math.min(y0, y[i])
+    x1 = Math.max(x1, x[i])
+    y1 = Math.max(y1, y[i])
+  }
+  if (x0 > x1) return null
+  const cx = (x0 + x1) / 2
+  const cy = (y0 + y1) / 2
+  let r = 0
+  for (let i = 0; i < count; i += 1) {
+    if (of[i] !== nebula || alpha[i] < DRAW_THRESHOLD) continue
+    r = Math.max(r, Math.hypot(x[i] - cx, y[i] - cy))
+  }
+  return { x: cx, y: cy, r }
+}
 
 /**
  * Narrower than this, a nebula's name (a star cluster's, #747) is set a size
@@ -710,6 +749,20 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
         stats.highlightNebula = n
       } else {
         stats.highlightNebula = -1
+        // The cluster under the mouse from far out (#756): the same ring, thinner and fainter, so the whole cluster answers the pointer.
+        const ring = frame.hoverRing ?? -1
+        const around = ring >= 0 && ring < nebulaCount ? clusterAsDrawn(ring, scene.nebula, x, y, starAlpha, count) : null
+        if (around) {
+          // Round the stars as drawn, not the cloud's disc: the disc keeps room round them the eye does not see as the cluster.
+          ctx.globalAlpha = HOVER_RING_ALPHA
+          ctx.strokeStyle = colours.lit
+          ctx.lineWidth = 1.5
+          ctx.setLineDash([])
+          ctx.beginPath()
+          ctx.arc(around.x, around.y, around.r + Math.max(frame.glyphSize * 0.5, frame.dotRadius * 2) + HOVER_RING_PAD, 0, Math.PI * 2)
+          ctx.stroke()
+          ctx.globalAlpha = 1
+        }
       }
 
       // A recommended star is always a full glyph, at least 12 px: the way in.

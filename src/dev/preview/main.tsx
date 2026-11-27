@@ -12,8 +12,8 @@
  * check labels; `newcomer=1` gives the sky of a student who has not started
  * anything, to see the first landing; `languageFirst=1` an account that never
  * stored a language, to see the language first (#627); `guide=fresh` the
- * star clusters' hint and the route scene's tour not seen yet (#747; without
- * it both count as seen); `fresh=1` forgets what the demo backend kept in this tab
+ * star clusters' hint and the route scene's tour not seen yet (#747), nor the
+ * zoom hint's lines (#756; without it all count as seen); `fresh=1` forgets what the demo backend kept in this tab
  * (completed lessons, the lighting and its acknowledgement, #51, and Ask's
  * messages); `role=teacher`, `classroom=` and `mic=` set up the virtual
  * classroom (#696, see `classroom.ts`); `voice=on`, `voiceFails=`, `mic=` and
@@ -92,9 +92,10 @@ async function start() {
   // done at once, as finishing them on the page would leave the demo backend.
   ;(window as Window & { __stoaPreviewDemo?: unknown }).__stoaPreviewDemo = { finishDemoKnowledgePoint }
   {
-    // The star clusters' hint and the route scene's tour (#747): seen, unless the surface asks for them.
+    // The star clusters' hint and the route scene's tour (#747), and the zoom hint's two lines (#756):
+    // seen, unless the surface asks for them.
     const [{ onceKey }, { DEMO_STUDENT_ID }] = await Promise.all([import('@/features/starmap/onboarding/shownOnce'), import('@/dev/demo/data/student')])
-    for (const hint of ['clusterHint', 'routeTour'] as const) {
+    for (const hint of ['clusterHint', 'routeTour', 'zoomHintFar', 'zoomHintNear'] as const) {
       if (guideFresh) localStorage.removeItem(onceKey(hint, DEMO_STUDENT_ID))
       else localStorage.setItem(onceKey(hint, DEMO_STUDENT_ID), '1')
     }

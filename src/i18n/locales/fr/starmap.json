@@ -74,7 +74,7 @@
   },
   "firstReveal": {
     "title": "Ta première étoile brille !",
-    "body": "Elle brille maintenant en or sur ta carte du ciel. Ensuite : {{name}}.",
+    "body": "Elle brille maintenant en or sur ta carte du ciel. Ensuite : {{name}} – ou choisis toi-même une autre étoile.",
     "show": "Voir l’étoile suivante",
     "later": "Compris"
   },
@@ -101,6 +101,7 @@
     "keys": "Clavier : flèches vers le plus proche dans ce sens, Tab suit le cours, + et − zooment.",
     "label": "Ce que signifient les étoiles",
     "pointer": "Fais glisser pour te déplacer, fais défiler ou pince pour zoomer. Choisis une étoile pour voir son chapitre ; appuie dessus et fais-la glisser (en tactile, maintiens-la d’abord) pour voir ses liens.",
+    "choose": "Vue d’ensemble : touche un amas pour voir son parcours ; un peu plus près, tu plonges dedans. De près, ouvre l’étoile que tu veux – le chemin doré n’est qu’une suggestion.",
     "reviewDue": "À réviser",
     "waiting": "S’appuie sur des étoiles pas encore allumées"
   },
@@ -193,6 +194,14 @@
     "group": "Zoom",
     "in": "Zoomer",
     "out": "Dézoomer"
+  },
+  "zoomHint": {
+    "cluster": "Clique sur un amas pour voir son parcours – ou fais défiler pour zoomer.",
+    "clusterTouch": "Touche un amas pour voir son parcours – ou pince pour zoomer.",
+    "far": "Clique sur un amas pour plonger dedans – ou fais défiler pour zoomer.",
+    "farTouch": "Touche un amas pour plonger dedans – ou pince pour zoomer.",
+    "near": "Clique sur une étoile pour l’ouvrir · fais défiler pour revoir tout le ciel.",
+    "nearTouch": "Touche une étoile pour l’ouvrir · pince pour revoir tout le ciel."
   },
   "clusters": {
     "routeLabel": "Parcours : {{name}}",

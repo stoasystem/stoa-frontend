@@ -218,6 +218,12 @@ export type SceneFrame = {
   /** The nebula whose link has keyboard focus, drawn with a ring, or -1. */
   highlightNebula: number
   hoveredNebula?: number
+  /**
+   * The cluster a mouse click would go into, lit whole while stars are too
+   * small to pick one by one (#756), or -1 / absent. Softer than the keyboard
+   * focus's ring, and not drawn over it.
+   */
+  hoverRing?: number
   /** Everything but the focus star fades to this (a chosen star, zoomed in to it). */
   dim: number
   /**

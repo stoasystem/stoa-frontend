@@ -43,9 +43,9 @@ export type Surface = {
   /** An account that never stored a language: the language first (#627) asks it before "About you". */
   languageFirst?: true
   /**
-   * `fresh`: the star clusters' panorama hint and the route scene's tour (#747) not seen yet by
-   * the demo account, so they show. Without it both count as seen, and the other surfaces show
-   * the map and the scenes as they are.
+   * `fresh`: the star clusters' panorama hint and the route scene's tour (#747), and the zoom
+   * hint's two lines (#756), not seen yet by the demo account, so they show. Without it all count
+   * as seen, and the other surfaces show the map and the scenes as they are.
    */
   guide?: 'fresh'
   /**

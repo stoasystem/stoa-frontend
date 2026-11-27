@@ -74,7 +74,7 @@
   },
   "firstReveal": {
     "title": "Dein erster Stern leuchtet!",
-    "body": "Er leuchtet jetzt golden auf deiner Sternkarte. Als Nächstes: {{name}}.",
+    "body": "Er leuchtet jetzt golden auf deiner Sternkarte. Als Nächstes: {{name}} – oder such dir selbst einen anderen Stern aus.",
     "show": "Nächsten Stern zeigen",
     "later": "Alles klar"
   },
@@ -101,6 +101,7 @@
     "keys": "Tasten: Pfeile zum Nächsten in dieser Richtung, Tab folgt dem Kurs, + und − zoomen.",
     "label": "Was die Sterne bedeuten",
     "pointer": "Ziehen verschiebt, Scrollen oder Zwei-Finger-Zoom zoomt. Einen Stern wählen zeigt sein Kapitel; ihn gedrückt ziehen (am Touchscreen erst halten) zeigt, womit er zusammenhängt.",
+    "choose": "In der Gesamtansicht zeigt dir ein Tipp auf einen Sternhaufen seine Lernroute, etwas näher fliegst du hinein. Von nahem kannst du jeden Stern öffnen – der goldene Weg ist nur ein Vorschlag.",
     "reviewDue": "Wiederholung fällig",
     "waiting": "Baut auf Sternen auf, die noch nicht leuchten"
   },
@@ -187,6 +188,14 @@
     "group": "Zoom",
     "in": "Hineinzoomen",
     "out": "Herauszoomen"
+  },
+  "zoomHint": {
+    "cluster": "Klick auf einen Sternhaufen für seine Lernroute – oder scroll hinein.",
+    "clusterTouch": "Tipp auf einen Sternhaufen für seine Lernroute – oder zoom hinein.",
+    "far": "Klick auf einen Sternhaufen, um hineinzufliegen – oder scroll hinein.",
+    "farTouch": "Tipp auf einen Sternhaufen, um hineinzufliegen – oder zoom hinein.",
+    "near": "Klick auf einen Stern, um ihn zu öffnen · scroll zurück zum ganzen Himmel.",
+    "nearTouch": "Tipp auf einen Stern, um ihn zu öffnen · zoom zurück zum ganzen Himmel."
   },
   "clusters": {
     "routeLabel": "Lernweg: {{name}}",
