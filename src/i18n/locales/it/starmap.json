@@ -74,7 +74,7 @@
   },
   "firstReveal": {
     "title": "La tua prima stella è accesa!",
-    "body": "Ora brilla d’oro sulla tua mappa stellare. Poi: {{name}}.",
+    "body": "Ora brilla d’oro sulla tua mappa stellare. Poi: {{name}} – oppure scegli tu un’altra stella.",
     "show": "Mostra la prossima stella",
     "later": "Capito"
   },
@@ -101,6 +101,7 @@
     "keys": "Tastiera: frecce verso il più vicino da quel lato, Tab segue il corso, + e − per lo zoom.",
     "label": "Cosa significano le stelle",
     "pointer": "Trascina per spostarti, scorri o pizzica per lo zoom. Scegli una stella per vederne il capitolo; premila e trascinala (sul touch, prima tienila premuta) per vedere a cosa è collegata.",
+    "choose": "Da lontano, tocca un ammasso per entrarci. Da vicino puoi aprire la stella che vuoi: il percorso dorato è solo un suggerimento.",
     "reviewDue": "Da ripassare",
     "waiting": "Si basa su stelle non ancora accese"
   },
@@ -193,6 +194,14 @@
     "group": "Zoom",
     "in": "Ingrandisci",
     "out": "Riduci"
+  },
+  "zoomHint": {
+    "cluster": "Fai clic su un ammasso per vedere il suo percorso – o scorri per ingrandire.",
+    "clusterTouch": "Tocca un ammasso per vedere il suo percorso – o pizzica per ingrandire.",
+    "far": "Fai clic su un ammasso per volarci dentro – o scorri per ingrandire.",
+    "farTouch": "Tocca un ammasso per volarci dentro – o pizzica per ingrandire.",
+    "near": "Fai clic su una stella qualsiasi per aprirla · scorri indietro per tornare a tutto il cielo.",
+    "nearTouch": "Tocca una stella qualsiasi per aprirla · pizzica per tornare a tutto il cielo."
   },
   "clusters": {
     "routeLabel": "Percorso: {{name}}",

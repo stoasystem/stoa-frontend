@@ -37,6 +37,7 @@ import { useAboutYou } from '@/features/starmap/onboarding/useAboutYou'
 import { useLanguageFirst } from '@/features/starmap/onboarding/useLanguageFirst'
 import { useFirstLanding } from '@/features/starmap/onboarding/useFirstLanding'
 import { useFirstReveal } from '@/features/starmap/onboarding/useFirstReveal'
+import { useZoomHint } from '@/features/starmap/onboarding/ZoomHint'
 import { ReviewReminderBubble, ReviewReminderCorner } from '@/features/starmap/reviewReminder/ReviewReminderMurmi'
 import { useReviewReminder } from '@/features/starmap/reviewReminder/useReviewReminder'
 import { DEFAULT_SUBJECT_ID, DEMO_STAR_COUNT, fixtureSizeFrom, foveationFrom, useStarMap } from '@/features/starmap/useStarMap'
@@ -123,22 +124,29 @@ export function StarMapRoute({ relations = false, longNames = false }: { relatio
   const landedAt = useRef(location.pathname)
   const onFirstFrame = useCallback(() => markLoginFirstScreenReady(landedAt.current), [])
 
+  // The zoom hint (#756): each of its lines goes once the student has done what it says.
+  const zoomHint = useZoomHint(ownerId)
+  const zoomChose = zoomHint.chose
   // A nebula or star lives under its own galaxy's route: one sky, so it may be another subject's.
   const onNavigate = useCallback(
-    (next: LayerTarget) =>
-      navigate({ pathname: pathForTarget(next.layer === 'map' ? map.subject.subjectId : subjectOfNebula(map, next.nebulaId), next), search: location.search }),
-    [navigate, map, location.search],
+    (next: LayerTarget) => {
+      zoomChose(next, routeTarget)
+      navigate({ pathname: pathForTarget(next.layer === 'map' ? map.subject.subjectId : subjectOfNebula(map, next.nebulaId), next), search: location.search })
+    },
+    [navigate, map, location.search, zoomChose, routeTarget],
   )
   // A star cluster chosen on the whole view (#747): its route scene, over the map; the sky stays the step back.
   // The clusters' hint has done its job then.
   const hintOpened = useRef<() => void>(() => {})
+  const zoomWentIn = zoomHint.wentIn
   const onOpenCluster = useCallback(
     (id: string) => {
       hintOpened.current()
+      zoomWentIn()
       const state: ClusterSceneState = { fromSky: true }
       navigate({ pathname: clusterPath(subjectOfNebula(map, id), id), search: location.search }, { state })
     },
-    [navigate, map, location.search],
+    [navigate, map, location.search, zoomWentIn],
   )
   // Back from a scene, focus goes back to the cluster it opened, when nothing else has it.
   const openedCluster = useRef<string | null>(null)
@@ -178,13 +186,15 @@ export function StarMapRoute({ relations = false, longNames = false }: { relatio
   const reminderBubble = !firstLandingUp && !findStarUp && !hintUp ? reminder.star : null
   // Not with a star chosen either: its card or sheet has that side of the map.
   const reminderCorner = !firstLandingUp && !findStarUp && !hintUp && !reminder.star && routeTarget.layer !== 'star' ? reminder.mood : null
+  // The zoom hint's line (#756) waits for every first-run screen, Murmi bubble and lighting moment above.
+  const zoomGuide = sceneUp || firstLandingUp || findStarUp || hintUp || reminderBubble || lightingBusy || firstReveal.target ? null : zoomHint.guide
 
   if (status === 'pending') return <StarMapLoading />
   if (status === 'error') return <StarMapError onRetry={retry} />
   if (map.subjects.length === 0) return <EmptyStarMap onShown={onFirstFrame} />
 
   const sky = (
-    <StarMapView demo={demo} map={stage.map} target={firstReveal.target ?? findStar.target ?? (reminderBubble ? reminder.target : null) ?? first.target} path={findStar.path} marked={reminderBubble?.unitId ?? null} onNavigate={onNavigate} land={stage.land} onFirstFrame={onFirstFrame} onCentreGalaxy={onCentreGalaxy} onOpenCluster={onOpenCluster} foveate={search.has('foveation') ? foveationFrom(search) : false}
+    <StarMapView demo={demo} map={stage.map} target={firstReveal.target ?? findStar.target ?? (reminderBubble ? reminder.target : null) ?? first.target} path={findStar.path} marked={reminderBubble?.unitId ?? null} onNavigate={onNavigate} land={stage.land} onFirstFrame={onFirstFrame} onCentreGalaxy={onCentreGalaxy} onOpenCluster={onOpenCluster} guide={zoomGuide} foveate={search.has('foveation') ? foveationFrom(search) : false}
       overlay={(locate, watch) => (
         <>
           <LightingOverlay map={map} locate={locate} watch={watch} onReveal={firstReveal.onReveal} onBusy={setLightingBusy} />

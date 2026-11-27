@@ -49,6 +49,7 @@ import { nebulaLinks } from '@/features/starmap/model/links'
 import { animationFrameScheduler, StarMapEngine, type FoundPath, type FrameScheduler, type NebulaDiscOnScreen, type StarOnScreen, type VisibleStar, type ZoomState } from '@/features/starmap/engine/starMapEngine'
 import { LEARNING_STATES, nebulaCounts, orderedNebulae, orderedStars, subjectOfNebula, type StarMap } from '@/features/starmap/model/starMap'
 import { usePrefersReducedMotion } from '@/features/starmap/motion/usePrefersReducedMotion'
+import { ZoomHintText, zoomHintLine, type ZoomGuide } from '@/features/starmap/onboarding/ZoomHint'
 import { createRenderer } from '@/features/starmap/render/createRenderer'
 import { GALAXY_NAME_INK } from '@/features/starmap/render/galaxyNames'
 import { STAR_INK } from '@/features/starmap/render/glyph'
@@ -129,6 +130,11 @@ export type StarMapViewProps = {
    * and stars are chosen as before. Absent, the map flies in at every zoom.
    */
   onOpenCluster?: (clusterId: string) => void
+  /**
+   * The zoom hint's lines still to give (#756), or null / absent for none: the
+   * map says the one that fits its zoom beside the zoom buttons.
+   */
+  guide?: ZoomGuide | null
   /** Drawn above the canvas, below the controls: the lighting layer (#51), told where a star -- or, by its id, a nebula -- is drawn. */
   overlay?: (locate: (unitId: string) => StarOnScreen | null, watch: (listener: () => void) => () => void) => ReactNode
 }
@@ -266,6 +272,8 @@ function LegendHow({ t }: { t: UseTranslationResponse<'starmap', undefined>['t']
   return (
     <>
       <p className="m-0 text-[13px] text-[color:var(--on-sky-text-body)]" data-legend-pointer>{t('legend.pointer')}</p>
+      {/* What a tap does from far out and up close, and that any star may be opened (#756). */}
+      <p className="m-0 text-[13px] text-[color:var(--on-sky-text-body)]" data-legend-choose>{t('legend.choose')}</p>
       <p className="m-0 text-[13px] text-[color:var(--on-sky-text-body)]" data-legend-keys>{t('legend.keys')}</p>
     </>
   )
@@ -274,7 +282,7 @@ function LegendHow({ t }: { t: UseTranslationResponse<'starmap', undefined>['t']
 const OVERLAY_LINK =
   'inline-flex min-h-11 items-center text-on-sky hover:opacity-70 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring'
 
-export function StarMapView({ map, demo = false, target, path, marked, onNavigate, land, onFirstFrame, onCentreGalaxy, onOpenCluster, foveate, scheduler, createRendererFor, overlay }: StarMapViewProps) {
+export function StarMapView({ map, demo = false, target, path, marked, onNavigate, land, onFirstFrame, onCentreGalaxy, onOpenCluster, guide, foveate, scheduler, createRendererFor, overlay }: StarMapViewProps) {
   const { t, i18n } = useTranslation('starmap')
   // The map's own links keep the query (`?points=`, the dev switches), as its
   // navigation does: a switch must hand the engine the same sky (#123).
@@ -1165,6 +1173,9 @@ export function StarMapView({ map, demo = false, target, path, marked, onNavigat
             </Dialog.Root>
           </div>
         )}
+
+        {/* What a tap does at this zoom (#756): one line beside the zoom buttons. */}
+        {stars.length > 0 && <ZoomHintText line={zoomHintLine(visible.zoom, target.layer, Boolean(onOpenCluster), guide)} wide={wide} />}
 
         {/* Zoom in and out (canvas board: a glass pair, bottom right). */}
         {stars.length > 0 && (
