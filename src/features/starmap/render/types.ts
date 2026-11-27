@@ -320,7 +320,20 @@ export type RenderStats = {
    * A new array every frame; empty when no name was drawn.
    */
   nebulaNames?: readonly NebulaNameBox[]
+  /**
+   * The star names drawn in the last frame (#755), so the pointer over a
+   * name lifts its star as the pointer over the star does. A new array every
+   * frame; empty when no star name was drawn.
+   */
+  starNames?: readonly StarNameBox[]
 }
+
+/**
+ * A star's name as drawn (`RenderStats.starNames`): which star, its box in CSS
+ * px of the stage (both lines of a name in two), its alpha, whether a leader
+ * ties it to its star and whether it sits on the opaque backing (#755).
+ */
+export type StarNameBox = { star: number; x0: number; y0: number; x1: number; y1: number; alpha: number; leader: boolean; backed: boolean }
 
 /** A name at the screen's edge as drawn (`RenderStats.edgeLabels`): its text, its box in CSS px of the stage, its alpha. */
 export type EdgeLabelBox = { text: string; x0: number; y0: number; x1: number; y1: number; alpha: number }
