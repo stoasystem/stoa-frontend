@@ -187,14 +187,15 @@ export function StarMapRoute({ relations = false, longNames = false }: { relatio
   // Not with a star chosen either: its card or sheet has that side of the map.
   const reminderCorner = !firstLandingUp && !findStarUp && !hintUp && !reminder.star && routeTarget.layer !== 'star' ? reminder.mood : null
   // The zoom hint's line (#756) waits for every first-run screen, Murmi bubble and lighting moment above.
-  const zoomGuide = sceneUp || firstLandingUp || findStarUp || hintUp || reminderBubble || lightingBusy || firstReveal.target ? null : zoomHint.guide
+  // Nor on a sky not confirmed yet (#757): nothing guiding shows on the last sky kept.
+  const zoomGuide = provisional || sceneUp || firstLandingUp || findStarUp || hintUp || reminderBubble || lightingBusy || firstReveal.target ? null : zoomHint.guide
 
   if (status === 'pending') return <StarMapLoading />
   if (status === 'error') return <StarMapError onRetry={retry} />
   if (map.subjects.length === 0) return <EmptyStarMap onShown={onFirstFrame} />
 
   const sky = (
-    <StarMapView demo={demo} map={stage.map} target={firstReveal.target ?? findStar.target ?? (reminderBubble ? reminder.target : null) ?? first.target} path={findStar.path} marked={reminderBubble?.unitId ?? null} onNavigate={onNavigate} land={stage.land} onFirstFrame={onFirstFrame} onCentreGalaxy={onCentreGalaxy} onOpenCluster={onOpenCluster} guide={zoomGuide} foveate={search.has('foveation') ? foveationFrom(search) : false}
+    <StarMapView demo={demo} map={stage.map} target={firstReveal.target ?? findStar.target ?? (reminderBubble ? reminder.target : null) ?? first.target} path={findStar.path} marked={reminderBubble?.unitId ?? null} onNavigate={onNavigate} land={stage.land} onFirstFrame={onFirstFrame} onCentreGalaxy={onCentreGalaxy} onOpenCluster={onOpenCluster} guide={zoomGuide} onEnterNebula={zoomWentIn} foveate={search.has('foveation') ? foveationFrom(search) : false}
       overlay={(locate, watch) => (
         <>
           <LightingOverlay map={map} locate={locate} watch={watch} onReveal={firstReveal.onReveal} onBusy={setLightingBusy} />

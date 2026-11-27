@@ -101,7 +101,7 @@
     "keys": "Tasten: Pfeile zum Nächsten in dieser Richtung, Tab folgt dem Kurs, + und − zoomen.",
     "label": "Was die Sterne bedeuten",
     "pointer": "Ziehen verschiebt, Scrollen oder Zwei-Finger-Zoom zoomt. Einen Stern wählen zeigt sein Kapitel; ihn gedrückt ziehen (am Touchscreen erst halten) zeigt, womit er zusammenhängt.",
-    "choose": "Von weitem bringt dich ein Tipp auf einen Sternhaufen hinein. Von nahem kannst du jeden Stern öffnen, den du willst – der goldene Weg ist nur ein Vorschlag.",
+    "choose": "In der Gesamtansicht zeigt dir ein Tipp auf einen Sternhaufen seine Lernroute, etwas näher fliegst du hinein. Von nahem kannst du jeden Stern öffnen – der goldene Weg ist nur ein Vorschlag.",
     "reviewDue": "Wiederholung fällig",
     "waiting": "Baut auf Sternen auf, die noch nicht leuchten"
   },
@@ -190,12 +190,12 @@
     "out": "Herauszoomen"
   },
   "zoomHint": {
-    "cluster": "Klick auf einen Sternhaufen für seine Lernroute – oder scroll zum Hineinzoomen.",
-    "clusterTouch": "Tipp auf einen Sternhaufen für seine Lernroute – oder zoom mit zwei Fingern hinein.",
-    "far": "Klick auf einen Sternhaufen, um hineinzufliegen – oder scroll zum Hineinzoomen.",
-    "farTouch": "Tipp auf einen Sternhaufen, um hineinzufliegen – oder zoom mit zwei Fingern hinein.",
-    "near": "Klick auf einen beliebigen Stern, um ihn zu öffnen · scroll zurück für den ganzen Himmel.",
-    "nearTouch": "Tipp auf einen beliebigen Stern, um ihn zu öffnen · zwei Finger zusammen für den ganzen Himmel."
+    "cluster": "Klick auf einen Sternhaufen für seine Lernroute – oder scroll hinein.",
+    "clusterTouch": "Tipp auf einen Sternhaufen für seine Lernroute – oder zoom hinein.",
+    "far": "Klick auf einen Sternhaufen, um hineinzufliegen – oder scroll hinein.",
+    "farTouch": "Tipp auf einen Sternhaufen, um hineinzufliegen – oder zoom hinein.",
+    "near": "Klick auf einen Stern, um ihn zu öffnen · scroll zurück zum ganzen Himmel.",
+    "nearTouch": "Tipp auf einen Stern, um ihn zu öffnen · zoom zurück zum ganzen Himmel."
   },
   "clusters": {
     "routeLabel": "Lernweg: {{name}}",

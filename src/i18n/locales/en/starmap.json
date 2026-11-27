@@ -101,7 +101,7 @@
     "keys": "Keys: arrows go to the nearest one that way, Tab follows the course, + and − zoom.",
     "label": "What the stars mean",
     "pointer": "Drag to move, scroll or pinch to zoom. Pick a star to see its chapter; press and drag it (on touch, hold it first) to see what it connects to.",
-    "choose": "From far out, a tap on a cluster takes you into it. Up close, you can open any star you like – the gold path is only a suggestion.",
+    "choose": "On the whole view, tap a cluster to see its learning route; a little closer, a tap flies you into it. Up close, open any star you like – the gold path is only a suggestion.",
     "reviewDue": "Due for review",
     "waiting": "Builds on stars not lit yet"
   },
@@ -190,12 +190,12 @@
     "out": "Zoom out"
   },
   "zoomHint": {
-    "cluster": "Click a cluster to see its learning route – or scroll to zoom in.",
-    "clusterTouch": "Tap a cluster to see its learning route – or pinch to zoom in.",
+    "cluster": "Click a cluster for its learning route – or scroll to zoom in.",
+    "clusterTouch": "Tap a cluster for its learning route – or pinch to zoom in.",
     "far": "Click a cluster to fly into it – or scroll to zoom in.",
     "farTouch": "Tap a cluster to fly into it – or pinch to zoom in.",
-    "near": "Click any star to open it · scroll back out for the whole sky.",
-    "nearTouch": "Tap any star to open it · pinch back out for the whole sky."
+    "near": "Click any star to open it · scroll out for the whole sky.",
+    "nearTouch": "Tap any star to open it · pinch out for the whole sky."
   },
   "clusters": {
     "routeLabel": "Learning route: {{name}}",

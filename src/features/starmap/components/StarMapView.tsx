@@ -135,6 +135,8 @@ export type StarMapViewProps = {
    * map says the one that fits its zoom beside the zoom buttons.
    */
   guide?: ZoomGuide | null
+  /** A nebula entered by its own link (the keyboard's way in, a router link rather than `onNavigate`): for the zoom hint (#756). */
+  onEnterNebula?: (nebulaId: string) => void
   /** Drawn above the canvas, below the controls: the lighting layer (#51), told where a star -- or, by its id, a nebula -- is drawn. */
   overlay?: (locate: (unitId: string) => StarOnScreen | null, watch: (listener: () => void) => () => void) => ReactNode
 }
@@ -282,7 +284,7 @@ function LegendHow({ t }: { t: UseTranslationResponse<'starmap', undefined>['t']
 const OVERLAY_LINK =
   'inline-flex min-h-11 items-center text-on-sky hover:opacity-70 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring'
 
-export function StarMapView({ map, demo = false, target, path, marked, onNavigate, land, onFirstFrame, onCentreGalaxy, onOpenCluster, guide, foveate, scheduler, createRendererFor, overlay }: StarMapViewProps) {
+export function StarMapView({ map, demo = false, target, path, marked, onNavigate, land, onFirstFrame, onCentreGalaxy, onOpenCluster, guide, onEnterNebula, foveate, scheduler, createRendererFor, overlay }: StarMapViewProps) {
   const { t, i18n } = useTranslation('starmap')
   // The map's own links keep the query (`?points=`, the dev switches), as its
   // navigation does: a switch must hand the engine the same sky (#123).
@@ -991,6 +993,7 @@ export function StarMapView({ map, demo = false, target, path, marked, onNavigat
                         onClick={(event) => {
                           if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || event.button !== 0) return
                           if (openCluster(nebula.topicId)) event.preventDefault()
+                          else onEnterNebula?.(nebula.topicId)
                         }}
                         onFocus={(event) => { measureFocusPill(event.currentTarget); focusNebula(nebulaIndex) }}
                         onBlur={() => focusNebula(-1)}

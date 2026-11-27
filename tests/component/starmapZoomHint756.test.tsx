@@ -30,6 +30,7 @@ import it_ from '@/i18n/locales/it/starmap.json'
 import { BUBBLE_EXIT_MS } from '@/features/starmap/components/MurmiBubble'
 import { StarMapView } from '@/features/starmap/components/StarMapView'
 import { StarMapEngine } from '@/features/starmap/engine/starMapEngine'
+import { clusterAsDrawn } from '@/features/starmap/render/canvas2d'
 import { orderedStars, type StarMap } from '@/features/starmap/model/starMap'
 import { markShown, onceKey, shownBefore } from '@/features/starmap/onboarding/shownOnce'
 import type { FirstReveal } from '@/features/starmap/onboarding/useFirstReveal'
@@ -324,6 +325,36 @@ describe('D. never with another bubble', () => {
     await waitFor(() => expect(hintLine()).not.toBeNull())
   })
 
+  it('waits for the sky to be confirmed: nothing on a provisional one (#757)', async () => {
+    const confirm: { current: (provisional: boolean) => void } = { current: () => {} }
+    function Switchable() {
+      const [provisional, setProvisional] = useState(true)
+      confirm.current = setProvisional
+      return (
+        <StarMapSourceContext.Provider value={{ ...source, provisional }}>
+          <MemoryRouter initialEntries={['/map/math']}>
+            <Routes>
+              <Route path="/map/:subjectId" element={<StarMapRoute />} />
+            </Routes>
+          </MemoryRouter>
+        </StarMapSourceContext.Provider>
+      )
+    }
+    const client = new QueryClient({ defaultOptions: { queries: { retry: false } } })
+    render(
+      <I18nextProvider i18n={i18n}>
+        <QueryClientProvider client={client}>
+          <Switchable />
+        </QueryClientProvider>
+      </I18nextProvider>,
+    )
+    await waitFor(() => expect(document.querySelector('[data-starmap-stage]')).not.toBeNull())
+    await act(async () => {})
+    expect(hintLine()).toBeNull()
+    act(() => confirm.current(false))
+    await waitFor(() => expect(hintLine()).not.toBeNull())
+  })
+
   it('waits for the first landing’s bubble', async () => {
     sessionStorage.setItem(`stoa.starmap.firstLanding.subject.${OWNER}`, 'math')
     mountRoute('/map/math', newcomer)
@@ -418,7 +449,40 @@ describe('D. never with another bubble', () => {
 
 // ---------------------------------------------------------------- E. the mouse from far out
 
+describe('C2. the keyboard way in', () => {
+  beforeEach(() => stageRect())
+
+  it("a nebula entered by its own link counts as gone in, as a tap does", () => {
+    const onEnterNebula = vi.fn()
+    const view = render(
+      <I18nextProvider i18n={i18n}>
+        <MemoryRouter>
+          <div data-surface="sky" className="flex">
+            <StarMapView map={skyMap(1000)} target={{ layer: 'map' }} onNavigate={() => {}} onEnterNebula={onEnterNebula} scheduler={fakeClock()} createRendererFor={() => recordingRenderer()} />
+          </div>
+        </MemoryRouter>
+      </I18nextProvider>,
+    )
+    const link = view.container.querySelector<HTMLAnchorElement>('a[data-nebula-link]')!
+    fireEvent.click(link)
+    expect(onEnterNebula).toHaveBeenCalledWith(link.dataset.nebulaLink)
+  })
+})
+
 describe('E. the mouse from far out', () => {
+  it('rings the cluster as drawn: round its stars, not round the cloud', () => {
+    // Three stars of nebula 1 in a 40 x 30 box, one of nebula 0 far away, one of nebula 1 not drawn.
+    const of = [1, 1, 1, 0, 1]
+    const x = [100, 140, 120, 900, 500]
+    const y = [200, 200, 230, 900, 500]
+    const alpha = [1, 1, 1, 1, 0]
+    const around = clusterAsDrawn(1, of, x, y, alpha, 5)!
+    expect(around.x).toBe(120)
+    expect(around.y).toBe(215)
+    expect(around.r).toBeCloseTo(Math.hypot(20, 15), 5)
+    expect(clusterAsDrawn(2, of, x, y, alpha, 5)).toBeNull()
+  })
+
   function engineOn() {
     const clock = fakeClock()
     const renderer = recordingRenderer()
@@ -470,7 +534,8 @@ describe('F. the words, in four languages', () => {
     const lines = locale.zoomHint
     for (const key of ['cluster', 'clusterTouch', 'far', 'farTouch', 'near', 'nearTouch'] as const) {
       expect(lines[key], key).toBeTruthy()
-      expect(lines[key].length, key).toBeLessThan(110)
+      // Two lines at most between the help star and the zoom buttons of a 375 px phone (measured: 80 characters fit).
+      expect(lines[key].length, key).toBeLessThanOrEqual(80)
     }
     expect(locale.legend.choose.length).toBeGreaterThan(40)
     // The half sentence after the next star's name.
