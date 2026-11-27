@@ -383,6 +383,10 @@ export class StarMapEngine {
   private hoveredNebula = -1
   /** The star under the mouse, where single stars can be picked (#138 B2: its name shows), or -1. */
   private hoveredStar = -1
+  /** Where the mouse rests over the map, or null: for the ring round the cluster a click there goes into (#756). */
+  private hoverPoint: Pointer | null = null
+  /** That cluster, by index, or -1: drawn while stars are still too small to pick one by one. */
+  private hoverRing = -1
   private pressedStar = -1
   /** The path to a star found from Ask (#489), by unit id, and how far it is drawn in (eased); kept while it eases out. */
   private path: FoundPath | null = null
@@ -948,14 +952,50 @@ export class StarMapEngine {
    * The cursor over `(x, y)` for a mouse: `grab` over a star that can be
    * dragged, `grabbing` while one is, else '' (the stage's own).
    */
-  cursorAt(x: number, y: number): '' | 'pointer' | 'grab' | 'grabbing' {
+  cursorAt(x: number, y: number): '' | 'pointer' | 'zoom-in' | 'grab' | 'grabbing' {
     if (this.grab?.dragging) return 'grabbing'
     if (this.pointers.size > 0) return ''
     if (this.grabbable(x, y, 'mouse') >= 0) return 'grab'
+    // From far out, a click on a cluster goes into it (#756): the magnifier says
+    // so, as its ring does (`hoverRingAt`), while no single star can be picked yet.
+    if (this.hoverRingAt(x, y) >= 0) return 'zoom-in'
     // Everything on this map is reached by clicking it, and the pointer never
     // said so: over a star or a nebula the cursor stayed the arrow, so the
     // whole sky read as a picture rather than something to open.
     return this.wouldChoose(x, y) ? 'pointer' : ''
+  }
+
+  /**
+   * The nebula a tap at `(x, y)` goes into -- its route scene on the whole
+   * view (#747), else a flight to it -- or null: the tap opens a star, lets a
+   * card go, or does nothing. The same order and reach `choose` uses.
+   */
+  private nebulaChoiceAt(x: number, y: number): string | null {
+    if (!this.map || this.viewport.width === 0) return null
+    const reach = starPickRadius(this.glyphSize, this.zoom.pickable)
+    const hit = this.pickStar(x, y) ?? this.beaconAt(x, y)
+    const target = this.target
+    if (this.zoom.wholeView && this.options.onOpenCluster) {
+      const cluster = hit?.nebulaId ?? this.nebulaNameAt(x, y) ?? this.nebulaAt(x, y) ?? this.nearestStar(x, y, reach)?.nebulaId ?? null
+      if (cluster) return cluster
+    }
+    if (hit) return null
+    const named = this.nebulaNameAt(x, y)
+    if (named) return target.layer === 'nebula' && target.nebulaId === named ? null : named
+    if (target.layer === 'star') return null
+    const nebulaId = this.nebulaAt(x, y) ?? this.nearestStar(x, y, reach)?.nebulaId ?? null
+    return !nebulaId || (target.layer === 'nebula' && target.nebulaId === nebulaId) ? null : nebulaId
+  }
+
+  /**
+   * The cluster a mouse over `(x, y)` lights up whole (#756), by index, or -1:
+   * the one a click there goes into, while stars are too small to pick one by
+   * one. Once they can be, only the star under the pointer answers it.
+   */
+  private hoverRingAt(x: number, y: number): number {
+    if (this.zoom.pickable || this.pointers.size > 0) return -1
+    const id = this.nebulaChoiceAt(x, y)
+    return id ? this.nebulaIndex.get(id) ?? -1 : -1
   }
 
   /** Whether a tap here would open something. The same reach `choose` uses. */
@@ -1517,9 +1557,12 @@ export class StarMapEngine {
     // Over a star's name, that star (#755): the name and its star are lifted together.
     const under = x === null ? -1 : this.hoverable(x, y)
     const star = under >= 0 || x === null ? under : this.starNameAt(x, y)
-    if (next === this.hoveredNebula && star === this.hoveredStar) return
+    this.hoverPoint = x === null ? null : { x, y }
+    const ring = x === null ? -1 : this.hoverRingAt(x, y)
+    if (next === this.hoveredNebula && star === this.hoveredStar && ring === this.hoverRing) return
     this.hoveredNebula = next
     this.hoveredStar = star
+    this.hoverRing = ring
     this.invalidate()
   }
 
@@ -1801,6 +1844,8 @@ export class StarMapEngine {
     // The whole view says what the clusters are, not what is in them: no star names, no star picked out by the pointer (#747).
     const wholeView = this.sky && pastPanorama < REVEAL.panoramaBand
     const { width, height } = this.viewport
+    // The mouse at rest while the zoom moves under it (the wheel): its ring follows what a click there would do now (#756).
+    if (this.hoverPoint) this.hoverRing = this.hoverRingAt(this.hoverPoint.x, this.hoverPoint.y)
     return {
       dotBlend: Math.max(dotBlendFor(glyphSize), 1 - ramp(pastPanorama, REVEAL.dotsPastPanorama)),
       dotRadius: Math.max(1.15, Math.min(2.1, t.scale * this.dotSpacing * 0.11)),
@@ -1834,6 +1879,7 @@ export class StarMapEngine {
       wholeMap: target.layer === 'map',
       focusStar,
       hoveredNebula: this.hoveredNebula,
+      hoverRing: this.hoverRing,
       highlightNebula: target.layer === 'star' ? -1 : this.focusNebula,
       dim: 1 - (1 - STAR_FOCUS_DIM) * focus,
       chosenAmount: this.chosenAmount,

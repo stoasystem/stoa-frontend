@@ -415,7 +415,9 @@ describe('card 125: a nebula name is something a pointer can hit', () => {
     const x = (box!.x0 + box!.x1) / 2
     const y = (box!.y0 + box!.y1) / 2
 
-    expect(s.engine.cursorAt(x, y)).toBe('pointer')
+    // Stars too small to pick one by one, a click goes into the nebula: the magnifier says so (#756).
+    expect(s.engine.zoom.pickable).toBe(false)
+    expect(s.engine.cursorAt(x, y)).toBe('zoom-in')
     s.engine.pointerDown(1, x, y)
     s.engine.pointerUp(1, x, y)
 
@@ -436,7 +438,7 @@ describe('card 125: a nebula name is something a pointer can hit', () => {
     const y = (box.y0 + box.y1) / 2
 
     s.real.stats.nebulaNames = []
-    expect(s.engine.cursorAt(x, y)).not.toBe('pointer')
+    expect(s.engine.cursorAt(x, y)).toBe('')
     s.engine.pointerDown(1, x, y)
     s.engine.pointerUp(1, x, y)
 

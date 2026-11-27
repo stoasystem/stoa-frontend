@@ -67,6 +67,8 @@ function smallCutScale(box: number): number {
  * a rim that has left the screen (#134).
  */
 const NEBULA_NAME_RING = 160
+/** How strongly the ring round the cluster under the mouse is drawn (#756): a hint, under the keyboard focus's full ring. */
+const HOVER_RING_ALPHA = 0.55
 
 /**
  * Narrower than this, a nebula's name (a star cluster's, #747) is set a size
@@ -710,6 +712,18 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
         stats.highlightNebula = n
       } else {
         stats.highlightNebula = -1
+        // The cluster under the mouse from far out (#756): the same ring, thinner and fainter, so the whole cluster answers the pointer.
+        const ring = frame.hoverRing ?? -1
+        if (ring >= 0 && ring < nebulaCount) {
+          ctx.globalAlpha = HOVER_RING_ALPHA
+          ctx.strokeStyle = colours.lit
+          ctx.lineWidth = 1.5
+          ctx.setLineDash([])
+          ctx.beginPath()
+          ctx.arc(nebulaX[ring], nebulaY[ring], nebulaR[ring] * 1.05 + 4, 0, Math.PI * 2)
+          ctx.stroke()
+          ctx.globalAlpha = 1
+        }
       }
 
       // A recommended star is always a full glyph, at least 12 px: the way in.
