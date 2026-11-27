@@ -242,6 +242,24 @@ export function backingBox(box: Box, pad: number): Box {
   return { x0: box.x0 - dx, y0: box.y0 - dy, x1: box.x1 + dx, y1: box.y1 + dy }
 }
 
+/** How far a box is from a point: 0 inside it, else to its nearest edge. */
+function boxDistance(box: Box, x: number, y: number): number {
+  return Math.hypot(Math.max(box.x0, Math.min(x, box.x1)) - x, Math.max(box.y0, Math.min(y, box.y1)) - y)
+}
+
+/**
+ * Whether a name at `box` could be read as another star's (#755): its middle
+ * is nearer another star than its own (`nearerStars`), or another star's
+ * centre is about as near the box's nearest edge as its own star's centre --
+ * within `ratio` times. Measured to the edge, not the middle: a name in two
+ * wide lines is read by the star its edge touches.
+ */
+export function ownerUnclear(box: Box, own: { x: number; y: number }, others: readonly Circle[], ratio: number): boolean {
+  if (nearerStars(box, own, others) > 0) return true
+  const d = boxDistance(box, own.x, own.y)
+  return others.some((c) => boxDistance(box, c.x, c.y) < d * ratio)
+}
+
 /**
  * A thin leader from a star to its name (#755), where the name alone might
  * not say whose it is: it sits on the far ring (`far`), its middle is
@@ -252,12 +270,10 @@ export function backingBox(box: Box, pad: number): Box {
  * (under `minLength` px apart).
  */
 export function leaderLine(box: Box, own: Circle, others: readonly Circle[], far: boolean, gap: number, minLength: number, ratio = 1): Segment | null {
+  if (!far && !ownerUnclear(box, own, others, ratio)) return null
   const tx = Math.max(box.x0, Math.min(own.x, box.x1))
   const ty = Math.max(box.y0, Math.min(own.y, box.y1))
   const d = Math.hypot(tx - own.x, ty - own.y)
-  const toBox = (c: Circle) => Math.hypot(Math.max(box.x0, Math.min(c.x, box.x1)) - c.x, Math.max(box.y0, Math.min(c.y, box.y1)) - c.y)
-  const unclear = far || nearerStars(box, own, others) > 0 || others.some((c) => toBox(c) < d * ratio)
-  if (!unclear) return null
   const start = own.r + gap
   if (d - start < minLength) return null
   const ux = (tx - own.x) / d

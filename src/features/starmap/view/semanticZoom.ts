@@ -196,6 +196,18 @@ export const REVEAL = {
    * `lineHeightPx` apart (#755), and placed as the box of all its lines; a
    * single word may run to `maxWidthPx`. Only what still does not fit is cut
    * with an ellipsis, so the longest of four languages reads whole (#76).
+   *
+   * Every star's name tries the eight spots beside its star, then the same
+   * eight `farGap` px further out (#755). A spot beside the star that could
+   * be read as another star's (`nameLeader.nearRatio`) costs `unclearCost`,
+   * more than any spot on the far ring, so a free one there wins -- and a
+   * name on the far ring always has its leader.
+   *
+   * On a narrow stage (a phone: the viewport has a `sheet` band) names wrap
+   * at `narrowLineWidthPx` into up to `narrowLines` lines, so they take less
+   * of the width; and with `narrowRestInsist` every star's name, not only a
+   * key star's, may sit over other stars or lines on the backing when no spot
+   * is free -- never over another name or a key star.
    */
   keyName: {
     keyStarCost: 1000,
@@ -207,11 +219,15 @@ export const REVEAL = {
     backingPadPx: 4,
     backingRadiusPx: 6,
     farGap: 14,
+    unclearCost: 8,
     lineWidthPx: 180,
     lines: 2,
     lineHeightPx: 15,
     maxWidthPx: 240,
     sideMarginPx: 48,
+    narrowLineWidthPx: 130,
+    narrowLines: 3,
+    narrowRestInsist: false,
   },
   /**
    * A thin leader from a star to its name (#755) where the name might be read

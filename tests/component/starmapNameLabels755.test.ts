@@ -6,7 +6,7 @@
  * is cut.
  */
 import { describe, expect, it } from 'vitest'
-import { backingBox, cutToWidth, leaderLine, wrapName, type Box, type Circle } from '@/features/starmap/render/labels'
+import { backingBox, cutToWidth, leaderLine, nearerStars, ownerUnclear, wrapName, type Box, type Circle } from '@/features/starmap/render/labels'
 import { REVEAL } from '@/features/starmap/view/semanticZoom'
 
 /** Text at 7 px a character, as the other label tests measure it. */
@@ -71,6 +71,40 @@ describe('#755: a leader ties a name to its star when the name alone might not',
   })
 })
 
+describe('#755: “Ideales Gas und kinetische Gastheorie” between two rings (physics, 1440×900, CSS px)', () => {
+  // Its own ring and the ring to its left, 84 px apart; the name in two lines just above its own.
+  const own: Circle = { x: 847, y: 554, r: 11 }
+  const left: Circle = { x: 763, y: 553, r: 11 }
+  const width = 153
+  const height = 17 + REVEAL.keyName.lineHeightPx
+  const { gapPx, minLengthPx, nearRatio } = REVEAL.nameLeader
+  const above = (gap: number): Box => ({ x0: own.x - width / 2, y0: own.y - own.r - gap - height, x1: own.x + width / 2, y1: own.y - own.r - gap })
+
+  it('beside its ring it could be either ring’s: the other ring is about as near its edge, though not its middle', () => {
+    const beside = above(3)
+    expect(nearerStars(beside, own, [left])).toBe(0)
+    expect(ownerUnclear(beside, own, [left], nearRatio)).toBe(true)
+    // There a leader would be a pixel long: such a spot costs more than any on the far ring.
+    expect(leaderLine(beside, own, [left], false, gapPx, minLengthPx, nearRatio)).toBeNull()
+    expect(REVEAL.keyName.unclearCost).toBeGreaterThan(15 * 0.5)
+  })
+
+  it('on the far ring above it the name has its leader down to its own ring', () => {
+    const far = above(3 + REVEAL.keyName.farGap)
+    const leader = leaderLine(far, own, [left], true, gapPx, minLengthPx, nearRatio)
+    expect(leader).not.toBeNull()
+    expect(leader!.x0).toBeCloseTo(own.x)
+    expect(leader!.y1).toBeCloseTo(far.y1)
+    expect(leader!.y0 - leader!.y1).toBeGreaterThanOrEqual(minLengthPx)
+  })
+
+  it('with the left ring well away, the same spot beside its ring reads as its own: no cost, no leader', () => {
+    const away = { ...left, x: 600 }
+    expect(ownerUnclear(above(3), own, [away], nearRatio)).toBe(false)
+    expect(leaderLine(above(3), own, [away], false, gapPx, minLengthPx, nearRatio)).toBeNull()
+  })
+})
+
 describe('#755: a long name breaks into two lines before it is cut', () => {
   const { lineWidthPx, lines, maxWidthPx } = REVEAL.keyName
 
@@ -84,6 +118,15 @@ describe('#755: a long name breaks into two lines before it is cut', () => {
     expect(set).toHaveLength(2)
     expect(set.join(' ')).toBe(name)
     for (const line of set) expect(measure(line)).toBeLessThanOrEqual(lineWidthPx)
+  })
+
+  it('on a phone’s narrow stage the same name reads in full over three narrower lines', () => {
+    const { narrowLineWidthPx, narrowLines } = REVEAL.keyName
+    const name = 'Messen, Energie sparen und Steuern in der Praxis'
+    const set = wrapName(name, measure, narrowLineWidthPx, narrowLines, maxWidthPx)
+    expect(set).toHaveLength(3)
+    expect(set.join(' ')).toBe(name)
+    for (const line of set) expect(measure(line)).toBeLessThanOrEqual(narrowLineWidthPx)
   })
 
   it('only a name too long for two lines is cut, at the end of the second', () => {

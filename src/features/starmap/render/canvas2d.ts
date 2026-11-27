@@ -9,7 +9,7 @@
  * the focus are never drawn one by one, and nothing is blurred per frame.
  */
 import { CHOSEN, DOT_CUT, dotBoxFor, GLOW_STOPS, GLYPH_LARGE, GLYPH_SMALL, HOVER, LINE_GLOW, ORB_TURN, RAY_STOPS, rayPath, STAR_INK, WAITING_RING_ALPHA, PRESS, SMALL_CUT_BELOW, type DotCut, type GlyphCut, type StarLight } from '@/features/starmap/render/glyph'
-import { aroundDisc, aroundDiscWide, backingBox, belongsTo, boxHitsCircle, boxHitsSegment, coversAny, keyStars, leaderLine, nearerStars, placeInsisting, placeLabel, wrapName, type Box, type Circle, type Segment } from '@/features/starmap/render/labels'
+import { aroundDisc, aroundDiscWide, backingBox, belongsTo, boxHitsCircle, boxHitsSegment, coversAny, keyStars, leaderLine, nearerStars, ownerUnclear, placeInsisting, placeLabel, wrapName, type Box, type Circle, type Segment } from '@/features/starmap/render/labels'
 import { DRAG, panoramaDot, panoramaLook, ramp, reachFade, REVEAL, type Ramp } from '@/features/starmap/view/semanticZoom'
 import { createTileCache, nebulaStateKeys, tileKey, tileSizeFor, TILE_REACH, type TileCache } from '@/features/starmap/render/nebulaTiles'
 import { CLOUD_REACH, galaxyHazeAlpha, galaxyHazeBox, nebulaGlowAlpha, paintGalaxy, paintGalaxyHaze, paintNebulaCloud } from '@/features/starmap/render/galaxy'
@@ -1053,10 +1053,12 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
         ctx.textAlign = 'center'
         ctx.textBaseline = 'top'
         const nameKeep = REVEAL.keyName
-        const lineCut = Math.min(nameKeep.lineWidthPx, width - nameKeep.sideMarginPx)
+        // A phone's stage (it has a sheet band) is narrow: its names wrap narrower, in more lines (#755).
+        const narrow = viewport.sheet !== undefined
+        const lineCut = Math.min(narrow ? nameKeep.narrowLineWidthPx : nameKeep.lineWidthPx, width - nameKeep.sideMarginPx)
         const wordCut = Math.min(nameKeep.maxWidthPx, width - nameKeep.sideMarginPx)
         /** A name in its lines, in the names' font (#76: the longest of four languages; #755: two lines before a cut). */
-        const linesOf = (name: string) => wrapName(name, (t) => ctx.measureText(t).width, lineCut, nameKeep.lines, wordCut)
+        const linesOf = (name: string) => wrapName(name, (t) => ctx.measureText(t).width, lineCut, narrow ? nameKeep.narrowLines : nameKeep.lines, wordCut)
         /** A name's box height for `lines` lines. */
         const nameHeight = (lines: number) => 17 + (lines - 1) * nameKeep.lineHeightPx
         // The stars on screen, in a grid, so a name only checks its neighbours.
@@ -1122,14 +1124,14 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
           // A name in two lines is placed as the box of both (#755).
           const nameH = nameHeight(textLines.length)
           // Every star tries the four sides, then the corners (#755: so a nebula's ordinary stars find room as it opens;
-          // a key star's lines often leave it on all four sides); one whose name insists (#144 B5) then the same eight further out.
+          // a key star's lines often leave it on all four sides), then the same eight further out (#144 B5, #755).
           const r = radiusOf(i)
-          const boxes = insist
-            ? [...aroundDiscWide(x[i], y[i], r, nameWidth, nameH, 3), ...aroundDiscWide(x[i], y[i], r, nameWidth, nameH, 3 + nameKeep.farGap)]
-            : aroundDiscWide(x[i], y[i], r, nameWidth, nameH, 3)
+          const boxes = [...aroundDiscWide(x[i], y[i], r, nameWidth, nameH, 3), ...aroundDiscWide(x[i], y[i], r, nameWidth, nameH, 3 + nameKeep.farGap)]
+          // On a phone any star's name may insist, though never over a key star (#755).
+          const insistsHere = insist || (narrow && nameKeep.narrowRestInsist)
           let box: Box | null = null
           if (base >= 0.01 && placedNames < STAR_NAMES_AT_MOST) {
-            const reachY = r + 3 + (insist ? nameKeep.farGap : 0) + nameH
+            const reachY = r + 3 + nameKeep.farGap + nameH
             const region: Box = { x0: x[i] - nameWidth - reachY, y0: y[i] - reachY, x1: x[i] + nameWidth + reachY, y1: y[i] + reachY }
             const around = near(region, i)
             const circles = around.all
@@ -1140,27 +1142,30 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
             // hovered star's name was asked for: it may cross a line or a star too (#138 B2).
             const held = Boolean(drag && drag.star === i) || i === hovered
             const preferred = preferring(boxes, entry.slot)
-            // A name that insists keeps to the side of its own star: nearer it than any other (#144 B5).
+            // A name keeps to the side of its own star: nearer it than any other (#144 B5). Beside
+            // its star where another star is about as near, it could be either's: a free spot on
+            // the far ring, with its leader, is better (#755).
             const own = { x: x[i], y: y[i] }
-            const theirs = insist ? (b: Box) => nearerStars(b, own, circles) * REVEAL.keyName.nearerStarCost : undefined
+            const theirs = (b: Box) =>
+              nearerStars(b, own, circles) * nameKeep.nearerStarCost +
+              (boxes.indexOf(b) < 8 && ownerUnclear(b, own, circles, REVEAL.nameLeader.nearRatio) ? nameKeep.unclearCost : 0)
             // A held name may sit on a galaxy name too (on its backing), but rather not.
-            const heldCost = (b: Box) => (theirs ? theirs(b) : 0) + (onGalaxyName(b) ? REVEAL.keyName.galaxyNameCost : 0)
-            // First the eight spots beside the star, free of stars, lines and galaxy names...
-            // (A held or hovered name may keep a spot on the far ring: hovered there, it stays put, #755.)
-            const beside = insist && !held ? preferred.filter((b) => boxes.indexOf(b) < 8) : preferred
+            const heldCost = (b: Box) => theirs(b) + (onGalaxyName(b) ? nameKeep.galaxyNameCost : 0)
+            // First the spots free of stars, lines and galaxy names...
             const found = held
-              ? placeLabel(beside, { boxes: placed, circles, segments: [] }, labelArea, heldCost)
-              : placeLabel(beside, { boxes: placed, circles, segments: lines, covers: galaxyCovers }, labelArea, theirs)
+              ? placeLabel(preferred, { boxes: placed, circles, segments: [] }, labelArea, heldCost)
+              : placeLabel(preferred, { boxes: placed, circles, segments: lines, covers: galaxyCovers }, labelArea, theirs)
             // A star's name may not sit on another star at all...
             box = found && (held || !circles.some((c) => boxHitsCircle(found, c))) ? found : null
             entry.backed = false
             if (box && held) {
               const at = box
               entry.backed = circles.some((c) => boxHitsCircle(at, c)) || lines.some((s) => boxHitsSegment(at, s)) || onGalaxyName(at)
-            } else if (!box && insist) {
+            } else if (!box && insistsHere) {
               // ...unless it insists (#144 B5, B8): then over other stars, across lines or on a
-              // galaxy name, on a dark backing.
+              // galaxy name, on the opaque backing. An ordinary star's name on a phone never over a key star.
               box = placeInsisting(preferred, placed, around.others, around.keys, lines, labelArea, theirs, galaxyCovers)
+              if (box && !insist && around.keys.some((c) => boxHitsCircle(box!, c))) box = null
               const at = box
               if (at) entry.backed = circles.some((c) => boxHitsCircle(at, c)) || lines.some((s) => boxHitsSegment(at, s)) || onGalaxyName(at)
             }
@@ -1179,7 +1184,7 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
           const alpha = Math.min(1, base * entry.alpha * kept(i))
           // A name on the far ring, or nearer another star than its own, is tied to its star
           // by a thin leader (#755), drawn under the name so the name's backing ends it.
-          const far = insist && entry.slot >= 8
+          const far = entry.slot >= 8
           const leader = leaderLine(at, { x: x[i], y: y[i], r: radiusOf(i) }, near({ x0: at.x0 - cell / 2, y0: at.y0 - cell / 2, x1: at.x1 + cell / 2, y1: at.y1 + cell / 2 }, i).all, far, REVEAL.nameLeader.gapPx, REVEAL.nameLeader.minLengthPx, REVEAL.nameLeader.nearRatio)
           if (leader) {
             ctx.globalAlpha = alpha * REVEAL.nameLeader.alpha
