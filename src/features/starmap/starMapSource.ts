@@ -52,6 +52,12 @@ export type StarMapSource = {
   demo: boolean
   /** Whether `read` has the sky yet. A source that has it at once leaves this out: `success`. */
   status?: StarMapReadStatus
+  /**
+   * The sky `read` draws is the last one this browser kept (#757), not yet
+   * confirmed by the server: draw it, but decide nothing on it -- no first
+   * landing, no lighting moment, no review reminder, no hint -- until it is.
+   */
+  provisional?: boolean
   /** Ask for the sky again after an `error`. */
   retry?: () => void
   /**
@@ -59,8 +65,10 @@ export type StarMapSource = {
    * source that sends the sky as a skeleton reads the stars around it in full
    * -- around that star, else around where the student last practised in that
    * galaxy -- unless it has that star already, in the language on screen.
+   * `named`: the route names the galaxy (`/map/:subjectId`), so it is known
+   * before the sky is, and its stars can be read at the same time (#757).
    */
-  focus?: (target: { subjectId: string; unitId: string | null }) => void
+  focus?: (target: { subjectId: string; unitId: string | null; named?: boolean }) => void
   /** Read the small stars of the star in focus again, after a read of them failed. */
   retrySkills?: () => void
   /** The map came on screen (#503): a source whose sky went stale reads it again. */

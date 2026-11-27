@@ -123,7 +123,11 @@ export function landingFor(map: StarMap, held: ReadonlySet<string>, next: LayerT
  */
 type Landing = { from: string; target: LayerTarget; routeAt?: LayerTarget }
 
-export function useLightingStage(map: StarMap, target: LayerTarget): LightingStage {
+/**
+ * `hold`: the sky is not the server's yet (a cached one, #757): arrival waits
+ * for it, so a landing is never decided on a sky that may be out of date.
+ */
+export function useLightingStage(map: StarMap, target: LayerTarget, { hold = false }: { hold?: boolean } = {}): LightingStage {
   const source = useLightingEventSource()
   const key = useSyncExternalStore(source.subscribe ?? noSubscription, () => waitingKey(source))
   const [revealed, setRevealed] = useState<ReadonlySet<string>>(() => new Set())
@@ -142,9 +146,9 @@ export function useLightingStage(map: StarMap, target: LayerTarget): LightingSta
     const whole = landingFor(map, held, target)
     return whole && target.layer === 'star' ? { from: target.unitId, target: whole } : null
   }
-  const [arrived, setArrived] = useState(() => map.stars.length > 0)
-  const [landing, setLanding] = useState<Landing | null>(arriving)
-  if (!arrived && map.stars.length > 0) {
+  const [arrived, setArrived] = useState(() => !hold && map.stars.length > 0)
+  const [landing, setLanding] = useState<Landing | null>(() => (hold ? null : arriving()))
+  if (!arrived && !hold && map.stars.length > 0) {
     setArrived(true)
     setLanding(arriving())
   }

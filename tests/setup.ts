@@ -1,6 +1,7 @@
 import '@testing-library/jest-dom/vitest'
 import { cleanup, configure } from '@testing-library/react'
 import { afterEach, vi } from 'vitest'
+import { forgetCachedSkies } from '@/lib/skyCache'
 
 // src/lib/env.ts reads runtime config at import time, so anything importing
 // the API layer needs a config registered before the first module evaluates.
@@ -59,6 +60,9 @@ vi.mock('@/i18n/resources', async (importOriginal) => {
 
 afterEach(() => {
   cleanup()
+  // The star map keeps the last sky it read in localStorage (#757), which lasts for the whole
+  // test file: a sky one test read must not be drawn, and decided on, in the next.
+  if (typeof localStorage !== 'undefined') forgetCachedSkies()
 })
 
 // findBy* and waitFor give up after 3 s, not Testing Library's 1 s (#440). A

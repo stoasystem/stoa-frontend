@@ -63,7 +63,7 @@ export function StarMapRoute({ relations = false, longNames = false }: { relatio
   const subjectId = params.subjectId ?? defaultSubject(lastSubject, defaults.subjects)
   const map = useStarMap(subjectId, fixtureSizeFrom(search, DEMO_STAR_COUNT),
     relations, longNames)
-  const { demo, status = 'success', retry, focus, arrive } = useStarMapSource()
+  const { demo, status = 'success', provisional = false, retry, focus, arrive } = useStarMapSource()
   // Back on the map, a sky that went stale while the student practised is read again (#503).
   useEffect(() => arrive?.(), [arrive])
   useEffect(() => {
@@ -80,7 +80,9 @@ export function StarMapRoute({ relations = false, longNames = false }: { relatio
   const routeTarget = sceneUp ? left : asked
   // A point waiting for its lighting moment is drawn in progress until it, and its star's route
   // (or a tap on it) opens on its nebula (#140, #145).
-  const stage = useLightingStage(map, routeTarget)
+  // A sky drawn from this browser's cache (#757) is only a picture: nothing below decides on it
+  // (who is new, what waits to be celebrated, what is due) until the server's answer is here.
+  const stage = useLightingStage(map, routeTarget, { hold: provisional })
   // A student whose account never stored a language picks one first (#627): "About you" and the landing wait.
   const language = useLanguageFirst(student, ownerId)
   // A student whose profile has no year group is asked it and their subjects first (#591): the landing waits.
@@ -90,7 +92,7 @@ export function StarMapRoute({ relations = false, longNames = false }: { relatio
   // profile says, lands on its recommended star with Murmi beside it, and after the first lighting sees
   // the galaxy (plan A).
   // Not under a cluster's route scene either: the landing is the map's, and the map is not on screen.
-  const first = useFirstLanding(map, stage.target, ownerId, { hold: language.hold || aboutYou.hold || sceneUp, subjects: aboutYou.subjects })
+  const first = useFirstLanding(map, stage.target, ownerId, { hold: language.hold || aboutYou.hold || sceneUp || provisional, subjects: aboutYou.subjects })
   const firstReveal = useFirstReveal(map, first.target, stage.reveal)
   // A star found from Ask with stars missing on the way: the path to it, and Murmi beside it (#489).
   const findStar = useFindStar(map)
@@ -101,16 +103,19 @@ export function StarMapRoute({ relations = false, longNames = false }: { relatio
     if (landingStar) offerExamples(ownerId, findOwnExamples(t, subjectOfNebula(map, landingStar.nebulaId)))
   }, [landingStar, map, offerExamples, ownerId, t])
   // Reviews due: Murmi whistles in a corner, and a tap flies to the star with the most cards due (#593).
-  const reminder = useReviewReminder(map, ownerId, student)
+  const reminder = useReviewReminder(map, ownerId, student, { hold: provisional })
   // A lighting moment on the map: the clusters' hint waits for it (#747).
   const [lightingBusy, setLightingBusy] = useState(false)
   // A star picked -- by a tap, a link, a hint, a card from Ask -- loads its small stars if it has none yet;
   // with none picked, the stars around where the student last practised in the galaxy in focus (#503).
-  const pickedStar = routeTarget.layer === 'star' ? routeTarget.unitId : null
+  // Before the sky is here, the star the route names: read beside the skeleton, the same read as after it (#757).
+  const pickedStar = routeTarget.layer === 'star' ? routeTarget.unitId : map.stars.length === 0 ? (unitId ?? null) : null
   const focusSubject = routeTarget.layer === 'map' ? map.subject.subjectId : subjectOfNebula(map, routeTarget.nebulaId)
+  // A galaxy the route names is known before the sky comes: its stars are read beside it (#757).
+  const named = params.subjectId !== undefined
   useEffect(() => {
-    focus?.({ subjectId: focusSubject, unitId: pickedStar })
-  }, [focusSubject, pickedStar, focus])
+    focus?.({ subjectId: focusSubject, unitId: pickedStar, named })
+  }, [focusSubject, pickedStar, named, focus])
 
   // Sign-in timing, handed over from ChatPage / LearnPage (#45): a student
   // lands on the map now, so its first drawn frame ends the wait. The mark is
@@ -163,6 +168,7 @@ export function StarMapRoute({ relations = false, longNames = false }: { relatio
   const findStarUp = Boolean(findStar.star && findStar.first && !firstReveal.target)
   // The star clusters' hint (#747): once per account, on the whole view, after every first-run screen and Murmi above.
   const hint = useClusterHint(map, ownerId, {
+    hold: provisional,
     blocked: sceneUp || routeTarget.layer !== 'map' || firstLandingUp || findStarUp || lightingBusy || Boolean(firstReveal.target),
   })
   const hintUp = hint.clusterId !== null

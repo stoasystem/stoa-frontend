@@ -50,7 +50,11 @@ function askedToReview(state: unknown): string | null {
   return typeof unitId === 'string' && unitId.length > 0 ? unitId : null
 }
 
-export function useReviewReminder(map: StarMap, ownerId: string, enabled: boolean): ReviewReminder {
+/**
+ * `hold`: the sky is not the server's yet (a cached one, #757). The summary is
+ * read all the same, but Murmi waits for the sky its counts belong to.
+ */
+export function useReviewReminder(map: StarMap, ownerId: string, enabled: boolean, { hold = false }: { hold?: boolean } = {}): ReviewReminder {
   const location = useLocation()
   const navigate = useNavigate()
   const navigationType = useNavigationType()
@@ -77,7 +81,7 @@ export function useReviewReminder(map: StarMap, ownerId: string, enabled: boolea
     void navigate({ pathname, search }, { replace: true, state: null })
   }, [asked, key, pathname, search, navigate])
 
-  const mostDue = enabled ? mostDueStar(map) : null
+  const mostDue = enabled && !hold ? mostDueStar(map) : null
   const open = useCallback(() => {
     if (!mostDue) return
     // The star's galaxy, the tap carried in the state (taken over just above, on this page or the next).
@@ -94,6 +98,6 @@ export function useReviewReminder(map: StarMap, ownerId: string, enabled: boolea
 
   const star = following ? (map.stars.find((candidate) => candidate.unitId === guide.unitId) ?? null) : null
   const target = useMemo(() => (star ? reminderTarget(map, star, reducedMotion) : null), [map, star, reducedMotion])
-  const mood = enabled && !waved ? reminderMood(summary) : null
+  const mood = enabled && !hold && !waved ? reminderMood(summary) : null
   return { mood, summary, mostDue, target, star, open, close, wave }
 }

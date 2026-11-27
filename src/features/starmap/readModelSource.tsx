@@ -28,8 +28,19 @@
  * (`skillsKnown: false`, or `skillsFailed` with a retry) rather than drawn as
  * a star with none. A backend before stoa-backend#127 sends the sky in full
  * and is asked for nothing more.
+ *
+ * On a return visit the sky is drawn at once from the last one this browser
+ * kept for the account (#757, `lib/skyCache.ts`) while the skeleton is read
+ * again; the source says so (`provisional`) and the route decides nothing on
+ * it. The cache never enters the query: the chapter (#368) and the lighting
+ * moment read the query, so they only ever see the server's answer. When it
+ * comes, every array that did not change is the cached one (`keepUnchanged`),
+ * so the placement below is the same one and the engine keeps its scene: no
+ * flight, no names fading in again; only what changed is drawn anew. The
+ * stars around one are read at the same time as the skeleton when the galaxy
+ * is known -- from the route, or from the cached sky -- not after it.
  */
-import { useCallback, useMemo, useState, type ReactNode } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import {
   StarMapSourceContext,
@@ -41,11 +52,12 @@ import {
 } from '@/features/starmap/starMapSource'
 import type { Nebula, Star, StarMap } from '@/features/starmap/model/starMap'
 import { layoutClusteredSky } from '@/features/starmap/route/clusteredSky'
-import { KNOWLEDGE_MAP_KEY, KNOWLEDGE_MAP_STALE_MS, useKnowledgeMapQuery } from '@/hooks/practice/useKnowledgeMapQuery'
+import { KNOWLEDGE_MAP_KEY, KNOWLEDGE_MAP_STALE_MS, useHasSky, useKnowledgeMapQuery } from '@/hooks/practice/useKnowledgeMapQuery'
 import { useKnowledgeMapStarsQuery, useStarDetails, type StarDetails } from '@/hooks/practice/useKnowledgeMapStars'
 import { useAuthStore } from '@/store/authStore'
 import type { KnowledgeMapResponse } from '@/types/practice'
-import type { SupportedLanguage } from '@/i18n/languages'
+import { activeLanguage, type SupportedLanguage } from '@/i18n/languages'
+import { readCachedSky, writeCachedSky } from '@/lib/skyCache'
 
 /**
  * One seed for every sky, so a student's map keeps its arrangement between
@@ -222,6 +234,27 @@ export function projectStarMap(
   }
 }
 
+const LAID_OUT = ['galaxies', 'nebulae', 'prerequisites', 'stars'] as const
+
+/**
+ * The server's sky with each array that came back as the cached sky had it
+ * replaced by the cached one (#757): the placement is kept per array, and the
+ * engine keeps its scene while the arrays are the same, so a sky that did not
+ * change is not drawn anew when it is confirmed. One that did keeps the
+ * camera where it is (the same layout) and draws what changed.
+ */
+export function keepUnchanged(fresh: KnowledgeMapResponse, cached: KnowledgeMapResponse | null): KnowledgeMapResponse {
+  if (!cached) return fresh
+  let kept: KnowledgeMapResponse | null = null
+  for (const field of LAID_OUT) {
+    if (fresh[field] !== cached[field] && JSON.stringify(fresh[field]) === JSON.stringify(cached[field])) {
+      kept ??= { ...fresh }
+      ;(kept as Record<string, unknown>)[field] = cached[field]
+    }
+  }
+  return kept ?? fresh
+}
+
 /**
  * Put the read model behind the star map for everything under it.
  *
@@ -249,20 +282,42 @@ function ReadModelSource({ children }: { children: ReactNode }) {
   // `read` for, and the route derives it from this very source - so keying the
   // query by subject would make every switch of galaxy a fetch, and the first
   // read a chicken-and-egg. The query is the chapter's too: one definition (#368).
-  const { data, status, refetch } = useKnowledgeMapQuery()
-  const skeleton = data?.view === 'skeleton'
+  const { data: fresh, status, refetch } = useKnowledgeMapQuery()
+  const hasSky = useHasSky()
+  const accountId = useAuthStore((state) => state.user?.id ?? null)
+  // The last sky kept for this account, read once per account (#757): only for drawing.
+  const cached = useMemo(() => (hasSky && accountId ? readCachedSky(accountId, activeLanguage()) : null), [hasSky, accountId])
+  const data = useMemo(() => (fresh ? keepUnchanged(fresh, cached) : undefined), [fresh, cached])
+  const sky = data ?? cached ?? undefined
+  const provisional = !data && Boolean(cached)
+  // Each new answer is kept for next time (an acknowledged lighting too), under the account
+  // it was read for. Only a new answer: the account changing under the same one writes nothing.
+  const written = useRef<KnowledgeMapResponse | undefined>(undefined)
+  useEffect(() => {
+    if (!fresh || fresh === written.current) return
+    written.current = fresh
+    if (accountId && hasSky) writeCachedSky(accountId, activeLanguage(), fresh)
+  }, [fresh, accountId, hasSky])
+  const skeleton = sky?.view === 'skeleton'
   const client = useQueryClient()
   const { stars: details, outdated } = useStarDetails()
   // What the map is on, and so the one neighbourhood read and watched (#503).
-  const [wanted, setWanted] = useState<{ subjectId: string; unitId: string | null } | null>(null)
-  const around = useKnowledgeMapStarsQuery(wanted?.subjectId ?? null, wanted?.unitId ?? null, { enabled: skeleton })
+  const [wanted, setWanted] = useState<{ subjectId: string; unitId: string | null; named: boolean } | null>(null)
+  // Read beside the skeleton, not after it, when the galaxy is known before it comes (#757):
+  // the route names it, or the cached sky did. On `/` with nothing cached it comes from the skeleton.
+  const galaxyKnown = Boolean(cached) || Boolean(wanted?.named)
+  const around = useKnowledgeMapStarsQuery(wanted?.subjectId ?? null, wanted?.unitId ?? null, {
+    enabled: data ? skeleton : galaxyKnown,
+  })
   const failed = around.isError && !around.data ? (wanted?.unitId ?? null) : null
 
   const focus = useCallback(
-    ({ subjectId, unitId }: { subjectId: string; unitId: string | null }) => {
+    ({ subjectId, unitId, named = false }: { subjectId: string; unitId: string | null; named?: boolean }) => {
       // A star already here, in the language on screen, is not read again: the map stays on what it reads.
       if (unitId && details.has(unitId) && !outdated.has(unitId)) return
-      setWanted((before) => (before?.subjectId === subjectId && before.unitId === unitId ? before : { subjectId, unitId }))
+      setWanted((before) =>
+        before?.subjectId === subjectId && before.unitId === unitId && before.named === named ? before : { subjectId, unitId, named },
+      )
     },
     [details, outdated],
   )
@@ -278,17 +333,20 @@ function ReadModelSource({ children }: { children: ReactNode }) {
 
   const source = useMemo<StarMapSource>(
     () => ({
-      read: (request) => (data ? projectStarMap(data, request, details, failed) : emptyStarMap(request.subjectId)),
+      read: (request) => (sky ? projectStarMap(sky, request, details, failed) : emptyStarMap(request.subjectId)),
       demo: false,
       // A sky already drawn stays drawn when a later refetch fails. Nobody
       // but a student asks for one, so for anybody else there is nothing to wait for.
-      status: data ? 'success' : isStudent ? status : 'success',
+      // A cached sky is drawn while the server's is on the wire; if that read fails,
+      // the student is told so rather than left on a sky nobody confirmed.
+      status: data ? 'success' : isStudent ? (cached && status === 'pending' ? 'success' : status) : 'success',
+      provisional,
       retry: () => void refetch(),
       focus,
       retrySkills,
       arrive,
     }),
-    [data, details, failed, status, isStudent, refetch, focus, retrySkills, arrive],
+    [sky, data, cached, provisional, details, failed, status, isStudent, refetch, focus, retrySkills, arrive],
   )
 
   return <StarMapSourceContext.Provider value={source}>{children}</StarMapSourceContext.Provider>
