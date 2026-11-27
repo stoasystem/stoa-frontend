@@ -6,7 +6,8 @@
  *
  * Who is new is read from the sky: no star lit and none in progress. So the
  * truth stays the backend's (#9), a shared browser is right for whoever is
- * signed in (ADR 0003), and signing out clears nothing that matters. A student
+ * signed in (ADR 0003), and signing out clears nothing that matters (the last
+ * sky this browser kept, #757, goes with it, and is never read for this). A student
  * who looked around and left lands here again next time, which is what they
  * still have to do. Only two conveniences are kept, in this tab's
  * sessionStorage and per account: plan B's answer and "Look around first".

@@ -26,6 +26,7 @@ import { pathFromState } from '@/lib/fromState'
 import { LOGIN_SUBMITTED_AT_KEY } from '@/lib/loginTimingKey'
 import { newRandomId } from '@/lib/randomId'
 import { signInOf } from '@/lib/signIn'
+import { forgetCachedSkies } from '@/lib/skyCache'
 import { isHeldTestRole } from '@/lib/testRoles'
 import { revokeSignIn, type DroppedSignIn } from '@/services/auth/revokeSignIn'
 import { replaceRefreshToken, storedRefreshToken } from '@/services/auth/sessionRefresh'
@@ -359,6 +360,8 @@ export function signInTab(
     ...(account && asAccount(account) ? { account: asAccount(account) } : {}),
   }
   bindTab(signIn)
+  // Another account's last sky is not this one's to draw (#757).
+  forgetCachedSkies(account?.id)
   if (!writeBrowserSignIn(signIn)) {
     // Storage refused the record (blocked, or full). This tab keeps working
     // on its own copy, as a tab with no id does; the previous sign-in is
@@ -428,6 +431,8 @@ export function signOutTab(ending: TabSignOut = { reason: 'signed-out' }): void 
   const account = ending.reason === 'signed-out' ? undefined : (ending.account ?? readTabAccount())
   const signIn = readBrowserSignIn()
   if (signIn && tabToken() && tabHolds(signIn)) removeBrowserSignIn()
+  // Signing out leaves no sky behind for whoever signs in next (#757).
+  forgetCachedSkies()
   try {
     sessionStorage.clear()
   } catch {

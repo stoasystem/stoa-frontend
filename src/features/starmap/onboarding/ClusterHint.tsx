@@ -46,16 +46,17 @@ export type ClusterHint = {
   opened: () => void
 }
 
-export function useClusterHint(map: StarMap, ownerId: string, { blocked }: { blocked: boolean }): ClusterHint {
+/** `hold`: the sky is not the server's yet (a cached one, #757): neither decided nor shown until it is. */
+export function useClusterHint(map: StarMap, ownerId: string, { blocked, hold = false }: { blocked: boolean; hold?: boolean }): ClusterHint {
   const [done, setDone] = useState(() => shownBefore('clusterHint', ownerId))
   // Decided once, on the first sky read: lighting a star on the way does not turn "new" into "a new look".
-  const [changed, setChanged] = useState<boolean | null>(() => (map.stars.length > 0 ? !isNewcomer(map) : null))
-  if (changed === null && map.stars.length > 0) setChanged(!isNewcomer(map))
+  const [changed, setChanged] = useState<boolean | null>(() => (!hold && map.stars.length > 0 ? !isNewcomer(map) : null))
+  if (changed === null && !hold && map.stars.length > 0) setChanged(!isNewcomer(map))
   const remember = useCallback(() => {
     markShown('clusterHint', ownerId)
     setDone(true)
   }, [ownerId])
-  const up = !done && !blocked && isClusterSky(map)
+  const up = !done && !blocked && !hold && isClusterSky(map)
   const clusterId = up ? hintCluster(map) : null
   const others = useMemo(
     () =>
