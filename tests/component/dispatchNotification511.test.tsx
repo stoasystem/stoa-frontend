@@ -30,8 +30,8 @@ const de = deTeacher.profile.notifications
 const LANGUAGES = ['de', 'en', 'fr', 'it'] as const
 
 const MATRIX = {
-  admin_operations: { in_app: true, realtime: true, email_digest: false, push: false },
-  teacher_responses: { in_app: false, realtime: false, email_digest: true, push: false },
+  admin_operations: { in_app: true, realtime: true, push: false },
+  teacher_responses: { in_app: false, realtime: false, push: true },
 }
 
 function backend({ dispatchEmail = true, saveFails = false } = {}) {
@@ -42,7 +42,7 @@ function backend({ dispatchEmail = true, saveFails = false } = {}) {
     preferences: MATRIX,
     dispatchEmail: stored,
     supportedCategories: Object.keys(MATRIX),
-    supportedChannels: ['email_digest', 'in_app', 'push', 'realtime'],
+    supportedChannels: ['in_app', 'push', 'realtime'],
     updatedAt: null,
   })
   mswServer.use(
@@ -207,7 +207,7 @@ describe('a dispatch email write and a matrix write', () => {
           preferences: MATRIX,
           dispatchEmail: true,
           supportedCategories: Object.keys(MATRIX),
-          supportedChannels: ['email_digest', 'in_app', 'push', 'realtime'],
+          supportedChannels: ['in_app', 'push', 'realtime'],
           updatedAt: null,
         }),
       ),
@@ -225,7 +225,7 @@ describe('a dispatch email write and a matrix write', () => {
           preferences: MATRIX,
           dispatchEmail: which === 'dispatchEmail' ? sent.dispatchEmail : true,
           supportedCategories: Object.keys(MATRIX),
-          supportedChannels: ['email_digest', 'in_app', 'push', 'realtime'],
+          supportedChannels: ['in_app', 'push', 'realtime'],
           updatedAt: null,
         })
       }),

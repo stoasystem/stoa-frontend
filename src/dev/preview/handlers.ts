@@ -115,17 +115,26 @@ const RENEWAL_CONTACT_EMAIL = 'info@stoaedu.ch'
 
 /*
  * The notification preferences as the backend keeps them
- * (`notification_service.py`): every category, every channel; in the bell
- * and live on, digest and push off; what was saved laid over that.
+ * (`notifications/_preferences.py`): every category, every channel; in the
+ * bell and live on, push off; what was saved laid over that. The digest email
+ * channel and the three categories no event fell into are retired
+ * (stoa-backend#684): taken and ignored, never read back.
  */
-const PREFERENCE_CATEGORIES = ['admin_operations', 'assignments', 'learning_updates', 'teacher_responses', 'weekly_reports']
-const PREFERENCE_CHANNELS = ['email_digest', 'in_app', 'push', 'realtime']
+const PREFERENCE_CATEGORIES = ['admin_operations', 'teacher_responses']
+const PREFERENCE_CHANNELS = ['in_app', 'push', 'realtime']
 
-/** The defaults with `over` laid on them, channel by channel (`_merged_preferences`). */
+/** The defaults with `over` laid on them, channel by channel, known channels only (`_merged_preferences`). */
 function withDefaults(over: NotificationPreferenceMatrix | null): NotificationPreferenceMatrix {
   return Object.fromEntries(PREFERENCE_CATEGORIES.map((category) => [
     category,
-    { in_app: true, realtime: true, email_digest: false, push: false, ...over?.[category] },
+    {
+      in_app: true,
+      realtime: true,
+      push: false,
+      ...Object.fromEntries(Object.entries(over?.[category] ?? {}).filter(
+        ([channel, enabled]) => PREFERENCE_CHANNELS.includes(channel) && typeof enabled === 'boolean',
+      )),
+    },
   ]))
 }
 

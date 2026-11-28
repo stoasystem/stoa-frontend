@@ -26,7 +26,7 @@ const API = 'https://api.test'
 const de = deParent.notificationSettings
 const LANGUAGES = ['de', 'en', 'fr', 'it'] as const
 
-const MATRIX = { weekly_reports: { in_app: true, realtime: true, email_digest: false, push: false } }
+const MATRIX = { teacher_responses: { in_app: true, realtime: true, push: false } }
 
 function backend({ weeklyReportEmail = true, saveFails = false } = {}) {
   const patches: unknown[] = []
@@ -37,7 +37,7 @@ function backend({ weeklyReportEmail = true, saveFails = false } = {}) {
     dispatchEmail: true,
     weeklyReportEmail: stored,
     supportedCategories: Object.keys(MATRIX),
-    supportedChannels: ['email_digest', 'in_app', 'push', 'realtime'],
+    supportedChannels: ['in_app', 'push', 'realtime'],
     updatedAt: null,
   })
   mswServer.use(

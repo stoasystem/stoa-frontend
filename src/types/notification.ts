@@ -50,17 +50,14 @@ export type RealtimeNotificationEnvelope = {
 
 /*
  * GET / PATCH /notifications/preferences. Categories and channels are the
- * backend's (`notification_service.PREFERENCE_CATEGORIES` / `_CHANNELS`); the
- * response lists which ones it supports.
+ * backend's (`notifications/_preferences.py`: `PREFERENCE_CATEGORIES` /
+ * `PREFERENCE_CHANNELS`); the response lists which ones it supports. The digest
+ * email channel and the three categories no event fell into are retired
+ * (stoa-backend#684): no longer read back, and ignored if sent.
  */
-export type NotificationPreferenceCategory =
-  | 'learning_updates'
-  | 'teacher_responses'
-  | 'assignments'
-  | 'weekly_reports'
-  | 'admin_operations'
+export type NotificationPreferenceCategory = 'teacher_responses' | 'admin_operations'
 
-export type NotificationPreferenceChannel = 'in_app' | 'realtime' | 'email_digest' | 'push'
+export type NotificationPreferenceChannel = 'in_app' | 'realtime' | 'push'
 
 export type NotificationPreferenceMatrix = Record<string, Partial<Record<NotificationPreferenceChannel, boolean>>>
 
