@@ -22,6 +22,7 @@
  */
 import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from 'react'
 import {
+  answerFilled,
   initialPracticeLessonState,
   practiceLessonReducer,
 } from '@/components/practice/practiceLessonReducer'
@@ -119,7 +120,7 @@ export function useLessonRun(lesson: PracticeLesson | undefined, { testOut = fal
       : null
     : state.feedback ?? null
   const last = quiz ? quiz.view.remaining <= 1 : queue.length <= 1
-  const answered = Array.isArray(state.answer) ? state.answer.length > 0 : state.answer.trim().length > 0
+  const answered = answerFilled(state.answer)
   const hintForChallenge = !quiz && hint && challenge && hint.challengeId === challenge.challengeId ? hint.hint : null
   const wrong = tries && challenge && tries.challengeId === challenge.challengeId ? tries.wrong : 0
   // Only skipped exercises are left: the quiz is offered instead of skipping again.

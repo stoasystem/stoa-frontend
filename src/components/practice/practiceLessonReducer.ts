@@ -1,3 +1,4 @@
+import { drawingFilled, emptyDrawing, isDrawing, sameDrawing } from '@/features/chapter/gridDrawing'
 import type { PracticeAnswer, PracticeAnswerResult, PracticeChallenge } from '@/types/practice'
 
 export type PracticeLessonState = {
@@ -24,8 +25,19 @@ export const initialPracticeLessonState: PracticeLessonState = {
   incorrectAttempts: 0,
 }
 
-/** The same answer: the same text, or the same pieces (or option numbers) in the same order. */
+/**
+ * Whether there is an answer to check: an order or a set of options needs a
+ * first pick, a drawing something drawn (#744), anything typed a character
+ * that is not a space.
+ */
+export function answerFilled(answer: PracticeAnswer): boolean {
+  if (isDrawing(answer)) return drawingFilled(answer)
+  return Array.isArray(answer) ? answer.length > 0 : answer.trim().length > 0
+}
+
+/** The same answer: the same text, the same pieces (or option numbers) in the same order, or the same drawing. */
 export function sameAnswer(a: PracticeAnswer, b: PracticeAnswer): boolean {
+  if (isDrawing(a) || isDrawing(b)) return isDrawing(a) && isDrawing(b) && sameDrawing(a, b)
   if (Array.isArray(a) || Array.isArray(b)) {
     return Array.isArray(a) && Array.isArray(b) && a.length === b.length && a.every((item, index) => item === b[index])
   }
@@ -51,7 +63,7 @@ export function practiceLessonReducer(
     case 'hint':
       return { ...state, hintsShown: state.hintsShown + 1 }
     case 'retry':
-      return { ...state, answer: Array.isArray(state.answer) ? [] : '', feedback: undefined }
+      return { ...state, answer: Array.isArray(state.answer) ? [] : isDrawing(state.answer) ? emptyDrawing() : '', feedback: undefined }
     case 'next':
       return {
         ...initialPracticeLessonState,

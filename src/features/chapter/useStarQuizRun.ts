@@ -23,6 +23,7 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { useCallback, useEffect, useReducer, useRef, useState } from 'react'
 import {
+  answerFilled,
   initialPracticeLessonState,
   practiceLessonReducer,
 } from '@/components/practice/practiceLessonReducer'
@@ -148,7 +149,7 @@ export function useStarQuizRun(unitId: string | undefined): StarQuizRun {
   const stopped = outcome !== null || trouble !== null || pending
   const challenge = stopped ? undefined : (view?.exercise ?? undefined)
   const shown = result ?? view
-  const answered = Array.isArray(state.answer) ? state.answer.length > 0 : state.answer.trim().length > 0
+  const answered = answerFilled(state.answer)
   const feedback: StageFeedback | null = result ? { correct: result.correct } : null
 
   // One answer on its way at a time, held as sent until it comes back (#733),

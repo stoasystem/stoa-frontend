@@ -8,6 +8,7 @@
  * lesson, so the chapter moves on, and Ask's conversations and messages with
  * their answers, so the thread read back holds them.
  */
+import { checkDemoGridAnswer, DEMO_GRID_LESSON_ID, demoGridLesson, demoGridLessonResult } from '@/dev/demo/data/gridDrawing'
 import {
   checkDemoAnswer,
   demoAnswerInvalid,
@@ -403,7 +404,11 @@ const routes: Array<[method: string, pattern: string, handler: Handler]> = [
     const { roadmap } = demoChapterNow()
     return params.subjectId === roadmap.subjectId && params.topicId === roadmap.topicId ? roadmap : null
   }],
-  ['GET', '/practice/lessons/:lessonId', ({ params }) => demoChapterNow().lessons.find((lesson) => lesson.id === params.lessonId) ?? null],
+  ['GET', '/practice/lessons/:lessonId', ({ params }) =>
+    // The grid drawing samples (#744) are a lesson of their own, outside the chapter.
+    params.lessonId === DEMO_GRID_LESSON_ID
+      ? demoGridLesson(demoLanguage())
+      : (demoChapterNow().lessons.find((lesson) => lesson.id === params.lessonId) ?? null)],
   ['POST', '/practice/challenges/:challengeId/answer', async ({ params, body }) => {
     // `?answerFails=once` (#733): each exercise's first check is the backend's
     // 503, the next one is judged; both take a second, so a press made while
@@ -415,14 +420,21 @@ const routes: Array<[method: string, pattern: string, handler: Handler]> = [
         return refuse(503, 'service_unavailable', 'Your answer could not be checked right now.')
       }
     }
+    // A drawing on a grid (#744): what is not one is refused as the backend refuses it.
+    const drawn = checkDemoGridAnswer(params.challengeId, field<unknown>(body, 'answer'), demoLanguage())
+    if (drawn === 'invalid') return refuse(422, 'practice_answer_invalid', 'This is not an answer to this exercise.')
     const answer = field<PracticeAnswer>(body, 'answer')
     // A set of options that cannot be one is refused before it is judged (stoa-backend#593).
-    if (demoAnswerInvalid(params.challengeId, answer)) return refuse(422, 'practice_answer_invalid', 'This answer cannot be checked.')
-    const result = checkDemoAnswer(params.challengeId, answer ?? '', demoLanguage())
+    if (!drawn && demoAnswerInvalid(params.challengeId, answer)) return refuse(422, 'practice_answer_invalid', 'This answer cannot be checked.')
+    const result = drawn ?? checkDemoAnswer(params.challengeId, answer ?? '', demoLanguage())
     if (result?.correct) answeredRight.add(params.challengeId)
     return result
   }],
   ['POST', '/practice/lessons/:lessonId/complete', ({ params }) => {
+    if (params.lessonId === DEMO_GRID_LESSON_ID) {
+      const lesson = demoGridLesson(demoLanguage())
+      return demoGridLessonResult(lesson.challenges.filter((challenge) => answeredRight.has(challenge.challengeId)).length)
+    }
     const lesson = demoChapterNow().lessons.find((candidate) => candidate.id === params.lessonId)
     const right = lesson?.challenges.filter((challenge) => answeredRight.has(challenge.challengeId)).length
     const result = demoLessonResult(params.lessonId, right)

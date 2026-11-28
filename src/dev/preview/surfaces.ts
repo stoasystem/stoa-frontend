@@ -275,6 +275,15 @@ export const SURFACES: readonly Surface[] = [
   },
   { id: 'chapter', label: 'Chapter', path: () => `/chapter/${unitId}`, signedIn: true, stars: false },
   { id: 'lesson', label: 'Practice stage', path: () => `/chapter/${unitId}/${nextLesson.lessonId}`, signedIn: true, stars: false },
+  // #744: the grid drawing samples of stoa-backend#594 (plot points, a rectangle, a rotation), a demo lesson of their own.
+  {
+    id: 'lesson-grid',
+    label: 'Practice stage · drawing on a grid',
+    path: () => `/chapter/${unitId}/demo-grid-drawing`,
+    signedIn: true,
+    stars: false,
+    readyWhen: '[data-grid-drawing]',
+  },
   // #586: a student new to Ask on the practice stage for the first time: Murmi points at Ask.
   {
     id: 'lesson-first',
