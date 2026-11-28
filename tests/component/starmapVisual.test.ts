@@ -308,8 +308,8 @@ describe('one sky: galaxies of nebulae (#119)', () => {
     engine.setViewport(width, height, 1)
     engine.setData(skyMap(1000, 'math'), { layer: 'map' })
     clock.advance(20)
-    for (const n of Array.from(blits.values())) n.length = 0
     // The second frame at one zoom paints the cache: the view grown by the margin on every side.
+    // (It may be one the engine drew: a frame that leaves a galaxy name out wants one more, #764.)
     real.draw(frame)
     const margin = Math.round(Math.max(width, height) * 0.25)
     const cache = [...blits.entries()].find(([canvas]) => canvas.width === width + 2 * margin && canvas.height === height + 2 * margin)

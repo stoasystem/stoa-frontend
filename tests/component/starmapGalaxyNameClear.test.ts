@@ -205,12 +205,18 @@ describe('the renderer keeps key star names off a galaxy name, or backs them', (
     const written = s.drawWith(onIt, frame)
     const letters = s.real.stats.galaxyNameBoxes ?? []
     expect(letters.some((b) => boxesOverlap(b, spot))).toBe(true)
-    const drawn = s.real.stats.nebulaNames ?? []
-    expect(drawn.length).toBeGreaterThan(0)
-    for (const name of drawn) {
-      const text = scene.nebulae[name.nebula].name.toLocaleUpperCase()
-      const backed = written.some((w) => w.text === text && w.backed)
-      expect(backed || !letters.some((b) => boxesOverlap(b, name))).toBe(true)
+    // #764: a nebula name is never on a galaxy name's letters, backed or bare: it moves off
+    // them, or the galaxy name is left out from the next frame on.
+    for (let round = 0; round < 2; round += 1) {
+      const out = round === 0 ? written : s.drawWith(onIt, frame)
+      const drawn = s.real.stats.nebulaNames ?? []
+      expect(drawn.length).toBeGreaterThan(0)
+      const shown = s.real.stats.galaxyNameBoxes ?? []
+      for (const name of drawn) {
+        const text = scene.nebulae[name.nebula].name.toLocaleUpperCase()
+        expect(out.some((w) => w.text === text && w.backed)).toBe(false)
+        expect(shown.some((b) => boxesOverlap(b, name))).toBe(false)
+      }
     }
     s.engine.destroy()
   })

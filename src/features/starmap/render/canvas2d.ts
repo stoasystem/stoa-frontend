@@ -9,7 +9,7 @@
  * the focus are never drawn one by one, and nothing is blurred per frame.
  */
 import { CHOSEN, DOT_CUT, dotBoxFor, GLOW_STOPS, GLYPH_LARGE, GLYPH_SMALL, HOVER, LINE_GLOW, ORB_TURN, RAY_STOPS, rayPath, STAR_INK, WAITING_RING_ALPHA, PRESS, SMALL_CUT_BELOW, type DotCut, type GlyphCut, type StarLight } from '@/features/starmap/render/glyph'
-import { aroundDisc, aroundDiscWide, backingBox, belongsTo, boxHitsCircle, boxHitsSegment, coversAny, keyStars, leaderLine, nearerStars, ownerUnclear, placeInsisting, placeLabel, wrapName, type Box, type Circle, type Segment } from '@/features/starmap/render/labels'
+import { aroundDiscWide, backingBox, belongsTo, boxesOverlap, boxHitsCircle, boxHitsSegment, coversAny, keyStars, leaderLine, nearerStars, ownerUnclear, placeInsisting, placeLabel, wrapName, type Box, type Circle, type Segment } from '@/features/starmap/render/labels'
 import { DRAG, panoramaDot, panoramaLook, ramp, reachFade, REVEAL, type Ramp } from '@/features/starmap/view/semanticZoom'
 import { createTileCache, nebulaStateKeys, tileKey, tileSizeFor, TILE_REACH, type TileCache } from '@/features/starmap/render/nebulaTiles'
 import { CLOUD_REACH, galaxyHazeAlpha, galaxyHazeBox, nebulaGlowAlpha, paintGalaxy, paintGalaxyHaze, paintNebulaCloud } from '@/features/starmap/render/galaxy'
@@ -495,6 +495,8 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
 
   const tiles: TileCache = createTileCache(paintTile)
   const galaxyNames = createGalaxyNames(makeCanvas)
+  // The galaxies whose names a cluster name took the place of in the last frame (#764): left out of this one.
+  let galaxyNamesLeftOut: ReadonlySet<number> = new Set()
   let tilesFor = ''
 
   const rebuild = () => {
@@ -575,6 +577,7 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
     setTheme(next) {
       theme = next
       galaxyNames.clear()
+      galaxyNamesLeftOut = new Set()
       starNameWidths = []
       starNameLines = []
       nebulaNameWidths = []
@@ -713,7 +716,7 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
         }
         lastLightKey = key
         // Far out, each galaxy's name, very faint, under its stars (#137 A3).
-        stats.galaxyNames = galaxyNames.draw(ctx, scene, frame, colours, dpr)
+        stats.galaxyNames = galaxyNames.draw(ctx, scene, frame, colours, dpr, galaxyNamesLeftOut)
       }
 
       // Haze under every nebula (one sky: its cloud, above), and the blurred stars of those outside the focus.
@@ -1075,6 +1078,12 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
       const galaxyCovers: readonly Box[] = scene.galaxy ? galaxyNames.boxes : []
       stats.galaxyNameBoxes = galaxyCovers
       const onGalaxyName = (b: Box) => galaxyCovers.length > 0 && coversAny(b, galaxyCovers)
+      // A nebula (cluster) name is what the student taps (#747): it never sits on a galaxy name's
+      // letters, backed or not. Where it has no other place, that galaxy name is left out instead
+      // (#764; the page's heading says it too). So it keeps off the letters of names left out as well.
+      const galaxyLetters = scene.galaxy ? galaxyNames.letters : []
+      const letterCovers = galaxyLetters.map((letters) => letters.box)
+      const crowded = new Set<number>()
       const names = { stars: 0, nebulae: 0 }
       const fadeOf = (key: string): LabelFade => {
         let entry = labelFades.get(key)
@@ -1353,42 +1362,37 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
           }
           const own = { x: nebulaX[n], y: nebulaY[n], r: nebulaR[n] }
           const others = cores.filter((_, m) => m !== n)
-          const ringOf = (form: NameForm) => aroundDisc(own.x, own.y, Math.min(own.r * 0.95, NEBULA_NAME_RING), form.width, form.height, 6)
+          // Its four sides, then the four corners (#764: a cluster in the sky's bottom row has the
+          // galaxy name below it and its neighbours either side, but often a corner free).
+          const ringOf = (form: NameForm) => aroundDiscWide(own.x, own.y, Math.min(own.r * 0.95, NEBULA_NAME_RING), form.width, form.height, 6)
           // The form it was drawn in last, until another is placed: so a name fading out keeps its shape.
           let shown = measured.forms[Math.min(entry.form ?? 0, measured.forms.length - 1)]
           let candidates = ringOf(shown)
           let box: Box | null = null
-          entry.backed = false
           if (base >= 0.01 && (labelled < limit || n === priority)) {
-            for (const [f, form] of measured.forms.entries()) {
-              const ring = ringOf(form)
-              const preferred = preferring(ring, entry.form === f ? entry.slot : -1)
-              const find = (covers: readonly Box[]) => {
+            // Off every galaxy name's letters (a name left out too) in any form if it can be;
+            // else on them, and that galaxy's name is left out (#764): never half under this one.
+            for (const covers of letterCovers.length > 0 ? [letterCovers, []] : [[]]) {
+              for (const [f, form] of measured.forms.entries()) {
+                const ring = ringOf(form)
+                const preferred = preferring(ring, entry.form === f ? entry.slot : -1)
                 const obstacles = { boxes: placed, circles: others, segments, covers }
-                return (
+                box =
                   placeLabel(preferred, obstacles, labelArea,
                     (candidate) => belongsTo(candidate, own, others) && !others.some((c) => boxHitsCircle(candidate, c)) ? 0 : Infinity) ??
                   // The hovered or focused name far out on one sky: a nebula packed
                   // among others has no side nearer itself than its neighbours, so
                   // there being nearer is a preference, not a rule -- the pointer says whose name it is.
                   (scene.galaxy && wholeMap && n === priority ? placeLabel(preferred, obstacles, labelArea, (candidate) => (belongsTo(candidate, own, others) ? 0 : 20)) : null)
-                )
+                if (box) {
+                  if (entry.form !== f) entry.slot = -1
+                  entry.form = f
+                  shown = form
+                  candidates = ring
+                  break
+                }
               }
-              // Off the galaxy names' letters if it can be; else on them, on a dark backing.
-              box = find(galaxyCovers)
-              let backed = false
-              if (!box && galaxyCovers.length > 0) {
-                box = find([])
-                backed = box !== null
-              }
-              if (box) {
-                entry.backed = backed
-                if (entry.form !== f) entry.slot = -1
-                entry.form = f
-                shown = form
-                candidates = ring
-                break
-              }
+              if (box) break
             }
           }
           settle(entry, box !== null)
@@ -1399,16 +1403,15 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
           }
           const at = box ?? (entry.slot >= 0 ? candidates[entry.slot] : null)
           if (!at || entry.alpha <= 0.001) continue
-          const nameAlpha = Math.min(1, frame.nebulaLabelAlpha * base * entry.alpha * INK.nebulaName.alpha * nebulaDim(n))
-          if (entry.backed) {
-            // On a galaxy name: the star names' opaque backing, so the letters under it do not show through.
-            ctx.globalAlpha = nameAlpha * REVEAL.keyName.backing
-            ctx.fillStyle = colours.sky
-            ctx.beginPath()
-            if (typeof ctx.roundRect === 'function') ctx.roundRect(at.x0, at.y0, at.x1 - at.x0, at.y1 - at.y0, 4)
-            else ctx.rect(at.x0, at.y0, at.x1 - at.x0, at.y1 - at.y0)
-            ctx.fill()
+          // A name on a galaxy name's letters (placed there, or fading out where it was) keeps that
+          // name left out; while it is still drawn, this name waits a frame rather than cover it (#764).
+          const under = galaxyLetters.filter((letters) => boxesOverlap(at, letters.box)).map((letters) => letters.galaxy)
+          for (const g of under) crowded.add(g)
+          if (under.some((g) => !galaxyNamesLeftOut.has(g))) {
+            settling = true
+            continue
           }
+          const nameAlpha = Math.min(1, frame.nebulaLabelAlpha * base * entry.alpha * INK.nebulaName.alpha * nebulaDim(n))
           ctx.globalAlpha = nameAlpha
           shown.lines.forEach((line, i) => outlinedText(line, (at.x0 + at.x1) / 2, at.y0 + 2 + i * lineHeight, colours.textBody, colours.sky, INK.nebulaName.outline))
           nebulaNameBoxes.push({ nebula: n, x0: at.x0, y0: at.y0, x1: at.x1, y1: at.y1, alpha: nameAlpha })
@@ -1417,6 +1420,10 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
         setLetterSpacing('0px')
       }
       stats.nebulaNames = nebulaNameBoxes
+      // The galaxy names the nebula names need the place of are left out of the next frame; the rest come back.
+      if (crowded.size !== galaxyNamesLeftOut.size || [...crowded].some((g) => !galaxyNamesLeftOut.has(g))) settling = true
+      galaxyNamesLeftOut = crowded
+      stats.galaxyNamesLeftOut = [...crowded]
       // Names no longer in play are forgotten (they had faded with the zoom).
       for (const [key, entry] of labelFades) if (entry.seen !== labelFrame) labelFades.delete(key)
       stats.names = names

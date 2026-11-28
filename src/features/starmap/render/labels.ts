@@ -7,7 +7,9 @@
  * lines, on an opaque backing (#755) (`placeInsisting`), and a name at the
  * screen's edge slides along it (`edgeSpots`) to keep clear of the key stars.
  * No name sits on a galaxy name's letters while it has a free spot off them
- * (`Obstacles.covers`); one that must sit there anyway gets the same backing.
+ * (`Obstacles.covers`); a star's name that must sit there anyway gets the
+ * same backing, and a nebula's name never does: the galaxy name makes way
+ * (#764, canvas2d.ts).
  */
 import { REVEAL } from '@/features/starmap/view/semanticZoom'
 
