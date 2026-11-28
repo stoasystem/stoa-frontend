@@ -23,6 +23,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { demoClusterMap } from '@/dev/demo/clusters/demoClusterMap'
 import { SURFACES } from '@/dev/preview/surfaces'
 import { AskServerProvider } from '@/features/ask/server/askServer'
+import { StarMapEngine } from '@/features/starmap/engine/starMapEngine'
 import { hintCluster, isClusterSky, useClusterHint } from '@/features/starmap/onboarding/ClusterHint'
 import { markShown, onceKey, shownBefore } from '@/features/starmap/onboarding/shownOnce'
 import { StarMapRoute } from '@/features/starmap/StarMapRoute'
@@ -350,6 +351,32 @@ describe("B. a newcomer's first landing (#769)", () => {
     const cluster = projected.stars.find((star) => star.unitId === physicsStart().unitId)!.nebulaId
     expect(landing(container)!.getAttribute('data-cluster-landing')).toBe(cluster)
     expect(landing(container)!.textContent).toContain(`Your first star, ${physicsStart().name}, is here.`)
+  })
+
+  it('rings the recommended cluster on the canvas only while Murmi’s bubble is up', async () => {
+    const mark = vi.spyOn(StarMapEngine.prototype, 'setMarkedCluster')
+    const last = () => mark.mock.lastCall?.[0] ?? null
+    const { container, unmount } = await openAt('/map/math', newcomerSky())
+    await waitFor(() => expect(landing(container)).not.toBeNull())
+    expect(last()).toBe('geometry')
+    fireEvent.click([...landing(container)!.querySelectorAll('button')].find((button) => button.textContent === 'Look around first')!)
+    await waitFor(() => expect(landing(container)).toBeNull())
+    expect(last()).toBeNull()
+    unmount()
+    // Opened from the bubble: the ring goes with it.
+    sessionStorage.removeItem(`stoa.starmap.firstLanding.dismissed.${OWNER}`)
+    mark.mockClear()
+    const again = await openAt('/map/math', newcomerSky())
+    await waitFor(() => expect(last()).toBe('geometry'))
+    fireEvent.click(again.container.querySelector('[data-nebula-link="geometry"]')!)
+    await waitFor(() => expect(again.container.querySelector('[data-scene-landing]')).not.toBeNull())
+    expect(last()).toBeNull()
+    again.unmount()
+    // A returning student: never a ring.
+    mark.mockClear()
+    await openAt('/map/math')
+    await act(async () => {})
+    expect(mark.mock.calls.filter(([id]) => id !== null)).toEqual([])
   })
 
   it('a student who has started something opens on the whole view as before, with the hint', async () => {

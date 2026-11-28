@@ -346,6 +346,29 @@ export const CHOICE = {
 } as const
 
 /**
+ * The cluster a newcomer's first landing points at (#769): a soft ring of
+ * light round its stars as drawn, while Murmi's bubble is up, so "this
+ * cluster" is the one ringed even when the bubble docks away from it on a
+ * phone. Drawn in the lit colour like the pointer's ring (#756), but wider
+ * and stronger than it, and with a faint glow under the line. It pulses
+ * gently with the recommended star's breath (`BREATHE`), and is still under
+ * reduced motion (`pulseFrom` unused: the ring holds at full strength).
+ */
+export const LANDING_MARK = {
+  /** The fine line's alpha at its strongest. */
+  alpha: 0.9,
+  /** The fine line's width, CSS px. */
+  width: 2,
+  /** The glow under it: this many times as wide, at this share of the line's alpha. */
+  glowWide: 5,
+  glowAlpha: 0.22,
+  /** Room between the ring and the cluster's outermost star glyph, CSS px (the pointer's ring keeps 8). */
+  pad: 12,
+  /** At the pulse's faintest, this share of `alpha`. */
+  pulseFrom: 0.55,
+} as const
+
+/**
  * The lighting moment's labels beside the star (#145, round three C14 of
  * #142): the flare's title and, with reduced motion, the still label. They
  * go below the star, else above, right or left of it, else slid along

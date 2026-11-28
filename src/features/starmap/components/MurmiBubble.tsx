@@ -67,9 +67,22 @@ export function starBox(spot: StarOnScreen): Rect {
 }
 
 /**
+ * What a bubble never covers of the spot it stands by (#769): a cluster's own
+ * name (`StarOnScreen.name`) and the stars round its centre (`size`). Empty
+ * for a star, whose own glyph the gap keeps clear already.
+ */
+export function ownBoxes(spot: StarOnScreen): Rect[] {
+  if (!spot.name) return []
+  const half = spot.size / 2
+  return [spot.name, { x0: spot.x - half, y0: spot.y - half, x1: spot.x + half, y1: spot.y + half }]
+}
+
+/**
  * Beside its star, clear of `controls` and of other stars (#586): `strict`
  * (the star Murmi names, say) and the `rest`. When no side clears every star,
- * a side that clears `strict` wins over one that covers less in all.
+ * a side that clears `strict` wins over one that covers less in all. A
+ * cluster's own name and stars (`ownBoxes`, #769) come before all of it:
+ * given up last, after the edges' names and the controls.
  */
 export function placeAvoiding(
   spot: StarOnScreen,
@@ -81,11 +94,23 @@ export function placeAvoiding(
   was?: LabelSide,
 ) {
   const gap = spot.size / 2 + 30
+  const own = ownBoxes(spot)
   const edges = [...(spot.keepClear ?? []), ...controls]
-  const all = placeBesideStar(spot, size, gap, layer, [...edges, ...(strict ? [strict] : []), ...rest], was)
-  if (!strict || !covers(all, size, strict)) return all
-  const kept = placeBesideStar(spot, size, gap, layer, [...edges, strict], was)
-  return covers(kept, size, strict) ? all : kept
+  const place = (keep: readonly Rect[]) => placeBesideStar(spot, size, gap, layer, keep, was)
+  const clear = (at: { x: number; y: number }) => !own.some((box) => covers(at, size, box)) && !(strict && covers(at, size, strict))
+  const all = place([...edges, ...own, ...(strict ? [strict] : []), ...rest])
+  if (clear(all)) return all
+  if (strict) {
+    const kept = place([...edges, ...own, strict])
+    if (clear(kept)) return kept
+  }
+  if (own.length === 0) return all
+  // Nothing clears it all: the cluster's own name and stars come first, then the controls.
+  for (const keep of [[...edges, ...own], [...controls, ...own], own]) {
+    const at = place(keep)
+    if (!own.some((box) => covers(at, size, box))) return at
+  }
+  return all
 }
 
 function covers(place: { x: number; y: number }, size: { width: number; height: number }, box: Rect): boolean {
@@ -104,13 +129,29 @@ export function dockedPlace(
   layer: { width: number; height: number },
   controls: readonly Rect[],
   strict: Rect | null = null,
+  rest: readonly Rect[] = [],
 ) {
   // Along the bottom: below 60% of the map; along the top: above 40%. A control between them
   // is beside the bubble, which stops short of it.
   const floor = Math.min(layer.height, ...controls.filter((rect) => rect.y0 > 0.6 * layer.height).map((rect) => rect.y0)) - GUTTER_PX
   const ceiling = Math.max(0, ...controls.filter((rect) => rect.y1 < 0.4 * layer.height).map((rect) => rect.y1)) + GUTTER_PX
   const low = floor - box.height
-  const coversStar = spot.y + spot.size / 2 + GUTTER_PX > low || (strict !== null && strict.y1 + GUTTER_PX > low && strict.y0 < floor)
+  let coversStar = spot.y + spot.size / 2 + GUTTER_PX > low || (strict !== null && strict.y1 + GUTTER_PX > low && strict.y0 < floor)
+  if (spot.name || rest.length > 0) {
+    // A cluster (#769): its own name and stars first -- never docked over while a side keeps
+    // clear of them -- then `strict`, then the fewest other names; the bottom on a tie.
+    const meets = (y: number, top: number, bottom: number) => top - GUTTER_PX < y + box.height && bottom + GUTTER_PX > y
+    const ownTop = Math.min(spot.y - spot.size / 2, spot.name?.y0 ?? Infinity)
+    const ownBottom = Math.max(spot.y + spot.size / 2, spot.name?.y1 ?? -Infinity)
+    const cost = (y: number) => [
+      meets(y, ownTop, ownBottom) ? 1 : 0,
+      strict && meets(y, strict.y0, strict.y1) ? 1 : 0,
+      rest.filter((rect) => rect.y0 < y + box.height && rect.y1 > y).length,
+    ]
+    const [top, bottom] = [cost(ceiling), cost(low)]
+    const first = top.findIndex((value, i) => value !== bottom[i])
+    coversStar = first >= 0 && top[first] < bottom[first]
+  }
   const y = coversStar ? ceiling : low
   const beside = controls.filter((rect) => rect.y0 < y + box.height && rect.y1 > y && rect.x0 > layer.width / 2)
   const right = Math.min(layer.width, ...beside.map((rect) => rect.x0)) - GUTTER_PX / 2
@@ -244,7 +285,11 @@ export function MurmiBubble({
           return at && at.x >= 0 && at.x <= width && at.y >= 0 && at.y <= height ? starBox(at) : null
         }
         const [strict = null, ...rest] = avoiding.map(boxOf)
-        const others = rest.filter((other): other is Rect => other !== null)
+        // Other clusters' names, as drawn (#769): kept clear where the bubble can.
+        const names = avoiding
+          .map((other) => (other === unitId ? undefined : locate(other)?.name))
+          .filter((name): name is Rect => name !== undefined && name.x1 >= 0 && name.x0 <= width && name.y1 >= 0 && name.y0 <= height)
+        const others = [...rest.filter((other): other is Rect => other !== null), ...names]
         const isDocked = width < DOCK_BELOW_PX
         setDocked(isDocked)
         if (!isDocked) box.style.width = ''
@@ -252,7 +297,7 @@ export function MurmiBubble({
         let at: { x: number; y: number; side: string }
         if (isDocked) {
           // Its height follows its width, so the next frame settles what this one measures.
-          const dock = dockedPlace(spot, size, { width, height }, controls, strict)
+          const dock = dockedPlace(spot, size, { width, height }, controls, strict, others)
           box.style.width = `${dock.width}px`
           at = dock
         } else {
