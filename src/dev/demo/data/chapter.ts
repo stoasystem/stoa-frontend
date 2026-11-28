@@ -588,7 +588,7 @@ export function checkDemoAnswer(id: string, answer: PracticeAnswer, language: Su
       [...answer].sort((a, b) => Number(a) - Number(b)).every((item, index) => item === key[index])
     : Array.isArray(expected)
       ? Array.isArray(answer) && answer.length === expected.length && answer.every((item, index) => item === expected[index])
-      : !Array.isArray(answer) && [expected, ...(found.spec.accepted ?? [])].some((right) => normal(right) === normal(answer))
+      : typeof answer === 'string' && [expected, ...(found.spec.accepted ?? [])].some((right) => normal(right) === normal(answer))
   return {
     challengeId: id,
     correct,

@@ -25,6 +25,7 @@ import {
   demoRoadmap,
   type DemoData,
 } from '@/dev/demo/data'
+import { demoGridReviewChallenge } from '@/dev/demo/data/gridDrawing'
 import { demoServerStorage } from '@/dev/preview/storage'
 import type { LitEvent } from '@/features/starmap/lighting/lightingEvents'
 import type { SupportedLanguage } from '@/i18n/languages'
@@ -174,7 +175,8 @@ export function makeReviewScheduled() {
  * `GET /practice/review/due`: nothing, as #116 opens; with `makeReviewDue`,
  * one question of each kind the lessons done have -- a picked one, missed
  * twice, a written one, one put in order and a set picked in the figure's
- * hotspots (#743) -- so the review shows each way of answering.
+ * hotspots (#743) -- and a drawing on a grid (#744), so the review shows each
+ * way of answering.
  */
 export function demoReviewDue(): ReviewDueResponse {
   const generatedAt = new Date().toISOString()
@@ -184,15 +186,19 @@ export function demoReviewDue(): ReviewDueResponse {
     .flatMap((lesson) => lesson.challenges.map((challenge) => ({ lesson, challenge })))
   const picked = new Map<string, (typeof challenges)[number]>()
   for (const entry of challenges) if (!picked.has(entry.challenge.type)) picked.set(entry.challenge.type, entry)
-  const items: ReviewCard[] = [...picked.values()].map(({ lesson, challenge }, index) => ({
+  // And one drawing on a grid (#744), the rotation sample, after them.
+  const grid = demoGridReviewChallenge(language)
+  const entries = [...picked.values()].map(({ challenge }) => challenge).concat(grid)
+  const items: ReviewCard[] = entries.map((challenge, index) => ({
     challengeId: challenge.challengeId,
-    lessonId: lesson.id,
-    subjectId: lesson.subjectId,
-    topicId: lesson.topicId,
+    lessonId: challenge.lessonId,
+    subjectId: challenge.subjectId,
+    topicId: challenge.topicId,
     prompt: challenge.prompt,
     options: challenge.options ?? [],
     ...(challenge.figure ? { figure: challenge.figure } : {}),
     ...(challenge.optionFigures ? { optionFigures: challenge.optionFigures } : {}),
+    ...(challenge.grid ? { grid: challenge.grid } : {}),
     type: challenge.type,
     dueAt: generatedAt,
     lapses: index === 0 ? 2 : 0,

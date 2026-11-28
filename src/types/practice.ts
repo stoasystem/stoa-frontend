@@ -10,8 +10,16 @@ export type PracticeLessonDifficulty = 'intro' | 'practice' | 'review'
 /**
  * `multi_select` (stoa-backend#593): a set of options is picked, judged as a
  * set; an option may also be a hotspot in the question's figure.
+ * `grid_drawing` (stoa-backend#594): points, segments or a polygon are drawn
+ * on a coordinate grid.
  */
-export type PracticeChallengeType = 'multiple_choice' | 'multi_select' | 'text_input' | 'ordering' | 'explanation'
+export type PracticeChallengeType =
+  | 'multiple_choice'
+  | 'multi_select'
+  | 'text_input'
+  | 'ordering'
+  | 'explanation'
+  | 'grid_drawing'
 
 export type PracticeRoadmapTopic = {
   id: string
@@ -69,6 +77,56 @@ export type ExerciseFigures = {
   optionFigures?: (string | null)[] | null
 }
 
+/**
+ * A labelled point on a coordinate grid (stoa-backend#594): a coordinate is a
+ * multiple of the grid's step, so a whole number or a half.
+ */
+export type GridPoint = {
+  label: string
+  x: number
+  y: number
+}
+
+/**
+ * Points, and segments and polygons joining points by label (stoa-backend#594).
+ * The same shape is the figure already on a grid (`GridSpec.given`), the
+ * answer to a `grid_drawing` exercise, and the right drawing a result shows.
+ * Segments and polygons may name the given figure's points as well as the
+ * student's own.
+ */
+export type GridDrawing = {
+  points: GridPoint[]
+  segments: string[][]
+  polygons: string[][]
+}
+
+/** The most one drawing may hold; more is refused as `practice_answer_invalid`. */
+export type GridLimits = {
+  points: number
+  segments: number
+  polygons: number
+}
+
+/**
+ * The grid a `grid_drawing` exercise is drawn on, without its checks or
+ * solutions (stoa-backend#594). Bounds are whole numbers, `step` is 1 or 0.5;
+ * `axes` draws the axes through 0 and `axisLabels` numbers them. `labels` are
+ * the point names the exercise asks for, in order, to be offered first; a
+ * student's labels never repeat the given figure's.
+ */
+export type GridSpec = {
+  xMin: number
+  xMax: number
+  yMin: number
+  yMax: number
+  step: number
+  axes?: boolean
+  axisLabels?: boolean
+  labels?: string[]
+  given?: GridDrawing | null
+  limits: GridLimits
+}
+
 export type PracticeChallenge = ExerciseFigures & {
   /**
    * What `GET /practice/lessons/:id` actually calls it. It was declared as
@@ -87,6 +145,8 @@ export type PracticeChallenge = ExerciseFigures & {
   type: PracticeChallengeType
   prompt: string
   options?: string[]
+  /** Only for a `grid_drawing` exercise: the grid it is drawn on (stoa-backend#594). */
+  grid?: GridSpec | null
   /** Whether `POST /practice/hints` has a hint for this exercise. */
   hintAvailable: boolean
   correctAnswer: string | string[]
@@ -148,11 +208,12 @@ export type PracticeProgress = {
 
 /**
  * An answer as it is sent, by the exercise's kind: the picked option's text,
- * the typed text, the pieces of an ordering in order, or -- for `multi_select`
+ * the typed text, the pieces of an ordering in order, -- for `multi_select`
  * (stoa-backend#593) -- the numbers of the picked options, 0 for the first,
- * each once, in any order.
+ * each once, in any order, or -- for `grid_drawing` (stoa-backend#594) -- a
+ * drawing.
  */
-export type PracticeAnswer = string | string[] | number[]
+export type PracticeAnswer = string | string[] | number[] | GridDrawing
 
 export type PracticeAnswerRequest = {
   answer: PracticeAnswer
@@ -191,6 +252,12 @@ export type PracticeAnswerResult = {
    * right options, 0 for the first; null or absent for every other kind.
    */
   correctOptions?: number[] | null
+  /**
+   * Only for a `grid_drawing` exercise (stoa-backend#594): one drawing that is
+   * right, sent once the answer is on record, right or wrong. Another drawing
+   * may be right too.
+   */
+  standardDrawing?: GridDrawing | null
   canAskLearningAssistant?: boolean
   canAskTeacher?: boolean
 }
@@ -449,6 +516,8 @@ export type ReviewCard = ExerciseFigures & {
   prompt: string
   options: string[]
   type: string
+  /** Only for a `grid_drawing` card: the grid it is drawn on (stoa-backend#594). */
+  grid?: GridSpec | null
   dueAt: string
   lapses: number
   reps: number

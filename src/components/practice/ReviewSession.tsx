@@ -27,8 +27,10 @@ import { useTranslation } from 'react-i18next'
 import { RotateCcw } from 'lucide-react'
 import { Button } from '@/components/base'
 import { EmptyState } from '@/components/common/EmptyState'
-import { AnswerInput, BankText, bodyOnSky, FeedbackCard, figureChoices, glass, type AnswerValue } from '@/features/chapter/answerControls'
+import { answerFilled } from '@/components/practice/practiceLessonReducer'
+import { AnswerInput, BankText, bodyOnSky, drawnOnGrid, FeedbackCard, figureChoices, glass, type AnswerValue } from '@/features/chapter/answerControls'
 import { ExerciseFigure } from '@/features/chapter/ExerciseFigure'
+import { GridDrawingFigure } from '@/features/chapter/GridDrawingInput'
 import { submitChallengeAnswer } from '@/services/practice/practiceApi'
 import { practiceQueryKeys } from '@/services/practice/practiceQueryKeys'
 import { useDueReviewQuery } from '@/hooks/practice/useReviewQueries'
@@ -40,13 +42,6 @@ const FROM_OPTIONS = ['multiple_choice', 'multi_select', 'ordering']
 
 /** Nothing picked yet: an empty order, an empty set of options (stoa-backend#593), or no text. */
 const emptyAnswer = (type: string): AnswerValue => (type === 'ordering' || type === 'multi_select' ? [] : '')
-
-/**
- * The rule the stage lights its Check button by (`useLessonRun`): an order
- * needs a first pick, anything typed needs a character that is not a space.
- */
-const isFilled = (answer: AnswerValue) =>
-  Array.isArray(answer) ? answer.length > 0 : answer.trim().length > 0
 
 export function ReviewSession({ unitId }: { unitId?: string } = {}) {
   const { t } = useTranslation('practice')
@@ -176,7 +171,9 @@ function ReviewQuestion({ card, onAnswer }: { card: ReviewCard; onAnswer: () => 
   // pick from. The stage would offer a text box; here that box would submit an
   // answer the question was never asking for and push its next date out, so
   // the review says plainly that this one belongs in its lesson.
-  const unanswerable = options.length === 0 && FROM_OPTIONS.includes(card.type)
+  // A drawing on a grid that arrived without its grid is the same (#744).
+  const unanswerable =
+    (options.length === 0 && FROM_OPTIONS.includes(card.type)) || (card.type === 'grid_drawing' && !card.grid)
   // The set just checked stays picked beside its verdict, in the list and in
   // the figure alike, until Try again (stoa-backend#593).
   const answering = {
@@ -202,7 +199,10 @@ function ReviewQuestion({ card, onAnswer }: { card: ReviewCard; onAnswer: () => 
 
       <ReasonLabel reason={card.reason} />
 
-      {card.figure && <ExerciseFigure svg={card.figure} labelledBy={promptId} choices={unanswerable ? undefined : figureChoices(answering)} />}
+      {/* A drawing on a grid shows its grid in the answer instead (#744). */}
+      {card.figure && !drawnOnGrid(card) && (
+        <ExerciseFigure svg={card.figure} labelledBy={promptId} choices={unanswerable ? undefined : figureChoices(answering)} />
+      )}
 
       {unanswerable ? (
         <p className={cn('m-0 text-[15px]', bodyOnSky)}>{t('review.answerInLesson')}</p>
@@ -231,6 +231,16 @@ function ReviewQuestion({ card, onAnswer }: { card: ReviewCard; onAnswer: () => 
             {result?.correct && (
               <div ref={verdictArea} tabIndex={-1} data-review-feedback="correct" className="outline-none">
                 <FeedbackCard correct feedback={result.feedback} explanation={result.explanation}>
+                  {/* The student's drawing stays in the grid above; beside it, the
+                      drawing the exercise keeps as right (#744). Held back from a
+                      wrong answer, as the explanation is. */}
+                  {card.grid && result.standardDrawing && (
+                    <div data-review-standard-drawing className="mt-2 flex flex-col gap-1.5">
+                      <p className="m-0 text-[13px] font-semibold">{tStage('stage.grid.standard')}</p>
+                      <GridDrawingFigure grid={card.grid} drawing={result.standardDrawing} label={tStage('stage.grid.standard')} />
+                      <p className={cn('m-0 text-[13px]', bodyOnSky)}>{tStage('stage.grid.standardNote')}</p>
+                    </div>
+                  )}
                   <p className={cn('m-0 text-[13px]', bodyOnSky)}>{t('review.comesBackLater')}</p>
                 </FeedbackCard>
               </div>
@@ -257,8 +267,8 @@ function ReviewQuestion({ card, onAnswer }: { card: ReviewCard; onAnswer: () => 
                 lift
                 variant="onSky"
                 className="self-start"
-                disabled={!isFilled(answerValue) || answer.isPending}
-                onClick={() => isFilled(answerValue) && answer.mutate(answerValue)}
+                disabled={!answerFilled(answerValue) || answer.isPending}
+                onClick={() => answerFilled(answerValue) && answer.mutate(answerValue)}
               >
                 {answer.isPending ? tStage('stage.checking') : tStage('stage.check')}
               </Button>

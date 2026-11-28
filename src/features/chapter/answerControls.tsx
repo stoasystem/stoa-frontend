@@ -9,13 +9,14 @@ import { useId, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { MathRenderer } from '@/components/ui/MathRenderer'
 import { ExerciseFigure, type FigureChoices } from '@/features/chapter/ExerciseFigure'
+import { GridDrawingInput } from '@/features/chapter/GridDrawingInput'
 import { cn } from '@/lib/utils'
-import type { ExerciseFigures, PracticeAnswer } from '@/types/practice'
+import type { ExerciseFigures, GridSpec, PracticeAnswer } from '@/types/practice'
 
 /**
  * What is picked or typed. An order is a list of pieces; a set of options
- * (`multi_select`, stoa-backend#593) the numbers of those picked; everything
- * else is text.
+ * (`multi_select`, stoa-backend#593) the numbers of those picked; a drawing on
+ * a grid a drawing (#744); everything else is text.
  */
 export type AnswerValue = PracticeAnswer
 
@@ -24,7 +25,17 @@ export type AnswerChallenge = Pick<ExerciseFigures, 'optionFigures'> & {
   challengeId: string
   type: string
   options?: string[] | null
+  /** A `grid_drawing` exercise's grid (stoa-backend#594). */
+  grid?: GridSpec | null
 }
+
+/**
+ * Whether the exercise's drawing is the grid the answer is drawn on: then
+ * that grid, with the figure already given on it, is the drawing to show,
+ * and the `figure` the backend renders of the same grid would show it twice.
+ */
+export const drawnOnGrid = (challenge: Pick<AnswerChallenge, 'type' | 'grid'>) =>
+  challenge.type === 'grid_drawing' && Boolean(challenge.grid)
 
 export const bodyOnSky = 'text-[color:var(--on-sky-text-body)]'
 
@@ -179,6 +190,10 @@ export function AnswerInput({
   const { t } = useTranslation('chapter')
   const optionId = useId()
   const options = challenge.options ?? []
+
+  if (challenge.type === 'grid_drawing' && challenge.grid) {
+    return <GridDrawingInput grid={challenge.grid} answer={value} onChange={onChange} verdict={verdict} disabled={disabled} />
+  }
 
   if (challenge.type === 'multiple_choice' && options.length > 0) {
     const selected = Array.isArray(value) ? '' : value
@@ -380,7 +395,7 @@ export function AnswerInput({
     )
   }
 
-  const text = Array.isArray(value) ? value.join(', ') : value
+  const text = Array.isArray(value) ? value.join(', ') : typeof value === 'string' ? value : ''
   const field =
     'w-full rounded-[12px] border border-[color:var(--on-sky-field-rule)] bg-white/[0.06] px-4 text-[17px] text-on-sky placeholder:text-[color:var(--on-sky-text-caption)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring disabled:opacity-40'
   return (

@@ -27,7 +27,7 @@ import { BUTTON_SIZES, ICON } from '@/components/base/sizes'
 import { MathRenderer } from '@/components/ui/MathRenderer'
 import { pathForTarget } from '@/features/starmap/view/layers'
 import type { AskPractice } from '@/features/ask/practiceContext'
-import { AnswerInput, BankText, bodyOnSky, FeedbackCard, figureChoices, glass, withoutBreaksAroundDisplayMath } from '@/features/chapter/answerControls'
+import { AnswerInput, BankText, bodyOnSky, drawnOnGrid, FeedbackCard, figureChoices, glass, withoutBreaksAroundDisplayMath } from '@/features/chapter/answerControls'
 import { ExerciseFigure } from '@/features/chapter/ExerciseFigure'
 import { StageWithAsk, STAGE_SIDE_QUERY } from '@/features/chapter/StageAsk'
 import { quizTroubleIsRestartable, quizTroubleKey } from '@/features/chapter/quiz'
@@ -541,7 +541,8 @@ function Exercise({
               >
                 <BankText>{challenge.prompt}</BankText>
               </h2>
-              {challenge.figure && (
+              {/* A drawing on a grid shows its grid in the answer instead (#744). */}
+              {challenge.figure && !drawnOnGrid(challenge) && (
                 // A set of options may be picked in the figure too (stoa-backend#593).
                 <ExerciseFigure svg={challenge.figure} labelledBy={promptId} className="mt-2" question choices={figureChoices(answering)} />
               )}
