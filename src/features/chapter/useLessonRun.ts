@@ -37,6 +37,7 @@ import type {
   LessonQuizAnswer,
   LessonQuizKind,
   LessonQuizSession,
+  PracticeAnswer,
   PracticeHintResponse,
   PracticeLesson,
 } from '@/types/practice'
@@ -320,7 +321,7 @@ export function useLessonRun(lesson: PracticeLesson | undefined, { testOut = fal
 
   const retry = useCallback(() => dispatch({ type: 'retry' }), [])
   // The answer on its way is the one on screen until its verdict or failure.
-  const answer = useCallback((value: string | string[]) => {
+  const answer = useCallback((value: PracticeAnswer) => {
     if (!sending.current) dispatch({ type: 'answer', answer: value })
   }, [])
 

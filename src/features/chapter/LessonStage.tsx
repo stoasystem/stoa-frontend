@@ -27,7 +27,7 @@ import { BUTTON_SIZES, ICON } from '@/components/base/sizes'
 import { MathRenderer } from '@/components/ui/MathRenderer'
 import { pathForTarget } from '@/features/starmap/view/layers'
 import type { AskPractice } from '@/features/ask/practiceContext'
-import { AnswerInput, BankText, bodyOnSky, FeedbackCard, glass, withoutBreaksAroundDisplayMath } from '@/features/chapter/answerControls'
+import { AnswerInput, BankText, bodyOnSky, FeedbackCard, figureChoices, glass, withoutBreaksAroundDisplayMath } from '@/features/chapter/answerControls'
 import { ExerciseFigure } from '@/features/chapter/ExerciseFigure'
 import { StageWithAsk, STAGE_SIDE_QUERY } from '@/features/chapter/StageAsk'
 import { quizTroubleIsRestartable, quizTroubleKey } from '@/features/chapter/quiz'
@@ -493,6 +493,13 @@ function Exercise({
   const long = challenge.prompt.length > 48
   // Keep the checked answer with its result; another attempt starts with Try again.
   const locked = Boolean(run.feedback) || run.checking
+  const answering = {
+    challenge,
+    value: run.answer,
+    onChange: run.setAnswer,
+    verdict: run.feedback ? (run.feedback.correct ? 'right' : 'wrong') : null,
+    disabled: locked,
+  } as const
 
   return (
     <>
@@ -534,7 +541,10 @@ function Exercise({
               >
                 <BankText>{challenge.prompt}</BankText>
               </h2>
-              {challenge.figure && <ExerciseFigure svg={challenge.figure} labelledBy={promptId} className="mt-2" question />}
+              {challenge.figure && (
+                // A set of options may be picked in the figure too (stoa-backend#593).
+                <ExerciseFigure svg={challenge.figure} labelledBy={promptId} className="mt-2" question choices={figureChoices(answering)} />
+              )}
             </div>
 
             <form
@@ -544,13 +554,7 @@ function Exercise({
               }}
             >
               {/* Enter in a text answer checks it (a form with one field submits on Enter). */}
-              <AnswerInput
-                challenge={challenge}
-                value={run.answer}
-                onChange={run.setAnswer}
-                verdict={run.feedback ? (run.feedback.correct ? 'right' : 'wrong') : null}
-                disabled={locked}
-              />
+              <AnswerInput {...answering} />
             </form>
 
             <Hint run={run} />

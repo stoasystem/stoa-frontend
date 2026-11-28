@@ -1,17 +1,17 @@
-import type { PracticeAnswerResult, PracticeChallenge } from '@/types/practice'
+import type { PracticeAnswer, PracticeAnswerResult, PracticeChallenge } from '@/types/practice'
 
 export type PracticeLessonState = {
   currentIndex: number
-  answer: string | string[]
+  answer: PracticeAnswer
   feedback?: PracticeAnswerResult
   hintsShown: number
   incorrectAttempts: number
 }
 
 export type PracticeLessonAction =
-  | { type: 'answer'; answer: string | string[] }
+  | { type: 'answer'; answer: PracticeAnswer }
   /** `answer`: the answer this verdict is for. A verdict for another one is dropped (#733). */
-  | { type: 'feedback'; feedback: PracticeAnswerResult; answer?: string | string[] }
+  | { type: 'feedback'; feedback: PracticeAnswerResult; answer?: PracticeAnswer }
   | { type: 'hint' }
   | { type: 'retry' }
   | { type: 'next'; challenges: PracticeChallenge[] }
@@ -24,8 +24,8 @@ export const initialPracticeLessonState: PracticeLessonState = {
   incorrectAttempts: 0,
 }
 
-/** The same answer: the same text, or the same pieces in the same order. */
-export function sameAnswer(a: string | string[], b: string | string[]): boolean {
+/** The same answer: the same text, or the same pieces (or option numbers) in the same order. */
+export function sameAnswer(a: PracticeAnswer, b: PracticeAnswer): boolean {
   if (Array.isArray(a) || Array.isArray(b)) {
     return Array.isArray(a) && Array.isArray(b) && a.length === b.length && a.every((item, index) => item === b[index])
   }

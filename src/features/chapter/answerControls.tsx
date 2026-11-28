@@ -8,12 +8,16 @@ import { Check, X } from 'lucide-react'
 import { useId, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { MathRenderer } from '@/components/ui/MathRenderer'
-import { ExerciseFigure } from '@/features/chapter/ExerciseFigure'
+import { ExerciseFigure, type FigureChoices } from '@/features/chapter/ExerciseFigure'
 import { cn } from '@/lib/utils'
-import type { ExerciseFigures } from '@/types/practice'
+import type { ExerciseFigures, PracticeAnswer } from '@/types/practice'
 
-/** What is picked or typed. An order is a list; everything else is text. */
-export type AnswerValue = string | string[]
+/**
+ * What is picked or typed. An order is a list of pieces; a set of options
+ * (`multi_select`, stoa-backend#593) the numbers of those picked; everything
+ * else is text.
+ */
+export type AnswerValue = PracticeAnswer
 
 /** As much of an exercise or a review card as answering it needs. */
 export type AnswerChallenge = Pick<ExerciseFigures, 'optionFigures'> & {
@@ -23,6 +27,51 @@ export type AnswerChallenge = Pick<ExerciseFigures, 'optionFigures'> & {
 }
 
 export const bodyOnSky = 'text-[color:var(--on-sky-text-body)]'
+
+/** The numbers of the options picked in a `multi_select` answer; none for any other value. */
+export function pickedOptions(value: AnswerValue): number[] {
+  return Array.isArray(value) ? value.filter((item): item is number => typeof item === 'number') : []
+}
+
+/**
+ * The set with this option picked or put back, in the options' order: the
+ * same set reads as the same answer however it was picked, from the list or
+ * from the figure.
+ */
+export function toggleOption(value: AnswerValue, index: number): number[] {
+  const picked = pickedOptions(value)
+  return (picked.includes(index) ? picked.filter((item) => item !== index) : [...picked, index]).sort((a, b) => a - b)
+}
+
+/**
+ * The hotspots of a `multi_select` question's figure (stoa-backend#593),
+ * wired to the same answer as the list under it: picking one in the figure
+ * picks that option in the list, and back. Undefined for any other kind, whose
+ * figure is a drawing and nothing more.
+ */
+export function figureChoices({
+  challenge,
+  value,
+  onChange,
+  verdict = null,
+  disabled,
+}: {
+  challenge: AnswerChallenge
+  value: AnswerValue
+  onChange: (value: AnswerValue) => void
+  verdict?: 'right' | 'wrong' | null
+  disabled: boolean
+}): FigureChoices | undefined {
+  const options = challenge.options ?? []
+  if (challenge.type !== 'multi_select' || options.length === 0) return undefined
+  return {
+    labels: options,
+    picked: pickedOptions(value),
+    onToggle: (index) => onChange(toggleOption(value, index)),
+    verdict,
+    disabled,
+  }
+}
 
 /**
  * The rule round a control not chosen yet: what tells it from the sky (WCAG
@@ -208,8 +257,90 @@ export function AnswerInput({
     )
   }
 
+  if (challenge.type === 'multi_select' && options.length > 0) {
+    const picked = pickedOptions(value)
+    const figures = options.map((_, index) => challenge.optionFigures?.[index] || '')
+    const pictured = figures.some(Boolean)
+    // Options that are only a letter (the hotspots' labels in the figure) are
+    // the badge alone, side by side; a letter beside the same letter says it twice.
+    const lettersOnly = !pictured && options.every((option) => /^\p{L}$/u.test(option.trim()))
+    return (
+      <fieldset className="m-0 min-w-0 border-0 p-0">
+        {/* Said, not counted: how many are right is not given away (stoa-backend#593). */}
+        <legend className={cn('mb-2 p-0 text-[13px] font-semibold', bodyOnSky)}>{t('stage.chooseSeveral')}</legend>
+        <div
+          className={
+            pictured
+              ? 'grid grid-cols-[repeat(auto-fit,minmax(min(100%,13rem),1fr))] gap-2'
+              : lettersOnly
+                ? 'grid grid-cols-[repeat(auto-fill,minmax(4.5rem,1fr))] gap-2'
+                : 'flex flex-col gap-2'
+          }
+        >
+          {options.map((option, index) => {
+            const chosen = picked.includes(index)
+            const figure = figures[index]
+            const letter = (figure || lettersOnly) && /^\p{L}$/u.test(option.trim()) ? option.trim() : null
+            const row = (
+              <>
+                <span
+                  id={`${optionId}-${index}-badge`}
+                  aria-hidden="true"
+                  // Square, not round: any number of these may be picked.
+                  className={cn(
+                    'inline-flex size-[30px] shrink-0 items-center justify-center rounded-[8px] text-[13px] font-semibold',
+                    chosen && verdict !== 'wrong' ? 'bg-lit text-[color:var(--on-sky-button-text)]' : 'bg-white/10 text-[color:var(--on-sky-text-body)]',
+                  )}
+                >
+                  {letter ?? String.fromCharCode(65 + index)}
+                </span>
+                <span id={`${optionId}-${index}`} className={letter ? 'sr-only' : 'flex-1 text-[17px] font-medium text-on-sky'}>
+                  <MathRenderer>{option}</MathRenderer>
+                </span>
+                {letter && !lettersOnly && <span className="flex-1" />}
+                {chosen && verdict === 'right' && <Check size={20} strokeWidth={2} aria-hidden="true" className="text-lit" />}
+                {chosen && verdict === 'wrong' && <X size={20} strokeWidth={2} aria-hidden="true" className="text-[color:var(--red)]" />}
+              </>
+            )
+            return (
+              <label
+                key={index}
+                data-answer-option={chosen ? (verdict ?? 'chosen') : undefined}
+                className={cn(
+                  'relative flex min-h-11 cursor-pointer gap-3.5 rounded-[14px] border px-[18px] py-3.5 backdrop-blur-[16px] has-[input:focus-visible]:outline-2 has-[input:focus-visible]:outline-offset-2 has-[input:focus-visible]:outline-ring',
+                  figure ? 'min-w-0 flex-col' : 'items-center',
+                  lettersOnly && 'justify-center gap-2 px-3',
+                  !chosen ? `${restingRule} bg-white/[0.06]` : verdict === 'wrong' ? 'border-[color:var(--red)] bg-white/[0.06]' : 'border-lit bg-lit/16',
+                  disabled && 'cursor-default',
+                )}
+              >
+                <input
+                  type="checkbox"
+                  value={index}
+                  checked={chosen}
+                  disabled={disabled}
+                  onChange={() => onChange(toggleOption(value, index))}
+                  aria-labelledby={option.trim() ? `${optionId}-${index}` : `${optionId}-${index}-badge`}
+                  className="sr-only"
+                />
+                {figure ? (
+                  <>
+                    <span className="flex items-center gap-3.5">{row}</span>
+                    <ExerciseFigure svg={figure} />
+                  </>
+                ) : (
+                  row
+                )}
+              </label>
+            )
+          })}
+        </div>
+      </fieldset>
+    )
+  }
+
   if (challenge.type === 'ordering' && options.length > 0) {
-    const chosen = Array.isArray(value) ? value : []
+    const chosen = Array.isArray(value) ? value.filter((item): item is string => typeof item === 'string') : []
     const toggle = (option: string) =>
       onChange(chosen.includes(option) ? chosen.filter((item) => item !== option) : [...chosen, option])
     return (

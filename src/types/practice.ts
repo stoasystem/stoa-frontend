@@ -7,7 +7,11 @@ export type PracticeGradeLevel = {
 export type PracticeLessonStatus = 'locked' | 'available' | 'completed'
 export type RoadmapLessonStatus = 'completed' | 'current' | 'available' | 'locked' | 'review'
 export type PracticeLessonDifficulty = 'intro' | 'practice' | 'review'
-export type PracticeChallengeType = 'multiple_choice' | 'text_input' | 'ordering' | 'explanation'
+/**
+ * `multi_select` (stoa-backend#593): a set of options is picked, judged as a
+ * set; an option may also be a hotspot in the question's figure.
+ */
+export type PracticeChallengeType = 'multiple_choice' | 'multi_select' | 'text_input' | 'ordering' | 'explanation'
 
 export type PracticeRoadmapTopic = {
   id: string
@@ -142,8 +146,16 @@ export type PracticeProgress = {
   progressPoints: number
 }
 
+/**
+ * An answer as it is sent, by the exercise's kind: the picked option's text,
+ * the typed text, the pieces of an ordering in order, or -- for `multi_select`
+ * (stoa-backend#593) -- the numbers of the picked options, 0 for the first,
+ * each once, in any order.
+ */
+export type PracticeAnswer = string | string[] | number[]
+
 export type PracticeAnswerRequest = {
-  answer: string | string[]
+  answer: PracticeAnswer
 }
 
 /**
@@ -174,6 +186,11 @@ export type PracticeAnswerResult = {
   hint?: string
   nextChallengeId?: string
   attemptsRemaining: number
+  /**
+   * Only for a `multi_select` exercise (stoa-backend#593): the numbers of its
+   * right options, 0 for the first; null or absent for every other kind.
+   */
+  correctOptions?: number[] | null
   canAskLearningAssistant?: boolean
   canAskTeacher?: boolean
 }

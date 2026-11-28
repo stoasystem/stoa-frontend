@@ -29,7 +29,7 @@ import {
 import type { LessonRun, StageFeedback } from '@/features/chapter/useLessonRun'
 import { answerStarQuiz, startStarQuiz } from '@/services/practice/practiceApi'
 import { practiceQueryKeys } from '@/services/practice/practiceQueryKeys'
-import type { StarQuizAnswer, StarQuizView } from '@/types/practice'
+import type { PracticeAnswer, StarQuizAnswer, StarQuizView } from '@/types/practice'
 
 /** Every refusal the two star quiz endpoints name. */
 export const STAR_QUIZ_TROUBLES = [
@@ -194,7 +194,7 @@ export function useStarQuizRun(unitId: string | undefined): StarQuizRun {
 
   const nothing = useCallback(() => {}, [])
   const retry = useCallback(() => dispatch({ type: 'retry' }), [])
-  const setAnswer = useCallback((value: string | string[]) => {
+  const setAnswer = useCallback((value: PracticeAnswer) => {
     if (!sending.current) dispatch({ type: 'answer', answer: value })
   }, [])
   const hearts = shown ? Math.max(0, shown.mistakesAllowed + 1 - shown.mistakes) : 0

@@ -70,6 +70,7 @@ export const demoChapter: DemoChapter = demoChapterFor('en')
 
 export {
   checkDemoAnswer,
+  demoAnswerInvalid,
   DEMO_COMPLETED_LESSONS,
   demoCatalog,
   demoHint,

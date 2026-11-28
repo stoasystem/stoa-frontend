@@ -76,6 +76,7 @@
     "checkFailed": "Non è stato possibile verificare la tua risposta. Riprova.",
     "checking": "Verifica in corso…",
     "chooseAnswer": "Scegli una risposta",
+    "chooseSeveral": "Scegli tutte le risposte giuste",
     "correct": "Giusto",
     "done": {
       "allDone": "Tutte le lezioni di {{chapter}} sono completate.",

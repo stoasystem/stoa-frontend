@@ -1,0 +1,50 @@
+/*
+ * Hotspots in a question's figure (stoa-backend#593, `ExerciseFigure`). The
+ * figure is dark ink on white paper wherever it is shown, so these are drawn
+ * for white, not for the sky: the sky's star-gold is 2:1 on white and would
+ * not be seen. Strokes keep their width on screen however the figure scales.
+ */
+[data-hotspots] [data-choice-hit] {
+  fill: transparent;
+  stroke: transparent;
+  stroke-width: 2px;
+  vector-effect: non-scaling-stroke;
+  cursor: pointer;
+}
+
+[data-hotspots] [data-choice][role='checkbox'] {
+  cursor: pointer;
+}
+
+[data-hotspots] [data-choice][aria-disabled='true'],
+[data-hotspots] [data-choice-hit]:has(+ [aria-disabled='true']) {
+  cursor: default;
+}
+
+/* Picked: gold behind the drawing, ringed in a dark amber (6.4:1 on white). */
+[data-hotspots] [data-choice-hit][data-state='picked'],
+[data-hotspots] [data-choice-hit][data-state='right'] {
+  fill: rgb(214 160 70 / 0.35);
+  stroke: #8a5a00;
+}
+
+/* Checked and wrong: the set was wrong, so each picked one is ringed red, as in the list. */
+[data-hotspots] [data-choice-hit][data-state='wrong'] {
+  fill: rgb(198 40 40 / 0.12);
+  stroke: #b3261e;
+}
+
+/* The one focus indicator (#83), in ink: the sky's ring colour is lost on the paper. */
+[data-hotspots] [data-choice]:focus-visible {
+  outline: var(--focus-ring-width) solid #1d1d1f;
+  outline-offset: 2px;
+}
+
+/*
+ * A figure with hotspots is drawn as wide as the column allows, up to 360 px,
+ * even when it was drawn smaller: a 120-unit figure at its own 120 px left
+ * dots of 6 px to tap. Never past its height limit (`FIGURE_MAX_HEIGHT`).
+ */
+[data-hotspots] > svg {
+  max-width: max(var(--figure-width, 0px), 360px) !important;
+}
