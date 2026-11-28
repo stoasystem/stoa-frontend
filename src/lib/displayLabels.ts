@@ -87,11 +87,31 @@ const rationaleKeys: Record<string, string> = {
     'practice:progress.rationale.signals',
 }
 
-export function getSubjectLabel(subject: string, t: TFunction) {
+/**
+ * A subject in the reader's language, or an empty string when there is none
+ * or the app does not know it. Reader endpoints send only the canonical id
+ * (`math`) or `null` and leave the naming to us (stoa-backend#637); an id we
+ * cannot name is left out rather than shown as sent (#745).
+ */
+export function getSubjectLabel(subject: string | null | undefined, t: TFunction): string {
   // Every spelling resolves to one id through the app's one alias table.
   const id = normalSubjectId(subject)
-  if (!id || !(id in subjectLabels)) return subject
+  if (!id || !(id in subjectLabels)) return ''
   return t(`chat:subjects.${id}`, { defaultValue: subjectLabels[id] })
+}
+
+/**
+ * A help request's "subject · grade" line; just the grade when the request
+ * has no subject we can name (#745).
+ */
+export function getHelpRequestWhere(
+  subject: string | null | undefined,
+  grade: string | null | undefined,
+  t: TFunction,
+): string {
+  const gradeLabel = getGradeLabelOrNotSet(grade, t)
+  const subjectLabel = getSubjectLabel(subject, t)
+  return subjectLabel ? t('teacher:requests.row', { subject: subjectLabel, grade: gradeLabel }) : gradeLabel
 }
 
 /*

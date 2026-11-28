@@ -18,7 +18,9 @@ export function StrongTopicList({ topics }: { topics: LearningWeakTopic[] }) {
           <div key={`${topic.subject}-${topic.topicId}`} className="rounded-md border p-3">
             <p className="font-medium">{topic.label}</p>
             <p className="text-sm text-muted-foreground">
-              {getSubjectLabel(topic.subject, t)} · {t('learningProfile.signals', { count: topic.count })}
+              {[getSubjectLabel(topic.subject, t), t('learningProfile.signals', { count: topic.count })]
+                .filter(Boolean)
+                .join(' · ')}
             </p>
           </div>
         ))}

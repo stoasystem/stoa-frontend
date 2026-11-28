@@ -28,7 +28,8 @@ export type TeacherHelpRequestSummary = {
    */
   studentId?: string
   studentName: string
-  subject: string
+  /** The canonical subject id, or `null` when the request has none (stoa-backend#637). */
+  subject: string | null
   grade: string
   status: TeacherHelpStatus
   /** How the student asked to be helped; missing means a text answer (`helpModeOf`, #705). */
@@ -73,7 +74,8 @@ export type TeacherHelpRequestDetail = {
     name: string
     grade: string
   }
-  subject: string
+  /** The canonical subject id, or `null` when the request has none (stoa-backend#637). */
+  subject: string | null
   status: TeacherHelpStatus
   /** How the student asked to be helped; missing means a text answer (`helpModeOf`, #705). */
   mode?: HelpMode

@@ -27,7 +27,7 @@ function familyExplanation(assignment: LearningAssignment, t: TFunction) {
 }
 
 function familyTarget(assignment: LearningAssignment, t: TFunction) {
-  const subject = assignment.subject ? getSubjectLabel(assignment.subject, t) : t('progress.subjectPending')
+  const subject = getSubjectLabel(assignment.subject, t) || t('progress.subjectPending')
   const topics = assignment.topicIds.map((topicId) => getTopicLabel(topicId, t)).join(', ')
   return `${subject} / ${topics || t('progress.topicPending')}`
 }

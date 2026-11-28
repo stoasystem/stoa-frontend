@@ -188,9 +188,10 @@ describe('the teacher request page', () => {
   })
 
   it('would notice a subject nobody mapped', () => {
-    // Negative control for the lookup above: an unmapped id comes back as
-    // itself rather than silently reading as something else.
-    expect(getSubjectLabel('astrophysics', i18n.t)).toBe('astrophysics')
+    // Negative control for the lookup above: an unmapped id comes back
+    // empty rather than silently reading as something else, and is not shown
+    // as sent either (#745).
+    expect(getSubjectLabel('astrophysics', i18n.t)).toBe('')
   })
 
   it('gives a response time nobody has to divide by 60', async () => {

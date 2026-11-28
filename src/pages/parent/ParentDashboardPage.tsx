@@ -65,10 +65,12 @@ function ChildRow({ child }: { child: ParentChild }) {
       title={child.name}
       subtitle={t('overview.childSubtitle', {
         grade: getGradeLabel(child.grade, t) ?? t('reports.gradeNotSet'),
+        // A subject the app cannot name is left out, not shown as its id (#745).
         subjects:
-          child.subjects.length > 0
-            ? child.subjects.map((subject) => getSubjectLabel(subject, t)).join(', ')
-            : t('reports.noSubjects'),
+          child.subjects
+            .map((subject) => getSubjectLabel(subject, t))
+            .filter(Boolean)
+            .join(', ') || t('reports.noSubjects'),
       })}
     />
   )

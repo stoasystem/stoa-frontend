@@ -51,7 +51,7 @@ function statusLabel(status: string, t: TFunction<'practice'>) {
 }
 
 function targetLabel(assignment: LearningAssignment, t: TFunction<'practice'>) {
-  const subject = assignment.subject ? getSubjectLabel(assignment.subject, t) : t('assignments.subjectPending')
+  const subject = getSubjectLabel(assignment.subject, t) || t('assignments.subjectPending')
   const topics = assignment.topicIds.map((topicId) => getTopicLabel(topicId, t)).join(', ')
   return `${subject} / ${topics || t('assignments.topicPending')}`
 }

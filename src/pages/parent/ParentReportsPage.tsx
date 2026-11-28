@@ -69,7 +69,10 @@ export function ParentReportsPage() {
 function ChildReports({ child }: { child: ParentChild }) {
   const { t } = useTranslation('parent')
   // The profile stores subject ids; the rest of the app says Mathematik.
-  const subjects = child.subjects.map((subject) => getSubjectLabel(subject, t)).join(', ')
+  const subjects = child.subjects
+    .map((subject) => getSubjectLabel(subject, t))
+    .filter(Boolean)
+    .join(', ')
   const about = `${getGradeLabel(child.grade, t) ?? t('reports.gradeNotSet')} · ${subjects || t('reports.noSubjects')}`
 
   return (

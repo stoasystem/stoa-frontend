@@ -70,7 +70,7 @@ type Overrides = Pick<
 /** Help requests that let this teacher assign: held now, or resolved (the backend checks the 14 days). */
 const RELATED_STATUSES = new Set(['in_progress', 'resolved'])
 
-type Student = { id: string; name: string; subject?: string }
+type Student = { id: string; name: string; subject?: string | null }
 
 /** One entry per student, the most recent request first, from the teacher's own requests. */
 function studentsOf(requests: readonly TeacherHelpRequestSummary[]): Student[] {
@@ -85,7 +85,7 @@ function studentsOf(requests: readonly TeacherHelpRequestSummary[]): Student[] {
 }
 
 /** The catalog subject a request's subject names, or "". */
-function catalogSubjectFor(subject: string | undefined, catalog: CurriculumCatalog | undefined) {
+function catalogSubjectFor(subject: string | null | undefined, catalog: CurriculumCatalog | undefined) {
   const wanted = normalSubjectId(subject)
   if (!wanted || !catalog) return ''
   return catalog.subjects.find((item) => normalSubjectId(item.id) === wanted)?.id ?? ''
@@ -150,7 +150,7 @@ export function TeacherAssignPracticePage() {
     () =>
       [...(catalog?.subjects ?? [])]
         .sort((a, b) => a.order - b.order)
-        .map((item) => ({ code: item.id, label: item.name || getSubjectLabel(item.id, t) })),
+        .map((item) => ({ code: item.id, label: item.name || getSubjectLabel(item.id, t) || item.id })),
     [catalog, t],
   )
   const topicTitles = useMemo(() => new Map((catalog?.topics ?? []).map((topic) => [topic.id, topic.title])), [catalog])

@@ -44,7 +44,9 @@ export function ChildLearningHistoryList({
                 {formatDateTime(item.createdAt)}
               </span>
             </div>
-            {item.subject && <p className="mt-1 text-sm text-muted-foreground">{getSubjectLabel(item.subject, t)}</p>}
+            {getSubjectLabel(item.subject, t) && (
+              <p className="mt-1 text-sm text-muted-foreground">{getSubjectLabel(item.subject, t)}</p>
+            )}
             <p className="mt-3 text-sm leading-6">{item.summary}</p>
           </CardContent>
         </Card>
