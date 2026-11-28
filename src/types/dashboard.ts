@@ -4,13 +4,6 @@ export type DashboardStat = {
   description: string
 }
 
-export type WeakTopic = {
-  id: string
-  subject: string
-  topic: string
-  level: 'low' | 'medium' | 'high'
-}
-
 export type RecentQuestion = {
   id: string
   subject: string

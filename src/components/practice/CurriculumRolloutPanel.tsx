@@ -30,9 +30,6 @@ export function CurriculumRolloutPanel({
   const activeSubjects = catalog?.subjects.filter((subject) => subject.rolloutState === 'active') ?? []
   const activeLessons = catalog?.lessons.filter((lesson) => lesson.rolloutState === 'active') ?? []
   const totalExercises = activeLessons.reduce((sum, lesson) => sum + lesson.exerciseCount, 0)
-  const visibleWeakTopics = weakTopicLabels.length > 0
-    ? weakTopicLabels
-    : progress?.weakTopics.map((topic) => topic.topicId.replace(/-/g, ' ')) ?? []
   // The backend names where the catalog came from in an internal id
   // ("practice_backfill"); a source with no label is left out, never shown raw.
   const sourceLabel = catalog ? t(`curriculumRollout.source.${catalog.source}`, { defaultValue: '' }) : ''
@@ -103,11 +100,11 @@ export function CurriculumRolloutPanel({
                   </div>
                   <div className="rounded-md border border-border/70 p-3">
                     <p className="text-xs text-muted-foreground">{t('curriculumRollout.weakAreas')}</p>
-                    {visibleWeakTopics.length === 0 ? (
+                    {weakTopicLabels.length === 0 ? (
                       <p className="mt-1 text-sm text-muted-foreground">{t('curriculumRollout.noWeakAreaEvidence')}</p>
                     ) : (
                       <div className="mt-2 flex flex-wrap gap-2">
-                        {visibleWeakTopics.slice(0, 4).map((topic) => (
+                        {weakTopicLabels.slice(0, 4).map((topic) => (
                           <Badge key={topic} variant="outline">{topic}</Badge>
                         ))}
                       </div>
