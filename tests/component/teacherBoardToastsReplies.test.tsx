@@ -169,7 +169,7 @@ describe('reply failures', () => {
 
 describe('other teacher toasts', () => {
   it('confirms saved availability in German', async () => {
-    vi.mocked(availabilityApi.updateTeacherWeeklyAvailability).mockResolvedValue({ subjects: [], weeklyAvailability: [] })
+    vi.mocked(availabilityApi.updateTeacherWeeklyAvailability).mockResolvedValue({ subjects: [], weeklyAvailability: [], status: null })
     const { result } = renderHook(() => useUpdateTeacherWeeklyAvailabilityMutation(), { wrapper: wrapper(client()) })
     result.current.mutate({ subjects: [], weeklyAvailability: [] })
     await waitFor(() => expect(toast.success).toHaveBeenCalledWith('Ihre Verfügbarkeit wurde gespeichert.'))

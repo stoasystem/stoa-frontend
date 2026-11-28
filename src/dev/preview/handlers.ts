@@ -35,11 +35,13 @@ import {
   classroomUnavailable,
   demoAvailabilityForPlan,
   demoClassroomPass,
+  demoOwnAvailability,
   demoTeacher,
   demoTeacherChangeStatus,
   demoTeacherReply,
   demoTeacherRequestDetail,
   previewAsTeacher,
+  saveDemoOwnAvailability,
   TEACHER_JOINS_AFTER_MS,
 } from '@/dev/preview/classroom'
 import {
@@ -350,6 +352,9 @@ const routes: Array<[method: string, pattern: string, handler: Handler]> = [
     classroomUnavailable()
       ? refuse(503, 'classroom_unavailable', 'The classroom is not configured.')
       : demoTeacherRequestDetail(params.id) && demoClassroomPass(`help-${params.id}`)],
+  // The teacher's own subjects, hours and status (#768, `?teacherDispatch=`).
+  ['GET', '/teachers/me/availability', () => demoOwnAvailability()],
+  ['PATCH', '/teachers/me/availability', ({ body }) => saveDemoOwnAvailability(body)],
   ['GET', '/teachers/me/help-requests/:id', ({ params }) => demoTeacherRequestDetail(params.id)],
   // Accepting it, then replying (#705, stoa-backend#479): a reply to a request
   // only offered is refused as the backend refuses it.

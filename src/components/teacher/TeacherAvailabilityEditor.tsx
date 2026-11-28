@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -19,13 +19,19 @@ export function TeacherAvailabilityEditor({ availability }: { availability: Teac
   const [showProblems, setShowProblems] = useState(false)
   const updateMutation = useUpdateTeacherWeeklyAvailabilityMutation()
 
-  useEffect(() => {
+  // Back to what is stored when the stored subjects or hours change (a save
+  // read back), not whenever the availability is read again: switching the
+  // status above (#768) reads it again and must not drop unsaved edits here.
+  const stored = JSON.stringify([availability.subjects, availability.weeklyAvailability])
+  const [shownStored, setShownStored] = useState(stored)
+  if (stored !== shownStored) {
     const normal = normalTeacherSubjects(availability.subjects)
+    setShownStored(stored)
     setStoredSubjects(normal)
     setSubjects(normal)
     setWeeklyAvailability(availability.weeklyAvailability)
     setShowProblems(false)
-  }, [availability])
+  }
 
   function updateSlot(index: number, patch: Partial<TeacherAvailabilitySlot>) {
     setWeeklyAvailability((slots) =>

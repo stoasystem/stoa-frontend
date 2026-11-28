@@ -9,6 +9,28 @@
     "title": "Availability",
     "description": "Set availability and subjects so support requests can be routed clearly.",
     "loadFailed": "Your availability couldn’t be loaded.",
+    "dispatch": {
+      "title": "Taking help requests",
+      "state": {
+        "unset": "You’re not taking requests yet",
+        "available": "You’re taking requests",
+        "paused": "You’re paused"
+      },
+      "explain": {
+        "unset": "Start now, or save your subjects and hours below: that starts it too.",
+        "available": "While you’re online, students can see you and new help requests can be sent to you.",
+        "paused": "Students don’t see you, and no new help requests are sent to you. STOA also pauses you when you don’t accept a help request sent to you in time."
+      },
+      "online": "You only count as online while STOA is open in your browser. About 5 minutes after you close it, students no longer see you.",
+      "hoursAreNotStatus": "The weekly hours below don’t switch this on or off.",
+      "action": {
+        "start": "Start taking requests",
+        "resume": "Resume taking requests",
+        "pause": "Pause"
+      },
+      "saving": "Saving…",
+      "saveFailed": "Your status couldn’t be changed. Please try again."
+    },
     "editor": {
       "subjects": "Subjects",
       "weeklySlots": "Weekly slots",
@@ -35,7 +57,13 @@
     "summary": {
       "title": "Current availability",
       "subjects": "Subjects: {{subjects}}",
-      "noSubjects": "none selected"
+      "noSubjects": "none selected",
+      "status": "Status: {{status}}",
+      "statusName": {
+        "unset": "not started",
+        "available": "taking requests",
+        "paused": "paused"
+      }
     }
   },
   "detail": {

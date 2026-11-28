@@ -1,6 +1,7 @@
 export const teacherQueryKeys = {
   all: ['teacher'] as const,
   profile: () => [...teacherQueryKeys.all, 'profile'] as const,
+  availability: () => [...teacherQueryKeys.all, 'availability'] as const,
   stats: () => [...teacherQueryKeys.all, 'stats'] as const,
   helpRequests: () => [...teacherQueryKeys.all, 'help-requests'] as const,
   helpRequestDetail: (requestId: string) => [...teacherQueryKeys.helpRequests(), requestId] as const,

@@ -9,6 +9,28 @@
     "title": "Disponibilité",
     "description": "Définissez vos disponibilités et vos matières pour que les demandes soient orientées clairement.",
     "loadFailed": "Votre disponibilité n’a pas pu être chargée.",
+    "dispatch": {
+      "title": "Accepter des demandes d’aide",
+      "state": {
+        "unset": "Vous n’acceptez pas encore de demandes",
+        "available": "Vous acceptez des demandes",
+        "paused": "Vous êtes en pause"
+      },
+      "explain": {
+        "unset": "Commencez maintenant, ou enregistrez vos matières et créneaux ci-dessous : cela vous fait aussi commencer.",
+        "available": "Tant que vous êtes en ligne, les élèves vous voient et de nouvelles demandes d’aide peuvent vous être attribuées.",
+        "paused": "Les élèves ne vous voient pas et aucune nouvelle demande d’aide ne vous est attribuée. STOA vous met aussi en pause si vous n’acceptez pas à temps une demande d’aide qui vous a été attribuée."
+      },
+      "online": "Vous n’êtes en ligne que tant que STOA est ouvert dans votre navigateur. Environ 5 minutes après l’avoir fermé, les élèves ne vous voient plus.",
+      "hoursAreNotStatus": "Les créneaux hebdomadaires ci-dessous ne l’activent ni ne le désactivent.",
+      "action": {
+        "start": "Accepter des demandes",
+        "resume": "Reprendre les demandes",
+        "pause": "Mettre en pause"
+      },
+      "saving": "Enregistrement…",
+      "saveFailed": "Votre statut n’a pas pu être modifié. Veuillez réessayer."
+    },
     "editor": {
       "subjects": "Matières",
       "weeklySlots": "Créneaux hebdomadaires",
@@ -35,7 +57,13 @@
     "summary": {
       "title": "Disponibilité actuelle",
       "subjects": "Matières : {{subjects}}",
-      "noSubjects": "aucune sélectionnée"
+      "noSubjects": "aucune sélectionnée",
+      "status": "Statut : {{status}}",
+      "statusName": {
+        "unset": "pas encore commencé",
+        "available": "accepte des demandes",
+        "paused": "en pause"
+      }
     }
   },
   "detail": {
