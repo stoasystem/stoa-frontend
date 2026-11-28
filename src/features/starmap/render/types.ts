@@ -304,6 +304,8 @@ export type RenderStats = {
   galaxyNames?: number
   /** Where star and nebula names kept off the galaxy names' letters in the last frame (CSS px; `galaxyNameBoxes`). */
   galaxyNameBoxes?: readonly { x0: number; y0: number; x1: number; y1: number }[]
+  /** The galaxies whose names a cluster name needs the place of, left out of the next frame (#764). */
+  galaxyNamesLeftOut?: readonly number[]
   /** Names drawn in the last frame, star and nebula (#134). */
   names?: { stars: number; nebulae: number }
   /** A name is still fading in or out: the renderer wants another frame. */

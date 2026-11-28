@@ -12,7 +12,9 @@
  * keyboard-focused or chosen (`galaxyNameYields`), easing there and back.
  * While a name is clearly drawn, the star and nebula names keep off its
  * letters (`galaxyNameBoxes`; canvas2d.ts places them), so no name is
- * written across it.
+ * written across it. A cluster's name with no place off them (#764) does
+ * not cover it either: that galaxy's name is left out whole while the
+ * cluster name needs the place (`draw`'s `leftOut`), and comes back after.
  *
  * Decorative text (WCAG 1.4.3 "incidental"): the same name is the page's
  * heading and the switcher's segment, both readable; the canvas name is
@@ -116,6 +118,9 @@ export function galaxyNameBoxes(placements: readonly GalaxyNamePlacement[], inkW
   return out
 }
 
+/** One galaxy name's letters (`galaxyNameBoxes`) and whose name it is. */
+export type GalaxyLetters = { galaxy: number; box: Box }
+
 function alphaOf(colour: string): number {
   const parts = colour.trim().startsWith('#') ? [] : (colour.match(/[\d.]+/g)?.map(Number) ?? [])
   return parts[3] ?? 1
@@ -138,6 +143,10 @@ export function createGalaxyNames(makeCanvas: MakeCanvas) {
   const sprites = new Map<string, { canvas: HTMLCanvasElement; size: number; width: number; height: number; ink: number }>()
   // The boxes the last frame's names keep other names off (`galaxyNameBoxes`).
   let boxes: Box[] = []
+  // Every clearly drawn name's letters with its galaxy, those left out too (#764).
+  let letters: GalaxyLetters[] = []
+  // Each galaxy's share of its ink coming back after it was left out (#764): 0 while left out.
+  let shown: number[] = []
   // Each galaxy's eased step back (#143), and the time it was last moved.
   let yields: number[] = []
   let lastTime: number | null = null
@@ -187,8 +196,19 @@ export function createGalaxyNames(makeCanvas: MakeCanvas) {
     get boxes(): readonly Box[] {
       return boxes
     },
-    /** Draws every name in view; returns how many. */
-    draw(ctx: CanvasRenderingContext2D, scene: SceneData, frame: SceneFrame, theme: StarMapTheme, dpr: number): number {
+    /**
+     * Where every name clearly in view last frame has its letters, with its galaxy, those
+     * left out too (#764): a cluster name with no spot off them learns whose name it would cover.
+     */
+    get letters(): readonly GalaxyLetters[] {
+      return letters
+    },
+    /**
+     * Draws every name in view but those of the galaxies in `leftOut` (#764: a cluster name
+     * needs the place); returns how many. A name left out is gone at once, never half under a
+     * cluster name, and comes back over `galaxyNameYield.ms`.
+     */
+    draw(ctx: CanvasRenderingContext2D, scene: SceneData, frame: SceneFrame, theme: StarMapTheme, dpr: number, leftOut: ReadonlySet<number> = new Set()): number {
       // Each name eases towards stepping back (or forward) over `galaxyNameYield.ms`,
       // by the frame's clock; at once where names do not fade (reduced motion: `labelFadeMs` 0).
       const targets = galaxyNameYieldTargets(scene, frame)
@@ -202,23 +222,37 @@ export function createGalaxyNames(makeCanvas: MakeCanvas) {
         if (next !== targets[g]) settling = true
         return next
       })
+      if (shown.length !== targets.length) shown = targets.map(() => 1)
+      shown = shown.map((amount, g) => {
+        if (leftOut.has(g)) return 0
+        const next = Math.min(1, amount + step)
+        if (next < 1) settling = true
+        return next
+      })
       const placements = galaxyNamePlacements(scene, frame, theme, yields)
-      boxes = galaxyNameBoxes(placements, (name) => {
+      const inkWidth = (name: GalaxyNamePlacement) => {
         const sprite = spriteFor(name.text, name.px, name.colour, dpr, theme.fontFamily)
         return sprite.ink * (name.px / sprite.size)
-      })
+      }
+      letters = placements.flatMap((name) => galaxyNameBoxes([name], inkWidth).map((box) => ({ galaxy: name.galaxy, box })))
+      boxes = letters.filter((l) => !leftOut.has(l.galaxy)).map((l) => l.box)
+      let drawn = 0
       for (const name of placements) {
+        if (leftOut.has(name.galaxy)) continue
         const sprite = spriteFor(name.text, name.px, name.colour, dpr, theme.fontFamily)
         const k = name.px / sprite.size
-        ctx.globalAlpha = Math.min(1, name.alpha)
+        ctx.globalAlpha = Math.min(1, name.alpha * (shown[name.galaxy] ?? 1))
         ctx.drawImage(sprite.canvas, name.x - (sprite.width * k) / 2, name.y - (sprite.height * k) / 2, sprite.width * k, sprite.height * k)
+        drawn += 1
       }
       ctx.globalAlpha = 1
-      return placements.length
+      return drawn
     },
     clear() {
       sprites.clear()
       boxes = []
+      letters = []
+      shown = []
       yields = []
       lastTime = null
       settling = false
