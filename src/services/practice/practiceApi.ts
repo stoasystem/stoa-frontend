@@ -24,7 +24,6 @@ import type {
   PracticeTeacherHelpRequest,
   PracticeTeacherHelpResponse,
   CurriculumCatalog,
-  CurriculumProgressSummary,
   KnowledgeMapNeighbourhood,
   KnowledgeMapResponse,
 } from '@/types/practice'
@@ -202,19 +201,6 @@ export async function getCurriculumCatalog({
 } = {}) {
   const response = await httpClient.get<CurriculumCatalog>('/practice/curriculum/catalog', {
     params: { subjectId, gradeLevel, includePreview },
-  })
-  return response.data
-}
-
-export async function getCurriculumProgress({
-  studentId,
-  subjectId,
-}: {
-  studentId?: string
-  subjectId?: string
-} = {}) {
-  const response = await httpClient.get<CurriculumProgressSummary>('/practice/curriculum/progress', {
-    params: { studentId, subjectId },
   })
   return response.data
 }

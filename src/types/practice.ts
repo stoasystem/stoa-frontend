@@ -447,7 +447,6 @@ export type CurriculumProgressSummary = {
   mistakeCount: number
   studyStreak: number
   practisedToday: boolean
-  weakTopics: Array<{ topicId: string; count: number }>
   source: string
 }
 
