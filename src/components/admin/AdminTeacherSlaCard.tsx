@@ -1,19 +1,24 @@
 import { AlertTriangle, CheckCircle2, Clock3 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import type { AdminTeacherSlaStats } from '@/services/admin/adminApi'
 
 /*
  * The figures are shown only once the stats have been read. A failed or
  * pending read used to fall through to "0 tracked, 0 breached" and an
  * invented 30-minute target, which reads as a healthy system (#262).
+ *
+ * The figures cover only the help requests of the last `periodDays` days, so
+ * the card says which days they are (#767, stoa-backend#697).
  */
 export function AdminTeacherSlaCard({
   stats,
+  periodDays,
   isLoading = false,
   isError = false,
 }: {
   stats?: AdminTeacherSlaStats
+  periodDays?: number
   isLoading?: boolean
   isError?: boolean
 }) {
@@ -23,6 +28,7 @@ export function AdminTeacherSlaCard({
     <Card>
       <CardHeader>
         <CardTitle className="text-base">{t('sla.title')}</CardTitle>
+        {typeof periodDays === 'number' && <CardDescription>{t('sla.period', { count: periodDays })}</CardDescription>}
       </CardHeader>
       <CardContent className="space-y-4">
         {/* Figures read before are real ones: they stay when the stats cannot

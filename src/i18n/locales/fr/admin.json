@@ -244,6 +244,9 @@
   },
   "sla": {
     "title": "Délais de réponse des enseignants",
+    "period_one": "Dernier jour",
+    "period_many": "{{count}} derniers jours",
+    "period_other": "{{count}} derniers jours",
     "tracked": "Suivies",
     "averageReply": "Réponse moy.",
     "target": "Objectif",
