@@ -6,9 +6,10 @@
  *      once per account, "a new look" for a student who knew the old map,
  *      gone on ✕ or the first cluster opened, never over another first-run
  *      screen;
- *   B. a newcomer's first landing opens the recommended star's cluster
- *      scene on that star, Murmi there; back is the whole view, where the
- *      hint takes over;
+ *   B. a newcomer's first landing (#769) stays on the whole view of the
+ *      chosen subject, Murmi beside the recommended star's cluster in place
+ *      of the hint; a tap on it opens its scene on that star, Murmi there;
+ *      back is the whole view, with neither the landing nor the hint again;
  *   C. the scene's tour on a first visit: main line, chapter, entrance;
  *      Escape, "Got it", replay; not on the newcomer's landing visit;
  *   and storage that throws breaks none of it.
@@ -69,6 +70,35 @@ function newcomerSky(): KnowledgeMapResponse {
       unlitPrerequisiteIds: [],
       recommendation: star.unitId === START ? { source: 'system' as const, reason: 'start' as const, relatedUnitId: null } : null,
     })),
+  }
+}
+
+/** Physics' recommended star in the two-subject sky. */
+function physicsStart() {
+  const physics = demoClusterMap('en', 'physics')
+  return physics.stars.find((star) => star.recommendation) ?? physics.stars[0]
+}
+
+/** Mathematics and physics, a newcomer in both: plan B asks between them. */
+function twoSubjectNewcomerSky(): KnowledgeMapResponse {
+  const math = newcomerSky()
+  const physics = demoClusterMap('en', 'physics')
+  const start = physicsStart().unitId
+  return {
+    ...math,
+    galaxies: [...math.galaxies, ...physics.subjects],
+    nebulae: [...math.nebulae, ...physics.nebulae.map((nebula) => ({ ...nebula, subjectId: 'physics' }))],
+    stars: [
+      ...math.stars,
+      ...(physics.stars.map((star) => ({
+        ...star,
+        state: 'ready' as const,
+        progress: 0,
+        unlitPrerequisiteIds: [],
+        recommendation: star.unitId === start ? { source: 'system' as const, reason: 'start' as const, relatedUnitId: null } : null,
+      })) as KnowledgeMapResponse['stars']),
+    ],
+    prerequisites: [...math.prerequisites, ...physics.prerequisites],
   }
 }
 
@@ -227,33 +257,106 @@ describe('A. the panorama hint', () => {
   })
 })
 
-describe("B. a newcomer's first landing", () => {
-  it('opens the recommended star in its cluster scene, Murmi there, its card open; no tour on that visit', async () => {
+describe("B. a newcomer's first landing (#769)", () => {
+  const landing = (container: HTMLElement) => container.querySelector<HTMLElement>('[data-cluster-landing]')
+
+  it('lands on the whole view, Murmi beside the cluster of the recommended star, saying a tap opens its route; no clusters’ hint', async () => {
     const { container } = await openAt('/map/math', newcomerSky())
+    await waitFor(() => expect(landing(container)).not.toBeNull())
+    expect(where()).toBe('/map/math')
+    expect(landing(container)!.getAttribute('data-cluster-landing')).toBe('geometry')
+    expect(landing(container)!.textContent).toContain('Start in this cluster')
+    expect(landing(container)!.textContent).toContain('Your first star, Plane shapes and polygons, is here. Tap the cluster to open its learning route.')
+    // One bubble: neither the clusters' hint nor a scene.
+    expect(container.querySelector('[data-cluster-hint]')).toBeNull()
+    expect(container.querySelector('[data-cluster-scene]')).toBeNull()
+    expect(container.querySelector('[data-first-landing]')).toBeNull()
+  })
+
+  it('a tap on that cluster opens its scene on the recommended star, its card open, Murmi there; no tour on that visit', async () => {
+    const { container } = await openAt('/map/math', newcomerSky())
+    await waitFor(() => expect(landing(container)).not.toBeNull())
+    fireEvent.click(container.querySelector('[data-nebula-link="geometry"]')!)
     await waitFor(() => expect(where()).toBe(`/map/math/cluster/geometry?star=${START}`))
     await waitFor(() => expect(container.querySelector('[data-scene-landing]')).not.toBeNull())
     expect(container.querySelector('[data-scene-landing]')!.textContent).toContain('Start here: Plane shapes and polygons')
     expect(container.querySelector('[data-route-card]')).not.toBeNull()
     expect(container.querySelector('[data-route-tour]')).toBeNull()
-    // No clusters' hint over the scene.
     expect(container.querySelector('[data-cluster-hint]')).toBeNull()
+    expect(landing(container)).toBeNull()
   })
 
-  it('back from the scene is the whole view, where the hint for a new student takes over; the landing is not made again', async () => {
+  it('back from the scene is the whole view: no landing decided again, and the clusters’ hint not shown a second time', async () => {
     const user = userEvent.setup()
-    const { container } = await openAt('/map/math', newcomerSky())
+    const { container, unmount } = await openAt('/map/math', newcomerSky())
+    await waitFor(() => expect(landing(container)).not.toBeNull())
+    fireEvent.click(container.querySelector('[data-nebula-link="geometry"]')!)
     await waitFor(() => expect(container.querySelector('[data-scene-landing]')).not.toBeNull())
     await user.click(screen.getByRole('button', { name: 'Back to the star map' }))
     await waitFor(() => expect(where()).toBe('/map/math'))
-    await waitFor(() => expect(container.querySelector('[data-cluster-hint]')).not.toBeNull())
-    expect(container.querySelector('[data-cluster-hint]')!.textContent).toContain('Your stars are in clusters now')
-    expect(container.querySelector('[data-cluster-hint]')!.getAttribute('data-cluster-hint')).toBe('geometry')
+    await waitFor(() => expect(container.querySelector('[data-cluster-scene]')).toBeNull())
+    await act(async () => {})
+    expect(landing(container)).toBeNull()
+    expect(container.querySelector('[data-cluster-hint]')).toBeNull()
     expect(where()).toBe('/map/math')
+    // The landing stood in for the hint: remembered for this account, in another tab too.
+    expect(shownBefore('clusterHint', OWNER)).toBe(true)
+    unmount()
+    sessionStorage.clear()
+    const elsewhere = await openAt('/map/math', newcomerSky())
+    await waitFor(() => expect(landing(elsewhere.container)).not.toBeNull())
+    expect(elsewhere.container.querySelector('[data-cluster-hint]')).toBeNull()
   })
 
-  it('a student who has started something opens on the whole view as before', async () => {
-    await openAt('/map/math')
+  it('another cluster tapped opens as any cluster does, and ends the landing', async () => {
+    const user = userEvent.setup()
+    const { container } = await openAt('/map/math', newcomerSky())
+    await waitFor(() => expect(landing(container)).not.toBeNull())
+    fireEvent.click(container.querySelector('[data-nebula-link="algebra"]')!)
+    await waitFor(() => expect(where()).toBe('/map/math/cluster/algebra'))
+    expect(container.querySelector('[data-scene-landing]')).toBeNull()
+    await user.click(screen.getByRole('button', { name: 'Back to the star map' }))
+    await waitFor(() => expect(where()).toBe('/map/math'))
+    await act(async () => {})
+    expect(landing(container)).toBeNull()
+    expect(container.querySelector('[data-cluster-hint]')).toBeNull()
+  })
+
+  it('"Look around first" sends Murmi away for this tab, the whole view staying, and no hint follows it', async () => {
+    const { container, unmount } = await openAt('/map/math', newcomerSky())
+    await waitFor(() => expect(landing(container)).not.toBeNull())
+    // The bubble is laid out but kept hidden in jsdom, which places nothing.
+    fireEvent.click([...landing(container)!.querySelectorAll('button')].find((button) => button.textContent === 'Look around first')!)
+    await waitFor(() => expect(landing(container)).toBeNull())
+    await act(async () => {})
     expect(where()).toBe('/map/math')
+    expect(container.querySelector('[data-cluster-hint]')).toBeNull()
+    expect(sessionStorage.getItem(`stoa.starmap.firstLanding.dismissed.${OWNER}`)).toBe('1')
+    // The recommended cluster now opens as any other.
+    fireEvent.click(container.querySelector('[data-nebula-link="geometry"]')!)
+    await waitFor(() => expect(where()).toBe('/map/math/cluster/geometry'))
+    unmount()
+    const again = await openAt('/map/math', newcomerSky())
+    await act(async () => {})
+    expect(landing(again.container)).toBeNull()
+  })
+
+  it("frames the chosen subject's galaxy: plan B's answer in another subject moves the whole view there", async () => {
+    sessionStorage.setItem(`stoa.starmap.firstLanding.subject.${OWNER}`, 'physics')
+    const { container } = await openAt('/map/math', twoSubjectNewcomerSky())
+    await waitFor(() => expect(where()).toBe('/map/physics'))
+    await waitFor(() => expect(landing(container)).not.toBeNull())
+    const projected = projectStarMap(twoSubjectNewcomerSky(), { subjectId: 'physics', language: 'en' })
+    const cluster = projected.stars.find((star) => star.unitId === physicsStart().unitId)!.nebulaId
+    expect(landing(container)!.getAttribute('data-cluster-landing')).toBe(cluster)
+    expect(landing(container)!.textContent).toContain(`Your first star, ${physicsStart().name}, is here.`)
+  })
+
+  it('a student who has started something opens on the whole view as before, with the hint', async () => {
+    const { container } = await openAt('/map/math')
+    expect(where()).toBe('/map/math')
+    await waitFor(() => expect(container.querySelector('[data-cluster-hint]')).not.toBeNull())
+    expect(landing(container)).toBeNull()
   })
 })
 

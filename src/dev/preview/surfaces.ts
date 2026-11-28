@@ -166,20 +166,20 @@ export const SURFACES: readonly Surface[] = [
     demo: 'newcomer',
     readyWhen: '[data-about-you] [data-shown]',
   },
-  // The first landing (plan A): a student who has not started anything opens the app on
-  // the recommended star in its star cluster's route scene (#747), its card open and Murmi
-  // there, instead of the whole sky. "About you" put off, so it lands where the course starts.
-  // Back to the star map, the clusters' hint for a new student takes over.
+  // The first landing (plan A): a student who has not started anything lands on the whole
+  // view of the sky of clusters, Murmi beside the cluster that holds the recommended star
+  // (#769). A tap on that cluster opens its route scene on the star, its card open and Murmi
+  // there. "About you" put off, so it lands where the course starts.
   {
     id: 'map-newcomer',
-    label: 'Star map · newcomer, first landing in the cluster scene',
+    label: 'Star map · newcomer, first landing beside the cluster to start in',
     path: (points) => withPoints('/', points),
     signedIn: true,
     stars: true,
     demo: 'newcomer',
     aboutYou: 'later',
     guide: 'fresh',
-    readyWhen: '[data-scene-landing]',
+    readyWhen: '[data-cluster-landing] [data-shown]',
   },
   // The whole first sign-in (docs/research/user-onboarding-design.md): the invitation link,
   // signing in, which subject school is on, and the first landing on "Integers", where the

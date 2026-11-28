@@ -27,7 +27,7 @@ import { LightingOverlay } from '@/features/starmap/lighting/LightingOverlay'
 import { useLightingStage } from '@/features/starmap/lighting/useLightingStage'
 import { FindStarBubble } from '@/features/starmap/findStar/FindStarBubble'
 import { useFindStar } from '@/features/starmap/findStar/useFindStar'
-import { ClusterHintBubble, useClusterHint } from '@/features/starmap/onboarding/ClusterHint'
+import { ClusterHintBubble, ClusterLandingBubble, otherClusters, useClusterHint } from '@/features/starmap/onboarding/ClusterHint'
 import { FirstLandingBubble } from '@/features/starmap/onboarding/FirstLandingBubble'
 import { findOwnExamples } from '@/features/starmap/onboarding/findOwnStar'
 import { FirstSubjectQuestion } from '@/features/starmap/onboarding/FirstSubjectQuestion'
@@ -138,16 +138,30 @@ export function StarMapRoute({ relations = false, longNames = false }: { relatio
   // A star cluster chosen on the whole view (#747): its route scene, over the map; the sky stays the step back.
   // The clusters' hint has done its job then.
   const hintOpened = useRef<() => void>(() => {})
+  // A newcomer's landing on a sky of clusters (#769) stands in for the hint: once it is over, so is the hint.
+  const hintDone = useRef<() => void>(() => {})
   const zoomWentIn = zoomHint.wentIn
+  const landingCluster = first.cluster
+  const openLandingCluster = first.openCluster
   const onOpenCluster = useCallback(
     (id: string) => {
       hintOpened.current()
       zoomWentIn()
+      if (landingCluster) {
+        hintDone.current()
+        // The recommended star's cluster opens on that star, its card open, Murmi there.
+        if (openLandingCluster(id)) return
+      }
       const state: ClusterSceneState = { fromSky: true }
       navigate({ pathname: clusterPath(subjectOfNebula(map, id), id), search: location.search }, { state })
     },
-    [navigate, map, location.search, zoomWentIn],
+    [navigate, map, location.search, zoomWentIn, landingCluster, openLandingCluster],
   )
+  const firstDismiss = first.dismiss
+  const dismissLanding = useCallback(() => {
+    hintDone.current()
+    firstDismiss()
+  }, [firstDismiss])
   // Back from a scene, focus goes back to the cluster it opened, when nothing else has it.
   const openedCluster = useRef<string | null>(null)
   useEffect(() => {
@@ -172,7 +186,7 @@ export function StarMapRoute({ relations = false, longNames = false }: { relatio
 
   // Neither a skeleton nor an error is the first screen a student signing in waits for: the clock runs on.
   // One Murmi bubble on the map at a time: the reminder gives way to the first landing and to finding a star.
-  const firstLandingUp = Boolean(language.open || aboutYouUp || first.asking || (first.star && !findStar.path) || (firstReveal.star && firstReveal.next))
+  const firstLandingUp = Boolean(language.open || aboutYouUp || first.asking || (first.star && !findStar.path) || (first.cluster && !findStar.path) || (firstReveal.star && firstReveal.next))
   const findStarUp = Boolean(findStar.star && findStar.first && !firstReveal.target)
   // The star clusters' hint (#747): once per account, on the whole view, after every first-run screen and Murmi above.
   const hint = useClusterHint(map, ownerId, {
@@ -182,7 +196,9 @@ export function StarMapRoute({ relations = false, longNames = false }: { relatio
   const hintUp = hint.clusterId !== null
   useEffect(() => {
     hintOpened.current = hintUp ? hint.opened : () => {}
-  }, [hintUp, hint.opened])
+    hintDone.current = hint.dismiss
+  }, [hintUp, hint.opened, hint.dismiss])
+  const landingOthers = useMemo(() => otherClusters(map, first.cluster?.clusterId ?? null), [map, first.cluster?.clusterId])
   const reminderBubble = !firstLandingUp && !findStarUp && !hintUp ? reminder.star : null
   // Not with a star chosen either: its card or sheet has that side of the map.
   const reminderCorner = !firstLandingUp && !findStarUp && !hintUp && !reminder.star && routeTarget.layer !== 'star' ? reminder.mood : null
@@ -213,6 +229,9 @@ export function StarMapRoute({ relations = false, longNames = false }: { relatio
             />
           )}
           {first.asking && <FirstSubjectQuestion subjects={first.asking} onChoose={first.choose} />}
+          {first.cluster && !findStar.path && (
+            <ClusterLandingBubble key={first.cluster.clusterId} clusterId={first.cluster.clusterId} star={first.cluster.star} others={landingOthers} locate={locate} watch={watch} onDismiss={dismissLanding} />
+          )}
           {first.star && !findStar.path && (
             // In the design preview only the demo knowledge point has a chapter, as on the star's card.
             <FirstLandingBubble star={first.star} startable={!(demo && first.star.chapter.lessonCount === 0)} onFindOwn={onFindOwn} locate={locate} watch={watch} onDismiss={first.dismiss} />

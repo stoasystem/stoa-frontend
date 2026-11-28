@@ -1,8 +1,9 @@
 /*
  * Murmi in a star cluster's route scene (#747).
  *
- *   - `SceneLandingBubble`: a newcomer's first landing opens the scene on
- *     the recommended star, its card open (`useFirstLanding`); Murmi says
+ *   - `SceneLandingBubble`: the cluster a newcomer's first landing points at
+ *     on the whole view, tapped, opens the scene on the recommended star,
+ *     its card open (`useFirstLanding`, #769); Murmi says
  *     start here, and that the card's "Start practising" begins, and keeps
  *     the landing's "Find my own star" (#586). Beside the card on a wide
  *     screen, above it on a phone.

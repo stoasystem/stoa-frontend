@@ -48,8 +48,8 @@ export class StudentWorld {
   failNextRetryably = false
   /**
    * A student who has not started anything (nothing lit, nothing in progress)
-   * gets the first landing (#467): the map opens on the recommended star's
-   * nebula with Murmi beside it. Off by default: the other specs are about a
+   * gets the first landing (#467, #769): the whole view, Murmi beside the
+   * recommended star's cluster. Off by default: the other specs are about a
    * student's session, not the onboarding, and open on the galaxy.
    */
   newcomer = false
