@@ -65,6 +65,7 @@ export function AdminDashboardPage() {
         </div>
         <AdminTeacherSlaCard
           stats={platformStatsQuery.data?.teacher_sla}
+          periodDays={platformStatsQuery.data?.period_days}
           isLoading={platformStatsQuery.isLoading}
           isError={platformStatsQuery.isError}
         />

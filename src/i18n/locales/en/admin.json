@@ -243,6 +243,8 @@
   },
   "sla": {
     "title": "Teacher SLA",
+    "period_one": "Last day",
+    "period_other": "Last {{count}} days",
     "tracked": "Tracked",
     "averageReply": "Avg reply",
     "target": "Target",

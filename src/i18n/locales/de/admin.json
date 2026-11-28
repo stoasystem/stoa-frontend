@@ -243,6 +243,8 @@
   },
   "sla": {
     "title": "Antwortzeiten der Lehrpersonen",
+    "period_one": "Letzter Tag",
+    "period_other": "Letzte {{count}} Tage",
     "tracked": "Erfasst",
     "averageReply": "Ø Antwortzeit",
     "target": "Ziel",

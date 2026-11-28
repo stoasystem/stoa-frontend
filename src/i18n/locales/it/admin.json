@@ -244,6 +244,9 @@
   },
   "sla": {
     "title": "Tempi di risposta dei docenti",
+    "period_one": "Ultimo giorno",
+    "period_many": "Ultimi {{count}} giorni",
+    "period_other": "Ultimi {{count}} giorni",
     "tracked": "Monitorate",
     "averageReply": "Risposta media",
     "target": "Obiettivo",

@@ -41,16 +41,10 @@ export type AdminTeacherSlaStats = {
   }
 }
 
+/** `teacher_sla` counts only the help requests of the last `period_days` days (stoa-backend#697). */
 export type AdminPlatformStats = {
-  total_users: number
-  total_students: number
-  total_parents: number
-  total_teachers: number
-  total_questions: number
-  ai_resolved: number
-  teacher_resolved: number
-  escalated: number
   teacher_sla: AdminTeacherSlaStats
+  period_days: number
 }
 
 // `image_upload` is the system's own case: an image moderation refused (#538).
