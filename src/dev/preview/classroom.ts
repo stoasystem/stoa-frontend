@@ -142,7 +142,8 @@ export function demoTeacherRequestDetail(requestId: string): TeacherHelpRequestD
     requestId,
     conversationId: DEMO_HELP_CONVERSATION_ID,
     student: { id: student.id, name: student.name, grade: 'Grade 9' },
-    subject: 'math',
+    // `helpSubject=none`: a request with no subject, which reader endpoints send as null (stoa-backend#637, #745).
+    subject: setting('helpSubject') === 'none' ? null : 'math',
     status: state.status,
     mode: setting('helpMode') === 'classroom' ? 'classroom' : 'text',
     requestMessage: conversation?.messages.find((message) => message.role === 'student')?.content,

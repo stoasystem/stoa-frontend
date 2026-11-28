@@ -8,7 +8,7 @@ import { TeacherPrepTable } from '@/components/teacher/TeacherPrepTable'
 import { TeacherSlaBadge } from '@/components/teacher/TeacherSlaBadge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { MathRenderer } from '@/components/ui/MathRenderer'
-import { getGradeLabelOrNotSet, getSubjectLabel } from '@/lib/displayLabels'
+import { getHelpRequestWhere } from '@/lib/displayLabels'
 import type { TeacherHelpMessage, TeacherHelpRequestDetail } from '@/types/teacher'
 import { helpModeOf, isOpenHelpRequest } from '@/types/teacherHelp'
 
@@ -45,13 +45,10 @@ export function HelpRequestDetailCard({ request }: { request: TeacherHelpRequest
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <CardTitle>{request.student.name}</CardTitle>
-            {/* The subject arrives as its id (`mathematics`); the rest of the
+            {/* The subject arrives as its id (`math`) or null; the rest of the
               * app calls it Mathematik. Same row wording as the request list. */}
             <p className="mt-1 text-sm text-muted-foreground">
-              {t('requests.row', {
-                subject: getSubjectLabel(request.subject, t),
-                grade: getGradeLabelOrNotSet(request.student.grade, t),
-              })}
+              {getHelpRequestWhere(request.subject, request.student.grade, t)}
             </p>
             {/* The request list leaves this out of its rows; it lives here. */}
             <p className="mt-1 text-xs text-muted-foreground" data-first-action>

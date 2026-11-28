@@ -19,7 +19,9 @@ export function WeakTopicList({ topics }: { topics: LearningWeakTopic[] }) {
             <div className="flex items-start justify-between gap-3">
               <div>
                 <p className="font-medium">{topic.label}</p>
-                <p className="text-sm text-muted-foreground">{getSubjectLabel(topic.subject, t)}</p>
+                {getSubjectLabel(topic.subject, t) && (
+                  <p className="text-sm text-muted-foreground">{getSubjectLabel(topic.subject, t)}</p>
+                )}
               </div>
               <span className="rounded-full bg-destructive/10 px-2 py-1 text-xs font-medium text-destructive">
                 {t('learningProfile.signals', { count: topic.count })}

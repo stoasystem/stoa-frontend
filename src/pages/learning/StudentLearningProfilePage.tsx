@@ -61,7 +61,9 @@ export function StudentLearningProfilePage() {
                   {profileQuery.data.subjectActivity.map((item) => (
                     <div key={item.subject} className="rounded-md border p-3">
                       {/* The backend labels subjects in English ("Mathematics"). */}
-                      <p className="font-medium">{getSubjectLabel(item.label || item.subject, t)}</p>
+                      <p className="font-medium">
+                        {getSubjectLabel(item.subject, t) || getSubjectLabel(item.label, t)}
+                      </p>
                       <p className="text-sm text-muted-foreground">
                         {[
                           t('learningProfile.activityQuestions', { count: item.questionCount }),

@@ -25,7 +25,7 @@ import type { ChildLearningSummary } from '@/types/parent'
  */
 function readableTopic(value: string, t: TFunction) {
   const subject = getSubjectLabel(value, t)
-  if (subject !== value) return subject
+  if (subject) return subject
   if (/\s/.test(value.trim())) return value.trim()
   return getTopicLabel(value, t)
 }
@@ -137,7 +137,7 @@ export function ChildSummaryPage() {
                       <p className="mt-1 text-xs uppercase tracking-[0.08em] text-primary">
                         {getActivityTypeLabel(activity.type, tParent)}
                       </p>
-                      {activity.subject && (
+                      {getSubjectLabel(activity.subject, tParent) && (
                         <p className="mt-1 text-sm text-muted-foreground">{getSubjectLabel(activity.subject, tParent)}</p>
                       )}
                       <p className="mt-2 text-sm leading-6">{activity.summary}</p>

@@ -233,7 +233,7 @@ export async function acknowledgeLitUnits(unitIds: readonly string[]) {
   return response.data.acknowledged
 }
 
-export function normalizeCurriculumSubjectId(subjectId?: string) {
+export function normalizeCurriculumSubjectId(subjectId?: string | null) {
   const normalized = subjectId?.trim().toLowerCase()
   if (!normalized) return undefined
   const aliases: Record<string, string> = {
