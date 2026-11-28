@@ -10,6 +10,7 @@
  */
 import {
   checkDemoAnswer,
+  demoAnswerInvalid,
   completeLesson,
   createDemoConversation,
   demo,
@@ -62,6 +63,7 @@ import { isSupportedLanguage } from '@/i18n/languages'
 import { commandMessageIds } from '@/services/chat/commandMessageIds'
 import type { ChatMessage, ConversationSummary, MessageQuote } from '@/types/chat'
 import type { NotificationPreferenceMatrix } from '@/types/notification'
+import type { PracticeAnswer } from '@/types/practice'
 import type { StudentEntitlement } from '@/types/student'
 import type { TeacherHelpRequestNote } from '@/types/teacher'
 
@@ -404,7 +406,10 @@ const routes: Array<[method: string, pattern: string, handler: Handler]> = [
         return refuse(503, 'service_unavailable', 'Your answer could not be checked right now.')
       }
     }
-    const result = checkDemoAnswer(params.challengeId, field<string | string[]>(body, 'answer') ?? '', demoLanguage())
+    const answer = field<PracticeAnswer>(body, 'answer')
+    // A set of options that cannot be one is refused before it is judged (stoa-backend#593).
+    if (demoAnswerInvalid(params.challengeId, answer)) return refuse(422, 'practice_answer_invalid', 'This answer cannot be checked.')
+    const result = checkDemoAnswer(params.challengeId, answer ?? '', demoLanguage())
     if (result?.correct) answeredRight.add(params.challengeId)
     return result
   }],

@@ -71,6 +71,7 @@
     "checkFailed": "Your answer could not be checked. Try again.",
     "checking": "Checking…",
     "chooseAnswer": "Choose an answer",
+    "chooseSeveral": "Choose every answer that fits",
     "correct": "Correct",
     "done": {
       "allDone": "Every lesson in {{chapter}} is done.",

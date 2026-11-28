@@ -27,7 +27,7 @@ import { useTranslation } from 'react-i18next'
 import { RotateCcw } from 'lucide-react'
 import { Button } from '@/components/base'
 import { EmptyState } from '@/components/common/EmptyState'
-import { AnswerInput, BankText, bodyOnSky, FeedbackCard, glass, type AnswerValue } from '@/features/chapter/answerControls'
+import { AnswerInput, BankText, bodyOnSky, FeedbackCard, figureChoices, glass, type AnswerValue } from '@/features/chapter/answerControls'
 import { ExerciseFigure } from '@/features/chapter/ExerciseFigure'
 import { submitChallengeAnswer } from '@/services/practice/practiceApi'
 import { practiceQueryKeys } from '@/services/practice/practiceQueryKeys'
@@ -36,9 +36,10 @@ import { cn } from '@/lib/utils'
 import type { PracticeAnswerResult, ReviewCard, ReviewReason } from '@/types/practice'
 
 /** The kinds that are answered by picking from what the card carries. */
-const FROM_OPTIONS = ['multiple_choice', 'ordering']
+const FROM_OPTIONS = ['multiple_choice', 'multi_select', 'ordering']
 
-const emptyAnswer = (type: string): AnswerValue => (type === 'ordering' ? [] : '')
+/** Nothing picked yet: an empty order, an empty set of options (stoa-backend#593), or no text. */
+const emptyAnswer = (type: string): AnswerValue => (type === 'ordering' || type === 'multi_select' ? [] : '')
 
 /**
  * The rule the stage lights its Check button by (`useLessonRun`): an order
@@ -176,6 +177,15 @@ function ReviewQuestion({ card, onAnswer }: { card: ReviewCard; onAnswer: () => 
   // answer the question was never asking for and push its next date out, so
   // the review says plainly that this one belongs in its lesson.
   const unanswerable = options.length === 0 && FROM_OPTIONS.includes(card.type)
+  // The set just checked stays picked beside its verdict, in the list and in
+  // the figure alike, until Try again (stoa-backend#593).
+  const answering = {
+    challenge: card,
+    value: answerValue,
+    onChange: setAnswerValue,
+    verdict: result ? (result.correct ? 'right' : 'wrong') : null,
+    disabled: result !== null || answer.isPending,
+  } as const
 
   return (
     <article data-review-card className="flex flex-col gap-4 rounded-[16px] border px-[18px] py-5 text-on-sky" style={glass}>
@@ -192,20 +202,14 @@ function ReviewQuestion({ card, onAnswer }: { card: ReviewCard; onAnswer: () => 
 
       <ReasonLabel reason={card.reason} />
 
-      {card.figure && <ExerciseFigure svg={card.figure} labelledBy={promptId} />}
+      {card.figure && <ExerciseFigure svg={card.figure} labelledBy={promptId} choices={unanswerable ? undefined : figureChoices(answering)} />}
 
       {unanswerable ? (
         <p className={cn('m-0 text-[15px]', bodyOnSky)}>{t('review.answerInLesson')}</p>
       ) : (
         <>
           <div ref={answerArea} className="contents">
-            <AnswerInput
-              challenge={card}
-              value={answerValue}
-              onChange={setAnswerValue}
-              verdict={result ? (result.correct ? 'right' : 'wrong') : null}
-              disabled={result !== null || answer.isPending}
-            />
+            <AnswerInput {...answering} />
           </div>
 
           <div className="flex flex-col">

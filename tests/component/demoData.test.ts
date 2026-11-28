@@ -83,7 +83,11 @@ describe('the demo knowledge point’s chapter', () => {
         for (const challenge of lesson.challenges) {
           if (challenge.type === 'multiple_choice') expect(challenge.options).toContain(challenge.correctAnswer)
           if (challenge.type === 'ordering') expect([...(challenge.correctAnswer as string[])].sort()).toEqual([...challenge.options!].sort())
-          expect(demo.checkDemoAnswer(challenge.challengeId, challenge.correctAnswer, language)?.correct).toBe(true)
+          // A set of options is answered with their numbers (stoa-backend#593), which every check names.
+          const key = challenge.type === 'multi_select' ? demo.checkDemoAnswer(challenge.challengeId, [0], language)!.correctOptions! : null
+          if (key) expect(challenge.correctAnswer).toBe(key.map((index) => challenge.options![index]).join('; '))
+          const right = key ?? challenge.correctAnswer
+          expect(demo.checkDemoAnswer(challenge.challengeId, right, language)?.correct).toBe(true)
           expect(demo.demoHint(challenge.challengeId, language)?.hint).toBe(challenge.hint)
         }
       }
@@ -132,7 +136,7 @@ describe('the demo knowledge point’s chapter', () => {
       total: 4,
       nextLessonId: lessonIds[1],
     })
-    expect(result.current.chapter.lessons.map((lesson) => lesson.exerciseCount)).toEqual([3, 5, 3, 2])
+    expect(result.current.chapter.lessons.map((lesson) => lesson.exerciseCount)).toEqual([3, 7, 3, 2])
   })
 })
 

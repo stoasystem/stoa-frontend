@@ -71,6 +71,7 @@
     "checkFailed": "Deine Antwort konnte nicht geprüft werden. Versuch es nochmals.",
     "checking": "Wird geprüft…",
     "chooseAnswer": "Wähle eine Antwort",
+    "chooseSeveral": "Wähle alle passenden Antworten",
     "correct": "Richtig",
     "done": {
       "allDone": "Alle Lektionen in {{chapter}} sind erledigt.",

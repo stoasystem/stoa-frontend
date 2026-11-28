@@ -38,7 +38,13 @@ const ATTRIBUTES = [
   'font-size', 'font-family', 'font-weight', 'font-style', 'text-anchor', 'dominant-baseline',
   'markerWidth', 'markerHeight', 'refX', 'refY', 'orient', 'markerUnits',
   'marker-start', 'marker-mid', 'marker-end',
+  // A hotspot of a `multi_select` question (stoa-backend#593): the option it
+  // stands for, by its place, A to L. Any other value is dropped below.
+  'data-choice',
 ]
+
+/** What `data-choice` may say: one option's letter, A for the first, at most twelve. */
+const CHOICE = /^[A-L]$/
 
 /*
  * The one reference a figure may make: `url(#id)`, written just so, to a
@@ -65,6 +71,7 @@ function figurePurifier(): Purifier {
     purifier.addHook('uponSanitizeAttribute', (_node, data) => {
       // A name is read out, never parsed as CSS: a backslash there is just text.
       if (data.attrName !== 'aria-label' && refersOut(data.attrValue)) data.keepAttr = false
+      if (data.attrName === 'data-choice' && !CHOICE.test(data.attrValue)) data.keepAttr = false
     })
   }
   return purifier

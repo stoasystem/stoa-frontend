@@ -76,6 +76,7 @@
     "checkFailed": "Ta réponse n’a pas pu être vérifiée. Réessaie.",
     "checking": "Vérification…",
     "chooseAnswer": "Choisis une réponse",
+    "chooseSeveral": "Choisis toutes les réponses qui conviennent",
     "correct": "Correct",
     "done": {
       "allDone": "Toutes les leçons de {{chapter}} sont terminées.",

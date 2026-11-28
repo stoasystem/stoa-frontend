@@ -49,7 +49,7 @@ npm run dev -- --host 127.0.0.1 --port 5173
 | `map-physics` / `map-german` / `map-english` | `/map/physics`、`/map/german`、`/map/english` | 可看：别的知识库学科的全景（#747）：物理三团、德语四团、英语四团，团名常显 |
 | `map-cluster-physics` / `map-cluster-german` / `map-cluster-english` | `/map/physics/cluster/physics-mechanics`、`/map/german/cluster/german-sentences`、`/map/english/cluster/english-me` | 可看：别的学科各一个路线场景（#747）：「Mechanics and heat」按前置算出主线和支线；「Sentences and spelling」「Me and my day」是按 topic 排成的一条主线（映射表里的人工主线），每个 topic 一章。其他星团把路径里的星团 id 换掉即可，id 见 `src/features/starmap/route/clusters.ts`。截图等 `[data-cluster-route]` |
 | `chapter` | `/chapter/demo-sine-cosine` | 可看：3 个核心课时加 1 个拓展练习集，开场时第 1 课已完成 |
-| `lesson` | `/chapter/demo-sine-cosine/demo-sine-cosine--rechnen--1` | 可看：5 道题（单选 ×2、填空、排序、选项是图的单选），能答错、重试、答对、完成课时；第 1 题带题干图（图上「Hypotenuse」随界面语言变），第 5 题三个选项都是图（#504） |
+| `lesson` | `/chapter/demo-sine-cosine/demo-sine-cosine--rechnen--1` | 可看：7 道题（单选 ×2、填空、排序、选项是图的单选、多选 ×2），能答错、重试、答对、完成课时；第 1 题带题干图（图上「Hypotenuse」随界面语言变），第 5 题三个选项都是图（#504）；第 6、7 题是 stoa-backend#593 的两道多选样题（#743）：第 6 题点题干图里的点（热区，和下面的字母选项同步选中），第 7 题是文字多选；演示后端按集合判题，回执带 `correctOptions`，空集、重复、越界或非整数答 422 `practice_answer_invalid` |
 | `skill` | `/chapter/demo-sine-cosine?skill=demo-sine-cosine--rechnen` | 可看：一颗分两个 Stufe 的小星（#501），当前该做的那组高亮 |
 | `skill-extension` | `/chapter/demo-sine-cosine?skill=demo-sine-cosine--begruenden` | 可看：拓展小星，带「先完成本星前面的阶段」和「先点亮：X」提示，练习照样能进 |
 | `ask` / `ask-conversation` | `/ask`、`/ask/demo-ask-sine` | 可看；桌面为侧栏，手机为全屏 sheet；`demo-ask-sine` 带一位进行中的老师；能发消息（答复为固定文字）、请老师 |

@@ -1,5 +1,5 @@
 /*
- * The demo knowledge point's chapter (#116): three lessons, eleven exercises,
+ * The demo knowledge point's chapter (#116): three lessons, thirteen exercises,
  * enough to walk a wrong answer, a right one, a finished lesson and a lit
  * star. In the shapes the chapter and the practice stage read
  * (`useChapter`, `useLessonQuery`, `useLessonRun`): the curriculum catalog,
@@ -15,6 +15,7 @@ import type { LearningState } from '@/features/starmap/model/starMap'
 import type { SupportedLanguage } from '@/i18n/languages'
 import type {
   CurriculumCatalog,
+  PracticeAnswer,
   PracticeAnswerResult,
   PracticeChallenge,
   PracticeChallengeType,
@@ -30,13 +31,16 @@ const all = (text: string): Localized => L(text, text, text, text)
 type ExerciseSpec = {
   type: PracticeChallengeType
   prompt: Localized
-  /** Multiple choice and ordering: the choices, as shown. */
+  /** Multiple choice, multi select and ordering: the choices, as shown. */
   options?: Localized[]
   /** The question's drawing (#504), in each language where it has words. */
   figure?: Localized
   /** One drawing per option, `''` where an option has none (#504). */
   optionFigures?: string[]
-  /** The option index (multiple choice), the order of option indexes (ordering), or the text. */
+  /**
+   * The option index (multiple choice), the order of option indexes (ordering),
+   * the set of option indexes (multi select, stoa-backend#593), or the text.
+   */
   answer: number | number[] | Localized
   /** Other spellings of a text answer that count as right. */
   accepted?: string[]
@@ -78,6 +82,23 @@ const TRIANGLES = [
   svg('0 0 120 100', `<polygon points="15,90 105,90 15,15" ${outline}/><path d="M15,78 L27,78 L27,90" fill="none" stroke="currentColor" stroke-width="1.5"/>`),
   svg('0 0 120 100', `<polygon points="10,90 75,90 115,30" ${outline}/>`),
 ]
+
+/*
+ * The two samples of stoa-backend#593 (`tests/fixtures/multi_select_samples_593.json`),
+ * as the backend has them: a set of text options, and a set picked in the
+ * figure, whose hotspots carry `data-choice` (A is the first option).
+ */
+const choiceDot = (letter: string, x: number, y: number) =>
+  `<g data-choice="${letter}"><circle cx="${x}" cy="${y}" r="3" fill="currentColor"/><text x="${x + 4}" y="${y - 3}" font-size="8">${letter}</text></g>`
+const POINTS_AND_CIRCLE = svg(
+  '0 0 120 100',
+  '<circle cx="60" cy="50" r="35" fill="none" stroke="currentColor" stroke-width="1.5"/>' +
+    choiceDot('A', 50, 40) +
+    choiceDot('B', 104, 18) +
+    choiceDot('C', 18, 86) +
+    choiceDot('D', 72, 66) +
+    choiceDot('E', 108, 82),
+)
 
 const PYTHAGORAS = L('Use $a^2 + b^2 = c^2$.', 'Nutze $a^2 + b^2 = c^2$.', 'Utilise $a^2 + b^2 = c^2$.', 'Usa $a^2 + b^2 = c^2$.')
 const SOHCAHTOA = L(
@@ -220,6 +241,55 @@ const EXERCISES: ExerciseSpec[][] = [
         'Il triangolo B ha un angolo retto, segnato dal quadrato.',
       ),
     },
+    // stoa-backend#593's hotspot sample: the points are picked in the figure or in the list.
+    {
+      type: 'multi_select',
+      prompt: L(
+        'Which marked points lie inside the circle? Tap them in the figure.',
+        'Welche markierten Punkte liegen innerhalb des Kreises? Tippe sie in der Abbildung an.',
+        'Quels points marqués se trouvent à l’intérieur du cercle ? Touche-les dans la figure.',
+        'Quali punti segnati si trovano all’interno del cerchio? Toccali nella figura.',
+      ),
+      figure: all(POINTS_AND_CIRCLE),
+      options: [all('A'), all('B'), all('C'), all('D'), all('E')],
+      answer: [0, 3],
+      hint: L(
+        'A point inside is closer to the centre than the circle line.',
+        'Ein Punkt innen liegt näher beim Mittelpunkt als die Kreislinie.',
+        'Un point à l’intérieur est plus proche du centre que le cercle.',
+        'Un punto interno è più vicino al centro della circonferenza.',
+      ),
+      explanation: L(
+        'Only A and D are closer to the centre than the radius; B, C and E lie outside.',
+        'Nur A und D sind näher beim Mittelpunkt als der Radius; B, C und E liegen ausserhalb.',
+        'Seuls A et D sont plus proches du centre que le rayon ; B, C et E sont à l’extérieur.',
+        'Solo A e D sono più vicini al centro del raggio; B, C ed E sono all’esterno.',
+      ),
+    },
+    // stoa-backend#593's text sample: a set of options in a list.
+    {
+      type: 'multi_select',
+      prompt: L(
+        'Which of these numbers are prime? Select all.',
+        'Welche dieser Zahlen sind Primzahlen? Wähle alle aus.',
+        'Lesquels de ces nombres sont premiers ? Sélectionne-les tous.',
+        'Quali di questi numeri sono primi? Selezionali tutti.',
+      ),
+      options: [all('2'), all('9'), all('11'), all('15'), all('17')],
+      answer: [0, 2, 4],
+      hint: L(
+        'A prime has exactly two divisors: 1 and itself.',
+        'Eine Primzahl hat genau zwei Teiler: 1 und sich selbst.',
+        'Un nombre premier a exactement deux diviseurs : 1 et lui-même.',
+        'Un numero primo ha esattamente due divisori: 1 e sé stesso.',
+      ),
+      explanation: L(
+        '2, 11 and 17 are divisible only by 1 and themselves. 9 = 3 · 3 and 15 = 3 · 5.',
+        '2, 11 und 17 haben nur die Teiler 1 und sich selbst. 9 = 3 · 3 und 15 = 3 · 5.',
+        '2, 11 et 17 n’ont que 1 et eux-mêmes comme diviseurs. 9 = 3 · 3 et 15 = 3 · 5.',
+        '2, 11 e 17 sono divisibili solo per 1 e per sé stessi. 9 = 3 · 3 e 15 = 3 · 5.',
+      ),
+    },
   ],
   [
     {
@@ -337,11 +407,14 @@ const challengeId = (lesson: number, exercise: number) => `${PRACTICE_SETS[lesso
 
 function challengeOf(spec: ExerciseSpec, lesson: number, exercise: number, language: SupportedLanguage): PracticeChallenge {
   const options = spec.options?.map((option) => localize(option, language))
+  // A set of options is written as the backend's `standardAnswer` says it: the texts, joined with "; ".
   const correctAnswer =
     typeof spec.answer === 'number'
       ? options![spec.answer]
       : Array.isArray(spec.answer)
-        ? spec.answer.map((index) => options![index])
+        ? spec.type === 'multi_select'
+          ? spec.answer.map((index) => options![index]).join('; ')
+          : spec.answer.map((index) => options![index])
         : localize(spec.answer, language)
   return {
     challengeId: challengeId(lesson, exercise),
@@ -483,21 +556,47 @@ function findSpec(id: string): { spec: ExerciseSpec; lesson: number; exercise: n
   return null
 }
 
+/**
+ * Whether the backend would refuse this answer to a demo exercise as no answer
+ * at all (422 `practice_answer_invalid`, stoa-backend#593): for a set of
+ * options, anything but a list of whole option numbers, each once, at least
+ * one. Other kinds take any answer.
+ */
+export function demoAnswerInvalid(id: string, answer: unknown): boolean {
+  const found = findSpec(id)
+  if (!found || found.spec.type !== 'multi_select') return false
+  const count = found.spec.options?.length ?? 0
+  return (
+    !Array.isArray(answer) ||
+    answer.length === 0 ||
+    answer.some((item) => typeof item !== 'number' || !Number.isInteger(item) || item < 0 || item >= count) ||
+    new Set(answer).size !== answer.length
+  )
+}
+
 /** `POST /practice/challenges/:id/answer`: the backend's check, for the demo exercises. Null for any other id. */
-export function checkDemoAnswer(id: string, answer: string | string[], language: SupportedLanguage = 'en'): PracticeAnswerResult | null {
+export function checkDemoAnswer(id: string, answer: PracticeAnswer, language: SupportedLanguage = 'en'): PracticeAnswerResult | null {
   const found = findSpec(id)
   if (!found) return null
   const challenge = challengeOf(found.spec, found.lesson, found.exercise, language)
   const expected = challenge.correctAnswer
-  const correct = Array.isArray(expected)
-    ? Array.isArray(answer) && answer.length === expected.length && answer.every((item, index) => item === expected[index])
-    : !Array.isArray(answer) && [expected, ...(found.spec.accepted ?? [])].some((right) => normal(right) === normal(answer))
+  // A set is judged as a set: any order, every right option and nothing else (stoa-backend#593).
+  const key = found.spec.type === 'multi_select' && Array.isArray(found.spec.answer) ? [...found.spec.answer].sort((a, b) => a - b) : null
+  const correct = key
+    ? Array.isArray(answer) &&
+      answer.length === key.length &&
+      [...answer].sort((a, b) => Number(a) - Number(b)).every((item, index) => item === key[index])
+    : Array.isArray(expected)
+      ? Array.isArray(answer) && answer.length === expected.length && answer.every((item, index) => item === expected[index])
+      : !Array.isArray(answer) && [expected, ...(found.spec.accepted ?? [])].some((right) => normal(right) === normal(answer))
   return {
     challengeId: id,
     correct,
     feedback: correct ? challenge.correctFeedback! : challenge.incorrectFeedback!,
     ...(correct ? { explanation: challenge.explanation } : { hint: challenge.hint }),
     attemptsRemaining: correct ? 0 : 2,
+    // As the backend: the right options' numbers for a set, null for every other kind.
+    correctOptions: key,
     canAskLearningAssistant: true,
     canAskTeacher: true,
   }
