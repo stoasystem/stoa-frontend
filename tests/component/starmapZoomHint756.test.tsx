@@ -10,8 +10,9 @@
  *      keeps it for the rest of the visit;
  *   C. on the map: line 1 far out, line 2 after flying in, gone after a star
  *      is opened, gone after a reload;
- *   D. never at the same time as the first landing, the first reveal, the
- *      review reminder's bubble, the find-star bubble or the clusters' hint;
+ *   D. never at the same time as the first landing (on a sky of clusters
+ *      too, #769), the first reveal, the review reminder's bubble, the
+ *      find-star bubble or the clusters' hint;
  *   E. from far out the mouse lights the cluster a click goes into, whole,
  *      under a magnifier; once stars can be picked, only a star answers;
  *   F. the help dialog and the first reveal say a star may be chosen freely,
@@ -411,14 +412,14 @@ describe('D. never with another bubble', () => {
     await waitFor(() => expect(hintLine()).not.toBeNull())
   })
 
-  it('waits for the clusters’ panorama hint', async () => {
-    // The real mathematics knowledge base, laid out as star clusters (#747), through the read model.
+  /** The real mathematics knowledge base, laid out as star clusters (#747), through the read model; `newcomer`: nothing started. */
+  function mountClusters({ newcomer = false } = {}) {
     const map = demoClusterMap('en')
     vi.mocked(getKnowledgeMap).mockResolvedValue({
       subjectId: 'math',
       galaxies: map.subjects,
       nebulae: map.nebulae.map((nebula) => ({ ...nebula, subjectId: 'math' })),
-      stars: map.stars as KnowledgeMapResponse['stars'],
+      stars: (newcomer ? map.stars.map((star) => ({ ...star, state: 'ready' as const, progress: 0, unlitPrerequisiteIds: [] })) : map.stars) as KnowledgeMapResponse['stars'],
       prerequisites: map.prerequisites,
       summary: map.summary,
     })
@@ -426,7 +427,7 @@ describe('D. never with another bubble', () => {
     // The read model is read for a signed-in account.
     useAuthStore.setState({ user: { id: OWNER, name: 'Ada', email: 'ada@example.com', role: 'student', mustChangePassword: false } as never, accessToken: 'token', isAuthenticated: true })
     const client = new QueryClient({ defaultOptions: { queries: { retry: false, gcTime: 0 } } })
-    const view = render(
+    return render(
       <I18nextProvider i18n={i18n}>
         <QueryClientProvider client={client}>
           <KnowledgeMapSourceProvider>
@@ -440,10 +441,24 @@ describe('D. never with another bubble', () => {
         </QueryClientProvider>
       </I18nextProvider>,
     )
+  }
+
+  it('waits for the clusters’ panorama hint', async () => {
+    const view = mountClusters()
     await waitFor(() => expect(view.container.querySelector('[data-cluster-hint]')).not.toBeNull())
     expect(hintLine()).toBeNull()
     fireEvent.click([...document.querySelectorAll<HTMLButtonElement>('[data-cluster-hint] button')].find((button) => button.textContent === en.clusterGuide.gotIt)!)
     await waitFor(() => expect(hintLine()).not.toBeNull(), { timeout: BUBBLE_EXIT_MS + 1000 })
+  })
+
+  it('waits for a newcomer’s landing on a sky of clusters (#769), and comes once it goes, with no hint between', async () => {
+    const view = mountClusters({ newcomer: true })
+    await waitFor(() => expect(view.container.querySelector('[data-cluster-landing]')).not.toBeNull())
+    expect(hintLine()).toBeNull()
+    fireEvent.click([...document.querySelectorAll<HTMLButtonElement>('[data-cluster-landing] button')].find((button) => button.textContent === en.firstLanding.later)!)
+    await waitFor(() => expect(view.container.querySelector('[data-cluster-landing]')).toBeNull(), { timeout: BUBBLE_EXIT_MS + 1000 })
+    await waitFor(() => expect(hintLine()?.dataset.zoomHint).toBe('cluster'))
+    expect(view.container.querySelector('[data-cluster-hint]')).toBeNull()
   })
 })
 

@@ -224,6 +224,12 @@ export type SceneFrame = {
    * focus's ring, and not drawn over it.
    */
   hoverRing?: number
+  /**
+   * The cluster a newcomer's first landing points at (#769), ringed with
+   * `LANDING_MARK`, and how strongly this frame (its pulse, 0..1); -1 / absent: none.
+   */
+  markCluster?: number
+  markAlpha?: number
   /** Everything but the focus star fades to this (a chosen star, zoomed in to it). */
   dim: number
   /**
@@ -289,6 +295,8 @@ export type RenderStats = {
   tilePaints: number
   /** The nebula drawn with a focus ring in the last frame, or -1. */
   highlightNebula: number
+  /** The cluster ringed for a newcomer's first landing in the last frame (#769), or -1 / absent. */
+  markCluster?: number
   /** Connection lines drawn in the last frame (#121). */
   links?: { bridges: number; hints: number; lines: number; labels: number; dragLabels?: number; bridgeLabels?: number }
   /**

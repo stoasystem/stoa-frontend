@@ -5,9 +5,10 @@
  *   1. the invitation link: choose a password, date of birth
  *   2. sign in
  *   3. plan B: which subject is school on now
- *   4. plan A: the first landing on "Integers", where the course starts,
- *      Murmi beside it
- *   5. "Look around first": Murmi goes, the camera stays
+ *   4. plan A: the first landing on the whole view, Murmi beside the
+ *      cluster that holds "Integers", where the course starts (#769)
+ *   5. that cluster opened: its route on "Integers", Murmi there
+ *   6. "Got it": Murmi goes, the card stays
  *
  * The first star has no chapter in the preview, so the chapter, the first
  * lighting and the reveal are not in this walk-through.
@@ -109,14 +110,20 @@ await page.locator('[data-first-question]').waitFor({ timeout: 15000 })
 await step('question', '3 · Which subject is school on? (plan B)', 2600)
 await page.locator('[data-first-question] [data-subject="math"]').click()
 
-// 4. Plan A: the first landing, in the recommended star's cluster scene (#747).
+// 4. Plan A: the first landing on the whole view, Murmi beside the cluster to start in (#769).
+await page.locator('[data-cluster-landing] [data-shown]').waitFor({ timeout: 15000 })
+await step('landing', '4 · First landing: the whole view, Murmi beside the cluster to start in', 3200)
+// 5. A tap on that cluster: its route scene on the recommended star, its card open, Murmi there.
+const cluster = await page.locator('[data-cluster-landing]').getAttribute('data-cluster-landing')
+await page.locator(`[data-nebula-link="${cluster}"]`).focus()
+await page.keyboard.press('Enter')
 await page.locator('[data-scene-landing]').waitFor({ timeout: 15000 })
-await step('landing', '4 · First landing: the cluster scene on the recommended star, Murmi there', 3200)
-// 5. "Got it": Murmi goes, the star's card stays. The first star ("Integers", where the
+await step('scene', '5 · The cluster opened: its route on the recommended star, Murmi there', 3200)
+// 6. "Got it": Murmi goes, the star's card stays. The first star ("Integers", where the
 // course starts) is a placeholder in the preview, with no chapter to start.
 await page.locator('[data-scene-landing] button').last().click()
 await page.locator('[data-scene-landing]').waitFor({ state: 'detached' })
-await step('look-around', '5 · Got it: Murmi goes, the card stays', 1800)
+await step('look-around', '6 · Got it: Murmi goes, the card stays', 1800)
 
 const video = page.video()
 await context.close()

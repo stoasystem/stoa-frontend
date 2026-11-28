@@ -21,12 +21,17 @@
  * once it is answered (and the sky read again) or put off, so it lands on the
  * star the backend recommends for the year group just saved.
  *
- * On a sky of star clusters (#747) the landing is not a flight into the
- * nebula: the recommended star's cluster opens its route scene on that star
- * (`clusterPath`), its card open and Murmi there (`ClusterScene`). The sky
- * stays the step back, marked as landed (`SceneLandingState`), so back from
- * the scene is the whole view, where the clusters' hint takes over -- and the
- * landing is not decided again.
+ * On a sky of star clusters (#747, #769) the landing is not a flight into
+ * the nebula: the camera stays on the whole view of the chosen subject's
+ * galaxy (the route follows to that galaxy if it is not the one in focus),
+ * and Murmi stands beside the cluster holding the recommended star
+ * (`cluster`). That one bubble says where to begin and takes the place of the
+ * clusters' hint for a newcomer. The student taps the cluster themselves
+ * (`openCluster`): the recommended one opens its route scene on that star
+ * (`clusterPath`), its card open and Murmi there (`ClusterScene`); another
+ * opens as any cluster does. Either way the landing is over: the sky under
+ * the scene is marked as landed (`SceneLandingState`), so back from the
+ * scene is the whole view and the landing is not decided again.
  *
  * The answer and "Look around first" are remembered for this tab only
  * (sessionStorage, one key per account): a reload or a way back to the map in
@@ -49,7 +54,7 @@ const UNSURE = ''
 /** Router state: the route was put right to this landing's nebula, for this star. */
 type LandingState = { firstLanding: string }
 
-/** Router state of the sky under a scene landing (#747): the newcomer was landed in a cluster's scene from here. */
+/** Router state of the sky once a newcomer's landing there is over (#747, #769): a cluster was opened from it. */
 export type SceneLandingState = { firstLandingSeen: string }
 /** Router state of that scene: opened from the sky (`ClusterSceneState`), as a newcomer's landing on this star. */
 export type SceneLandingSceneState = { fromSky: true; firstLanding: string }
@@ -90,6 +95,10 @@ export type FirstLanding = {
   target: LayerTarget
   /** The star Murmi stands beside, while the landing lasts and the student has not waved it away. */
   star: Star | null
+  /** On a sky of star clusters (#769): the cluster Murmi stands beside, holding the recommended star, while the landing lasts. */
+  cluster: { clusterId: string; star: Star } | null
+  /** A cluster tapped on the whole view: true when the landing opened it (on its star), false to open it as usual. */
+  openCluster: (clusterId: string) => boolean
   /** "Look around first", or Escape: Murmi goes, the camera stays. */
   dismiss: () => void
   /** Plan B: the subjects to choose between, while the question is open. */
@@ -142,7 +151,8 @@ export function useFirstLanding(map: StarMap, target: LayerTarget, ownerId: stri
    * The route has reached the landing's nebula. From then on the galaxy's
    * route is the student going back out (the way back, the switcher, a pinch
    * that settles on the galaxy), and ends the landing; before, it is the
-   * route still to be put right.
+   * route still to be put right. On a sky of clusters: the route has reached
+   * the landing star's galaxy, and another galaxy is the student panning on.
    */
   const [followed, setFollowed] = useState(first.followed)
   const [dismissed, setDismissed] = useState(false)
@@ -154,23 +164,54 @@ export function useFirstLanding(map: StarMap, target: LayerTarget, ownerId: stri
     setFollowed(now.followed)
   }
 
-  // A sky of star clusters (#747): the landing opens the recommended star's cluster scene instead.
+  // A sky of star clusters (#747, #769): the camera stays on the whole view, of the landing star's galaxy.
   const clusters = isClusterSky(map)
+  const landingStarId = clusters && landing?.layer === 'nebula' ? landing.whole?.star : undefined
+  const clusterStar = landingStarId ? (map.stars.find((candidate) => candidate.unitId === landingStarId) ?? null) : null
+  const clusterSubject = clusterStar ? subjectOfNebula(map, clusterStar.nebulaId) : null
   useEffect(() => {
-    if (!clusters || !landing || landing.layer !== 'nebula' || !landing.whole || target.layer !== 'map') return
-    const unitId = landing.whole.star
-    const star = map.stars.find((candidate) => candidate.unitId === unitId)
-    setLanding(null)
-    if (!star) return
-    const subjectId = subjectOfNebula(map, star.nebulaId)
-    const sky: SceneLandingState = { firstLandingSeen: unitId }
-    const scene: SceneLandingSceneState = { fromSky: true, firstLanding: unitId }
-    const query = new URLSearchParams(search)
-    query.set('star', unitId)
-    // The sky under the scene, marked as landed: back from the scene is the whole view, not another landing.
-    void navigate({ pathname: pathForTarget(subjectId, { layer: 'map' }), search }, { replace: true, state: sky })
-    void navigate({ pathname: clusterPath(subjectId, star.nebulaId), search: `?${query}` }, { state: scene })
-  }, [clusters, landing, target, map, navigate, search])
+    if (!clusters || !landing) return
+    if (!clusterStar || target.layer !== 'map') {
+      // No star to stand by, or the student moved on (a nebula, a star): the landing is over.
+      setLanding(null)
+      return
+    }
+    if (clusterSubject === map.subject.subjectId) {
+      if (!followed) setFollowed(true)
+      return
+    }
+    // Panned or switched to another galaxy once there: the student moved on.
+    if (followed) {
+      setLanding(null)
+      return
+    }
+    // Another galaxy's star (plan B's answer, the profile's subject): the route follows to that galaxy, in place.
+    if (clusterSubject !== null) void navigate({ pathname: pathForTarget(clusterSubject, { layer: 'map' }), search }, { replace: true })
+  }, [clusters, landing, clusterStar, clusterSubject, target, map, navigate, search, followed])
+
+  /**
+   * A cluster tapped on the whole view while the landing is up: the landing
+   * is over, and the sky under the scene marked as landed. The recommended
+   * star's cluster opens on that star, its card open (true); another is left
+   * to open as any cluster does (false).
+   */
+  const openCluster = useCallback(
+    (clusterId: string): boolean => {
+      if (!clusterStar) return false
+      const unitId = clusterStar.unitId
+      setLanding(null)
+      const sky: SceneLandingState = { firstLandingSeen: unitId }
+      // The galaxy's own route (from `/` too), so back from the scene names the subject, as the switcher does.
+      void navigate({ pathname: pathForTarget(map.subject.subjectId, { layer: 'map' }), search }, { replace: true, state: sky })
+      if (clusterId !== clusterStar.nebulaId) return false
+      const scene: SceneLandingSceneState = { fromSky: true, firstLanding: unitId }
+      const query = new URLSearchParams(search)
+      query.set('star', unitId)
+      void navigate({ pathname: clusterPath(subjectOfNebula(map, clusterStar.nebulaId), clusterStar.nebulaId), search: `?${query}` }, { state: scene })
+      return true
+    },
+    [clusterStar, map, navigate, search],
+  )
 
   const landed = !clusters && landing !== null && (sameTarget(landing, target) || (!followed && target.layer === 'map'))
   useEffect(() => {
@@ -201,7 +242,9 @@ export function useFirstLanding(map: StarMap, target: LayerTarget, ownerId: stri
   const dismiss = useCallback(() => {
     writeTab(dismissedKey, '1')
     setDismissed(true)
-  }, [dismissedKey])
+    // On a sky of clusters the camera never left the whole view: nothing is left of the landing.
+    if (clusters) setLanding(null)
+  }, [dismissedKey, clusters])
 
   const choose = useCallback(
     (subjectId: string | null) => {
@@ -216,5 +259,7 @@ export function useFirstLanding(map: StarMap, target: LayerTarget, ownerId: stri
   const starId = landed && landing.layer === 'nebula' ? landing.whole?.star : undefined
   const star = !dismissed && starId ? (map.stars.find((candidate) => candidate.unitId === starId) ?? null) : null
   const open = asking && target.layer === 'map' && isNewcomer(map)
-  return { target: landed ? landing : target, star, dismiss, asking: open ? startableSubjects(map) : null, choose }
+  // Murmi by the cluster once the route is on the landing star's galaxy.
+  const cluster = !dismissed && clusterStar && target.layer === 'map' && clusterSubject === map.subject.subjectId ? { clusterId: clusterStar.nebulaId, star: clusterStar } : null
+  return { target: landed ? landing : target, star, cluster, openCluster, dismiss, asking: open ? startableSubjects(map) : null, choose }
 }

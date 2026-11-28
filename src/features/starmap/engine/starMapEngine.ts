@@ -37,7 +37,7 @@
  */
 import { nebulaLinks, routeChapterIndices, starLinkIndices } from '@/features/starmap/model/links'
 import { orderedNebulae, orderedStars, STAR_LOOKS, starLook, type Star, type StarMap } from '@/features/starmap/model/starMap'
-import { breathAt, easeStandard, motionPolicy, type MotionPolicy } from '@/features/starmap/motion/motionPolicy'
+import { BREATHE, breathAt, easeStandard, motionPolicy, type MotionPolicy } from '@/features/starmap/motion/motionPolicy'
 import type { EdgeLabelBox, SceneData, SceneFrame, StarMapRenderer, StarMapTheme } from '@/features/starmap/render/types'
 import {
   baseScale,
@@ -77,6 +77,7 @@ import {
   lineReveal,
   nebulaNameAlpha,
   ramp,
+  LANDING_MARK,
   REVEAL,
   skillAlpha,
   starFocusAmount,
@@ -117,6 +118,8 @@ export type StarOnScreen = {
   size: number
   /** The names at the screen's edge in the same frame, CSS px: a label laid beside the star keeps clear of them (#145 C14). */
   keepClear?: readonly { x0: number; y0: number; x1: number; y1: number }[]
+  /** A cluster's own name as drawn in the same frame, CSS px (#769): a bubble beside it never covers it. */
+  name?: { x0: number; y0: number; x1: number; y1: number }
 }
 
 /**
@@ -379,6 +382,10 @@ export class StarMapEngine {
   private focusStar = -1
   /** A star Murmi points at from its bubble (#593), drawn as keyboard focus draws one: picked out and named. */
   private markedStar: string | null = null
+  /** The cluster a newcomer's first landing points at (#769), ringed; null: none. */
+  private markedCluster: string | null = null
+  /** Its ring's strength this frame: the pulse, or 1 held still. */
+  private markAlpha = 1
   private focusNebula = -1
   private hoveredNebula = -1
   /** The star under the mouse, where single stars can be picked (#138 B2: its name shows), or -1. */
@@ -710,6 +717,13 @@ export class StarMapEngine {
   setMarkedStar(unitId: string | null): void {
     if (unitId === this.markedStar) return
     this.markedStar = unitId
+    this.invalidate()
+  }
+
+  /** Murmi's first landing points at this cluster (#769), or at none: a soft ring round its stars (`LANDING_MARK`). */
+  setMarkedCluster(topicId: string | null): void {
+    if (topicId === this.markedCluster) return
+    this.markedCluster = topicId
     this.invalidate()
   }
 
@@ -1150,7 +1164,11 @@ export class StarMapEngine {
   /** Where `topicId`'s nebula (a star cluster, #747) was drawn in the last frame, its disc as the size; null before one or for none. */
   nebulaOnScreen(topicId: string): StarOnScreen | null {
     const index = this.drewFirstFrame ? (this.nebulaIndex.get(topicId) ?? -1) : -1
-    return index < 0 ? null : { x: this.nebulaX[index], y: this.nebulaY[index], size: 2 * this.nebulaR[index], keepClear: this.renderer.stats.edgeLabels }
+    if (index < 0) return null
+    // Its name as drawn, for a bubble beside it to keep clear of (#769).
+    const drawn = (this.renderer.stats.nebulaNames ?? []).find((box) => box.nebula === index && box.alpha > 0.05)
+    const name = drawn ? { x0: drawn.x0, y0: drawn.y0, x1: drawn.x1, y1: drawn.y1 } : undefined
+    return { x: this.nebulaX[index], y: this.nebulaY[index], size: 2 * this.nebulaR[index], keepClear: this.renderer.stats.edgeLabels, name }
   }
 
   /** With a star chosen, where it was drawn in the last frame (it may be panned off screen, #132); else null. */
@@ -1718,6 +1736,14 @@ export class StarMapEngine {
       keepGoing = true
     }
 
+    // The cluster a newcomer's first landing points at (#769): its ring pulses with the breath, held still under reduced motion.
+    this.markAlpha = 1
+    if (this.markedCluster && this.nebulaIndex.has(this.markedCluster) && this.policy.breathing && !this.paused) {
+      const swell = (breathAt(now).alpha - BREATHE.alphaFrom) / (BREATHE.alphaTo - BREATHE.alphaFrom)
+      this.markAlpha = LANDING_MARK.pulseFrom + (1 - LANDING_MARK.pulseFrom) * swell
+      keepGoing = true
+    }
+
     this.renderer.draw(this.frameState(t, crossfade, chosen, breath, now))
     // A name still fading in or out wants the next frame too.
     if (this.renderer.stats.settling) keepGoing = true
@@ -1880,6 +1906,8 @@ export class StarMapEngine {
       focusStar,
       hoveredNebula: this.hoveredNebula,
       hoverRing: this.hoverRing,
+      markCluster: this.markedCluster ? (this.nebulaIndex.get(this.markedCluster) ?? -1) : -1,
+      markAlpha: this.markAlpha,
       highlightNebula: target.layer === 'star' ? -1 : this.focusNebula,
       dim: 1 - (1 - STAR_FOCUS_DIM) * focus,
       chosenAmount: this.chosenAmount,

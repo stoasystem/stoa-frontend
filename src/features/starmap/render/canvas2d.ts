@@ -10,7 +10,7 @@
  */
 import { CHOSEN, DOT_CUT, dotBoxFor, GLOW_STOPS, GLYPH_LARGE, GLYPH_SMALL, HOVER, LINE_GLOW, ORB_TURN, RAY_STOPS, rayPath, STAR_INK, WAITING_RING_ALPHA, PRESS, SMALL_CUT_BELOW, type DotCut, type GlyphCut, type StarLight } from '@/features/starmap/render/glyph'
 import { aroundDiscWide, backingBox, belongsTo, boxesOverlap, boxHitsCircle, boxHitsSegment, coversAny, keyStars, leaderLine, nearerStars, ownerUnclear, placeInsisting, placeLabel, wrapName, type Box, type Circle, type Segment } from '@/features/starmap/render/labels'
-import { DRAG, panoramaDot, panoramaLook, ramp, reachFade, REVEAL, type Ramp } from '@/features/starmap/view/semanticZoom'
+import { DRAG, LANDING_MARK, panoramaDot, panoramaLook, ramp, reachFade, REVEAL, type Ramp } from '@/features/starmap/view/semanticZoom'
 import { createTileCache, nebulaStateKeys, tileKey, tileSizeFor, TILE_REACH, type TileCache } from '@/features/starmap/render/nebulaTiles'
 import { CLOUD_REACH, galaxyHazeAlpha, galaxyHazeBox, nebulaGlowAlpha, paintGalaxy, paintGalaxyHaze, paintNebulaCloud } from '@/features/starmap/render/galaxy'
 import { createGalaxyNames } from '@/features/starmap/render/galaxyNames'
@@ -766,6 +766,28 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
           ctx.stroke()
           ctx.globalAlpha = 1
         }
+      }
+
+      // The cluster a newcomer's first landing points at (#769): a soft ring of light round its stars as drawn.
+      const mark = frame.markCluster ?? -1
+      const marked = mark >= 0 && mark < nebulaCount ? clusterAsDrawn(mark, scene.nebula, x, y, starAlpha, count) : null
+      stats.markCluster = marked ? mark : -1
+      if (marked) {
+        const r = marked.r + Math.max(frame.glyphSize * 0.5, frame.dotRadius * 2) + LANDING_MARK.pad
+        const strength = LANDING_MARK.alpha * Math.max(0, Math.min(1, frame.markAlpha ?? 1))
+        ctx.strokeStyle = colours.lit
+        ctx.setLineDash([])
+        ctx.globalAlpha = strength * LANDING_MARK.glowAlpha
+        ctx.lineWidth = LANDING_MARK.width * LANDING_MARK.glowWide
+        ctx.beginPath()
+        ctx.arc(marked.x, marked.y, r, 0, Math.PI * 2)
+        ctx.stroke()
+        ctx.globalAlpha = strength
+        ctx.lineWidth = LANDING_MARK.width
+        ctx.beginPath()
+        ctx.arc(marked.x, marked.y, r, 0, Math.PI * 2)
+        ctx.stroke()
+        ctx.globalAlpha = 1
       }
 
       // A recommended star is always a full glyph, at least 12 px: the way in.

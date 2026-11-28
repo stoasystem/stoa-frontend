@@ -2,16 +2,29 @@ import { expect, test } from './support/fixtures'
 import { signInAsStudent } from './support/signIn'
 import { StudentWorld } from './support/student'
 
-// The first landing (#467; on star clusters #747): a student who has not started anything does
-// not open on the whole galaxy but in the recommended star's cluster, its learning route scene
-// opened on that star with its card, and Murmi beside the star; "Got it" sends Murmi away and
-// leaves the scene as it is; back to the star map is the whole view, the landing not made again.
-test('a newcomer lands on the recommended star, Murmi beside it, and can wave Murmi away', async ({ page, backend }) => {
+// The first landing (#467; on star clusters #747, #769): a student who has not started anything
+// lands on the whole view of the subject's sky of clusters, Murmi beside the cluster that holds
+// the recommended star, saying to begin there. The student opens that cluster themselves: its
+// learning route scene opens on the recommended star with its card, Murmi there too; "Got it"
+// sends Murmi away and leaves the scene as it is; back to the star map is the whole view, with
+// neither the landing nor the clusters' hint again.
+test('a newcomer lands on the whole view, Murmi beside the cluster to start in, which opens on the recommended star', async ({ page, backend }) => {
   const world = new StudentWorld(backend)
   world.newcomer = true
   world.install()
   await signInAsStudent(page)
 
+  // The whole view, where sign-in put it.
+  await expect(page).toHaveURL('/')
+  const landing = page.getByRole('complementary', { name: 'Start in this cluster' })
+  await expect(landing).toBeVisible()
+  await expect(landing).toContainText('Your first star, Reducing fractions, is here.')
+  await expect(page.locator('[data-cluster-landing="fractions"]')).toBeVisible()
+  await expect(page.getByRole('complementary', { name: 'Your stars are in clusters now' })).toHaveCount(0)
+
+  // The keyboard's way in, as a tap on the cluster.
+  await page.locator('[data-nebula-link="fractions"]').focus()
+  await page.keyboard.press('Enter')
   await expect(page).toHaveURL('/map/math/cluster/fractions?star=reducing')
   const bubble = page.getByRole('complementary', { name: 'Start here: Reducing fractions' })
   await expect(bubble).toBeVisible()
@@ -24,7 +37,9 @@ test('a newcomer lands on the recommended star, Murmi beside it, and can wave Mu
 
   await page.getByRole('button', { name: 'Back to the star map' }).click()
   await expect(page).toHaveURL('/map/math')
-  await expect(page.getByRole('complementary', { name: 'Your stars are in clusters now' })).toBeVisible()
+  await expect(page.locator('[data-starmap-stage]')).toBeVisible()
+  await expect(page.getByRole('complementary', { name: 'Start in this cluster' })).toHaveCount(0)
+  await expect(page.getByRole('complementary', { name: 'Your stars are in clusters now' })).toHaveCount(0)
 })
 
 // "About you" (#591): a newcomer whose profile has no year group is asked it,
@@ -52,8 +67,8 @@ test('a newcomer with no year group is asked first, and lands where the year gro
 
   await expect(about).toBeHidden()
   expect(world.profileWrites).toEqual([{ grade: 'grade_6_primary', primarySubjects: ['math'] }])
-  await expect(page).toHaveURL('/map/math/cluster/fractions?star=reducing')
-  await expect(page.getByRole('complementary', { name: 'For your year group, start here: Reducing fractions' })).toBeVisible()
+  await expect(page).toHaveURL('/')
+  await expect(page.getByRole('complementary', { name: 'For your year group, start in this cluster' })).toBeVisible()
 })
 
 test('"Later" (or Escape) lands as before, and is not asked again in this tab', async ({ page, backend }) => {
@@ -71,11 +86,11 @@ test('"Later" (or Escape) lands as before, and is not asked again in this tab', 
 
   await expect(about).toBeHidden()
   expect(world.profileWrites).toEqual([])
-  await expect(page).toHaveURL('/map/math/cluster/fractions?star=reducing')
-  await expect(page.getByRole('complementary', { name: 'Start here: Reducing fractions' })).toBeVisible()
+  await expect(page).toHaveURL('/')
+  await expect(page.getByRole('complementary', { name: 'Start in this cluster' })).toBeVisible()
 
   await page.reload()
-  await expect(page.getByRole('complementary', { name: 'Start here: Reducing fractions' })).toBeVisible()
+  await expect(page.getByRole('complementary', { name: 'Start in this cluster' })).toBeVisible()
   await expect(page.getByRole('region', { name: 'About you' })).toHaveCount(0)
   expect(world.profileWrites).toEqual([])
 })
