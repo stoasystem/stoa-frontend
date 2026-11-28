@@ -497,6 +497,7 @@
     "questions": "Questions",
     "aiResolved": "AI resolved",
     "teacherHelp": "Teacher help",
+    "totalsPeriod": "Last 90 days",
     "weakTitle": "Weak topics",
     "weakEmpty": "No weak topics have enough evidence yet.",
     "strongTitle": "Strength topics",

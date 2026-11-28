@@ -508,6 +508,7 @@
     "questions": "Questions",
     "aiResolved": "Résolues par l’IA",
     "teacherHelp": "Aide d’enseignant",
+    "totalsPeriod": "90 derniers jours",
     "weakTitle": "Thèmes fragiles",
     "weakEmpty": "Aucun thème fragile n’est encore suffisamment étayé.",
     "strongTitle": "Points forts",

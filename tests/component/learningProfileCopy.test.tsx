@@ -3,7 +3,8 @@
  * backend labels them ("Mathematics", "Physics"), and counts of one read as
  * one ("1 Frage", not "1 Fragen"). Found in review of #176: the page showed
  * the backend's English subject labels on every language, and its header and
- * topic cards were never translated at all.
+ * topic cards were never translated at all. Since #763 the header says the
+ * three totals are over the last 90 days, as the backend counts them (#695).
  */
 import type { ReactNode } from 'react'
 import { render, screen } from '@testing-library/react'
@@ -74,11 +75,11 @@ afterEach(async () => {
 
 describe('the learning profile speaks the reader’s language', () => {
   it.each([
-    { language: 'de', math: 'Mathematik', physics: 'Physik', one: '1 Frage', many: '3 Fragen', weak: 'Schwache Themen' },
-    { language: 'en', math: 'Mathematics', physics: 'Physics', one: '1 question', many: '3 questions', weak: 'Weak topics' },
-    { language: 'fr', math: 'Mathématiques', physics: 'Physique', one: '1 question', many: '3 questions', weak: 'Thèmes fragiles' },
-    { language: 'it', math: 'Matematica', physics: 'Fisica', one: '1 domanda', many: '3 domande', weak: 'Argomenti deboli' },
-  ])('in $language: subject names, counts of one, and the topic cards', async ({ language, math, physics, one, many, weak }) => {
+    { language: 'de', math: 'Mathematik', physics: 'Physik', one: '1 Frage', many: '3 Fragen', weak: 'Schwache Themen', period: 'Letzte 90 Tage' },
+    { language: 'en', math: 'Mathematics', physics: 'Physics', one: '1 question', many: '3 questions', weak: 'Weak topics', period: 'Last 90 days' },
+    { language: 'fr', math: 'Mathématiques', physics: 'Physique', one: '1 question', many: '3 questions', weak: 'Thèmes fragiles', period: '90 derniers jours' },
+    { language: 'it', math: 'Matematica', physics: 'Fisica', one: '1 domanda', many: '3 domande', weak: 'Argomenti deboli', period: 'Ultimi 90 giorni' },
+  ])('in $language: subject names, counts of one, the topic cards, and the 90 days the totals count', async ({ language, math, physics, one, many, weak, period }) => {
     await i18n.changeLanguage(language)
     const { container } = renderProfile()
 
@@ -87,6 +88,8 @@ describe('the learning profile speaks the reader’s language', () => {
     expect(screen.getByText(new RegExp(`^${one} ·`))).toBeInTheDocument()
     expect(screen.getByText(new RegExp(`^${many} ·`))).toBeInTheDocument()
     expect(screen.getByText(weak)).toBeInTheDocument()
+    // The header's three totals count the last 90 days since backend #695 (#763).
+    expect(screen.getByText(period)).toBeInTheDocument()
 
     const text = container.textContent ?? ''
     if (language !== 'en') {

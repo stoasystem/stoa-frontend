@@ -25,18 +25,22 @@ export function LearningProfileHeader({ profile }: { profile: LearningProfile })
             {profile.subjects.map((subject) => learningSubjectName(subject, t)).join(', ')}
           </p>
         </div>
-        <div className="grid grid-cols-3 gap-3 text-sm">
-          <div className="rounded-md border p-3">
-            <p className="text-2xl font-semibold">{totals.questionCount}</p>
-            <p className="text-muted-foreground">{tAdmin('learningProfile.questions')}</p>
-          </div>
-          <div className="rounded-md border p-3">
-            <p className="text-2xl font-semibold">{totals.aiResolvedCount}</p>
-            <p className="text-muted-foreground">{tAdmin('learningProfile.aiResolved')}</p>
-          </div>
-          <div className="rounded-md border p-3">
-            <p className="text-2xl font-semibold">{totals.teacherEscalationCount}</p>
-            <p className="text-muted-foreground">{tAdmin('learningProfile.teacherHelp')}</p>
+        {/* The three totals count the last 90 days, the stretch the weak topics are judged over (backend #695). */}
+        <div className="space-y-2">
+          <p className="text-xs font-medium text-muted-foreground">{tAdmin('learningProfile.totalsPeriod')}</p>
+          <div className="grid grid-cols-3 gap-3 text-sm">
+            <div className="rounded-md border p-3">
+              <p className="text-2xl font-semibold">{totals.questionCount}</p>
+              <p className="text-muted-foreground">{tAdmin('learningProfile.questions')}</p>
+            </div>
+            <div className="rounded-md border p-3">
+              <p className="text-2xl font-semibold">{totals.aiResolvedCount}</p>
+              <p className="text-muted-foreground">{tAdmin('learningProfile.aiResolved')}</p>
+            </div>
+            <div className="rounded-md border p-3">
+              <p className="text-2xl font-semibold">{totals.teacherEscalationCount}</p>
+              <p className="text-muted-foreground">{tAdmin('learningProfile.teacherHelp')}</p>
+            </div>
           </div>
         </div>
       </CardContent>
