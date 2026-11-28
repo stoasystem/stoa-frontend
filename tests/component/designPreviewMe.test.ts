@@ -47,19 +47,36 @@ describe('what /me saves in the design preview', () => {
 
   it('answers the backend\'s whole matrix, every category and channel at its default (#184 review)', async () => {
     const read = (await call('GET', '/notifications/preferences'))?.data as { preferences: Record<string, object>; supportedCategories: string[]; supportedChannels: string[] }
-    expect(read.supportedCategories).toEqual(['admin_operations', 'assignments', 'learning_updates', 'teacher_responses', 'weekly_reports'])
-    expect(read.supportedChannels).toEqual(['email_digest', 'in_app', 'push', 'realtime'])
+    expect(read.supportedCategories).toEqual(['admin_operations', 'teacher_responses'])
+    expect(read.supportedChannels).toEqual(['in_app', 'push', 'realtime'])
+    expect(Object.keys(read.preferences).sort()).toEqual(read.supportedCategories)
     for (const category of read.supportedCategories) {
-      expect(read.preferences[category]).toEqual({ in_app: true, realtime: true, email_digest: false, push: false })
+      expect(read.preferences[category]).toEqual({ in_app: true, realtime: true, push: false })
     }
   })
 
   it('rebuilds a saved matrix from the defaults, as the backend does: what is left out goes back to its default', async () => {
-    await call('PATCH', '/notifications/preferences', { preferences: { assignments: { push: true } } })
+    await call('PATCH', '/notifications/preferences', { preferences: { admin_operations: { push: true } } })
     await call('PATCH', '/notifications/preferences', { preferences: { teacher_responses: { in_app: false } } })
     const read = (await call('GET', '/notifications/preferences'))?.data as { preferences: Record<string, object> }
-    expect(read.preferences.teacher_responses).toEqual({ in_app: false, realtime: true, email_digest: false, push: false })
-    expect(read.preferences.assignments).toEqual({ in_app: true, realtime: true, email_digest: false, push: false })
+    expect(read.preferences.teacher_responses).toEqual({ in_app: false, realtime: true, push: false })
+    expect(read.preferences.admin_operations).toEqual({ in_app: true, realtime: true, push: false })
+  })
+
+  it('takes the retired digest channel and categories and ignores them, as the backend does (stoa-backend#684)', async () => {
+    const saved = (await call('PATCH', '/notifications/preferences', {
+      preferences: {
+        teacher_responses: { in_app: false, email_digest: true },
+        weekly_reports: { in_app: false },
+        assignments: { push: true },
+        learning_updates: { realtime: false },
+      },
+    }))?.data as { preferences: Record<string, object> }
+    expect(saved.preferences).toEqual({
+      admin_operations: { in_app: true, realtime: true, push: false },
+      teacher_responses: { in_app: false, realtime: true, push: false },
+    })
+    expect((await call('GET', '/notifications/preferences'))?.data).toMatchObject({ preferences: saved.preferences })
   })
 
   it('answers a saved notification switch whole, so the switch stays on the page', async () => {

@@ -34,11 +34,8 @@ type Seen = {
 }
 
 const DEFAULT_MATRIX = {
-  admin_operations: { in_app: true, realtime: true, email_digest: false, push: false },
-  assignments: { in_app: true, realtime: true, email_digest: false, push: false },
-  learning_updates: { in_app: true, realtime: true, email_digest: false, push: true },
-  teacher_responses: { in_app: true, realtime: true, email_digest: true, push: false },
-  weekly_reports: { in_app: true, realtime: true, email_digest: false, push: false },
+  admin_operations: { in_app: true, realtime: true, push: true },
+  teacher_responses: { in_app: true, realtime: true, push: true },
 }
 
 function backend({
@@ -78,7 +75,7 @@ function backend({
     userId: 'u-1',
     preferences: matrix,
     supportedCategories: Object.keys(DEFAULT_MATRIX),
-    supportedChannels: ['email_digest', 'in_app', 'push', 'realtime'],
+    supportedChannels: ['in_app', 'push', 'realtime'],
     updatedAt: null,
   })
   mswServer.use(
@@ -615,7 +612,7 @@ describe('notification preferences on /me', () => {
     expect(seen.preferences[0]).toEqual({
       preferences: {
         ...DEFAULT_MATRIX,
-        teacher_responses: { in_app: false, realtime: false, email_digest: true, push: false },
+        teacher_responses: { in_app: false, realtime: false, push: true },
       },
     })
     await waitFor(() => expect(toggle).not.toBeChecked())
@@ -629,10 +626,10 @@ describe('notification preferences on /me', () => {
       name: enCommon.me.notifications.categories.teacher_responses.title,
     })
 
-    // Meanwhile, on another device: weekly reports by e-mail.
+    // Meanwhile, on another device: admin notices no longer pushed.
     const elsewhere = {
       ...DEFAULT_MATRIX,
-      weekly_reports: { in_app: true, realtime: true, email_digest: true, push: false },
+      admin_operations: { in_app: true, realtime: true, push: false },
     }
     mswServer.use(
       http.get('https://api.test/notifications/preferences', () =>
@@ -640,7 +637,7 @@ describe('notification preferences on /me', () => {
           userId: 'u-1',
           preferences: elsewhere,
           supportedCategories: Object.keys(DEFAULT_MATRIX),
-          supportedChannels: ['email_digest', 'in_app', 'push', 'realtime'],
+          supportedChannels: ['in_app', 'push', 'realtime'],
         }),
       ),
     )
@@ -650,7 +647,7 @@ describe('notification preferences on /me', () => {
     expect(seen.preferences[0]).toEqual({
       preferences: {
         ...elsewhere,
-        teacher_responses: { in_app: false, realtime: false, email_digest: true, push: false },
+        teacher_responses: { in_app: false, realtime: false, push: true },
       },
     })
   })
