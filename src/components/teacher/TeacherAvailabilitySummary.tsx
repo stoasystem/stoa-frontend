@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { dispatchStatusKey } from '@/lib/dispatchStatus'
 import { normalTeacherSubjects, teacherSubjectLabel } from '@/lib/subjects'
 import { weekdayName } from '@/lib/weekdays'
 import type { TeacherWeeklyAvailability } from '@/types/teacherAvailability'
@@ -13,6 +14,7 @@ export function TeacherAvailabilitySummary({ availability }: { availability: Tea
         <CardTitle className="text-base">{t('availability.summary.title')}</CardTitle>
       </CardHeader>
       <CardContent className="space-y-3 text-sm leading-6 text-muted-foreground">
+        <p>{t('availability.summary.status', { status: t(`availability.summary.statusName.${dispatchStatusKey(availability.status)}`) })}</p>
         <p>{t('availability.summary.subjects', { subjects: subjects || t('availability.summary.noSubjects') })}</p>
         <ul className="space-y-2">
           {availability.weeklyAvailability.map((slot) => (

@@ -46,31 +46,6 @@ export type StudentProfile = {
   choices?: ProfileChoices
 }
 
-/** Where a history row came from, and what happened in it. */
-export type LearningHistorySource = 'questions' | 'practice_path' | 'practice_library' | 'classroom'
-
-export type LearningHistoryKind =
-  | 'question_asked'
-  | 'question_answered'
-  | 'teacher_help'
-  | 'practice_lesson'
-  | 'library_set'
-
-export type LearningHistoryItem = {
-  id: string
-  subject: string
-  title: string
-  summary: string
-  createdAt: string
-  href?: string
-  // `title` and `sourceLabel` are the server's English fallbacks. `kind` and
-  // `source` are the machine-readable pair the UI renders from, so the row
-  // reads in the student's language and grouping does not depend on wording.
-  sourceLabel?: string
-  kind?: LearningHistoryKind
-  source?: LearningHistorySource
-}
-
 /** Where a usage period stands (stoa-backend#239): `none` is an account no period was ever set for. */
 export type UsagePeriodState = 'active' | 'expired' | 'none'
 

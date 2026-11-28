@@ -9,6 +9,28 @@
     "title": "Verfügbarkeit",
     "description": "Legen Sie Verfügbarkeit und Fächer fest, damit Anfragen klar zugewiesen werden können.",
     "loadFailed": "Ihre Verfügbarkeit konnte nicht geladen werden.",
+    "dispatch": {
+      "title": "Hilfeanfragen annehmen",
+      "state": {
+        "unset": "Sie nehmen noch keine Anfragen an",
+        "available": "Sie nehmen Anfragen an",
+        "paused": "Sie sind pausiert"
+      },
+      "explain": {
+        "unset": "Starten Sie jetzt, oder speichern Sie unten Ihre Fächer und Zeitfenster: Damit starten Sie ebenfalls.",
+        "available": "Solange Sie online sind, sehen Lernende Sie, und Ihnen können neue Hilfeanfragen zugewiesen werden.",
+        "paused": "Lernende sehen Sie nicht, und Ihnen werden keine neuen Hilfeanfragen zugewiesen. STOA pausiert Sie auch dann, wenn Sie eine Ihnen zugewiesene Hilfeanfrage nicht rechtzeitig annehmen."
+      },
+      "online": "Online sind Sie nur, solange STOA in Ihrem Browser geöffnet ist. Etwa 5 Minuten nach dem Schliessen sehen Lernende Sie nicht mehr.",
+      "hoursAreNotStatus": "Die wöchentlichen Zeitfenster unten schalten das nicht ein oder aus.",
+      "action": {
+        "start": "Anfragen annehmen",
+        "resume": "Wieder Anfragen annehmen",
+        "pause": "Pausieren"
+      },
+      "saving": "Wird gespeichert …",
+      "saveFailed": "Ihr Status konnte nicht geändert werden. Bitte versuchen Sie es erneut."
+    },
     "editor": {
       "subjects": "Fächer",
       "weeklySlots": "Wöchentliche Zeitfenster",
@@ -35,7 +57,13 @@
     "summary": {
       "title": "Aktuelle Verfügbarkeit",
       "subjects": "Fächer: {{subjects}}",
-      "noSubjects": "keine ausgewählt"
+      "noSubjects": "keine ausgewählt",
+      "status": "Status: {{status}}",
+      "statusName": {
+        "unset": "noch nicht gestartet",
+        "available": "nimmt Anfragen an",
+        "paused": "pausiert"
+      }
     }
   },
   "detail": {

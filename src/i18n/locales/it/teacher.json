@@ -9,6 +9,28 @@
     "title": "Disponibilità",
     "description": "Imposta disponibilità e materie così che le richieste possano essere indirizzate con chiarezza.",
     "loadFailed": "Non è stato possibile caricare la tua disponibilità.",
+    "dispatch": {
+      "title": "Accettare richieste di aiuto",
+      "state": {
+        "unset": "Non accetti ancora richieste",
+        "available": "Accetti richieste",
+        "paused": "Sei in pausa"
+      },
+      "explain": {
+        "unset": "Inizia ora, oppure salva qui sotto le tue materie e fasce orarie: anche così inizi.",
+        "available": "Finché sei online, gli studenti ti vedono e possono esserti assegnate nuove richieste di aiuto.",
+        "paused": "Gli studenti non ti vedono e non ti vengono assegnate nuove richieste di aiuto. STOA ti mette in pausa anche se non accetti in tempo una richiesta di aiuto assegnata a te."
+      },
+      "online": "Sei online solo finché STOA è aperto nel tuo browser. Circa 5 minuti dopo averlo chiuso, gli studenti non ti vedono più.",
+      "hoursAreNotStatus": "Le fasce orarie settimanali qui sotto non lo attivano né lo disattivano.",
+      "action": {
+        "start": "Inizia ad accettare richieste",
+        "resume": "Riprendi ad accettare richieste",
+        "pause": "Metti in pausa"
+      },
+      "saving": "Salvataggio…",
+      "saveFailed": "Non è stato possibile cambiare il tuo stato. Riprova."
+    },
     "editor": {
       "subjects": "Materie",
       "weeklySlots": "Fasce settimanali",
@@ -35,7 +57,13 @@
     "summary": {
       "title": "Disponibilità attuale",
       "subjects": "Materie: {{subjects}}",
-      "noSubjects": "nessuna selezionata"
+      "noSubjects": "nessuna selezionata",
+      "status": "Stato: {{status}}",
+      "statusName": {
+        "unset": "non ancora iniziato",
+        "available": "accetta richieste",
+        "paused": "in pausa"
+      }
     }
   },
   "detail": {

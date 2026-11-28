@@ -44,8 +44,8 @@ function renderWith(children: ReactNode, client = new QueryClient({ defaultOptio
   return client
 }
 
-function renderEditor(availability: TeacherWeeklyAvailability) {
-  return renderWith(<TeacherAvailabilityEditor availability={availability} />)
+function renderEditor(availability: Omit<TeacherWeeklyAvailability, 'status'>) {
+  return renderWith(<TeacherAvailabilityEditor availability={{ status: null, ...availability }} />)
 }
 
 async function save() {
@@ -57,7 +57,7 @@ const thursday = { dayOfWeek: 'thursday' as const, startTime: '09:00', endTime: 
 
 beforeEach(async () => {
   vi.clearAllMocks()
-  update.mockResolvedValue({ subjects: [], weeklyAvailability: [] })
+  update.mockResolvedValue({ subjects: [], weeklyAvailability: [], status: null })
   await i18n.changeLanguage('de')
 })
 

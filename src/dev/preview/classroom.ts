@@ -20,6 +20,11 @@
  *   ?micPermission=granted|prompt|denied
  *                              where the browser stands on the microphone
  *                              before the student enters (`micPermission.ts`)
+ *   ?teacherDispatch=paused|unset
+ *                              the demo teacher's own status on
+ *                              /teacher/availability (#768): paused, as the
+ *                              backend leaves a teacher who missed a request,
+ *                              or never set; left out, taking requests
  *
  * A student who asks for a teacher here waits `TEACHER_JOINS_AFTER_MS`, then
  * the demo teacher has the request (`in_progress`), so the bar changes from
@@ -30,6 +35,7 @@ import { demo, demoConversation } from '@/dev/preview/demoSource'
 import type { VoiceConnector } from '@/features/classroom/classroomVoice'
 import type { ClassroomPass } from '@/types/classroom'
 import type { TeacherHelpRequestDetail, TeacherHelpRequestNote } from '@/types/teacher'
+import type { TeacherWeeklyAvailability } from '@/types/teacherAvailability'
 import type { TeacherAvailability, TeacherHelpStatus, TeacherSupportModeStanding } from '@/types/teacherHelp'
 import type { User } from '@/types/user'
 
@@ -189,4 +195,37 @@ export function demoAvailabilityForPlan(availability: TeacherAvailability): Teac
       ? { canRequest: false, remainingCases: 0, weeklyCases: 0, blockedReason: 'teacher_support_not_included', resetsAt: null }
       : { canRequest: false, remainingCases: 0, weeklyCases: 2, blockedReason: 'teacher_support_allowance_exhausted', resetsAt: null }
   return { ...availability, teacherSupport: { ...support, classroom } }
+}
+
+/*
+ * The demo teacher's own subjects, hours and status (`/teachers/me/availability`,
+ * #768), kept for the tab as the backend keeps them: a field left out of a
+ * save is kept, and a first save of subjects or hours by a teacher who never
+ * set the status makes them available.
+ */
+let ownAvailability: TeacherWeeklyAvailability | null = null
+
+export function demoOwnAvailability(): TeacherWeeklyAvailability {
+  if (!ownAvailability) {
+    const asked = setting('teacherDispatch')
+    ownAvailability = {
+      subjects: ['math', 'physics'],
+      weeklyAvailability: [{ dayOfWeek: 'saturday', startTime: '10:00', endTime: '12:00' }],
+      status: asked === 'paused' ? 'paused' : asked === 'unset' ? null : 'available',
+    }
+  }
+  return ownAvailability
+}
+
+export function saveDemoOwnAvailability(body: unknown): TeacherWeeklyAvailability {
+  const now = demoOwnAvailability()
+  const sent = (typeof body === 'object' && body !== null ? body : {}) as Partial<TeacherWeeklyAvailability>
+  const status = sent.status === 'available' || sent.status === 'paused' ? sent.status : null
+  const savedHours = sent.subjects !== undefined || sent.weeklyAvailability !== undefined
+  ownAvailability = {
+    subjects: sent.subjects ?? now.subjects,
+    weeklyAvailability: sent.weeklyAvailability ?? now.weeklyAvailability,
+    status: status ?? (savedHours && now.status === null ? 'available' : now.status),
+  }
+  return ownAvailability
 }
